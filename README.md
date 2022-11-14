@@ -1,1 +1,1 @@
-# algokit-cli
+# AlgoKit CLI
