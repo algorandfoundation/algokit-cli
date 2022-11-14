@@ -1,6 +1,13 @@
 # AlgoKit CLI for contributors
 
-## Libraries and Tools
+## Setup
+
+### Dev environment dependencies (AlgoKit CLI development)
+
+- `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
+- `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
+
+### Libraries and Tools
 
 AlgoKit uses Python as a main language and many Python libraries and tools. This section lists all of them with a tiny brief.  
 
