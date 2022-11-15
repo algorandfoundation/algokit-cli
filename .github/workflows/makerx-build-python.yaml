@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # if there is a requirements.txt file
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install poetry
+          poetry install
 
       - name: Activate virtual environment
         working-directory: ${{ inputs.sourceCodeDirectory }}
