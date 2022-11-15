@@ -16,7 +16,7 @@ on:
       artifactName:
         required: false
         type: string
-        description: "Artifact name - Required when shouldPublish is true, default is false"
+        description: "Artifact name - Required when shouldPublish is true"
 
 jobs:
   build-python:
@@ -51,7 +51,7 @@ jobs:
         working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry run pytest
 
-      - name: Audit
+      - name: Audit with pip-audit
         working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry run pip-audit
 
