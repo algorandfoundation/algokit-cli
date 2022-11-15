@@ -1,0 +1,59 @@
+name: Build and Test Python
+
+on:
+  workflow_call:
+    inputs:
+      shouldPublish:
+        description: "To publish the artifact or not, default is false"
+        required: false
+        type: boolean
+        default: false
+      artifactName:
+        required: false
+        type: string
+        description: "Artifact name - Required when shouldPublish is true"
+
+jobs:
+  build-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Check code style with Black
+        uses: psf/black@stable
+
+      - name: Lint with Ruff
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          poetry run ruff src/**/*.py
+
+      - name: Test with pytest
+        run: poetry run pytest
+
+      - name: Audit with pip-audit
+        run: poetry run pip-audit
+
+      - name: Build Wheel
+        run: poetry build --format wheel
+
+      - name: Upload artifact for deployment job
+        if: inputs.shouldPublish == true
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist/algokit-*-py3-none-any.whl
+          if-no-files-found: error
