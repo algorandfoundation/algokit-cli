@@ -17,6 +17,11 @@ def cli(ctx, version):
     if version:
         ctx.invoke(version_command)
 
+    # The help output would normally show when no subcommands have been supplied,
+    # but we override the default behavior through the invoke_without_command so we can show 'algokit --version'
+    if ctx.invoked_subcommand is None: 
+        print(ctx.get_help())
+
 
 def check_python_version():
     installed_python_version = sys.version_info
