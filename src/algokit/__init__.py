@@ -9,13 +9,16 @@ from algokit.cli.version import version_command
 class ConfigurationError(Exception):
     pass
 
-@click.group(help='AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.', invoke_without_command=True)
+CLICK_CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+@click.group(help='AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.', invoke_without_command=True, context_settings=CLICK_CONTEXT_SETTINGS)
 @click.option("--version", help="Show current version of AlgoKit cli", is_flag=True)
 @click.pass_context
 def cli(ctx, version):
     check_python_version()
     if version:
         ctx.invoke(version_command)
+        return
 
     # The help output would normally show when no subcommands have been supplied,
     # but we override the default behavior through the invoke_without_command so we can show 'algokit --version'
