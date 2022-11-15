@@ -7,6 +7,7 @@
         {
             "name": "Python: Module",
             "type": "python",
+            "cwd": "${workspaceFolder}/src",
             "request": "launch",
             "module": "algokit",
             "justMyCode": true
