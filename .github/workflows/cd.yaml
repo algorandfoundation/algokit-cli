@@ -1,0 +1,34 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  versioning:
+    uses: ./.github/workflows/versioning.yaml
+  
+  build:
+    uses: ./.github/workflows/build-python.yaml
+    needs: [versioning]
+    with:
+      shouldPublish: true
+      artifactName: ${{ needs.versioning.outputs.artifact_name }}
+
+  deployment:
+    name: Publish package
+    needs: [build]
+    uses: ./.github/workflows/publish-package.yaml
+    with:
+      tag_name: ${{ needs.versioning.outputs.tag_name }}
+      artifactName:  ${{ needs.versioning.outputs.artifact_name }}
+
+
+
+
