@@ -1,0 +1,13 @@
+name: AlgoKit CI
+
+on:
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build-python:
+    name: Build and test Python
+    uses: ./.github/workflows/makerx-build-python.yaml
+    with:
+      sourceCodeDirectory: .
+      shouldPublish: false
