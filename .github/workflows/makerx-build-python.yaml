@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
+      - name: Check code style with Black
+        uses: psf/black@stable
+
       - name: Lint with Ruff
         working-directory: ${{ inputs.sourceCodeDirectory }}
         run: |
