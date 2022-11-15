@@ -38,7 +38,7 @@ jobs:
         run: |
           source .venv/bin/activate
           # stop the build if there are Python syntax errors or undefined names
-          ruff ~/src/**/*.py
+          ruff src/**/*.py
 
       - name: Test with pytest
         working-directory: ${{ inputs.sourceCodeDirectory }}
