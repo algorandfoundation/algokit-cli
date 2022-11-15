@@ -9,7 +9,7 @@ from algokit.cli.version import version_command
 class ConfigurationError(Exception):
     pass
 
-@click.group(help='AlgoKit is your one stop shop to develop applications on the Algorand blockchain.', invoke_without_command=True)
+@click.group(help='AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.', invoke_without_command=True)
 @click.option("--version", help="Show current version of AlgoKit cli", is_flag=True)
 @click.pass_context
 def cli(ctx, version):
