@@ -2,24 +2,8 @@ name: AlgoKit CI
 
 on:
   pull_request:
-  workflow_dispatch:
-    inputs:
-      shouldPublish:
-        description: 'To build and publish the artifact as a pre-release or not'
-        default: false
-        type: boolean
-        required: false
-      artifactName:
-        description: 'Artifact Name'
-        default: 'algokit-cli'
-        type: string
-        required: false
       
 jobs:
   build-python:
     name: Build and test Python
     uses: ./.github/workflows/makerx-build-python.yaml
-    with:
-      sourceCodeDirectory: .
-      shouldPublish: ${{ inputs.shouldPublish }}
-      artifactName: ${{ inputs.artifactName }}

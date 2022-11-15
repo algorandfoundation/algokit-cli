@@ -4,17 +4,19 @@ on:
   workflow_call:
     inputs:
       sourceCodeDirectory:
+        description: "Source code main directory, default is '.'"
         required: false
         type: string
         default: .
       shouldPublish:
+        description: "To publish the artifact or not, default is false"
         required: false
         type: boolean
         default: false
       artifactName:
         required: false
         type: string
-        description: "Artifact name - Required when shouldPublish is true"
+        description: "Artifact name - Required when shouldPublish is true, default is false"
 
 jobs:
   build-python:
