@@ -39,7 +39,9 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## ⚠️ Pre-Alpha Software ⚠️
 
-### This software may break your computer or (more likely) just not do anything useful yet and be a general pain to install.
+**Work In Progress:** This guide is an initial version targeted at developing the CLI tool itself. The structure of this guide will change over time to be more end user focused. We anticipate this guide will eventually get an end user running AlgoKit CLI with the most basic commands. It will then link out to separate Algorand foundation documentation for a full user guide.
+
+**This software may break your computer or (more likely) just not do anything useful yet and be a general pain to install.**
 
 Still not deterred?
 
