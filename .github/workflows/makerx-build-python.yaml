@@ -4,11 +4,13 @@ on:
   workflow_call:
     inputs:
       sourceCodeDirectory:
-        required: true
+        required: false
         type: string
+        default: .
       shouldPublish:
-        required: true
+        required: false
         type: boolean
+        default: false
       artifactName:
         required: false
         type: string
