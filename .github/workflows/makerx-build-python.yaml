@@ -52,19 +52,14 @@ jobs:
         working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry run pip-audit
 
-      - name: Build
+      - name: Build Wheel
         working-directory: ${{ inputs.sourceCodeDirectory }}
-        run: poetry build
-      
-      - name: Zip artifacts
-        if: inputs.shouldPublish == true
-        working-directory: ${{ inputs.sourceCodeDirectory }}
-        run: pushd dist && zip -r ../${{ inputs.artifactName }}.zip . -r && popd
+        run: poetry build --format wheel
 
       - name: Upload artifact for deployment job
         if: inputs.shouldPublish == true
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifactName }}
-          path: ${{ inputs.sourceCodeDirectory }}/${{ inputs.artifactName }}.zip
+          path: dist/algokit-*-py3-none-any.whl
           if-no-files-found: error
