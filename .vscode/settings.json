@@ -1,0 +1,10 @@
+{
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "python.formatting.blackArgs": ["--line-length\", \"120\""],
+  "python.analysis.typeCheckingMode": "strict",
+  "python.linting.enabled": true,
+  "python.linting.lintOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.eol": "\n"
+}
