@@ -1,0 +1,9 @@
+name: AlgoKit CI
+
+on:
+  pull_request:
+      
+jobs:
+  build-python:
+    name: Build and test Python
+    uses: ./.github/workflows/makerx-build-python.yaml
