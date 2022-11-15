@@ -4,14 +4,19 @@ import logging
 
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
-from algokit.cli.version import version
+from algokit.cli.version import version_command
 
 class ConfigurationError(Exception):
     pass
 
-@click.group(help='AlgoKit is your one stop shop to develop applications on the Algorand blockchain.')
-def cli():
+@click.group(help='AlgoKit is your one stop shop to develop applications on the Algorand blockchain.', invoke_without_command=True)
+@click.option("--version", help="Show current version of AlgoKit cli", is_flag=True)
+@click.pass_context
+def cli(ctx, version):
     check_python_version()
+    if version:
+        ctx.invoke(version_command)
+
 
 def check_python_version():
     installed_python_version = sys.version_info
@@ -21,7 +26,7 @@ def check_python_version():
 
 cli.add_command(init_command)
 cli.add_command(sandbox_group)
-cli.add_command(version)
+cli.add_command(version_command)
 
 
 if __name__ == "__main__":
