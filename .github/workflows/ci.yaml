@@ -1,0 +1,10 @@
+name: AlgoKit CI
+
+on: [pull_request]
+      
+jobs:
+  ci-build:
+    name: Build (CI)
+    uses: ./.github/workflows/build-python.yaml
+    with:
+      shouldPublish: false
