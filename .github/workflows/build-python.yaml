@@ -3,11 +3,6 @@ name: Build and Test Python
 on:
   workflow_call:
     inputs:
-      sourceCodeDirectory:
-        description: "Source code main directory, default is '.'"
-        required: false
-        type: string
-        default: .
       shouldPublish:
         description: "To publish the artifact or not, default is false"
         required: false
@@ -42,21 +37,17 @@ jobs:
         uses: psf/black@stable
 
       - name: Lint with Ruff
-        working-directory: ${{ inputs.sourceCodeDirectory }}
         run: |
           # stop the build if there are Python syntax errors or undefined names
           poetry run ruff src/**/*.py
 
       - name: Test with pytest
-        working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry run pytest
 
       - name: Audit with pip-audit
-        working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry run pip-audit
 
       - name: Build Wheel
-        working-directory: ${{ inputs.sourceCodeDirectory }}
         run: poetry build --format wheel
 
       - name: Upload artifact for deployment job
