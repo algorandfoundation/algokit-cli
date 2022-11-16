@@ -1,15 +1,49 @@
 # AlgoKit CLI for contributors
 
-## Setup
+## Setup (AlgoKit CLI development)
 
-### Dev environment dependencies (AlgoKit CLI development)
+### Initial setup
 
-- `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
-- `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
+1. Clone this repository: `git clone https://github.com/algorandfoundation/algokit-cli`
+2. Install pre-requisites:
+
+   - Manually:
+     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
+     - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
+     - Run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies)
+   - Via automated script:
+
+     - Bash (e.g. Linux, MacOS): `./scripts/setup.sh`
+     - Windows
+
+       1. Ensure you have [Powershell Core (7+)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2) e.g. via `winget install --id Microsoft.Powershell --source winget` or `choco install pwsh -y`
+       2. `./scripts/setup.ps1` (or if you want to confirm each step `./scripts/setup.ps1 -Confirm`)
+
+     - This setup.(sh|ps1) script will:
+
+       - Install Python 3.10 if not present (via `pyenv`, after installing pyenv)
+       - Install Poetry (via `pyenv`)
+       - Install Python dependencies and setup Python venv (to `./.venv/`) (via `poetry install`)
+       - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a smoother getting started experience)
+
+3. Open it and start debugging / developing via:
+
+   - VS Code
+     1. Open the repository root in VS Code
+     2. Install recommended extensions
+     3. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
+     4. Hit F5 and it should start running with breakpoint debugging
+   - IDEA (e.g. PyCharm)
+     1. Open the repository root in the IDE
+     2. Hit F5 and it should start running with breakpoint debugging
+   - Other
+     1. Open the repository root in your text editor of choice
+     2. In a terminal run `source ./.venv/bin/activate` (Non-Windows) or `./venv/Scripts/Activate.ps1` (Windows)
+     3. To execute the commandline execute: `python -m src.algokit [args]`
 
 ### Libraries and Tools
 
-AlgoKit uses Python as a main language and many Python libraries and tools. This section lists all of them with a tiny brief.  
+AlgoKit uses Python as a main language and many Python libraries and tools. This section lists all of them with a tiny brief.
 
 - [Poetry](https://python-poetry.org/): Python packaging and dependency management.
 - [pipx](https://github.com/pypa/pipx): Install and Run Python Applications in Isolated Environments

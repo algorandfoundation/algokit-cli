@@ -15,6 +15,7 @@ pytest = "^7.2.0"
 black = {extras = ["d"], version = "^22.10.0"}
 ruff = "^0.0.120"
 pip-audit = "^2.4.5"
+python-dotenv = "^0.21.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -55,3 +56,6 @@ per-file-ignores = {}
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Assume Python 3.10.
 target-version = "py310"
+
+[tool.black]
+line-length = 120

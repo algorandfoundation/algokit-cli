@@ -3,6 +3,8 @@
     "esbenp.prettier-vscode",
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "charliermarsh.ruff"
+    "charliermarsh.ruff",
+    "bungcip.better-toml",
+    "EditorConfig.EditorConfig"
   ]
 }

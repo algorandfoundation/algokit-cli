@@ -1,10 +1,46 @@
 {
-  "python.formatting.provider": "black",
+  // General - see also /.editorconfig
   "editor.formatOnSave": true,
-  "python.formatting.blackArgs": ["--line-length\", \"120\""],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Python
+  // Inform VS Code there is an interpreter in the .venv for the workspace
+  // On Windows this doesn't work since it's not in .venv/bin, but rather .venv/Scripts.
+  //    However if you symlink Scripts -> bin it does work! Run scripts/setup.ps1 as admin for that trick
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+  "python.formatting.provider": "black",
+  "[python]": {
+    // https://dev.to/eegli/quick-guide-to-python-formatting-in-vs-code-2040
+    "editor.defaultFormatter": null
+  },
   "python.analysis.typeCheckingMode": "strict",
   "python.linting.enabled": true,
   "python.linting.lintOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "files.eol": "\n"
+  "ruff.importStrategy": "fromEnvironment",
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": false,
+  "python.linting.banditEnabled": false,
+  "python.linting.prospectorEnabled": false,
+  "python.linting.pydocstyleEnabled": false,
+  "python.linting.pycodestyleEnabled": false,
+  // https://github.com/microsoft/vscode-python/issues/6933
+  "python.sortImports.args": [
+    "--multi-line=3",
+    "--trailing-comma",
+    "--force-grid-wrap=0",
+    "--use-parentheses",
+    "--line-width=120"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+
+  // PowerShell
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+  "powershell.codeFormatting.preset": "Stroustrup"
 }

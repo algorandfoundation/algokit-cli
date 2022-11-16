@@ -1,5 +1,6 @@
-import click
 from importlib import metadata
+
+import click
 
 
 @click.command("version", short_help="Show current version of AlgoKit cli")
