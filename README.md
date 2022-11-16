@@ -6,13 +6,13 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 ## Use Cases
 
-TODO: List some example user stories
+- Building and deploying Algorand PyTEAL smart contracts
 
 ## Roadmap
 
 This tool is currently in early development. Feel free to explore the repository and install the tool, but be aware that this is a work in progress and features may not be stable at this stage.
 
-TODO: list outcomes as intended features and basic summary of each
+- Building and deploying Algorand dApps
 
 ## Guiding Principles
 
@@ -33,7 +33,7 @@ The target audience for this tool is software developers building applications o
 
 ## Contributing
 
-This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.MD) to learn about making improvements to the CLI tool itself.
+This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.MD) to learn about making improvements to the CLI tool itself, including developer setup instructions.
 
 # User Guide
 
@@ -52,10 +52,18 @@ Here's how to test it out and maybe even start hacking, assuming you have access
 1. Ensure [Python](https://www.python.org/downloads/) 3.10 or higher is installed on your system and available on your `PATH`
    - Note there is probably a better way to install Python than to download it directly, e.g. your friendly local Linux package manager, Homebrew on macOS, chocolatey on Windows
 2. Install [pipx](https://pypa.github.io/pipx/)
-   - Make sure to follow _all_ the instructions for your OS, there will be two commands, the first to install, and the second to ensure your path is setup. Make sure to read the output of this second command as well, as it'll probably tell you to relaunch your terminal.
-3. Checkout this repo e.g. with git clone
-4. If you want to start hacking on algokit-cli, run `poetry install` to install dependencies (including dev dependencies) and activate the virtual environment it creates in `.venv` in your checkout (you can run `poetry shell` or just activate it directly if you know what you're doing). If you're using an IDE it should probably do that for you though.
-5. Optionally, if you want to rest running `algokit`, then:
-   1. Run `poetry build` in the checkout (you shouldn't need to activate the venv first). This will output a "source distribution" (a tar.gz file) and a "binary distribution" (a .whl file) in the `dist/` directory.
-   2. Run `pipx install ./dist/algokit-<TAB>-<TAB>` (ie the .whl file)
-   3. You can now run `algokit` and should see a help message! 🎉
+   - Make sure to follow _all_ the instructions for your OS, there will be two commands, the first to install, and the second to ensure your path is setup so you can execute `pipx`. Make sure to read the output of this second command as well, as it'll probably tell you to relaunch your terminal.
+3. Either:
+
+   - Install via Git:
+
+     1. `pipx install git+https://github.com/algorandfoundation/algokit-cli`
+     2. You can now run `algokit` and should see a help message! 🎉
+
+   - Install via source:
+
+     1. Checkout this repository e.g. with git clone
+     2. Ensure you have Poetry installed
+     3. Run `poetry build` in the checkout (you shouldn't need to activate the venv first). This will output a "source distribution" (a tar.gz file) and a "binary distribution" (a .whl file) in the `dist/` directory.
+     4. Run `pipx install ./dist/algokit-<TAB>-<TAB>` (ie the .whl file)
+     5. You can now run `algokit` and should see a help message! 🎉

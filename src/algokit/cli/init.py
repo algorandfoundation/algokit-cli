@@ -4,9 +4,7 @@ import click
 
 
 @click.command("init", short_help="Initializes a new project.")
-@click.argument(
-    "path", required=False, type=click.Path(resolve_path=True, path_type=Path)
-)
+@click.argument("path", required=False, type=click.Path(resolve_path=True, path_type=Path))
 def init_command(path: Path):
     """Initializes a new project."""
     if path is None:

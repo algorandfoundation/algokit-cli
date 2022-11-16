@@ -1,6 +1,8 @@
-import click
-import sys
 import logging
+import sys
+
+import click
+from click import Context
 
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
@@ -21,7 +23,7 @@ CLICK_CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 )
 @click.option("--version", help="Show current version of AlgoKit cli", is_flag=True)
 @click.pass_context
-def cli(ctx, version):
+def cli(ctx: Context, version: bool):
     check_python_version()
     if version:
         ctx.invoke(version_command)
@@ -39,7 +41,7 @@ def check_python_version():
         f"Python version "
         f"{installed_python_version.major}.{installed_python_version.minor}.{installed_python_version.micro} installed"
     )
-    if installed_python_version > (3, 10):
+    if installed_python_version < (3, 10, 0):
         raise ConfigurationError(
             f"Unsupported CPython version "
             f"({installed_python_version.major}.{installed_python_version.minor}.{installed_python_version.micro}) "
