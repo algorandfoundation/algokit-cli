@@ -32,8 +32,7 @@
      1. Open the repository root in VS Code
      2. Install recommended extensions
      3. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
-     4. Open a terminal in VSCode and run `poetry install`
-     5. Hit F5 and it should start running with breakpoint debugging
+     4. Hit F5 and it should start running with breakpoint debugging
         (NOTE: VSCode may be prompt to select the Python Interpreter. Select python.exe from the .venv path)
    - IDEA (e.g. PyCharm)
      1. Open the repository root in the IDE
