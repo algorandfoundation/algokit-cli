@@ -12,4 +12,4 @@ load_dotenv(dotenv_path)
 
 args = os.environ.get("DEBUG_ARGS") or ""
 
-cli(args.split(" "))
+cli(args.split())
