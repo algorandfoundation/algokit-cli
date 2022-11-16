@@ -10,7 +10,7 @@ function runInstalls () {
   PYTHON_INSTALL_VERSION='3.10.8'
   PYTHON_MIN_VERSION='3.10'
 
-  touch ~/.bashrc
+  touch -a ~/.bashrc
 
   pyenv="$(pyenv --version 2>/dev/null)"
   if [[ $? -eq 0 ]]; then
