@@ -72,3 +72,9 @@ AlgoKit uses Python as a main language and many Python libraries and tools. This
 - [Click](https://palletsprojects.com/p/click/): A Python package for creating beautiful command line interfaces.
 - [Black](https://github.com/psf/black): A Python code formatter.
 - [Tox](https://tox.wiki/en/latest/): Automate and standardize testing in Python.
+
+## Architecture decisions
+
+As part of developing AlgoKit we are documenting key architecture decisions using [Architecture Decision Records (ADRs)](https://adr.github.io/). The following are the key decisions that have been made thus far:
+
+- [2022-11-14: AlgoKit sandbox approach](docs/architecture-decisions/2022-11-14_sandbox-approach.md)
