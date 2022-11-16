@@ -13,34 +13,47 @@
      - Run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies)
    - Via automated script:
 
-     - Bash (e.g. Linux, MacOS): `./scripts/setup.sh`
-     - Windows
+     - For your convenience, we provide an opinionated way to _quickly_ get the prerequisites up and running via pyenv and Poetry, which is handy if you are less familiar with Python or feeling lazy.
+     - These scripts are idempotent and re-entrant so safe to run again and again if they come across a problem on your system that needs to get resolved to run them to completion.
+     - To execute them:
 
-       1. Ensure you have [Powershell Core (7+)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2) e.g. via `winget install --id Microsoft.Powershell --source winget` or `choco install pwsh -y`
-       2. `./scripts/setup.ps1` (or if you want to confirm each step `./scripts/setup.ps1 -Confirm`)
+       - Bash (e.g. Linux (Debian, Ubuntu) or Mac OSX): `./scripts/setup.sh`
+       - Windows
 
-     - This setup.(sh|ps1) script will:
+         1. Ensure you have [Powershell Core (7+)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2) e.g. via `winget install --id Microsoft.Powershell --source winget` or `choco install pwsh -y`
+         2. `./scripts/setup.ps1` (or if you want to confirm each step `./scripts/setup.ps1 -Confirm`)
 
-       - Install Python 3.10 if not present (via `pyenv`, after installing pyenv)
+     - These scripts will:
+
+       - Install Python 3.10 if not present (via `pyenv`, after installing pyenv if it's not present)
        - Install Poetry (via `pyenv`)
        - Install Python dependencies and setup Python venv (to `./.venv/`) (via `poetry install`)
-       - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a smoother getting started experience)
+       - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a slightly smoother getting started experience in VS Code)
 
-3. Open it and start debugging / developing via:
+3. Open the project and start debugging / developing via:
 
    - VS Code
+
      1. Open the repository root in VS Code
      2. Install recommended extensions
      3. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
      4. Hit F5 and it should start running with breakpoint debugging
-        (NOTE: VSCode may be prompt to select the Python Interpreter. Select python.exe from the .venv path)
+
+        (**NOTE:** The first time you run, VS Code may prompt you to select the Python Interpreter. Select python from the .venv path)
+
    - IDEA (e.g. PyCharm)
      1. Open the repository root in the IDE
-     2. Hit F5 and it should start running with breakpoint debugging
+     2. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
+     3. Hit F5 and it should start running with breakpoint debugging
    - Other
      1. Open the repository root in your text editor of choice
      2. In a terminal run `source ./.venv/bin/activate` (Non-Windows) or `./venv/Scripts/Activate.ps1` (Windows)
      3. To execute the commandline execute: `python -m src.algokit [args]`
+
+### Subsequently
+
+1. If you update to the latest source code and there are new dependencies you will need to run `poetry install` again
+2. Follow step 3 above
 
 ### Libraries and Tools
 
