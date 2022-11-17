@@ -24,7 +24,7 @@ In order for AlgoKit to facilitate a productive development experience it needs 
 ## Principles
 
 - **[AlgoKit Guiding Principles](../../README.md#Guiding-Principles)** - specifically Seamless onramp, Leverage existing ecosystem, Meet devs where they are
-- **Lightweight** - the solution should not have as low an impact as possible on resources on the developers machine
+- **Lightweight** - the solution should have as low an impact as possible on resources on the developers machine
 - **Fast** - the solution should start quickly, which makes for a nicer experience locally and also allows it to be used for continuous integration automation testing
 
 ## Options
@@ -59,9 +59,7 @@ Work with the Algorand Inc. team to get a lightweight algod client that can run 
 **Cons**
 
 - Indexer wouldn't be supported (Postgres would require Docker anyway)
-- Will take time to develop since:
-  1. The lightweight private network client version of algod would need to be developed; and
-  2. algod would need to be modified to work cross-platform
+- Algorand Inc. does not distribute Windows binaries.
 
 ### Option 3 - Sandbox
 
@@ -71,6 +69,7 @@ Use the existing [Algorand Sandbox](https://github.com/algorand/sandbox).
 
 - Implicitly kept up to date with Algorand - no extra thing to maintain
 - Battle-tested by the core Algorand team day-in-day-out
+- Supports all environments including unreleased feature branches (because it can target a git repo / commit hash)
 
 **Cons**
 
