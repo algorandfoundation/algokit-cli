@@ -1,14 +1,14 @@
 import logging
-import os
 
 import click
 
+from algokit.core import conf, exec
 from algokit.core.sandbox import get_docker_compose_yml
-from algokit.core.utils import app_config, exec
+
 logger = logging.getLogger(__name__)
 
 
-@click.group("sandbox", short_help="Manage the Algorand sandbox")
+@click.group("sandbox", short_help="Manage the AlgoKit sandbox")
 def sandbox_group():
     exec.run(
         "docker",
@@ -22,18 +22,12 @@ def sandbox_group():
         throw_on_error="Docker Compose not found; please install Docker Compose and add to path. "
         + "See https://docs.docker.com/compose/install/ for more information.",
     )
+    exec.run("docker ps", suppress_output=True, throw_on_error="Docker engine isn't running; please start it. ")
 
 
-@sandbox_group.command("start")
+@sandbox_group.command("start", short_help="Start the AlgoKit sandbox")
 def start_sandbox():
-    click.echo("Starting the AlgoKit sandbox now...")
-    app_config.write("docker-compose.yml", get_docker_compose_yml())
-    exec.run("docker-compose up -d", app_config.get_config_dir(), throw_on_error="Error starting sandbox")
-    click.echo("Started; execute `algokit sandbox status` to check the status.")
-
-
-@sandbox_group.command("restart")
-def restart_sandbox():
-    logger.info("Restarting the sandbox now...")
-    # TODO: the thing
-    logger.info("Done!")
+    logger.info("Starting the AlgoKit sandbox now...")
+    conf.write_config("docker-compose.yml", get_docker_compose_yml())
+    exec.run("docker-compose up -d", conf.get_app_config_dir(), throw_on_error="Error starting sandbox")
+    logger.info("Started; execute `algokit sandbox status` to check the status.")
