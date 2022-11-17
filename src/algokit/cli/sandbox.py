@@ -1,48 +1,35 @@
 import logging
-
-import subprocess
+import os
 
 import click
 
+from algokit.core.sandbox import get_docker_compose_yml
+from algokit.core.utils import app_config, exec
 logger = logging.getLogger(__name__)
-
-def run(command: str):
-    return subprocess.run(
-        command.split(),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
 
 
 @click.group("sandbox", short_help="Manage the Algorand sandbox")
 def sandbox_group():
-    logger.debug("Hello I'm the sandbox command group")
+    exec.run(
+        "docker",
+        suppress_output=True,
+        throw_on_error="Docker not found; please install Docker and add to path. "
+        + "See https://docs.docker.com/get-docker/ for more information.",
+    )
+    exec.run(
+        "docker-compose",
+        suppress_output=True,
+        throw_on_error="Docker Compose not found; please install Docker Compose and add to path. "
+        + "See https://docs.docker.com/compose/install/ for more information.",
+    )
 
 
 @sandbox_group.command("start")
 def start_sandbox():
-    print("Starting the AlgoKit sandbox now...")
-    result = run("docker network create -d bridge algokit-network")
-    click.echo(result.args)
-    result = run(
-        "docker run -p 4001:4001 -p 4002:4002 -p 9392:9392 "
-        + '--network algokit-network --label com.docker.compose.project="AlgoKit_sandbox" '
-        + "--name algokit_algod -d makerxau/algorand-sandbox-dev:latest"
-    )
-    click.echo(result.args)
-    result = run(
-        "docker run -u postgres -e POSTGRES_USER=algorand -e POSTGRES_PASSWORD=algorand -e POSTGRES_DB=indexer_db "
-        + '--network algokit-network --label com.docker.compose.project="AlgoKit_sandbox" '
-        + "--name algokit_postgres -d postgres:13-alpine"
-    )
-    click.echo(result.args)
-    result = run(
-        "docker run -p 8980:8980 -e ALGOD_HOST=algokit_algod -e POSTGRES_HOST=algokit_postgres -e POSTGRES_PORT=5432 "
-        + "-e POSTGRES_USER=algorand -e POSTGRES_PASSWORD=algorand -e POSTGRES_DB=indexer_db "
-        + '--network algokit-network --label com.docker.compose.project="AlgoKit_sandbox" '
-        + "--name algokit_indexer -d makerxau/algorand-indexer-dev:latest "
-    )
-    click.echo(result.args)
+    click.echo("Starting the AlgoKit sandbox now...")
+    app_config.write("docker-compose.yml", get_docker_compose_yml())
+    exec.run("docker-compose up -d", app_config.get_config_dir(), throw_on_error="Error starting sandbox")
+    click.echo("Started; execute `algokit sandbox status` to check the status.")
 
 
 @sandbox_group.command("restart")
