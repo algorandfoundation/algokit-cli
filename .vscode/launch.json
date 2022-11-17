@@ -9,9 +9,9 @@
       "type": "python",
       "cwd": "${workspaceFolder}",
       "request": "launch",
-      "module": "localinvoke",
+      "module": "debug",
       "justMyCode": true,
-      "console": "internalConsole"
+      "console": "integratedTerminal"
     }
   ]
 }

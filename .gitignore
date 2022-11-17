@@ -160,3 +160,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .DS_Store
+
+# we use this file for quickly editing run/debug args, it shouldn't be committed
+/args.in
