@@ -10,7 +10,7 @@
    - Manually:
      - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
-     - Run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies)
+     - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via automated script:
 
      - For your convenience, we provide an opinionated way to _quickly_ get the prerequisites up and running via pyenv and Poetry, which is handy if you are less familiar with Python or feeling lazy.
@@ -36,19 +36,27 @@
 
      1. Open the repository root in VS Code
      2. Install recommended extensions
-     3. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
-     4. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
+     3. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
 
         (**NOTE:** The first time you run, VS Code may prompt you to select the Python Interpreter. Select python from the .venv path)
 
    - IDEA (e.g. PyCharm)
      1. Open the repository root in the IDE
-     2. Copy `src/.env.sample` to `src/.env` and change `DEBUG_ARGS` to whatever commandline args you want to debug
-     3. Hit Shift+F9 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
+     2. Hit Shift+F9 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
    - Other
      1. Open the repository root in your text editor of choice
-     2. In a terminal run `source ./.venv/bin/activate` (Non-Windows) or `./venv/Scripts/Activate.ps1` (Windows)
-     3. To execute the commandline execute: `python -m src.algokit [args]`
+     2. In a terminal run `poetry shell`
+     3. Run `./debug.py` through your debugger of choice
+   - In each of the above cases, as `args.in` file will be created in the source root. 
+     Each line will be executed in order, with the arguments passed to the cli.
+     For example, you could have:
+     ```
+     version
+     --help
+     version --help
+     ```
+     Not a terribly useful sequence of commands, but hopefully this helps illustrate the usage.
+
 
 ### Subsequently
 
