@@ -1,3 +1,3 @@
-from algokit import cli
+from algokit.cli import algokit
 
-cli()
+algokit()
