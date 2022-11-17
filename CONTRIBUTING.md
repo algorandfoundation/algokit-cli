@@ -47,7 +47,7 @@
      1. Open the repository root in your text editor of choice
      2. In a terminal run `poetry shell`
      3. Run `./debug.py` through your debugger of choice
-   - In each of the above cases, as `args.in` file will be created in the source root. 
+   - In each of the above cases, an `args.in` file will be created in the source root. 
      Each line will be executed in order, with the arguments passed to the cli.
      For example, you could have:
      ```
