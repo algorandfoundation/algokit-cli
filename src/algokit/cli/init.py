@@ -1,6 +1,9 @@
 from pathlib import Path
+import logging
 
 import click
+
+logger = logging.getLogger(__name__)
 
 
 @click.command("init", short_help="Initializes a new project.")
@@ -8,7 +11,7 @@ import click
 def init_command(path: Path):
     """Initializes a new project."""
     if path is None:
-        print("Initialising in current directory")
+        logger.info("Initialising in current directory")
         path = Path.cwd()
     # TODO: the thing
-    print(f"Initialized the project in {click.format_filename(path)}")
+    logger.info(f"Initialized the project in {click.format_filename(path)}")
