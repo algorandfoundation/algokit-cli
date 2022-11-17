@@ -5,6 +5,7 @@ import click
 from algokit.core import conf, exec
 from algokit.core.sandbox import get_docker_compose_yml
 
+
 logger = logging.getLogger(__name__)
 
 
