@@ -21,7 +21,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-algokit = "algokit:cli"
+algokit = "algokit.cli:algokit"
 
 [tool.ruff]
 line-length = 120
