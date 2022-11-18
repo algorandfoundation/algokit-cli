@@ -29,7 +29,7 @@ else:
         GenericDiffReporter(create_config(["TortoiseGit", "{ProgramFiles}\\TortoiseGit\\bin\\TortoiseGitMerge.exe"])),
         reporters.ReportWithBeyondCompare(),
         reporters.ReportWithWinMerge(),
-        # reporters.ReportWithVSCode(),
+        reporters.ReportWithVSCode(),
         reporters.PythonNativeReporter(),
     ]
     set_default_reporter(reporters.FirstWorkingReporter(*default_reporters))
