@@ -1,0 +1,5 @@
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
+DEBUG: STDOUT+STDERR
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: STDOUT+STDERR
+Error: Docker engine isn't running; please start it.

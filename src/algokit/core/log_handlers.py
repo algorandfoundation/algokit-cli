@@ -14,6 +14,8 @@ __all__ = [
     "color_option",
     "verbose_option",
     "uncaught_exception_logging_handler",
+    "EXTRA_EXCLUDE_FROM_CONSOLE",
+    "EXTRA_EXCLUDE_FROM_LOGFILE",
 ]
 
 
@@ -62,6 +64,22 @@ class NoExceptionFormatter(logging.Formatter):
 
 CONSOLE_LOG_HANDLER_NAME = "console_log_handler"
 
+EXCLUDE_FROM_KEY = "exclude_from"
+EXCLUDE_FROM_CONSOLE_VALUE = "console"
+EXCLUDE_FROM_LOGFILE_VALUE = "logfile"
+
+EXTRA_EXCLUDE_FROM_CONSOLE = {EXCLUDE_FROM_KEY: EXCLUDE_FROM_CONSOLE_VALUE}
+EXTRA_EXCLUDE_FROM_LOGFILE = {EXCLUDE_FROM_KEY: EXCLUDE_FROM_LOGFILE_VALUE}
+
+
+class ManualExclusionFilter(logging.Filter):
+    def __init__(self, exclude_value: str):
+        super().__init__()
+        self.exclude_value = exclude_value
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return getattr(record, EXCLUDE_FROM_KEY, None) != self.exclude_value
+
 
 def initialise_logging() -> None:
     console_log_handler = ClickHandler()
@@ -69,6 +87,7 @@ def initialise_logging() -> None:
     console_log_handler.setLevel(logging.INFO)
     console_log_handler.name = CONSOLE_LOG_HANDLER_NAME
     console_log_handler.formatter = NoExceptionFormatter()
+    console_log_handler.addFilter(ManualExclusionFilter(exclude_value=EXCLUDE_FROM_CONSOLE_VALUE))
 
     file_log_handler = RotatingFileHandler(
         filename=get_app_state_dir() / "cli.log",
@@ -79,11 +98,9 @@ def initialise_logging() -> None:
     file_log_handler.formatter = logging.Formatter(
         "%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S"
     )
+    file_log_handler.addFilter(ManualExclusionFilter(exclude_value=EXCLUDE_FROM_LOGFILE_VALUE))
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        handlers=[console_log_handler, file_log_handler],
-    )
+    logging.basicConfig(level=logging.DEBUG, handlers=[console_log_handler, file_log_handler], force=True)
 
 
 def uncaught_exception_logging_handler(

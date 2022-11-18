@@ -1,12 +1,10 @@
 import os
-from pathlib import Path
-from functools import cache
 import platform
+from pathlib import Path
 
 PACKAGE_NAME = "algokit"
 
 
-@cache
 def get_app_config_dir() -> Path:
     """Get the application config files location - things that should persist, and potentially follow a user"""
     os_type = platform.system().lower()
@@ -19,7 +17,6 @@ def get_app_config_dir() -> Path:
     return _get_relative_app_path(config_dir)
 
 
-@cache
 def get_app_state_dir() -> Path:
     """Get the application state files location - things the user wouldn't normally interact with directly"""
     os_type = platform.system().lower()

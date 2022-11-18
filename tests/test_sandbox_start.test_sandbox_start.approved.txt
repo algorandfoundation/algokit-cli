@@ -1,0 +1,49 @@
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
+DEBUG: STDOUT+STDERR
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: STDOUT+STDERR
+Starting the AlgoKit sandbox now...
+DEBUG: Sandbox directory does not exist yet, creating
+DEBUG: Sandbox compose file does not exist yet, writing out for the first time
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
+DEBUG: STDOUT+STDERR
+Started; execute `algokit sandbox status` to check the status.
+----
+{app_config}/sandbox/docker-compose.yml:
+----
+version: '3'
+
+services:
+  algod:
+    container_name: algokit_algod
+    image: makerxau/algorand-sandbox-dev:latest
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 9392:9392
+
+  indexer:
+    container_name: algokit_indexer
+    image: makerxau/algorand-indexer-dev:latest
+    ports:
+      - 8980:8980
+    restart: unless-stopped
+    environment:
+      ALGOD_HOST: algod
+      POSTGRES_HOST: indexer-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: indexer_db
+    depends_on:
+      - indexer-db
+      - algod
+
+  indexer-db:
+    container_name: algokit_postgres
+    image: postgres:13-alpine
+    user: postgres
+    environment:
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: indexer_db
