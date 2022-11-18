@@ -58,6 +58,8 @@ Here's how to test it out and maybe even start hacking, assuming you have access
    - Install via Git:
 
      1. `pipx install git+https://github.com/algorandfoundation/algokit-cli`
+        - If you have trouble running this check you can execute `git clone https://github.com/algorandfoundation/algokit-cli`
+        - In the future, when this is published publicly you will be able to simply execute `pipx install algokit`
      2. You can now run `algokit` and should see a help message! 🎉
 
    - Install via source:
