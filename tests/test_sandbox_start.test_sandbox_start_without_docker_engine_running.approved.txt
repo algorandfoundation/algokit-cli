@@ -1,0 +1,5 @@
+ERROR: STDERR
+----
+STDERR:
+----
+Error: Docker engine isn't running; please start it. 

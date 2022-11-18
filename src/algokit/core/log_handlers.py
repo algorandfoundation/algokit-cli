@@ -80,10 +80,7 @@ def initialise_logging() -> None:
         "%(asctime)s.%(msecs)03d %(name)s %(levelname)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S"
     )
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        handlers=[console_log_handler, file_log_handler],
-    )
+    logging.basicConfig(level=logging.DEBUG, handlers=[console_log_handler, file_log_handler], force=True)
 
 
 def uncaught_exception_logging_handler(

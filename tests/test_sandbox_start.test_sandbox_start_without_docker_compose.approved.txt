@@ -1,0 +1,5 @@
+ERROR: STDERR
+----
+STDERR:
+----
+Error: Docker Compose not found; please install Docker Compose and add to path. See https://docs.docker.com/compose/install/ for more information.

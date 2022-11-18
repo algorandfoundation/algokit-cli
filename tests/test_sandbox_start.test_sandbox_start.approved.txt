@@ -1,6 +1,43 @@
-Hello I'm the sandbox command group
 Starting the AlgoKit sandbox now...
-['docker', 'network', 'create', '-d', 'bridge', 'algokit-network']
-['docker', 'run', '-p', '4001:4001', '-p', '4002:4002', '-p', '9392:9392', '--network', 'algokit-network', '--label', 'com.docker.compose.project="AlgoKit_sandbox"', '--name', 'algokit_algod', '-d', 'makerxau/algorand-sandbox-dev:latest']
-['docker', 'run', '-u', 'postgres', '-e', 'POSTGRES_USER=algorand', '-e', 'POSTGRES_PASSWORD=algorand', '-e', 'POSTGRES_DB=indexer_db', '--network', 'algokit-network', '--label', 'com.docker.compose.project="AlgoKit_sandbox"', '--name', 'algokit_postgres', '-d', 'postgres:13-alpine']
-['docker', 'run', '-p', '8980:8980', '-e', 'ALGOD_HOST=algokit_algod', '-e', 'POSTGRES_HOST=algokit_postgres', '-e', 'POSTGRES_PORT=5432', '-e', 'POSTGRES_USER=algorand', '-e', 'POSTGRES_PASSWORD=algorand', '-e', 'POSTGRES_DB=indexer_db', '--network', 'algokit-network', '--label', 'com.docker.compose.project="AlgoKit_sandbox"', '--name', 'algokit_indexer', '-d', 'makerxau/algorand-indexer-dev:latest']
+DEBUG: Running 'docker compose up -d' in '{app_config}'
+DEBUG: STDOUT
+Started; execute `algokit sandbox status` to check the status.
+----
+{app_config}/docker-compose.yml:
+----
+version: '3'
+
+services:
+  algod:
+    container_name: algokit_algod
+    image: makerxau/algorand-sandbox-dev:latest
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 9392:9392
+
+  indexer:
+    container_name: algokit_indexer
+    image: makerxau/algorand-indexer-dev:latest
+    ports:
+      - 8980:8980
+    restart: unless-stopped
+    environment:
+      ALGOD_HOST: algod
+      POSTGRES_HOST: indexer-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: indexer_db
+    depends_on:
+      - indexer-db
+      - algod
+
+  indexer-db:
+    container_name: algokit_postgres
+    image: postgres:13-alpine
+    user: postgres
+    environment:
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: indexer_db

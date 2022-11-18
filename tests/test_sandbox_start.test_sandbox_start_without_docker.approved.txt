@@ -1,0 +1,5 @@
+ERROR: STDERR
+----
+STDERR:
+----
+Error: Docker not found; please install Docker and add to path. See https://docs.docker.com/get-docker/ for more information.

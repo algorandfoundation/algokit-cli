@@ -17,7 +17,7 @@ def sandbox_group():
         + "See https://docs.docker.com/get-docker/ for more information.",
     )
     exec.run(
-        "docker-compose",
+        "docker compose",
         suppress_output=True,
         throw_on_error="Docker Compose not found; please install Docker Compose and add to path. "
         + "See https://docs.docker.com/compose/install/ for more information.",
@@ -29,5 +29,5 @@ def sandbox_group():
 def start_sandbox():
     logger.info("Starting the AlgoKit sandbox now...")
     conf.write_config("docker-compose.yml", get_docker_compose_yml())
-    exec.run("docker-compose up -d", conf.get_app_config_dir(), throw_on_error="Error starting sandbox")
+    exec.run("docker compose up -d", conf.get_app_config_dir(), throw_on_error="Error starting sandbox")
     logger.info("Started; execute `algokit sandbox status` to check the status.")
