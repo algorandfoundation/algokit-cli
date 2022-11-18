@@ -9,15 +9,11 @@ from pytest_mock import MockerFixture
 from algokit.cli import algokit
 
 
-def get_verify_output(stdout: str, additional_name: str | None = None, additional_output: str | None = None):
-    return (
-        f"""{stdout}----
+def get_verify_output(stdout: str, additional_name: str, additional_output: str):
+    return f"""{stdout}----
 {additional_name}:
 ----
 {additional_output}"""
-        if additional_name
-        else stdout
-    )
 
 
 def invoke(args: str):
