@@ -5,7 +5,7 @@ DEBUG: STDOUT+STDERR
 Starting the AlgoKit sandbox now...
 DEBUG: Sandbox directory does not exist yet, creating
 DEBUG: Sandbox compose file does not exist yet, writing out for the first time
-DEBUG: Running 'docker compose up -d' in '{app_config}/sandbox'
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 DEBUG: STDOUT+STDERR
 Started; execute `algokit sandbox status` to check the status.
 ----

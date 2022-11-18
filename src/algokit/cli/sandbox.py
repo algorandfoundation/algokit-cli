@@ -47,5 +47,5 @@ def start_sandbox():
         logger.debug("Sandbox compose file does not require updating")
     else:
         logger.warning("Sandbox definition is out of date, please run algokit sandbox update")
-    exec.run("docker compose up -d".split(), cwd=sandbox_dir)
+    exec.run("docker compose up --detach --quiet-pull --wait".split(), cwd=sandbox_dir)
     logger.info("Started; execute `algokit sandbox status` to check the status.")
