@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import subprocess
 from pathlib import Path
@@ -7,21 +8,39 @@ import click
 logger = logging.getLogger(__name__)
 
 
+@dataclasses.dataclass
+class RunResult:
+    command: str
+    exit_code: int
+    output: str
+
+
 def run(
-    command: str,
-    working_directory: Path | None = None,
-    suppress_output: bool = False,
-    throw_on_error: str | None = None,
-):
-    """Runs the given command by spawing a sub process in the given working directory (or cwd if unspecified)"""
-    if not suppress_output:
-        logger.debug(f"Running '{command}' in '{working_directory or Path.cwd()}'")
-    result = subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
-    if not suppress_output and result.stdout.decode("utf-8").strip().__len__() > 0:
-        logger.debug(result.stdout.decode("utf-8"))
+    command: list[str],
+    cwd: Path | None = None,
+    check: bool = True,
+    timeout: int | float | None = None,
+    env: dict[str, str] | None = None,
+) -> RunResult:
+    """Wraps subprocess.run() to add: logging and unicode I/O capture
 
-    if throw_on_error is not None and result.returncode != 0:
-        logger.error(result.stderr.decode("utf-8"))
-        raise click.ClickException(throw_on_error)
+    Note that not all options or usage scenarios here are covered, just some common use cases
+    """
+    command_str = " ".join(command)
+    logger.debug(f"Running '{command_str}' in '{cwd or Path.cwd()}'")
 
-    return result
+    # note: we don't pass check parameter through, so we can log the result regardless of success/failure being checked
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.STDOUT,  # redirect stderr to stdout, so they're interleaved in the correct ordering
+        text=True,  # make all I/O in unicode/text
+        cwd=cwd,
+        timeout=timeout,
+        env=env,
+    )
+    logger.debug(f"Execution of '{command_str}' completed with code {result.returncode}, output = \n{result.stdout}")
+    if result.returncode != 0:
+        if check:
+            raise click.ClickException(error_message or f"Command failed: '{command_str}'")
+    return RunResult(command=command_str, exit_code=result.returncode, output=result.stdout)

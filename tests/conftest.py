@@ -32,7 +32,7 @@ else:
             ),
             reporters.ReportWithBeyondCompare(),
             reporters.ReportWithWinMerge(),
-            reporters.ReportWithVSCode(),
+            # reporters.ReportWithVSCode(),
             reporters.PythonNativeReporter(),
         ]
     )

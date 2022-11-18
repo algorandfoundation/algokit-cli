@@ -1,9 +1,17 @@
+DEBUG: Running 'docker' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: CompletedProcess(args=['docker'], returncode=0, stdout='STDOUT', stderr='STDERR')
+DEBUG: Running 'docker compose' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: CompletedProcess(args=['docker', 'compose'], returncode=0, stdout='STDOUT', stderr='STDERR')
+DEBUG: Running 'docker ps' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: CompletedProcess(args=['docker', 'ps'], returncode=0, stdout='STDOUT', stderr='STDERR')
 Starting the AlgoKit sandbox now...
-DEBUG: Running 'docker compose up -d' in '{app_config}'
-DEBUG: STDOUT
+DEBUG: Sandbox directory does not exist yet, creating
+DEBUG: Sandbox compose file does not exist yet, writing out for the first time
+DEBUG: Running 'docker compose up -d' in '{app_config}/sandbox'
+DEBUG: CompletedProcess(args=['docker', 'compose', 'up', '-d'], returncode=0, stdout='STDOUT', stderr='STDERR')
 Started; execute `algokit sandbox status` to check the status.
 ----
-{app_config}/docker-compose.yml:
+{app_config}/sandbox/docker-compose.yml:
 ----
 version: '3'
 
