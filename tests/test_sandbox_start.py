@@ -17,12 +17,21 @@ def get_verify_output(stdout: str, additional_name: str, additional_output: str)
 {additional_output}"""
 
 
-def invoke(args: str) -> click.testing.Result:
+@dataclasses.dataclass
+class ClickInvokeResult:
+    exit_code: int
+    output: str
+
+
+def invoke(args: str) -> ClickInvokeResult:
     from algokit.cli import algokit
 
     runner = CliRunner()
+    cwd = Path.cwd()
     assert isinstance(algokit, click.BaseCommand)
-    return runner.invoke(algokit, f"-v --no-color {args}")
+    result = runner.invoke(algokit, f"-v --no-color {args}")
+    output = result.stdout.replace(str(cwd), "{current_working_directory}")
+    return ClickInvokeResult(exit_code=result.exit_code, output=output)
 
 
 @dataclasses.dataclass
@@ -70,7 +79,7 @@ def test_sandbox_start(tmp_app_dir: AppDirs, mocker: MockerFixture):
     assert result.exit_code == 0
     verify(
         get_verify_output(
-            result.stdout.replace(str(tmp_app_dir.app_config_dir), "{app_config}"),
+            result.output.replace(str(tmp_app_dir.app_config_dir), "{app_config}"),
             "{app_config}/sandbox/docker-compose.yml",
             (tmp_app_dir.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
         )
@@ -83,7 +92,7 @@ def test_sandbox_start_without_docker(tmp_app_dir: AppDirs, mocker: MockerFixtur
     result = invoke("sandbox start")
 
     assert result.exit_code == 1
-    verify(result.stdout)
+    verify(result.output)
 
 
 def test_sandbox_start_without_docker_compose(tmp_app_dir: AppDirs, mocker: MockerFixture):
@@ -92,7 +101,7 @@ def test_sandbox_start_without_docker_compose(tmp_app_dir: AppDirs, mocker: Mock
     result = invoke("sandbox start")
 
     assert result.exit_code == 1
-    verify(result.stdout)
+    verify(result.output)
 
 
 def test_sandbox_start_without_docker_engine_running(tmp_app_dir: AppDirs, mocker: MockerFixture):
@@ -101,4 +110,4 @@ def test_sandbox_start_without_docker_engine_running(tmp_app_dir: AppDirs, mocke
     result = invoke("sandbox start")
 
     assert result.exit_code == 1
-    verify(result.stdout)
+    verify(result.output)

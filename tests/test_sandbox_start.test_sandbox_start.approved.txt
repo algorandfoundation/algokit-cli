@@ -1,6 +1,6 @@
-DEBUG: Running 'docker compose version' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
 DEBUG: STDOUT+STDERR
-DEBUG: Running 'docker version' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: STDOUT+STDERR
 Starting the AlgoKit sandbox now...
 DEBUG: Sandbox directory does not exist yet, creating
