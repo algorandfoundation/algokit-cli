@@ -1,6 +1,5 @@
 import platform
 import sys
-import logging
 
 # this isn't beautiful, but to avoid confusing user errors we need this check before we start importing our own modules
 if sys.version_info < (3, 10, 0):
@@ -14,7 +13,7 @@ if sys.version_info < (3, 10, 0):
     sys.exit(-1)
 
 try:
-    from algokit.core.log_handlers import file_log_handler, console_log_handler
+    from algokit.core.log_handlers import initialise_logging, uncaught_exception_logging_handler
 except ImportError as ex:
     # the above should succeed both in importing "algokit" itself, and we also know that "click" will
     # be imported too, if those basic packages aren't present, something is very wrong
@@ -24,10 +23,9 @@ except ImportError as ex:
     )
     sys.exit(-1)
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    handlers=[console_log_handler, file_log_handler],
-)
+
+initialise_logging()
+sys.excepthook = uncaught_exception_logging_handler
 
 
 if __name__ == "__main__":
