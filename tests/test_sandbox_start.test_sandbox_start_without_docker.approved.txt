@@ -1,5 +1,3 @@
-ERROR: STDERR
-----
-STDERR:
-----
-Error: Docker not found; please install Docker and add to path. See https://docs.docker.com/get-docker/ for more information.
+DEBUG: Running 'docker compose version' in '/Users/adam/vcs/algokit-cli/tests'
+Error: Docker not found; please install Docker and add to path.
+See https://docs.docker.com/get-docker/ for more information.

@@ -5,6 +5,8 @@ from pathlib import Path
 
 import click
 
+from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE, EXTRA_EXCLUDE_FROM_LOGFILE
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,9 +20,9 @@ class RunResult:
 def run(
     command: list[str],
     cwd: Path | None = None,
-    check: bool = True,
     timeout: int | float | None = None,
     env: dict[str, str] | None = None,
+    bad_return_code_error_message: str | None = None,
 ) -> RunResult:
     """Wraps subprocess.run() to add: logging and unicode I/O capture
 
@@ -39,8 +41,16 @@ def run(
         timeout=timeout,
         env=env,
     )
-    logger.debug(f"Execution of '{command_str}' completed with code {result.returncode}, output = \n{result.stdout}")
-    if result.returncode != 0:
-        if check:
-            raise click.ClickException(error_message or f"Command failed: '{command_str}'")
+    # a bit gnarly, but log the full results to the log file (for debugging / error reporting),
+    # and just show process output in verbose mode to console
+    logger.debug(
+        str(result),
+        extra=EXTRA_EXCLUDE_FROM_CONSOLE,
+    )
+    logger.debug(
+        result.stdout,
+        extra=EXTRA_EXCLUDE_FROM_LOGFILE,
+    )
+    if result.returncode != 0 and bad_return_code_error_message:
+        raise click.ClickException(bad_return_code_error_message)
     return RunResult(command=command_str, exit_code=result.returncode, output=result.stdout)

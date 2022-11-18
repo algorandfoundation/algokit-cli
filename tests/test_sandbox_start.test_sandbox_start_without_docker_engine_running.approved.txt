@@ -1,5 +1,5 @@
-ERROR: STDERR
-----
-STDERR:
-----
-Error: Docker engine isn't running; please start it. 
+DEBUG: Running 'docker compose version' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: STDOUT+STDERR
+DEBUG: Running 'docker version' in '/Users/adam/vcs/algokit-cli/tests'
+DEBUG: STDOUT+STDERR
+Error: Docker engine isn't running; please start it.

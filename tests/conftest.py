@@ -20,20 +20,16 @@ else:
                 )
             )
         ]
-        if os.getenv("APPROVAL_REPORTER", "")
+        if os.getenv("APPROVAL_REPORTER")
         else []
     )
-    default_reporters.extend(
-        [
-            GenericDiffReporter(create_config(["kdiff3", "/usr/bin/kdiff3"])),
-            GenericDiffReporter(create_config(["DiffMerge", "/Applications/DiffMerge.app/Contents/MacOS/DiffMerge"])),
-            GenericDiffReporter(
-                create_config(["TortoiseGit", "{ProgramFiles}\\TortoiseGit\\bin\\TortoiseGitMerge.exe"])
-            ),
-            reporters.ReportWithBeyondCompare(),
-            reporters.ReportWithWinMerge(),
-            # reporters.ReportWithVSCode(),
-            reporters.PythonNativeReporter(),
-        ]
-    )
+    default_reporters += [
+        GenericDiffReporter(create_config(["kdiff3", "/usr/bin/kdiff3"])),
+        GenericDiffReporter(create_config(["DiffMerge", "/Applications/DiffMerge.app/Contents/MacOS/DiffMerge"])),
+        GenericDiffReporter(create_config(["TortoiseGit", "{ProgramFiles}\\TortoiseGit\\bin\\TortoiseGitMerge.exe"])),
+        reporters.ReportWithBeyondCompare(),
+        reporters.ReportWithWinMerge(),
+        # reporters.ReportWithVSCode(),
+        reporters.PythonNativeReporter(),
+    ]
     set_default_reporter(reporters.FirstWorkingReporter(*default_reporters))

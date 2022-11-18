@@ -15,7 +15,7 @@ def sandbox_group():
     try:
         exec.run(
             ["docker", "compose", "version"],
-            error_message=(
+            bad_return_code_error_message=(
                 "Docker Compose not found; please install Docker Compose and add to path.\n"
                 "See https://docs.docker.com/compose/install/ for more information."
             ),
@@ -28,7 +28,7 @@ def sandbox_group():
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
 
-    exec.run(["docker", "version"], error_message="Docker engine isn't running; please start it. ")
+    exec.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
 @sandbox_group.command("start", short_help="Start the AlgoKit sandbox")
