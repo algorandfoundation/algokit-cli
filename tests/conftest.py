@@ -1,8 +1,26 @@
 import os
+from pathlib import Path
 
-from approvaltests import Reporter, reporters, set_default_reporter
-from approvaltests.reporters.generic_diff_reporter_config import create_config
-from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter
+import pytest
+from approvaltests import Reporter, reporters, set_default_reporter  # type: ignore
+from approvaltests.reporters.generic_diff_reporter_config import create_config  # type: ignore
+from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
+from pytest_mock import MockerFixture
+from utils.app_dir_mock import AppDirs, tmp_app_dir
+from utils.exec_mock import ExecMock
+
+
+@pytest.fixture
+def exec_mock(mocker: MockerFixture) -> ExecMock:
+    exec_mock = ExecMock()
+    mocker.patch("algokit.core.exec.__run").side_effect = exec_mock.get_run()
+    return exec_mock
+
+
+@pytest.fixture
+def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
+    return tmp_app_dir(mocker, tmp_path)
+
 
 if os.getenv("CI", ""):
     set_default_reporter(reporters.PythonNativeReporter())

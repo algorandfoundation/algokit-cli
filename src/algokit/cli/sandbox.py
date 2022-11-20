@@ -5,7 +5,6 @@ from algokit.core import exec
 from algokit.core.conf import get_app_config_dir
 from algokit.core.sandbox import get_docker_compose_yml
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -46,5 +45,5 @@ def start_sandbox() -> None:
         logger.debug("Sandbox compose file does not require updating")
     else:
         logger.warning("Sandbox definition is out of date, please run algokit sandbox update")
-    exec.run("docker compose up --detach --quiet-pull --wait".split(), cwd=sandbox_dir)
+    exec.run("docker compose up --detach --quiet-pull --wait".split(), cwd=sandbox_dir, stdout_as_info=True)
     logger.info("Started; execute `algokit sandbox status` to check the status.")
