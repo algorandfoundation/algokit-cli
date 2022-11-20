@@ -66,4 +66,4 @@ suppress-none-returning = true
 line-length = 120
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "tests"]
