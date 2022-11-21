@@ -3,6 +3,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from types import TracebackType
+from typing import Any
 
 import click
 from click.globals import resolve_color_default
@@ -55,10 +56,10 @@ class NoExceptionFormatter(logging.Formatter):
     (without interfering with other formatters that might later want to add such information)
     """
 
-    def formatException(self, *args) -> str:
+    def formatException(self, *args: Any) -> str:  # noqa: N802
         return ""
 
-    def formatStack(self, *args) -> str:
+    def formatStack(self, *args: Any) -> str:  # noqa: N802
         return ""
 
 
@@ -114,7 +115,7 @@ def uncaught_exception_logging_handler(
         logging.critical(f"Unhandled {exc_type.__name__}: {exc_value}", exc_info=(exc_type, exc_value, exc_traceback))
 
 
-def _set_verbose(_ctx: click.Context, _param: click.Option, value: bool) -> None:
+def _set_verbose(_ctx: click.Context, _param: click.Option, value: bool) -> None:  # noqa: FBT001
     if value:
         for handler in logging.getLogger().handlers:
             if handler.name == CONSOLE_LOG_HANDLER_NAME:

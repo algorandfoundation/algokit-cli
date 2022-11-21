@@ -2,6 +2,7 @@ import dataclasses
 import subprocess
 from pathlib import Path
 from subprocess import CompletedProcess
+from typing import Any, Callable
 
 import click.testing
 import pytest
@@ -10,7 +11,7 @@ from click.testing import CliRunner
 from pytest_mock import MockerFixture
 
 
-def get_verify_output(stdout: str, additional_name: str, additional_output: str):
+def get_verify_output(stdout: str, additional_name: str, additional_output: str) -> str:
     return f"""{stdout}----
 {additional_name}:
 ----
@@ -53,16 +54,18 @@ def tmp_app_dir(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return AppDirs(app_config_dir=app_config_dir, app_state_dir=app_state_dir)
 
 
-def get_run_mock_call(fail_on: list[str] | None = None):
-    def run(cmd: list[str], *_, **__) -> subprocess.CompletedProcess:
+def get_run_mock_call(fail_on: list[str] | None = None) -> Callable[[list[str], ...], subprocess.CompletedProcess]:
+    def run(cmd: list[str], *args: Any, **kwargs: Any) -> subprocess.CompletedProcess:
         should_fail = fail_on and fail_on == cmd
         return CompletedProcess(cmd, -1 if should_fail else 0, "STDOUT+STDERR")
 
     return run
 
 
-def get_run_mock_error_call(fail_on: list[str] | None = None):
-    def run(cmd: list[str], *_, **__) -> subprocess.CompletedProcess:
+def get_run_mock_error_call(
+    fail_on: list[str] | None = None,
+) -> Callable[[list[str], ...], subprocess.CompletedProcess]:
+    def run(cmd: list[str], *args: Any, **kwargs: Any) -> subprocess.CompletedProcess:
         should_fail = fail_on and fail_on == cmd
         if should_fail:
             raise FileNotFoundError(f"No such file or directory: {cmd[0]}")
