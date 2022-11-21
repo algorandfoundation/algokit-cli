@@ -1,0 +1,25 @@
+name: Versioning
+
+on:
+  workflow_call:
+    outputs:
+      release_name:
+        description: "The release name"
+        value: ${{ jobs.versioning.outputs.release_name }}
+
+jobs:
+  versioning:
+    name: Get release name
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    outputs:
+      release_name: ${{ steps.Build_release_name.outputs.release_name }}
+    steps:
+      - name: Build release name
+        id: Build_release_name
+        shell: bash
+        run: |
+          versionNumber = ${{ github.run_number }}
+          beta = "-beta"
+          release_name = ${{ format('{0}{1}), versionNumber, beta }}
+          echo "release_name=${{ release_name }}" >> $GITHUB_OUTPUT

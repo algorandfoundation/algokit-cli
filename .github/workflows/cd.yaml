@@ -7,28 +7,35 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 jobs:
   versioning:
-    uses: ./.github/workflows/versioning.yaml
-  
+    name: versioning
+    uses: ./.github/workflows/create-version.yaml
+
   build:
     uses: ./.github/workflows/build-python.yaml
     needs: [versioning]
     with:
       shouldPublish: true
-      artifactName: ${{ needs.versioning.outputs.artifact_name }}
+      artifactName: ${{ needs.versioning.outputs.release_name }}
 
-  deployment:
-    name: Publish package
-    needs: [build]
-    uses: ./.github/workflows/publish-package.yaml
+  # TODO: when starting releasing to PyPi
+  # publish_to_pypi:
+  #   name: Publish package to PyPi
+  #   needs: [versioning, build]
+  #   uses: ./.github/workflows/publish-package-to-pypi.yaml
+  #   with:
+  #     artifactName: ${{ needs.versioning.outputs.release_name }}
+
+  git_tag:
+    uses: ./.github/workflows/create-git-tag.yaml
+    needs: [versioning, build]
+    permissions:
+      contents: write
     with:
-      tag_name: ${{ needs.versioning.outputs.tag_name }}
-      artifactName:  ${{ needs.versioning.outputs.artifact_name }}
-
-
-
-
+      tag: ${{ needs.versioning.outputs.release_name }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
