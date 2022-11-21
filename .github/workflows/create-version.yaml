@@ -2,6 +2,10 @@ name: Versioning
 
 on:
   workflow_call:
+    input:
+      run_number:
+        description: The workflow run
+        type: string
     outputs:
       release_name:
         description: "The release name"
@@ -19,6 +23,5 @@ jobs:
         id: build_release_name
         shell: bash
         run: |
-          versionNumber = ${{ github.run_number }}
-          release_name = "$(versionNumber)-beta"
+          release_name = "v.${{ inputs.run_number }}-beta"
           echo "release_name=$(release_name)" >> $GITHUB_OUTPUT
