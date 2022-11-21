@@ -17,6 +17,7 @@ ruff = "^0.0.132"
 pip-audit = "^2.4.5"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
+mypy = "^0.991"
 
 [build-system]
 requires = ["poetry-core"]
@@ -67,3 +68,17 @@ line-length = 120
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]
+
+[tool.mypy]
+files = "src/"
+python_version = "3.10"
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+warn_return_any = true
+strict = true
+disallow_untyped_decorators = true
+disallow_any_generics = false
+implicit_reexport = false
+show_error_codes = true

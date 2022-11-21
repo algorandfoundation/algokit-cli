@@ -32,7 +32,6 @@ def run(
     logger.debug(f"Running '{command_str}' in '{cwd or Path.cwd()}'")
 
     lines = []
-
     exit_code = None
     with Popen(
         command,
@@ -43,6 +42,7 @@ def run(
         env=env,
         bufsize=1,  # line buffering, works because text=True
     ) as proc:
+        assert proc.stdout  # type narrowing
         while exit_code is None:
             line = proc.stdout.readline()
             if not line:
@@ -54,7 +54,7 @@ def run(
                     level=stdout_log_level,
                     msg=click.style(f"{command[0]}:", bold=True) + f" {line.strip()}",
                 )
-    output = "".join(lines)
+    output = "".join(lines)  # type: ignore[unreachable]
     if exit_code != 0 and bad_return_code_error_message:
         raise click.ClickException(bad_return_code_error_message)
     return RunResult(command=command_str, exit_code=exit_code, output=output)

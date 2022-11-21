@@ -41,6 +41,9 @@ jobs:
           # stop the build if there are Python syntax errors or undefined names
           poetry run ruff src/**/*.py
 
+      - name: mypy
+        run: poetry run mypy
+
       - name: Test with pytest
         run: poetry run pytest
 
