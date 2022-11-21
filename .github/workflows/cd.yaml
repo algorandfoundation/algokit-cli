@@ -14,8 +14,6 @@ jobs:
   versioning:
     name: Versioning
     uses: ./.github/workflows/create-version.yaml
-    with:
-      run_number: ${{ github.run_number }}
 
   build:
     name: Build Python
