@@ -12,10 +12,11 @@ permissions:
 
 jobs:
   versioning:
-    name: versioning
+    name: Versioning
     uses: ./.github/workflows/create-version.yaml
 
   build:
+    name: Build Python
     uses: ./.github/workflows/build-python.yaml
     needs: [versioning]
     with:
@@ -31,8 +32,9 @@ jobs:
   #     artifactName: ${{ needs.versioning.outputs.release_name }}
 
   git_tag:
+    name: Tag
     uses: ./.github/workflows/create-git-tag.yaml
-    needs: [versioning, build]
+    needs: [build]
     permissions:
       contents: write
     with:

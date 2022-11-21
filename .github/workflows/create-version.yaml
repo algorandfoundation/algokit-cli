@@ -22,4 +22,4 @@ jobs:
           versionNumber = ${{ github.run_number }}
           beta = "-beta"
           release_name = ${{ format('{0}{1}), versionNumber, beta }}
-          echo "release_name=${{ release_name }}" >> $GITHUB_OUTPUT
+          echo "release_name=$(release_name)" >> $GITHUB_OUTPUT
