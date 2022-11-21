@@ -1,10 +1,10 @@
-name: Build and Test Python
+name: Build, Test and Publish Python
 
 on:
   workflow_call:
     inputs:
       shouldPublish:
-        description: "To publish the artifact or not, default is false"
+        description: "To publish the (Python 3.10, Ubuntu) artifact or not, default is false"
         required: false
         type: boolean
         default: false
@@ -38,9 +38,6 @@ jobs:
 
       - name: Test with pytest
         run: poetry run pytest
-
-      - name: Audit with pip-audit
-        run: poetry run pip-audit
 
       - name: Build Wheel
         run: poetry build --format wheel

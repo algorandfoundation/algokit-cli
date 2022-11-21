@@ -20,6 +20,7 @@ approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
 mypy = "^0.991"
 pytest-httpx = "^0.21.2"
+python-semantic-release = "^7.32.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -84,3 +85,14 @@ disallow_untyped_decorators = true
 disallow_any_generics = false
 implicit_reexport = false
 show_error_codes = true
+
+[tool.semantic_release]
+version_toml = "pyproject.toml:tool.poetry.version"
+remove_dist=false
+build_command="poetry build --format wheel" 
+version_source="tag"
+major_on_zero=false
+upload_to_repository=false
+tag_commit=true
+branch="main"
+commit_message="{version}\n\nskip-checks: true"
