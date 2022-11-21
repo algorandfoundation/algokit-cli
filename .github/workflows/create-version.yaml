@@ -2,7 +2,7 @@ name: Versioning
 
 on:
   workflow_call:
-    input:
+    inputs:
       run_number:
         description: The workflow run
         type: string
