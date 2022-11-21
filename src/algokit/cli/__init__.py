@@ -2,7 +2,7 @@ import click
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
 from algokit.core.conf import PACKAGE_NAME
-from algokit.core.log_handlers import color_option, verbose_option
+from algokit.core.log_handlers import output_options
 
 
 @click.group(
@@ -10,8 +10,7 @@ from algokit.core.log_handlers import color_option, verbose_option
     context_settings={"help_option_names": ["-h", "--help"]},
 )
 @click.version_option(package_name=PACKAGE_NAME)
-@verbose_option
-@color_option
+@output_options(root=True)
 def algokit() -> None:
     pass
 

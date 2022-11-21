@@ -1,19 +1,20 @@
+import functools
 import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
 from types import TracebackType
-from typing import Any
+from typing import Any, Callable, cast
 
 import click
+from click.decorators import FC
 from click.globals import resolve_color_default
 
 from .conf import get_app_state_dir
 
 __all__ = [
     "initialise_logging",
-    "color_option",
-    "verbose_option",
+    "output_options",
     "uncaught_exception_logging_handler",
     "EXTRA_EXCLUDE_FROM_CONSOLE",
     "EXTRA_EXCLUDE_FROM_LOGFILE",
@@ -129,20 +130,30 @@ def _set_force_styles_to(ctx: click.Context, _param: click.Option, value: bool |
         ctx.color = value
 
 
-verbose_option = click.option(
-    "--verbose",
-    "-v",
-    is_flag=True,
-    callback=_set_verbose,
-    expose_value=False,
-    help="Enable logging of DEBUG messages to the console",
-)
+def output_options(*, root: bool = True) -> Callable[[FC], FC]:
+    def decorator(func: FC) -> FC:
+        @click.option(
+            "--verbose",
+            "-v",
+            is_flag=True,
+            callback=_set_verbose,
+            expose_value=False,
+            help="Enable logging of DEBUG messages to the console",
+        )
+        @click.option(
+            "--color/--no-color",
+            # support NO_COLOR (ref: https://no-color.org) env var as default value,
+            # note: we only check the environment variable at the root level,
+            #       in order to avoid clobbering manually specified options in sub-commands
+            default=lambda: False if (root and os.getenv("NO_COLOR")) else None,
+            callback=_set_force_styles_to,
+            expose_value=False,
+            help="Force enable or disable of console output styling",
+        )
+        @functools.wraps(func)
+        def wrapped(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+            return func(*args, **kwargs)
 
-color_option = click.option(
-    "--color/--no-color",
-    # support NO_COLOR (ref: https://no-color.org) env var as default value,
-    default=lambda: False if os.getenv("NO_COLOR") else None,
-    callback=_set_force_styles_to,
-    expose_value=False,
-    help="Force enable or disable of console output styling",
-)
+        return cast(FC, wrapped)
+
+    return decorator

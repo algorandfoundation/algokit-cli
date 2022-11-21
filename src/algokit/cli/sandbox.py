@@ -3,12 +3,14 @@ import logging
 import click
 from algokit.core import exec
 from algokit.core.conf import get_app_config_dir
+from algokit.core.log_handlers import output_options
 from algokit.core.sandbox import get_docker_compose_yml
 
 logger = logging.getLogger(__name__)
 
 
 @click.group("sandbox", short_help="Manage the AlgoKit sandbox")
+@output_options()
 def sandbox_group() -> None:
     try:
         exec.run(
@@ -30,6 +32,7 @@ def sandbox_group() -> None:
 
 
 @sandbox_group.command("start", short_help="Start the AlgoKit sandbox")
+@output_options()
 def start_sandbox() -> None:
     logger.info("Starting the AlgoKit sandbox now...")
     sandbox_dir = get_app_config_dir() / "sandbox"
