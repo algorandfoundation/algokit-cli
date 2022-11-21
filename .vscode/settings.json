@@ -6,6 +6,16 @@
     "source.organizeImports": false
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".mypy_cache": true,
+    ".pytest_cache": true,
+    ".ruff_cache": true,
+    "**/__pycache__": true,
+    ".idea": true
+  },
 
   // Python
   // Inform VS Code there is an interpreter in the .venv for the workspace
@@ -18,12 +28,16 @@
     // https://dev.to/eegli/quick-guide-to-python-formatting-in-vs-code-2040
     "editor.defaultFormatter": null
   },
-  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.typeCheckingMode": "basic",
   "python.linting.enabled": true,
   "python.linting.lintOnSave": true,
   "ruff.importStrategy": "fromEnvironment",
   "python.linting.pylintEnabled": false,
   "python.linting.mypyEnabled": false,
+  "mypy.configFile": "pyproject.toml",
+  // set to empty array to use config from project
+  "mypy.targets": [],
+  "mypy.runUsingActiveInterpreter": true,
   "python.linting.banditEnabled": false,
   "python.linting.prospectorEnabled": false,
   "python.linting.pydocstyleEnabled": false,
