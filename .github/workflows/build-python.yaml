@@ -15,7 +15,11 @@ on:
 
 jobs:
   build-python:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python: ["3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -23,10 +27,10 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python }}
           cache: "poetry"
 
       - name: Install dependencies
@@ -38,7 +42,7 @@ jobs:
       - name: Lint with Ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          poetry run ruff src/**/*.py
+          poetry run ruff .
 
       - name: mypy
         run: poetry run mypy
@@ -52,8 +56,8 @@ jobs:
       - name: Build Wheel
         run: poetry build --format wheel
 
-      - name: Upload artifact for deployment job
-        if: inputs.shouldPublish == true
+      - name: Upload artifact - using Python 3.10 on ubuntu-latest
+        if: inputs.shouldPublish == true && matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifactName }}
