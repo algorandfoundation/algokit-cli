@@ -5,7 +5,8 @@
     "ms-python.vscode-pylance",
     "charliermarsh.ruff",
     "bungcip.better-toml",
-    "EditorConfig.EditorConfig",
-    "emeraldwalk.RunOnSave"
+    "editorconfig.editorconfig",
+    "emeraldwalk.runonsave",
+    "matangover.mypy"
   ]
 }
