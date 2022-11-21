@@ -7,10 +7,6 @@ on:
         description: "Git tag"
         required: true
         type: string
-    secrets:
-      GITHUB_TOKEN:
-        description: "GitHub token to push git tag to repository."
-        required: true
 
 jobs:
   push-git-tag:
