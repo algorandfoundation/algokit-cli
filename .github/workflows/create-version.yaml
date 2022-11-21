@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: false
     outputs:
-      release_name: ${{ steps.Build_release_name.outputs.release_name }}
+      release_name: ${{ steps.build_release_name.outputs.release_name }}
     steps:
       - name: Build release name
-        id: Build_release_name
+        id: build_release_name
         shell: bash
         run: |
           versionNumber = ${{ github.run_number }}
           beta = "-beta"
-          release_name = ${{ format('{0}{1}), versionNumber, beta }}
+          release_name = ${{ format('{0}{1}'), versionNumber, beta }}
           echo "release_name=$(release_name)" >> $GITHUB_OUTPUT
