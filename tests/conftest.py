@@ -13,7 +13,7 @@ from utils.exec_mock import ExecMock
 @pytest.fixture
 def exec_mock(mocker: MockerFixture) -> ExecMock:
     exec_mock = ExecMock()
-    mocker.patch("algokit.core.exec.Popen").side_effect = exec_mock.get_run()  # type: ignore
+    mocker.patch("algokit.core.exec.Popen").side_effect = exec_mock.popen
     return exec_mock
 
 
@@ -22,7 +22,7 @@ def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)
 
 
-if os.getenv("CI", ""):
+if os.getenv("CI"):
     set_default_reporter(reporters.PythonNativeReporter())
 else:
 
