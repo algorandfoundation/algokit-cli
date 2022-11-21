@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: false
     outputs:
-      release_name: ${{ steps.build_release_name.outputs.version_number }}
+      version_number: ${{ steps.get_version_number.outputs.version_number }}
     steps:
-      - name: Determine version number
-        id: build_release_name
+      - name: Get version number
+        id: get_version_number
         shell: bash
         run: echo "version_number=${{ github.run_number }}-beta" >> $GITHUB_OUTPUT
