@@ -1,9 +1,8 @@
 import click
-
-from algokit.core.conf import PACKAGE_NAME
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
-from algokit.core.log_handlers import verbose_option, color_option
+from algokit.core.conf import PACKAGE_NAME
+from algokit.core.log_handlers import color_option, verbose_option
 
 
 @click.group(
@@ -13,7 +12,7 @@ from algokit.core.log_handlers import verbose_option, color_option
 @click.version_option(package_name=PACKAGE_NAME)
 @verbose_option
 @color_option
-def algokit():
+def algokit() -> None:
     pass
 
 

@@ -4,7 +4,6 @@ import subprocess
 from pathlib import Path
 
 import click
-
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE, EXTRA_EXCLUDE_FROM_LOGFILE
 
 logger = logging.getLogger(__name__)

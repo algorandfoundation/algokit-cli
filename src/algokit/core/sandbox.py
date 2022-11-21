@@ -4,7 +4,7 @@ def get_docker_compose_yml(
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
     indexer_port: int = 8980,
-):
+) -> str:
     return f"""version: '3'
 
 services:
