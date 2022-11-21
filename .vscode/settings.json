@@ -2,7 +2,8 @@
   // General - see also /.editorconfig
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true
+    // Don't want to use isort because it conflicts with Ruff - see run on save below
+    "source.organizeImports": false
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
@@ -27,16 +28,17 @@
   "python.linting.prospectorEnabled": false,
   "python.linting.pydocstyleEnabled": false,
   "python.linting.pycodestyleEnabled": false,
-  // https://github.com/microsoft/vscode-python/issues/6933
-  "python.sortImports.args": [
-    "--multi-line=3",
-    "--trailing-comma",
-    "--force-grid-wrap=0",
-    "--use-parentheses",
-    "--line-width=120"
-  ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
+  "emeraldwalk.runonsave": {
+    "commands": [
+      // Run Ruff linter on save of Python file
+      {
+        "match": "\\.py$",
+        "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix"
+      }
+    ]
+  },
 
   // PowerShell
   "[powershell]": {

@@ -1,6 +1,5 @@
 from io import StringIO
-from pathlib import Path
-from typing import IO
+from typing import IO, Any, Callable
 
 
 class RunningProcessMock:
@@ -42,8 +41,8 @@ class ExecMock:
     def should_bad_exit_on(self, cmd: list[str] | str):
         self.bad_exit_on.append(cmd.split() if isinstance(cmd, str) else cmd)
 
-    def get_run(self):
-        def run(cmd: list[str], _cwd: Path | None, _env: dict[str, str] | None) -> RunningProcessMock:
+    def get_run(self) -> Callable[[list[str], ...], RunningProcessMock]:  # type: ignore
+        def run(cmd: list[str], *args: Any, **kwargs: Any) -> RunningProcessMock:
             should_fail = cmd in self.fail_on
             if should_fail:
                 raise FileNotFoundError(f"No such file or directory: {cmd[0]}")

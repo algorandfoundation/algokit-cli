@@ -2,6 +2,7 @@ import dataclasses
 import logging
 import subprocess
 from pathlib import Path
+from subprocess import Popen
 
 import click
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE, EXTRA_EXCLUDE_FROM_LOGFILE
@@ -18,19 +19,28 @@ class RunResult:
 
 def run(
     command: list[str],
+    *,
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
     bad_return_code_error_message: str | None = None,
     stdout_as_info: bool = False,
 ) -> RunResult:
-    """Wraps subprocess.run() to add: logging and unicode I/O capture
+    """Wraps subprocess.Popen() to add: logging and unicode I/O capture
 
     Note that not all options or usage scenarios here are covered, just some common use cases
     """
     command_str = " ".join(command)
     logger.debug(f"Running '{command_str}' in '{cwd or Path.cwd()}'")
 
-    result = __run(command, cwd, env)
+    # note: we don't pass check parameter through, so we can log the result regardless of success/failure being checked
+    result = Popen(
+        command,
+        stdout=subprocess.PIPE,  # capture stdout
+        stderr=subprocess.STDOUT,  # redirect stderr to stdout, so they're interleaved in the correct ordering
+        text=True,  # make all I/O in unicode/text
+        cwd=cwd,
+        env=env,
+    )
 
     # a bit gnarly, but log the full results to the log file (for debugging / error reporting),
     # and just show process output in verbose mode to console
@@ -59,15 +69,3 @@ def run(
     if result.returncode != 0 and bad_return_code_error_message:
         raise click.ClickException(bad_return_code_error_message)
     return RunResult(command=command_str, exit_code=result.returncode, output=stdout)
-
-
-def __run(command: list[str], cwd: Path | None, env: dict[str, str] | None):
-    # note: we don't pass check parameter through, so we can log the result regardless of success/failure being checked
-    return subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,  # capture stdout
-        stderr=subprocess.STDOUT,  # redirect stderr to stdout, so they're interleaved in the correct ordering
-        text=True,  # make all I/O in unicode/text
-        cwd=cwd,
-        env=env,
-    )

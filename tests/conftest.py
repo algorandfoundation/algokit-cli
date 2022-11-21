@@ -13,7 +13,7 @@ from utils.exec_mock import ExecMock
 @pytest.fixture
 def exec_mock(mocker: MockerFixture) -> ExecMock:
     exec_mock = ExecMock()
-    mocker.patch("algokit.core.exec.__run").side_effect = exec_mock.get_run()
+    mocker.patch("algokit.core.exec.Popen").side_effect = exec_mock.get_run()  # type: ignore
     return exec_mock
 
 
