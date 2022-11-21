@@ -31,19 +31,54 @@ def sandbox_group() -> None:
 
 @sandbox_group.command("start", short_help="Start the AlgoKit sandbox")
 def start_sandbox() -> None:
-    logger.info("Starting the AlgoKit sandbox now...")
     sandbox_dir = get_app_config_dir() / "sandbox"
     if not sandbox_dir.exists():
-        logger.debug("Sandbox directory does not exist yet, creating")
+        logger.debug("Sandbox directory does not exist yet; creating it")
         sandbox_dir.mkdir()
     sandbox_compose_path = sandbox_dir / "docker-compose.yml"
     compose_content = get_docker_compose_yml()
     if not sandbox_compose_path.exists():
-        logger.debug("Sandbox compose file does not exist yet, writing out for the first time")
+        logger.debug("Sandbox compose file does not exist yet; writing it out for the first time")
         sandbox_compose_path.write_text(compose_content)
     elif sandbox_compose_path.read_text() == compose_content:
         logger.debug("Sandbox compose file does not require updating")
     else:
-        logger.warning("Sandbox definition is out of date, please run algokit sandbox update")
+        logger.warning("Sandbox definition is out of date; please run algokit sandbox reset")
+    logger.info("Starting the AlgoKit sandbox now...")
     exec.run("docker compose up --detach --quiet-pull --wait".split(), cwd=sandbox_dir, stdout_log_level=logging.INFO)
     logger.info("Started; execute `algokit sandbox status` to check the status.")
+
+
+@sandbox_group.command("reset", short_help="Reset the AlgoKit sandbox")
+@click.option(
+    "--pull/--no-pull",
+    default=True,
+    expose_value=True,
+    help="Enable or disable pulling latest images from DockerHub",
+)
+@click.pass_context
+def reset_sandbox(ctx: click.Context, *, pull: bool) -> None:
+    sandbox_dir = get_app_config_dir() / "sandbox"
+    sandbox_compose_path = sandbox_dir / "docker-compose.yml"
+    if not sandbox_compose_path.exists():
+        logger.debug("Existing Sandbox not found; creating from scratch...")
+        ctx.invoke(start_sandbox)
+    else:
+        logger.info("Deleting any existing Sandbox...")
+        exec.run("docker compose down".split(), cwd=sandbox_dir, stdout_log_level=logging.DEBUG)
+        compose_content = get_docker_compose_yml()
+        if sandbox_compose_path.read_text() != compose_content:
+            logger.info("Sandbox definition is out of date; updating it to latest")
+            sandbox_compose_path.write_text(compose_content)
+        if pull:
+            logger.info("Looking for latest Sandbox images from DockerHub...")
+            exec.run(
+                "docker compose pull --ignore-pull-failures --quiet".split(),
+                cwd=sandbox_dir,
+                stdout_log_level=logging.INFO,
+            )
+        logger.info("Starting the AlgoKit sandbox now...")
+        exec.run(
+            "docker compose up --detach --quiet-pull --wait".split(), cwd=sandbox_dir, stdout_log_level=logging.INFO
+        )
+        logger.info("Started; execute `algokit sandbox status` to check the status.")

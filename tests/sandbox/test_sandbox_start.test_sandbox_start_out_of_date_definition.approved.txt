@@ -1,0 +1,16 @@
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+WARNING: Sandbox definition is out of date; please run algokit sandbox reset
+Starting the AlgoKit sandbox now...
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
+docker: STDOUT
+docker: STDERR
+Started; execute `algokit sandbox status` to check the status.
+----
+{app_config}/sandbox/docker-compose.yml:
+----
+out of date config

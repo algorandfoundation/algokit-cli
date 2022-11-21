@@ -4,9 +4,9 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
+DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
 Starting the AlgoKit sandbox now...
-DEBUG: Sandbox directory does not exist yet, creating
-DEBUG: Sandbox compose file does not exist yet, writing out for the first time
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR

@@ -1,3 +1,4 @@
+from algokit.core.sandbox import get_docker_compose_yml
 from approvaltests import verify  # type: ignore
 from utils.app_dir_mock import AppDirs
 from utils.click_invoker import invoke
@@ -12,6 +13,32 @@ def get_verify_output(stdout: str, additional_name: str, additional_output: str)
 
 
 def test_sandbox_start(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    result = invoke("sandbox start")
+
+    assert result.exit_code == 0
+    verify(
+        get_verify_output(
+            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            "{app_config}/sandbox/docker-compose.yml",
+            (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+        )
+    )
+
+
+def test_sandbox_start_up_to_date_definition(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    (app_dir_mock.app_config_dir / "sandbox").mkdir()
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
+
+    result = invoke("sandbox start")
+
+    assert result.exit_code == 0
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
+def test_sandbox_start_out_of_date_definition(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    (app_dir_mock.app_config_dir / "sandbox").mkdir()
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
+
     result = invoke("sandbox start")
 
     assert result.exit_code == 0
