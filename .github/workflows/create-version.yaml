@@ -3,19 +3,19 @@ name: Versioning
 on:
   workflow_call:
     outputs:
-      release_name:
-        description: "The release name"
-        value: ${{ jobs.versioning.outputs.release_name }}
+      version_number:
+        description: "The version number"
+        value: ${{ jobs.versioning.outputs.version_number }}
 
 jobs:
   versioning:
-    name: Get release name
+    name: Get version name
     runs-on: ubuntu-latest
     continue-on-error: false
     outputs:
-      release_name: ${{ steps.build_release_name.outputs.release_name }}
+      release_name: ${{ steps.build_release_name.outputs.version_number }}
     steps:
-      - name: Build release name
+      - name: Determine version number
         id: build_release_name
         shell: bash
-        run: echo "release_name=v.${{ github.run_number }}-beta" >> $GITHUB_OUTPUT
+        run: echo "version_number=${{ github.run_number }}-beta" >> $GITHUB_OUTPUT

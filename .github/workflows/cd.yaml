@@ -21,7 +21,7 @@ jobs:
     needs: [versioning]
     with:
       shouldPublish: true
-      artifactName: ${{ needs.versioning.outputs.release_name }}
+      artifactName: "AlgoKit-cli-${{ needs.versioning.outputs.version_number }}"
 
   # TODO: when starting releasing to PyPi
   # publish_to_pypi:
@@ -38,4 +38,4 @@ jobs:
     permissions:
       contents: write
     with:
-      tag: ${{ needs.versioning.outputs.release_name }}
+      version_number: ${{ needs.versioning.outputs.version_number }}

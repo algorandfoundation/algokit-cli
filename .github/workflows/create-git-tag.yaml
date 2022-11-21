@@ -3,8 +3,8 @@ name: Create git tag
 on:
   workflow_call:
     inputs:
-      tag:
-        description: "Git tag"
+      version_number:
+        description: Version number to be used in git tag
         required: true
         type: string
 
@@ -22,4 +22,5 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ inputs.tag }}
+          custom_tag: ${{ inputs.version_number }}
+          tag_prefix: "v."
