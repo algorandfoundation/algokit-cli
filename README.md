@@ -8,6 +8,10 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 - Building and deploying Algorand PyTEAL smart contracts
 
+## Features
+
+- [AlgoKit Sandbox](docs/features/sandbox.md) - Manage a locally sandboxed private Algorand network
+
 ## Roadmap
 
 This tool is currently in early development. Feel free to explore the repository and install the tool, but be aware that this is a work in progress and features may not be stable at this stage.
