@@ -1,0 +1,41 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  versioning:
+    name: versioning
+    uses: ./.github/workflows/create-version.yaml
+
+  build:
+    uses: ./.github/workflows/build-python.yaml
+    needs: [versioning]
+    with:
+      shouldPublish: true
+      artifactName: ${{ needs.versioning.outputs.release_name }}
+
+  # TODO: when starting releasing to PyPi
+  # publish_to_pypi:
+  #   name: Publish package to PyPi
+  #   needs: [versioning, build]
+  #   uses: ./.github/workflows/publish-package-to-pypi.yaml
+  #   with:
+  #     artifactName: ${{ needs.versioning.outputs.release_name }}
+
+  git_tag:
+    uses: ./.github/workflows/create-git-tag.yaml
+    needs: [versioning, build]
+    permissions:
+      contents: write
+    with:
+      tag: ${{ needs.versioning.outputs.release_name }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

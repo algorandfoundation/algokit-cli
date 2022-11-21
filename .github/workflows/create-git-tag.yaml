@@ -1,0 +1,28 @@
+name: Create git tag
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Git tag"
+        required: true
+        type: string
+    secrets:
+      GITHUB_TOKEN:
+        description: "GitHub token to push git tag to repository."
+        required: true
+
+jobs:
+  push-git-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # Push tag to GitHub if the version's tag is not tagged
+      - name: push-version-to-git-tag
+        uses: pkgdeps/git-tag-action@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_repo: ${{ github.repository }}
+          version: ${{ inputs.tag }}
