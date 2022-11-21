@@ -4,10 +4,9 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from types import TracebackType
-from typing import Any, Callable, cast
+from typing import Any, Callable, ParamSpec, TypeVar
 
 import click
-from click.decorators import FC
 from click.globals import resolve_color_default
 
 from .conf import get_app_state_dir
@@ -130,8 +129,12 @@ def _set_force_styles_to(ctx: click.Context, _param: click.Option, value: bool |
         ctx.color = value
 
 
-def output_options(*, root: bool = True) -> Callable[[FC], FC]:
-    def decorator(func: FC) -> FC:
+T = TypeVar("T")
+P = ParamSpec("P")
+
+
+def output_options(*, root: bool = True) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
         @click.option(
             "--verbose",
             "-v",
@@ -151,9 +154,9 @@ def output_options(*, root: bool = True) -> Callable[[FC], FC]:
             help="Force enable or disable of console output styling",
         )
         @functools.wraps(func)
-        def wrapped(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+        def wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
             return func(*args, **kwargs)
 
-        return cast(FC, wrapped)
+        return wrapped
 
     return decorator
