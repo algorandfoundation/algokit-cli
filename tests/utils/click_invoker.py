@@ -1,8 +1,6 @@
 import dataclasses
 from pathlib import Path
 
-import click
-import click.testing
 from click.testing import CliRunner
 
 
@@ -12,12 +10,19 @@ class ClickInvokeResult:
     output: str
 
 
-def invoke(args: str) -> ClickInvokeResult:
+def invoke(args: str, *, verbose: bool = True, force_color_flag: bool | None = False) -> ClickInvokeResult:
     from algokit.cli import algokit
 
     runner = CliRunner()
     cwd = Path.cwd()
-    assert isinstance(algokit, click.BaseCommand)
-    result = runner.invoke(algokit, f"-v --no-color {args}")  # type: ignore
+    flags = []
+    if verbose:
+        flags.append("-v")
+    if force_color_flag is True:
+        flags.append("--color")
+    elif force_color_flag is False:
+        flags.append("--no-color")
+    cmd_str = " ".join([*flags, args])
+    result = runner.invoke(algokit, cmd_str)
     output = result.stdout.replace(str(cwd), "{current_working_directory}")
     return ClickInvokeResult(exit_code=result.exit_code, output=output)

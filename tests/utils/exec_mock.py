@@ -11,7 +11,7 @@ class PopenMock:
     def __enter__(self) -> "PopenMock":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):  # noqa: ANN001
+    def __exit__(self, exc_type, exc_val, exc_tb):  # noqa
         # TODO: we should change the structure of this mocking a bit,
         #       and check that I/O cleanup was called
         pass
@@ -38,7 +38,7 @@ class ExecMock:
     def __init__(self):
         self.fail_on: list[list[str]] = []
         self.bad_exit_on: list[list[str]] = []
-        self._output: list[str] = []
+        self._output: tuple[str, ...] = ()
 
     def should_fail_on(self, cmd: list[str] | str):
         self.fail_on.append(cmd.split() if isinstance(cmd, str) else cmd)
@@ -54,5 +54,5 @@ class ExecMock:
         if should_fail:
             raise FileNotFoundError(f"No such file or directory: {cmd[0]}")
         exit_code = -1 if cmd in self.bad_exit_on else 0
-        output = "\n".join(self._output or ["STDOUT", "STDERR"])
+        output = "\n".join(self._output or ("STDOUT", "STDERR"))
         return PopenMock(output, exit_code)

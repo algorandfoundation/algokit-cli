@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.group("sandbox", short_help="Manage the AlgoKit sandbox")
-@output_options()
+@output_options
 def sandbox_group() -> None:
     try:
         exec.run(
@@ -32,7 +32,7 @@ def sandbox_group() -> None:
 
 
 @sandbox_group.command("start", short_help="Start the AlgoKit sandbox")
-@output_options()
+@output_options
 def start_sandbox() -> None:
     logger.info("Starting the AlgoKit sandbox now...")
     sandbox_dir = get_app_config_dir() / "sandbox"

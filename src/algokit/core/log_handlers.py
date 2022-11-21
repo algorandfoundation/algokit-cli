@@ -17,6 +17,7 @@ __all__ = [
     "uncaught_exception_logging_handler",
     "EXTRA_EXCLUDE_FROM_CONSOLE",
     "EXTRA_EXCLUDE_FROM_LOGFILE",
+    "get_colour_pref_from_args",
 ]
 
 
@@ -82,10 +83,22 @@ class ManualExclusionFilter(logging.Filter):
         return getattr(record, EXCLUDE_FROM_KEY, None) != self.exclude_value
 
 
+# HACK: due to there being no support for "global flags" in click (see: https://github.com/pallets/click/issues/66),
+#       we handle these flags specially. All groups/commands should have the @output_options decorator below added,
+#       so that the help doc shows these as correctly being applicable anywhere, but in order to prevent user
+#       confusion when specifying before or after a command gives different results, and similarly for colour options
+#       (e.g. if you pass --no-color as the last flag on the command line, it's very surprising if colour shows up
+#       in some of the output, which it can if there's output in parent groups)
+_VERBOSE_FLAGS = ["--verbose", "-v"]
+
+
 def initialise_logging() -> None:
     console_log_handler = ClickHandler()
-    # default to INFO, this case be upgraded later based on -v flag
-    console_log_handler.setLevel(logging.INFO)
+    if set(_VERBOSE_FLAGS).intersection(sys.argv):
+        console_log_level = logging.DEBUG
+    else:
+        console_log_level = logging.INFO
+    console_log_handler.setLevel(console_log_level)
     console_log_handler.name = CONSOLE_LOG_HANDLER_NAME
     console_log_handler.formatter = NoExceptionFormatter()
     console_log_handler.addFilter(ManualExclusionFilter(exclude_value=EXCLUDE_FROM_CONSOLE_VALUE))
@@ -115,48 +128,45 @@ def uncaught_exception_logging_handler(
         logging.critical(f"Unhandled {exc_type.__name__}: {exc_value}", exc_info=(exc_type, exc_value, exc_traceback))
 
 
-def _set_verbose(_ctx: click.Context, _param: click.Option, value: bool) -> None:  # noqa: FBT001
-    if value:
-        for handler in logging.getLogger().handlers:
-            if handler.name == CONSOLE_LOG_HANDLER_NAME:
-                handler.setLevel(logging.DEBUG)
-                return
-        raise RuntimeError(f"Couldn't locate required logger named {CONSOLE_LOG_HANDLER_NAME}")
-
-
-def _set_force_styles_to(ctx: click.Context, _param: click.Option, value: bool | None) -> None:
-    if value is not None:
-        ctx.color = value
+_ENABLE_COLOR_FLAG = "--color"
+_DISABLE_COLOR_FLAG = "--no-color"
 
 
 T = TypeVar("T")
 P = ParamSpec("P")
 
 
-def output_options(*, root: bool = True) -> Callable[[Callable[P, T]], Callable[P, T]]:
-    def decorator(func: Callable[P, T]) -> Callable[P, T]:
-        @click.option(
-            "--verbose",
-            "-v",
-            is_flag=True,
-            callback=_set_verbose,
-            expose_value=False,
-            help="Enable logging of DEBUG messages to the console",
-        )
-        @click.option(
-            "--color/--no-color",
-            # support NO_COLOR (ref: https://no-color.org) env var as default value,
-            # note: we only check the environment variable at the root level,
-            #       in order to avoid clobbering manually specified options in sub-commands
-            default=lambda: False if (root and os.getenv("NO_COLOR")) else None,
-            callback=_set_force_styles_to,
-            expose_value=False,
-            help="Force enable or disable of console output styling",
-        )
-        @functools.wraps(func)
-        def wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
-            return func(*args, **kwargs)
+def output_options(func: Callable[P, T]) -> Callable[P, T]:
+    # if you're wondering why these options do nothing, please see the HACK comment above,
+    # where the names are declared
+    @click.option(
+        *_VERBOSE_FLAGS,
+        is_flag=True,
+        expose_value=False,
+        help="Enable logging of DEBUG messages to the console",
+    )
+    @click.option(
+        f"{_ENABLE_COLOR_FLAG}/{_DISABLE_COLOR_FLAG}",
+        default=None,
+        expose_value=False,
+        help="Force enable or disable of console output styling",
+    )
+    @functools.wraps(func)
+    def wrapped(*args: P.args, **kwargs: P.kwargs) -> T:
+        return func(*args, **kwargs)
 
-        return wrapped
+    return wrapped
 
-    return decorator
+
+def get_colour_pref_from_args(argv: list[str]) -> bool | None:
+    # search in reverse, last specified wins.
+    # see HACK note above for why this function exists
+    for arg in reversed(argv):
+        if arg == _ENABLE_COLOR_FLAG:
+            return True
+        if arg == _DISABLE_COLOR_FLAG:
+            return False
+    # support NO_COLOR (ref: https://no-color.org) env var as default value,
+    if os.getenv("NO_COLOR"):
+        return False
+    return None
