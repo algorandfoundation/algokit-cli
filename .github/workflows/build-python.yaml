@@ -42,7 +42,7 @@ jobs:
       - name: Lint with Ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          poetry run ruff src/**/*.py
+          poetry run ruff .
 
       - name: mypy
         run: poetry run mypy
