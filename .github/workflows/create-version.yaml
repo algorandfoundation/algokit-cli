@@ -20,5 +20,5 @@ jobs:
         shell: bash
         run: |
           versionNumber = ${{ github.run_number }}
-          release_name = "${versionNumber}-beta"
+          release_name = "$(versionNumber)-beta"
           echo "release_name=$(release_name)" >> $GITHUB_OUTPUT
