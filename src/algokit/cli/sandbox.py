@@ -57,7 +57,7 @@ def start_sandbox() -> None:
     help="Enable or disable pulling latest images from DockerHub",
 )
 @click.pass_context
-def reset_sandbox(ctx: click.Context, pull: bool) -> None:
+def reset_sandbox(ctx: click.Context, *, pull: bool) -> None:
     sandbox_dir = get_app_config_dir() / "sandbox"
     sandbox_compose_path = sandbox_dir / "docker-compose.yml"
     if not sandbox_compose_path.exists():
