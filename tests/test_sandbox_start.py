@@ -1,11 +1,10 @@
 from approvaltests import verify  # type: ignore
+from utils.app_dir_mock import AppDirs
+from utils.click_invoker import invoke
+from utils.exec_mock import ExecMock
 
-from .utils.app_dir_mock import AppDirs
-from .utils.click_invoker import invoke
-from .utils.exec_mock import ExecMock
 
-
-def get_verify_output(stdout: str, additional_name: str, additional_output: str):
+def get_verify_output(stdout: str, additional_name: str, additional_output: str) -> str:
     return f"""{stdout}----
 {additional_name}:
 ----
