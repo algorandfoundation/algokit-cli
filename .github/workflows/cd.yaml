@@ -34,7 +34,7 @@ jobs:
   git_tag:
     name: Tag
     uses: ./.github/workflows/create-git-tag.yaml
-    needs: [build]
+    needs: [versioning, build]
     permissions:
       contents: write
     with:
