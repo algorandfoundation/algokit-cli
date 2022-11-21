@@ -18,6 +18,7 @@ pip-audit = "^2.4.5"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
 mypy = "^0.991"
+python-semantic-release = "^7.32.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -82,3 +83,7 @@ disallow_untyped_decorators = true
 disallow_any_generics = false
 implicit_reexport = false
 show_error_codes = true
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:tool.poetry.version"
+#version_variable = "version.py:__version__"
