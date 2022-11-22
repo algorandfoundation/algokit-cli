@@ -5,6 +5,7 @@ from pathlib import Path
 from subprocess import Popen
 
 import click
+from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,11 @@ def run(
                     level=stdout_log_level,
                     msg=click.style(f"{command[0]}:", bold=True) + f" {line.strip()}",
                 )
-    output = "".join(lines)  # type: ignore[unreachable]
-    if exit_code != 0 and bad_return_code_error_message:
-        raise click.ClickException(bad_return_code_error_message)
+    if exit_code == 0:  # type: ignore[unreachable]
+        logger.debug(f"'{command_str}' completed successfully", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
+    else:
+        logger.debug(f"'{command_str}' failed, exited with code = {exit_code}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
+        if bad_return_code_error_message:
+            raise click.ClickException(bad_return_code_error_message)
+    output = "".join(lines)
     return RunResult(command=command_str, exit_code=exit_code, output=output)

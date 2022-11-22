@@ -1,0 +1,4 @@
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.2.1"}
+Error: Minimum docker compose version supported: v2.5.0, installed = v2.2.1
+Please update your Docker install
