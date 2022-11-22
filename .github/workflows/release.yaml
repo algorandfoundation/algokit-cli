@@ -1,0 +1,51 @@
+name: CD
+
+on: workflow_dispatch
+
+concurrency: release
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # - name: Install poetry
+      #   run: pipx install poetry
+
+      # - name: Set up Python ${{ matrix.python }}
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: ${{ matrix.python }}
+      #     cache: "poetry"
+
+      # - name: Install dependencies
+      #   run: poetry install --no-interaction --no-root
+
+      # - name: Bump Version
+      #   run: poetry run semantic-release --pre-release --define prerelease_tag="${GITHUB_REF##*/}" version
+
+      # - name: Get Version
+      #   id: get_version
+      #   run: echo "version=$(poetry run semantic-release print-version)" >> $GITHUB_OUTPUT
+
+      # - name: Build Python
+      #   uses: ./.github/workflows/build-python.yaml
+      #   with:
+      #     shouldPublish: true
+      #     artifactName: "AlgoKit-cli-${{ steps.get_version.version }}"
+
+      - name: Create Release
+        uses: relekang/python-semantic-release@master
+        with:
+          github_token: xxx
+          repository_username: xxx
+          repository_password: xxx
+          additional_options: --pre-release --define prerelease_tag="${GITHUB_REF##*/}" --define branch="${GITHUB_REF##*/}"
