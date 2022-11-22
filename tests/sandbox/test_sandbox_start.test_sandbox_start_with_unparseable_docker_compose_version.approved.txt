@@ -1,16 +1,13 @@
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
-DEBUG: docker: {"version": "v2.5.0"}
+DEBUG: docker: {"version": "v2.5-dev123"}
+WARNING: Unable to extract docker compose version from output: 
+{"version": "v2.5-dev123"}
+Please ensure a minimum of compose v2.5.0 is used
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-Deleting any existing Sandbox...
-DEBUG: Running 'docker compose down' in '{app_config}/sandbox'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
-Looking for latest Sandbox images from DockerHub...
-DEBUG: Running 'docker compose pull --ignore-pull-failures --quiet' in '{app_config}/sandbox'
-docker: STDOUT
-docker: STDERR
+DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
 Starting the AlgoKit sandbox now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT

@@ -1,3 +1,5 @@
+import json
+
 from algokit.core.sandbox import get_docker_compose_yml
 from approvaltests import verify  # type: ignore
 from utils.app_dir_mock import AppDirs
@@ -85,3 +87,21 @@ def test_sandbox_start_without_docker_engine_running(app_dir_mock: AppDirs, exec
 
     assert result.exit_code == 1
     verify(result.output)
+
+
+def test_sandbox_start_with_old_docker_compose_version(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    exec_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.2.1"})])
+
+    result = invoke("sandbox start")
+
+    assert result.exit_code == 1
+    verify(result.output)
+
+
+def test_sandbox_start_with_unparseable_docker_compose_version(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    exec_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.5-dev123"})])
+
+    result = invoke("sandbox start")
+
+    assert result.exit_code == 0
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
