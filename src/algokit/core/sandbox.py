@@ -1,6 +1,8 @@
 import enum
+import json
 import logging
 from pathlib import Path
+from typing import Any, cast
 
 from algokit.core.conf import get_app_config_dir
 from algokit.core.exec import RunResult, run
@@ -73,13 +75,25 @@ class ComposeSandbox:
         logger.info("Looking for latest Sandbox images from DockerHub...")
         self._run_compose_command("pull --ignore-pull-failures --quiet")
 
+    def ps(self) -> list[dict[str, Any]]:
+        run_results = self._run_compose_command("ps --all --format json", stdout_log_level=logging.DEBUG)
+        if run_results.exit_code != 0:
+            return []
+        data = json.loads(run_results.output)
+        assert isinstance(data, list)
+        return cast(list[dict[str, Any]], data)
+
+
+DEFAULT_ALGOD_PORT = 4001
+DEFAULT_INDEXER_PORT = 8980
+
 
 def get_docker_compose_yml(
     name: str = "algokit",
-    algod_port: int = 4001,
+    algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    indexer_port: int = 8980,
+    indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
     return f"""version: '3'
 name: "{name}_sandbox"

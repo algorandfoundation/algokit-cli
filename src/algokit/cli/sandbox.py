@@ -1,7 +1,9 @@
 import json
 import logging
+from typing import Any
 
 import click
+import httpx
 from algokit.core import exec
 from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
 
@@ -91,3 +93,94 @@ def reset_sandbox(update: bool) -> None:  # noqa: FBT001
         if update:
             sandbox.pull()
     sandbox.up()
+
+
+SERVICE_NAMES = ("algod", "indexer")
+
+
+@sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox")
+def sandbox_status() -> None:
+    sandbox = ComposeSandbox()
+    ps = sandbox.ps()
+    ps_by_name = {stats["Service"]: stats for stats in ps}
+    # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),
+    # then they will be missing from the output dictionary
+    if not all(item in ps_by_name.keys() for item in frozenset(SERVICE_NAMES)):
+        raise click.ClickException("Sandbox has not been initialized yet, please run 'algokit sandbox start'")
+    # initialise output dict by setting status
+    output_by_name = {
+        name: {"Status": "Running" if ps_by_name[name]["State"] == "running" else "Not running"}
+        for name in SERVICE_NAMES
+    }
+    # fill out remaining output_by_name["algod"] values
+    if output_by_name["algod"]["Status"] == "Running":
+        output_by_name["algod"].update(fetch_algod_data(ps_by_name["algod"]))
+    # fill out remaining output_by_name["indexer"] values
+    if output_by_name["indexer"]["Status"] == "Running":
+        output_by_name["indexer"].update(fetch_indexer_data(ps_by_name["indexer"]))
+
+    # Print the status details
+    for service_name, service_info in output_by_name.items():
+        logger.info("\n")
+        logger.info(click.style(f"# {service_name} status", bold=True))
+        for key, value in service_info.items():
+            logger.info(click.style(f"{key}:", bold=True) + f" {value}")
+
+    # return non-zero if any container is not running
+    if not all(item["Status"] == "Running" for item in output_by_name.values()):
+        raise click.ClickException()  # type: ignore
+
+
+def fetch_algod_data(service_info: dict[str, Any]) -> dict[str, Any]:
+    results: dict[str, Any] = {}
+    try:
+        # Docker image response
+        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        http_status_response = httpx.get(
+            f"http://localhost:{port}/v1/status",
+            headers={"X-Algo-API-Token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        )
+        if http_status_response.status_code == httpx.codes.OK:
+            status_response = http_status_response.json()
+            results["Last round"] = status_response["lastRound"]
+            results["Time since last round"] = "%.1fs" % status_response["timeSinceLastRound"]
+
+            http_versions_response = httpx.get(
+                f"http://localhost:{port}/versions",
+                headers={"X-Algo-API-Token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+            )
+            if http_versions_response.status_code == httpx.codes.OK:
+                genesis_response = http_versions_response.json()
+                results["Genesis ID"] = genesis_response["genesis_id"]
+                results["Genesis hash"] = genesis_response["genesis_hash_b64"]
+                major_version = genesis_response["build"]["major"]
+                minor_version = genesis_response["build"]["minor"]
+                build_version = genesis_response["build"]["build_number"]
+                results["Version"] = f"{major_version}.{minor_version}.{build_version}"
+        else:
+            results["Status"] = "Error"
+    except Exception:
+        results = {}
+        results["Status"] = "Error"
+    return results
+
+
+def fetch_indexer_data(service_info: dict[str, Any]) -> dict[str, Any]:
+    results: dict[str, Any] = {}
+    try:
+        # Docker image response
+        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        # container specific response
+        http_response = httpx.get(f"http://localhost:{port}/health")
+        if http_response.status_code == httpx.codes.OK:
+            response = http_response.json()
+            results["Last round"] = response["round"]
+            if "errors" in response:
+                results["Error(s)"] = response["errors"]
+            results["Version"] = response["version"]
+        else:
+            results["Status"] = "Error"
+    except Exception:
+        results = {}
+        results["Status"] = "Error"
+    return results
