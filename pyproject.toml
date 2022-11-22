@@ -87,5 +87,6 @@ implicit_reexport = false
 show_error_codes = true
 
 [tool.semantic_release]
-version_variable = "pyproject.toml:tool.poetry.version"
-#version_variable = "version.py:__version__"
+version_toml = "pyproject.toml:tool.poetry.version"
+#branch = "main"
+branch = "release-versioning"
