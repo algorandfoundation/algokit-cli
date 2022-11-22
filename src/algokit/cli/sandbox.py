@@ -159,7 +159,8 @@ def fetch_algod_data(service_info: dict[str, Any]) -> dict[str, Any]:
                 results["Version"] = f"{major_version}.{minor_version}.{build_version}"
         else:
             results["Status"] = "Error"
-    except Exception:
+    except Exception as err:
+        logger.debug("Received error: %s", err)
         results = {}
         results["Status"] = "Error"
     return results
@@ -180,7 +181,8 @@ def fetch_indexer_data(service_info: dict[str, Any]) -> dict[str, Any]:
             results["Version"] = response["version"]
         else:
             results["Status"] = "Error"
-    except Exception:
+    except Exception as err:
+        logger.debug("Received error: %s", err)
         results = {}
         results["Status"] = "Error"
     return results

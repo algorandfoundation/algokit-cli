@@ -1,4 +1,5 @@
 from approvaltests import verify
+from pytest_httpx import HTTPXMock
 from utils.app_dir_mock import AppDirs
 from utils.click_invoker import invoke
 from utils.exec_mock import ExecMock
@@ -11,9 +12,21 @@ def get_verify_output(stdout: str, additional_name: str, additional_output: str)
 {additional_output}"""
 
 
-def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock):
+def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
+    httpx_mock.add_response(url="http://localhost:4001/v1/status", json={"lastRound": 1, "timeSinceLastRound": 15.3})
+    httpx_mock.add_response(
+        url="http://localhost:4001/versions",
+        json={
+            "genesis_id": "{genesis_id}",
+            "genesis_hash_b64": "{genesis_hash_b64}",
+            "build": {"major": 1, "minor": 2, "build_number": 1},
+        },
+    )
+    httpx_mock.add_response(
+        url="http://localhost:8980/health", json={"round": 1, "errors": ["error"], "version": "v1.0"}
+    )
 
     exec_mock.set_output(
         "docker compose ps --all --format json",
