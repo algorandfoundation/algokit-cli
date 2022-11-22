@@ -3,7 +3,8 @@ name: CD
 on:
   push:
     branches:
-      - main
+      - release-versioning
+      #- main
   workflow_dispatch:
 
 permissions:
@@ -11,31 +12,6 @@ permissions:
   packages: read
 
 jobs:
-  versioning:
-    name: Versioning
-    uses: ./.github/workflows/create-version.yaml
-
   build:
-    name: Build Python
-    uses: ./.github/workflows/build-python.yaml
-    needs: [versioning]
-    with:
-      shouldPublish: true
-      artifactName: "AlgoKit-cli-${{ needs.versioning.outputs.version_number }}"
-
-  # TODO: when starting releasing to PyPi
-  # publish_to_pypi:
-  #   name: Publish package to PyPi
-  #   needs: [versioning, build]
-  #   uses: ./.github/workflows/publish-package-to-pypi.yaml
-  #   with:
-  #     artifactName: ${{ needs.versioning.outputs.release_name }}
-
-  git_tag:
-    name: Tag
-    uses: ./.github/workflows/create-git-tag.yaml
-    needs: [versioning, build]
-    permissions:
-      contents: write
-    with:
-      version_number: ${{ needs.versioning.outputs.version_number }}
+    name: Continuous Deployment
+    uses: ./.github/workflows/release-beta.yaml

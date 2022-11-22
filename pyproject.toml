@@ -87,8 +87,10 @@ show_error_codes = true
 [tool.semantic_release]
 version_toml = "pyproject.toml:tool.poetry.version"
 #branch = "main"
+remove_dist=false
+build_command="poetry build --format wheel" 
+# the following are while developing only
 branch = "release-versioning"
-# while debugging
 major_on_zero=false
 upload_to_repository=false
-build_command="poetry build --format wheel"
+
