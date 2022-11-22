@@ -58,7 +58,7 @@ jobs:
         run: |
           poetry run semantic-release \
             --prerelease \
-            --define=prerelease_tag=alpha+${{ steps.get_branch.outputs.branch }} \
+            --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             --define=tag_commit=false \
             publish
