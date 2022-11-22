@@ -52,4 +52,4 @@ jobs:
           github_token: xxx
           repository_username: xxx
           repository_password: xxx
-          additional_options: --prerelease --define=prerelease_tag="${GITHUB_REF##*/}" --define=branch="${GITHUB_REF##*/}"
+          additional_options: --prerelease --define=prerelease_tag=${GITHUB_REF##*/} --define=branch=${GITHUB_REF##*/}
