@@ -48,6 +48,7 @@ else:
         GenericDiffReporter(create_config(["kdiff3", "/usr/bin/kdiff3"])),
         GenericDiffReporter(create_config(["DiffMerge", "/Applications/DiffMerge.app/Contents/MacOS/DiffMerge"])),
         GenericDiffReporter(create_config(["TortoiseGit", "{ProgramFiles}\\TortoiseGit\\bin\\TortoiseGitMerge.exe"])),
+        GenericDiffReporter(create_config(["VSCodeInsiders", "code-insiders", ["-d"]])),
         reporters.ReportWithBeyondCompare(),
         reporters.ReportWithWinMerge(),
         reporters.ReportWithVSCode(),
