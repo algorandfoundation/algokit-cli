@@ -3,8 +3,14 @@ name: AlgoKit CI
 on: [pull_request]
       
 jobs:
+  ci-check:
+    name: Check (CI)
+    uses: ./.github/workflows/check-python.yaml
+
   ci-build:
     name: Build (CI)
+    # don't run build & test until basic checks have passed
+    needs: ci-check
     uses: ./.github/workflows/build-python.yaml
     with:
       shouldPublish: false
