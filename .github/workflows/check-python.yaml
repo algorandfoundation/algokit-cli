@@ -1,0 +1,34 @@
+name: Check Python Code
+
+on:
+  workflow_call:
+
+jobs:
+  check-python:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Check code style with Black
+        uses: psf/black@stable
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Lint with Ruff
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          poetry run ruff .
+
+      - name: mypy
+        run: poetry run mypy

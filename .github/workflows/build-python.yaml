@@ -36,17 +36,6 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
-      - name: Check code style with Black
-        uses: psf/black@stable
-
-      - name: Lint with Ruff
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          poetry run ruff .
-
-      - name: mypy
-        run: poetry run mypy
-
       - name: Test with pytest
         run: poetry run pytest
 
