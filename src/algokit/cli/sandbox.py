@@ -42,6 +42,16 @@ def start_sandbox() -> None:
     sandbox.up()
 
 
+@sandbox_group.command("stop", short_help="Stop the AlgoKit Sandbox")
+def stop_sandbox() -> None:
+    sandbox = ComposeSandbox()
+    compose_file_status = sandbox.compose_file_status()
+    if compose_file_status is ComposeFileStatus.MISSING:
+        logger.debug("Sandbox compose file does not exist yet; run `algokit sandbox start` to start the Sandbox")
+    else:
+        sandbox.stop()
+
+
 @sandbox_group.command("reset", short_help="Reset the AlgoKit Sandbox")
 @click.option(
     "--update/--no-update",

@@ -1,0 +1,8 @@
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: Sandbox compose file does not exist yet; run `algokit sandbox start` to start the Sandbox

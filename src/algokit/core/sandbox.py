@@ -60,6 +60,11 @@ class ComposeSandbox:
         )
         logger.info("Started; execute `algokit sandbox status` to check the status.")
 
+    def stop(self) -> None:
+        logger.info("Stopping the AlgoKit sandbox now...")
+        self._run_compose_command("stop", bad_return_code_error_message="Failed to stop Sandbox")
+        logger.info("Sandbox Stopped; execute `algokit sandbox start` to start it again.")
+
     def down(self) -> None:
         logger.info("Deleting any existing Sandbox...")
         self._run_compose_command("down", stdout_log_level=logging.DEBUG)
