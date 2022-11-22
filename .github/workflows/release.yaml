@@ -1,10 +1,6 @@
-name: Release
+name: Release Production
 
-on:
-  push:
-    branches:
-      - release-versioning
-  workflow_dispatch:
+on: workflow_dispatch
 
 concurrency: release
 
@@ -13,48 +9,38 @@ permissions:
   packages: read
 
 jobs:
-  release:
+  # run_ci:
+
+  continuous_deployment:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: "main" # note, user can select a branch when running this action, but we force it back to main
 
-      # - name: Install poetry
-      #   run: pipx install poetry
+      - name: Install poetry
+        run: pipx install poetry
 
-      # - name: Set up Python ${{ matrix.python }}
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: ${{ matrix.python }}
-      #     cache: "poetry"
-
-      # - name: Install dependencies
-      #   run: poetry install --no-interaction --no-root
-
-      # - name: Bump Version
-      #   run: poetry run semantic-release --prerelease --define prerelease_tag="${GITHUB_REF##*/}" version
-
-      # - name: Get Version
-      #   id: get_version
-      #   run: echo "version=$(poetry run semantic-release print-version)" >> $GITHUB_OUTPUT
-
-      # - name: Build Python
-      #   uses: ./.github/workflows/build-python.yaml
-      #   with:
-      #     shouldPublish: true
-      #     artifactName: "AlgoKit-cli-${{ steps.get_version.version }}"
-
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
-      - name: Create Release
-        uses: relekang/python-semantic-release@master
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          github_token: xxx
-          repository_username: xxx
-          repository_password: xxx
-          additional_options: --prerelease --define=prerelease_tag=${{ steps.extract_branch.outputs.branch }} --define=branch=${{ steps.extract_branch.outputs.branch }}
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Release
+        run: |
+          poetry run semantic-release \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Upload artifact - using Python 3.10 on ubuntu-latest
+        uses: actions/upload-artifact@v3
+        with:
+          name: algokit-cli
+          path: dist/algokit-*-py3-none-any.whl
+          if-no-files-found: error

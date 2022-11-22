@@ -1,0 +1,72 @@
+name: Release Beta
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+concurrency: release
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  # run_ci:
+
+  release_beta:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Get branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: get_branch
+
+      - name: hacky fix git
+        run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+
+      - name: Create Continuous Deployment Release
+        if: steps.get_branch.outputs.branch == 'main'
+        run: |
+          poetry run semantic-release \
+            --prerelease \
+            --define=tag_commit=false \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Create Feature Branch Release
+        if: steps.get_branch.outputs.branch != 'main'
+        run: |
+          poetry run semantic-release \
+            --prerelease \
+            --define=prerelease_tag=alpha+${{ steps.get_branch.outputs.branch }} \
+            --define=branch=${{ steps.get_branch.outputs.branch }} \
+            --define=tag_commit=false \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: algokit-cli
+          path: dist/algokit-*-py3-none-any.whl
+          if-no-files-found: error
