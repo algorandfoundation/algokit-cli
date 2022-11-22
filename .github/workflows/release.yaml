@@ -46,10 +46,15 @@ jobs:
       #     shouldPublish: true
       #     artifactName: "AlgoKit-cli-${{ steps.get_version.version }}"
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Create Release
         uses: relekang/python-semantic-release@master
         with:
           github_token: xxx
           repository_username: xxx
           repository_password: xxx
-          additional_options: --prerelease --define=prerelease_tag=${GITHUB_REF##*/} --define=branch=${GITHUB_REF##*/}
+          additional_options: --prerelease --define=prerelease_tag=${{ steps.extract_branch.outputs.branch }} --define=branch=${{ steps.extract_branch.outputs.branch }}
