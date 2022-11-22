@@ -55,7 +55,7 @@ def test_sandbox_reset_with_existing_sandbox_with_up_to_date_config_no_pull(app_
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
 
-    result = invoke("sandbox reset --no-pull")
+    result = invoke("sandbox reset --no-update")
 
     assert result.exit_code == 0
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))

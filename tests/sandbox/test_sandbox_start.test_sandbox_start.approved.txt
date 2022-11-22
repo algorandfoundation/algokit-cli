@@ -15,6 +15,7 @@ Started; execute `algokit sandbox status` to check the status.
 {app_config}/sandbox/docker-compose.yml:
 ----
 version: '3'
+name: "algokit_sandbox"
 
 services:
   algod:

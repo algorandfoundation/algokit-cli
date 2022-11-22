@@ -1,5 +1,5 @@
 from io import StringIO
-from typing import IO, Any
+from typing import IO, Any, Sequence, TypeVar
 
 
 class PopenMock:
@@ -50,9 +50,20 @@ class ExecMock:
         self._output = lines
 
     def popen(self, cmd: list[str], *args: Any, **kwargs: Any) -> PopenMock:
-        should_fail = cmd in self.fail_on
+        should_fail = any(sequence_starts_with(cmd, prefix) for prefix in self.fail_on)
         if should_fail:
             raise FileNotFoundError(f"No such file or directory: {cmd[0]}")
-        exit_code = -1 if cmd in self.bad_exit_on else 0
+        exit_code = -1 if any(sequence_starts_with(cmd, prefix) for prefix in self.bad_exit_on) else 0
         output = "\n".join(self._output or ["STDOUT", "STDERR"])
         return PopenMock(output, exit_code)
+
+
+T = TypeVar("T")
+
+
+def sequence_starts_with(seq: Sequence[T], test: Sequence[T]) -> bool:
+    """Like startswith, but for a generic sequence"""
+    test_len = len(test)
+    if len(seq) < test_len:
+        return False
+    return seq[:test_len] == test

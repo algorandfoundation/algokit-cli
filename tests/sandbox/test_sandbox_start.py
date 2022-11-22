@@ -25,6 +25,15 @@ def test_sandbox_start(app_dir_mock: AppDirs, exec_mock: ExecMock):
     )
 
 
+def test_sandbox_start_failure(app_dir_mock: AppDirs, exec_mock: ExecMock):
+    exec_mock.should_bad_exit_on("docker compose up")
+
+    result = invoke("sandbox start")
+
+    assert result.exit_code == 1
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
 def test_sandbox_start_up_to_date_definition(app_dir_mock: AppDirs, exec_mock: ExecMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
