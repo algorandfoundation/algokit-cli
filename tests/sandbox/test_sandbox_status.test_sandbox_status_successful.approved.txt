@@ -13,16 +13,16 @@ DEBUG: HTTP Request: GET http://localhost:8980/health "HTTP/1.1 200 OK"
 # algod status
 Status: Running
 Port: 4001
-Last round: 0
-Time since last round: 0.0s
-Genesis ID: sandnet-v1
-Genesis hash: 1dpDw4wZL+8OI6IUy7S6LyUqcXQ2busuRZIQRsZjsbE=
-Version: 3.11.2
+Last round: 1
+Time since last round: 15.3s
+Genesis ID: {genesis_id}
+Genesis hash: {genesis_hash_b64}
+Version: 1.2.1
 
 
 # indexer status
 Status: Running
 Port: 8980
-Last round: 0
-Error(s): ['fetcher error: HTTP 404: {"message":"failed to retrieve information from the ledger"}/n']
-Version: (unknown version)
+Last round: 1
+Error(s): ['error']
+Version: v1.0

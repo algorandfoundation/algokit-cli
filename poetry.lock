@@ -569,6 +569,21 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
 
 [[package]]
+name = "pytest-httpx"
+version = "0.21.2"
+description = "Send responses to httpx."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+httpx = ">=0.23.0,<0.24.0"
+pytest = ">=6,<8"
+
+[package.extras]
+testing = ["pytest-asyncio (>=0.20.0,<0.21.0)", "pytest-cov (>=4.0.0,<5.0.0)"]
+
+[[package]]
 name = "pytest-mock"
 version = "3.10.0"
 description = "Thin-wrapper around the mock package for easier use with pytest"
@@ -764,7 +779,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "3ba63725a3b5f74482427a72fc99229519edcee40eccab8a1328e3a20341e203"
+content-hash = "0f48e2148f302b4ab416a04b287a631b43e8d56ac8c9ee7f063be3c1c8a2eb99"
 
 [metadata.files]
 aiohttp = [
@@ -1256,6 +1271,10 @@ pyperclip = [
 pytest = [
     {file = "pytest-7.2.0-py3-none-any.whl", hash = "sha256:892f933d339f068883b6fd5a459f03d85bfcb355e4981e146d2c7616c21fef71"},
     {file = "pytest-7.2.0.tar.gz", hash = "sha256:c4014eb40e10f11f355ad4e3c2fb2c6c6d1919c73f3b5a433de4708202cade59"},
+]
+pytest-httpx = [
+    {file = "pytest_httpx-0.21.2-py3-none-any.whl", hash = "sha256:a6ea51ab4e603507b4e91ac868e62c8a40dde85ded9f5dd71d6e29b0e8d5a217"},
+    {file = "pytest_httpx-0.21.2.tar.gz", hash = "sha256:39596a2caa7aeb384de7f1cf134bcc4595177a449af7d0fc9bd5916cad515464"},
 ]
 pytest-mock = [
     {file = "pytest-mock-3.10.0.tar.gz", hash = "sha256:fbbdb085ef7c252a326fd8cdcac0aa3b1333d8811f131bdcc701002e1be7ed4f"},
