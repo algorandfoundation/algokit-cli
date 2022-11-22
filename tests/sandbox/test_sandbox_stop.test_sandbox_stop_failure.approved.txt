@@ -1,0 +1,11 @@
+DEBUG: Running 'docker compose version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+Stopping the AlgoKit sandbox now...
+DEBUG: Running 'docker compose stop' in '{app_config}/sandbox'
+docker: STDOUT
+docker: STDERR
+Error: Failed to stop Sandbox
