@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any, cast
 
+import httpx
 from algokit.core.conf import get_app_config_dir
 from algokit.core.exec import RunResult, run
 
@@ -76,7 +77,7 @@ class ComposeSandbox:
         self._run_compose_command("pull --ignore-pull-failures --quiet")
 
     def ps(self) -> list[dict[str, Any]]:
-        run_results = self._run_compose_command("ps --all --format json", stdout_log_level=logging.DEBUG)
+        run_results = self._run_compose_command("ps --format json", stdout_log_level=logging.DEBUG)
         if run_results.exit_code != 0:
             return []
         data = json.loads(run_results.output)
@@ -84,16 +85,12 @@ class ComposeSandbox:
         return cast(list[dict[str, Any]], data)
 
 
-DEFAULT_ALGOD_PORT = 4001
-DEFAULT_INDEXER_PORT = 8980
-
-
 def get_docker_compose_yml(
     name: str = "algokit",
-    algod_port: int = DEFAULT_ALGOD_PORT,
+    algod_port: int = 4001,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    indexer_port: int = DEFAULT_INDEXER_PORT,
+    indexer_port: int = 8980,
 ) -> str:
     return f"""version: '3'
 name: "{name}_sandbox"
@@ -133,3 +130,60 @@ services:
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexer_db
 """
+
+
+def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
+    results: dict[str, Any] = {}
+    try:
+        # Docker image response
+        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        # container specific response
+        with httpx.Client() as client:
+            algod_headers = {"X-Algo-API-Token": "a" * 64}
+            http_status_response = client.get(f"http://localhost:{port}/v1/status", headers=algod_headers, timeout=3)
+            http_versions_response = client.get(f"http://localhost:{port}/versions", headers=algod_headers, timeout=3)
+            if (
+                http_status_response.status_code != httpx.codes.OK
+                or http_versions_response.status_code != httpx.codes.OK
+            ):
+                return {"Status": "Error"}
+
+            # status response
+            status_response = http_status_response.json()
+            results["Last round"] = status_response["lastRound"]
+            results["Time since last round"] = "%.1fs" % status_response["timeSinceLastRound"]
+            # genesis response
+            genesis_response = http_versions_response.json()
+            results["Genesis ID"] = genesis_response["genesis_id"]
+            results["Genesis hash"] = genesis_response["genesis_hash_b64"]
+            major_version = genesis_response["build"]["major"]
+            minor_version = genesis_response["build"]["minor"]
+            build_version = genesis_response["build"]["build_number"]
+            results["Version"] = f"{major_version}.{minor_version}.{build_version}"
+            client.close
+        return results
+    except Exception as err:
+        logger.debug(f"Error checking algod status: {err}", exc_info=True)
+        return {"Status": "Error"}
+
+
+def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
+    results: dict[str, Any] = {}
+    try:
+        # Docker image response
+        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        # container specific response
+        http_response = httpx.get(f"http://localhost:{port}/health", timeout=5)
+
+        if http_response.status_code != httpx.codes.OK:
+            return {"Status": "Error"}
+
+        response = http_response.json()
+        results["Last round"] = response["round"]
+        if "errors" in response:
+            results["Error(s)"] = response["errors"]
+        results["Version"] = response["version"]
+        return results
+    except Exception as err:
+        logger.debug(f"Error checking indexer status: {err}", exc_info=True)
+        return {"Status": "Error"}
