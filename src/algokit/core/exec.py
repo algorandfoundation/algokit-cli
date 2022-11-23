@@ -23,6 +23,7 @@ def run(
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
     bad_return_code_error_message: str | None = None,
+    prefix_process: bool = True,
     stdout_log_level: int = logging.DEBUG,
 ) -> RunResult:
     """Wraps subprocess.Popen() similarly to subprocess.run() but adds: logging and streaming (unicode) I/O capture
@@ -53,7 +54,7 @@ def run(
                 lines.append(line)
                 logger.log(
                     level=stdout_log_level,
-                    msg=click.style(f"{command[0]}:", bold=True) + f" {line.strip()}",
+                    msg=(click.style(f"{command[0]}:", bold=True) if prefix_process else "") + f" {line.strip()}",
                 )
     if exit_code == 0:  # type: ignore[unreachable]
         logger.debug(f"'{command_str}' completed successfully", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
