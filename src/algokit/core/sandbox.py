@@ -85,12 +85,16 @@ class ComposeSandbox:
         return cast(list[dict[str, Any]], data)
 
 
+DEFAULT_ALGOD_PORT = 4001
+DEFAULT_INDEXER_PORT = 8980
+
+
 def get_docker_compose_yml(
     name: str = "algokit",
-    algod_port: int = 4001,
+    algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    indexer_port: int = 8980,
+    indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
     return f"""version: '3'
 name: "{name}_sandbox"
@@ -136,12 +140,20 @@ def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
     results: dict[str, Any] = {}
     try:
         # Docker image response
-        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        # Search for DEFAULT_ALGOD_PORT in ports, if found use it, if not found this is an error
+        if not any(item["PublishedPort"] == DEFAULT_ALGOD_PORT for item in service_info["Publishers"]):
+            return {"Status": "Error"}
+
+        results["Port"] = DEFAULT_ALGOD_PORT
         # container specific response
         with httpx.Client() as client:
             algod_headers = {"X-Algo-API-Token": "a" * 64}
-            http_status_response = client.get(f"http://localhost:{port}/v1/status", headers=algod_headers, timeout=3)
-            http_versions_response = client.get(f"http://localhost:{port}/versions", headers=algod_headers, timeout=3)
+            http_status_response = client.get(
+                f"http://localhost:{DEFAULT_ALGOD_PORT}/v1/status", headers=algod_headers, timeout=3
+            )
+            http_versions_response = client.get(
+                f"http://localhost:{DEFAULT_ALGOD_PORT}/versions", headers=algod_headers, timeout=3
+            )
             if (
                 http_status_response.status_code != httpx.codes.OK
                 or http_versions_response.status_code != httpx.codes.OK
@@ -171,9 +183,12 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
     results: dict[str, Any] = {}
     try:
         # Docker image response
-        results["Port"] = port = service_info["Publishers"][0]["PublishedPort"]
+        if not any(item["PublishedPort"] == DEFAULT_INDEXER_PORT for item in service_info["Publishers"]):
+            return {"Status": "Error"}
+
+        results["Port"] = service_info["Publishers"][0]["PublishedPort"]
         # container specific response
-        http_response = httpx.get(f"http://localhost:{port}/health", timeout=5)
+        http_response = httpx.get(f"http://localhost:{DEFAULT_INDEXER_PORT}/health", timeout=5)
 
         if http_response.status_code != httpx.codes.OK:
             return {"Status": "Error"}
