@@ -1,0 +1,4 @@
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+Error: Docker engine isn't running; please start it.

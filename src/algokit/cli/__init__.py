@@ -1,4 +1,5 @@
 import click
+from algokit.cli.goal import goal_command
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
 from algokit.core.conf import PACKAGE_NAME
@@ -18,3 +19,4 @@ def algokit() -> None:
 
 algokit.add_command(init_command)
 algokit.add_command(sandbox_group)
+algokit.add_command(goal_command)
