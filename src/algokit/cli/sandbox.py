@@ -3,7 +3,7 @@ import logging
 
 import click
 from algokit.core import exec
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
+from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
 
 logger = logging.getLogger(__name__)
 
@@ -91,3 +91,40 @@ def reset_sandbox(update: bool) -> None:  # noqa: FBT001
         if update:
             sandbox.pull()
     sandbox.up()
+
+
+SERVICE_NAMES = ("algod", "indexer", "indexer-db")
+
+
+@sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox")
+def sandbox_status() -> None:
+    sandbox = ComposeSandbox()
+    ps = sandbox.ps()
+    ps_by_name = {stats["Service"]: stats for stats in ps}
+    # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),
+    # then they will be missing from the output dictionary
+    if set(SERVICE_NAMES) != ps_by_name.keys():
+        raise click.ClickException("Sandbox has not been initialized yet, please run 'algokit sandbox start'")
+    # initialise output dict by setting status
+    output_by_name = {
+        name: {"Status": "Running" if ps_by_name[name]["State"] == "running" else "Not running"}
+        for name in SERVICE_NAMES
+    }
+    # fill out remaining output_by_name["algod"] values
+    if output_by_name["algod"]["Status"] == "Running":
+        output_by_name["algod"].update(fetch_algod_status_data(ps_by_name["algod"]))
+    # fill out remaining output_by_name["indexer"] values
+    if output_by_name["indexer"]["Status"] == "Running":
+        output_by_name["indexer"].update(fetch_indexer_status_data(ps_by_name["indexer"]))
+
+    # Print the status details
+    for service_name, service_info in output_by_name.items():
+        logger.info(click.style(f"# {service_name} status", bold=True))
+        for key, value in service_info.items():
+            logger.info(click.style(f"{key}:", bold=True) + f" {value}")
+
+    # return non-zero if any container is not running
+    if not all(item["Status"] == "Running" for item in output_by_name.values()):
+        raise click.ClickException(
+            "At least one container isn't running; execute `algokit sandbox start` to start the Sandbox"
+        )
