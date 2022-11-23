@@ -38,7 +38,7 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, h
             json.dumps(
                 [
                     {
-                        "ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973",
+                        "ID": "90ce27e631e4d0b048322abd01a9e68e4c899b936ad4e4e3106ad5d9f774a189",
                         "Name": "algokit_algod",
                         "Command": "start.sh",
                         "Project": "algokit_sandbox",
@@ -53,7 +53,7 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, h
                         ],
                     },
                     {
-                        "ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7",
+                        "ID": "d3a74173d552ac388643ee65c9c6aa4c1864cb1442d0423d62bd95c468ac4b97",
                         "Name": "algokit_indexer",
                         "Command": "/tmp/start.sh",
                         "Project": "algokit_sandbox",
@@ -64,6 +64,17 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, h
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
                         ],
+                    },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
                     },
                 ]
             )
@@ -123,6 +134,17 @@ def test_sandbox_status_http_error(app_dir_mock: AppDirs, exec_mock: ExecMock, h
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
                         ],
                     },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                    },
                 ]
             )
         ],
@@ -180,6 +202,17 @@ def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, exec_mock: ExecMo
                             {"URL": "0.0.0.0", "TargetPort": 1234, "PublishedPort": 1234, "Protocol": "tcp"}
                         ],
                     },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                    },
                 ]
             )
         ],
@@ -230,6 +263,17 @@ def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, exec_mock: Ex
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
                         ],
+                    },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
                     },
                 ]
             )
@@ -286,6 +330,17 @@ def test_sandbox_status_docker_error(app_dir_mock: AppDirs, exec_mock: ExecMock,
                         "ExitCode": 0,
                         "Publishers": [],
                     },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                    },
                 ]
             )
         ],
@@ -319,7 +374,18 @@ def test_sandbox_status_missing_service(app_dir_mock: AppDirs, exec_mock: ExecMo
                             {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
-                    }
+                    },
+                    {
+                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "Name": "algokit_postgres",
+                        "Command": "docker-entrypoint.sh postgres",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer-db",
+                        "State": "running",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                    },
                 ]
             )
         ],

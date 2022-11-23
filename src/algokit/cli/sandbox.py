@@ -93,7 +93,7 @@ def reset_sandbox(update: bool) -> None:  # noqa: FBT001
     sandbox.up()
 
 
-SERVICE_NAMES = ("algod", "indexer")
+SERVICE_NAMES = ("algod", "indexer", "indexer-db")
 
 
 @sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox")
@@ -103,7 +103,7 @@ def sandbox_status() -> None:
     ps_by_name = {stats["Service"]: stats for stats in ps}
     # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),
     # then they will be missing from the output dictionary
-    if not set(SERVICE_NAMES) <= ps_by_name.keys():
+    if set(SERVICE_NAMES) != ps_by_name.keys():
         raise click.ClickException("Sandbox has not been initialized yet, please run 'algokit sandbox start'")
     # initialise output dict by setting status
     output_by_name = {

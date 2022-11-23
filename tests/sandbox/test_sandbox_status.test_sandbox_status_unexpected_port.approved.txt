@@ -4,7 +4,7 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'
-DEBUG: docker: [{"ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973", "Name": "algokit_algod", "Command": "start.sh", "Project": "algokit_sandbox", "Service": "algod", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}]}, {"ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7", "Name": "algokit_indexer", "Command": "/tmp/start.sh", "Project": "algokit_sandbox", "Service": "indexer", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "0.0.0.0", "TargetPort": 1234, "PublishedPort": 1234, "Protocol": "tcp"}]}]
+DEBUG: docker: [{"ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973", "Name": "algokit_algod", "Command": "start.sh", "Project": "algokit_sandbox", "Service": "algod", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}]}, {"ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7", "Name": "algokit_indexer", "Command": "/tmp/start.sh", "Project": "algokit_sandbox", "Service": "indexer", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "0.0.0.0", "TargetPort": 1234, "PublishedPort": 1234, "Protocol": "tcp"}]}, {"ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026", "Name": "algokit_postgres", "Command": "docker-entrypoint.sh postgres", "Project": "algokit_sandbox", "Service": "indexer-db", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}]}]
 DEBUG: HTTP Request: GET http://localhost:4001/v1/status "HTTP/1.1 200 OK"
 DEBUG: HTTP Request: GET http://localhost:4001/versions "HTTP/1.1 200 OK"
 # algod status
@@ -17,4 +17,6 @@ Genesis hash: {genesis_hash_b64}
 Version: 1.2.1
 # indexer status
 Status: Error
+# indexer-db status
+Status: Running
 Error: At least one container isn't running; execute `algokit sandbox start` to start the Sandbox
