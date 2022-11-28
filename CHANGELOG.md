@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2022-11-28)
+### Feature
+* Publish to repo ([`277f070`](https://github.com/robdmoore/algokit-cli/commit/277f070504059cb9e41846e5345c2f96a6613b0e))
+* Test feature ([`a3aad01`](https://github.com/robdmoore/algokit-cli/commit/a3aad016e58b0e1b4e9d45680295f99eec497aed))
+* Some feature ([`61aaec8`](https://github.com/robdmoore/algokit-cli/commit/61aaec8ef833fafd6cd067a59673c8a16b4667df))
+
+### Fix
+* Fixing package name for versioning ([`ba5f994`](https://github.com/robdmoore/algokit-cli/commit/ba5f994b00075bfb1b8abf1f1f9a6c43cce30e0f))
+* Added tag_commit=true ([`2d741ab`](https://github.com/robdmoore/algokit-cli/commit/2d741abbd57f945c003cb882507d70478794bd9b))
+
+### Breaking
+* Test feature ([`a3aad01`](https://github.com/robdmoore/algokit-cli/commit/a3aad016e58b0e1b4e9d45680295f99eec497aed))
+
 ## v0.4.2 (2022-11-28)
 ### Fix
 * Fixing pr build ([`158faa1`](https://github.com/robdmoore/algokit-cli/commit/158faa11b2ba113d177913337706cfacbe43deb9))
