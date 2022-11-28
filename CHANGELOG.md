@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.2 (2022-11-28)
+### Fix
+* Fixing pr build ([`158faa1`](https://github.com/robdmoore/algokit-cli/commit/158faa11b2ba113d177913337706cfacbe43deb9))
+
 ## v0.4.1 (2022-11-28)
 ### Fix
 * Fixing dependency publish ([`9718feb`](https://github.com/robdmoore/algokit-cli/commit/9718febb32456986988f367040093dae6881f5c7))
