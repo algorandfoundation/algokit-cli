@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rdmak"
-version = "0.1.0"
+version = "0.3.0"
 description = "Algorand development kit command line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -92,3 +92,5 @@ remove_dist=false
 build_command="poetry build --format wheel" 
 major_on_zero=false
 upload_to_repository=false
+tag_commit=false
+branch="main"
