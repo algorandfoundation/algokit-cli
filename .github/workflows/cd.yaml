@@ -1,17 +1,105 @@
-name: CD
+name: Continuous Delivery of Python package
 
 on:
   push:
     branches:
-      - release-versioning
-      #- main
+      - main
   workflow_dispatch:
+    inputs:
+      production_release:
+        description: "Production release?"
+        required: true
+        default: "true"
+
+concurrency: release
 
 permissions:
   contents: write
   packages: read
 
 jobs:
-  build:
-    name: Continuous Deployment
-    uses: ./.github/workflows/release-beta.yaml
+  check-python:
+    name: Check Python
+    uses: ./.github/workflows/check-python.yaml
+
+  build-python:
+    name: Build Python
+    uses: ./.github/workflows/build-python.yaml
+    needs: check-python
+    with:
+      # The artifact is published below after the version number is set
+      shouldPublish: false
+
+  release:
+    name: Release Library
+    needs: build-python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Fetch entire repository history so we can determine version number from it
+          fetch-depth: 0
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Get branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: get_branch
+
+      - name: Set Git user as GitHub actions
+        run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+
+      - name: Create Continuous Deployment Release
+        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
+        run: |
+          poetry run semantic-release \
+            --prerelease \
+            --define=tag_commit=false \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Create Production Release
+        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
+        run: |
+          poetry run semantic-release \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Create Feature Branch Release
+        if: steps.get_branch.outputs.branch != 'main'
+        run: |
+          poetry run semantic-release \
+            --prerelease \
+            --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
+            --define=branch=${{ steps.get_branch.outputs.branch }} \
+            --define=tag_commit=false \
+            publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: algokit-cli
+          path: dist/algokit-*-py3-none-any.whl
+          if-no-files-found: error

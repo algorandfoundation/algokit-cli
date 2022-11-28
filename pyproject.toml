@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "algokit"
+name = "rdmak"
 version = "0.3.0-beta+release-versioning.1"
 description = "Algorand development kit command line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
@@ -88,11 +88,7 @@ show_error_codes = true
 
 [tool.semantic_release]
 version_toml = "pyproject.toml:tool.poetry.version"
-#branch = "main"
 remove_dist=false
 build_command="poetry build --format wheel" 
-# the following are while developing only
-branch = "release-versioning"
 major_on_zero=false
 upload_to_repository=false
-
