@@ -77,8 +77,8 @@ jobs:
         run: |
           poetry run semantic-release \
             --define=version_source="commit" \
-            --define=upload_to_repository=true \
             publish
+        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
