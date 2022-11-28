@@ -66,23 +66,24 @@ jobs:
         run: |
           poetry run semantic-release \
             --prerelease \
+            --define=upload_to_repository=true \
             publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: __token__
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 
       - name: Create Production Release
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
         run: |
           poetry run semantic-release \
             --define=version_source="commit" \
+            --define=upload_to_repository=true \
             publish
-        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: __token__
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 
       - name: Create Feature Branch Release
         if: steps.get_branch.outputs.branch != 'main'
@@ -91,11 +92,12 @@ jobs:
             --prerelease \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
+            --define=upload_to_repository=true \
             publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: __token__
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
