@@ -18,21 +18,21 @@ permissions:
   packages: read
 
 jobs:
-  check-python:
+  ci-check-python:
     name: Check Python
     uses: ./.github/workflows/check-python.yaml
 
-  build-python:
+  ci-build-python:
     name: Build Python
     uses: ./.github/workflows/build-python.yaml
-    needs: check-python
+    needs: ci-check-python
     with:
       # The artifact is published below after the version number is set
       shouldPublish: false
 
   release:
     name: Release Library
-    needs: build-python
+    needs: ci-build-python
     runs-on: ubuntu-latest
 
     steps:
