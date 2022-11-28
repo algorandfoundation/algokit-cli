@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rdmak"
-version = "0.4.0-beta.5"
+version = "0.4.1-beta.1"
 description = "Algorand development kit command line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -90,8 +90,8 @@ show_error_codes = true
 version_toml = "pyproject.toml:tool.poetry.version"
 remove_dist=false
 build_command="poetry build --format wheel" 
+version_source="tag"
 major_on_zero=false
 upload_to_repository=false
-tag_commit=false
 branch="main"
-commit_message="{version}\n\nskip-checks: true"
+#commit_message="{version}\n\nskip-checks: true"
