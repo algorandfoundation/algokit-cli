@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rdmak"
-version = "0.6.0-beta.2"
+version = "0.4.0"
 description = "Algorand development kit command line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
