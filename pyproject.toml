@@ -93,5 +93,6 @@ build_command="poetry build --format wheel"
 version_source="tag"
 major_on_zero=false
 upload_to_repository=false
+tag_commit=true
 branch="main"
 commit_message="{version}\n\nskip-checks: true"
