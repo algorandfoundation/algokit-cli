@@ -66,7 +66,6 @@ jobs:
         run: |
           poetry run semantic-release \
             --prerelease \
-            --define=tag_commit=false \
             publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,6 +76,8 @@ jobs:
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
         run: |
           poetry run semantic-release \
+            --define=version_source="commit" \
+            --define=upload_to_repository=true \
             publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,7 +91,6 @@ jobs:
             --prerelease \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
-            --define=tag_commit=false \
             publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
