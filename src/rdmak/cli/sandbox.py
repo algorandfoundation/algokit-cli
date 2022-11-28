@@ -2,8 +2,8 @@ import json
 import logging
 
 import click
-from algokit.core import exec
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
+from rdmak.core import exec
+from rdmak.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
 
 logger = logging.getLogger(__name__)
 

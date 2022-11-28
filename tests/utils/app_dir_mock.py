@@ -13,7 +13,7 @@ class AppDirs:
 def tmp_app_dir(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     app_config_dir = tmp_path / "config"
     app_config_dir.mkdir()
-    mocker.patch("algokit.core.sandbox.get_app_config_dir").return_value = app_config_dir
+    mocker.patch("rdmak.core.sandbox.get_app_config_dir").return_value = app_config_dir
 
     app_state_dir = tmp_path / "state"
     app_state_dir.mkdir()

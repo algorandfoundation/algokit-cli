@@ -13,7 +13,7 @@ class ClickInvokeResult:
 
 
 def invoke(args: str) -> ClickInvokeResult:
-    from algokit.cli import algokit
+    from rdmak.cli import algokit
 
     runner = CliRunner()
     cwd = Path.cwd()

@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any, cast
 
 import httpx
-from algokit.core.conf import get_app_config_dir
-from algokit.core.exec import RunResult, run
+from rdmak.core.conf import get_app_config_dir
+from rdmak.core.exec import RunResult, run
 
 logger = logging.getLogger(__name__)
 

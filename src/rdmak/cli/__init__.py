@@ -1,9 +1,9 @@
 import click
-from algokit.cli.goal import goal_command
-from algokit.cli.init import init_command
-from algokit.cli.sandbox import sandbox_group
-from algokit.core.conf import PACKAGE_NAME
-from algokit.core.log_handlers import color_option, verbose_option
+from rdmak.cli.goal import goal_command
+from rdmak.cli.init import init_command
+from rdmak.cli.sandbox import sandbox_group
+from rdmak.core.conf import PACKAGE_NAME
+from rdmak.core.log_handlers import color_option, verbose_option
 
 
 @click.group(

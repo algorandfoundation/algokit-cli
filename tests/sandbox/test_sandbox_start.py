@@ -1,7 +1,7 @@
 import json
 
-from algokit.core.sandbox import get_docker_compose_yml
 from approvaltests import verify  # type: ignore
+from rdmak.core.sandbox import get_docker_compose_yml
 from utils.app_dir_mock import AppDirs
 from utils.click_invoker import invoke
 from utils.exec_mock import ExecMock

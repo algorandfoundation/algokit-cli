@@ -1,7 +1,7 @@
 import logging
 
 import click
-from algokit.core import exec
+from rdmak.core import exec
 
 logger = logging.getLogger(__name__)
 

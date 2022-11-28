@@ -16,7 +16,7 @@ def exec_mock(mocker: MockerFixture) -> ExecMock:
     exec_mock = ExecMock()
     # add a default for docker compose version
     exec_mock.set_output(["docker", "compose", "version", "--format", "json"], [json.dumps({"version": "v2.5.0"})])
-    mocker.patch("algokit.core.exec.Popen").side_effect = exec_mock.popen
+    mocker.patch("rdmak.core.exec.Popen").side_effect = exec_mock.popen
     return exec_mock
 
 

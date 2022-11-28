@@ -5,7 +5,7 @@ from pathlib import Path
 from subprocess import Popen
 
 import click
-from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from rdmak.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 
 logger = logging.getLogger(__name__)
 

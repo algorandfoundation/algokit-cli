@@ -13,7 +13,7 @@ if sys.version_info < (3, 10, 0):
     sys.exit(-1)
 
 try:
-    from algokit.core.log_handlers import initialise_logging, uncaught_exception_logging_handler
+    from rdmak.core.log_handlers import initialise_logging, uncaught_exception_logging_handler
 except ImportError as ex:
     # the above should succeed both in importing "algokit" itself, and we also know that "click" will
     # be imported too, if those basic packages aren't present, something is very wrong
@@ -29,6 +29,6 @@ sys.excepthook = uncaught_exception_logging_handler
 
 
 if __name__ == "__main__":
-    from algokit.cli import algokit
+    from rdmak.cli import algokit
 
     algokit()

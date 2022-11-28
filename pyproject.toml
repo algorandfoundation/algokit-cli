@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rdmak"
-version = "0.3.0-beta+release-versioning.1"
+version = "0.1.0"
 description = "Algorand development kit command line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -27,7 +27,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-algokit = "algokit.cli:algokit"
+rdmak = "rdmak.cli:algokit"
 
 [tool.ruff]
 line-length = 120
