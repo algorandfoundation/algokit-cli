@@ -10,7 +10,7 @@ from rdmak.core.log_handlers import color_option, verbose_option
     help="AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.",
     context_settings={"help_option_names": ["-h", "--help"]},
 )
-@click.version_option(package_name=PACKAGE_NAME)
+@click.version_option(package_name="rdmak")
 @verbose_option
 @color_option
 def algokit() -> None:
