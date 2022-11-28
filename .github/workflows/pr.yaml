@@ -9,7 +9,7 @@ jobs:
 
   pr-build:
     name: Build and Test Python
-    needs: ci-check
+    needs: pr-check
     uses: ./.github/workflows/build-python.yaml
     with:
       shouldPublish: false
