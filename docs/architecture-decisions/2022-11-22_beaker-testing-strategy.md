@@ -5,17 +5,17 @@
 - **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Michael Diamant (Algorand Inc.), Benjamin Guidarelli (Algorand Foundation)
 - **Date created**: 2022-11-22
 - **Date decided:** TBD
-- **Date updated**: 2022-11-23
+- **Date updated**: 2022-11-28
 
 ## Context
 
 AlgoKit will be providing a smart contract development experience built on top of [PyTEAL](https://pyteal.readthedocs.io/en/stable/) and [Beaker](https://developer.algorand.org/articles/hello-beaker/). Beaker is currently in a pre-production state and needs to be productionised to provide confidence for use in generating production-ready smart contracts by AlgoKit users. One of the key things to resolve to productionisation of Beaker is to improve the automated test coverage.
 
-Beaker itself is currently split into the PyTEAL generation related code and the deployment and invocation related code (including interacting with Sandbox). This decision is solely focussed on the PyTEAL generation components of Beaker. The current automated test coverage of this part of the codebase is ~50% and is largely based on compiling and/or executing smart contracts against Algorand Sandbox. While it's generally not best practice to try and case a specific code coverage percentage, a coverage of 80% +/- 15% is likely indicative of good coverage.
+Beaker itself is currently split into the PyTEAL generation related code and the deployment and invocation related code (including interacting with Sandbox). This decision is solely focussed on the PyTEAL generation components of Beaker. The current automated test coverage of this part of the codebase is ~50% and is largely based on compiling and/or executing smart contracts against Algorand Sandbox. While it's generally not best practice to try and case a specific code coverage percentage, a coverage of ~80%+ is likely indicative of good coverage in a dynamic language such as Python.
 
 The Sandbox tests provide a great deal of confidence, but are also slow to execute, which can potentially impair Beaker development and maintenance experience, especially as the coverage % is grown and/or features are added over time.
 
-Beaker, like PyTEAL, can be considered to be a transpiler on top of TEAL. When generating smart contracts, the individual TEAL opcodes are significant, since security audits will often consider the impact at that level and it can have impacts on (limited!) resource usage of the smart contract. As such, "output stability" is potentially an important characteristic to test for.
+Beaker, like PyTEAL, can be considered to be a transpiler on top of TEAL. When generating smart contracts, the individual TEAL opcodes are significant, since security audits will often consider the impact at that level, and it can have impacts on (limited!) resource usage of the smart contract. As such, "output stability" is potentially an important characteristic to test for.
 
 ## Requirements
 
@@ -33,68 +33,63 @@ Beaker, like PyTEAL, can be considered to be a transpiler on top of TEAL. When g
 
 ### Option 1: TEAL Approval tests
 
-TODO
+Writing [approval tests](https://approvaltests.com/) of the TEAL output generated from a given Beaker smart contract.
 
 **Pros**
 
-- TODO
+- Ensures TEAL output stability and focussing on asserting the output of Beaker rather than testing whether Algorand Protocol is working
+- Runs in-memory/in-process so will execute in low 10s of milliseconds making it easy to provide high coverage with low developer feedback loop overhead
+- Tests are easy to write - the assertion is a single line of code (no tedious assertions)
+- The tests go from Beaker contract -> TEAL approval so don't bake implementation detail and thus allow full Beaker refactoring with regression confidence without needing to modify the tests
+- Excellent regression coverage characteristics - fast test run and quick to write allows for high coverage and anchoring assertions to TEAL output is a very clear regression marker
 
 **Cons**
 
-- TODO
+- The tests rely on the approver to understand the TEAL opcodes that are emitted and verify they match the intent of the Beaker contract - anecdotally this can be difficult at times even for experienced (Py)TEAL developers
+- Doesn't assert the correctness of the TEAL output, just that it matches the previously manually approved output
 
 ### Option 2: Sandbox compile tests
 
-TODO
+Writing Beaker smart contracts and checking that the TEAL output successfully compiles against algod.
 
 **Pros**
 
-- TODO
+- Ensures that the TEAL output compiles, giving some surety about the intactness of it and focussing on asserting the output of Beaker rather than testing whether Algorand Protocol is working
+- Faster than executing the contract
+- Tests are easy to write - the assertion is a single line of code (no tedious assertions)
 
 **Cons**
 
-- TODO
+- Order of magnitude slower than asserting TEAL output (out of process communication)
+- Doesn't assert the correctness of the TEAL output, just that it compiles
 
-### Option 3: Sandbox dry run tests
+### Option 3: Sandbox execution tests
 
-TODO
+Execute the smart contracts and assert the output is as expected. This can be done using dry run and/or actual transactions.
 
 **Pros**
 
-- TODO
+- Asserts that the TEAL output _executes_ correctly giving the highest confidence
+- Doesn't require the test writer to understand the TEAL output
+- Tests don't bake implementation detail and do assert on output so give a reasonable degree of refactoring confidence without modifying tests
 
 **Cons**
 
-- TODO
-
-### Option 4: Sandbox execution tests
-
-TODO
-
-**Pros**
-
-- TODO
-
-**Cons**
-
-- TODO
-
-### Option 5: Combined approach
-
-TODO
-
-**Pros**
-
-- TODO
-
-**Cons**
-
-- TODO
+- Tests are more complex to write
+- Tests take an order of magnitude longer to run than just compilation (two orders of magnitude to run than checking TEAL output)
+- Harder to get high regression coverage since it's slower to write and run the tests making it impractical to get full coverage
+- Doesn't ensure output stability
+- Is testing that the Algorand Protocol itself works (TEAL `x` when executed does `y`) so the testing scope is broader than just Beaker itself
 
 ## Preferred option
 
-todo
+Option 1 (combined with Option 2 to ensure the approved TEAL actually compiles, potentially only run on CI by default to ensure fast local dev loop) for the bulk of testing to provide a rapid feedback loop for developers as well as ensuring output stability and great regression coverage.
 
 ## Selected option
 
-todo
+Combination of option 1, 2 and 3:
+
+- While Option 1 + 2 provides high confidence with fast feedback loop, it relies on the approver being able to determine the TEAL output does what they think it does, which isn't always the case
+- Option 3 will be used judiciously to provide that extra level of confidence that the fundamentals of the Beaker output are correct for each main feature; this will involve key scenarios being tested with execution based tests, the goal isn't to get combinatorial coverage, which would be slow and time-consuming, but to give a higher degree of confidence
+- The decision of when to use Option 3 as well as Option 1+2 will be made on a per-feature basis and reviewed via pull request, over time a set of principles may be able to be revised that outline a clear delineation
+- Use of PyTest markers to separate execution so by default the dev feedback loop is still fast, but the full suite is always run against pull requests and merges to main
