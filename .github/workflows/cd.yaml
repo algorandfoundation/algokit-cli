@@ -67,6 +67,7 @@ jobs:
           poetry run semantic-release \
             --prerelease \
             publish
+        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
@@ -77,8 +78,8 @@ jobs:
         run: |
           poetry run semantic-release \
             --define=version_source="commit" \
-            --define=upload_to_repository=${{ secrets.PYPI_TOKEN != '' }} \
             publish
+        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
@@ -91,8 +92,8 @@ jobs:
             --prerelease \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
-            --define=upload_to_repository=${{ secrets.PYPI_TOKEN != '' }} \
             publish
+        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
