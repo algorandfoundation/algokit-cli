@@ -2,6 +2,7 @@ import json
 import logging
 
 import click
+from algokit.cli.goal import goal_command
 from algokit.core import exec
 from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
 
@@ -128,3 +129,13 @@ def sandbox_status() -> None:
         raise click.ClickException(
             "At least one container isn't running; execute `algokit sandbox start` to start the Sandbox"
         )
+
+
+@sandbox_group.command(
+    "console",
+    short_help="Run the Algorand goal CLI against the AlgoKit Sandbox via a Bash console"
+    + " so you can execute multiple goal commands and/or interact with a filesystem",
+)
+@click.pass_context
+def sandbox_console(context: click.Context) -> None:
+    context.invoke(goal_command, console=True)
