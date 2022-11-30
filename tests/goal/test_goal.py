@@ -1,13 +1,19 @@
 from subprocess import CompletedProcess
 
 from pytest_mock import MockerFixture
-from utils.app_dir_mock import AppDirs
 from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 
 
-def test_goal_no_args(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_goal_help():
+    result = invoke("goal -h")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_goal_no_args(proc_mock: ProcMock, mocker: MockerFixture):
     result = invoke("goal")
 
     assert result.exit_code == 0
