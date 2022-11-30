@@ -1,0 +1,5 @@
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+Opening Bash console on the algod node; execute `exit` to return to original console
+DEBUG: Running 'docker exec -it -w /root algokit_algod bash' in '{current_working_directory}'
