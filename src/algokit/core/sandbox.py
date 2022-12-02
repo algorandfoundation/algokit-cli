@@ -172,7 +172,6 @@ def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
             minor_version = genesis_response["build"]["minor"]
             build_version = genesis_response["build"]["build_number"]
             results["Version"] = f"{major_version}.{minor_version}.{build_version}"
-            client.close
         return results
     except Exception as err:
         logger.debug(f"Error checking algod status: {err}", exc_info=True)
