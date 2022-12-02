@@ -16,13 +16,13 @@ import prompt_toolkit.document
 import questionary
 from algokit.core import proc
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
-from questionary.constants import INSTRUCTION_MULTILINE
 
 logger = logging.getLogger(__name__)
 
 
 _blessed_templates = {
     "beaker-default": "gh:copier-org/autopretty",
+    "simple": "gh:fastapi-mvc/copier-script",
 }
 
 _unofficial_template_warning = (
@@ -76,15 +76,12 @@ def init_command(
     if template_name:
         template_url = _blessed_templates[template_name]
     elif template_url:
-        # allow passing the URL to a blessed template instead of the name,
-        # just because we can & it's easy
-        if template_url not in _blessed_templates.values():
-            logger.warning(_unofficial_template_warning)
-            # note: we use unsafe_ask here (and everywhere else) so we don't have to
-            # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
-            # at the root level
-            if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
-                _fail_and_bail()
+        logger.warning(_unofficial_template_warning)
+        # note: we use unsafe_ask here (and everywhere else) so we don't have to
+        # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
+        # at the root level
+        if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
+            _fail_and_bail()
     else:
         template_url = _get_template_url()
 
@@ -95,8 +92,7 @@ def init_command(
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(
-            project_path,
-            default_commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
+            project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
         )
 
     logger.info("For next steps, consult the documentation of your selected template.")
@@ -180,7 +176,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
 
 def _get_template_url() -> str:
     choice_value = questionary.select(
-        "Select a project template: ", choices=[*_blessed_templates, "custom url"]
+        "Select a project template: ", choices=[*_blessed_templates, "<enter custom url>"]
     ).unsafe_ask()
     try:
         return _blessed_templates[choice_value]
@@ -238,7 +234,7 @@ def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) ->
     )
 
 
-def _git_init(project_path: Path, default_commit_message: str) -> None:
+def _git_init(project_path: Path, commit_message: str) -> None:
     def git(*args: str, bad_exit_warn_message: str) -> bool:
         result = proc.run(["git", *args], cwd=project_path)
         success = result.exit_code == 0
@@ -248,20 +244,5 @@ def _git_init(project_path: Path, default_commit_message: str) -> None:
 
     if git("init", bad_exit_warn_message="Failed to initialise git repository"):
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
-            try:
-                logger.info(
-                    "Ready to commit initial changes. To skip committing, ctrl-c now.\n"
-                    "Otherwise, you can modify the commit message below or accept the default.\n"
-                    f"{INSTRUCTION_MULTILINE}"
-                )
-                commit_message: str = questionary.text(
-                    "Commit message: ",
-                    default=default_commit_message,
-                    multiline=True,
-                    instruction="",
-                    validate=NonEmptyValidator,
-                ).unsafe_ask()
-            except KeyboardInterrupt:
-                logger.info("Skipping initial commit")
-            else:
-                git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
+            if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
+                logger.info("Changes committed successfully!")
