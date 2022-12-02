@@ -43,10 +43,7 @@ _unofficial_template_warning = (
     "--template-url",
     type=str,
     default=None,
-    help=(
-        "URL to a git repo with a custom project template. "
-        "Can use shorthand of gh: instead of github.com and gl: instead of gitlab.com"
-    ),
+    help="URL to a git repo with a custom project template.",
     metavar="URL",
 )
 @click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
@@ -176,10 +173,19 @@ def _get_template_url() -> str:
     # note we print the warning but don't prompt for confirmation like we would when the URL is passed
     # as a command line argument, instead we allow the user to return to the official selection list
     # by entering a blank string
-    logger.warning(_unofficial_template_warning)
+    logger.warning(f"\n{_unofficial_template_warning}\n")
     logger.info(
         "Enter a custom project URL, or leave blank and press enter to go back to official template selection.\n"
-        "Note that you can use gh: as a shorthand for github.com and likewise gl: for gitlab.com"
+        "Note that you can use gh: as a shorthand for github.com and likewise gl: for gitlab.com\n"
+        "Valid examples:\n"
+        " - gh:copier-org/copier\n"
+        " - gl:copier-org/copier\n"
+        " - git@github.com:copier-org/copier.git\n"
+        " - git+https://mywebsiteisagitrepo.example.com/\n"
+        " - /local/path/to/git/repo\n"
+        " - /local/path/to/git/bundle/file.bundle\n"
+        " - ~/path/to/git/repo\n"
+        " - ~/path/to/git/repo.bundle\n"
     )
     template_url: str = (
         questionary.text("Custom template URL: ", validate=GitRepoValidator, validate_while_typing=False)
