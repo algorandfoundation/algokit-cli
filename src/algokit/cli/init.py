@@ -47,12 +47,29 @@ _unofficial_template_warning = (
     metavar="URL",
 )
 @click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
+@click.option(
+    "answers",
+    "--answer",
+    "-a",
+    multiple=True,
+    help="Answers key/value pairs to pass to the template.",
+    nargs=2,
+    default=[],
+    metavar="<key> <value>",
+)
 def init_command(
-    directory_name: str | None, template_name: str | None, template_url: str | None, use_git: bool | None
+    directory_name: str | None,
+    template_name: str | None,
+    template_url: str | None,
+    use_git: bool | None,
+    answers: list[tuple[str, str]],
 ) -> None:
     """Initializes a new project from a template."""
+    # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
+    # parse this early to prevent frustration
+    answers_dict = dict(answers)
 
     project_path = _get_project_path(directory_name)
 
@@ -73,7 +90,7 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
-    copier_worker = copier.run_copy(template_url, project_path)
+    copier_worker = copier.run_copy(template_url, project_path, data=answers_dict)
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
