@@ -3,7 +3,7 @@ import logging
 
 import click
 from algokit.cli.goal import goal_command
-from algokit.core import exec
+from algokit.core import proc
 from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 @click.group("sandbox", short_help="Manage the AlgoKit sandbox")
 def sandbox_group() -> None:
     try:
-        compose_version_result = exec.run(
+        compose_version_result = proc.run(
             ["docker", "compose", "version", "--format", "json"],
             bad_return_code_error_message=(
                 "Docker Compose not found; please install Docker Compose and add to path.\n"
@@ -45,7 +45,7 @@ def sandbox_group() -> None:
                     "Please update your Docker install"
                 )
 
-    exec.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+    proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
 @sandbox_group.command("start", short_help="Start the AlgoKit Sandbox")

@@ -14,8 +14,8 @@ httpx = "^0.23.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
 black = {extras = ["d"], version = "^22.10.0"}
-ruff = "^0.0.132"
-pip-audit = "^2.4.5"
+ruff = "^0.0.150"
+pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
 mypy = "^0.991"
@@ -88,11 +88,11 @@ show_error_codes = true
 
 [tool.semantic_release]
 version_toml = "pyproject.toml:tool.poetry.version"
-remove_dist=false
-build_command="poetry build --format wheel" 
-version_source="tag"
-major_on_zero=false
-upload_to_repository=false
-tag_commit=true
-branch="main"
-commit_message="{version}\n\nskip-checks: true"
+remove_dist = false
+build_command = "poetry build --format wheel"
+version_source = "tag"
+major_on_zero = false
+upload_to_repository = false
+tag_commit = true
+branch = "main"
+commit_message = "{version}\n\nskip-checks: true"
