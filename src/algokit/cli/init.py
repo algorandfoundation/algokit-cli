@@ -1,4 +1,5 @@
 import logging
+import re
 from pathlib import Path
 
 try:
@@ -6,11 +7,16 @@ try:
 except ImportError:
     from typing import NoReturn as Never
 
+# TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
+#       to their repo to include py.typed file
 import click
+import copier  # type: ignore
+import copier.vcs  # type: ignore
 import prompt_toolkit.document
 import questionary
 from algokit.core import proc
-from copier import run_copy  # type: ignore
+from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from questionary.constants import INSTRUCTION_MULTILINE
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +66,7 @@ def init_command(
         # just because we can & it's easy
         if template_url not in _blessed_templates.values():
             logger.warning(_unofficial_template_warning)
-            # note: we use unsafe_ask here (and almost everywhere else) so we don't have to
+            # note: we use unsafe_ask here (and everywhere else) so we don't have to
             # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
             # at the root level
             if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
@@ -70,18 +76,20 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
-    copier_worker = run_copy(template_url, project_path)
-    logger.debug("Project initialisation complete")
+    copier_worker = copier.run_copy(template_url, project_path)
+    expanded_template_url = copier_worker.template.url_expanded
+    logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(
             project_path,
-            default_commit_message=f"Project initialised with AlgoKit CLI using template: {template_url}",
+            default_commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
         )
 
     logger.info("For next steps, consult the documentation of your selected template.")
-    git_url = copier_worker.template.url_expanded.removesuffix(".git")
-    if git_url.startswith("http"):
-        logger.info(f"Your selected template comes from {git_url}")
+    if re.search("https?://", expanded_template_url):
+        # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
+        # and print it out so the user can (depending on terminal) click it to open in browser
+        logger.info(f"Your selected template comes from {expanded_template_url.removesuffix('.git')}")
 
 
 def _fail_and_bail() -> Never:
@@ -118,6 +126,19 @@ class ChainedValidator(questionary.Validator):
             validator.validate(document)
 
 
+class GitRepoValidator(questionary.Validator):
+    def validate(self, document: prompt_toolkit.document.Document) -> None:
+        value = document.text.strip()
+        if not value:
+            return
+        try:
+            if copier.vcs.get_repo(value) is not None:
+                return
+        except Exception:
+            logger.exception(f"Error parsing repo URL = {value}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
+        raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
+
+
 def _get_project_path(directory_name_option: str | None = None) -> Path:
     base_path = Path.cwd()
     if directory_name_option is not None:
@@ -126,6 +147,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
         directory_name = questionary.text(
             "Name of directory to create the project in: ",
             validate=ChainedValidator(NonEmptyValidator(), DirectoryNameValidator(base_path)),
+            validate_while_typing=False,
         ).unsafe_ask()
     project_path = base_path / directory_name.strip()
     if project_path.exists():
@@ -133,8 +155,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
         )
-        continue_answer = questionary.confirm("Continue anyway?", default=False).unsafe_ask()
-        if not continue_answer:
+        if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
             # re-prompt only if interactive and user didn't cancel
             if directory_name_option is None:
                 return _get_project_path()
@@ -156,16 +177,12 @@ def _get_template_url() -> str:
     # as a command line argument, instead we allow the user to return to the official selection list
     # by entering a blank string
     logger.warning(_unofficial_template_warning)
+    logger.info(
+        "Enter a custom project URL, or leave blank and press enter to go back to official template selection.\n"
+        "Note that you can use gh: as a shorthand for github.com and likewise gl: for gitlab.com"
+    )
     template_url: str = (
-        # TODO: validate URL
-        questionary.text(
-            "Custom template URL: ",
-            instruction=(
-                "\nEnter a custom project URL, or hit enter to go back to official template selection."
-                "\nNote that you can use gh: as a shorthand for github.com and likewise gl: for gitlab.com"
-                "\n>"
-            ),
-        )
+        questionary.text("Custom template URL: ", validate=GitRepoValidator, validate_while_typing=False)
         .unsafe_ask()
         .strip()
     )
@@ -200,7 +217,7 @@ def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) ->
 
 def _git_init(project_path: Path, default_commit_message: str) -> None:
     def git(*args: str, bad_exit_warn_message: str) -> bool:
-        result = proc.run(["git", *args], cwd=project_path, stdout_log_level=logging.INFO)
+        result = proc.run(["git", *args], cwd=project_path)
         success = result.exit_code == 0
         if not success:
             logger.warning(bad_exit_warn_message)
@@ -208,16 +225,20 @@ def _git_init(project_path: Path, default_commit_message: str) -> None:
 
     if git("init", bad_exit_warn_message="Failed to initialise git repository"):
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
-            commit_message: str | None = questionary.text(
-                (
-                    "Ready to commit initial changes. To skip committing, ctrl-c now. "
-                    "Otherwise, you can modify the commit message below or accept the default"
-                ),
-                default=default_commit_message,
-                multiline=True,
-                validate=NonEmptyValidator,
-            ).ask()
-            if commit_message is None:
+            try:
+                logger.info(
+                    "Ready to commit initial changes. To skip committing, ctrl-c now.\n"
+                    "Otherwise, you can modify the commit message below or accept the default.\n"
+                    f"{INSTRUCTION_MULTILINE}"
+                )
+                commit_message: str = questionary.text(
+                    "Commit message: ",
+                    default=default_commit_message,
+                    multiline=True,
+                    instruction="",
+                    validate=NonEmptyValidator,
+                ).unsafe_ask()
+            except KeyboardInterrupt:
                 logger.info("Skipping initial commit")
             else:
                 git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
