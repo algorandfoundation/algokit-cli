@@ -1,7 +1,7 @@
 import logging
 
 import click
-from algokit.core import exec
+from algokit.core import proc
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @click.argument("goal_args", nargs=-1, type=click.UNPROCESSED)
 def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
     try:
-        exec.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+        proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except IOError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
@@ -31,7 +31,7 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
         ) from ex
     if console:
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
-        result = exec.run_interactive("docker exec -it -w /root algokit_algod bash".split())
+        result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
         if result.exit_code != 0:
             raise click.ClickException(
                 "Error executing goal;" + " ensure the Sandbox is started by executing `algokit sandbox status`"
@@ -40,7 +40,7 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
     else:
         cmd = str("docker exec algokit_algod goal").split()
         cmd.extend(goal_args)
-        exec.run(
+        proc.run(
             cmd,
             stdout_log_level=logging.INFO,
             prefix_process=False,

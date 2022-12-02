@@ -5,7 +5,7 @@ from approvaltests import verify
 from pytest_httpx import HTTPXMock
 from utils.app_dir_mock import AppDirs
 from utils.click_invoker import invoke
-from utils.exec_mock import ExecMock
+from utils.proc_mock import ProcMock
 
 
 def get_verify_output(stdout: str, additional_name: str, additional_output: str) -> str:
@@ -15,7 +15,7 @@ def get_verify_output(stdout: str, additional_name: str, additional_output: str)
 {additional_output}"""
 
 
-def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -32,7 +32,7 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, h
         url="http://localhost:8980/health", json={"round": 1, "errors": ["error"], "version": "v1.0"}
     )
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -86,7 +86,7 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, exec_mock: ExecMock, h
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_http_error(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -101,7 +101,7 @@ def test_sandbox_status_http_error(app_dir_mock: AppDirs, exec_mock: ExecMock, h
     )
     httpx_mock.add_exception(httpx.ReadTimeout("Unable to read within timeout"))
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -155,7 +155,7 @@ def test_sandbox_status_http_error(app_dir_mock: AppDirs, exec_mock: ExecMock, h
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -169,7 +169,7 @@ def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, exec_mock: ExecMo
         },
     )
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -223,7 +223,7 @@ def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, exec_mock: ExecMo
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -231,7 +231,7 @@ def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, exec_mock: Ex
         url="http://localhost:8980/health", json={"round": 1, "errors": ["error"], "version": "v1.0"}
     )
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -285,7 +285,7 @@ def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, exec_mock: Ex
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_docker_error(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -299,7 +299,7 @@ def test_sandbox_status_docker_error(app_dir_mock: AppDirs, exec_mock: ExecMock,
         },
     )
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -351,11 +351,11 @@ def test_sandbox_status_docker_error(app_dir_mock: AppDirs, exec_mock: ExecMock,
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_missing_service(app_dir_mock: AppDirs, exec_mock: ExecMock, httpx_mock: HTTPXMock):
+def test_sandbox_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
-    exec_mock.set_output(
+    proc_mock.set_output(
         "docker compose ps --format json",
         [
             json.dumps(
@@ -396,10 +396,10 @@ def test_sandbox_status_missing_service(app_dir_mock: AppDirs, exec_mock: ExecMo
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_failure(app_dir_mock: AppDirs, exec_mock: ExecMock):
+def test_sandbox_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
-    exec_mock.should_bad_exit_on("docker compose stop")
+    proc_mock.should_bad_exit_on("docker compose stop")
 
     result = invoke("sandbox status")
 
@@ -407,15 +407,15 @@ def test_sandbox_status_failure(app_dir_mock: AppDirs, exec_mock: ExecMock):
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_no_existing_definition(app_dir_mock: AppDirs, exec_mock: ExecMock):
+def test_sandbox_status_no_existing_definition(app_dir_mock: AppDirs, proc_mock: ProcMock):
     result = invoke("sandbox status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_without_docker(app_dir_mock: AppDirs, exec_mock: ExecMock):
-    exec_mock.should_fail_on("docker compose version")
+def test_sandbox_status_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock):
+    proc_mock.should_fail_on("docker compose version")
 
     result = invoke("sandbox status")
 
@@ -423,8 +423,8 @@ def test_sandbox_status_without_docker(app_dir_mock: AppDirs, exec_mock: ExecMoc
     verify(result.output)
 
 
-def test_sandbox_status_without_docker_compose(app_dir_mock: AppDirs, exec_mock: ExecMock):
-    exec_mock.should_bad_exit_on("docker compose version")
+def test_sandbox_status_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock):
+    proc_mock.should_bad_exit_on("docker compose version")
 
     result = invoke("sandbox status")
 
@@ -432,8 +432,8 @@ def test_sandbox_status_without_docker_compose(app_dir_mock: AppDirs, exec_mock:
     verify(result.output)
 
 
-def test_sandbox_status_without_docker_engine_running(app_dir_mock: AppDirs, exec_mock: ExecMock):
-    exec_mock.should_bad_exit_on("docker version")
+def test_sandbox_status_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock):
+    proc_mock.should_bad_exit_on("docker version")
 
     result = invoke("sandbox status")
 

@@ -6,7 +6,7 @@ from typing import Any, cast
 
 import httpx
 from algokit.core.conf import get_app_config_dir
-from algokit.core.exec import RunResult, run
+from algokit.core.proc import RunResult, run
 
 logger = logging.getLogger(__name__)
 

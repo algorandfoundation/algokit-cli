@@ -8,16 +8,16 @@ from approvaltests.reporters.generic_diff_reporter_config import create_config  
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
 from pytest_mock import MockerFixture
 from utils.app_dir_mock import AppDirs, tmp_app_dir
-from utils.exec_mock import ExecMock
+from utils.proc_mock import ProcMock
 
 
 @pytest.fixture
-def exec_mock(mocker: MockerFixture) -> ExecMock:
-    exec_mock = ExecMock()
+def proc_mock(mocker: MockerFixture) -> ProcMock:
+    proc_mock = ProcMock()
     # add a default for docker compose version
-    exec_mock.set_output(["docker", "compose", "version", "--format", "json"], [json.dumps({"version": "v2.5.0"})])
-    mocker.patch("algokit.core.exec.Popen").side_effect = exec_mock.popen
-    return exec_mock
+    proc_mock.set_output(["docker", "compose", "version", "--format", "json"], [json.dumps({"version": "v2.5.0"})])
+    mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
+    return proc_mock
 
 
 @pytest.fixture

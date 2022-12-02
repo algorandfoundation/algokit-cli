@@ -42,7 +42,7 @@ class CommandMockData:
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
 
 
-class ExecMock:
+class ProcMock:
     def __init__(self):
         self._mock_data: dict[tuple[str, ...], CommandMockData] = {}
 
