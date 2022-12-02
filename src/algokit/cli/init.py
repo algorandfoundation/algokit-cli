@@ -95,15 +95,15 @@ def init_command(
             project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
         )
 
-    logger.info("For next steps, consult the documentation of your selected template.")
+    logger.info("🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐")
     if re.search("https?://", expanded_template_url):
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
-        logger.info(f"Your selected template comes from {expanded_template_url.removesuffix('.git')}")
+        logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
 
 
 def _fail_and_bail() -> Never:
-    logger.info("Bailing out...\n( o_o) /シ")
+    logger.info("🛑 Bailing out... 👋")
     raise click.exceptions.Exit(code=1)
 
 
@@ -245,4 +245,4 @@ def _git_init(project_path: Path, commit_message: str) -> None:
     if git("init", bad_exit_warn_message="Failed to initialise git repository"):
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
             if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
-                logger.info("Changes committed successfully!")
+                logger.info("🎉 Performed initial git commit successfully! 🎉")
