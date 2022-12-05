@@ -240,7 +240,10 @@ def test_init_template_url_and_template_name(tmp_path_factory: TempPathFactory, 
 
     mock_questionary_input.send_text("Y")  # community warning
     result = invoke(
-        f"init --name myapp --no-git --template simple --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
+        (
+            "init --name myapp --no-git --template simple "
+            f"--template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes"
+        ),
         cwd=cwd,
     )
 
