@@ -267,6 +267,7 @@ def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_ques
 def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
     cwd = tmp_path_factory.mktemp("cwd")
 
+    # Source for special keys https://github.com/tmbo/questionary/blob/master/tests/prompts/test_select.py
     mock_questionary_input.send_text("\x1b[A")  # one up
     mock_questionary_input.send_text("\n")  # enter
 
