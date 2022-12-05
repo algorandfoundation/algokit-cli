@@ -1,0 +1,2 @@
+WARNING: <INSERT warning message about community / unofficial templates & arbitrary code execution HERE>
+🛑 Bailing out... 👋
