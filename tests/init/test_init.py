@@ -54,7 +54,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     paths = {p.relative_to(created_dir) for p in created_dir.iterdir()}
     assert paths == {Path("script.sh"), Path(".git")}
     git_rev_list = subprocess.run(
-        ["git", "rev-list", "--max-parents=0", "HEAD", "--", "."], cwd=created_dir, capture_output=True, text=True
+        ["git", "rev-list", "--max-parents=0", "main", "--", "."], cwd=created_dir, capture_output=True, text=True
     )
     assert git_rev_list.returncode == 0
     git_initial_commit_hash = git_rev_list.stdout[:7]
