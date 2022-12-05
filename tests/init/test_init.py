@@ -1,14 +1,22 @@
-from pathlib import Path
 import logging
+import subprocess
+from pathlib import Path
 
+import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests import verify
+from click import unstyle
 from prompt_toolkit.input import PipeInput
 from utils.click_invoker import invoke
-from click import unstyle
 
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-script-v0.1.0.gitbundle"
+
+
+@pytest.fixture(autouse=True, scope="module")
+def supress_copier_dependencies_debug_output():
+    logging.getLogger("plumbum.local").setLevel("INFO")
+    logging.getLogger("asyncio").setLevel("INFO")
 
 
 def test_init_minimal_interaction_required_no_git_no_network(
@@ -16,8 +24,6 @@ def test_init_minimal_interaction_required_no_git_no_network(
 ):
     cwd = tmp_path_factory.mktemp("cwd")
 
-    logging.getLogger("plumbum.local").setLevel("INFO")
-    logging.getLogger("asyncio").setLevel("INFO")
     mock_questionary_input.send_text("Y")
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
@@ -28,3 +34,28 @@ def test_init_minimal_interaction_required_no_git_no_network(
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path("myapp"), Path("myapp") / "script.sh"}
     verify(unstyle(result.output))
+
+
+def test_init_minimal_interaction_required_yes_git_no_network(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_questionary_input.send_text("Y")
+    dir_name = "myapp"
+    result = invoke(
+        f"init --name {dir_name} --git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    created_dir = cwd / dir_name
+    assert created_dir.is_dir()
+    paths = {p.relative_to(created_dir) for p in created_dir.iterdir()}
+    assert paths == {Path("script.sh"), Path(".git")}
+    git_rev_list = subprocess.run(
+        ["git", "rev-list", "--max-parents=0", "HEAD"], cwd=created_dir, capture_output=True, text=True
+    )
+    assert git_rev_list.returncode == 0
+    git_initial_commit_hash = git_rev_list.stdout[:7]
+    verify(unstyle(result.output).replace(git_initial_commit_hash, "{git_initial_commit_hash}"))
