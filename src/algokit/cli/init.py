@@ -76,6 +76,9 @@ def init_command(
     if template_name:
         template_url = _blessed_templates[template_name]
     elif template_url:
+        if not _repo_url_is_valid(template_url):
+            logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
+            _fail_and_bail()
         logger.warning(_unofficial_template_warning)
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
@@ -136,17 +139,22 @@ class ChainedValidator(questionary.Validator):
             validator.validate(document)
 
 
+def _repo_url_is_valid(url: str) -> bool:
+    """Check the repo URL is valid according to copier"""
+    if not url:
+        return False
+    try:
+        return copier.vcs.get_repo(url) is not None
+    except Exception:
+        logger.exception(f"Error parsing repo URL = {url}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
+        return False
+
+
 class GitRepoValidator(questionary.Validator):
     def validate(self, document: prompt_toolkit.document.Document) -> None:
         value = document.text.strip()
-        if not value:
-            return
-        try:
-            if copier.vcs.get_repo(value) is not None:
-                return
-        except Exception:
-            logger.exception(f"Error parsing repo URL = {value}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
-        raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
+        if not _repo_url_is_valid(value):
+            raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
 
 
 def _get_project_path(directory_name_option: str | None = None) -> Path:
