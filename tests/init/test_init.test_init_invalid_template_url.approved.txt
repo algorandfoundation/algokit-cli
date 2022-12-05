@@ -1,0 +1,2 @@
+WARNING: <INSERT warning message about community / unofficial templates & arbitrary code execution HERE>
+DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template https://www.google.com

@@ -132,3 +132,16 @@ def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questio
 
     assert result.exit_code == 0
     verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+
+
+def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_questionary_input.send_text("Y")  # community warning
+    result = invoke(
+        "init --name myapp --no-git --template-url https://www.google.com --answer script script.sh --answer nix yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 1
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
