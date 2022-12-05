@@ -16,6 +16,7 @@ DEBUG: git: Initialized empty Git repository in {current_working_directory}/myap
 DEBUG: Running 'git add --all' in '{current_working_directory}/myapp'
 DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-script-v0.1.0.gitbundle' in '{current_working_directory}/myapp'
 DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-script-v0.1.0.gitbundle
+DEBUG: git: Author: GitHub Actions <no-reply@example.com>
 DEBUG: git: 1 file changed, 14 insertions(+)
 DEBUG: git: create mode 100755 script.sh
 🎉 Performed initial git commit successfully! 🎉
