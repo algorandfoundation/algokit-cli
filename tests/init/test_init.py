@@ -109,3 +109,21 @@ def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questi
 
     assert result.exit_code == 0
     verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+
+
+def test_init_existing_filename_same_as_folder_name(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+):
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "myapp").touch()
+
+    mock_questionary_input.send_text("Y")  # override
+    mock_questionary_input.send_text("Y")  # community warning
+
+    result = invoke(
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 1
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
