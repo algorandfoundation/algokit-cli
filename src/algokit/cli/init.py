@@ -161,6 +161,10 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
         ).unsafe_ask()
     project_path = base_path / directory_name.strip()
     if project_path.exists():
+        # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
+        if not project_path.is_dir():
+            logger.error("File with same name already exists in current directory, please supply a different name")
+            _fail_and_bail()
         logger.warning(
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
