@@ -1,5 +1,5 @@
 WARNING: <INSERT warning message about community / unofficial templates & arbitrary code execution HERE>
-DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template /Users/adam/vcs/algokit-cli/tests/init/copier-script-v0.1.0.gitbundle
+DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template {test_parent_directory}/copier-script-v0.1.0.gitbundle
 No git tags found in template; using HEAD as ref
 
 Copying from template version 0.0.0.post6.dev0+8199b7d
@@ -8,14 +8,14 @@ Copying from template version 0.0.0.post6.dev0+8199b7d
 
  > Running task 1 of 1: chmod +x script.sh
 
-DEBUG: Project initialisation complete, final clone URL = /Users/adam/vcs/algokit-cli/tests/init/copier-script-v0.1.0.gitbundle
+DEBUG: Project initialisation complete, final clone URL = {test_parent_directory}/copier-script-v0.1.0.gitbundle
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
 DEBUG: Running 'git init' in '{current_working_directory}/myapp'
 DEBUG: git: Initialized empty Git repository in {current_working_directory}/myapp/.git/
 DEBUG: Running 'git add --all' in '{current_working_directory}/myapp'
-DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: /Users/adam/vcs/algokit-cli/tests/init/copier-script-v0.1.0.gitbundle' in '{current_working_directory}/myapp'
-DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: /Users/adam/vcs/algokit-cli/tests/init/copier-script-v0.1.0.gitbundle
+DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-script-v0.1.0.gitbundle' in '{current_working_directory}/myapp'
+DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-script-v0.1.0.gitbundle
 DEBUG: git: 1 file changed, 14 insertions(+)
 DEBUG: git: create mode 100755 script.sh
 🎉 Performed initial git commit successfully! 🎉

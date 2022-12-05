@@ -33,7 +33,7 @@ def test_init_minimal_interaction_required_no_git_no_network(
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path("myapp"), Path("myapp") / "script.sh"}
-    verify(unstyle(result.output))
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
 
 
 def test_init_minimal_interaction_required_yes_git_no_network(
@@ -58,4 +58,8 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     )
     assert git_rev_list.returncode == 0
     git_initial_commit_hash = git_rev_list.stdout[:7]
-    verify(unstyle(result.output).replace(git_initial_commit_hash, "{git_initial_commit_hash}"))
+    verify(
+        unstyle(result.output)
+        .replace(git_initial_commit_hash, "{git_initial_commit_hash}")
+        .replace(str(PARENT_DIRECTORY), "{test_parent_directory}")
+    )
