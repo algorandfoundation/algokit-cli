@@ -46,7 +46,12 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     result = invoke(
         f"init --name {dir_name} --git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
         cwd=cwd,
-        env={"GIT_AUTHOR_NAME": "GitHub Actions", "GIT_AUTHOR_EMAIL": "no-reply@example.com"},
+        env={
+            "GIT_AUTHOR_NAME": "GitHub Actions",
+            "GIT_COMMITTER_NAME": "GitHub Actions",
+            "GIT_AUTHOR_EMAIL": "no-reply@example.com",
+            "GIT_COMMITTER_EMAIL": "no-reply@example.com",
+        },
     )
 
     assert result.exit_code == 0
