@@ -1,11 +1,14 @@
 import json
 import os
+import typing
 from pathlib import Path
 
 import pytest
 from approvaltests import Reporter, reporters, set_default_reporter  # type: ignore
 from approvaltests.reporters.generic_diff_reporter_config import create_config  # type: ignore
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
+from prompt_toolkit.application import create_app_session
+from prompt_toolkit.input import PipeInput, create_pipe_input
 from pytest_mock import MockerFixture
 from utils.app_dir_mock import AppDirs, tmp_app_dir
 from utils.proc_mock import ProcMock
@@ -23,6 +26,13 @@ def proc_mock(mocker: MockerFixture) -> ProcMock:
 @pytest.fixture
 def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)
+
+
+@pytest.fixture(scope="function")
+def mock_questionary_input() -> typing.Iterator[PipeInput]:
+    with create_pipe_input() as pipe_input:
+        with create_app_session(input=pipe_input):
+            yield pipe_input
 
 
 if os.getenv("CI"):
