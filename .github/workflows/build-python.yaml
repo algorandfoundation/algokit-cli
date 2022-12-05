@@ -40,6 +40,9 @@ jobs:
 
       - name: Test with pytest
         run: poetry run pytest
+        env:
+          GIT_AUTHOR_NAME: "GitHub Actions"
+          GIT_AUTHOR_EMAIL: "no-reply@example.com"
 
       - name: Build Wheel
         run: poetry build --format wheel

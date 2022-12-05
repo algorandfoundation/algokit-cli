@@ -242,7 +242,7 @@ def _git_init(project_path: Path, commit_message: str) -> None:
             logger.warning(bad_exit_warn_message)
         return success
 
-    if git("init", bad_exit_warn_message="Failed to initialise git repository"):
+    if git("init", "--initial-branch=main", bad_exit_warn_message="Failed to initialise git repository"):
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
             if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
                 logger.info("🎉 Performed initial git commit successfully! 🎉")
