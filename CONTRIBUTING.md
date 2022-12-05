@@ -81,3 +81,4 @@ AlgoKit uses Python as a main language and many Python libraries and tools. This
 As part of developing AlgoKit we are documenting key architecture decisions using [Architecture Decision Records (ADRs)](https://adr.github.io/). The following are the key decisions that have been made thus far:
 
 - [2022-11-14: AlgoKit sandbox approach](docs/architecture-decisions/2022-11-14_sandbox-approach.md)
+- [2022-11-22: Beaker testing strategy](docs/architecture-decisions/2022-11-22_beaker-testing-strategy.md)
