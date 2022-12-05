@@ -74,11 +74,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
 def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
     cwd = tmp_path_factory.mktemp("cwd")
 
-    mock_questionary_input.send_text("y")
-    result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
-        cwd=cwd,
-    )
+    (cwd / "myapp").mkdir()
     mock_questionary_input.send_text("N")
 
     result = invoke(
@@ -93,12 +89,7 @@ def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock
 def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
     cwd = tmp_path_factory.mktemp("cwd")
 
-    mock_questionary_input.send_text("y")  # community warning
-    invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --answer script script.sh --answer nix yes",
-        cwd=cwd,
-    )
-
+    (cwd / "myapp").mkdir()
     mock_questionary_input.send_text("Y")  # override
     mock_questionary_input.send_text("Y")  # community warning
 
