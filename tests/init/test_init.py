@@ -118,3 +118,17 @@ def test_init_existing_filename_same_as_folder_name(
 
     assert result.exit_code == 1
     verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+
+
+def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_questionary_input.send_text("\n")
+
+    result = invoke(
+        "init --name myapp --no-git --answer script script.sh --answer nix yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))

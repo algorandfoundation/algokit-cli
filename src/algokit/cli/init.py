@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 _blessed_templates = {
-    "beaker-default": "gh:copier-org/autopretty",
     "simple": "gh:fastapi-mvc/copier-script",
+    "beaker-default": "gh:copier-org/autopretty",
 }
 
 _unofficial_template_warning = (
