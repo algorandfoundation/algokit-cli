@@ -2,12 +2,5 @@ WARNING: Community templates have not been reviewed, and can execute arbitrary c
 Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml
 DEBUG: Attempting to initialise project in {current_working_directory}/FAKE_PROJECT from template {test_parent_directory}/copier-script-v0.1.0.gitbundle
 No git tags found in template; using HEAD as ref
-
-Copying from template version 0.0.0.post6.dev0+8199b7d
-    create  .
-    create  script.sh
-
- > Running task 1 of 1: chmod +x script.sh
-
 DEBUG: Project initialisation complete, final clone URL = {test_parent_directory}/copier-script-v0.1.0.gitbundle
 🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐
