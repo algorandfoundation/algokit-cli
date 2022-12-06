@@ -1,4 +1,5 @@
-WARNING: <INSERT warning message about community / unofficial templates & arbitrary code execution HERE>
+WARNING: Community templates have not been reviewed, and can execute arbitrary code.
+Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml
 DEBUG: Attempting to initialise project in {current_working_directory}/FAKE_PROJECT from template {test_parent_directory}/copier-script-v0.1.0.gitbundle
 No git tags found in template; using HEAD as ref
 

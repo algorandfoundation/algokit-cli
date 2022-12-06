@@ -15,18 +15,21 @@ import copier.vcs  # type: ignore
 import prompt_toolkit.document
 import questionary
 from algokit.core import proc
+from algokit.core.click_extensions import DeferredChoice
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator
 
 logger = logging.getLogger(__name__)
 
 
-_blessed_templates = {
-    "simple": "gh:fastapi-mvc/copier-script",
-    "beaker-default": "gh:copier-org/autopretty",
-}
+# this is a function so we can modify the values in unit tests
+def _get_blessed_templates() -> dict[str, str]:
+    return {}
+
 
 _unofficial_template_warning = (
-    "<INSERT warning message about community / unofficial templates & arbitrary code execution HERE>"
+    "Community templates have not been reviewed, and can execute arbitrary code.\n"
+    "Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml"
 )
 
 
@@ -35,7 +38,7 @@ _unofficial_template_warning = (
 @click.option(
     "template_name",
     "--template",
-    type=click.Choice(list(_blessed_templates.keys())),
+    type=DeferredChoice(lambda: list(_get_blessed_templates())),
     default=None,
     help="Name of an official template to use",
 )
@@ -74,7 +77,8 @@ def init_command(
     project_path = _get_project_path(directory_name)
 
     if template_name:
-        template_url = _blessed_templates[template_name]
+        blessed_templates = _get_blessed_templates()
+        template_url = blessed_templates[template_name]
     elif template_url:
         if not _repo_url_is_valid(template_url):
             logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
@@ -110,11 +114,15 @@ def _fail_and_bail() -> Never:
     raise click.exceptions.Exit(code=1)
 
 
-class NonEmptyValidator(questionary.Validator):
-    def validate(self, document: prompt_toolkit.document.Document) -> None:
-        value = document.text.strip()
-        if not value:
-            raise questionary.ValidationError(message="Please enter a value")
+def _repo_url_is_valid(url: str) -> bool:
+    """Check the repo URL is valid according to copier"""
+    if not url:
+        return False
+    try:
+        return copier.vcs.get_repo(url) is not None
+    except Exception:
+        logger.exception(f"Error parsing repo URL = {url}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
+        return False
 
 
 class DirectoryNameValidator(questionary.Validator):
@@ -128,33 +136,6 @@ class DirectoryNameValidator(questionary.Validator):
             raise questionary.ValidationError(
                 message="File with same name already exists in current directory, please enter a different name"
             )
-
-
-class ChainedValidator(questionary.Validator):
-    def __init__(self, *validators: questionary.Validator):
-        self._validators = validators
-
-    def validate(self, document: prompt_toolkit.document.Document) -> None:
-        for validator in self._validators:
-            validator.validate(document)
-
-
-def _repo_url_is_valid(url: str) -> bool:
-    """Check the repo URL is valid according to copier"""
-    if not url:
-        return False
-    try:
-        return copier.vcs.get_repo(url) is not None
-    except Exception:
-        logger.exception(f"Error parsing repo URL = {url}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
-        return False
-
-
-class GitRepoValidator(questionary.Validator):
-    def validate(self, document: prompt_toolkit.document.Document) -> None:
-        value = document.text.strip()
-        if not _repo_url_is_valid(value):
-            raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
 
 
 def _get_project_path(directory_name_option: str | None = None) -> Path:
@@ -186,12 +167,20 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
     return project_path
 
 
+class GitRepoValidator(questionary.Validator):
+    def validate(self, document: prompt_toolkit.document.Document) -> None:
+        value = document.text.strip()
+        if not _repo_url_is_valid(value):
+            raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
+
+
 def _get_template_url() -> str:
+    blessed_templates = _get_blessed_templates()
     choice_value = questionary.select(
-        "Select a project template: ", choices=[*_blessed_templates, "<enter custom url>"]
+        "Select a project template: ", choices=[*blessed_templates, "<enter custom url>"]
     ).unsafe_ask()
     try:
-        return _blessed_templates[choice_value]
+        return blessed_templates[choice_value]
     except KeyError:
         # user selected custom url
         pass

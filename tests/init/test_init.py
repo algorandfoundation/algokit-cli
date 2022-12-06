@@ -7,6 +7,7 @@ from _pytest.tmpdir import TempPathFactory
 from approvaltests import verify
 from click import unstyle
 from prompt_toolkit.input import PipeInput
+from pytest_mock import MockerFixture
 from utils.click_invoker import invoke
 
 PARENT_DIRECTORY = Path(__file__).parent
@@ -17,6 +18,14 @@ GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-script-v0.1.0.gitbundle"
 def supress_copier_dependencies_debug_output():
     logging.getLogger("plumbum.local").setLevel("INFO")
     logging.getLogger("asyncio").setLevel("INFO")
+
+
+@pytest.fixture(autouse=True)
+def set_blessed_templates(mocker: MockerFixture):
+    mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
+        "simple": "gh:fastapi-mvc/copier-script",
+        "beaker-default": "gh:copier-org/autopretty",
+    }
 
 
 def test_init_minimal_interaction_required_no_git_no_network(

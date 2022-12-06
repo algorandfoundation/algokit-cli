@@ -1,5 +1,6 @@
 WARNING: 
-<INSERT warning message about community / unofficial templates & arbitrary code execution HERE>
+Community templates have not been reviewed, and can execute arbitrary code.
+Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml
 
 Enter a custom project URL, or leave blank and press enter to go back to official template selection.
 Note that you can use gh: as a shorthand for github.com and likewise gl: for gitlab.com
