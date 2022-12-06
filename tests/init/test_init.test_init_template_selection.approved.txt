@@ -1,11 +1,4 @@
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template gh:fastapi-mvc/copier-script
-
-Copying from template version 0.1.0
-    create  .
-    create  script.sh
-
- > Running task 1 of 1: chmod +x script.sh
-
 DEBUG: Project initialisation complete, final clone URL = https://github.com/fastapi-mvc/copier-script.git
 🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
