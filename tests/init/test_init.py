@@ -320,7 +320,6 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
         {
             Path("myapp"),
             Path("myapp") / "README.md",
-            Path("myapp") / "deployer",
             Path("myapp") / "smart_contracts",
         }
     )
