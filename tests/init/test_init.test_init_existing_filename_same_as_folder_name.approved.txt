@@ -1,0 +1,2 @@
+ERROR: File with same name already exists in current directory, please supply a different name
+🛑 Bailing out... 👋
