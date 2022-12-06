@@ -1,0 +1,24 @@
+DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template gh:wilsonwaters/copier-testing-template
+No git tags found in template; using HEAD as ref
+
+Copying from template version 0.0.0.post8.dev0+2934e83
+    create  .
+    create  README.md
+    create  .editorconfig
+    create  smart_contracts
+    create  smart_contracts/helloworld
+    create  smart_contracts/helloworld/helloworld.py
+    create  smart_contracts/__init__.py
+    create  smart_contracts/__main__.py
+    create  .gitignore
+    create  .gitattributes
+    create  deployer
+    create  deployer/poetry.toml
+    create  deployer/pyproject.toml
+    create  deployer/__init__.py
+
+
+DEBUG: Project initialisation complete, final clone URL = https://github.com/wilsonwaters/copier-testing-template.git
+🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐
+Your selected template comes from:
+➡️  https://github.com/wilsonwaters/copier-testing-template

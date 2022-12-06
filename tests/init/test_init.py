@@ -25,6 +25,7 @@ def set_blessed_templates(mocker: MockerFixture):
     mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
         "simple": "gh:fastapi-mvc/copier-script",
         "beaker-default": "gh:copier-org/autopretty",
+        "beaker": "gh:wilsonwaters/copier-testing-template",
     }
 
 
@@ -287,4 +288,40 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
     )
 
     assert result.exit_code == 0
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+
+
+def test_init_with_defaults(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_questionary_input.send_text("Y")
+    result = invoke(
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths == {Path("myapp"), Path("myapp") / "none"}
+    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+
+
+def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    result = invoke(
+        "init --name myapp --no-git --template beaker --defaults",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "deployer",
+            Path("myapp") / "smart_contracts",
+        }
+    )
     verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))

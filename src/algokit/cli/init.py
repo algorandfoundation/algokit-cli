@@ -53,6 +53,12 @@ _unofficial_template_warning = (
 )
 @click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
 @click.option(
+    "--defaults",
+    default=None,
+    help="Automatically choose default answers without asking when creating this template",
+    is_flag=True,
+)
+@click.option(
     "answers",
     "--answer",
     "-a",
@@ -61,9 +67,6 @@ _unofficial_template_warning = (
     nargs=2,
     default=[],
     metavar="<key> <value>",
-)
-@click.option(
-    "--defaults", default=None, help="Automatically choose default answers without asking when creating this template"
 )
 def init_command(
     directory_name: str | None,
@@ -100,7 +103,11 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
-    copier_worker = copier.run_copy(template_url, project_path, data=answers_dict, defaults=defaults)
+    if defaults is not None:
+        copier_worker = copier.run_copy(template_url, project_path, data=answers_dict, defaults=defaults)
+    else:
+        copier_worker = copier.run_copy(template_url, project_path, data=answers_dict)
+
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
