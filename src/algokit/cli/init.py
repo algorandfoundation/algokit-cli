@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, str]:
-    return {}
+    return {
+        "beaker": "gh:wilsonwaters/copier-testing-template",
+    }
 
 
 _unofficial_template_warning = (
@@ -60,12 +62,16 @@ _unofficial_template_warning = (
     default=[],
     metavar="<key> <value>",
 )
+@click.option(
+    "--defaults", default=None, help="Automatically choose default answers without asking when creating this template"
+)
 def init_command(
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
     use_git: bool | None,
     answers: list[tuple[str, str]],
+    defaults: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
@@ -94,7 +100,7 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
-    copier_worker = copier.run_copy(template_url, project_path, data=answers_dict)
+    copier_worker = copier.run_copy(template_url, project_path, data=answers_dict, defaults=defaults)
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
