@@ -1,8 +1,8 @@
 import json
 
 from algokit.core.sandbox import get_docker_compose_yml
-from approvaltests import verify  # type: ignore
 from utils.app_dir_mock import AppDirs
+from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 

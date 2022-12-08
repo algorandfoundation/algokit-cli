@@ -94,6 +94,7 @@ def initialise_logging() -> None:
         filename=get_app_state_dir() / "cli.log",
         maxBytes=1 * 1024 * 1024,
         backupCount=5,
+        encoding="utf-8",
     )
     file_log_handler.setLevel(logging.DEBUG)
     file_log_handler.formatter = logging.Formatter(

@@ -1,7 +1,7 @@
 from subprocess import CompletedProcess
 
-from approvaltests import verify  # type: ignore
 from pytest_mock import MockerFixture
+from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 

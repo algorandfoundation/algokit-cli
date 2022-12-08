@@ -28,7 +28,11 @@ def invoke(
         os.chdir(cwd)
     try:
         result = runner.invoke(algokit, f"-v --no-color {args}", env=env)  # type: ignore
-        output = result.stdout.replace(str(cwd or prior_cwd), "{current_working_directory}")
+        output = (
+            result.stdout.replace(str(cwd or prior_cwd), "{current_working_directory}")
+            .replace(str(cwd or prior_cwd).replace("\\", "/"), "{current_working_directory}")
+            .replace("{current_working_directory}\\", "{current_working_directory}/")
+        )
         return ClickInvokeResult(exit_code=result.exit_code, output=output)
     finally:
         if cwd is not None:
