@@ -91,9 +91,7 @@ def initialise_logging() -> None:
     console_log_handler.addFilter(ManualExclusionFilter(exclude_value=EXCLUDE_FROM_CONSOLE_VALUE))
 
     file_log_handler = RotatingFileHandler(
-        filename=get_app_state_dir() / "cli.log",
-        maxBytes=1 * 1024 * 1024,
-        backupCount=5,
+        filename=get_app_state_dir() / "cli.log", maxBytes=1 * 1024 * 1024, backupCount=5, encoding="utf-8"
     )
     file_log_handler.setLevel(logging.DEBUG)
     file_log_handler.formatter = logging.Formatter(
