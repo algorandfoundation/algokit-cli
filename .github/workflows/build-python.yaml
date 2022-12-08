@@ -19,7 +19,7 @@ jobs:
       matrix:
         #os: ["ubuntu-latest", "macos-latest", "windows-latest"]
         # Mac and Windows chew through build minutes - waiting until repo is public to enable
-        os: ["ubuntu-latest", "windows-latest"]
+        os: ["ubuntu-latest"]
         python: ["3.10"]
     runs-on: ${{ matrix.os }}
     steps:
