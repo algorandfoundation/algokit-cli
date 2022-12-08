@@ -2,16 +2,22 @@ import logging
 import subprocess
 from pathlib import Path
 
+import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from approvaltests import verify
-from click import unstyle
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
+from utils.approvals import TokenScrubber, combine_scrubbers, verify
 from utils.click_invoker import invoke
 
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-script-v0.1.0.gitbundle"
+
+
+def make_output_scrubber(**extra_tokens: str) -> TokenScrubber:
+    default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
+    tokens = default_tokens | extra_tokens
+    return combine_scrubbers(click.unstyle, TokenScrubber(tokens=tokens))
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -43,7 +49,7 @@ def test_init_minimal_interaction_required_no_git_no_network(
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path("myapp"), Path("myapp") / "script.sh"}
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_minimal_interaction_required_yes_git_no_network(
@@ -75,9 +81,8 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     assert git_rev_list.returncode == 0
     git_initial_commit_hash = git_rev_list.stdout[:7]
     verify(
-        unstyle(result.output)
-        .replace(git_initial_commit_hash, "{git_initial_commit_hash}")
-        .replace(str(PARENT_DIRECTORY), "{test_parent_directory}")
+        result.output,
+        scrubber=make_output_scrubber(git_initial_commit_hash=git_initial_commit_hash),
     )
 
 
@@ -93,7 +98,7 @@ def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock
     )
 
     assert result.exit_code == 1
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -109,7 +114,7 @@ def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questi
     )
 
     assert result.exit_code == 0
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_existing_filename_same_as_folder_name(
@@ -127,7 +132,7 @@ def test_init_existing_filename_same_as_folder_name(
     )
 
     assert result.exit_code == 1
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -141,7 +146,7 @@ def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questio
     )
 
     assert result.exit_code == 0
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -154,7 +159,7 @@ def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_quest
     )
 
     assert result.exit_code == 1
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -170,7 +175,7 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path(project_name), Path(project_name) / "script.sh"}
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -187,7 +192,7 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path(project_name), Path(project_name) / "script.sh"}
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_project_name_reenter_folder_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -208,7 +213,7 @@ def test_init_project_name_reenter_folder_name(tmp_path_factory: TempPathFactory
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path(project_name_2), Path(project_name_2) / "script.sh", Path(project_name)}
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -239,9 +244,8 @@ def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_
     assert git_rev_list.returncode == 0
     git_initial_commit_hash = git_rev_list.stdout[:7]
     verify(
-        unstyle(result.output)
-        .replace(git_initial_commit_hash, "{git_initial_commit_hash}")
-        .replace(str(PARENT_DIRECTORY), "{test_parent_directory}")
+        result.output,
+        scrubber=make_output_scrubber(git_initial_commit_hash=git_initial_commit_hash),
     )
 
 
@@ -258,7 +262,7 @@ def test_init_template_url_and_template_name(tmp_path_factory: TempPathFactory, 
     )
 
     assert result.exit_code == 1
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -271,7 +275,7 @@ def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_ques
     )
 
     assert result.exit_code == 1
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -288,7 +292,7 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
     )
 
     assert result.exit_code == 0
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_with_defaults(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -303,7 +307,7 @@ def test_init_with_defaults(tmp_path_factory: TempPathFactory, mock_questionary_
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {Path("myapp"), Path("myapp") / "none"}
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
@@ -323,4 +327,4 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
             Path("myapp") / "smart_contracts",
         }
     )
-    verify(unstyle(result.output).replace(str(PARENT_DIRECTORY), "{test_parent_directory}"))
+    verify(result.output, scrubber=make_output_scrubber())

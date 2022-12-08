@@ -1,9 +1,9 @@
 import json
 
 import httpx
-from approvaltests import verify
 from pytest_httpx import HTTPXMock
 from utils.app_dir_mock import AppDirs
+from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 

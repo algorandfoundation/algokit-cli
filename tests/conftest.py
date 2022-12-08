@@ -9,6 +9,7 @@ from approvaltests.reporters.generic_diff_reporter_config import create_config  
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
 from prompt_toolkit.application import create_app_session
 from prompt_toolkit.input import PipeInput, create_pipe_input
+from prompt_toolkit.output import DummyOutput
 from pytest_mock import MockerFixture
 from utils.app_dir_mock import AppDirs, tmp_app_dir
 from utils.proc_mock import ProcMock
@@ -31,7 +32,7 @@ def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
 @pytest.fixture(scope="function")
 def mock_questionary_input() -> typing.Iterator[PipeInput]:
     with create_pipe_input() as pipe_input:
-        with create_app_session(input=pipe_input):
+        with create_app_session(input=pipe_input, output=DummyOutput()):
             yield pipe_input
 
 
