@@ -51,6 +51,12 @@ _unofficial_template_warning = (
     help="URL to a git repo with a custom project template.",
     metavar="URL",
 )
+@click.option(
+    "--accept-template-url",
+    is_flag=True,
+    default=None,
+    help="Accept the specified template URL, acknowledging the security implications of an unofficial template.",
+)
 @click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
 @click.option(
     "--defaults",
@@ -72,6 +78,7 @@ def init_command(
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
+    accept_template_url: bool | None,
     use_git: bool | None,
     answers: list[tuple[str, str]],
     defaults: bool | None,
@@ -96,7 +103,7 @@ def init_command(
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
         # at the root level
-        if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
+        if not accept_template_url and not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
             _fail_and_bail()
     else:
         template_url = _get_template_url()

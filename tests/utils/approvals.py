@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class TokenScrubber(Scrubber):
+class TokenScrubber(Scrubber):  # type: ignore
     def __init__(self, tokens: dict[str, str]):
         self._tokens = tokens
 
