@@ -42,7 +42,7 @@ _unofficial_template_warning = (
     "--template",
     type=DeferredChoice(lambda: list(_get_blessed_templates())),
     default=None,
-    help="Name of an official template to use",
+    help="Name of an official template to use.",
 )
 @click.option(
     "--template-url",
@@ -61,7 +61,7 @@ _unofficial_template_warning = (
 @click.option(
     "--defaults",
     default=None,
-    help="Automatically choose default answers without asking when creating this template",
+    help="Automatically choose default answers without asking when creating this template.",
     is_flag=True,
 )
 @click.option(

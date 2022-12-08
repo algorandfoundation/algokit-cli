@@ -9,7 +9,7 @@ from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_
 logger = logging.getLogger(__name__)
 
 
-@click.group("sandbox", short_help="Manage the AlgoKit sandbox")
+@click.group("sandbox", short_help="Manage the AlgoKit sandbox.")
 def sandbox_group() -> None:
     try:
         compose_version_result = proc.run(
@@ -48,7 +48,7 @@ def sandbox_group() -> None:
     proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
-@sandbox_group.command("start", short_help="Start the AlgoKit Sandbox")
+@sandbox_group.command("start", short_help="Start the AlgoKit Sandbox.")
 def start_sandbox() -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
@@ -62,7 +62,7 @@ def start_sandbox() -> None:
     sandbox.up()
 
 
-@sandbox_group.command("stop", short_help="Stop the AlgoKit Sandbox")
+@sandbox_group.command("stop", short_help="Stop the AlgoKit Sandbox.")
 def stop_sandbox() -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
@@ -72,7 +72,7 @@ def stop_sandbox() -> None:
         sandbox.stop()
 
 
-@sandbox_group.command("reset", short_help="Reset the AlgoKit Sandbox")
+@sandbox_group.command("reset", short_help="Reset the AlgoKit Sandbox.")
 @click.option(
     "--update/--no-update",
     default=True,
@@ -97,7 +97,7 @@ def reset_sandbox(update: bool) -> None:  # noqa: FBT001
 SERVICE_NAMES = ("algod", "indexer", "indexer-db")
 
 
-@sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox")
+@sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox.")
 def sandbox_status() -> None:
     sandbox = ComposeSandbox()
     ps = sandbox.ps()
@@ -134,7 +134,7 @@ def sandbox_status() -> None:
 @sandbox_group.command(
     "console",
     short_help="Run the Algorand goal CLI against the AlgoKit Sandbox via a Bash console"
-    + " so you can execute multiple goal commands and/or interact with a filesystem",
+    + " so you can execute multiple goal commands and/or interact with a filesystem.",
 )
 @click.pass_context
 def sandbox_console(context: click.Context) -> None:

@@ -136,7 +136,7 @@ verbose_option = click.option(
     is_flag=True,
     callback=_set_verbose,
     expose_value=False,
-    help="Enable logging of DEBUG messages to the console",
+    help="Enable logging of DEBUG messages to the console.",
 )
 
 color_option = click.option(
@@ -145,5 +145,5 @@ color_option = click.option(
     default=lambda: False if os.getenv("NO_COLOR") else None,
     callback=_set_force_styles_to,
     expose_value=False,
-    help="Force enable or disable of console output styling",
+    help="Force enable or disable of console output styling.",
 )

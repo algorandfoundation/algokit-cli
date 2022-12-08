@@ -40,6 +40,13 @@ def set_blessed_templates(mocker: MockerFixture):
     }
 
 
+def test_init_help():
+    result = invoke("init -h")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
 def test_init_no_interaction_required_no_git_no_network(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ):

@@ -8,14 +8,14 @@ logger = logging.getLogger(__name__)
 
 @click.command(
     "goal",
-    short_help="Run the Algorand goal CLI against the AlgoKit Sandbox",
+    short_help="Run the Algorand goal CLI against the AlgoKit Sandbox.",
     context_settings={
         "ignore_unknown_options": True,
     },
 )
 @click.option(
     "--console/--no-console",
-    help="Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem",
+    help="Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.",
     default=False,
 )
 @click.argument("goal_args", nargs=-1, type=click.UNPROCESSED)
