@@ -33,8 +33,11 @@ def verify(
     if scrubber is not None:
         options = options.add_scrubber(scrubber)
     kwargs.setdefault("encoding", "utf-8")
+    normalised_data = str(data).replace("\r\n", "\n")
     approvaltests.verify(
-        data=data,
+        data=normalised_data,
         options=options,
+        # Don't normalise newlines
+        newline="",
         **kwargs,
     )

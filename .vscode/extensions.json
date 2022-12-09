@@ -7,6 +7,7 @@
     "bungcip.better-toml",
     "editorconfig.editorconfig",
     "emeraldwalk.runonsave",
-    "matangover.mypy"
+    "matangover.mypy",
+    "runarsf.platform-settings"
   ]
 }

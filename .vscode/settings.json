@@ -18,10 +18,19 @@
   },
 
   // Python
-  // Inform VS Code there is an interpreter in the .venv for the workspace
-  // On Windows this doesn't work since it's not in .venv/bin, but rather .venv/Scripts.
-  //    However if you symlink Scripts -> bin it does work! Run scripts/setup.ps1 as admin for that trick
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "platformSettings.autoLoad": true,
+  "platformSettings.platforms": {
+    "default": {
+      "nodes": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
+      }
+    },
+    "win32": {
+      "nodes": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
+      }
+    }
+  },
   "python.analysis.extraPaths": ["${workspaceFolder}/src"],
   "python.formatting.provider": "black",
   "[python]": {
