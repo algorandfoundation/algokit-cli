@@ -28,7 +28,7 @@ jobs:
       - name: Check formatting with Black
         run: |
           # stop the build if there are files that don't meet formatting requirements
-          poetry run black .
+          poetry run black --check .
 
       - name: Check linting with Ruff
         run: |
