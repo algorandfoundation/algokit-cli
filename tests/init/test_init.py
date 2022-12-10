@@ -367,7 +367,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --template beaker --defaults",
+        "init --name myapp --no-git --template beaker --defaults -a run_poetry_install False",
         cwd=cwd,
     )
 
