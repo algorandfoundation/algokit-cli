@@ -3,7 +3,8 @@ Usage: algokit init [OPTIONS]
   Initializes a new project from a template.
 
 Options:
-  --name TEXT                     Name of the directory / repository to create.
+  -n, --name TEXT                 Name of the project / directory / repository
+                                  to create.
   -t, --template [simple|beaker|beaker_with_version]
                                   Name of an official template to use.
   --template-url URL              URL to a git repo with a custom project

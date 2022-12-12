@@ -31,7 +31,8 @@ def _get_blessed_templates() -> dict[str, str]:
 
 _unofficial_template_warning = (
     "Community templates have not been reviewed, and can execute arbitrary code.\n"
-    "Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml"
+    "Please inspect the template repository, and pay particular attention to the "
+    + "values of _tasks, _migrations and _jinja_extensions in copier.yml"
 )
 
 
@@ -51,8 +52,9 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
 @click.option(
     "directory_name",
     "--name",
+    "-n",
     type=str,
-    help="Name of the directory / repository to create.",
+    help="Name of the project / directory / repository to create.",
     callback=validate_dir_name,
 )
 @click.option(
@@ -110,7 +112,7 @@ def init_command(
     # parse this early to prevent frustration
     answers_dict = dict(answers)
 
-    project_path = _get_project_path(directory_name)
+    project_path, directory_name = _get_project_path(directory_name)
 
     if template_name:
         blessed_templates = _get_blessed_templates()
@@ -155,7 +157,10 @@ def init_command(
             project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
         )
 
-    logger.info("🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐")
+    logger.info(
+        f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
+        + "consult the documentation of your selected template 🧐"
+    )
     if re.search("https?://", expanded_template_url):
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
@@ -163,6 +168,8 @@ def init_command(
             f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}"
             + (f"@{vcs_ref}" if vcs_ref else "")
         )
+    logger.info("As a suggestion, if you wanted to open the project in VS Code you could execute:")
+    logger.info(f"> cd {directory_name} && code .")
 
 
 def _fail_and_bail() -> Never:
@@ -194,7 +201,7 @@ class DirectoryNameValidator(questionary.Validator):
             )
 
 
-def _get_project_path(directory_name_option: str | None = None) -> Path:
+def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, str]:
     base_path = Path.cwd()
     if directory_name_option is not None:
         directory_name = directory_name_option
@@ -220,7 +227,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
                 return _get_project_path()
             else:
                 _fail_and_bail()
-    return project_path
+    return project_path, directory_name
 
 
 class GitRepoValidator(questionary.Validator):

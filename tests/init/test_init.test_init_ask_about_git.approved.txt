@@ -1,5 +1,5 @@
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
-Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml
+Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 DEBUG: Project initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle
@@ -13,4 +13,6 @@ DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised w
 DEBUG: git: 1 file changed, 1 insertion(+)
 DEBUG: git: create mode 100644 hello_world/helloworld.txt
 🎉 Performed initial git commit successfully! 🎉
-🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐
+🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
+As a suggestion, if you wanted to open the project in VS Code you could execute:
+> cd myapp && code .
