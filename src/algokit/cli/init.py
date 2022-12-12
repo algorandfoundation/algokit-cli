@@ -110,10 +110,9 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
-    if defaults is not None:
-        copier_worker = copier.run_copy(template_url, project_path, data=answers_dict, defaults=defaults, quiet=True)
-    else:
-        copier_worker = copier.run_copy(template_url, project_path, data=answers_dict, quiet=True)
+    copier_worker = copier.run_copy(
+        template_url, project_path, data=answers_dict, defaults=defaults or False, quiet=True
+    )
 
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
