@@ -4,13 +4,14 @@ Usage: algokit init [OPTIONS]
 
 Options:
   --name TEXT                     Name of the directory / repository to create.
-  --template [simple|beaker|beaker_with_version]
+  -t, --template [simple|beaker|beaker_with_version]
                                   Name of an official template to use.
   --template-url URL              URL to a git repo with a custom project
                                   template.
-  --accept-template-url           Accept the specified template URL,
-                                  acknowledging the security implications of an
-                                  unofficial template.
+  --unsafe-security-accept-template-url
+                                  Accept the specified template URL,
+                                  acknowledging the security implications of
+                                  trusting an unofficial template.
   --git / --no-git                Initialise git repository in directory after
                                   creation.
   --defaults                      Automatically choose default answers without
