@@ -35,8 +35,26 @@ _unofficial_template_warning = (
 )
 
 
+def validate_dir_name(context: click.Context, param: click.Parameter, value: str) -> str:
+    if re.match(r"^[\w\-.]+$", value):
+        return value
+    else:
+        raise click.BadParameter(
+            "Received invalid value for directory name; "
+            + "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            context,
+            param,
+        )
+
+
 @click.command("init", short_help="Initializes a new project.")
-@click.option("directory_name", "--name", type=str, help="Name of the directory / repository to create.")
+@click.option(
+    "directory_name",
+    "--name",
+    type=str,
+    help="Name of the directory / repository to create.",
+    callback=validate_dir_name,
+)
 @click.option(
     "template_name",
     "--template",

@@ -48,6 +48,13 @@ def test_init_help():
     verify(result.output)
 
 
+def test_invalid_name():
+    result = invoke("init --name invalid{name")
+
+    assert result.exit_code != 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def test_init_no_interaction_required_no_git_no_network(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ):
