@@ -11,6 +11,8 @@ from pytest_mock import MockerFixture
 from utils.approvals import TokenScrubber, combine_scrubbers, verify
 from utils.click_invoker import invoke
 
+from tests import get_combined_verify_output
+
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
 
@@ -59,9 +61,7 @@ def test_invalid_name():
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_no_git_no_network(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -81,9 +81,7 @@ def test_init_no_interaction_required_no_git_no_network(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_defaults_no_git_no_network(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -376,7 +374,7 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_with_official_template_name(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -396,9 +394,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_official_template_name_and_hash(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -416,3 +412,35 @@ def test_init_with_official_template_name_and_hash(
         }
     )
     verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_with_env(tmp_path_factory: TempPathFactory):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    result = invoke(
+        (
+            "init --name myapp --no-git --template beaker --defaults "
+            '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
+            " -a run_poetry_install False"
+        ),
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "smart_contracts",
+            Path("myapp") / "smart_contracts" / ".env.template",
+        }
+    )
+    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+
+    verify(
+        get_combined_verify_output(
+            result.output, additional_name=".env.template", additional_output=env_template_file_contents
+        ),
+        scrubber=make_output_scrubber(),
+    )

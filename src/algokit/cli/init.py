@@ -3,6 +3,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+
 try:
     from typing import Never  # type: ignore[attr-defined]
 except ImportError:
@@ -21,6 +23,17 @@ from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator
 
 logger = logging.getLogger(__name__)
+
+
+DEFAULT_ANSWERS: dict[str, str] = {
+    "algod_token": DEFAULT_ALGOD_TOKEN,
+    "algod_server": DEFAULT_ALGOD_SERVER,
+    "algod_port": str(DEFAULT_ALGOD_PORT),
+    "indexer_token": DEFAULT_ALGOD_TOKEN,
+    "indexer_server": DEFAULT_ALGOD_SERVER,
+    "indexer_port": str(DEFAULT_INDEXER_PORT),
+}
+"""Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
 
 @dataclass
@@ -128,8 +141,9 @@ def init_command(
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
-    # parse this early to prevent frustration
-    answers_dict = dict(answers)
+
+    # parse the input early to prevent frustration - combined with some defaults but they can be overridden
+    answers_dict = DEFAULT_ANSWERS | dict(answers)
 
     project_path, directory_name = _get_project_path(directory_name)
 
