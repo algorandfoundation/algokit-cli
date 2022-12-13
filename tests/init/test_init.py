@@ -48,13 +48,20 @@ def test_init_help():
     verify(result.output)
 
 
+def test_invalid_name():
+    result = invoke("init --name invalid{name")
+
+    assert result.exit_code != 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def test_init_no_interaction_required_no_git_no_network(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --accept-template-url "
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --unsafe-security-accept-template-url "
         + "--answer project_name test --answer greeting hi --answer include_extra_file yes",
         cwd=cwd,
     )
@@ -76,7 +83,8 @@ def test_init_no_interaction_required_defaults_no_git_no_network(
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --accept-template-url --defaults",
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        + "--unsafe-security-accept-template-url --defaults",
         cwd=cwd,
     )
 
