@@ -11,7 +11,7 @@ DEBUG: Running 'git add --all' in '{current_working_directory}/myapp'
 DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle' in '{current_working_directory}/myapp'
 DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle
 DEBUG: git: 1 file changed, 1 insertion(+)
-DEBUG: git: create mode 100644 hello_world/helloworld.txt
+DEBUG: git: create mode 100644 myapp/helloworld.txt
 🎉 Performed initial git commit successfully! 🎉
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 As a suggestion, if you wanted to open the project in VS Code you could execute:

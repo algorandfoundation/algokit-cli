@@ -94,8 +94,8 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {
         Path("myapp"),
-        Path("myapp") / "hello_world",
-        Path("myapp") / "hello_world" / "helloworld.txt",
+        Path("myapp") / "myapp",
+        Path("myapp") / "myapp" / "helloworld.txt",
     }
     verify(result.output, scrubber=make_output_scrubber())
 
@@ -115,8 +115,8 @@ def test_init_minimal_interaction_required_no_git_no_network(
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {
         Path("myapp"),
-        Path("myapp") / "hello_world",
-        Path("myapp") / "hello_world" / "helloworld.txt",
+        Path("myapp") / "myapp",
+        Path("myapp") / "myapp" / "helloworld.txt",
     }
     verify(result.output, scrubber=make_output_scrubber())
 
@@ -143,7 +143,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     created_dir = cwd / dir_name
     assert created_dir.is_dir()
     paths = {p.relative_to(created_dir) for p in created_dir.iterdir()}
-    assert paths == {Path(".git"), Path("hello_world")}
+    assert paths == {Path(".git"), Path("myapp")}
     git_rev_list = subprocess.run(
         ["git", "rev-list", "--max-parents=0", "HEAD"], cwd=created_dir, capture_output=True, text=True
     )
@@ -245,8 +245,8 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {
         Path(project_name),
-        Path(project_name) / "hello_world",
-        Path(project_name) / "hello_world" / "helloworld.txt",
+        Path(project_name) / project_name,
+        Path(project_name) / project_name / "helloworld.txt",
     }
     verify(result.output, scrubber=make_output_scrubber())
 
@@ -266,8 +266,8 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {
         Path(project_name),
-        Path(project_name) / "hello_world",
-        Path(project_name) / "hello_world" / "helloworld.txt",
+        Path(project_name) / project_name,
+        Path(project_name) / project_name / "helloworld.txt",
     }
     verify(result.output, scrubber=make_output_scrubber())
 
@@ -291,8 +291,8 @@ def test_init_project_name_reenter_folder_name(tmp_path_factory: TempPathFactory
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
     assert paths == {
         Path(project_name_2),
-        Path(project_name_2) / "hello_world",
-        Path(project_name_2) / "hello_world" / "helloworld.txt",
+        Path(project_name_2) / project_name_2,
+        Path(project_name_2) / project_name_2 / "helloworld.txt",
         Path(project_name),
     }
     verify(result.output, scrubber=make_output_scrubber())
@@ -319,7 +319,7 @@ def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_
     created_dir = cwd / dir_name
     assert created_dir.is_dir()
     paths = {p.relative_to(created_dir) for p in created_dir.iterdir()}
-    assert paths == {Path("hello_world"), Path(".git")}
+    assert paths == {Path("myapp"), Path(".git")}
     git_rev_list = subprocess.run(
         ["git", "rev-list", "--max-parents=0", "HEAD"], cwd=created_dir, capture_output=True, text=True
     )

@@ -146,6 +146,8 @@ def init_command(
     answers_dict = DEFAULT_ANSWERS | dict(answers)
 
     project_path, directory_name = _get_project_path(directory_name)
+    if not answers_dict.get("project_name"):
+        answers_dict = answers_dict | {"project_name": directory_name}
 
     if template_name:
         blessed_templates = _get_blessed_templates()
@@ -230,7 +232,7 @@ def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, s
         directory_name = directory_name_option
     else:
         directory_name = questionary.text(
-            "Name of directory to create the project in: ",
+            "Name of project / directory to create the project in: ",
             validate=ChainedValidator(NonEmptyValidator(), DirectoryNameValidator(base_path)),
             validate_while_typing=False,
         ).unsafe_ask()
