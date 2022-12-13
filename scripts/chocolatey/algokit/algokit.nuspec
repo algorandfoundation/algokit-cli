@@ -2,18 +2,18 @@
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <version>0.1.0-beta.17</version>
+    <id>algokit</id>
+    <version></version> <!-- note, no semantic version 2.0 support. So beta.17 needs to be beta17 https://github.com/chocolatey/choco/issues/1610 -->
     <packageSourceUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/scripts/chocolatey</packageSourceUrl>
     <owners>wilsonwaters</owners>
-    <title>algokit (Install)</title>
+    <title>algokit</title>
     <authors>Algorand Foundation</authors>
     <projectUrl>https://www.algorand.foundation/developers</projectUrl>
-    <!-- <iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/algokit.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
+    <!-- <iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/algokit.png</iconUrl> -->
     <licenseUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/LICENSE</licenseUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/algorandfoundation/algokit-cli</projectSourceUrl>
-    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
+    <!-- <docsUrl>At what url are the software docs located?</docsUrl> -->
     <bugTrackerUrl>https://github.com/algorandfoundation/algokit-cli/issues</bugTrackerUrl>
     <tags>algokit algorand developers python typescript hello-world smart-contract beaker</tags>
     <summary>The Algorand AlgoKit CLI is the one-stop shop tool for developers building on the Algorand network.</summary>
@@ -22,10 +22,11 @@
     ]]></description>
     <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <dependencies>
-      <dependency id="python" version="3.10" />
+      <dependency id="python3" version="3.10" />
     </dependencies>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
+    <file src="..\..\..\dist\algokit*.whl" target="tools" />
   </files>
 </package>
