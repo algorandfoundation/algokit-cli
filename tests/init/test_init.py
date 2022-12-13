@@ -420,7 +420,8 @@ def test_init_with_env(tmp_path_factory: TempPathFactory):
     result = invoke(
         (
             "init --name myapp --no-git --template beaker --defaults "
-            '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234'
+            '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
+            " -a run_poetry_install False"
         ),
         cwd=cwd,
     )
