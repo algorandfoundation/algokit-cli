@@ -59,9 +59,7 @@ def test_invalid_name():
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_no_git_no_network(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -81,9 +79,7 @@ def test_init_no_interaction_required_no_git_no_network(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_defaults_no_git_no_network(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -376,7 +372,7 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_with_official_template_name(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -396,9 +392,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_official_template_name_and_hash(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -416,3 +410,35 @@ def test_init_with_official_template_name_and_hash(
         }
     )
     verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_with_env(tmp_path_factory: TempPathFactory):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    result = invoke(
+        (
+            "init --name myapp --no-git --template beaker --defaults "
+            '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234'
+        ),
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "smart_contracts",
+            Path("myapp") / "smart_contracts" / ".env",
+            Path("myapp") / "smart_contracts" / ".env.template",
+        }
+    )
+    verify(result.output, scrubber=make_output_scrubber())
+    env_file_contents = (Path(cwd / "myapp" / "smart_contracts" / ".env")).read_text()
+    assert "ALGOD_TOKEN=abcdefghijklmnopqrstuvwxyz" in env_file_contents
+    assert "ALGOD_SERVER=http://mylocalserver" in env_file_contents
+    assert "ALGOD_PORT=1234" in env_file_contents
+    assert "INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" in env_file_contents
+    assert "INDEXER_SERVER=http://localhost" in env_file_contents
+    assert "INDEXER_PORT=8980" in env_file_contents
