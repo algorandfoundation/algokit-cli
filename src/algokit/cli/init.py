@@ -110,8 +110,19 @@ def init_command(
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
 
+    vcs_ref = None
+    if "@" in str(template_url):
+        split_by_at = template_url.split("@")
+        template_url = split_by_at[0]
+        vcs_ref = split_by_at[1]
+
     copier_worker = copier.run_copy(
-        template_url, project_path, data=answers_dict, defaults=defaults or False, quiet=True
+        template_url,
+        project_path,
+        data=answers_dict,
+        defaults=defaults or False,
+        quiet=True,
+        vcs_ref=vcs_ref,
     )
 
     expanded_template_url = copier_worker.template.url_expanded
@@ -125,7 +136,10 @@ def init_command(
     if re.search("https?://", expanded_template_url):
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
-        logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
+        logger.info(
+            f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}"
+            + (f"@{vcs_ref}" if vcs_ref else "")
+        )
 
 
 def _fail_and_bail() -> Never:

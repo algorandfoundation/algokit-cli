@@ -37,6 +37,7 @@ def set_blessed_templates(mocker: MockerFixture):
     mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
         "simple": "gh:robdmoore/copier-helloworld",
         "beaker": "gh:wilsonwaters/copier-testing-template",
+        "beaker_with_version": "gh:wilsonwaters/copier-testing-template@96fc7fd766fac607cdf5d69ee6e85ade04dddd47",
     }
 
 
@@ -368,6 +369,28 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory, moc
 
     result = invoke(
         "init --name myapp --no-git --template beaker --defaults -a run_poetry_install False",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "smart_contracts",
+        }
+    )
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_with_official_template_name_and_hash(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+):
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    result = invoke(
+        "init --name myapp --no-git --template beaker_with_version --defaults -a run_poetry_install False",
         cwd=cwd,
     )
 
