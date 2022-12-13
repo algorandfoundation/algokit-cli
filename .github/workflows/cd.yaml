@@ -105,3 +105,9 @@ jobs:
           name: algokit-cli
           path: dist/algokit-*-py3-none-any.whl
           if-no-files-found: error
+
+  cd-publish-release-packages:
+    name: Publish Release Packages
+    uses: ./.github/workflows/publish-release-packages.yaml
+    with:
+      artifactName: "TODO"

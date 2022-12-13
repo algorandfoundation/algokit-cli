@@ -1,0 +1,37 @@
+name: Publish packages to public repositories
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        required: true
+        type: string
+        description: "The github artifact holding the wheel file which will be published"
+
+jobs:
+  publish-chocolatey:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        run: echo "Get artifact from github and extract wheel"
+
+      - name: Get package version
+        run: echo "TODO Determine algocli version and make it available to further steps. Ensure x.y.x-beta.12 versions are rewritten as x.y.z-beta12. Any package with x.y.z will be an official release. Any package with slash notation (x.y.z-bla) will be a prerelease"
+
+      - name: Build package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: pack --version {verison} .\scripts\chocolatey\wwtest\algokit.nuspec
+
+      - name: Set API key
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: apikey --api-key ${{ secrets.CHOCOLATEY_API_KEY }} -source https://push.chocolatey.org/
+
+      - name: Push package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: push --source https://push.chocolatey.org/
