@@ -3,6 +3,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+
 try:
     from typing import Never  # type: ignore[attr-defined]
 except ImportError:
@@ -128,8 +130,19 @@ def init_command(
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
+
+    # adding default ones
+    default_answers = {
+        "algod_token": DEFAULT_ALGOD_TOKEN,
+        "algod_server": DEFAULT_ALGOD_SERVER,
+        "algod_port": str(DEFAULT_ALGOD_PORT),
+        "indexer_token": DEFAULT_ALGOD_TOKEN,
+        "indexer_server": DEFAULT_ALGOD_SERVER,
+        "indexer_port": str(DEFAULT_INDEXER_PORT),
+    }
+
     # parse this early to prevent frustration
-    answers_dict = dict(answers)
+    answers_dict = default_answers | dict(answers)
 
     project_path, directory_name = _get_project_path(directory_name)
 

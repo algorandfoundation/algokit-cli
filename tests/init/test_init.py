@@ -11,6 +11,8 @@ from pytest_mock import MockerFixture
 from utils.approvals import TokenScrubber, combine_scrubbers, verify
 from utils.click_invoker import invoke
 
+from tests import get_combined_verify_output
+
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
 
@@ -430,15 +432,14 @@ def test_init_with_env(tmp_path_factory: TempPathFactory):
             Path("myapp"),
             Path("myapp") / "README.md",
             Path("myapp") / "smart_contracts",
-            Path("myapp") / "smart_contracts" / ".env",
             Path("myapp") / "smart_contracts" / ".env.template",
         }
     )
-    verify(result.output, scrubber=make_output_scrubber())
-    env_file_contents = (Path(cwd / "myapp" / "smart_contracts" / ".env")).read_text()
-    assert "ALGOD_TOKEN=abcdefghijklmnopqrstuvwxyz" in env_file_contents
-    assert "ALGOD_SERVER=http://mylocalserver" in env_file_contents
-    assert "ALGOD_PORT=1234" in env_file_contents
-    assert "INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" in env_file_contents
-    assert "INDEXER_SERVER=http://localhost" in env_file_contents
-    assert "INDEXER_PORT=8980" in env_file_contents
+    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+
+    verify(
+        get_combined_verify_output(
+            result.output, additional_name=".env.template", additional_output=env_template_file_contents
+        ),
+        scrubber=make_output_scrubber(),
+    )

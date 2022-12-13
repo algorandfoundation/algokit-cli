@@ -6,3 +6,12 @@ Your selected template comes from:
 ➡️  https://github.com/wilsonwaters/copier-testing-template
 As a suggestion, if you wanted to open the project in VS Code you could execute:
 > cd myapp && code .
+----
+.env.template:
+----
+ALGOD_TOKEN=abcdefghijklmnopqrstuvwxyz
+ALGOD_SERVER=http://mylocalserver
+ALGOD_PORT=1234
+INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+INDEXER_SERVER=http://localhost
+INDEXER_PORT=8980
