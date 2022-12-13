@@ -1,0 +1,8 @@
+DEBUG: Checking {current_working_directory} for bootstrapping needs
+DEBUG: Skipping {current_working_directory}/.venv
+DEBUG: Checking {current_working_directory}/boring_dir for bootstrapping needs
+DEBUG: Checking {current_working_directory}/double_nested_dir for bootstrapping needs
+DEBUG: Checking {current_working_directory}/empty_dir for bootstrapping needs
+DEBUG: Skipping {current_working_directory}/node_modules
+DEBUG: Skipping {current_working_directory}/__pycache__
+Finished bootstrapping {current_working_directory}
