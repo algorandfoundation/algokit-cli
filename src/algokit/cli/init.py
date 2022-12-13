@@ -1,8 +1,10 @@
 import logging
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from algokit.cli.bootstrap import bootstrap_all as bootstrap
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 try:
@@ -56,6 +58,11 @@ def _get_blessed_templates() -> dict[str, TemplateSource]:
         # a good example of a TemplateSource that should have a commit= specified
         "beaker": TemplateSource(url="gh:wilsonwaters/copier-testing-template"),
     }
+
+
+# this is a function so we can mock it out in unit tests
+def _invoke_bootstrap(context: click.Context) -> None:
+    context.invoke(bootstrap)
 
 
 _unofficial_template_warning = (
@@ -119,6 +126,13 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     help="Automatically choose default answers without asking when creating this template.",
 )
 @click.option(
+    "run_bootstrap",
+    "--bootstrap/--no-bootstrap",
+    is_flag=True,
+    default=None,
+    help="Whether to run `algokit bootstrap` to bootstrap the new project's dependencies.",
+)
+@click.option(
     "answers",
     "--answer",
     "-a",
@@ -128,7 +142,9 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
+@click.pass_context
 def init_command(
+    context: click.Context,
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
@@ -136,6 +152,7 @@ def init_command(
     use_git: bool | None,
     answers: list[tuple[str, str]],
     use_defaults: bool,  # noqa: FBT001
+    run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
@@ -177,6 +194,18 @@ def init_command(
         quiet=True,
         vcs_ref=template.commit,
     )
+
+    if run_bootstrap is None and use_defaults:
+        run_bootstrap = True
+    if run_bootstrap is None:
+        run_bootstrap = _get_run_bootstrap()
+    if run_bootstrap:
+        base_path = Path.cwd()
+        try:
+            os.chdir(project_path)
+            _invoke_bootstrap(context)
+        finally:
+            os.chdir(base_path)
 
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
@@ -337,3 +366,13 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
             if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
                 logger.info("🎉 Performed initial git commit successfully! 🎉")
+
+
+def _get_run_bootstrap() -> bool:
+    return bool(
+        questionary.confirm(
+            "Do you want to run `algokit bootstrap` to bootstrap dependencies"
+            + " for this new project so it can be run immediately?",
+            default=True,
+        ).unsafe_ask()
+    )
