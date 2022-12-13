@@ -28,7 +28,7 @@ $pipxListOutput = pipx list
 if ($LASTEXITCODE -ne 0) {
   Throw "Error searching for existing packages"
 }
-if ($pipxListOutput -match "algokit.*") {
+if ($pipxListOutput -match "$env:ChocolateyPackageName.*") {
   pipx uninstall $env:ChocolateyPackageName
   if ($LASTEXITCODE -ne 0) {
     Throw "Error removing existing version"
