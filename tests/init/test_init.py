@@ -391,7 +391,13 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory):
             Path("myapp") / "smart_contracts",
         }
     )
-    verify(result.output, scrubber=make_output_scrubber())
+    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+    verify(
+        get_combined_verify_output(
+            result.output, additional_name=".env.template", additional_output=env_template_file_contents
+        ),
+        scrubber=make_output_scrubber(),
+    )
 
 
 def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFactory):
@@ -414,13 +420,14 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_env(tmp_path_factory: TempPathFactory):
+def test_init_with_custom_env(tmp_path_factory: TempPathFactory):
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
         (
             "init --name myapp --no-git --template beaker --defaults "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
+            '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '
             " -a run_poetry_install False"
         ),
         cwd=cwd,
