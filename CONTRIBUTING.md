@@ -33,8 +33,14 @@ We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v
        - Install Poetry (via `pyenv`)
        - Install Python dependencies and setup Python venv (to `./.venv/`) (via `poetry install`)
        - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a slightly smoother getting started experience in VS Code)
+       - 
+3. Install pre-commit hooks (optional but recommended):
 
-3. Open the project and start debugging / developing via:
+    [pre-commit](https://pre-commit.com/) is configured in this repository, so once `poetry install` has been run,
+    execute `pre-commit install` inside the virtual-env, and git will ensure formatting, linting, and static typing (via `mypy`)
+    is correct when you perform a commit.
+
+4. Open the project and start debugging / developing via:
 
    - VS Code
 

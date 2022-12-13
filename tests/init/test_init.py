@@ -34,10 +34,14 @@ def supress_copier_dependencies_debug_output():
 
 @pytest.fixture(autouse=True)
 def set_blessed_templates(mocker: MockerFixture):
+    from algokit.cli.init import TemplateSource
+
     mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
-        "simple": "gh:robdmoore/copier-helloworld",
-        "beaker": "gh:wilsonwaters/copier-testing-template",
-        "beaker_with_version": "gh:wilsonwaters/copier-testing-template@96fc7fd766fac607cdf5d69ee6e85ade04dddd47",
+        "simple": TemplateSource("gh:robdmoore/copier-helloworld"),
+        "beaker": TemplateSource("gh:wilsonwaters/copier-testing-template"),
+        "beaker_with_version": TemplateSource(
+            "gh:wilsonwaters/copier-testing-template", "96fc7fd766fac607cdf5d69ee6e85ade04dddd47"
+        ),
     }
 
 
@@ -61,7 +65,7 @@ def test_init_no_interaction_required_no_git_no_network(
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --unsafe-security-accept-template-url "
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
         + "--answer project_name test --answer greeting hi --answer include_extra_file yes",
         cwd=cwd,
     )
@@ -84,7 +88,7 @@ def test_init_no_interaction_required_defaults_no_git_no_network(
 
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' "
-        + "--unsafe-security-accept-template-url --defaults",
+        + "--UNSAFE-SECURITY-accept-template-url --defaults",
         cwd=cwd,
     )
 

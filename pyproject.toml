@@ -24,6 +24,7 @@ mypy = "^0.991"
 pytest-httpx = "^0.21.2"
 python-semantic-release = "^7.32.2"
 pytest-cov = "^4.0.0"
+pre-commit = "^2.20.0"
 
 [build-system]
 requires = ["poetry-core"]
