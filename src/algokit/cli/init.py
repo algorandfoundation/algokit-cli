@@ -25,6 +25,17 @@ from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValida
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_ANSWERS: dict[str, str] = {
+    "algod_token": DEFAULT_ALGOD_TOKEN,
+    "algod_server": DEFAULT_ALGOD_SERVER,
+    "algod_port": str(DEFAULT_ALGOD_PORT),
+    "indexer_token": DEFAULT_ALGOD_TOKEN,
+    "indexer_server": DEFAULT_ALGOD_SERVER,
+    "indexer_port": str(DEFAULT_INDEXER_PORT),
+}
+"""Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
+
+
 @dataclass
 class TemplateSource:
     url: str
@@ -131,18 +142,8 @@ def init_command(
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
 
-    # adding default ones
-    default_answers = {
-        "algod_token": DEFAULT_ALGOD_TOKEN,
-        "algod_server": DEFAULT_ALGOD_SERVER,
-        "algod_port": str(DEFAULT_ALGOD_PORT),
-        "indexer_token": DEFAULT_ALGOD_TOKEN,
-        "indexer_server": DEFAULT_ALGOD_SERVER,
-        "indexer_port": str(DEFAULT_INDEXER_PORT),
-    }
-
-    # parse this early to prevent frustration
-    answers_dict = default_answers | dict(answers)
+    # parse the input early to prevent frustration - combined with some defaults but they can be overridden
+    answers_dict = DEFAULT_ANSWERS | dict(answers)
 
     project_path, directory_name = _get_project_path(directory_name)
 
