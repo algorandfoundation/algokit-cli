@@ -6,5 +6,4 @@ DEBUG: {python_base_path}/bin/python3: STDERR
 DEBUG: Running '{python_base_path}/bin/python3 -m pipx install poetry' in '{current_working_directory}'
 DEBUG: {python_base_path}/bin/python3: STDOUT
 DEBUG: {python_base_path}/bin/python3: STDERR
-ERROR: Unable to install poetry via pipx; please install poetry manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again.
-Error: Error bootstrapping poetry; try running `poetry install` manually.
+Error: Unable to install poetry via pipx; please install poetry manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again.
