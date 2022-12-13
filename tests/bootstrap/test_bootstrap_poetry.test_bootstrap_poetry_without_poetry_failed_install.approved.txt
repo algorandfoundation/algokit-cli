@@ -1,0 +1,9 @@
+DEBUG: Running 'poetry -V' in '{current_working_directory}'
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: STDOUT
+DEBUG: pipx: STDERR
+DEBUG: Running 'pipx install poetry' in '{current_working_directory}'
+DEBUG: pipx: STDOUT
+DEBUG: pipx: STDERR
+ERROR: Unable to install poetry via pipx; please install poetry manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again.
+Error: Error bootstrapping poetry; try running `poetry install` manually.
