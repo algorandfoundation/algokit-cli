@@ -1,0 +1,46 @@
+DEBUG: Running 'pip show AlgoKit' in '{current_working_directory}'
+DEBUG: pip: Name: algokit
+DEBUG: pip: Version: 0.1.0
+DEBUG: pip: Summary: Algorand development kit command line interface
+DEBUG: pip: Home-page:
+DEBUG: pip: Author: Algorand Foundation
+DEBUG: pip: Author-email: contact@algorand.foundation
+DEBUG: pip: License: MIT
+DEBUG: pip: Location: {current_working_directory}/.venv/lib/python3.11/site-packages
+DEBUG: pip: Requires: click, copier, httpx, questionary
+DEBUG: pip: Required-by:
+DEBUG: Running 'brew -v' in '{current_working_directory}'
+DEBUG: brew: Homebrew 3.6.14
+DEBUG: brew: Homebrew/homebrew-core (git revision d7bde1056b7; last commit 2022-12-07)
+DEBUG: brew: Homebrew/homebrew-cask (git revision 6fb50d235a; last commit 2022-12-07)
+DEBUG: Running 'docker -v' in '{current_working_directory}'
+DEBUG: docker: Docker version 20.10.21, build baeda1f
+DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
+DEBUG: docker-compose: Docker Compose version v2.12.2
+DEBUG: Running 'git -v' in '{current_working_directory}'
+DEBUG: git: git version 2.37.1 (Apple Git-137.1)
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.1.0
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: Configuration file exists at /Users/mzaatar/Library/Application Support/pypoetry, reusing this directory.
+DEBUG: poetry: 
+DEBUG: poetry: Consider moving configuration to /Users/mzaatar/Library/Preferences/pypoetry, as support for the legacy directory will be removed in an upcoming release.
+DEBUG: poetry: Poetry (version 1.2.2)
+DEBUG: Running 'node -v' in '{current_working_directory}'
+DEBUG: node: v18.12.1
+DEBUG: Running 'npm -v' in '{current_working_directory}'
+DEBUG: npm: 8.19.2
+Time: 1990-12-31T22:00:00+08:00
+AlgoKit: 0.1.0 {current_working_directory}/.venv/lib/python3.11/site-packages
+Brew installed version: 3.6.14
+OS: darwin 13.0.1
+Docker: 20.10.21
+Docker Compose: 2.12.2
+Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/Git: 2.37.1
+[TODO] AlgoKit Python: <version of algokit version> <path> (base path: <base path>)
+[TODO] Global Python: <version of first global path python3 version> <path> | None found
+Pipx: 1.1.0
+Poetry: 1.2.2
+Node: 18.12.1
+Npm: 8.19.2
+If you are experiencing a problem with algokit, feel free to submit an issue via https://github.com/algorandfoundation/algokit-cli/issues/new; please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

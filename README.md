@@ -75,6 +75,8 @@ Here's how to test it out and maybe even start hacking, assuming you have access
      4. Run `pipx install ./dist/algokit-<TAB>-<TAB>` (ie the .whl file)
      5. You can now run `algokit` and should see a help message! 🎉
 
+   4. Recommended: Run `algokit doctor` to check the system is ready to enjoy development on Algorand!
+
 ### Update
 
 To update a previous algokit installation you can simply run `pipx reinstall algokit` and it'll grab the latest from wherever it was installed from. Note: If you installed a specific version e.g. `pipx install git+https://github.com/algorandfoundation/algokit-cli@v.13-beta` then this command won't have any effect since that repository tag will point to the same version.
