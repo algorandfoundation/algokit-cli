@@ -19,6 +19,8 @@ DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
 DEBUG: docker-compose: Docker Compose version v2.12.2
 DEBUG: Running 'git -v' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
+DEBUG: Running 'python --version' in '{current_working_directory}'
+DEBUG: python: Python 3.11.0
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: 1.1.0
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
@@ -32,15 +34,16 @@ DEBUG: Running 'npm -v' in '{current_working_directory}'
 DEBUG: npm: 8.19.2
 Time: 1990-12-31T22:00:00+08:00
 AlgoKit: 0.1.0 {current_working_directory}/.venv/lib/python3.11/site-packages
-Brew installed version: 3.6.14
+Brew: 3.6.14
 OS: darwin 13.0.1
 Docker: 20.10.21
 Docker Compose: 2.12.2
-Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/Git: 2.37.1
-[TODO] AlgoKit Python: <version of algokit version> <path> (base path: <base path>)
-[TODO] Global Python: <version of first global path python3 version> <path> | None found
+Git: 2.37.1
+AlgoKit Python: 3.11.0
+Global Python: [TODO] <version of first global path python3 version> <path> | None found
 Pipx: 1.1.0
 Poetry: 1.2.2
-Node: 18.12.1
+Node.js: 18.12.1
 Npm: 8.19.2
+
 If you are experiencing a problem with algokit, feel free to submit an issue via https://github.com/algorandfoundation/algokit-cli/issues/new; please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

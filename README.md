@@ -75,7 +75,7 @@ Here's how to test it out and maybe even start hacking, assuming you have access
      4. Run `pipx install ./dist/algokit-<TAB>-<TAB>` (ie the .whl file)
      5. You can now run `algokit` and should see a help message! 🎉
 
-   4. Recommended: Run `algokit doctor` to check the system is ready to enjoy development on Algorand!
+> Recommended: Run `algokit doctor` to check the system is ready to enjoy development on Algorand!
 
 ### Update
 
