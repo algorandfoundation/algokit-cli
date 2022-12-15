@@ -1,5 +1,5 @@
 import typing
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -33,8 +33,7 @@ def mock_dependencies(mocker: MockerFixture) -> None:
     mocked_os.version.return_value = "linux_version"
     # Mock datetime
     mocked_date = mocker.patch("algokit.core.doctor.datetime")
-    fake_now = datetime(1990, 12, 31, 10, 9, 8, tzinfo=timezone.utc).astimezone()
-    mocked_date.now.return_value = fake_now
+    mocked_date.now.return_value = datetime(1990, 12, 31, 10, 9, 8)
     # Mock shutil
     mocked_shutil = mocker.patch("algokit.core.doctor.shutil")
     mocked_shutil.which.return_value = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3"

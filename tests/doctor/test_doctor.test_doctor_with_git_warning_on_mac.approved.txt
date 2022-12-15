@@ -26,7 +26,7 @@ DEBUG: Running 'node -v' in '{current_working_directory}'
 DEBUG: node: v18.12.1
 DEBUG: Running 'npm -v' in '{current_working_directory}'
 DEBUG: npm: 8.19.2
-Time: 1990-12-31T18:09:08+08:00
+Time: 1990-12-31T10:09:08
 AlgoKit: 1.2.3 /pipx/venvs/algokit
 Brew: 3.6.15
 OS: Mac OS X mac_os_version

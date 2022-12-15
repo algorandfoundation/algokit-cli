@@ -24,7 +24,7 @@ class ProcessResult:
 
 
 def get_date() -> ProcessResult:
-    return ProcessResult(format(datetime.now(timezone.utc).astimezone().isoformat()), 0)
+    return ProcessResult(format(datetime.now(timezone.utc).isoformat()), 0)
 
 
 def get_algokit_info() -> ProcessResult:
