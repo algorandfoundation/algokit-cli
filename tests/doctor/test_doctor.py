@@ -39,11 +39,12 @@ def mock_dependencies(mocker: MockerFixture) -> None:
     mocked_shutil.which.return_value = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3"
     # Mock sys - Tuple[int, int, int, str, int]
     mocker.patch("algokit.core.doctor.sys_version_info", VersionInfoType(3, 6, 2, "blah", 0))
+    mocker.patch("algokit.core.doctor.sys_executable", "{current_working_directory}/.venv/bin/python")
 
 
 @pytest.fixture(autouse=True)
 def mock_happy_values(proc_mock: ProcMock) -> None:
-    proc_mock.set_output(["pipx", "list", "--short"], ["aaa 2.3.4", "algokit 1.2.3", "copier 7.0.1\n"])
+    proc_mock.set_output(["pipx", "list", "--short"], ["aaa 2.3.4", "algokit 1.2.3", "copier 7.0.1"])
     proc_mock.set_output(
         ["pipx", "environment"],
         ["PIPX_SHARED_LIBS=/pipx/shared", "PIPX_LOCAL_VENVS=/pipx/venvs"],
@@ -52,7 +53,7 @@ def mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["brew", "-v"], ["Homebrew 3.6.15", "Homebrew/homebrew-core (blah)"])
     proc_mock.set_output(["docker", "-v"], ["Docker version 20.10.21, build baeda1f"])
     proc_mock.set_output(["docker-compose", "-v"], ["Docker Compose version v2.12.2"])
-    proc_mock.set_output(["git", "-v"], ["git version 2.37.1 (Apple Git-137.1)"])
+    proc_mock.set_output(["git", "--version"], ["git version 2.37.1 (Apple Git-137.1)"])
     proc_mock.set_output(["python3", "--version"], ["Python 3.11.0"])
     proc_mock.set_output(["pipx", "--version"], ["1.1.0"])
     proc_mock.set_output(["poetry", "--version"], ["blah blah", "", "Poetry (version 1.2.2)"])
@@ -123,7 +124,7 @@ def test_doctor_with_docker_compose_warning(proc_mock: ProcMock):
 
 
 def test_doctor_with_git_warning_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
-    proc_mock.set_output(["git", "-v"], ["EMPTY"])
+    proc_mock.set_output(["git", "--version"], ["EMPTY"])
 
     result = invoke("doctor")
 
@@ -135,7 +136,7 @@ def test_doctor_with_git_warning_on_windows(mocker: MockerFixture, proc_mock: Pr
     mocked_os = mocker.patch("algokit.cli.doctor.platform")
     mocked_os.system.return_value = "windows"
 
-    proc_mock.set_output(["git", "-v"], [])
+    proc_mock.set_output(["git", "--version"], [])
 
     result = invoke("doctor")
 
@@ -150,7 +151,7 @@ def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
     proc_mock.set_output(["brew", "-v"], [])
     proc_mock.set_output(["docker", "-v"], [])
     proc_mock.set_output(["docker-compose", "-v"], [])
-    proc_mock.set_output(["git", "-v"], [])
+    proc_mock.set_output(["git", "--version"], [])
     proc_mock.set_output(["python3", "--version"], [])
     proc_mock.set_output(["pipx", "--version"], [])
     proc_mock.set_output(["poetry", "--version"], [])

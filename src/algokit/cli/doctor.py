@@ -63,7 +63,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     logger.info(DOCTOR_END_MESSAGE)
 
     if copy_to_clipboard:
-        pyclip.copy("\n".join(f"{key}: {value.info}" for key, value in service_outputs.items()))
+        pyclip.copy("\n".join(f"* {key}: {value.info}" for key, value in service_outputs.items()))
 
     if return_code != 0:
         raise click.exceptions.Exit(code=1)

@@ -12,7 +12,7 @@ DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
 DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
 DEBUG: docker-compose: Docker Compose version v2.12.2
-DEBUG: Running 'git -v' in '{current_working_directory}'
+DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: git: EMPTY
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: python3: Python 3.11.0
@@ -34,7 +34,7 @@ Docker: 20.10.21
 Docker Compose: 2.12.2
 Git: None found.
 Git required to run `algokit init`; install via https://github.com/git-guides/install-git
-AlgoKit Python: 3.6.2
+AlgoKit Python: 3.6.2 {current_working_directory}/.venv/bin/python
 Global Python: 3.11.0 /Library/Frameworks/Python.framework/Versions/3.11/bin/python3
 Pipx: 1.1.0
 Poetry: 1.2.2
