@@ -1,10 +1,9 @@
 import logging
-import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from algokit.cli.bootstrap import bootstrap_all as bootstrap
+from algokit.core.bootstrap import bootstrap_any_including_subdirs
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 try:
@@ -58,11 +57,6 @@ def _get_blessed_templates() -> dict[str, TemplateSource]:
         # a good example of a TemplateSource that should have a commit= specified
         "beaker": TemplateSource(url="gh:wilsonwaters/copier-testing-template"),
     }
-
-
-# this is a function so we can mock it out in unit tests
-def _invoke_bootstrap(context: click.Context) -> None:
-    context.invoke(bootstrap)
 
 
 _unofficial_template_warning = (
@@ -142,9 +136,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
-@click.pass_context
 def init_command(
-    context: click.Context,
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
@@ -195,24 +187,18 @@ def init_command(
         vcs_ref=template.commit,
     )
 
-    if run_bootstrap is None and use_defaults:
-        run_bootstrap = True
-    if run_bootstrap is None:
-        run_bootstrap = _get_run_bootstrap()
-    if run_bootstrap:
-        base_path = Path.cwd()
-        try:
-            os.chdir(project_path)
-            _invoke_bootstrap(context)
-        finally:
-            os.chdir(base_path)
-
     expanded_template_url = copier_worker.template.url_expanded
-    logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
+    logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(
             project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
         )
+
+    if run_bootstrap is None:
+        # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
+        run_bootstrap = use_defaults or _get_run_bootstrap()
+    if run_bootstrap:
+        bootstrap_any_including_subdirs(project_path)
 
     logger.info(
         f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "

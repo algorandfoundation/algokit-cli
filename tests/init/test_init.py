@@ -34,8 +34,8 @@ def supress_copier_dependencies_debug_output():
     logging.getLogger("asyncio").setLevel("INFO")
 
 
-def bootstrap_mock(context: click.Context):
-    click.echo(f"Executed `algokit bootstrap all` in {Path.cwd()}")
+def bootstrap_mock(p: Path):
+    click.echo(f"Executed `algokit bootstrap all` in {p}")
 
 
 @pytest.fixture(autouse=True)
@@ -50,7 +50,7 @@ def set_blessed_templates(mocker: MockerFixture):
         ),
     }
 
-    mocker.patch("algokit.cli.init._invoke_bootstrap").side_effect = bootstrap_mock
+    mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
 
 
 def test_init_help():

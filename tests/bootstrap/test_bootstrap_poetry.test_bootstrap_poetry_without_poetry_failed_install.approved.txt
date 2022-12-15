@@ -1,4 +1,5 @@
-DEBUG: Running 'poetry -V' in '{current_working_directory}'
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+Attempting to install poetry with pipx...
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
