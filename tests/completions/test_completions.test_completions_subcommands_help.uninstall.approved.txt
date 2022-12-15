@@ -1,0 +1,5 @@
+Usage: algokit completions uninstall [OPTIONS]
+
+Options:
+  --shell [bash|zsh]  Specify shell
+  -h, --help          Show this message and exit.

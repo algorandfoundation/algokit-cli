@@ -12,7 +12,7 @@ We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v
 2. Install pre-requisites:
 
    - Manually:
-     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
+     - Install `Python` - [Link](https://www.python.org/downloads/): The recommended version is `3.10`.
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
      - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via automated script:

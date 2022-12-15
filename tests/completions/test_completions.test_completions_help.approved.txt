@@ -1,0 +1,8 @@
+Usage: algokit completions [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  install    Install completions.
+  uninstall  Uninstall completions.

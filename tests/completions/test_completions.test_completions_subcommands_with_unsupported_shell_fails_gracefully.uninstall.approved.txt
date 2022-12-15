@@ -1,0 +1,1 @@
+WARNING: pwsh is not a supported shell. 😢

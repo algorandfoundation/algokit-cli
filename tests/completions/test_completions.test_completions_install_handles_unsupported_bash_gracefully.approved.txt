@@ -1,0 +1,2 @@
+DEBUG: Failed to generate completion source
+ERROR: Shell completion is not supported for Bash versions older than 4.4.
