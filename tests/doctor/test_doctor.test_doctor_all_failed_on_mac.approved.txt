@@ -2,7 +2,7 @@ DEBUG: Running 'pipx list --short' in '{current_working_directory}'
 DEBUG: Running 'brew -v' in '{current_working_directory}'
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
-DEBUG: Running 'git -v' in '{current_working_directory}'
+DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
@@ -18,7 +18,7 @@ Docker Compose: None found.
 Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
 Git: None found.
 Git required to run `algokit init`; install via https://github.com/git-guides/install-git
-AlgoKit Python: 3.6.2
+AlgoKit Python: 3.6.2 {current_working_directory}/.venv/bin/python
 Global Python: None found.
 Pipx: None found.
 Pipx is required to install Poetry; install via https://pypa.github.io/pipx/

@@ -3,6 +3,7 @@ import logging
 import platform
 import shutil
 from datetime import datetime, timezone
+from sys import executable as sys_executable
 from sys import version_info as sys_version_info
 
 from algokit.core import proc
@@ -49,16 +50,18 @@ def get_algokit_info() -> ProcessResult:
 
 def get_choco_info() -> ProcessResult:
     try:
-        process_results = proc.run(["choco"])
-        return ProcessResult(process_results.output.splitlines()[0].split(" v")[1], process_results.exit_code)
+        process_results = proc.run(["choco"]).output.splitlines()[0].split(" v")[1]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult("None found", 1)
 
 
 def get_brew_info() -> ProcessResult:
     try:
-        process_results = proc.run(["brew", "-v"])
-        return ProcessResult(process_results.output.splitlines()[0].split(" ")[1], process_results.exit_code)
+        process_results = proc.run(["brew", "-v"]).output.splitlines()[0].split(" ")[1]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult("None found", 1)
 
@@ -80,10 +83,9 @@ def get_os(os_type: str) -> ProcessResult:
 
 def get_docker_info() -> ProcessResult:
     try:
-        process_results = proc.run(["docker", "-v"])
-        return ProcessResult(
-            process_results.output.splitlines()[0].split(" ")[2].split(",")[0], process_results.exit_code
-        )
+        process_results = proc.run(["docker", "-v"]).output.splitlines()[0].split(" ")[2].split(",")[0]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult(
             (
@@ -113,8 +115,9 @@ def get_docker_compose_info() -> ProcessResult:
 
 def get_git_info(system: str) -> ProcessResult:
     try:
-        process_results = proc.run(["git", "-v"])
-        return ProcessResult(process_results.output.splitlines()[0].split(" ")[2], process_results.exit_code)
+        process_results = proc.run(["git", "--version"]).output.splitlines()[0].split(" ")[2]
+        major, minor, build = map(int, process_results.split("."))
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         if system == "windows":
             return ProcessResult(
@@ -134,24 +137,28 @@ def get_git_info(system: str) -> ProcessResult:
 
 def get_algokit_python_info() -> ProcessResult:
     try:
-        return ProcessResult(f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro}", 0)
+        return ProcessResult(
+            f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro} {sys_executable}", 0
+        )
     except Exception:
         return ProcessResult("None found.", 1)
 
 
 def get_global_python_info() -> ProcessResult:
     try:
-        global_python3_version = proc.run(["python3", "--version"]).output.splitlines()[0].split(" ")[1]
+        major, minor, build = get_version_from_str(
+            proc.run(["python3", "--version"]).output.splitlines()[0].split(" ")[1]
+        )
         global_python3_location = shutil.which("python3")
-        return ProcessResult(f"{global_python3_version} {global_python3_location}", 0)
+        return ProcessResult(f"{major}.{minor}.{build} {global_python3_location}", 0)
     except Exception:
         return ProcessResult("None found.", 1)
 
 
 def get_pipx_info() -> ProcessResult:
     try:
-        process_results = proc.run(["pipx", "--version"])
-        return ProcessResult(process_results.output.splitlines()[0], process_results.exit_code)
+        major, minor, build = get_version_from_str(proc.run(["pipx", "--version"]).output.splitlines()[0])
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult(
             "None found.\nPipx is required to install Poetry; install via https://pypa.github.io/pipx/", 1
@@ -160,9 +167,9 @@ def get_pipx_info() -> ProcessResult:
 
 def get_poetry_info() -> ProcessResult:
     try:
-        process_results = proc.run(["poetry", "--version"])
-        poetry_version = process_results.output.splitlines()[-1].split("version ")[1].split(")")[0]
-        return ProcessResult(poetry_version, process_results.exit_code)
+        process_results = proc.run(["poetry", "--version"]).output.splitlines()[-1].split("version ")[1].split(")")[0]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult(
             (
@@ -175,8 +182,9 @@ def get_poetry_info() -> ProcessResult:
 
 def get_node_info() -> ProcessResult:
     try:
-        process_results = proc.run(["node", "-v"])
-        return ProcessResult(process_results.output.splitlines()[0].split("v")[1], process_results.exit_code)
+        process_results = proc.run(["node", "-v"]).output.splitlines()[0].split("v")[1]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult(
             (
@@ -189,8 +197,9 @@ def get_node_info() -> ProcessResult:
 
 def get_npm_info() -> ProcessResult:
     try:
-        process_results = proc.run(["npm", "-v"])
-        return ProcessResult(process_results.output.splitlines()[0], process_results.exit_code)
+        process_results = proc.run(["npm", "-v"]).output.splitlines()[0]
+        major, minor, build = get_version_from_str(process_results)
+        return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         return ProcessResult("None found.", 1)
 
@@ -199,3 +208,8 @@ def is_minimum_version(system_version: str, minimum_version: str) -> bool:
     system_version_as_tuple = tuple(map(int, (system_version.split("."))))
     minimum_version_as_tuple = tuple(map(int, (minimum_version.split("."))))
     return system_version_as_tuple >= minimum_version_as_tuple
+
+
+def get_version_from_str(version: str) -> tuple[int, int, int]:
+    major, minor, build = map(int, version.split("."))
+    return major, minor, build
