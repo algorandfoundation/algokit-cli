@@ -102,6 +102,3 @@ upload_to_repository = false
 tag_commit = true
 branch = "main"
 commit_message = "{version}\n\nskip-checks: true"
-
-[pyperclip3]
-ignore_missing_imports = true

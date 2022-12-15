@@ -2,7 +2,7 @@ import logging
 import platform
 
 import click
-import pyperclip3
+import pyperclip3  # type: ignore
 from algokit.core.doctor import DoctorFunctions
 
 logger = logging.getLogger(__name__)
