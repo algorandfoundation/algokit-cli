@@ -2,8 +2,8 @@ import dataclasses
 import logging
 import platform
 import shutil
-import sys
 from datetime import datetime, timezone
+from sys import version_info as sys_version_info
 
 from algokit.core import proc
 
@@ -65,13 +65,17 @@ def get_brew_info() -> ProcessResult:
 
 def get_os(os_type: str) -> ProcessResult:
     os_version = ""
+    os_name = ""
     if os_type == "windows":
+        os_name = "Windows"
         os_version = platform.win32_ver()[0]
     elif os_type == "darwin":
+        os_name = "Mac OS X"
         os_version = platform.mac_ver()[0]
     else:
+        os_name = "Unix/Linux"
         os_version = platform.version()
-    return ProcessResult(f"{os_type} {os_version}", 0)
+    return ProcessResult(f"{os_name} {os_version}", 0)
 
 
 def get_docker_info() -> ProcessResult:
@@ -122,7 +126,7 @@ def get_git_info(system: str) -> ProcessResult:
             )
         else:
             return ProcessResult(
-                "None found.\nGit required to run 1algokit init`; "
+                "None found.\nGit required to run `algokit init`; "
                 "install via https://github.com/git-guides/install-git",
                 1,
             )
@@ -130,8 +134,7 @@ def get_git_info(system: str) -> ProcessResult:
 
 def get_algokit_python_info() -> ProcessResult:
     try:
-        python_version = sys.version_info
-        return ProcessResult(f"{python_version.major}.{python_version.minor}.{python_version.micro}", 0)
+        return ProcessResult(f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro}", 0)
     except Exception:
         return ProcessResult("None found.", 1)
 
@@ -187,9 +190,9 @@ def get_node_info() -> ProcessResult:
 def get_npm_info() -> ProcessResult:
     try:
         process_results = proc.run(["npm", "-v"])
-        return ProcessResult(process_results.output, process_results.exit_code)
+        return ProcessResult(process_results.output.splitlines()[0], process_results.exit_code)
     except Exception:
-        return ProcessResult("None found", 1)
+        return ProcessResult("None found.", 1)
 
 
 def is_minimum_version(system_version: str, minimum_version: str) -> bool:
