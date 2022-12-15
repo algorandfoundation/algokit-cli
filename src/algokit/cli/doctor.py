@@ -3,7 +3,7 @@ import platform
 
 import click
 import pyperclip3  # type: ignore
-from algokit.core.doctor import DoctorFunctions
+from algokit.core.doctor import DoctorFunctions, ProcessResult
 
 logger = logging.getLogger(__name__)
 DOCTOR_END_MESSAGE = (
@@ -30,7 +30,7 @@ DOCTOR_END_MESSAGE = (
 def doctor_command(*, copy_to_clipboard: bool) -> None:
     os_type = platform.system().lower()
 
-    service_outputs: dict[str, str] = {}
+    service_outputs: dict[str, ProcessResult] = {}
     service_outputs_contents_lines: list[str] = []
     doctor_functions = DoctorFunctions()
 
@@ -51,15 +51,28 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     service_outputs["Node.js"] = doctor_functions.get_node_info()
     service_outputs["Npm"] = doctor_functions.get_npm_info()
 
+    critical_services = ["Docker", "Docker Compose", "Git"]
     # Print the status details
     if copy_to_clipboard:
         for key, value in service_outputs.items():
-            logger.info(click.style(f"{key}: ", bold=True) + f"{value}")
-            service_outputs_contents_lines.append(f"{key}: {value}\n")
+            color = "green"
+            if value.exit_code != 0:
+                if key in critical_services:
+                    color = "red"
+                else:
+                    color = "yellow"
+            logger.info(click.style(f"{key}: ", bold=True) + click.style(f"{value.info}", fg=color))
+            service_outputs_contents_lines.append(f"{key}: {value.info}\n")
         service_outputs_contents_lines.append(DOCTOR_END_MESSAGE)
     else:
         for key, value in service_outputs.items():
-            logger.info(click.style(f"{key}: ", bold=True) + f"{value}")
+            color = "green"
+            if value.exit_code != 0:
+                if key in critical_services:
+                    color = "red"
+                else:
+                    color = "yellow"
+            logger.info(click.style(f"{key}: ", bold=True) + click.style(f"{value.info}", fg=color))
 
     # print end message anyway
     logger.info(DOCTOR_END_MESSAGE)
