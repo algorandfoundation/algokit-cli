@@ -2,8 +2,9 @@ import logging
 import platform
 
 import click
-import pyperclip3  # type: ignore
-from algokit.core.doctor import DoctorFunctions, ProcessResult
+import pyclip  # type: ignore
+from algokit.core import doctor as doctor_functions
+from algokit.core.doctor import ProcessResult
 
 logger = logging.getLogger(__name__)
 DOCTOR_END_MESSAGE = (
@@ -28,11 +29,9 @@ DOCTOR_END_MESSAGE = (
     default=False,
 )
 def doctor_command(*, copy_to_clipboard: bool) -> None:
+    return_code = 0
     os_type = platform.system().lower()
-
     service_outputs: dict[str, ProcessResult] = {}
-    service_outputs_contents_lines: list[str] = []
-    doctor_functions = DoctorFunctions()
 
     service_outputs["Time"] = doctor_functions.get_date()
     service_outputs["AlgoKit"] = doctor_functions.get_algokit_info()
@@ -53,29 +52,18 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
 
     critical_services = ["Docker", "Docker Compose", "Git"]
     # Print the status details
-    if copy_to_clipboard:
-        for key, value in service_outputs.items():
-            color = "green"
-            if value.exit_code != 0:
-                if key in critical_services:
-                    color = "red"
-                else:
-                    color = "yellow"
-            logger.info(click.style(f"{key}: ", bold=True) + click.style(f"{value.info}", fg=color))
-            service_outputs_contents_lines.append(f"{key}: {value.info}\n")
-        service_outputs_contents_lines.append(DOCTOR_END_MESSAGE)
-    else:
-        for key, value in service_outputs.items():
-            color = "green"
-            if value.exit_code != 0:
-                if key in critical_services:
-                    color = "red"
-                else:
-                    color = "yellow"
-            logger.info(click.style(f"{key}: ", bold=True) + click.style(f"{value.info}", fg=color))
+    for key, value in service_outputs.items():
+        color = "green"
+        if value.exit_code != 0:
+            color = "red" if key in critical_services else "yellow"
+            return_code = 1
+        logger.info(click.style(f"{key}: ", bold=True) + click.style(f"{value.info}", fg=color))
 
     # print end message anyway
     logger.info(DOCTOR_END_MESSAGE)
 
     if copy_to_clipboard:
-        pyperclip3.copy("".join(service_outputs_contents_lines))
+        pyclip.copy("\n".join(f"{key}: {value.info}" for key, value in service_outputs.items()))
+
+    if return_code != 0:
+        raise click.exceptions.Exit(code=1)
