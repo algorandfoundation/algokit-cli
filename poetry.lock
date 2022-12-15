@@ -750,6 +750,14 @@ python-versions = ">=3.6"
 pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
+name = "pasteboard"
+version = "0.3.3"
+description = "Pasteboard - Python interface for reading from NSPasteboard (macOS clipboard)"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
+
+[[package]]
 name = "pathspec"
 version = "0.10.2"
 description = "Utility library for gitignore style pattern matching of file paths."
@@ -892,6 +900,21 @@ python-versions = ">=3.6.2"
 
 [package.dependencies]
 wcwidth = "*"
+
+[[package]]
+name = "pyclip"
+version = "0.7.0"
+description = "Cross-platform clipboard utilities supporting both binary and text data."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+pasteboard = {version = "0.3.3", markers = "platform_system == \"Darwin\""}
+pywin32 = {version = ">=1.0", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+test = ["pytest"]
 
 [[package]]
 name = "pycparser"
@@ -1429,7 +1452,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "8c1e4d9767957b7b2cab2e06e7bfe4c37069214ebae65806b00d9dda569aa4f4"
+content-hash = "ac48cd3e24e5ba742d46a35f0557b1c497da443b24daf95dcbc76f8482cfb2e9"
 
 [metadata.files]
 aiohttp = [
@@ -2201,6 +2224,13 @@ packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
+pasteboard = [
+    {file = "pasteboard-0.3.3-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:afd171e200316f6b3d3da381476921ca57cb8f26d2fa418f779454913918dbb9"},
+    {file = "pasteboard-0.3.3-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:f99dd6c7039b755756b2068942c4c2487d6366e5a56eafd6db0ae7aa2a371a0e"},
+    {file = "pasteboard-0.3.3-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:19229dfa28f41afb5e731ac81e52bbc4212f67d678c082d3e3621cec0628a773"},
+    {file = "pasteboard-0.3.3-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:20a5c53bae8ac8186ecdd621020fb1b072d45a35f9f11a8e4cd5e82d76b485d0"},
+    {file = "pasteboard-0.3.3.tar.gz", hash = "sha256:d80275e76ff1eaaa5ca3d0e0fd8aecd5ea1298523dfd51f3774b5aaebdde02cf"},
+]
 pathspec = [
     {file = "pathspec-0.10.2-py3-none-any.whl", hash = "sha256:88c2606f2c1e818b978540f73ecc908e13999c6c3a383daf3705652ae79807a5"},
     {file = "pathspec-0.10.2.tar.gz", hash = "sha256:8f6bf73e5758fd365ef5d58ce09ac7c27d2833a8d7da51712eac6e27e35141b0"},
@@ -2244,6 +2274,10 @@ pre-commit = [
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.36-py3-none-any.whl", hash = "sha256:aa64ad242a462c5ff0363a7b9cfe696c20d55d9fc60c11fd8e632d064804d305"},
     {file = "prompt_toolkit-3.0.36.tar.gz", hash = "sha256:3e163f254bef5a03b146397d7c1963bd3e2812f0964bb9a24e6ec761fd28db63"},
+]
+pyclip = [
+    {file = "pyclip-0.7.0-py3-none-any.whl", hash = "sha256:a7b7ea2cfad2dd61e86a529af588d006070d3eb0bd32981afaee5215f4604fec"},
+    {file = "pyclip-0.7.0.tar.gz", hash = "sha256:57602047a4ceab709bdcd42f3dde6449a3349b95c16154cfdce27376a2072491"},
 ]
 pycparser = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
