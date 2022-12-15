@@ -1,3 +1,4 @@
+import json
 import typing
 from datetime import datetime
 from pathlib import Path
@@ -51,7 +52,7 @@ def mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["choco"], ["Chocolatey v0.10.15", "Please run 'choco -?' for help"])
     proc_mock.set_output(["brew", "-v"], ["Homebrew 3.6.15", "Homebrew/homebrew-core (blah)"])
     proc_mock.set_output(["docker", "-v"], ["Docker version 20.10.21, build baeda1f"])
-    proc_mock.set_output(["docker-compose", "-v"], ["Docker Compose version v2.12.2"])
+    proc_mock.set_output(["docker", "compose", "version", "--format", "json"], [json.dumps({"version": "v2.12.2"})])
     proc_mock.set_output(["git", "-v"], ["git version 2.37.1 (Apple Git-137.1)"])
     proc_mock.set_output(["python3", "--version"], ["Python 3.11.0"])
     proc_mock.set_output(["pipx", "--version"], ["1.1.0"])
@@ -114,7 +115,7 @@ def test_doctor_successful_on_linux(mocker: MockerFixture, proc_mock: ProcMock):
 
 
 def test_doctor_with_docker_compose_warning(proc_mock: ProcMock):
-    proc_mock.set_output(["docker-compose", "-v"], ["Docker Compose version v2.1.3"])
+    proc_mock.set_output(["docker", "compose", "version", "--format", "json"], [json.dumps({"version": "v2.1.3"})])
 
     result = invoke("doctor")
 
@@ -149,7 +150,7 @@ def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
     proc_mock.set_output(["choco"], [])
     proc_mock.set_output(["brew", "-v"], [])
     proc_mock.set_output(["docker", "-v"], [])
-    proc_mock.set_output(["docker-compose", "-v"], [])
+    proc_mock.set_output(["docker", "compose", "version", "--format", "json"], [])
     proc_mock.set_output(["git", "-v"], [])
     proc_mock.set_output(["python3", "--version"], [])
     proc_mock.set_output(["pipx", "--version"], [])

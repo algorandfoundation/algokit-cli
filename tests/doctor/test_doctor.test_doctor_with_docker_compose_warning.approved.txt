@@ -10,8 +10,8 @@ DEBUG: brew: Homebrew 3.6.15
 DEBUG: brew: Homebrew/homebrew-core (blah)
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
-DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
-DEBUG: docker-compose: Docker Compose version v2.1.3
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.1.3"}
 DEBUG: Running 'git -v' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
@@ -32,7 +32,7 @@ Brew: 3.6.15
 OS: Mac OS X mac_os_version
 Docker: 20.10.21
 Docker Compose: 2.1.3
-Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
+Docker Compose 2.5.0 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
 Git: 2.37.1
 AlgoKit Python: 3.6.2
 Global Python: 3.11.0 /Library/Frameworks/Python.framework/Versions/3.11/bin/python3

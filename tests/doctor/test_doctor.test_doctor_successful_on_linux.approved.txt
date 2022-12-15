@@ -7,8 +7,8 @@ DEBUG: pipx: PIPX_SHARED_LIBS=/pipx/shared
 DEBUG: pipx: PIPX_LOCAL_VENVS=/pipx/venvs
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
-DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
-DEBUG: docker-compose: Docker Compose version v2.12.2
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.12.2"}
 DEBUG: Running 'git -v' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
 DEBUG: Running 'python3 --version' in '{current_working_directory}'

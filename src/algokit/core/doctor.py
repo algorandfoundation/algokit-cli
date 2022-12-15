@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import logging
 import platform
 import shutil
@@ -6,10 +7,11 @@ from datetime import datetime, timezone
 from sys import version_info as sys_version_info
 
 from algokit.core import proc
+from algokit.core.proc import RunResult
 
 logger = logging.getLogger(__name__)
 
-DOCKER_COMPOSE_MINIMUM_VERSION = "2.5"
+DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
 
 DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE = (
     f"\nDocker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to `run algokit sandbox command`; "
@@ -96,16 +98,22 @@ def get_docker_info() -> ProcessResult:
 
 def get_docker_compose_info() -> ProcessResult:
     try:
-        process_results = proc.run(["docker-compose", "-v"])
-        docker_compose_version = process_results.output.splitlines()[0].split(" v")[2]
-        minimum_version_met = is_minimum_version(docker_compose_version, DOCKER_COMPOSE_MINIMUM_VERSION)
+
+        process_results = get_docker_compose_version("")
+        compose_version: dict[str, str] = json.loads(process_results.output)
+        compose_version_str = compose_version["version"].lstrip("v")
+        compose_minimum_version_met = is_minimum_version(compose_version_str, DOCKER_COMPOSE_MINIMUM_VERSION)
+
+        # docker_compose_version = process_results.output.splitlines()[0].split(" v")[2]
+        # minimum_version_met = is_minimum_version(docker_compose_version, DOCKER_COMPOSE_MINIMUM_VERSION)
+
         return ProcessResult(
             (
-                docker_compose_version
-                if minimum_version_met
-                else f"{docker_compose_version}{DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE}"
+                compose_version_str
+                if compose_minimum_version_met
+                else f"{compose_version_str}{DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE}"
             ),
-            process_results.exit_code if minimum_version_met else 1,
+            process_results.exit_code if compose_minimum_version_met else 1,
         )
     except Exception:
         return ProcessResult(f"None found. {DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE}", 1)
@@ -195,7 +203,14 @@ def get_npm_info() -> ProcessResult:
         return ProcessResult("None found.", 1)
 
 
-def is_minimum_version(system_version: str, minimum_version: str) -> bool:
-    system_version_as_tuple = tuple(map(int, (system_version.split("."))))
+def is_minimum_version(current_version: str, minimum_version: str) -> bool:
+    system_version_as_tuple = tuple(map(int, (current_version.split("."))))
     minimum_version_as_tuple = tuple(map(int, (minimum_version.split("."))))
     return system_version_as_tuple >= minimum_version_as_tuple
+
+
+def get_docker_compose_version(bad_return_code_error_message: str) -> RunResult:
+    return proc.run(
+        ["docker", "compose", "version", "--format", "json"],
+        bad_return_code_error_message=bad_return_code_error_message,
+    )

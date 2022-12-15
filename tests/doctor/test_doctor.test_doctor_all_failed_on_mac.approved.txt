@@ -1,7 +1,7 @@
 DEBUG: Running 'pipx list --short' in '{current_working_directory}'
 DEBUG: Running 'brew -v' in '{current_working_directory}'
 DEBUG: Running 'docker -v' in '{current_working_directory}'
-DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
 DEBUG: Running 'git -v' in '{current_working_directory}'
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
@@ -15,7 +15,7 @@ OS: Mac OS X mac_os_version
 Docker: None found.
 Docker required to `run algokit sandbox` command; install via https://docs.docker.com/get-docker/
 Docker Compose: None found. 
-Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
+Docker Compose 2.5.0 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
 Git: None found.
 Git required to run `algokit init`; install via https://github.com/git-guides/install-git
 AlgoKit Python: 3.6.2
