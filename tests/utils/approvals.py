@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import approvaltests
@@ -13,10 +14,10 @@ __all__ = [
 
 
 def normalize_path(content: str, path: str, token: str) -> str:
-    return (
-        content.replace(path, token)  # literal replace
-        .replace(path.replace("\\", "/"), token)  # windows to posix
-        .replace(f"{token}\\", f"{token}/")  # trailing slash
+    return re.sub(
+        rf"{token}\S+",
+        lambda m: m[0].replace("\\", "/"),
+        content.replace(path, token).replace(path.replace("\\", "/"), token),
     )
 
 
