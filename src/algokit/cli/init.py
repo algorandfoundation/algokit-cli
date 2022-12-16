@@ -56,7 +56,7 @@ def _get_blessed_templates() -> dict[str, TemplateSource]:
     return {
         # NOTE: leaving unpinned for now whilst this under active development, but this would be
         # a good example of a TemplateSource that should have a commit= specified
-        "beaker": TemplateSource(url="gh:wilsonwaters/copier-testing-template"),
+        "beaker": TemplateSource(url="gh:algorandfoundation/algokit-beaker-default-template"),
     }
 
 

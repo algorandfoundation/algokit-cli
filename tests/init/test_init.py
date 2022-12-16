@@ -45,9 +45,9 @@ def set_blessed_templates(mocker: MockerFixture):
 
     mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
         "simple": TemplateSource("gh:robdmoore/copier-helloworld"),
-        "beaker": TemplateSource("gh:wilsonwaters/copier-testing-template"),
+        "beaker": TemplateSource("gh:algorandfoundation/algokit-beaker-default-template"),
         "beaker_with_version": TemplateSource(
-            "gh:wilsonwaters/copier-testing-template", "96fc7fd766fac607cdf5d69ee6e85ade04dddd47"
+            "gh:algorandfoundation/algokit-beaker-default-template", "96fc7fd766fac607cdf5d69ee6e85ade04dddd47"
         ),
     }
 
