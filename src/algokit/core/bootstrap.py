@@ -6,6 +6,7 @@ from shutil import copyfile, which
 from typing import Iterator
 
 import click
+import questionary
 from algokit.core import proc
 
 ENV_TEMPLATE = ".env.template"
@@ -67,7 +68,14 @@ def bootstrap_poetry(project_dir: Path) -> None:
         try_install_poetry = True
 
     if try_install_poetry:
-        logger.info("Attempting to install poetry with pipx...")
+        logger.info("Poetry not found; attempting to install it...")
+        if not _get_install_poetry():
+            raise click.ClickException(
+                (
+                    "Unable to install poetry via pipx; please install poetry "
+                    "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
+                )
+            )
         pipx_command = _find_valid_pipx_command()
         proc.run(
             [*pipx_command, "install", "poetry"],
@@ -161,3 +169,12 @@ def _get_base_python_path() -> str | None:
                 return str(candidate_path)
     # give up, we tried...
     return this_python
+
+
+def _get_install_poetry() -> bool:
+    return bool(
+        questionary.confirm(
+            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
+            default=True,
+        ).unsafe_ask()
+    )
