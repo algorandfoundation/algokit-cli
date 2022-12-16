@@ -1,5 +1,4 @@
 import sys
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -11,7 +10,14 @@ from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 
 
-python_base_executable = str(Path(sys.executable).resolve())
+@pytest.fixture(scope="module")
+def python_base_executable() -> str:
+    from algokit.core.bootstrap import _get_base_python_path
+
+    value = _get_base_python_path()
+    if value is None:
+        pytest.fail("Python base detection failed, this should work (even in CI)")
+    return value
 
 
 @pytest.fixture()
@@ -26,6 +32,12 @@ def system_python_paths(request: FixtureRequest, mocker: MockerFixture) -> Magic
     mock = mocker.patch("algokit.core.bootstrap.which")
     mock.side_effect = which
     return mock
+
+
+def test_base_python_path(python_base_executable: str):
+    """When running in a venv (expected test mode), we should be able to resolve to base python.
+    Otherwise, they should be the same"""
+    assert (python_base_executable == sys.executable) == (sys.prefix == sys.base_prefix)
 
 
 def test_bootstrap_poetry_with_poetry(proc_mock: ProcMock):
@@ -75,7 +87,10 @@ def test_bootstrap_poetry_without_poetry_failed_poetry_path(proc_mock: ProcMock)
     indirect=["system_python_paths"],
 )
 def test_bootstrap_poetry_without_poetry_or_pipx_path(
-    request: FixtureRequest, proc_mock: ProcMock, system_python_paths: MagicMock
+    request: FixtureRequest,
+    proc_mock: ProcMock,
+    system_python_paths: MagicMock,
+    python_base_executable: str,
 ):
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
@@ -87,7 +102,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
 
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
-    proc_mock: ProcMock, system_python_paths: MagicMock
+    proc_mock: ProcMock,
+    system_python_paths: MagicMock,
+    python_base_executable: str,
 ):
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
@@ -100,7 +117,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
 
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
-    proc_mock: ProcMock, system_python_paths: MagicMock
+    proc_mock: ProcMock,
+    system_python_paths: MagicMock,
+    python_base_executable: str,
 ):
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
@@ -113,7 +132,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
 
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
-    proc_mock: ProcMock, system_python_paths: MagicMock
+    proc_mock: ProcMock,
+    system_python_paths: MagicMock,
+    python_base_executable: str,
 ):
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")

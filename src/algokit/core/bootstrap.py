@@ -1,4 +1,5 @@
 import logging
+import platform
 import sys
 from pathlib import Path
 from shutil import copyfile, which
@@ -126,5 +127,37 @@ def _get_python_paths() -> Iterator[str]:
     for python_name in ("python3", "python"):
         if python_path := which(python_name):
             yield python_path
-    # need to resolve symlinks in (expected case) of algokit executing in a venv
-    yield str(Path(sys.executable).resolve())
+    python_base_path = _get_base_python_path()
+    if python_base_path is not None:
+        yield python_base_path
+
+
+def _get_base_python_path() -> str | None:
+    this_python: str | None = sys.executable
+    if not this_python:
+        # Not: can be empty or None... yikes! unlikely though
+        # https://docs.python.org/3.10/library/sys.html#sys.executable
+        return None
+    # not in venv... not recommended to install algokit this way, but okay
+    if sys.prefix == sys.base_prefix:
+        return this_python
+    this_python_path = Path(this_python)
+    # try resolving symlink, this should be default on *nix
+    try:
+        if this_python_path.is_symlink():
+            return str(this_python_path.resolve())
+    except (OSError, RuntimeError):
+        pass
+    # otherwise, try getting an internal value which should be set when running in a .venv
+    # this will be the value of `home = <path>` in pyvenv.cfg if it exists
+    if base_home := getattr(sys, "_home", None):
+        base_home_path = Path(base_home)
+        is_windows = platform.system() == "Windows"
+        for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
+            candidate_path = base_home_path / name
+            if is_windows:
+                candidate_path = candidate_path.with_suffix(".exe")
+            if candidate_path.is_file():
+                return str(candidate_path)
+    # give up, we tried...
+    return this_python
