@@ -1,13 +1,24 @@
 DEBUG: Running 'pipx list --short' in '{current_working_directory}'
+DEBUG: Getting algokit version failed: list index out of range
 DEBUG: Running 'docker -v' in '{current_working_directory}'
+DEBUG: Getting docker version failed: list index out of range
 DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
+DEBUG: Getting docker compose version failed: list index out of range
 DEBUG: Running 'git --version' in '{current_working_directory}'
+DEBUG: Getting git version failed: list index out of range
+DEBUG: Getting AlgoKit python version failed: 'str' object has no attribute 'major'
 DEBUG: Running 'python --version' in '{current_working_directory}'
+DEBUG: Getting python version failed: list index out of range
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
+DEBUG: Getting python version failed: list index out of range
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: Getting pipx version failed: list index out of range
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: Getting poetry version failed: list index out of range
 DEBUG: Running 'node -v' in '{current_working_directory}'
+DEBUG: Getting node version failed: list index out of range
 DEBUG: Running 'npm -v' in '{current_working_directory}'
+DEBUG: Getting npm version failed: list index out of range
 Time: 1990-12-31T10:09:08
 AlgoKit: None found
 OS: Unix/Linux linux_version

@@ -60,6 +60,7 @@ def mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["poetry", "--version"], ["blah blah", "", "Poetry (version 1.2.2)"])
     proc_mock.set_output(["node", "-v"], ["v18.12.1"])
     proc_mock.set_output(["npm", "-v"], ["8.19.2"])
+    proc_mock.set_output(["npm.cmd", "-v"], ["8.19.2"])
 
 
 def mock_shutil_which(python_command_name: str) -> str:
@@ -249,7 +250,7 @@ def test_doctor_with_weird_values_on_windows(mocker: MockerFixture, proc_mock: P
     proc_mock.set_output(
         ["choco"], ["Chocolatey v0.10.15", "choco: Please run 'choco -?' or 'choco <command> -?' for help menu."]
     )
-    proc_mock.set_output(["npm", "-v"], [" 16.17.0 "])
+    proc_mock.set_output(["npm.cmd", "-v"], [" 16.17.0 "])
 
     result = invoke("doctor")
 

@@ -14,6 +14,7 @@ DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
 DEBUG: docker-compose: Docker Compose version v2.12.2
 DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: git: EMPTY
+DEBUG: Getting git version failed: list index out of range
 DEBUG: Running 'python --version' in '{current_working_directory}'
 DEBUG: python: Python 3.10.0
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
