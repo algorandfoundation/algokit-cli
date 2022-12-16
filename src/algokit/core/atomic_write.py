@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import stat
 import tempfile
@@ -10,6 +11,7 @@ def atomic_write(file_contents: list[str], target_file_path: Path, mode: str = "
     # Use the same directory as the destination file so replace is atomic
     temp_file = tempfile.NamedTemporaryFile(delete=False, dir=target_file_path.parent)
     temp_file_path = Path(temp_file.name)
+    temp_file.close()
     try:
         # preserve file metadata if it already exists
         if target_file_path.exists():
@@ -27,6 +29,8 @@ def atomic_write(file_contents: list[str], target_file_path: Path, mode: str = "
 def _copy_with_metadata(source: Path, target: Path) -> None:
     # copy content, stat-info (mode too), timestamps...
     shutil.copy2(source, target)
-    # copy owner and group
-    st = os.stat(source)
-    os.chown(target, st[stat.ST_UID], st[stat.ST_GID])
+    os_type = platform.system().lower()
+    if os_type != "windows":
+        # copy owner and group
+        st = os.stat(source)
+        os.chown(target, st[stat.ST_UID], st[stat.ST_GID])

@@ -68,7 +68,7 @@ class ShellCompletion:
         try:
             return completion.source()
         except RuntimeError as ex:
-            logger.debug("Failed to generate completion source", exc_info=ex)
+            logger.debug(f"Failed to generate completion source. {ex}")
             if self.shell == "bash":
                 logger.error("Shell completion is not supported for Bash versions older than 4.4.")
             else:

@@ -7,8 +7,17 @@ __all__ = [
     "TokenScrubber",
     "Scrubber",
     "combine_scrubbers",
+    "normalize_path",
     "verify",
 ]
+
+
+def normalize_path(content: str, path: str, token: str) -> str:
+    return (
+        content.replace(path, token)  # literal replace
+        .replace(path.replace("\\", "/"), token)  # windows to posix
+        .replace(f"{token}\\", f"{token}/")  # trailing slash
+    )
 
 
 class TokenScrubber(Scrubber):  # type: ignore
@@ -27,7 +36,7 @@ def verify(
     *,
     options: approvaltests.Options | None = None,
     scrubber: Scrubber | None = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None:
     options = options or approvaltests.Options()
     if scrubber is not None:
