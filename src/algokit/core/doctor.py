@@ -116,7 +116,7 @@ def get_docker_compose_info() -> ProcessResult:
 def get_git_info(system: str) -> ProcessResult:
     try:
         process_results = proc.run(["git", "--version"]).output.splitlines()[0].split(" ")[2]
-        major, minor, build = map(int, process_results.split("."))
+        major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
         if system == "windows":
@@ -138,19 +138,20 @@ def get_git_info(system: str) -> ProcessResult:
 def get_algokit_python_info() -> ProcessResult:
     try:
         return ProcessResult(
-            f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro} {sys_executable}", 0
+            f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro} (location: {sys_executable})",
+            0,
         )
     except Exception:
         return ProcessResult("None found.", 1)
 
 
-def get_global_python_info() -> ProcessResult:
+def get_global_python_info(python_command_name: str) -> ProcessResult:
     try:
         major, minor, build = get_version_from_str(
-            proc.run(["python3", "--version"]).output.splitlines()[0].split(" ")[1]
+            proc.run([python_command_name, "--version"]).output.splitlines()[0].split(" ")[1]
         )
-        global_python3_location = shutil.which("python3")
-        return ProcessResult(f"{major}.{minor}.{build} {global_python3_location}", 0)
+        global_python3_location = shutil.which(python_command_name)
+        return ProcessResult(f"{major}.{minor}.{build} (location: {global_python3_location})", 0)
     except Exception:
         return ProcessResult("None found.", 1)
 
@@ -211,5 +212,6 @@ def is_minimum_version(system_version: str, minimum_version: str) -> bool:
 
 
 def get_version_from_str(version: str) -> tuple[int, int, int]:
-    major, minor, build = map(int, version.split("."))
+    # take only the first three parts x.y.z of the version to ignore weird version
+    major, minor, build = map(int, version.split(".")[:3])
     return major, minor, build
