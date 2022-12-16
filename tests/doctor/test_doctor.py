@@ -162,3 +162,13 @@ def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
 
     assert result.exit_code == 1
     verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_with_weird_values_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
+    proc_mock.set_output(["brew", "-v"], ["Homebrew 3.6.15-31-g82d89bb"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+

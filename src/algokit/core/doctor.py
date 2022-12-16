@@ -59,7 +59,7 @@ def get_choco_info() -> ProcessResult:
 
 def get_brew_info() -> ProcessResult:
     try:
-        process_results = proc.run(["brew", "-v"]).output.splitlines()[0].split(" ")[1]
+        process_results = proc.run(["brew", "-v"]).output.splitlines()[0].split(" ")[1].split("-")[0]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
