@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import approvaltests
@@ -7,8 +8,17 @@ __all__ = [
     "TokenScrubber",
     "Scrubber",
     "combine_scrubbers",
+    "normalize_path",
     "verify",
 ]
+
+
+def normalize_path(content: str, path: str, token: str) -> str:
+    return re.sub(
+        rf"{token}\S+",
+        lambda m: m[0].replace("\\", "/"),
+        content.replace(path, token).replace(path.replace("\\", "/"), token),
+    )
 
 
 class TokenScrubber(Scrubber):  # type: ignore
@@ -27,7 +37,7 @@ def verify(
     *,
     options: approvaltests.Options | None = None,
     scrubber: Scrubber | None = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None:
     options = options or approvaltests.Options()
     if scrubber is not None:

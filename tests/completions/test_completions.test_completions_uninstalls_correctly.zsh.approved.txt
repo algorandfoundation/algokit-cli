@@ -1,0 +1,4 @@
+DEBUG: Removing source script {home}/.config/algokit/.algokit-completions.zsh
+DEBUG: Completion source found in {home}/.zshrc
+DEBUG: Removing completion source found in {home}/.zshrc
+AlgoKit completions uninstalled for zsh 🎉

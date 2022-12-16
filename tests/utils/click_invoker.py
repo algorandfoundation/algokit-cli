@@ -1,11 +1,16 @@
 import dataclasses
+import logging
 import os
-import re
 from pathlib import Path
 
 import click
 import click.testing
 from click.testing import CliRunner
+
+from tests.utils.approvals import normalize_path
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -29,13 +34,9 @@ def invoke(
         os.chdir(cwd)
     try:
         result = runner.invoke(algokit, f"-v --no-color {args}", env=env)  # type: ignore
-        output = re.sub(
-            r"{current_working_directory}\S+",
-            lambda m: m[0].replace("\\", "/"),
-            result.stdout.replace(str(cwd or prior_cwd), "{current_working_directory}").replace(
-                str(cwd or prior_cwd).replace("\\", "/"), "{current_working_directory}"
-            ),
-        )
+        if result.exc_info is Exception:
+            logger.error("Click invocation error", exc_info=result.exc_info)
+        output = normalize_path(result.stdout, str(cwd or prior_cwd), "{current_working_directory}")
         return ClickInvokeResult(exit_code=result.exit_code, output=output)
     finally:
         if cwd is not None:
