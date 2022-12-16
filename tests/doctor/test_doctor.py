@@ -36,7 +36,7 @@ def mock_dependencies(mocker: MockerFixture) -> None:
     mocked_date.now.return_value = datetime(1990, 12, 31, 10, 9, 8)
     # Mock shutil
     mocked_shutil = mocker.patch("algokit.core.doctor.shutil")
-    mocked_shutil.which.return_value = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3"
+    mocked_shutil.which.side_effect = mock_shutil_which
     # Mock sys - Tuple[int, int, int, str, int]
     mocker.patch("algokit.core.doctor.sys_version_info", VersionInfoType(3, 6, 2, "blah", 0))
     mocker.patch("algokit.core.doctor.sys_executable", "{current_working_directory}/.venv/bin/python")
@@ -54,11 +54,21 @@ def mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["docker", "-v"], ["Docker version 20.10.21, build baeda1f"])
     proc_mock.set_output(["docker-compose", "-v"], ["Docker Compose version v2.12.2"])
     proc_mock.set_output(["git", "--version"], ["git version 2.37.1 (Apple Git-137.1)"])
+    proc_mock.set_output(["python", "--version"], ["Python 3.10.0"])
     proc_mock.set_output(["python3", "--version"], ["Python 3.11.0"])
     proc_mock.set_output(["pipx", "--version"], ["1.1.0"])
     proc_mock.set_output(["poetry", "--version"], ["blah blah", "", "Poetry (version 1.2.2)"])
     proc_mock.set_output(["node", "-v"], ["v18.12.1"])
     proc_mock.set_output(["npm", "-v"], ["8.19.2"])
+    proc_mock.set_output(["npm.cmd", "-v"], ["8.19.2"])
+
+
+def mock_shutil_which(python_command_name: str) -> str:
+    if python_command_name == "python":
+        return "/Library/Frameworks/Python.framework/Versions/3.10/bin/python"
+    if python_command_name == "python3":
+        return "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3"
+    return ""
 
 
 def make_output_scrubber(**extra_tokens: str) -> Scrubber:
@@ -145,6 +155,10 @@ def test_doctor_with_git_warning_on_windows(mocker: MockerFixture, proc_mock: Pr
 
 
 def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
+
+    mocker.patch("algokit.core.doctor.sys_version_info", "")
+    mocker.patch("algokit.core.doctor.sys_executable", "")
+
     proc_mock.set_output(["pipx", "list", "--short"], [])
     proc_mock.set_output(["pipx", "environment"], [])
     proc_mock.set_output(["choco"], [])
@@ -152,6 +166,7 @@ def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
     proc_mock.set_output(["docker", "-v"], [])
     proc_mock.set_output(["docker-compose", "-v"], [])
     proc_mock.set_output(["git", "--version"], [])
+    proc_mock.set_output(["python", "--version"], [])
     proc_mock.set_output(["python3", "--version"], [])
     proc_mock.set_output(["pipx", "--version"], [])
     proc_mock.set_output(["poetry", "--version"], [])
@@ -161,4 +176,83 @@ def test_doctor_all_failed_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
     result = invoke("doctor")
 
     assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_all_failed_on_windows(mocker: MockerFixture, proc_mock: ProcMock):
+    mocked_os = mocker.patch("algokit.cli.doctor.platform")
+    mocked_os.system.return_value = "windows"
+
+    mocker.patch("algokit.core.doctor.sys_version_info", "")
+    mocker.patch("algokit.core.doctor.sys_executable", "")
+
+    proc_mock.set_output(["pipx", "list", "--short"], [])
+    proc_mock.set_output(["pipx", "environment"], [])
+    proc_mock.set_output(["choco"], [])
+    proc_mock.set_output(["brew", "-v"], [])
+    proc_mock.set_output(["docker", "-v"], [])
+    proc_mock.set_output(["docker-compose", "-v"], [])
+    proc_mock.set_output(["git", "--version"], [])
+    proc_mock.set_output(["python", "--version"], [])
+    proc_mock.set_output(["python3", "--version"], [])
+    proc_mock.set_output(["pipx", "--version"], [])
+    proc_mock.set_output(["poetry", "--version"], [])
+    proc_mock.set_output(["node", "-v"], [])
+    proc_mock.set_output(["npm.cmd", "-v"], [])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_all_failed_on_linux(mocker: MockerFixture, proc_mock: ProcMock):
+    mocked_os = mocker.patch("algokit.cli.doctor.platform")
+    mocked_os.system.return_value = "linux"
+
+    mocker.patch("algokit.core.doctor.sys_version_info", "")
+    mocker.patch("algokit.core.doctor.sys_executable", "")
+
+    proc_mock.set_output(["pipx", "list", "--short"], [])
+    proc_mock.set_output(["pipx", "environment"], [])
+    proc_mock.set_output(["choco"], [])
+    proc_mock.set_output(["brew", "-v"], [])
+    proc_mock.set_output(["docker", "-v"], [])
+    proc_mock.set_output(["docker-compose", "-v"], [])
+    proc_mock.set_output(["git", "--version"], [])
+    proc_mock.set_output(["python", "--version"], [])
+    proc_mock.set_output(["python3", "--version"], [])
+    proc_mock.set_output(["pipx", "--version"], [])
+    proc_mock.set_output(["poetry", "--version"], [])
+    proc_mock.set_output(["node", "-v"], [])
+    proc_mock.set_output(["npm", "-v"], [])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_with_weird_values_on_mac(mocker: MockerFixture, proc_mock: ProcMock):
+    proc_mock.set_output(["brew", "-v"], ["Homebrew 3.6.15-31-g82d89bb"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_with_weird_values_on_windows(mocker: MockerFixture, proc_mock: ProcMock):
+    mocked_os = mocker.patch("algokit.cli.doctor.platform")
+    mocked_os.system.return_value = "windows"
+
+    proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])
+    proc_mock.set_output(
+        ["choco"], ["Chocolatey v0.10.15", "choco: Please run 'choco -?' or 'choco <command> -?' for help menu."]
+    )
+    proc_mock.set_output(["npm.cmd", "-v"], [" 16.17.0 "])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())

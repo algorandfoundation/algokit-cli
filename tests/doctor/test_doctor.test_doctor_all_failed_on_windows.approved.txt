@@ -1,7 +1,7 @@
 DEBUG: Running 'pipx list --short' in '{current_working_directory}'
 DEBUG: Getting algokit version failed: list index out of range
-DEBUG: Running 'brew -v' in '{current_working_directory}'
-DEBUG: Getting brew version failed: list index out of range
+DEBUG: Running 'choco' in '{current_working_directory}'
+DEBUG: Getting chocolatey version failed: list index out of range
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: Getting docker version failed: list index out of range
 DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
@@ -19,18 +19,18 @@ DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: Getting poetry version failed: list index out of range
 DEBUG: Running 'node -v' in '{current_working_directory}'
 DEBUG: Getting node version failed: list index out of range
-DEBUG: Running 'npm -v' in '{current_working_directory}'
+DEBUG: Running 'npm.cmd -v' in '{current_working_directory}'
 DEBUG: Getting npm version failed: list index out of range
 Time: 1990-12-31T10:09:08
 AlgoKit: None found
-Brew: None found
-OS: Mac OS X mac_os_version
+Chocolatey: None found
+OS: Windows windows_version
 Docker: None found.
 Docker required to `run algokit sandbox` command; install via https://docs.docker.com/get-docker/
 Docker Compose: None found. 
 Docker Compose 2.5 required to `run algokit sandbox command`; install via https://docs.docker.com/compose/install/
 Git: None found.
-Git required to run `algokit init`; install via https://github.com/git-guides/install-git
+Git required to `run algokit init`; install via `choco install git` if using Chocolatey or via https://github.com/git-guides/install-git#install-git-on-windows
 AlgoKit Python: None found.
 Global Python: None found.
 Global Python3: None found.
