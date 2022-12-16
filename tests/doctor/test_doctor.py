@@ -197,7 +197,7 @@ def test_doctor_all_failed_on_windows(mocker: MockerFixture, proc_mock: ProcMock
     proc_mock.set_output(["pipx", "--version"], [])
     proc_mock.set_output(["poetry", "--version"], [])
     proc_mock.set_output(["node", "-v"], [])
-    proc_mock.set_output(["npm", "-v"], [])
+    proc_mock.set_output(["npm.cmd", "-v"], [])
 
     result = invoke("doctor")
 

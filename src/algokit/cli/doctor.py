@@ -49,7 +49,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     service_outputs["Pipx"] = doctor_functions.get_pipx_info()
     service_outputs["Poetry"] = doctor_functions.get_poetry_info()
     service_outputs["Node.js"] = doctor_functions.get_node_info()
-    service_outputs["Npm"] = doctor_functions.get_npm_info()
+    service_outputs["Npm"] = doctor_functions.get_npm_info(os_type)
 
     critical_services = ["Docker", "Docker Compose", "Git"]
     # Print the status details

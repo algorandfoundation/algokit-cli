@@ -44,7 +44,8 @@ def get_algokit_info() -> ProcessResult:
         pipx_venv_location = algokit_pip_line[0].split("=")[1]
         algokit_location = f"{pipx_venv_location}/algokit"
         return ProcessResult(f"{algokit_version} {algokit_location}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult("None found", 1)
 
 
@@ -53,7 +54,8 @@ def get_choco_info() -> ProcessResult:
         process_results = proc.run(["choco"]).output.splitlines()[0].split(" v")[1]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult("None found", 1)
 
 
@@ -62,7 +64,8 @@ def get_brew_info() -> ProcessResult:
         process_results = proc.run(["brew", "-v"]).output.splitlines()[0].split(" ")[1].split("-")[0]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult("None found", 1)
 
 
@@ -86,7 +89,8 @@ def get_docker_info() -> ProcessResult:
         process_results = proc.run(["docker", "-v"]).output.splitlines()[0].split(" ")[2].split(",")[0]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult(
             (
                 "None found.\nDocker required to `run algokit sandbox` command;"
@@ -109,7 +113,8 @@ def get_docker_compose_info() -> ProcessResult:
             ),
             process_results.exit_code if minimum_version_met else 1,
         )
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult(f"None found. {DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE}", 1)
 
 
@@ -119,6 +124,7 @@ def get_git_info(system: str) -> ProcessResult:
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception:
+        logger.debug("Getting Git version failed", exc_info=True)
         if system == "windows":
             return ProcessResult(
                 (
@@ -141,7 +147,8 @@ def get_algokit_python_info() -> ProcessResult:
             f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro} (location: {sys_executable})",
             0,
         )
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult("None found.", 1)
 
 
@@ -152,7 +159,8 @@ def get_global_python_info(python_command_name: str) -> ProcessResult:
         )
         global_python3_location = shutil.which(python_command_name)
         return ProcessResult(f"{major}.{minor}.{build} (location: {global_python3_location})", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult("None found.", 1)
 
 
@@ -160,7 +168,8 @@ def get_pipx_info() -> ProcessResult:
     try:
         major, minor, build = get_version_from_str(proc.run(["pipx", "--version"]).output.splitlines()[0])
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult(
             "None found.\nPipx is required to install Poetry; install via https://pypa.github.io/pipx/", 1
         )
@@ -171,7 +180,8 @@ def get_poetry_info() -> ProcessResult:
         process_results = proc.run(["poetry", "--version"]).output.splitlines()[-1].split("version ")[1].split(")")[0]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult(
             (
                 "None found.\nPoetry is required for some Python-based templates; install via `algokit bootstrap` "
@@ -186,7 +196,8 @@ def get_node_info() -> ProcessResult:
         process_results = proc.run(["node", "-v"]).output.splitlines()[0].split("v")[1]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Exception: {e}")
         return ProcessResult(
             (
                 "None found.\nNode.js is required for some Node.js-based templates; install via `algokit bootstrap` "
@@ -196,12 +207,13 @@ def get_node_info() -> ProcessResult:
         )
 
 
-def get_npm_info() -> ProcessResult:
+def get_npm_info(system: str) -> ProcessResult:
     try:
-        process_results = proc.run(["npm", "-v"]).output.splitlines()[0]
+        process_results = proc.run(["npm" if system != "windows" else "npm.cmd", "-v"]).output.splitlines()[0]
         major, minor, build = get_version_from_str(process_results)
         return ProcessResult(f"{major}.{minor}.{build}", 0)
-    except Exception:
+    except Exception as e:
+        logger.debug(f"Getting Npm version failed: {e}", exc_info=True)
         return ProcessResult("None found.", 1)
 
 
