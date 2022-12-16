@@ -11,7 +11,7 @@ Options:
 
 Commands:
   bootstrap    Bootstrap AlgoKit project dependencies.
-  completions  Manage AlgoKit shell integration.
+  completions  Install and Uninstall AlgoKit shell integration.
   doctor       Run the Algorand doctor CLI.
   goal         Run the Algorand goal CLI against the AlgoKit Sandbox.
   init         Initializes a new project.

@@ -12,22 +12,33 @@ logger = logging.getLogger(__name__)
 SUPPORTED_SHELLS = ["bash", "zsh"]
 
 
-@click.group("completions", short_help="Manage AlgoKit shell integration.")
+@click.group("completions", short_help="Install and Uninstall AlgoKit shell integration.")
 def completions_group() -> None:
     pass
 
 
-shell_option = click.option("--shell", type=click.Choice(SUPPORTED_SHELLS), help="Specify shell")
+shell_option = click.option(
+    "--shell", type=click.Choice(SUPPORTED_SHELLS), help="Specify shell to install algokit completions for."
+)
 
 
-@completions_group.command("install", short_help="Install completions.")
+@completions_group.command(
+    "install",
+    short_help="Install shell completions, this command will attempt to update the interactive profile script"
+    " for the current shell to support algokit completions. To specify a specific shell use --shell.",
+)
 @shell_option
 def install(shell: str | None) -> None:
     shell_completion = ShellCompletion(shell)
     shell_completion.install()
 
 
-@completions_group.command("uninstall", short_help="Uninstall completions.")
+@completions_group.command(
+    "uninstall",
+    short_help="Uninstall shell completions, this command will attempt to update the interactive profile script"
+    " for the current shell to remove any algokit completions that have been added."
+    " To specify a specific shell use --shell.",
+)
 @shell_option
 def uninstall(shell: str | None) -> None:
     shell_completion = ShellCompletion(shell)
