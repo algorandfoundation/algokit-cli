@@ -5,13 +5,10 @@ DEBUG: pipx: copier 7.0.1
 DEBUG: Running 'pipx environment' in '{current_working_directory}'
 DEBUG: pipx: PIPX_SHARED_LIBS=/pipx/shared
 DEBUG: pipx: PIPX_LOCAL_VENVS=/pipx/venvs
-DEBUG: Running 'choco' in '{current_working_directory}'
-DEBUG: choco: Chocolatey v0.10.15
-DEBUG: choco: Please run 'choco -?' for help
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
-DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
-DEBUG: docker-compose: Docker Compose version v2.12.2
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.12.2"}
 DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: Getting git version failed: list index out of range
 DEBUG: Running 'python --version' in '{current_working_directory}'
@@ -28,10 +25,12 @@ DEBUG: Running 'node -v' in '{current_working_directory}'
 DEBUG: node: v18.12.1
 DEBUG: Running 'npm.cmd -v' in '{current_working_directory}'
 DEBUG: npm.cmd: 8.19.2
+DEBUG: Running 'choco' in '{current_working_directory}'
+DEBUG: choco: Chocolatey v0.10.15
+DEBUG: choco: Please run 'choco -?' for help
 Time: 1990-12-31T10:09:08
 AlgoKit: 1.2.3 /pipx/venvs/algokit
-Chocolatey: 0.10.15
-OS: Windows windows_version
+OS: Windows-other-system-info
 Docker: 20.10.21
 Docker Compose: 2.12.2
 Git: None found.
@@ -43,4 +42,5 @@ Pipx: 1.1.0
 Poetry: 1.2.2
 Node.js: 18.12.1
 Npm: 8.19.2
+Chocolatey: 0.10.15
 If you are experiencing a problem with algokit, feel free to submit an issue via https://github.com/algorandfoundation/algokit-cli/issues/new; please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

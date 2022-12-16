@@ -1,10 +1,18 @@
-import json
 import logging
+from subprocess import CalledProcessError
 
 import click
 from algokit.cli.goal import goal_command
 from algokit.core import proc
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, fetch_algod_status_data, fetch_indexer_status_data
+from algokit.core.sandbox import (
+    DOCKER_COMPOSE_MINIMUM_VERSION,
+    ComposeFileStatus,
+    ComposeSandbox,
+    fetch_algod_status_data,
+    fetch_indexer_status_data,
+    get_docker_compose_version_string,
+)
+from algokit.core.utils import is_minimum_version
 
 logger = logging.getLogger(__name__)
 
@@ -12,13 +20,12 @@ logger = logging.getLogger(__name__)
 @click.group("sandbox", short_help="Manage the AlgoKit sandbox.")
 def sandbox_group() -> None:
     try:
-        compose_version_result = proc.run(
-            ["docker", "compose", "version", "--format", "json"],
-            bad_return_code_error_message=(
-                "Docker Compose not found; please install Docker Compose and add to path.\n"
-                "See https://docs.docker.com/compose/install/ for more information."
-            ),
-        )
+        compose_version_str = get_docker_compose_version_string() or ""
+    except CalledProcessError as ex:
+        raise click.ClickException(
+            "Docker Compose not found; please install Docker Compose and add to path.\n"
+            "See https://docs.docker.com/compose/install/ for more information."
+        ) from ex
     except IOError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
@@ -28,20 +35,19 @@ def sandbox_group() -> None:
         ) from ex
     else:
         try:
-            compose_version: dict[str, str] = json.loads(compose_version_result.output)
-            compose_version_str = compose_version["version"]
-            compose_major, compose_minor, *_ = map(int, compose_version_str.lstrip("v").split("."))
+            compose_version_ok = is_minimum_version(compose_version_str, DOCKER_COMPOSE_MINIMUM_VERSION)
         except Exception:
             logger.warning(
                 "Unable to extract docker compose version from output: \n"
-                + compose_version_result.output.strip()
-                + "\nPlease ensure a minimum of compose v2.5.0 is used",
+                + compose_version_str
+                + f"\nPlease ensure a minimum of compose v{DOCKER_COMPOSE_MINIMUM_VERSION} is used",
                 exc_info=True,
             )
         else:
-            if (compose_major, compose_minor) < (2, 5):
+            if not compose_version_ok:
                 raise click.ClickException(
-                    f"Minimum docker compose version supported: v2.5.0, installed = {compose_version_str}\n"
+                    f"Minimum docker compose version supported: v{DOCKER_COMPOSE_MINIMUM_VERSION}, "
+                    f"installed = v{compose_version_str}\n"
                     "Please update your Docker install"
                 )
 
