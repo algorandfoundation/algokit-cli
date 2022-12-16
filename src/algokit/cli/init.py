@@ -3,6 +3,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from algokit.core.bootstrap import bootstrap_any_including_subdirs
+from algokit.core.questionary_extensions import _get_confirm_default_yes_prompt
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 try:
@@ -119,6 +121,13 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     help="Automatically choose default answers without asking when creating this template.",
 )
 @click.option(
+    "run_bootstrap",
+    "--bootstrap/--no-bootstrap",
+    is_flag=True,
+    default=None,
+    help="Whether to run `algokit bootstrap` to bootstrap the new project's dependencies.",
+)
+@click.option(
     "answers",
     "--answer",
     "-a",
@@ -136,6 +145,7 @@ def init_command(
     use_git: bool | None,
     answers: list[tuple[str, str]],
     use_defaults: bool,  # noqa: FBT001
+    run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
@@ -145,9 +155,10 @@ def init_command(
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
     answers_dict = DEFAULT_ANSWERS | dict(answers)
 
-    project_path, directory_name = _get_project_path(directory_name)
-    if not answers_dict.get("project_name"):
-        answers_dict = answers_dict | {"project_name": directory_name}
+    project_path = _get_project_path(directory_name)
+    directory_name = project_path.name
+    # provide the directory name as an answer to the template, if not explicitly overridden by user
+    answers_dict.setdefault("project_name", directory_name)
 
     if template_name:
         blessed_templates = _get_blessed_templates()
@@ -179,7 +190,23 @@ def init_command(
     )
 
     expanded_template_url = copier_worker.template.url_expanded
-    logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
+    logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
+
+    if run_bootstrap is None:
+        # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
+        run_bootstrap = use_defaults or _get_run_bootstrap()
+    if run_bootstrap:
+        # note: we run bootstrap before git commit so that we can commit any lock files,
+        # but if something goes wrong, we don't want to block
+        try:
+            bootstrap_any_including_subdirs(project_path, _get_confirm_default_yes_prompt)
+        except Exception:
+            logger.exception(
+                "Bootstrap failed. Once any errors above are resolved, "
+                f"you can run `algokit bootstrap` in {project_path}",
+                exc_info=True,
+            )
+
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(
             project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
@@ -226,7 +253,7 @@ class DirectoryNameValidator(questionary.Validator):
             )
 
 
-def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, str]:
+def _get_project_path(directory_name_option: str | None = None) -> Path:
     base_path = Path.cwd()
     if directory_name_option is not None:
         directory_name = directory_name_option
@@ -252,7 +279,7 @@ def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, s
                 return _get_project_path()
             else:
                 _fail_and_bail()
-    return project_path, directory_name
+    return project_path
 
 
 class GitRepoValidator(questionary.Validator):
@@ -337,3 +364,13 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
             if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
                 logger.info("🎉 Performed initial git commit successfully! 🎉")
+
+
+def _get_run_bootstrap() -> bool:
+    return bool(
+        questionary.confirm(
+            "Do you want to run `algokit bootstrap` to bootstrap dependencies"
+            + " for this new project so it can be run immediately?",
+            default=True,
+        ).unsafe_ask()
+    )

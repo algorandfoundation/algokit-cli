@@ -76,7 +76,6 @@ line-length = 120
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]
-addopts = "--cov=algokit"
 
 [tool.mypy]
 files = "src/"

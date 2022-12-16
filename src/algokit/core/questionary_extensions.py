@@ -16,3 +16,12 @@ class ChainedValidator(questionary.Validator):
     def validate(self, document: prompt_toolkit.document.Document) -> None:
         for validator in self._validators:
             validator.validate(document)
+
+
+def _get_confirm_default_yes_prompt(prompt: str) -> bool:
+    return bool(
+        questionary.confirm(
+            prompt,
+            default=True,
+        ).unsafe_ask()
+    )

@@ -1,6 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
+from typing import Callable
 
 import click
 import pytest
@@ -34,6 +35,10 @@ def supress_copier_dependencies_debug_output():
     logging.getLogger("asyncio").setLevel("INFO")
 
 
+def bootstrap_mock(p: Path, prompt: Callable[[str], bool]):
+    click.echo(f"Executed `algokit bootstrap all` in {p}")
+
+
 @pytest.fixture(autouse=True)
 def set_blessed_templates(mocker: MockerFixture):
     from algokit.cli.init import TemplateSource
@@ -45,6 +50,8 @@ def set_blessed_templates(mocker: MockerFixture):
             "gh:wilsonwaters/copier-testing-template", "96fc7fd766fac607cdf5d69ee6e85ade04dddd47"
         ),
     }
+
+    mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
 
 
 def test_init_help():
@@ -66,7 +73,7 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
 
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        + "--answer project_name test --answer greeting hi --answer include_extra_file yes",
+        + "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
         cwd=cwd,
     )
 
@@ -100,14 +107,15 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_minimal_interaction_required_no_git_no_network(
+def test_init_minimal_interaction_required_no_git_no_network_no_bootstrap(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ):
     cwd = tmp_path_factory.mktemp("cwd")
 
+    # Accept community template
     mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults --no-bootstrap",
         cwd=cwd,
     )
 
@@ -248,6 +256,34 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
         Path(project_name) / project_name,
         Path(project_name) / project_name / "helloworld.txt",
     }
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+    # bootstrap: yes
+    mock_questionary_input.send_text("Y")
+    result = invoke(
+        f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
+        + " --answer greeting hi --answer include_extra_file yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    cwd = tmp_path_factory.mktemp("cwd")
+    # bootstrap: yes
+    mock_questionary_input.send_text("N")
+    result = invoke(
+        f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
+        + " --answer greeting hi --answer include_extra_file yes",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
 
 
