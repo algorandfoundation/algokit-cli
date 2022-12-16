@@ -1,16 +1,17 @@
 import dataclasses
 import logging
-import platform
-import shutil
 from datetime import datetime, timezone
+from platform import platform as get_platform
+from shutil import which
 from sys import executable as sys_executable
-from sys import version_info as sys_version_info
+from sys import version as sys_version
 
 from algokit.core import proc
+from algokit.core.sandbox import DOCKER_COMPOSE_MINIMUM_VERSION, get_docker_compose_version_string
+from algokit.core.utils import get_version_from_str, is_minimum_version
 
 logger = logging.getLogger(__name__)
 
-DOCKER_COMPOSE_MINIMUM_VERSION = "2.5"
 
 DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE = (
     f"\nDocker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to `run algokit sandbox command`; "
@@ -25,7 +26,7 @@ class ProcessResult:
 
 
 def get_date() -> ProcessResult:
-    return ProcessResult(format(datetime.now(timezone.utc).isoformat()), 0)
+    return ProcessResult(str(datetime.now(timezone.utc).isoformat()), 0)
 
 
 def get_algokit_info() -> ProcessResult:
@@ -46,7 +47,7 @@ def get_algokit_info() -> ProcessResult:
         return ProcessResult(f"{algokit_version} {algokit_location}", 0)
     except Exception as e:
         logger.debug(f"Getting algokit version failed: {e}", exc_info=True)
-        return ProcessResult("None found", 1)
+        return ProcessResult("None found.", 1)
 
 
 def get_choco_info() -> ProcessResult:
@@ -56,7 +57,7 @@ def get_choco_info() -> ProcessResult:
         return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception as e:
         logger.debug(f"Getting chocolatey version failed: {e}", exc_info=True)
-        return ProcessResult("None found", 1)
+        return ProcessResult("None found.", 1)
 
 
 def get_brew_info() -> ProcessResult:
@@ -66,22 +67,11 @@ def get_brew_info() -> ProcessResult:
         return ProcessResult(f"{major}.{minor}.{build}", 0)
     except Exception as e:
         logger.debug(f"Getting brew version failed: {e}", exc_info=True)
-        return ProcessResult("None found", 1)
+        return ProcessResult("None found.", 1)
 
 
-def get_os(os_type: str) -> ProcessResult:
-    os_version = ""
-    os_name = ""
-    if os_type == "windows":
-        os_name = "Windows"
-        os_version = platform.win32_ver()[0]
-    elif os_type == "darwin":
-        os_name = "Mac OS X"
-        os_version = platform.mac_ver()[0]
-    else:
-        os_name = "Unix/Linux"
-        os_version = platform.version()
-    return ProcessResult(f"{os_name} {os_version}", 0)
+def get_os() -> ProcessResult:
+    return ProcessResult(get_platform(), 0)
 
 
 def get_docker_info() -> ProcessResult:
@@ -102,8 +92,7 @@ def get_docker_info() -> ProcessResult:
 
 def get_docker_compose_info() -> ProcessResult:
     try:
-        process_results = proc.run(["docker-compose", "-v"])
-        docker_compose_version = process_results.output.splitlines()[0].split(" v")[2]
+        docker_compose_version = get_docker_compose_version_string() or ""
         minimum_version_met = is_minimum_version(docker_compose_version, DOCKER_COMPOSE_MINIMUM_VERSION)
         return ProcessResult(
             (
@@ -111,7 +100,7 @@ def get_docker_compose_info() -> ProcessResult:
                 if minimum_version_met
                 else f"{docker_compose_version}{DOCKER_COMPOSE_MINIMUM_VERSION_MESSAGE}"
             ),
-            process_results.exit_code if minimum_version_met else 1,
+            0 if minimum_version_met else 1,
         )
     except Exception as e:
         logger.debug(f"Getting docker compose version failed: {e}", exc_info=True)
@@ -142,14 +131,7 @@ def get_git_info(system: str) -> ProcessResult:
 
 
 def get_algokit_python_info() -> ProcessResult:
-    try:
-        return ProcessResult(
-            f"{sys_version_info.major}.{sys_version_info.minor}.{sys_version_info.micro} (location: {sys_executable})",
-            0,
-        )
-    except Exception as e:
-        logger.debug(f"Getting AlgoKit python version failed: {e}", exc_info=True)
-        return ProcessResult("None found.", 1)
+    return ProcessResult(f"{sys_version} (location: {sys_executable})", 0)
 
 
 def get_global_python_info(python_command_name: str) -> ProcessResult:
@@ -157,7 +139,7 @@ def get_global_python_info(python_command_name: str) -> ProcessResult:
         major, minor, build = get_version_from_str(
             proc.run([python_command_name, "--version"]).output.splitlines()[0].split(" ")[1]
         )
-        global_python3_location = shutil.which(python_command_name)
+        global_python3_location = which(python_command_name)
         return ProcessResult(f"{major}.{minor}.{build} (location: {global_python3_location})", 0)
     except Exception as e:
         logger.debug(f"Getting python version failed: {e}", exc_info=True)
@@ -215,15 +197,3 @@ def get_npm_info(system: str) -> ProcessResult:
     except Exception as e:
         logger.debug(f"Getting npm version failed: {e}", exc_info=True)
         return ProcessResult("None found.", 1)
-
-
-def is_minimum_version(system_version: str, minimum_version: str) -> bool:
-    system_version_as_tuple = tuple(map(int, (system_version.split("."))))
-    minimum_version_as_tuple = tuple(map(int, (minimum_version.split("."))))
-    return system_version_as_tuple >= minimum_version_as_tuple
-
-
-def get_version_from_str(version: str) -> tuple[int, int, int]:
-    # take only the first three parts x.y.z of the version to ignore weird version
-    major, minor, build = map(int, version.split(".")[:3])
-    return major, minor, build

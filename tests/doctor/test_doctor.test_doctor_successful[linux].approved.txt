@@ -7,8 +7,8 @@ DEBUG: pipx: PIPX_SHARED_LIBS=/pipx/shared
 DEBUG: pipx: PIPX_LOCAL_VENVS=/pipx/venvs
 DEBUG: Running 'docker -v' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
-DEBUG: Running 'docker-compose -v' in '{current_working_directory}'
-DEBUG: docker-compose: Docker Compose version v2.12.2
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.12.2"}
 DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
 DEBUG: Running 'python --version' in '{current_working_directory}'
@@ -27,7 +27,7 @@ DEBUG: Running 'npm -v' in '{current_working_directory}'
 DEBUG: npm: 8.19.2
 Time: 1990-12-31T10:09:08
 AlgoKit: 1.2.3 /pipx/venvs/algokit
-OS: Unix/Linux linux_version
+OS: Linux-other-system-info
 Docker: 20.10.21
 Docker Compose: 2.12.2
 Git: 2.37.1
