@@ -3,10 +3,9 @@ import platform
 import sys
 from pathlib import Path
 from shutil import copyfile, which
-from typing import Iterator
+from typing import Callable, Iterator
 
 import click
-import questionary
 from algokit.core import proc
 
 ENV_TEMPLATE = ".env.template"
@@ -14,7 +13,7 @@ ENV_TEMPLATE = ".env.template"
 logger = logging.getLogger(__name__)
 
 
-def bootstrap_any(project_dir: Path) -> None:
+def bootstrap_any(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
     env_path = project_dir / ENV_TEMPLATE
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
@@ -27,18 +26,18 @@ def bootstrap_any(project_dir: Path) -> None:
 
     if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
         logger.debug("Running `algokit bootstrap poetry`")
-        bootstrap_poetry(project_dir)
+        bootstrap_poetry(project_dir, install_prompt)
 
 
-def bootstrap_any_including_subdirs(base_path: Path) -> None:
-    bootstrap_any(base_path)
+def bootstrap_any_including_subdirs(base_path: Path, install_prompt: Callable[[str], bool]) -> None:
+    bootstrap_any(base_path, install_prompt)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
         if sub_dir.is_dir():
             if sub_dir.name.lower() in [".venv", "node_modules", "__pycache__"]:
                 logger.debug(f"Skipping {sub_dir}")
             else:
-                bootstrap_any(sub_dir)
+                bootstrap_any(sub_dir, install_prompt)
 
 
 def bootstrap_env(project_dir: Path) -> None:
@@ -57,7 +56,7 @@ def bootstrap_env(project_dir: Path) -> None:
             copyfile(env_template_path, env_path)
 
 
-def bootstrap_poetry(project_dir: Path) -> None:
+def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
     try:
         proc.run(
             ["poetry", "--version"],
@@ -69,7 +68,9 @@ def bootstrap_poetry(project_dir: Path) -> None:
 
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
-        if not _get_install_poetry():
+        if not install_prompt(
+            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?"
+        ):
             raise click.ClickException(
                 (
                     "Unable to install poetry via pipx; please install poetry "
@@ -169,12 +170,3 @@ def _get_base_python_path() -> str | None:
                 return str(candidate_path)
     # give up, we tried...
     return this_python
-
-
-def _get_install_poetry() -> bool:
-    return bool(
-        questionary.confirm(
-            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
-            default=True,
-        ).unsafe_ask()
-    )

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from algokit.core.bootstrap import bootstrap_any_including_subdirs
+from algokit.core.questionary_extensions import _get_confirm_default_yes_prompt
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 try:
@@ -198,10 +199,12 @@ def init_command(
         # note: we run bootstrap before git commit so that we can commit any lock files,
         # but if something goes wrong, we don't want to block
         try:
-            bootstrap_any_including_subdirs(project_path)
+            bootstrap_any_including_subdirs(project_path, _get_confirm_default_yes_prompt)
         except Exception:
             logger.exception(
-                "Bootstrap failed. Once any errors above are resolved, you can run `algokit bootstrap` in { "
+                "Bootstrap failed. Once any errors above are resolved, "
+                f"you can run `algokit bootstrap` in {project_path}",
+                exc_info=True,
             )
 
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):

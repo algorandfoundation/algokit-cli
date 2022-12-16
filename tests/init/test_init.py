@@ -1,6 +1,7 @@
 import logging
 import subprocess
 from pathlib import Path
+from typing import Callable
 
 import click
 import pytest
@@ -34,7 +35,7 @@ def supress_copier_dependencies_debug_output():
     logging.getLogger("asyncio").setLevel("INFO")
 
 
-def bootstrap_mock(p: Path):
+def bootstrap_mock(p: Path, prompt: Callable[[str], bool]):
     click.echo(f"Executed `algokit bootstrap all` in {p}")
 
 
