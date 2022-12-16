@@ -154,9 +154,10 @@ def init_command(
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
     answers_dict = DEFAULT_ANSWERS | dict(answers)
 
-    project_path, directory_name = _get_project_path(directory_name)
-    if not answers_dict.get("project_name"):
-        answers_dict = answers_dict | {"project_name": directory_name}
+    project_path = _get_project_path(directory_name)
+    directory_name = project_path.name
+    # provide the directory name as an answer to the template, if not explicitly overridden by user
+    answers_dict.setdefault("project_name", directory_name)
 
     if template_name:
         blessed_templates = _get_blessed_templates()
@@ -189,16 +190,24 @@ def init_command(
 
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
-    if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
-        _git_init(
-            project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
-        )
 
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or _get_run_bootstrap()
     if run_bootstrap:
-        bootstrap_any_including_subdirs(project_path)
+        # note: we run bootstrap before git commit so that we can commit any lock files,
+        # but if something goes wrong, we don't want to block
+        try:
+            bootstrap_any_including_subdirs(project_path)
+        except Exception:
+            logger.exception(
+                "Bootstrap failed. Once any errors above are resolved, you can run `algokit bootstrap` in { "
+            )
+
+    if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
+        _git_init(
+            project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
+        )
 
     logger.info(
         f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
@@ -241,7 +250,7 @@ class DirectoryNameValidator(questionary.Validator):
             )
 
 
-def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, str]:
+def _get_project_path(directory_name_option: str | None = None) -> Path:
     base_path = Path.cwd()
     if directory_name_option is not None:
         directory_name = directory_name_option
@@ -267,7 +276,7 @@ def _get_project_path(directory_name_option: str | None = None) -> tuple[Path, s
                 return _get_project_path()
             else:
                 _fail_and_bail()
-    return project_path, directory_name
+    return project_path
 
 
 class GitRepoValidator(questionary.Validator):
