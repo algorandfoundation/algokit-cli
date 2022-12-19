@@ -1,27 +1,26 @@
 import os
-import platform
 import shutil
 import stat
-import tempfile
 from pathlib import Path
+from typing import Literal
 
 
-# from https://python.plainenglish.io/simple-safe-atomic-writes-in-python3-44b98830a013
-def atomic_write(file_contents: list[str], target_file_path: Path, mode: str = "w") -> None:
-    # Use the same directory as the destination file so replace is atomic
-    temp_file = tempfile.NamedTemporaryFile(delete=False, dir=target_file_path.parent)
-    temp_file_path = Path(temp_file.name)
-    temp_file.close()
+def atomic_write(file_contents: str, target_file_path: Path, mode: Literal["a", "w"] = "w") -> None:
+    # if target path is a symlink, we want to use the real path as the replacement target,
+    # otherwise we'd just be overwriting the symlink
+    target_file_path = target_file_path.resolve()
+    temp_file_path = target_file_path.with_suffix(f"{target_file_path.suffix}.algokit~")
     try:
         # preserve file metadata if it already exists
-        if target_file_path.exists():
+        try:
             _copy_with_metadata(target_file_path, temp_file_path)
-        with open(temp_file_path, mode) as file:
-            file.writelines(file_contents)
-            file.flush()
-            os.fsync(file.fileno())
-
-        os.replace(temp_file_path, target_file_path)
+        except FileNotFoundError:
+            pass
+        # write content to new temp file
+        with temp_file_path.open(mode=mode, encoding="utf-8") as fp:
+            fp.write(file_contents)
+        # overwrite destination with the temp file
+        temp_file_path.replace(target_file_path)
     finally:
         temp_file_path.unlink(missing_ok=True)
 
@@ -29,8 +28,8 @@ def atomic_write(file_contents: list[str], target_file_path: Path, mode: str = "
 def _copy_with_metadata(source: Path, target: Path) -> None:
     # copy content, stat-info (mode too), timestamps...
     shutil.copy2(source, target)
-    os_type = platform.system().lower()
-    if os_type != "windows":
+    # try copy owner+group if platform supports it
+    if hasattr(os, "chown"):
         # copy owner and group
-        st = os.stat(source)
+        st = source.stat()
         os.chown(target, st[stat.ST_UID], st[stat.ST_GID])

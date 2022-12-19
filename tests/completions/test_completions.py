@@ -66,7 +66,7 @@ class CompletionsTestContext:
             command += f" --shell {shell}"
 
         result = invoke(command, env=self.env)
-        normalized_output = normalize_path(result.output, self.home.name, "{home}").replace("\\", "/")
+        normalized_output = normalize_path(result.output, str(self.home_path), "{home}").replace("\\", "/")
         return ClickInvokeResult(exit_code=result.exit_code, output=normalized_output)
 
     @property
@@ -86,6 +86,7 @@ def test_completions_installs_correctly_with_specified_shell(shell: str):
     assert result.exit_code == 0
     # content of this file is defined by click, so only assert it exists not its content
     assert context.source_path.exists()
+    assert not context.profile_path.with_suffix(".algokit~").exists()
     profile = context.profile_contents
     verify(get_combined_verify_output(result.output, "profile", profile), options=NamerFactory.with_parameters(shell))
 
@@ -120,6 +121,7 @@ def test_completions_uninstalls_correctly(shell: str):
     assert result.exit_code == 0
     assert not context.source_path.exists()
     profile = context.profile_contents
+    assert not context.profile_path.with_suffix(".algokit~").exists()
     assert profile == ORIGINAL_PROFILE_CONTENTS
     verify(result.output, options=NamerFactory.with_parameters(shell))
 

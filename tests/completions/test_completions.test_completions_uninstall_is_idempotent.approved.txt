@@ -1,2 +1,2 @@
 DEBUG: Removing source script {home}/.config/algokit/.algokit-completions.bash
-AlgoKit completions uninstalled for bash 🎉
+AlgoKit completions not installed for bash 🤔
