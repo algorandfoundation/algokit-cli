@@ -1,6 +1,5 @@
 DEBUG: Writing source script {home}/.config/algokit/.algokit-completions.bash
-DEBUG: {home}/.bashrc already contains completion source
-AlgoKit completions installed for bash 🎉
+{home}/.bashrc already contains completion source 🤔
 Restart shell or run `. ~/.bashrc` to enable completions
 ----
 profile:

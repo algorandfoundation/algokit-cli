@@ -56,25 +56,29 @@ class ShellCompletion:
 
     def install(self) -> None:
         self._save_source()
-        self._insert_profile_line()
-        logger.info(f"AlgoKit completions installed for {self.shell} 🎉")
+        if self._insert_profile_line():
+            logger.info(f"AlgoKit completions installed for {self.shell} 🎉")
+        else:
+            logger.info(f"{self.profile_path} already contains completion source 🤔")
         home_based_profile_path = _get_home_based_path(self.profile_path)
         logger.info(f"Restart shell or run `. {home_based_profile_path}` to enable completions")
 
     def uninstall(self) -> None:
         self._remove_source()
-        self._remove_profile_line()
-        logger.info(f"AlgoKit completions uninstalled for {self.shell} 🎉")
+        if self._remove_profile_line():
+            logger.info(f"AlgoKit completions uninstalled for {self.shell} 🎉")
+        else:
+            logger.info(f"AlgoKit completions not installed for {self.shell} 🤔")
 
     @property
     def source(self) -> str:
         completion_class = click.shell_completion.get_completion_class(self.shell)
         completion = completion_class(
             # class is only instantiated to get source snippet, so don't need to pass a real command
-            None,  # type: ignore
-            {},
-            "algokit",
-            "_ALGOKIT_COMPLETE",
+            cli=None,  # type: ignore
+            ctx_args={},
+            prog_name="algokit",
+            complete_var="_ALGOKIT_COMPLETE",
         )
         try:
             return completion.source()
@@ -90,65 +94,57 @@ class ShellCompletion:
         # grab source before attempting to write file in case it fails
         source = self.source
         logger.debug(f"Writing source script {self.source_path}")
-        with open(self.source_path, "w") as source_file:
-            source_file.write(source)
-            source_file.flush()
+        self.source_path.write_text(source, encoding="utf-8")
 
     def _remove_source(self) -> None:
         logger.debug(f"Removing source script {self.source_path}")
         self.source_path.unlink(missing_ok=True)
 
-    def _insert_profile_line(self) -> None:
-        do_write = True
-        if self.profile_path.exists():
-            with open(self.profile_path) as file:
-                for line in file:
-                    if self.profile_line in line:
-                        logger.debug(f"{self.profile_path} already contains completion source")
-                        # profile already contains source of completion script. nothing to do
-                        do_write = False
-                        break
+    def _insert_profile_line(self) -> bool:
+        try:
+            content = self.profile_path.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            pass
+        else:
+            if self.profile_line in content:
+                # profile already contains source of completion script. nothing to do
+                return False
 
-        if do_write:
-            logger.debug(f"Appending completion source to {self.profile_path}")
-            # got to end of file, so append profile line
-            atomic_write([self.profile_line], self.profile_path, "a")
+        logger.debug(f"Appending completion source to {self.profile_path}")
+        # got to end of file, so append profile line
+        atomic_write(self.profile_line, self.profile_path, "a")
+        return True
 
-    def _remove_profile_line(self) -> None:
-        if not self.profile_path.exists():
+    def _remove_profile_line(self) -> bool:
+        try:
+            content = self.profile_path.read_text(encoding="utf-8")
+        except FileNotFoundError:
             logger.debug(f"{self.profile_path} not found")
-            # nothing to do
-            return
-
+            return False
         # see if profile script contains profile_line, if it does remove it
-        do_write = False
-        lines = []
-        with open(self.profile_path) as file:
-            for line in file:
-                if self.profile_line in line:
-                    do_write = True
-                    logger.debug(f"Completion source found in {self.profile_path}")
-                else:
-                    lines.append(line)
+        if self.profile_line not in content:
+            return False
+        logger.debug(f"Completion source found in {self.profile_path}")
+        content = content.replace(self.profile_line, "")
 
-        if do_write:
-            logger.debug(f"Removing completion source found in {self.profile_path}")
-            atomic_write(lines, self.profile_path, "w")
+        logger.debug(f"Removing completion source found in {self.profile_path}")
+        atomic_write(content, self.profile_path, "w")
+        return True
 
 
 def _get_home_based_path(path: Path) -> Path:
-    home = Path("~").expanduser()
+    home = Path.home()
     try:
         home_based_path = path.relative_to(home)
-        return "~" / home_based_path
     except ValueError:
         return path
+    else:
+        return "~" / home_based_path
 
 
 def _get_current_shell() -> str:
     try:
-        shell = shellingham.detect_shell()
-        shell_name: str = shell[0]
+        shell_name, *_ = shellingham.detect_shell()  # type: tuple[str, str]
     except Exception as ex:
         logger.debug("Could not determine current shell", exc_info=ex)
         logger.warning("Could not determine current shell. Try specifying a supported shell with --shell")
