@@ -67,6 +67,7 @@ jobs:
           poetry run semantic-release \
             --prerelease \
             publish
+          gh release edit --prerelease "$(python run semantic-release print-version --current)"
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,6 +94,7 @@ jobs:
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             publish
+          gh release edit --prerelease "$(python run semantic-release print-version --current)"
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
