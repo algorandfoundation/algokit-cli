@@ -108,16 +108,9 @@ jobs:
 
   cd-publish-release-packages:
     name: Publish Release Packages
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch name
-        shell: bash
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-        id: get_branch
-
-      - name: Publish
-        # if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true' # Might want to adjust this to publish (pre-release) on merge as well.
-        if: steps.get_branch.outputs.branch == 'chocolatey-package' && inputs.production_release != 'true' # ww testing.
-        uses: ./.github/workflows/publish-release-packages.yaml
-        with:
-          artifactName: algokit-cli
+    needs: release
+    # if: ${{ github.ref_name == 'main' }} && inputs.production_release == 'true' # Might want to adjust this to publish (pre-release) on merge as well.
+    if: ${{ github.ref_name == 'chocolatey-package' }} && inputs.production_release != 'true' # ww testing.
+    uses: ./.github/workflows/publish-release-packages.yaml
+    with:
+      artifactName: algokit-cli
