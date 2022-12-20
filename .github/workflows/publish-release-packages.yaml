@@ -30,12 +30,15 @@ jobs:
           if ($wheelFileName.count -ne 1) {
               Throw "Packaging error. build artifact contained $($wheelFileName.count) normally named wheel files"
           }
-          if ($wheelFileName[0].Name -Match '-([0-9]+\.[0-9]+\.[0-9]+)b?([0-9]*)(\+.*?)?(.[0-9]+)?-') {
+          if ($wheelFileName[0].Name -Match '-([0-9]+\.[0-9]+\.[0-9]+)b?([0-9]*)(\+(.*?))?(.[0-9]+)?-') {
               $version_number = $Matches[1]
               $version_beta = $Matches[2]
-              $version_branch = $Matches[3]
-              $version_branch = $version_branch.Replace(".", "") # dots aren't valid here
-              $version_betanumber = $Matches[4]
+              $version_branch = $Matches[4]
+              $version_branch = $version_branch ? $version_branch.Replace(".", "") : "" # dots aren't valid here
+              $version_betanumber = $Matches[5]
+              $version_beta_truncated = "beta$($version_beta)$($version_branch)"
+              #$version_beta_truncated = "beta$($version_beta)$($version_branch)$($version_betanumber)" # When chocolatey supports semver v2.0
+              $version_beta_truncated = $version_beta_truncated.subString(0, [System.Math]::Min(20, $version_beta_truncated.Length - 1)) # chocolatey has a limit of 20 characters on "special version part"
           }
           else {
               Throw "Packaging error. Unrecognised file name pattern $($wheelFileName[0].Name)"
@@ -43,8 +46,7 @@ jobs:
 
           $version = $version_number
           if ($version_beta) {
-              $version = "$($version)-beta$($version_beta)$($version_branch)"
-              #$version = "$($version)-beta$($version_beta)$($version_branch)$($version_betanumber)" # When chocolatey supports semver v2.0
+              $version = "$($version)-$($version_beta_truncated)"
           }
 
           echo "version=$version" | Tee-Object -Append -FilePath $env:GITHUB_OUTPUT
