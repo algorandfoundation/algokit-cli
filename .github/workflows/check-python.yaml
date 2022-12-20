@@ -23,7 +23,7 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Audit with pip-audit
-        run: poetry run pip-audit
+        run: poetry run pip-audit --ignore-vuln GHSA-hcpj-qp55-gfph # ww temporarily ignore copier import from github while we wait for a pypi package
 
       - name: Check formatting with Black
         run: |
