@@ -1,0 +1,49 @@
+DEBUG: Running 'docker --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'git --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'python --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'python3 --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'node --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'npm.cmd --version' in '{current_working_directory}'
+DEBUG: Command not found
+DEBUG: Running 'choco --version' in '{current_working_directory}'
+DEBUG: Command not found
+timestamp: 1990-12-31T10:09:08
+AlgoKit: 1.2.3
+AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
+OS: Windows-other-system-info
+docker: Command not found
+  Docker required to `run algokit sandbox` command; install via https://docs.docker.com/get-docker/
+docker compose: Command not found
+git: Command not found
+  Git required to `run algokit init`; install via `choco install git` if using Chocolatey, 
+  or via https://github.com/git-guides/install-git#install-git-on-windows
+python: Command not found
+python3: Command not found
+pipx: Command not found
+  pipx is required if poetry is not installed in order to install it automatically;
+  install via https://pypa.github.io/pipx/
+poetry: Command not found
+  Poetry is required for some Python-based templates;
+  install via `algokit bootstrap` within project directory, or via:
+  https://python-poetry.org/docs/#installation
+node: Command not found
+  Node.js is required for some Node.js-based templates;
+  install via `algokit bootstrap` within project directory, or via:
+  https://nodejs.dev/en/learn/how-to-install-nodejs/
+npm: Command not found
+chocolatey: Command not found
+
+If you are experiencing a problem with algokit, feel free to submit an issue via:
+https://github.com/algorandfoundation/algokit-cli/issues/new
+Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

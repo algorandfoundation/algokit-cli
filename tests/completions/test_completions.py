@@ -66,8 +66,8 @@ class CompletionsTestContext:
             command += f" --shell {shell}"
 
         result = invoke(command, env=self.env)
-        normalized_output = normalize_path(result.output, str(self.home_path), "{home}").replace("\\", "/")
-        return ClickInvokeResult(exit_code=result.exit_code, output=normalized_output)
+        result.output = normalize_path(result.output, str(self.home_path), "{home}").replace("\\", "/")
+        return result
 
     @property
     def profile_contents(self) -> str:
