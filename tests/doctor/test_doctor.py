@@ -197,6 +197,36 @@ def test_doctor_with_weird_values_on_mac(mocker: MockerFixture, proc_mock: ProcM
     verify(result.output, scrubber=make_output_scrubber())
 
 
+def test_unparseable_python_version(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(["python", "--version"], ["  ", "1-2-3", "  abc  "])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_unexpected_exception(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    def which_throw(_cmd: str) -> None:
+        raise RuntimeError("OH NO")
+
+    mocker.patch("algokit.core.doctor.which").side_effect = which_throw
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_npm_permission_denied(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.should_deny_on(["npm"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 @pytest.mark.parametrize("mock_dependencies", [pytest.param("Windows", id="windows")], indirect=["mock_dependencies"])
 def test_doctor_with_weird_values_on_windows(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
     proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])

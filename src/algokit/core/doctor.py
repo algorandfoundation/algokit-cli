@@ -1,14 +1,11 @@
 import dataclasses
-import importlib.metadata
 import logging
 import re
-import sys
 import traceback
 from shutil import which
 from typing import Callable
 
 from algokit.core import proc
-from algokit.core.conf import PACKAGE_NAME
 from algokit.core.utils import is_minimum_version
 
 logger = logging.getLogger(__name__)
@@ -29,6 +26,10 @@ class DoctorResult:
     ok: bool
     output: str
     extra_help: list[str] | None = None
+
+
+def format_exception_only(ex: Exception) -> list[str]:
+    return [ln.rstrip("\n") for ln in traceback.format_exception_only(type(ex), ex)]
 
 
 def check_dependency(
@@ -52,14 +53,22 @@ def check_dependency(
     :param minimum_version_help: Custom help output if minimum version not met.
     """
     try:
-        try:
-            proc_result = proc.run(cmd)
-        except FileNotFoundError:
-            logger.debug("Command not found", exc_info=True)
-            return DoctorResult(ok=False, output="Command not found", extra_help=missing_help)
-        except PermissionError:
-            logger.debug("Permission denied running command", exc_info=True)
-            return DoctorResult(ok=False, output="Permission denied running command")
+        proc_result = proc.run(cmd)
+    except FileNotFoundError:
+        logger.debug("Command not found", exc_info=True)
+        return DoctorResult(ok=False, output="Command not found!", extra_help=missing_help)
+    except PermissionError:
+        logger.debug("Permission denied running command", exc_info=True)
+        return DoctorResult(ok=False, output="Permission denied attempting to run command")
+    except Exception as ex:
+        logger.debug(f"Unexpected exception running command: {ex}", exc_info=True)
+        return DoctorResult(
+            ok=False,
+            output="Unexpected error running command",
+            extra_help=format_exception_only(ex),
+        )
+
+    try:
         if proc_result.exit_code != 0:
             return DoctorResult(
                 ok=False,
@@ -75,8 +84,8 @@ def check_dependency(
         logger.debug(f"Unexpected error checking dependency: {ex}", exc_info=True)
         return DoctorResult(
             ok=False,
-            output=f"Error checking dependency: {ex}",
-            extra_help=traceback.format_tb(ex.__traceback__),
+            output="Unexpected error checking dependency",
+            extra_help=format_exception_only(ex),
         )
     if minimum_version is not None:
         try:
@@ -99,14 +108,3 @@ def check_dependency(
                 extra_help=(minimum_version_help or [f"Minimum version required: {minimum_version}"]),
             )
     return DoctorResult(ok=True, output=output)
-
-
-def get_algokit_info() -> DoctorResult:
-    return DoctorResult(
-        ok=True,
-        output=importlib.metadata.version(PACKAGE_NAME),
-        extra_help=[
-            f"- python version: {sys.version}",
-            f"- venv location: {sys.prefix}",
-        ],
-    )
