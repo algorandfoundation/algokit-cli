@@ -108,7 +108,8 @@ jobs:
 
   cd-publish-release-packages:
     name: Publish Release Packages
-    if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true' # Might want to adjust this to publish on merge as well.
+    # if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true' # Might want to adjust this to publish (pre-release) on merge as well.
+    if: steps.get_branch.outputs.branch == 'chocolatey-package' && inputs.production_release != 'true' # ww testing.
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
       artifactName: algokit-cli
