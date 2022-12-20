@@ -22,7 +22,8 @@ jobs:
           path: dist
 
       # Re-create the version based on the wheel file name.
-      # NOTE: x.y.x-beta.12 versions are not supported by chocolatey and are rewritten as x.y.z-beta12
+      # NOTE: x.y.x-beta.12 versions are not supported by chocolatey and need to be rewritten as x.y.z-beta12 (however this will likely change soon)
+      # "special version part" requirements. <20 characters, no '.' no '+'
       - name: Get artifact details
         id: get_artifact
         run: |
