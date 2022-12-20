@@ -23,7 +23,13 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Audit with pip-audit
-        run: poetry run pip-audit --ignore-vuln GHSA-hcpj-qp55-gfph # ww temporarily ignore copier import from github while we wait for a pypi package
+        run: |
+          # audit non dev dependencies, no exclusions
+          poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt
+          
+          # audit all dependencies, with exclusions
+          poetry run pip-audit \
+            --ignore-vuln "GHSA-hcpj-qp55-gfph" # GitPython vulnerability, dev only dependency
 
       - name: Check formatting with Black
         run: |

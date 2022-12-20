@@ -6,12 +6,7 @@ from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 
-
-def get_verify_output(stdout: str, additional_name: str, additional_output: str) -> str:
-    return f"""{stdout}----
-{additional_name}:
-----
-{additional_output}"""
+from tests import get_combined_verify_output
 
 
 def test_sandbox_start(app_dir_mock: AppDirs, proc_mock: ProcMock):
@@ -19,7 +14,7 @@ def test_sandbox_start(app_dir_mock: AppDirs, proc_mock: ProcMock):
 
     assert result.exit_code == 0
     verify(
-        get_verify_output(
+        get_combined_verify_output(
             result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
             "{app_config}/sandbox/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
@@ -54,7 +49,7 @@ def test_sandbox_start_out_of_date_definition(app_dir_mock: AppDirs, proc_mock: 
 
     assert result.exit_code == 0
     verify(
-        get_verify_output(
+        get_combined_verify_output(
             result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
             "{app_config}/sandbox/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),

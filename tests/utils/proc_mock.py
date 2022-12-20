@@ -38,6 +38,7 @@ class PopenMock:
 @dataclasses.dataclass
 class CommandMockData:
     raise_not_found: bool = False
+    raise_permission_denied: bool = False
     exit_code: int = 0
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
 
@@ -64,6 +65,9 @@ class ProcMock:
 
     def should_fail_on(self, cmd: list[str] | str) -> None:
         self._add_mock_data(cmd, CommandMockData(raise_not_found=True))
+
+    def should_deny_on(self, cmd: list[str] | str) -> None:
+        self._add_mock_data(cmd, CommandMockData(raise_permission_denied=True))
 
     def should_bad_exit_on(self, cmd: list[str] | str, exit_code: int = -1, output: list[str] | None = None) -> None:
         if exit_code == 0:
@@ -93,6 +97,8 @@ class ProcMock:
 
         if mock_data.raise_not_found:
             raise FileNotFoundError(f"No such file or directory: {cmd[0]}")
+        if mock_data.raise_permission_denied:
+            raise PermissionError(f"I'm sorry Dave I can't do {cmd[0]}")
         exit_code = mock_data.exit_code
         output = "\n".join(mock_data.output_lines)
         return PopenMock(output, exit_code)

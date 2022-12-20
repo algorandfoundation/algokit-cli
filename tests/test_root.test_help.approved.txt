@@ -10,7 +10,9 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  bootstrap  Bootstrap AlgoKit project dependencies.
-  goal       Run the Algorand goal CLI against the AlgoKit Sandbox.
-  init       Initializes a new project.
-  sandbox    Manage the AlgoKit sandbox.
+  bootstrap    Bootstrap AlgoKit project dependencies.
+  completions  Install and Uninstall AlgoKit shell integration.
+  doctor       Run the Algorand doctor CLI.
+  goal         Run the Algorand goal CLI against the AlgoKit Sandbox.
+  init         Initializes a new project.
+  sandbox      Manage the AlgoKit sandbox.

@@ -1,0 +1,2 @@
+DEBUG: Checking {current_working_directory} for bootstrapping needs
+Finished bootstrapping {current_working_directory}

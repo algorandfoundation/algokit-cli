@@ -4,13 +4,6 @@ from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 
 
-def get_verify_output(stdout: str, additional_name: str, additional_output: str) -> str:
-    return f"""{stdout}----
-{additional_name}:
-----
-{additional_output}"""
-
-
 def test_sandbox_stop(app_dir_mock: AppDirs, proc_mock: ProcMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")

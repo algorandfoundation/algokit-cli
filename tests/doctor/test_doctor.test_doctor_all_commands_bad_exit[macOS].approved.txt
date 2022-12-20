@@ -1,0 +1,48 @@
+DEBUG: Running 'docker --version' in '{current_working_directory}'
+DEBUG: docker: I AM A TEAPOT
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: I AM A TEAPOT
+DEBUG: Running 'git --version' in '{current_working_directory}'
+DEBUG: git: I AM A TEAPOT
+DEBUG: Running 'python --version' in '{current_working_directory}'
+DEBUG: python: I AM A TEAPOT
+DEBUG: Running 'python3 --version' in '{current_working_directory}'
+DEBUG: python3: I AM A TEAPOT
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: I AM A TEAPOT
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: I AM A TEAPOT
+DEBUG: Running 'node --version' in '{current_working_directory}'
+DEBUG: node: I AM A TEAPOT
+DEBUG: Running 'npm --version' in '{current_working_directory}'
+DEBUG: npm: I AM A TEAPOT
+DEBUG: Running 'brew --version' in '{current_working_directory}'
+DEBUG: brew: I AM A TEAPOT
+timestamp: 1990-12-31T10:09:08
+AlgoKit: 1.2.3
+AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
+OS: Darwin-other-system-info
+docker: Command exited with code: -1
+  I AM A TEAPOT
+docker compose: Command exited with code: -1
+  I AM A TEAPOT
+git: Command exited with code: -1
+  I AM A TEAPOT
+python: Command exited with code: -1
+  I AM A TEAPOT
+python3: Command exited with code: -1
+  I AM A TEAPOT
+pipx: Command exited with code: -1
+  I AM A TEAPOT
+poetry: Command exited with code: -1
+  I AM A TEAPOT
+node: Command exited with code: -1
+  I AM A TEAPOT
+npm: Command exited with code: -1
+  I AM A TEAPOT
+brew: Command exited with code: -1
+  I AM A TEAPOT
+
+If you are experiencing a problem with algokit, feel free to submit an issue via:
+https://github.com/algorandfoundation/algokit-cli/issues/new
+Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

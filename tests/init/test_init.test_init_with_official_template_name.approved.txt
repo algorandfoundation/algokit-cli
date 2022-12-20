@@ -1,6 +1,18 @@
-DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template gh:wilsonwaters/copier-testing-template
+DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template gh:algorandfoundation/algokit-beaker-default-template
 No git tags found in template; using HEAD as ref
-DEBUG: Project initialisation complete, final clone URL = https://github.com/wilsonwaters/copier-testing-template.git
-🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐
+DEBUG: Template initialisation complete, final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
+Executed `algokit bootstrap all` in {current_working_directory}/myapp
+🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️  https://github.com/wilsonwaters/copier-testing-template
+➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+As a suggestion, if you wanted to open the project in VS Code you could execute:
+> cd myapp && code .
+----
+.env.template:
+----
+ALGOD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ALGOD_SERVER=http://localhost
+ALGOD_PORT=4001
+INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+INDEXER_SERVER=http://localhost
+INDEXER_PORT=8980

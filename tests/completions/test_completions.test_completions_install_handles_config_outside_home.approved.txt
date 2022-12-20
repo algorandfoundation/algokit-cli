@@ -1,0 +1,9 @@
+DEBUG: Writing source script {config}/algokit/.algokit-completions.bash
+DEBUG: Appending completion source to {home}/.bashrc
+AlgoKit completions installed for bash 🎉
+Restart shell or run `. ~/.bashrc` to enable completions
+----
+profile:
+----
+# ORIGINAL END OF FILE
+. {config}/algokit/.algokit-completions.bash

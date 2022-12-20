@@ -12,7 +12,7 @@ We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v
 2. Install pre-requisites:
 
    - Manually:
-     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`.
+     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`. It is also recommended to use `3.10` for development so dependencies on higher versions are not introduced, and to avoid debugging issues with `3.11`(see https://github.com/fabioz/PyDev.Debugger/issues/234 and https://github.com/microsoft/debugpy/issues/939)
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
      - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via automated script:
@@ -33,8 +33,14 @@ We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v
        - Install Poetry (via `pyenv`)
        - Install Python dependencies and setup Python venv (to `./.venv/`) (via `poetry install`)
        - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a slightly smoother getting started experience in VS Code)
+       - 
+3. Install pre-commit hooks (optional but recommended):
 
-3. Open the project and start debugging / developing via:
+    [pre-commit](https://pre-commit.com/) is configured in this repository, so once `poetry install` has been run,
+    execute `pre-commit install` inside the virtual-env, and git will ensure formatting, linting, and static typing (via `mypy`)
+    is correct when you perform a commit.
+
+4. Open the project and start debugging / developing via:
 
    - VS Code
 

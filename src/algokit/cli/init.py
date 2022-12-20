@@ -1,6 +1,11 @@
 import logging
 import re
+from dataclasses import dataclass
 from pathlib import Path
+
+from algokit.core.bootstrap import bootstrap_any_including_subdirs
+from algokit.core.questionary_extensions import _get_confirm_default_yes_prompt
+from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 try:
     from typing import Never  # type: ignore[attr-defined]
@@ -22,24 +27,71 @@ from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValida
 logger = logging.getLogger(__name__)
 
 
+DEFAULT_ANSWERS: dict[str, str] = {
+    "algod_token": DEFAULT_ALGOD_TOKEN,
+    "algod_server": DEFAULT_ALGOD_SERVER,
+    "algod_port": str(DEFAULT_ALGOD_PORT),
+    "indexer_token": DEFAULT_ALGOD_TOKEN,
+    "indexer_server": DEFAULT_ALGOD_SERVER,
+    "indexer_port": str(DEFAULT_INDEXER_PORT),
+}
+"""Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
+
+
+@dataclass
+class TemplateSource:
+    url: str
+    commit: str | None = None
+    """when adding a blessed template that is verified but not controlled by Algorand, 
+    ensure a specific commit is used"""
+
+    def __str__(self) -> str:
+        if self.commit:
+            return "@".join([self.url, self.commit])
+        return self.url
+
+
 # this is a function so we can modify the values in unit tests
-def _get_blessed_templates() -> dict[str, str]:
+def _get_blessed_templates() -> dict[str, TemplateSource]:
     return {
-        "beaker": "gh:wilsonwaters/copier-testing-template",
+        # NOTE: leaving unpinned for now whilst this under active development, but this would be
+        # a good example of a TemplateSource that should have a commit= specified
+        "beaker": TemplateSource(url="gh:algorandfoundation/algokit-beaker-default-template"),
     }
 
 
 _unofficial_template_warning = (
     "Community templates have not been reviewed, and can execute arbitrary code.\n"
-    "Please inspect the template repository, and pay particular attention to the value of _tasks in copier.yml"
+    "Please inspect the template repository, and pay particular attention to the "
+    + "values of _tasks, _migrations and _jinja_extensions in copier.yml"
 )
 
 
+def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
+    if not value or re.match(r"^[\w\-.]+$", value):
+        return value
+    else:
+        raise click.BadParameter(
+            "Received invalid value for directory name; "
+            + "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            context,
+            param,
+        )
+
+
 @click.command("init", short_help="Initializes a new project.")
-@click.option("directory_name", "--name", type=str, help="Name of the directory / repository to create.")
+@click.option(
+    "directory_name",
+    "--name",
+    "-n",
+    type=str,
+    help="Name of the project / directory / repository to create.",
+    callback=validate_dir_name,
+)
 @click.option(
     "template_name",
     "--template",
+    "-t",
     type=DeferredChoice(lambda: list(_get_blessed_templates())),
     default=None,
     help="Name of an official template to use.",
@@ -52,17 +104,28 @@ _unofficial_template_warning = (
     metavar="URL",
 )
 @click.option(
-    "--accept-template-url",
+    "--UNSAFE-SECURITY-accept-template-url",
     is_flag=True,
-    default=None,
-    help="Accept the specified template URL, acknowledging the security implications of an unofficial template.",
+    default=False,
+    help=(
+        "Accept the specified template URL, "
+        "acknowledging the security implications of arbitrary code execution trusting an unofficial template."
+    ),
 )
 @click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
 @click.option(
+    "use_defaults",
     "--defaults",
-    default=None,
-    help="Automatically choose default answers without asking when creating this template.",
     is_flag=True,
+    default=False,
+    help="Automatically choose default answers without asking when creating this template.",
+)
+@click.option(
+    "run_bootstrap",
+    "--bootstrap/--no-bootstrap",
+    is_flag=True,
+    default=None,
+    help="Whether to run `algokit bootstrap` to bootstrap the new project's dependencies.",
 )
 @click.option(
     "answers",
@@ -78,23 +141,28 @@ def init_command(
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
-    accept_template_url: bool | None,
+    unsafe_security_accept_template_url: bool,  # noqa: FBT001
     use_git: bool | None,
     answers: list[tuple[str, str]],
-    defaults: bool | None,
+    use_defaults: bool,  # noqa: FBT001
+    run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
-    # parse this early to prevent frustration
-    answers_dict = dict(answers)
+
+    # parse the input early to prevent frustration - combined with some defaults but they can be overridden
+    answers_dict = DEFAULT_ANSWERS | dict(answers)
 
     project_path = _get_project_path(directory_name)
+    directory_name = project_path.name
+    # provide the directory name as an answer to the template, if not explicitly overridden by user
+    answers_dict.setdefault("project_name", directory_name)
 
     if template_name:
         blessed_templates = _get_blessed_templates()
-        template_url = blessed_templates[template_name]
+        template = blessed_templates[template_name]
     elif template_url:
         if not _repo_url_is_valid(template_url):
             logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
@@ -103,29 +171,57 @@ def init_command(
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
         # at the root level
-        if not accept_template_url and not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
-            _fail_and_bail()
+        if not unsafe_security_accept_template_url:
+            if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
+                _fail_and_bail()
+        template = TemplateSource(url=template_url)
     else:
-        template_url = _get_template_url()
+        template = _get_template_url()
 
-    logger.debug(f"Attempting to initialise project in {project_path} from template {template_url}")
+    logger.debug(f"Attempting to initialise project in {project_path} from template {template}")
 
     copier_worker = copier.run_copy(
-        template_url, project_path, data=answers_dict, defaults=defaults or False, quiet=True
+        template.url,
+        project_path,
+        data=answers_dict,
+        defaults=use_defaults,
+        quiet=True,
+        vcs_ref=template.commit,
     )
 
     expanded_template_url = copier_worker.template.url_expanded
-    logger.debug(f"Project initialisation complete, final clone URL = {expanded_template_url}")
+    logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
+
+    if run_bootstrap is None:
+        # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
+        run_bootstrap = use_defaults or _get_run_bootstrap()
+    if run_bootstrap:
+        # note: we run bootstrap before git commit so that we can commit any lock files,
+        # but if something goes wrong, we don't want to block
+        try:
+            bootstrap_any_including_subdirs(project_path, _get_confirm_default_yes_prompt)
+        except Exception:
+            logger.exception(
+                "Bootstrap failed. Once any errors above are resolved, "
+                f"you can run `algokit bootstrap` in {project_path}",
+                exc_info=True,
+            )
+
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(
             project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
         )
 
-    logger.info("🙌 Project initialized! For next steps, consult the documentation of your selected template 🧐")
+    logger.info(
+        f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
+        + "consult the documentation of your selected template 🧐"
+    )
     if re.search("https?://", expanded_template_url):
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
         logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
+    logger.info("As a suggestion, if you wanted to open the project in VS Code you could execute:")
+    logger.info(f"> cd {directory_name} && code .")
 
 
 def _fail_and_bail() -> Never:
@@ -163,7 +259,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
         directory_name = directory_name_option
     else:
         directory_name = questionary.text(
-            "Name of directory to create the project in: ",
+            "Name of project / directory to create the project in: ",
             validate=ChainedValidator(NonEmptyValidator(), DirectoryNameValidator(base_path)),
             validate_while_typing=False,
         ).unsafe_ask()
@@ -193,7 +289,7 @@ class GitRepoValidator(questionary.Validator):
             raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
 
 
-def _get_template_url() -> str:
+def _get_template_url() -> TemplateSource:
     blessed_templates = _get_blessed_templates()
     choice_value = questionary.select(
         "Select a project template: ", choices=[*blessed_templates, "<enter custom url>"]
@@ -225,8 +321,10 @@ def _get_template_url() -> str:
         .unsafe_ask()
         .strip()
     )
-    # re-prompt if empty response
-    return template_url or _get_template_url()
+    if not template_url:
+        # re-prompt if empty response
+        return _get_template_url()
+    return TemplateSource(url=template_url)
 
 
 def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) -> bool:
@@ -266,3 +364,13 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
             if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
                 logger.info("🎉 Performed initial git commit successfully! 🎉")
+
+
+def _get_run_bootstrap() -> bool:
+    return bool(
+        questionary.confirm(
+            "Do you want to run `algokit bootstrap` to bootstrap dependencies"
+            + " for this new project so it can be run immediately?",
+            default=True,
+        ).unsafe_ask()
+    )

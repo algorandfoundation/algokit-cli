@@ -1,0 +1,7 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+Installing Python dependencies and setting up Python virtual environment via Poetry
+DEBUG: Running 'poetry install' in '{current_working_directory}'
+poetry: STDOUT
+poetry: STDERR

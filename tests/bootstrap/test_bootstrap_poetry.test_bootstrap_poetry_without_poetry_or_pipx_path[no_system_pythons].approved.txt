@@ -1,0 +1,13 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+Poetry not found; attempting to install it...
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: Running '{python_base_executable} -m pipx --version' in '{current_working_directory}'
+DEBUG: {python_base_executable}: STDOUT
+DEBUG: {python_base_executable}: STDERR
+DEBUG: Running '{python_base_executable} -m pipx install poetry' in '{current_working_directory}'
+DEBUG: {python_base_executable}: STDOUT
+DEBUG: {python_base_executable}: STDERR
+Installing Python dependencies and setting up Python virtual environment via Poetry
+DEBUG: Running 'poetry install' in '{current_working_directory}'
+poetry: STDOUT
+poetry: STDERR

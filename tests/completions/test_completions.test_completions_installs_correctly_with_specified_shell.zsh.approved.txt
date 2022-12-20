@@ -1,0 +1,9 @@
+DEBUG: Writing source script {home}/.config/algokit/.algokit-completions.zsh
+DEBUG: Appending completion source to {home}/.zshrc
+AlgoKit completions installed for zsh 🎉
+Restart shell or run `. ~/.zshrc` to enable completions
+----
+profile:
+----
+# ORIGINAL END OF FILE
+. ~/.config/algokit/.algokit-completions.zsh

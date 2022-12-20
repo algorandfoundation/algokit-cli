@@ -1,5 +1,7 @@
 import click
 from algokit.cli.bootstrap import bootstrap_group
+from algokit.cli.completions import completions_group
+from algokit.cli.doctor import doctor_command
 from algokit.cli.goal import goal_command
 from algokit.cli.init import init_command
 from algokit.cli.sandbox import sandbox_group
@@ -18,7 +20,9 @@ def algokit() -> None:
     pass
 
 
+algokit.add_command(bootstrap_group)
+algokit.add_command(completions_group)
+algokit.add_command(doctor_command)
+algokit.add_command(goal_command)
 algokit.add_command(init_command)
 algokit.add_command(sandbox_group)
-algokit.add_command(goal_command)
-algokit.add_command(bootstrap_group)

@@ -1,0 +1,4 @@
+DEBUG: Removing source script {home}/.config/algokit/.algokit-completions.bash
+DEBUG: Completion source found in {home}/.bashrc
+DEBUG: Removing completion source found in {home}/.bashrc
+AlgoKit completions uninstalled for bash 🎉

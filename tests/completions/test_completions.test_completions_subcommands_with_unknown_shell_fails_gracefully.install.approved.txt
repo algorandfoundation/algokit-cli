@@ -1,0 +1,2 @@
+DEBUG: Could not determine current shell
+WARNING: Could not determine current shell. Try specifying a supported shell with --shell

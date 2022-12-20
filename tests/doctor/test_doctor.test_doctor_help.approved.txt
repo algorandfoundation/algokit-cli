@@ -1,0 +1,6 @@
+Usage: algokit doctor [OPTIONS]
+
+Options:
+  -c, --copy-to-clipboard  Copy the contents of the doctor message (in Markdown
+                           format) in your clipboard.
+  -h, --help               Show this message and exit.

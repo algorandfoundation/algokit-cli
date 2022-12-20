@@ -1,0 +1,247 @@
+import typing
+from datetime import datetime
+from pathlib import Path
+
+import click
+import pytest
+from approvaltests.pytest.py_test_namer import PyTestNamer
+from approvaltests.scrubbers.scrubbers import Scrubber
+from pytest_mock import MockerFixture
+from utils.approvals import TokenScrubber, combine_scrubbers, verify
+from utils.click_invoker import invoke
+from utils.proc_mock import ProcMock
+
+PARENT_DIRECTORY = Path(__file__).parent
+
+DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+
+
+class VersionInfoType(typing.NamedTuple):
+    major: int
+    minor: int
+    micro: int
+    releaselevel: str
+    serial: int
+
+
+@pytest.fixture()
+def mock_dependencies(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
+    # Mock OS.platform
+    platform_system: str = getattr(request, "param", "Darwin")
+
+    mocker.patch("algokit.cli.doctor.importlib.metadata").version.return_value = "1.2.3"
+    platform_module = mocker.patch("algokit.cli.doctor.platform")
+    platform_module.platform.return_value = f"{platform_system}-other-system-info"
+    platform_module.system.return_value = platform_system
+    # Mock datetime
+    mocker.patch("algokit.cli.doctor.dt").datetime.now.return_value = datetime(1990, 12, 31, 10, 9, 8)
+    # Mock shutil
+    mocker.patch("algokit.core.doctor.which").side_effect = mock_shutil_which
+    # Mock sys - Tuple[int, int, int, str, int]
+    sys_module = mocker.patch("algokit.cli.doctor.sys")
+    sys_module.version = "3.6.2"
+    sys_module.prefix = "/home/me/.local/pipx/venvs/algokit"
+
+
+@pytest.fixture(autouse=True)
+def mock_happy_values(proc_mock: ProcMock) -> None:
+    proc_mock.set_output(["choco", "--version"], ["1.2.2"])
+    proc_mock.set_output(["brew", "--version"], ["Homebrew 3.6.15", "Homebrew/homebrew-core (blah)"])
+    proc_mock.set_output(["docker", "--version"], ["Docker version 20.10.21, build baeda1f"])
+    proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.12.2"}'])
+    proc_mock.set_output(["git", "--version"], ["git version 2.37.1 (Apple Git-137.1)"])
+    proc_mock.set_output(["python", "--version"], ["Python 3.10.0"])
+    proc_mock.set_output(["python3", "--version"], ["Python 3.11.0"])
+    proc_mock.set_output(["pipx", "--version"], ["1.1.0"])
+    proc_mock.set_output(["poetry", "--version"], ["blah blah", "", "Poetry (version 1.2.2)"])
+    proc_mock.set_output(["node", "--version"], ["v18.12.1"])
+    proc_mock.set_output(["npm", "--version"], ["8.19.2"])
+    proc_mock.set_output(["npm.cmd", "--version"], ["8.19.2"])
+
+
+def mock_shutil_which(python_command_name: str) -> str:
+    if python_command_name == "python":
+        return "/usr/local/bin/python"
+    if python_command_name == "python3":
+        return "/usr/local/bin/python3"
+    return ""
+
+
+def make_output_scrubber(**extra_tokens: str) -> Scrubber:
+    default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
+    tokens = default_tokens | extra_tokens
+    return combine_scrubbers(
+        click.unstyle,
+        TokenScrubber(tokens=tokens),
+        TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
+        lambda t: t.replace("{test_parent_directory}\\", "{test_parent_directory}/"),
+    )
+
+
+def test_doctor_help(mocker: MockerFixture, mock_dependencies: None):
+    result = invoke("doctor -h")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_doctor_with_copy(mocker: MockerFixture, mock_dependencies: None):
+    # Mock pyclip
+    mocked_os = mocker.patch("algokit.cli.doctor.pyclip.copy")
+    result = invoke("doctor -c")
+
+    assert result.exit_code == 0
+    mocked_os.assert_called_once()
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+@pytest.mark.parametrize(
+    "mock_dependencies",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ],
+    indirect=["mock_dependencies"],
+)
+def test_doctor_successful(request: pytest.FixtureRequest, mock_dependencies: None):
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
+def test_doctor_with_docker_compose_version_warning(proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.1.3"}'])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_with_docker_compose_version_unparseable(proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "TEAPOT"}'])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+ALL_COMMANDS = [
+    ["choco", "--version"],
+    ["brew", "--version"],
+    ["docker", "--version"],
+    DOCKER_COMPOSE_VERSION_COMMAND,
+    ["git", "--version"],
+    ["python", "--version"],
+    ["python3", "--version"],
+    ["pipx", "--version"],
+    ["poetry", "--version"],
+    ["node", "--version"],
+    ["npm", "--version"],
+    ["npm.cmd", "--version"],
+]
+
+
+@pytest.mark.parametrize(
+    "mock_dependencies",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ],
+    indirect=["mock_dependencies"],
+)
+def test_doctor_all_commands_not_found(
+    request: pytest.FixtureRequest, mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None
+):
+    for cmd in ALL_COMMANDS:
+        proc_mock.should_fail_on(cmd[0])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
+@pytest.mark.parametrize(
+    "mock_dependencies",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ],
+    indirect=["mock_dependencies"],
+)
+def test_doctor_all_commands_bad_exit(
+    request: pytest.FixtureRequest, mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None
+):
+
+    for cmd in ALL_COMMANDS:
+        proc_mock.should_bad_exit_on(cmd, output=["I AM A TEAPOT"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
+def test_doctor_with_weird_values_on_mac(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(["brew", "--version"], ["Homebrew 3.6.15-31-g82d89bb"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_unparseable_python_version(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(["python", "--version"], ["  ", "1-2-3", "  abc  "])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_unexpected_exception(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    def which_throw(_cmd: str) -> None:
+        raise RuntimeError("OH NO")
+
+    mocker.patch("algokit.core.doctor.which").side_effect = which_throw
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_npm_permission_denied(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.should_deny_on(["npm"])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+@pytest.mark.parametrize("mock_dependencies", [pytest.param("Windows", id="windows")], indirect=["mock_dependencies"])
+def test_doctor_with_weird_values_on_windows(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
+    proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])
+    proc_mock.set_output(
+        ["choco"], ["Chocolatey v0.10.15", "choco: Please run 'choco -?' or 'choco <command> -?' for help menu."]
+    )
+    proc_mock.should_fail_on(["npm"])
+    proc_mock.set_output(["npm.cmd", "--version"], [" 16.17.0 "])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_doctor_no_mocking():
+    result = invoke("doctor")
+    assert result.exception is None
