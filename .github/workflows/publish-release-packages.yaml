@@ -16,15 +16,40 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download artifact
-        run: echo "Get artifact from github and extract wheel"
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
 
-      - name: Get package version
-        run: echo "TODO Determine algocli version and make it available to further steps. Ensure x.y.x-beta.12 versions are rewritten as x.y.z-beta12. Any package with x.y.z will be an official release. Any package with slash notation (x.y.z-bla) will be a prerelease"
+      # Re-create the version based on the wheel file name.
+      # NOTE: x.y.x-beta.12 versions are not supported by chocolatey and are rewritten as x.y.z-beta12
+      - name: Get artifact details
+        id: get_artifact
+        run: |
+          $wheelFileName = Get-ChildItem -File -Filter algokit-*-py3-none-any.whl dist
+          if ($wheelFileName.count -ne 1) {
+              Throw "Packaging error. build artifact contained $($wheelFileName.count) normally named wheel files"
+          }
+          if ($wheelFileName[0].Name -Match '-([0-9]+\.[0-9]+\.[0-9]+)b?([0-9]*)-') {
+              $version_number = $Matches[1]
+              $version_beta = $Matches[2]
+          }
+          else {
+              Throw "Packaging error. Unrecognised file name pattern $($wheelFileName[0].Name)"
+          }
+
+          $version = $version_number
+          if ($version_beta) {
+              $version = "$($version)-beta$($version_beta)"
+          }
+
+          echo "version=$version" | Tee-Object -Append -FilePath $env:GITHUB_OUTPUT
+          echo "wheelFileName=$($wheelFileName[0].Name)" | Tee-Object -Append -FilePath $env:GITHUB_OUTPUT
 
       - name: Build package
         uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: pack --version {verison} .\scripts\chocolatey\wwtest\algokit.nuspec
+          args: pack --version steps.get_artifact.outputs.version .\scripts\chocolatey\algokit\algokit.nuspec
 
       - name: Set API key
         uses: crazy-max/ghaction-chocolatey@v2

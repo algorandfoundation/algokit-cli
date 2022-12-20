@@ -111,4 +111,4 @@ jobs:
     if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true' # Might want to adjust this to publish on merge as well.
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
-      artifactName: "TODO"
+      artifactName: algokit-cli
