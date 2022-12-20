@@ -1,11 +1,4 @@
-DEBUG: Running 'pipx list --short' in '{current_working_directory}'
-DEBUG: pipx: aaa 2.3.4
-DEBUG: pipx: algokit 1.2.3
-DEBUG: pipx: copier 7.0.1
-DEBUG: Running 'pipx environment' in '{current_working_directory}'
-DEBUG: pipx: PIPX_SHARED_LIBS=/pipx/shared
-DEBUG: pipx: PIPX_LOCAL_VENVS=/pipx/venvs
-DEBUG: Running 'docker -v' in '{current_working_directory}'
+DEBUG: Running 'docker --version' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
 DEBUG: docker: {"version": "v2.12.2"}
@@ -21,25 +14,28 @@ DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: blah blah
 DEBUG: poetry: 
 DEBUG: poetry: Poetry (version 1.2.2)
-DEBUG: Running 'node -v' in '{current_working_directory}'
+DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: node: v18.12.1
-DEBUG: Running 'npm -v' in '{current_working_directory}'
+DEBUG: Running 'npm --version' in '{current_working_directory}'
 DEBUG: npm: 8.19.2
-DEBUG: Running 'brew -v' in '{current_working_directory}'
+DEBUG: Running 'brew --version' in '{current_working_directory}'
 DEBUG: brew: Homebrew 3.6.15
 DEBUG: brew: Homebrew/homebrew-core (blah)
-Time: 1990-12-31T10:09:08
-AlgoKit: 1.2.3 /pipx/venvs/algokit
+timestamp: 1990-12-31T10:09:08
+AlgoKit: 1.2.3
+AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Darwin-other-system-info
-Docker: 20.10.21
-Docker Compose: 2.12.2
-Git: 2.37.1
-AlgoKit Python: 3.6.2 (location: {current_working_directory}/.venv/bin/python)
-Global Python: 3.10.0 (location: /Library/Frameworks/Python.framework/Versions/3.10/bin/python)
-Global Python3: 3.11.0 (location: /Library/Frameworks/Python.framework/Versions/3.11/bin/python3)
-Pipx: 1.1.0
-Poetry: 1.2.2
-Node.js: 18.12.1
-Npm: 8.19.2
-Brew: 3.6.15
-If you are experiencing a problem with algokit, feel free to submit an issue via https://github.com/algorandfoundation/algokit-cli/issues/new; please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`
+docker: 20.10.21
+docker compose: 2.12.2
+git: 2.37.1
+python: 3.10.0 (location: /usr/local/bin/python)
+python3: 3.11.0 (location: /usr/local/bin/python3)
+pipx: 1.1.0
+poetry: 1.2.2
+node: 18.12.1
+npm: 8.19.2
+brew: 3.6.15
+
+If you are experiencing a problem with algokit, feel free to submit an issue via:
+https://github.com/algorandfoundation/algokit-cli/issues/new
+Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

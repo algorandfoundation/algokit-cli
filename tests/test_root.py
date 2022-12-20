@@ -7,3 +7,9 @@ def test_help():
 
     assert result.exit_code == 0
     verify(result.output)
+
+
+def test_version():
+    result = invoke("--version")
+
+    assert result.exit_code == 0

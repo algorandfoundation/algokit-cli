@@ -2,11 +2,9 @@ import enum
 import json
 import logging
 from pathlib import Path
-from subprocess import CalledProcessError
 from typing import Any, cast
 
 import httpx
-from algokit.core import proc
 from algokit.core.conf import get_app_config_dir
 from algokit.core.proc import RunResult, run
 
@@ -210,22 +208,10 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         return {"Status": "Error"}
 
 
-def get_docker_compose_version_string() -> str | None:
-    # 1. IOError - docker not installed or not on path
-    #   -- handle: don't
-    # 2. exit code non-zero ... for whatever reason
-    #   -- handle: raise CalledProcessError
-    # 3. failing to parse output of version string
-    cmd = ["docker", "compose", "version", "--format", "json"]
-    compose_version_result = proc.run(cmd)
-    if compose_version_result.exit_code != 0:
-        raise CalledProcessError(
-            returncode=compose_version_result.exit_code, cmd=cmd, output=compose_version_result.output
-        )
-    compose_version: dict[str, str] = json.loads(compose_version_result.output)
-    try:
-        compose_version_str = compose_version["version"]
-    except KeyError:
-        return None
-    else:
-        return compose_version_str.lstrip("v")
+DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+
+
+def parse_docker_compose_version_output(output: str) -> str:
+    compose_version: dict[str, str] = json.loads(output)
+    compose_version_str = compose_version.get("version", "")
+    return compose_version_str.lstrip("v")

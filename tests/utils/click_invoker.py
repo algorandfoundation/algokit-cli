@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 class ClickInvokeResult:
     exit_code: int
     output: str
+    exception: BaseException | None
 
 
 def invoke(
@@ -37,7 +38,7 @@ def invoke(
         if result.exc_info is Exception:
             logger.error("Click invocation error", exc_info=result.exc_info)
         output = normalize_path(result.stdout, str(cwd or prior_cwd), "{current_working_directory}")
-        return ClickInvokeResult(exit_code=result.exit_code, output=output)
+        return ClickInvokeResult(exit_code=result.exit_code, output=output, exception=result.exception)
     finally:
         if cwd is not None:
             os.chdir(prior_cwd)
