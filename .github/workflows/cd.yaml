@@ -32,7 +32,7 @@ jobs:
 
   release:
     name: Release Library
-    needs: ci-build-python
+    #ww needs: ci-build-python
     runs-on: ubuntu-latest
 
     steps:
