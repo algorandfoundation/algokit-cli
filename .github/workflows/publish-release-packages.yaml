@@ -34,6 +34,7 @@ jobs:
               $version_number = $Matches[1]
               $version_beta = $Matches[2]
               $version_branch = $Matches[3]
+              $version_branch = $version_branch.Replace(".", "") # dots aren't valid here
               $version_betanumber = $Matches[4]
           }
           else {
