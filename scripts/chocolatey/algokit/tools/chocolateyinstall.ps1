@@ -24,12 +24,12 @@ if ($wheelFileName.count -ne 1) {
 
 # determine if the package is already installed. In which case, uninstall it first
 # Note - pipx upgrade does not work with local files
-$pipxListOutput = pipx list
+$pipxListOutput = python -m pipx list
 if ($LASTEXITCODE -ne 0) {
   Throw "Error searching for existing packages"
 }
 if ($pipxListOutput -match "$env:ChocolateyPackageName.*") {
-  pipx uninstall $env:ChocolateyPackageName
+  python -m pipx uninstall $env:ChocolateyPackageName
   if ($LASTEXITCODE -ne 0) {
     Throw "Error removing existing version"
   }
@@ -37,7 +37,7 @@ if ($pipxListOutput -match "$env:ChocolateyPackageName.*") {
 
 # install the bundled wheel file.
 # For some reason pipx outputs normal messages to stderr, which causes choco to complain. Redirect stderr to stdout and rely on return value for errors
-pipx install $wheelFileName[0].FullName 2>&1
+python -m pipx install $wheelFileName[0].FullName 2>&1
 if ($LASTEXITCODE -ne 0) {
   Throw "Error installing $($wheelFileName[0].FullName)"
 }
