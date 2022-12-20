@@ -114,3 +114,4 @@ jobs:
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
       artifactName: algokit-cli
+    secrets: inherit
