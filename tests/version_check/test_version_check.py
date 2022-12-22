@@ -43,7 +43,7 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 
 def test_version_check_uses_cache(app_dir_mock: AppDirs):
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
-    version_cache.write_text("999.99.99", encoding="utf-8")
+    version_cache.write_text("1234.56.78", encoding="utf-8")
     result = invoke("bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0

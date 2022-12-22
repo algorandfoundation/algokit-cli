@@ -9,7 +9,6 @@ from click.testing import CliRunner
 
 from tests.utils.approvals import normalize_path
 
-
 logger = logging.getLogger(__name__)
 
 

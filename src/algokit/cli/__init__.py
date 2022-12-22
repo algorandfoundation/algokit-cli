@@ -1,4 +1,5 @@
 import click
+
 from algokit.cli.bootstrap import bootstrap_group
 from algokit.cli.completions import completions_group
 from algokit.cli.config import config_group

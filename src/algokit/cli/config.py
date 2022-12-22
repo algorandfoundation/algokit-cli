@@ -1,4 +1,5 @@
 import click
+
 from algokit.core.version_prompt import version_prompt_configuration_command
 
 

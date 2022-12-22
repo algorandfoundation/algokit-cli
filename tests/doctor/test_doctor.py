@@ -29,8 +29,8 @@ def mock_dependencies(request: pytest.FixtureRequest, mocker: MockerFixture) -> 
     # Mock OS.platform
     platform_system: str = getattr(request, "param", "Darwin")
 
-    mocker.patch("algokit.cli.doctor.importlib.metadata").version.return_value = "1.2.3"
-    mocker.patch("algokit.cli.doctor.get_latest_version").return_value = (1, 2, 3)
+    mocker.patch("algokit.cli.doctor.get_current_package_version").return_value = "1.2.3"
+    mocker.patch("algokit.cli.doctor.get_latest_github_version").return_value = "1.2.3"
     platform_module = mocker.patch("algokit.cli.doctor.platform")
     platform_module.platform.return_value = f"{platform_system}-other-system-info"
     platform_module.system.return_value = platform_system

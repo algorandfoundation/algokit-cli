@@ -23,7 +23,6 @@ DEBUG: choco: Chocolatey v0.10.15
 DEBUG: choco: choco: Please run 'choco -?' or 'choco <command> -?' for help menu.
 timestamp: 1990-12-31T10:09:08
 AlgoKit: 1.2.3
-Latest AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Windows-other-system-info
 docker: 20.10.21
@@ -37,6 +36,6 @@ node: 18.12.1
 npm: 16.17.0
 chocolatey: 0.10.15
 
-If you are experiencing a problem with algokit, feel free to submit an issue via:
+If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
 https://github.com/algorandfoundation/algokit-cli/issues/new
 Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

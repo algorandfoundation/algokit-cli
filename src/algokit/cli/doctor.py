@@ -1,19 +1,19 @@
 import datetime as dt
-import importlib.metadata
 import logging
 import platform
 import sys
 
 import click
 import pyclip  # type: ignore
-from algokit.core.conf import PACKAGE_NAME
+
+from algokit.core.conf import get_current_package_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
     parse_docker_compose_version_output,
 )
-from algokit.core.version_prompt import format_version, get_latest_version
+from algokit.core.version_prompt import get_latest_github_version
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +38,9 @@ CRITICAL_COLOR = "red"
 def doctor_command(*, copy_to_clipboard: bool) -> None:
     os_type = platform.system()
     is_windows = os_type == "Windows"
-    current_algokit_version = importlib.metadata.version(PACKAGE_NAME)
-    latest_algokit_version = format_version(get_latest_version())
-    if current_algokit_version != latest_algokit_version:
-        current_algokit_version = click.style(current_algokit_version, fg=WARNING_COLOR)
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
-        "AlgoKit": DoctorResult(ok=True, output=current_algokit_version),
-        "Latest AlgoKit": DoctorResult(ok=True, output=latest_algokit_version),
+        "AlgoKit": _get_algokit_version_output(),
         "AlgoKit Python": DoctorResult(ok=True, output=f"{sys.version} (location: {sys.prefix})"),
         "OS": DoctorResult(ok=True, output=platform.platform()),
         "docker": check_dependency(
@@ -121,7 +116,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     # print end message anyway
     logger.info(
         "\n"
-        "If you are experiencing a problem with algokit, feel free to submit an issue via:\n"
+        "If you are experiencing a problem with AlgoKit, feel free to submit an issue via:\n"
         "https://github.com/algorandfoundation/algokit-cli/issues/new\n"
         "Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`"
     )
@@ -136,3 +131,17 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
 
     if any(not value.ok for value in service_outputs.values()):
         raise click.exceptions.Exit(code=1)
+
+
+def _get_algokit_version_output() -> DoctorResult:
+    current = get_current_package_version()
+    try:
+        latest = get_latest_github_version()
+    except Exception as ex:
+        logger.warning("Failed to check latest AlgoKit release version", exc_info=ex)
+        latest = None
+    if latest is None or current == latest:
+        output = current
+    else:
+        output = click.style(current, fg=WARNING_COLOR) + f" (latest: {latest})"
+    return DoctorResult(ok=True, output=output)
