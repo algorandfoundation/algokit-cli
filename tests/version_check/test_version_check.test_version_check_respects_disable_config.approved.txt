@@ -1,1 +1,1 @@
-DEBUG: Skipping version check
+DEBUG: Version prompt disabled

@@ -1,1 +1,1 @@
-Version check enabled
+📡 Resuming check for new versions
