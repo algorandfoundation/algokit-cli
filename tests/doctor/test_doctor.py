@@ -228,6 +228,14 @@ def test_npm_permission_denied(mocker: MockerFixture, proc_mock: ProcMock, mock_
     verify(result.output, scrubber=make_output_scrubber())
 
 
+def test_new_algokit_version_available(request: pytest.FixtureRequest, mocker: MockerFixture, mock_dependencies: None):
+    mocker.patch("algokit.cli.doctor.get_latest_github_version").return_value = "4.5.6"
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
 @pytest.mark.parametrize("mock_dependencies", [pytest.param("Windows", id="windows")], indirect=["mock_dependencies"])
 def test_doctor_with_weird_values_on_windows(mocker: MockerFixture, proc_mock: ProcMock, mock_dependencies: None):
     proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])

@@ -1,0 +1,41 @@
+DEBUG: Running 'docker --version' in '{current_working_directory}'
+DEBUG: docker: Docker version 20.10.21, build baeda1f
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.12.2"}
+DEBUG: Running 'git --version' in '{current_working_directory}'
+DEBUG: git: git version 2.37.1 (Apple Git-137.1)
+DEBUG: Running 'python --version' in '{current_working_directory}'
+DEBUG: python: Python 3.10.0
+DEBUG: Running 'python3 --version' in '{current_working_directory}'
+DEBUG: python3: Python 3.11.0
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.1.0
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: blah blah
+DEBUG: poetry: 
+DEBUG: poetry: Poetry (version 1.2.2)
+DEBUG: Running 'node --version' in '{current_working_directory}'
+DEBUG: node: v18.12.1
+DEBUG: Running 'npm --version' in '{current_working_directory}'
+DEBUG: npm: 8.19.2
+DEBUG: Running 'brew --version' in '{current_working_directory}'
+DEBUG: brew: Homebrew 3.6.15
+DEBUG: brew: Homebrew/homebrew-core (blah)
+timestamp: 1990-12-31T10:09:08
+AlgoKit: 1.2.3 (latest: 4.5.6)
+AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
+OS: Darwin-other-system-info
+docker: 20.10.21
+docker compose: 2.12.2
+git: 2.37.1
+python: 3.10.0 (location: /usr/local/bin/python)
+python3: 3.11.0 (location: /usr/local/bin/python3)
+pipx: 1.1.0
+poetry: 1.2.2
+node: 18.12.1
+npm: 8.19.2
+brew: 3.6.15
+
+If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
+https://github.com/algorandfoundation/algokit-cli/issues/new
+Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`

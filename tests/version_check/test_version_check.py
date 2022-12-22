@@ -1,8 +1,10 @@
+import os
 from importlib import metadata
+from time import time
 
 import pytest
 from algokit.core.conf import PACKAGE_NAME
-from algokit.core.version_prompt import LATEST_URL
+from algokit.core.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -44,6 +46,19 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 def test_version_check_uses_cache(app_dir_mock: AppDirs):
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("1234.56.78", encoding="utf-8")
+    result = invoke("bootstrap env", skip_version_check=False)
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_scrubber(app_dir_mock))
+
+
+def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDirs, httpx_mock: HTTPXMock):
+    httpx_mock.add_response(url=LATEST_URL, json={"tag_name": f"v{NEW_VERSION}"})
+    version_cache = app_dir_mock.app_state_dir / "last-version-check"
+    version_cache.write_text("1234.56.78", encoding="utf-8")
+    modified_time = time() - VERSION_CHECK_INTERVAL - 1
+    os.utime(version_cache, (modified_time, modified_time))
+
     result = invoke("bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
