@@ -103,6 +103,7 @@ def get_latest_version() -> Version:
 def _set_version_check(_ctx: click.Context, _: click.Option, value: bool | None) -> None:
     if value is not None:
         _store_version_check(enable=value)
+        _ctx.exit()
 
 
 def _skip_version_check(_ctx: click.Context, _: click.Option, value: bool) -> None:  # noqa FBT001
@@ -118,9 +119,11 @@ def _is_version_check_disabled() -> bool:
 def _store_version_check(*, enable: bool) -> None:
     disable_marker = get_app_config_dir() / "disable-version-check"
     if enable:
-        disable_marker.touch()
-    else:
         disable_marker.unlink(missing_ok=True)
+        logger.info("Version check enabled")
+    else:
+        disable_marker.touch()
+        logger.info("Version check disabled")
 
 
 version_check_option = click.option(

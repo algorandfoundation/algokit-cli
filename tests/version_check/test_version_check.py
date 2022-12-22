@@ -80,3 +80,13 @@ def test_version_check_disable_version_check(app_dir_mock: AppDirs):
     assert result.exit_code == 0
     assert disable_version_check_path.exists()
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
+
+
+def test_version_check_enable_version_check(app_dir_mock: AppDirs):
+    disable_version_check_path = app_dir_mock.app_config_dir / "disable-version-check"
+    disable_version_check_path.touch()
+    result = invoke("--enable-version-check")
+
+    assert result.exit_code == 0
+    assert not disable_version_check_path.exists()
+    verify(result.output, scrubber=make_scrubber(app_dir_mock))
