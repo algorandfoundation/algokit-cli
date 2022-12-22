@@ -6,7 +6,7 @@ from importlib import metadata
 from time import time
 
 import click
-import requests
+import httpx
 from algokit.core.conf import PACKAGE_NAME, get_app_config_dir, get_app_state_dir
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ def _do_version_check(context: click.Context) -> None:
         return
 
     if current_version < latest_version:
-        click.echo(
+        logger.info(
             f"You are using AlgoKit version {_version_str(current_version)}, "
             f"however version {_version_str(latest_version)} is available."
         )
@@ -87,7 +87,7 @@ def get_latest_version() -> Version:
     if gh_token:
         logger.debug("Using GH_TOKEN to query latest version")
         headers["Authorization"] = f"Bearer {gh_token}"
-    response = requests.get(LATEST_URL, headers=headers)
+    response = httpx.get(LATEST_URL, headers=headers)
     if response.status_code != 200:
         return None
 

@@ -34,7 +34,7 @@ def setup(latest_version_mock: MagicMock, mocker: MockerFixture, app_dir_mock: A
     # restore latest version behaviour
     mocker.stop(latest_version_mock)
 
-    mocker.patch("requests.get").return_value = MockReleaseResponse(f"v{NEW_VERSION}")
+    mocker.patch("httpx.get").return_value = MockReleaseResponse(f"v{NEW_VERSION}")
     mocker.patch("algokit.core.version_check.get_app_config_dir").return_value = app_dir_mock.app_config_dir
     mocker.patch("algokit.core.version_check.get_app_state_dir").return_value = app_dir_mock.app_state_dir
     # make bootstrap env a no-op
