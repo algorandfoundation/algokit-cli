@@ -18,6 +18,7 @@ DEBUG: Running 'npm --version' in '{current_working_directory}'
 DEBUG: npm: I AM A TEAPOT
 timestamp: 1990-12-31T10:09:08
 AlgoKit: 1.2.3
+Latest AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Linux-other-system-info
 docker: Command exited with code: -1

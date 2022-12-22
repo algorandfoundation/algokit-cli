@@ -13,8 +13,12 @@ from algokit.core.sandbox import (
     DOCKER_COMPOSE_VERSION_COMMAND,
     parse_docker_compose_version_output,
 )
+from algokit.core.version_prompt import format_version, get_latest_version
 
 logger = logging.getLogger(__name__)
+
+WARNING_COLOR = "yellow"
+CRITICAL_COLOR = "red"
 
 
 @click.command(
@@ -34,9 +38,14 @@ logger = logging.getLogger(__name__)
 def doctor_command(*, copy_to_clipboard: bool) -> None:
     os_type = platform.system()
     is_windows = os_type == "Windows"
+    current_algokit_version = importlib.metadata.version(PACKAGE_NAME)
+    latest_algokit_version = format_version(get_latest_version())
+    if current_algokit_version != latest_algokit_version:
+        current_algokit_version = click.style(current_algokit_version, fg=WARNING_COLOR)
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
-        "AlgoKit": DoctorResult(ok=True, output=importlib.metadata.version(PACKAGE_NAME)),
+        "AlgoKit": DoctorResult(ok=True, output=current_algokit_version),
+        "Latest AlgoKit": DoctorResult(ok=True, output=latest_algokit_version),
         "AlgoKit Python": DoctorResult(ok=True, output=f"{sys.version} (location: {sys.prefix})"),
         "OS": DoctorResult(ok=True, output=platform.platform()),
         "docker": check_dependency(
@@ -103,7 +112,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         if value.ok:
             color = None
         else:
-            color = "red" if key in critical_services else "yellow"
+            color = CRITICAL_COLOR if key in critical_services else WARNING_COLOR
         msg = click.style(f"{key}: ", bold=True) + click.style(value.output, fg=color)
         for ln in value.extra_help or []:
             msg += f"\n  {ln}"
