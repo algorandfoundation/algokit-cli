@@ -2,6 +2,7 @@ import json
 import os
 import typing
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 from approvaltests import Reporter, reporters, set_default_reporter  # type: ignore
@@ -13,6 +14,12 @@ from prompt_toolkit.output import DummyOutput
 from pytest_mock import MockerFixture
 from utils.app_dir_mock import AppDirs, tmp_app_dir
 from utils.proc_mock import ProcMock
+
+
+@pytest.fixture(autouse=True)
+def latest_version_mock(mocker: MockerFixture) -> MagicMock:
+    # disable version check by default
+    return mocker.patch("algokit.core.version_check._do_version_check")
 
 
 @pytest.fixture
