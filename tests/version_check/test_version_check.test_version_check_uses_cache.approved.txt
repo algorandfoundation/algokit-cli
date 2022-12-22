@@ -1,0 +1,2 @@
+DEBUG: (999, 99, 99) found in cache {app_state}/last-version-check
+You are using AlgoKit version {current_version}, however version {new_version} is available.

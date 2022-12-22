@@ -1,0 +1,3 @@
+DEBUG: {app_state}/last-version-check not found
+DEBUG: Latest version tag: v{new_version}
+You are using AlgoKit version {current_version}, however version {new_version} is available.
