@@ -9,7 +9,6 @@ from click.testing import CliRunner
 
 from tests.utils.approvals import normalize_path
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -24,6 +23,7 @@ def invoke(
     args: str,
     *,
     cwd: Path | None = None,
+    skip_version_check: bool = True,
     env: dict[str, str | None] | None = None,
 ) -> ClickInvokeResult:
     from algokit.cli import algokit
@@ -34,7 +34,10 @@ def invoke(
     if cwd is not None:
         os.chdir(cwd)
     try:
-        result = runner.invoke(algokit, f"-v --no-color {args}", env=env)  # type: ignore
+        test_args = "-v --no-color"
+        if skip_version_check:
+            test_args = f"{test_args} --skip-version-check"
+        result = runner.invoke(algokit, f"{test_args} {args}", env=env)  # type: ignore
         if result.exc_info is Exception:
             logger.error("Click invocation error", exc_info=result.exc_info)
         output = normalize_path(result.stdout, str(cwd or prior_cwd), "{current_working_directory}")

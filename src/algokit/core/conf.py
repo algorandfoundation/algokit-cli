@@ -1,5 +1,6 @@
 import os
 import platform
+from importlib import metadata
 from pathlib import Path
 
 PACKAGE_NAME = "algokit"
@@ -36,3 +37,7 @@ def _get_relative_app_path(base_dir: str) -> Path:
     result = path / PACKAGE_NAME
     result.mkdir(parents=True, exist_ok=True)
     return result
+
+
+def get_current_package_version() -> str:
+    return metadata.version(PACKAGE_NAME)

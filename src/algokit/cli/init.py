@@ -19,6 +19,7 @@ import copier  # type: ignore
 import copier.vcs  # type: ignore
 import prompt_toolkit.document
 import questionary
+
 from algokit.core import proc
 from algokit.core.click_extensions import DeferredChoice
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
