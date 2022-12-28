@@ -7,6 +7,7 @@ Commands:
   console  Run the Algorand goal CLI against the AlgoKit Sandbox via a Bash
            console so you can execute multiple goal commands and/or interact
            with a filesystem.
+  explore  Explore the AlgoKit Sandbox using Dappflow
   reset    Reset the AlgoKit Sandbox.
   start    Start the AlgoKit Sandbox.
   status   Check the status of the AlgoKit Sandbox.
