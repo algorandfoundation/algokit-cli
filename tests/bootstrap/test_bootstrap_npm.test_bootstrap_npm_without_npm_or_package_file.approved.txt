@@ -1,3 +1,0 @@
-DEBUG: Running 'node --version' in '{current_working_directory}'
-DEBUG: Command not found
-Error: Node.js is required; install via https://nodejs.dev/en/learn/how-to-install-nodejs/ and try `algokit bootstrap npm` again.

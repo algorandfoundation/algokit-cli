@@ -1,7 +1,18 @@
+import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
+from pytest_mock import MockerFixture
 from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
+
+
+@pytest.fixture()
+def mock_dependencies(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
+    # Mock OS.platform
+    platform_system: str = getattr(request, "param", "Darwin")
+    platform_module = mocker.patch("algokit.core.bootstrap.platform")
+    platform_module.system.return_value = platform_system
 
 
 def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory):
@@ -42,18 +53,31 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: Proc
     verify(result.output)
 
 
-def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
+@pytest.mark.parametrize(
+    "mock_dependencies",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ],
+    indirect=["mock_dependencies"],
+)
+def test_bootstrap_all_npm(
+    proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_dependencies: None
+):
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
 
-    proc_mock.set_output("node --version", ["v18.12.1"])
+    proc_mock.set_output("npm install", ["<<Installed npm packages>>"])
+    proc_mock.set_output("npm.cmd install", ["<<Installed npm.cmd packages on Windows>>"])
+
     result = invoke(
         "bootstrap all",
         cwd=cwd,
     )
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(result.output, namer=PyTestNamer(request))
 
 
 def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):

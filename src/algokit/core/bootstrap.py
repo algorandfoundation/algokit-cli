@@ -8,10 +8,8 @@ from typing import Callable, Iterator
 import click
 
 from algokit.core import proc
-from algokit.core.doctor import check_dependency
 
 ENV_TEMPLATE = ".env.template"
-NODE_LTS_MINIMUM_VERSION = "18.12.1"
 NODE_URL = "https://nodejs.dev/en/learn/how-to-install-nodejs/"
 logger = logging.getLogger(__name__)
 
@@ -111,34 +109,20 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
 
 
 def bootstrap_npm(project_dir: Path) -> None:
-    doctor_results = check_dependency(
-        ["node", "--version"],
-        missing_help=[
-            f"Node.js is required; install via {NODE_URL} and try `algokit bootstrap npm` again.",
-        ],
-        minimum_version=NODE_LTS_MINIMUM_VERSION,
-        minimum_version_help=[
-            f"Node.js {NODE_LTS_MINIMUM_VERSION} is required; "
-            f"install via {NODE_URL} and try `algokit bootstrap npm` again.",
-        ],
-    )
-    if not doctor_results.ok:
-        raise click.ClickException("".join(doctor_results.extra_help or []))
+    package_json_path = project_dir / "package.json"
+    if not package_json_path.exists():
+        logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
     else:
-        package_json_path = project_dir / "package.json"
-        if not package_json_path.exists():
-            logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
-        else:
-            logger.info("Installing npm dependencies")
-            try:
-                is_windows = platform.system() == "Windows"
-                proc.run(
-                    ["npm", "install"] if not is_windows else ["npm.cmd", "install"],
-                    stdout_log_level=logging.INFO,
-                    cwd=project_dir,
-                )
-            except IOError as e:
-                raise click.ClickException((f"Failed to run `npm install using {package_json_path}.")) from e
+        logger.info("Installing npm dependencies")
+        try:
+            is_windows = platform.system() == "Windows"
+            proc.run(
+                ["npm", "install"] if not is_windows else ["npm.cmd", "install"],
+                stdout_log_level=logging.INFO,
+                cwd=project_dir,
+            )
+        except IOError as e:
+            raise click.ClickException((f"Failed to run `npm install using {package_json_path}.")) from e
 
 
 def _find_valid_pipx_command() -> list[str]:
