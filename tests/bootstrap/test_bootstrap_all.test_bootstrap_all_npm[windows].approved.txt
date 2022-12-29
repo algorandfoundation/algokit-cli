@@ -2,5 +2,6 @@ DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Running `algokit bootstrap npm`
 Installing npm dependencies
 DEBUG: Running 'npm.cmd install' in '{current_working_directory}'
-npm.cmd: <<Installed npm.cmd packages on Windows>>
+npm.cmd: STDOUT
+npm.cmd: STDERR
 Finished bootstrapping {current_working_directory}

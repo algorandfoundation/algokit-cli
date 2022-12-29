@@ -10,7 +10,6 @@ import click
 from algokit.core import proc
 
 ENV_TEMPLATE = ".env.template"
-NODE_URL = "https://nodejs.dev/en/learn/how-to-install-nodejs/"
 logger = logging.getLogger(__name__)
 
 
@@ -117,7 +116,7 @@ def bootstrap_npm(project_dir: Path) -> None:
         try:
             is_windows = platform.system() == "Windows"
             proc.run(
-                ["npm", "install"] if not is_windows else ["npm.cmd", "install"],
+                ["npm" if not is_windows else "npm.cmd", "install"],
                 stdout_log_level=logging.INFO,
                 cwd=project_dir,
             )
@@ -184,9 +183,9 @@ def _get_base_python_path() -> str | None:
     # this will be the value of `home = <path>` in pyvenv.cfg if it exists
     if base_home := getattr(sys, "_home", None):
         base_home_path = Path(base_home)
+        is_windows = platform.system() == "Windows"
         for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
             candidate_path = base_home_path / name
-            is_windows = platform.system() == "Windows"
             if is_windows:
                 candidate_path = candidate_path.with_suffix(".exe")
             if candidate_path.is_file():

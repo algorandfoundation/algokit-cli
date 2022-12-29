@@ -33,6 +33,6 @@ def poetry() -> None:
     bootstrap_poetry(Path.cwd(), _get_confirm_default_yes_prompt)
 
 
-@bootstrap_group.command("npm", short_help="Bootstrap Node.JS project in the current working directory.")
+@bootstrap_group.command("npm", short_help="Bootstrap Node.js project in the current working directory.")
 def npm() -> None:
     bootstrap_npm(Path.cwd())
