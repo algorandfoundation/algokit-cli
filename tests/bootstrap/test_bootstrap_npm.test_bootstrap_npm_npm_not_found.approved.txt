@@ -1,0 +1,5 @@
+DEBUG: Running 'node --version' in '{current_working_directory}'
+DEBUG: node: v18.12.1
+Installing npm dependencies
+DEBUG: Running 'npm install' in '{current_working_directory}'
+Error: Failed to run `npm install using {current_working_directory}/package.json.

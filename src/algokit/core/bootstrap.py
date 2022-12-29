@@ -11,7 +11,8 @@ from algokit.core import proc
 from algokit.core.doctor import check_dependency
 
 ENV_TEMPLATE = ".env.template"
-NODE_MINIMUM_LTS_VERSION = "18.12.1"
+NODE_LTS_MINIMUM_VERSION = "18.12.1"
+NODE_URL = "https://nodejs.dev/en/learn/how-to-install-nodejs/"
 is_windows = platform.system() == "Windows"
 logger = logging.getLogger(__name__)
 
@@ -111,19 +112,19 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
 
 
 def bootstrap_npm(project_dir: Path) -> None:
-    try:
-        check_dependency(
-            ["node", "--version"],
-            minimum_version=NODE_MINIMUM_LTS_VERSION,
-            missing_help=["node --version failed, please check your node install"],
-        )
-    except Exception as ex:
-        raise click.ClickException(
-            (
-                "Unable to find node on your system; please install node and check node installation "
-                "is on your path and try `algokit bootstrap npm` again."
-            )
-        ) from ex
+    doctor_results = check_dependency(
+        ["node", "--version"],
+        missing_help=[
+            f"Node.js is required; install via {NODE_URL} and try `algokit bootstrap npm` again.",
+        ],
+        minimum_version=NODE_LTS_MINIMUM_VERSION,
+        minimum_version_help=[
+            f"Node.js {NODE_LTS_MINIMUM_VERSION} is required; "
+            f"install via {NODE_URL} and try `algokit bootstrap npm` again.",
+        ],
+    )
+    if not doctor_results.ok:
+        raise click.ClickException("".join(doctor_results.extra_help or []))
     else:
         package_json_path = project_dir / "package.json"
         if not package_json_path.exists():

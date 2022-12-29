@@ -17,7 +17,7 @@ def test_bootstrap_npm_with_lower_npm_version(
         cwd=cwd,
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     verify(result.output)
 
 
@@ -104,4 +104,23 @@ def test_bootstrap_npm(
     )
 
     assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_bootstrap_npm_npm_not_found(
+    proc_mock: ProcMock,
+    tmp_path_factory: TempPathFactory,
+):
+    proc_mock.set_output("node --version", ["v18.12.1"])
+    proc_mock.should_fail_on("npm install")
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "package.json").touch()
+
+    result = invoke(
+        "bootstrap npm",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 1
     verify(result.output)
