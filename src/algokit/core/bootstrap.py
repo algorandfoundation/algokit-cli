@@ -13,7 +13,6 @@ from algokit.core.doctor import check_dependency
 ENV_TEMPLATE = ".env.template"
 NODE_LTS_MINIMUM_VERSION = "18.12.1"
 NODE_URL = "https://nodejs.dev/en/learn/how-to-install-nodejs/"
-is_windows = platform.system() == "Windows"
 logger = logging.getLogger(__name__)
 
 
@@ -132,7 +131,12 @@ def bootstrap_npm(project_dir: Path) -> None:
         else:
             logger.info("Installing npm dependencies")
             try:
-                proc.run(["npm", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
+                is_windows = platform.system() == "Windows"
+                proc.run(
+                    ["npm", "install"] if not is_windows else ["npm.cmd", "install"],
+                    stdout_log_level=logging.INFO,
+                    cwd=project_dir,
+                )
             except IOError as e:
                 raise click.ClickException((f"Failed to run `npm install using {package_json_path}.")) from e
 
@@ -198,6 +202,7 @@ def _get_base_python_path() -> str | None:
         base_home_path = Path(base_home)
         for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
             candidate_path = base_home_path / name
+            is_windows = platform.system() == "Windows"
             if is_windows:
                 candidate_path = candidate_path.with_suffix(".exe")
             if candidate_path.is_file():
