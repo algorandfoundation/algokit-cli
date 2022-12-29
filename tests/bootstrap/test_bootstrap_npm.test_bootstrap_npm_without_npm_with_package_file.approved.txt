@@ -1,0 +1,2 @@
+DEBUG: Running 'npm --version' in '{current_working_directory}'
+Error: Unable to find npm on your system; please install npm and check npm installation is on your path and try `algokit bootstrap npm` again.

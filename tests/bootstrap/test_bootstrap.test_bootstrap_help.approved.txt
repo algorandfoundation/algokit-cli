@@ -7,4 +7,5 @@ Commands:
   all     Bootstrap all aspects of the current directory and immediate sub
           directories by convention.
   env     Bootstrap .env file in the current working directory.
+  npm     Bootstrap Node.JS project in the current working directory.
   poetry  Bootstrap Python Poetry and install in the current working directory.

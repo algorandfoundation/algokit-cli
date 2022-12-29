@@ -42,6 +42,20 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: Proc
     verify(result.output)
 
 
+def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "package.json").touch()
+
+    proc_mock.set_output("node --version", ["v18.12.1"])
+    result = invoke(
+        "bootstrap all",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
 def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "pyproject.toml").write_text("[tool.poetry]", encoding="utf-8")

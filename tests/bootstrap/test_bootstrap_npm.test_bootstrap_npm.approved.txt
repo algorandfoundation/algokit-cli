@@ -1,0 +1,6 @@
+DEBUG: Running 'node --version' in '{current_working_directory}'
+DEBUG: node: v18.12.1
+Installing npm dependencies
+DEBUG: Running 'npm install' in '{current_working_directory}'
+npm: STDOUT
+npm: STDERR

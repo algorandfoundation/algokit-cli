@@ -8,9 +8,11 @@ from typing import Callable, Iterator
 import click
 
 from algokit.core import proc
+from algokit.core.doctor import check_dependency
 
 ENV_TEMPLATE = ".env.template"
-
+NODE_MINIMUM_LTS_VERSION = "18.12.1"
+is_windows = platform.system() == "Windows"
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +20,7 @@ def bootstrap_any(project_dir: Path, install_prompt: Callable[[str], bool]) -> N
     env_path = project_dir / ENV_TEMPLATE
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
+    package_json_path = project_dir / "package.json"
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
@@ -28,6 +31,10 @@ def bootstrap_any(project_dir: Path, install_prompt: Callable[[str], bool]) -> N
     if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
         logger.debug("Running `algokit bootstrap poetry`")
         bootstrap_poetry(project_dir, install_prompt)
+
+    if package_json_path.exists():
+        logger.debug("Running `algokit bootstrap npm`")
+        bootstrap_npm(project_dir)
 
 
 def bootstrap_any_including_subdirs(base_path: Path, install_prompt: Callable[[str], bool]) -> None:
@@ -103,6 +110,32 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
             ) from e
 
 
+def bootstrap_npm(project_dir: Path) -> None:
+    try:
+        check_dependency(
+            ["node", "--version"],
+            minimum_version=NODE_MINIMUM_LTS_VERSION,
+            missing_help=["node --version failed, please check your node install"],
+        )
+    except Exception as ex:
+        raise click.ClickException(
+            (
+                "Unable to find node on your system; please install node and check node installation "
+                "is on your path and try `algokit bootstrap npm` again."
+            )
+        ) from ex
+    else:
+        package_json_path = project_dir / "package.json"
+        if not package_json_path.exists():
+            logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
+        else:
+            logger.info("Installing npm dependencies")
+            try:
+                proc.run(["npm", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
+            except IOError as e:
+                raise click.ClickException((f"Failed to run `npm install using {package_json_path}.")) from e
+
+
 def _find_valid_pipx_command() -> list[str]:
     for pipx_command in _get_candidate_pipx_commands():
         try:
@@ -162,7 +195,6 @@ def _get_base_python_path() -> str | None:
     # this will be the value of `home = <path>` in pyvenv.cfg if it exists
     if base_home := getattr(sys, "_home", None):
         base_home_path = Path(base_home)
-        is_windows = platform.system() == "Windows"
         for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
             candidate_path = base_home_path / name
             if is_windows:

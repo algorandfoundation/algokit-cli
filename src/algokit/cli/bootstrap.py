@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_env, bootstrap_poetry
+from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_env, bootstrap_npm, bootstrap_poetry
 from algokit.core.questionary_extensions import _get_confirm_default_yes_prompt
 
 logger = logging.getLogger(__name__)
@@ -31,3 +31,8 @@ def env() -> None:
 @bootstrap_group.command("poetry", short_help="Bootstrap Python Poetry and install in the current working directory.")
 def poetry() -> None:
     bootstrap_poetry(Path.cwd(), _get_confirm_default_yes_prompt)
+
+
+@bootstrap_group.command("npm", short_help="Bootstrap Node.JS project in the current working directory.")
+def npm() -> None:
+    bootstrap_npm(Path.cwd())
