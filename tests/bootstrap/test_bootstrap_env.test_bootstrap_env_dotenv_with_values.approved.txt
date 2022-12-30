@@ -4,4 +4,13 @@ Copying {current_working_directory}/.env.template to {current_working_directory}
 ----
 .env:
 ----
-env_template_contents
+
+TOKEN_1=123
+# comment for token 2 - you should enter a valid value
+# another comment
+TOKEN_2_WITH_MULTI_LINES_COMMENT=test
+TOKEN_3=test value with spaces
+
+TOKEN_4_WITH_NO_EQUALS_SIGN
+# another comment
+TOKEN_5_SPECIAL_CHAR=*  

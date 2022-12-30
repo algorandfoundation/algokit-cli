@@ -2,10 +2,11 @@ import logging
 import platform
 import sys
 from pathlib import Path
-from shutil import copyfile, which
+from shutil import which
 from typing import Callable, Iterator
 
 import click
+import questionary
 
 from algokit.core import proc
 
@@ -51,14 +52,43 @@ def bootstrap_env(project_dir: Path) -> None:
 
     if env_path.exists():
         logger.info(".env already exists; skipping bootstrap of .env")
-    else:
-        logger.debug(f"{env_path} doesn't exist yet")
-        if not env_template_path.exists():
-            logger.info("No .env or .env.template file; nothing to do here, skipping bootstrap of .env")
-        else:
-            logger.debug(f"{env_template_path} exists")
-            logger.info(f"Copying {env_template_path} to {env_path}")
-            copyfile(env_template_path, env_path)
+        return
+
+    logger.debug(f"{env_path} doesn't exist yet")
+    if not env_template_path.exists():
+        logger.info("No .env or .env.template file; nothing to do here, skipping bootstrap of .env")
+        return
+
+    logger.debug(f"{env_template_path} exists")
+    logger.info(f"Copying {env_template_path} to {env_path} and prompting for empty values")
+    # find all empty values in .env file and prompt the user for a value
+    with env_template_path.open(encoding="utf-8") as env_template_file, env_path.open(
+        mode="w", encoding="utf-8"
+    ) as env_file:
+        comment_lines: list[str] = []
+        for line in env_template_file:
+            # strip newline character(s) from end of line for simpler handling
+            stripped_line = line.strip()
+            # if it is a comment line, keep it in var and continue
+            if stripped_line.startswith("#"):
+                comment_lines.append(line)
+                env_file.write(line)
+            # keep blank lines in output but don't accumulate them in comments
+            elif not stripped_line:
+                env_file.write(line)
+            else:
+                # lines not blank and not empty
+                var_name, *var_value = stripped_line.split("=", maxsplit=1)
+                # if it is an empty value, the user should be prompted for value with the comment line above
+                if var_value and not var_value[0]:
+                    logger.info("".join(comment_lines))
+                    var_name = var_name.strip()
+                    new_value = questionary.text(f"Please provide a value for {var_name}:").unsafe_ask()
+                    env_file.write(f"{var_name}={new_value}\n")
+                else:
+                    # this is a line with value, reset comment lines.
+                    env_file.write(line)
+                comment_lines = []
 
 
 def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
