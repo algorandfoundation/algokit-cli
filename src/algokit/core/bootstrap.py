@@ -1,15 +1,18 @@
 import logging
 import platform
+import re
 import sys
 from pathlib import Path
-from shutil import copyfile, which
+from shutil import which
 from typing import Callable, Iterator
 
 import click
+import questionary
 
 from algokit.core import proc
 
 ENV_TEMPLATE = ".env.template"
+REGEX_ENV_EMPTY_VALUE_REGEX = r"[a-zA-Z1-9_]*\=\s*$"
 logger = logging.getLogger(__name__)
 
 
@@ -58,7 +61,35 @@ def bootstrap_env(project_dir: Path) -> None:
         else:
             logger.debug(f"{env_template_path} exists")
             logger.info(f"Copying {env_template_path} to {env_path}")
-            copyfile(env_template_path, env_path)
+            # find all empty values in .env file and prompt the user for a value
+            with open(env_template_path) as env_template_file, open(env_path, "w") as env_file:
+                env_template_file_lines = env_template_file.readlines()
+                comment_line = ""
+                env_file_contents = []
+                for line in env_template_file_lines:
+                    # if it is a comment line, keep it in var and continue
+                    if line.startswith("#"):
+                        comment_line = line
+                        env_file_contents.append(line)
+                    else:
+                        is_empty_value = re.search(REGEX_ENV_EMPTY_VALUE_REGEX, line)
+                        # if it is an empty value, the user should be prompted for value with the comment line above
+                        if is_empty_value:
+                            comment_or_ask = (
+                                comment_line.strip()
+                                if comment_line
+                                else f"Please provide a value for {line.replace('=', '')}:"
+                            )
+                            new_value = questionary.text(comment_or_ask).unsafe_ask()
+                            env_file_contents.append(f"{line.strip()}{new_value}\n")
+                        else:
+                            # if there was no empty value match, the comment belongs to a line with value.
+                            env_file_contents.append(line)
+                            comment_line = ""
+                # write contents to the env file
+                env_file.writelines(env_file_contents)
+                env_file.close()
+                env_template_file.close()
 
 
 def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
