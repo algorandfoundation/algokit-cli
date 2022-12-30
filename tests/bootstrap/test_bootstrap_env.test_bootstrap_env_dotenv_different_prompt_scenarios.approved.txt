@@ -4,7 +4,7 @@ Copying {current_working_directory}/.env.template to {current_working_directory}
 # comment for token 2 - you should enter a valid value
 # another comment
 
-DEBUG: Using selector: KqueueSelector
+DEBUG: {replaced_selector}
 
 
 # another comment

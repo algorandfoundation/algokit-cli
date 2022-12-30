@@ -1,9 +1,24 @@
+import click
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
-from utils.approvals import verify
+from utils.approvals import TokenScrubber, combine_scrubbers, verify
 from utils.click_invoker import invoke
 
 from tests import get_combined_verify_output
+
+
+def make_output_scrubber(**extra_tokens: str) -> Scrubber:
+    default_tokens = {
+        "KqueueSelector": "Using selector: KqueueSelector",
+        "EpollSelector": "Using selector: EpollSelector",
+    }
+    tokens = default_tokens | extra_tokens
+    return combine_scrubbers(
+        click.unstyle,
+        TokenScrubber(tokens=tokens),
+        lambda t: t.replace("KqueueSelector", "replaced_selector").replace("EpollSelector", "replaced_selector"),
+    )
 
 
 def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory):
@@ -111,4 +126,7 @@ TOKEN_8_SPECIAL_CHAR=*
     )
 
     assert result.exit_code == 0
-    verify(get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")))
+    verify(
+        get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")),
+        scrubber=make_output_scrubber(),
+    )
