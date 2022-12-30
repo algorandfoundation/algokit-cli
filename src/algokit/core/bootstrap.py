@@ -1,6 +1,5 @@
 import logging
 import platform
-import re
 import sys
 from pathlib import Path
 from shutil import which
@@ -62,34 +61,37 @@ def bootstrap_env(project_dir: Path) -> None:
             logger.debug(f"{env_template_path} exists")
             logger.info(f"Copying {env_template_path} to {env_path}")
             # find all empty values in .env file and prompt the user for a value
-            with open(env_template_path) as env_template_file, open(env_path, "w") as env_file:
-                env_template_file_lines = env_template_file.readlines()
-                comment_line = ""
-                env_file_contents = []
-                for line in env_template_file_lines:
+            with env_template_path.open(encoding="utf-8") as env_template_file, env_path.open(
+                mode="w", encoding="utf-8"
+            ) as env_file:
+                comment_lines: list[str] = []  # TODO: empty this when new value is encountered
+                env_file_contents: list[str] = []
+                for line in env_template_file:
+                    # strip newline character(s) from end of line for simpler handling
+                    line = line.rstrip("\n")
+                    stripped_line = line.strip()
                     # if it is a comment line, keep it in var and continue
-                    if line.startswith("#"):
-                        comment_line = line
+                    if stripped_line.startswith("#"):
+                        comment_lines.append(line)
+                        env_file_contents.append(line)
+                    # keep blank lines in output but don't accumulate them in comments
+                    elif not stripped_line:
                         env_file_contents.append(line)
                     else:
-                        is_empty_value = re.search(REGEX_ENV_EMPTY_VALUE_REGEX, line)
+                        # lines not blank and not empty
+                        var_name, *var_value = stripped_line.split("=", maxsplit=1)
                         # if it is an empty value, the user should be prompted for value with the comment line above
-                        if is_empty_value:
-                            comment_or_ask = (
-                                comment_line.strip()
-                                if comment_line
-                                else f"Please provide a value for {line.replace('=', '')}:"
-                            )
-                            new_value = questionary.text(comment_or_ask).unsafe_ask()
-                            env_file_contents.append(f"{line.strip()}{new_value}\n")
+                        if var_value and not var_value[0]:
+                            var_name = var_name.strip()
+                            logger.info("\n".join(comment_lines))
+                            new_value = questionary.text(f"Please provide a value for {var_name}:").unsafe_ask()
+                            env_file_contents.append(f"{var_name}={new_value}")
                         else:
-                            # if there was no empty value match, the comment belongs to a line with value.
+                            # this is a line with value, reset comment lines.
                             env_file_contents.append(line)
-                            comment_line = ""
+                        comment_lines = []
                 # write contents to the env file
-                env_file.writelines(env_file_contents)
-                env_file.close()
-                env_template_file.close()
+                env_file.write("\n".join(env_file_contents))
 
 
 def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
