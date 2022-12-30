@@ -1,4 +1,5 @@
 import click
+import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
@@ -12,12 +13,15 @@ def make_output_scrubber(**extra_tokens: str) -> Scrubber:
     default_tokens = {
         "KqueueSelector": "Using selector: KqueueSelector",
         "EpollSelector": "Using selector: EpollSelector",
+        "IocpProactor": "Using proactor: IocpProactor",
     }
     tokens = default_tokens | extra_tokens
     return combine_scrubbers(
         click.unstyle,
         TokenScrubber(tokens=tokens),
-        lambda t: t.replace("KqueueSelector", "replaced_selector").replace("EpollSelector", "replaced_selector"),
+        lambda t: t.replace("KqueueSelector", "selector")
+        .replace("EpollSelector", "selector")
+        .replace("IocpProactor", "selector"),
     )
 
 
@@ -85,7 +89,10 @@ TOKEN_5_SPECIAL_CHAR=*
 
 
 def test_bootstrap_env_dotenv_different_prompt_scenarios(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+    tmp_path_factory: TempPathFactory,
+    mock_questionary_input: PipeInput,
+    request: pytest.FixtureRequest,
+    mock_os_dependency: None,
 ):
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
