@@ -11,7 +11,6 @@ import questionary
 from algokit.core import proc
 
 ENV_TEMPLATE = ".env.template"
-REGEX_ENV_EMPTY_VALUE_REGEX = r"[a-zA-Z1-9_]*\=\s*$"
 logger = logging.getLogger(__name__)
 
 
