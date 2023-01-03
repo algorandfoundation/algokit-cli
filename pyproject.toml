@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 click = "^8.1.3"
 httpx = "^0.23.1"
-copier = { git = "https://github.com/wilsonwaters/copier.git", branch="remove-iteration-utilities" }
+copier = "^7.1.0a0"
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.0"
