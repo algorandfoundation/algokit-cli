@@ -39,7 +39,7 @@ The target audience for this tool is software developers building applications o
 
 This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.MD) to learn about making improvements to the CLI tool itself, including developer setup instructions.
 
-# User Guide
+# Install
 
 ## ⚠️ Pre-Alpha Software ⚠️
 
@@ -47,36 +47,117 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 **This software may break your computer or (more likely) just not do anything useful yet and be a general pain to install.**
 
-Still not deterred?
+## Prerequisites
 
-Here's how to test it out and maybe even start hacking, assuming you have access to this repo.
+AlgoKit has some runtime dependencies that also need to be available for particular commands.
 
-### Install
+Note: You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
-1. Ensure [Python](https://www.python.org/downloads/) 3.10 or higher is installed on your system and available on your `PATH`
-   - Note there is probably a better way to install Python than to download it directly, e.g. your friendly local Linux package manager, Homebrew on macOS, chocolatey on Windows
-2. Install [pipx](https://pypa.github.io/pipx/)
-   - Make sure to follow _all_ the instructions for your OS, there will be two commands, the first to install, and the second to ensure your path is setup so you can execute `pipx`. Make sure to read the output of this second command as well, as it'll probably tell you to relaunch your terminal.
-3. Either:
+- Git - Git is used when creating and updating projects from templates
+- Docker - Docker is used to run the AlgoKit Sandbox environment
 
-   - Install via Git:
+AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/) see below for specific installation instructions.
 
-     1. `pipx install git+https://github.com/algorandfoundation/algokit-cli`
-        - You can specify a tag using appending i.e. `pipx install git+https://github.com/algorandfoundation/algokit-cli@v.13-beta`
-        - If you have trouble running this check you can execute `git clone https://github.com/algorandfoundation/algokit-cli`
-        - In the future, when this is published publicly you will be able to simply execute `pipx install algokit`
-     2. You can now run `algokit` and should see a help message! 🎉
+- [Windows](#install-algokit-on-windows)
+- [Mac](#install-algokit-on-mac)
+- [Linux](#install-algokit-on-linux)
+- [pipx](#install-algokit-with-pipx-on-any-os)
 
-   - Install via source:
+## Install AlgoKit on Windows
 
-     1. Checkout this repository e.g. with git clone
-     2. Ensure you have Poetry installed
-     3. Run `poetry build` in the checkout (you shouldn't need to activate the venv first). This will output a "source distribution" (a tar.gz file) and a "binary distribution" (a .whl file) in the `dist/` directory.
-     4. Run `pipx install ./dist/algokit-<TAB>-<TAB>` (ie the .whl file)
-     5. You can now run `algokit` and should see a help message! 🎉
+NOTE: this method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
-> Recommended: Run `algokit doctor` to check the system is ready to enjoy development on Algorand!
+1. Ensure Prerequisites are installed
 
-### Update
+    - [Chocolatey](https://chocolatey.org/install)
+    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
+    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
 
-To update a previous algokit installation you can simply run `pipx reinstall algokit` and it'll grab the latest from wherever it was installed from. Note: If you installed a specific version e.g. `pipx install git+https://github.com/algorandfoundation/algokit-cli@v.13-beta` then this command won't have any effect since that repository tag will point to the same version.
+2. Install using Chocolatey
+
+   - Install AlgoKit: `choco install algokit`
+   - Update AlgoKit: `choco upgrade algokit`
+   - Remove AlgoKit: `choco uninstall algokit`
+
+3. [Verify installation](#verify-installation)
+
+## Install AlgoKit on Mac
+
+NOTE: this method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+
+1. Ensure Prerequisites are installed
+
+   - [Brew](https://docs.brew.sh/Installation)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-mac) should already be available if brew is installed
+   - [Docker](https://docs.docker.com/desktop/install/mac-install/) (or `brew install --cask docker-desktop`)
+   
+
+2. Install using Brew
+
+   - Install AlgoKit: `brew install algorandfoundation/tap/algokit`
+   - Update AlgoKit: `brew upgrade algokit`
+   - Remove AlgoKit: `brew uninstall algokit`
+
+3. [Verify installation](#verify-installation)
+
+## Install AlgoKit on Linux
+
+1. Ensure Prerequisites are installed
+
+   - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
+   - [Docker](https://docs.docker.com/desktop/install/linux-install/)
+   - [Python 3.10+](https://www.python.org/downloads/)
+
+     NOTE: There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
+
+   - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
+
+2. Continue with step 2 the following section to install via [pipx](#install-algokit-with-pipx-on-any-os)
+
+## Install AlgoKit with pipx on any OS
+
+1. Ensure Prerequisites are installed
+
+   - [Git](https://github.com/git-guides/install-git)
+   - [Docker](https://docs.docker.com/get-docker/)
+   - [Python 3.10+](https://www.python.org/downloads/)
+   - [pipx](https://pypa.github.io/pipx/installation/)
+
+2. Install using pipx
+
+   - Install AlgoKit: `pipx install algokit`
+   - Update AlgoKit: `pipx upgrade algokit`
+   - Remove AlgoKit: `pipx uninstall algokit`
+
+3. [Verify installation](#verify-installation)
+
+## Verify installation
+
+Verify AlgoKit is installed correctly run `algokit --version` and you should see output similar to
+
+```
+algokit, version 0.8.0
+```
+
+It is also recommended to run `algokit doctor` to verify there are no issues in your local environment
+
+```
+timestamp: 2023-01-03T06:41:10+00:00
+AlgoKit: 0.1.0
+AlgoKit Python: 3.11.0 (main, Oct 26 2022, 19:06:18) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
+OS: macOS-13.1-arm64-arm-64bit
+docker: 20.10.21
+docker compose: 2.13.0
+git: 2.37.1
+python: 3.10.9 (location:  /opt/homebrew/bin/python)
+python3: 3.10.9 (location:  /opt/homebrew/bin/python3)
+pipx: 1.1.0
+poetry: 1.2.2
+node: 18.12.1
+npm: 8.19.2
+brew: 3.6.16
+
+If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
+https://github.com/algorandfoundation/algokit-cli/issues/new
+Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`
+```
