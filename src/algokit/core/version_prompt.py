@@ -91,14 +91,21 @@ skip_version_check_option = click.option(
 )
 
 
-@click.command("version-prompt", short_help="Enables or disables version prompt")
-@click.argument("enable", required=False, type=bool, default=None)
-def version_prompt_configuration_command(*, enable: bool | None) -> None:
+@click.command(
+    "version-prompt", short_help="Enables or disables checking and prompting if a new version of AlgoKit is available"
+)
+@click.argument("enable", required=False, type=click.Choice(["enable", "disable"]), default=None)
+def version_prompt_configuration_command(*, enable: str | None) -> None:
+    """Controls whether AlgoKit checks and prompts for new versions.
+    Set to [disable] to prevent AlgoKit performing this check permanently, or [enable] to resume checking.
+    If no argument is provided then outputs current setting.
+
+    Also see --skip-version-check which can be used to disable check for a single command."""
     if enable is None:
-        logger.info(str(not _skip_version_prompt()))
+        logger.info("disable" if _skip_version_prompt() else "enable")
     else:
         disable_marker = get_app_config_dir() / DISABLE_CHECK_MARKER
-        if enable:
+        if enable == "enable":
             disable_marker.unlink(missing_ok=True)
             logger.info("📡 Resuming check for new versions")
         else:
