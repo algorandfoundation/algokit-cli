@@ -1,0 +1,2 @@
+DEBUG: 1234.56.78 found in cache {app_state}/last-version-check
+You are using AlgoKit version {current_version}, however version 1234.56.78 is available.

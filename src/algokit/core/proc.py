@@ -6,6 +6,7 @@ from subprocess import Popen
 from subprocess import run as subprocess_run
 
 import click
+
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 
 logger = logging.getLogger(__name__)

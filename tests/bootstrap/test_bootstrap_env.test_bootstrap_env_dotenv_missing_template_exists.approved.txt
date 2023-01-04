@@ -1,6 +1,6 @@
 DEBUG: {current_working_directory}/.env doesn't exist yet
 DEBUG: {current_working_directory}/.env.template exists
-Copying {current_working_directory}/.env.template to {current_working_directory}/.env
+Copying {current_working_directory}/.env.template to {current_working_directory}/.env and prompting for empty values
 ----
 .env:
 ----
