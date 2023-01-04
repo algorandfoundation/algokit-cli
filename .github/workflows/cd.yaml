@@ -66,6 +66,7 @@ jobs:
         run: |
           poetry run semantic-release \
             --prerelease \
+            --define=branch=main \
             publish
           gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
         # --define=upload_to_repository=true \
@@ -79,6 +80,7 @@ jobs:
         run: |
           poetry run semantic-release \
             --define=version_source="commit" \
+            --define=branch=main \
             publish
         # --define=upload_to_repository=true \
         env:
