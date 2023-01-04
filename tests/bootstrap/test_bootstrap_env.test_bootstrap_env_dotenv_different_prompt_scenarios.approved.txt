@@ -1,0 +1,31 @@
+DEBUG: {current_working_directory}/.env doesn't exist yet
+DEBUG: {current_working_directory}/.env.template exists
+Copying {current_working_directory}/.env.template to {current_working_directory}/.env and prompting for empty values
+# comment for token 2 - you should enter a valid value
+# another comment
+
+DEBUG: {selector}
+
+
+# another comment
+
+
+----
+.env:
+----
+
+TOKEN_1=123
+
+# comment for token 2 - you should enter a valid value
+# another comment
+TOKEN_2_WITH_MULTI_LINES_COMMENT=test value for TOKEN_2_WITH_MULTI_LINES_COMMENT
+TOKEN_3=test value
+
+TOKEN_4_WITH_SPACES=test value for TOKEN_4_WITH_SPACES
+TOKEN_5_WITHOUT_COMMENT=test value for TOKEN_5_WITHOUT_COMMENT
+TOKEN_WITH_NO_EQUALS_SIGN
+# another comment
+TOKEN_6_EMPTY_WITH_COMMENT=test value for TOKEN_6_EMPTY_WITH_COMMENT
+TOKEN_7_VALUE_WILL_BE_EMPTY=
+TOKEN_8 = value with spaces
+TOKEN_8_SPECIAL_CHAR=*  

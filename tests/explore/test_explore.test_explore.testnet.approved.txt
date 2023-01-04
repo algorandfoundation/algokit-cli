@@ -1,0 +1,1 @@
+call('https://app.dappflow.org/setup-config?algod_url=https%3A%2F%2Ftestnet-api.algonode.cloud&indexer_url=https%3A%2F%2Ftestnet-idx.algonode.cloud')

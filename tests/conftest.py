@@ -24,6 +24,14 @@ def proc_mock(mocker: MockerFixture) -> ProcMock:
     return proc_mock
 
 
+@pytest.fixture()
+def mock_os_dependency(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
+    # Mock OS.platform
+    platform_system: str = getattr(request, "param", "Darwin")
+    platform_module = mocker.patch("algokit.core.bootstrap.platform")
+    platform_module.system.return_value = platform_system
+
+
 @pytest.fixture
 def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)

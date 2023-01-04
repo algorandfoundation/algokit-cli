@@ -1,0 +1,4 @@
+Installing npm dependencies
+DEBUG: Running 'npm install' in '{current_working_directory}'
+npm: STDOUT
+npm: STDERR

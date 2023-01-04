@@ -1,6 +1,8 @@
 import logging
 
 import click
+
+from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
 from algokit.core.sandbox import (
@@ -145,3 +147,9 @@ def sandbox_status() -> None:
 @click.pass_context
 def sandbox_console(context: click.Context) -> None:
     context.invoke(goal_command, console=True)
+
+
+@sandbox_group.command("explore", short_help="Explore the AlgoKit Sandbox using Dappflow")
+@click.pass_context
+def sandbox_explore(context: click.Context) -> None:
+    context.invoke(explore_command)

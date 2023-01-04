@@ -4,6 +4,7 @@ from pathlib import Path
 import click
 import click.shell_completion
 import shellingham  # type: ignore
+
 from algokit.core.atomic_write import atomic_write
 from algokit.core.conf import get_app_config_dir
 

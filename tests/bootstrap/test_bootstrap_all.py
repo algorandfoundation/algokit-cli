@@ -1,4 +1,6 @@
+import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
 from utils.approvals import verify
 from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
@@ -40,6 +42,33 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: Proc
 
     assert result.exit_code == 0
     verify(result.output)
+
+
+@pytest.mark.parametrize(
+    "mock_os_dependency",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ],
+    indirect=["mock_os_dependency"],
+)
+def test_bootstrap_all_npm(
+    proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
+):
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "package.json").touch()
+
+    # proc_mock.set_output("npm install", ["<<Installed npm packages>>"])
+    # proc_mock.set_output("npm.cmd install", ["<<Installed npm.cmd packages on Windows>>"])
+
+    result = invoke(
+        "bootstrap all",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, namer=PyTestNamer(request))
 
 
 def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):

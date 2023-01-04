@@ -4,7 +4,7 @@ DEBUG: Checking {current_working_directory}/live_dir for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
 DEBUG: {current_working_directory}/live_dir/.env doesn't exist yet
 DEBUG: {current_working_directory}/live_dir/.env.template exists
-Copying {current_working_directory}/live_dir/.env.template to {current_working_directory}/live_dir/.env
+Copying {current_working_directory}/live_dir/.env.template to {current_working_directory}/live_dir/.env and prompting for empty values
 DEBUG: Running `algokit bootstrap poetry`
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
