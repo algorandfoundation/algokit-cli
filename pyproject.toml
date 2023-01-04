@@ -27,6 +27,11 @@ pytest-httpx = "^0.21.2"
 python-semantic-release = "^7.32.2"
 pytest-cov = "^4.0.0"
 pre-commit = "^2.20.0"
+sphinx = "^6.0.0"
+sphinx-click = "^4.4.0"
+sphinxnotes-markdown-builder = "^0.5.6"
+poethepoet = "^0.17.1"
+gfm-toc = "^0.0.7"
 
 [build-system]
 requires = ["poetry-core"]
@@ -34,6 +39,11 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 algokit = "algokit.cli:algokit"
+
+[tool.poe.tasks]
+docs_generate = "sphinx-build -b markdown -E docs/sphinx docs/cli"
+docs_toc = "gfm-toc docs/cli/index.md"
+docs = ["docs_generate", "docs_toc"]
 
 [tool.ruff]
 line-length = 120
@@ -61,6 +71,7 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
+    "docs/sphinx",
 ]
 per-file-ignores = {}
 # Allow unused variables when underscore-prefixed.
