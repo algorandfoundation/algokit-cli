@@ -9,11 +9,11 @@
     <title>algokit</title>
     <authors>Algorand Foundation</authors>
     <projectUrl>https://www.algorand.foundation/developers</projectUrl>
-    <!-- <iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/algokit.png</iconUrl> -->
+    <iconUrl>https://www.algorand.com/assets/media-kit/logos/logo-marks/png/algorand_logo_mark_black.png</iconUrl>
     <licenseUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/algorandfoundation/algokit-cli</projectSourceUrl>
-    <!-- <docsUrl>At what url are the software docs located?</docsUrl> -->
+    <docsUrl>https://github.com/algorandfoundation/algokit-cli</docsUrl>
     <bugTrackerUrl>https://github.com/algorandfoundation/algokit-cli/issues</bugTrackerUrl>
     <tags>algokit algorand developers python typescript hello-world smart-contract beaker</tags>
     <summary>The Algorand AlgoKit CLI is the one-stop shop tool for developers building on the Algorand network.</summary>
