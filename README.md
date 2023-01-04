@@ -4,6 +4,8 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 
 AlgoKit gets developers of all levels up and running with a familiar, fun and productive development environment in minutes. The goal of AlgoKit is to help developers build and launch secure, automated production-ready applications rapidly.
 
+[Install AlgoKit](#install)
+
 ## Use Cases
 
 - Building and deploying Algorand PyTEAL smart contracts
