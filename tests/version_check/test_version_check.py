@@ -82,7 +82,7 @@ def test_version_check_respects_skip_option(app_dir_mock: AppDirs):
 
 def test_version_check_disable_version_check(app_dir_mock: AppDirs):
     disable_version_check_path = app_dir_mock.app_config_dir / "disable-version-prompt"
-    result = invoke("config version-prompt False")
+    result = invoke("config version-prompt disable")
 
     assert result.exit_code == 0
     assert disable_version_check_path.exists()
@@ -92,7 +92,7 @@ def test_version_check_disable_version_check(app_dir_mock: AppDirs):
 def test_version_check_enable_version_check(app_dir_mock: AppDirs):
     disable_version_check_path = app_dir_mock.app_config_dir / "disable-version-prompt"
     disable_version_check_path.touch()
-    result = invoke("config version-prompt True")
+    result = invoke("config version-prompt enable")
 
     assert result.exit_code == 0
     assert not disable_version_check_path.exists()
