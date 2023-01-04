@@ -1,0 +1,69 @@
+name: Publish packages to public repositories
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        required: true
+        type: string
+        description: "The github artifact holding the wheel file which will be published"
+
+jobs:
+  publish-chocolatey:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
+
+      # Re-create the version based on the wheel file name.
+      # NOTE: x.y.x-beta.12 versions are not supported by chocolatey and need to be rewritten as x.y.z-beta12 (however this will likely change soon)
+      # "special version part" requirements. <20 characters, no '.' no '+'
+      - name: Get artifact details
+        id: get_artifact
+        run: |
+          $wheelFileName = Get-ChildItem -File -Filter algokit-*-py3-none-any.whl dist
+          if ($wheelFileName.count -ne 1) {
+              Throw "Packaging error. build artifact contained $($wheelFileName.count) normally named wheel files"
+          }
+          if ($wheelFileName[0].Name -Match '-([0-9]+\.[0-9]+\.[0-9]+)b?([0-9]*)(\+(.*?))?(.[0-9]+)?-') {
+              $version_number = $Matches[1]
+              $version_beta = $Matches[2]
+              $version_branch = $Matches[4]
+              $version_branch = $version_branch ? $version_branch.Replace(".", "") : "" # dots aren't valid here
+              $version_betanumber = $Matches[5]
+              $version_beta_truncated = "beta$($version_beta)$($version_branch)"
+              #$version_beta_truncated = "beta$($version_beta)$($version_branch)$($version_betanumber)" # When chocolatey supports semver v2.0
+              $version_beta_truncated = $version_beta_truncated.subString(0, [System.Math]::Min(20, $version_beta_truncated.Length - 1)) # chocolatey has a limit of 20 characters on "special version part"
+          }
+          else {
+              Throw "Packaging error. Unrecognised file name pattern $($wheelFileName[0].Name)"
+          }
+
+          $version = $version_number
+          if ($version_beta) {
+              $version = "$($version)-$($version_beta_truncated)"
+          }
+
+          echo "version=$version" | Tee-Object -Append -FilePath $env:GITHUB_OUTPUT
+          echo "wheelFileName=$($wheelFileName[0].Name)" | Tee-Object -Append -FilePath $env:GITHUB_OUTPUT
+
+      - name: Build package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: pack --version ${{ steps.get_artifact.outputs.version }} .\scripts\chocolatey\algokit\algokit.nuspec
+
+      - name: Set API key
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: apikey --api-key ${{ secrets.CHOCOLATEY_API_KEY }} -source https://push.chocolatey.org/
+
+      - name: Push package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: push --source https://push.chocolatey.org/
