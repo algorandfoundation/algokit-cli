@@ -49,7 +49,7 @@ And when the user enters a value for `SERVER_PORT`, a new `.env` file will be cr
 
 ```t
 SERVER_URL=http://myserver.com.au
-# This is a mandatory field to run the server, please enter a value value
+# This is a mandatory field to run the server, please enter a value
 # For example: 5000
 SERVER_PORT=4000
 ```
