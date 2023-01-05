@@ -13,7 +13,7 @@ $ algokit
 $ ~ algokit <Press Tab>
 bootstrap    -- Bootstrap AlgoKit project dependencies.
 completions  -- Install and Uninstall AlgoKit shell integration.
-config       -- Configure AlgoKit options
+config       -- Configure AlgoKit options.
 doctor       -- Run the Algorand doctor CLI.
 explore      -- Explore the specified network in the...
 goal         -- Run the Algorand goal CLI against the AlgoKit Sandbox.

@@ -13,9 +13,9 @@ Options:
 Commands:
   bootstrap    Bootstrap AlgoKit project dependencies.
   completions  Install and Uninstall AlgoKit shell integration.
-  config       Configure AlgoKit options
+  config       Configure AlgoKit options.
   doctor       Run the Algorand doctor CLI.
-  explore      Explore the specified network in the browser using Dappflow
+  explore      Explore the specified network in the browser using Dappflow.
   goal         Run the Algorand goal CLI against the AlgoKit Sandbox.
   init         Initializes a new project.
   sandbox      Manage the AlgoKit sandbox.
