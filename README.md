@@ -79,6 +79,8 @@ AlgoKit can be installed using OS specific package managers, or using the python
    - [Chocolatey](https://chocolatey.org/install)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
+      > __Note__
+      > See [here](docs/features/sandbox.md#prerequisites) for more tips on installing Docker on Windows
 
 2. Install using Chocolatey
 

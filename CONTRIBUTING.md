@@ -49,7 +49,7 @@ We are using the [Conventional Commits](https://www.conventionalcommits.org/en/v
      3. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
 
         > __Note__
-        > The first time you run, VS Code may prompt you to select the Python Interpreter, or if you are having issues running you may need to select it via the `Python: Select Interpreter` pallette command. You should select the python with the ./.venv path)
+        > The first time you run, VS Code may prompt you to select the Python Interpreter, or if you are having issues running you may need to select it via the `Python: Select Interpreter` pallette command. You should select the Python Interpreter with the ./.venv path)
 
    - IDEA (e.g. PyCharm)
      1. Open the repository root in the IDE
