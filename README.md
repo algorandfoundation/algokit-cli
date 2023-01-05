@@ -12,6 +12,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 ## Features
 
+- [AlgoKit Bootstrap](docs/features/bootstrap.md) - Bootstrap AlgoKit project dependencies
 - [AlgoKit Completions](docs/features/completions.md) - Install shell completions for AlgoKit
 - [AlgoKit Doctor](docs/features/doctor.md) - Check AlgoKit installation and dependencies
 - [AlgoKit Explore](docs/features/explore.md) - Explore Algorand Blockchains using Dappflow
