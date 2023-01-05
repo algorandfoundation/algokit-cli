@@ -30,7 +30,7 @@ For instance, a sample `.env.template` file as follows:
 
 ```t
 SERVER_URL=http://myserver.com.au
-# This is a mandatory field to run the server, please enter a value value
+# This is a mandatory field to run the server, please enter a value
 # For example: 5000
 SERVER_PORT=
 ```
