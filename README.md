@@ -14,6 +14,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 - [AlgoKit Doctor](docs/features/doctor.md) - Check AlgoKit installation and dependencies
 - [AlgoKit Sandbox](docs/features/sandbox.md) - Manage a locally sandboxed private Algorand network
+- [AlgoKit Completions](docs/features/completions.md) - Install shell completions for AlgoKit
 
 ## Roadmap
 
@@ -112,7 +113,7 @@ NOTE: this method will install Python 3.10 as a dependency via Brew. If you alre
 
    - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
 
-2. Continue with step 2 the following section to install via [pipx](#install-algokit-with-pipx-on-any-os)
+2. Continue with step 2 in the following section to install via [pipx](#install-algokit-with-pipx-on-any-os)
 
 ## Install AlgoKit with pipx on any OS
 
@@ -133,7 +134,7 @@ NOTE: this method will install Python 3.10 as a dependency via Brew. If you alre
 
 ## Verify installation
 
-Verify AlgoKit is installed correctly run `algokit --version` and you should see output similar to
+Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to
 
 ```
 algokit, version 0.8.0
