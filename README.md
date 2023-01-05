@@ -56,7 +56,8 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 AlgoKit has some runtime dependencies that also need to be available for particular commands.
 
-Note: You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
+> __Note__
+>  You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
 - Git - Git is used when creating and updating projects from templates
 - Docker - Docker is used to run the AlgoKit Sandbox environment
@@ -70,7 +71,8 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 ## Install AlgoKit on Windows
 
-NOTE: this method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> __Note__ 
+> This method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure Prerequisites are installed
 
@@ -88,7 +90,8 @@ NOTE: this method will install the most recent python3 version through chocolate
 
 ## Install AlgoKit on Mac
 
-NOTE: this method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> __Note__ 
+> This method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure Prerequisites are installed
 
@@ -112,7 +115,8 @@ NOTE: this method will install Python 3.10 as a dependency via Brew. If you alre
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
    - [Python 3.10+](https://www.python.org/downloads/)
 
-     NOTE: There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
+     > __Note__ 
+     > There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
 
    - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
 
