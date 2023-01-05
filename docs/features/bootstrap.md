@@ -56,7 +56,7 @@ SERVER_PORT=4000
 
 ### Bootstrap Node.js project
 
-The command `algokit bootstrap npm` install Node.js project dependencies by searching for `package.json` file in the current directory and run `npm install` command to install all node modules specified in that file.
+The command `algokit bootstrap npm` installs Node.js project dependencies by searching for `package.json` file in the current directory and running `npm install` command to install all node modules specified in that file.
 
 Here is an example outcome of running `algokit bootstrap npm` command:
 
