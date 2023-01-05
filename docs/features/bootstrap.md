@@ -35,7 +35,7 @@ SERVER_URL=http://myserver.com.au
 SERVER_PORT=
 ```
 
-Running the command `algokit bootstrap env` using the above `.env.template` will result of the following:
+Running the command `algokit bootstrap env` using the above `.env.template` will result in the following:
 
 ```
 Copying /Users/me/algokit-cli/.env.template to /Users/me/algokit-cli/.env and prompting for empty values
