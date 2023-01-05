@@ -15,7 +15,7 @@ The simplest use of the command is to just run `algokit init` and you will then 
 🎤 Package author name
    Algorand Foundation
 🎤 Package author email
-   al@algorand.foundation
+   info@algorand.foundation
 🎤 Do you want to add VSCode configuration?
    Yes
 🎤 Do you want to use a Python linter?
@@ -86,7 +86,7 @@ To find out the key for a specific answer you can either look at `.copier-answer
 
 ## Non-interactive project initialization
 
-By combining a number of options it is possible to initialize a new project without any interaction. For example to create a project named `my-smart-contract` using the `beaker` template, no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values you could execute the following.
+By combining a number of options, it is possible to initialize a new project without any interaction. For example to create a project named `my-smart-contract` using the `beaker` template, no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values you could execute the following.
 
 `algokit init -n my-smart-contract -t beaker --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults`
 
