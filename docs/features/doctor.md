@@ -13,6 +13,7 @@ Please run this command to if you are facing a issue running AlgoKit. It is reco
 For example, running `algokit doctor` with all prerequisites installed will result of the following output:
 
 ```
+$ ~ algokit doctor
 timestamp: 2023-01-05T02:50:49+00:00
 AlgoKit: 0.1.0
 AlgoKit Python: 3.11.0 (main, Oct 26 2022, 19:06:18) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/me/.local/pipx/venvs/algokit)

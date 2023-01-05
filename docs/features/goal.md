@@ -4,7 +4,8 @@ AlgoKit goal command provides the user with a mechanism to run goal cli commands
 
 You can explore all possible goal commands by running `algokit goal` and the results would be as follows:
 
-```t
+```
+$ ~ algokit goal
  GOAL is the CLI for interacting Algorand software instance. The binary 'goal' is installed alongside the algod binary and is considered an integral part of the complete installation. The binaries should be used in tandem - you should not try to use a version of goal with a different version of algod.
 
  Usage:
@@ -41,6 +42,7 @@ You can explore all possible goal commands by running `algokit goal` and the res
 For instance, running this command `algokit goal report` would result in the following:
 
 ```
+$ ~ algokit goal report
  12885688322
  3.12.2.dev [rel/stable] (commit #181490e3)
  go-algorand is licensed with AGPLv3.0
@@ -65,11 +67,13 @@ For instance, running this command `algokit goal report` would result in the fol
 If the sandbox `algod` docker container is not present or not running, the command will fails as follows, respectively:
 
 ```
+$ ~ algokit goal
  Error: No such container: algokit_algod
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
 
 ```
+$ ~ algokit goal
  Error response from daemon: Container 5a73961536e2c98e371465739053d174066c40d00647c8742f2bb39eb793ed7e is not running
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```

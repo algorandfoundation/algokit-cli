@@ -5,6 +5,7 @@ The AlgoKit Bootstrap feature allows you to bootstrap different project dependen
 Available commands and possible usage as follows:
 
 ```
+$ ~ algokit bootstrap
 Usage: algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -28,16 +29,17 @@ The command `algokit bootstrap env` runs two main tasks:
 
 For instance, a sample `.env.template` file as follows:
 
-```t
+```
 SERVER_URL=http://myserver.com.au
 # This is a mandatory field to run the server, please enter a value
 # For example: 5000
 SERVER_PORT=
 ```
 
-Running the command `algokit bootstrap env` using the above `.env.template` will result in the following:
+Running the `algokit bootstrap env` command while the above `.env.template` file in the current directory will result in the following:
 
 ```
+$ ~ algokit bootstrap env
 Copying /Users/me/algokit-cli/.env.template to /Users/me/algokit-cli/.env and prompting for empty values
 # This is a mandatory field to run the server, please enter a value value
 # For example: 5000
@@ -47,7 +49,7 @@ Copying /Users/me/algokit-cli/.env.template to /Users/me/algokit-cli/.env and pr
 
 And when the user enters a value for `SERVER_PORT`, a new `.env` file will be created as follows
 
-```t
+```
 SERVER_URL=http://myserver.com.au
 # This is a mandatory field to run the server, please enter a value
 # For example: 5000
@@ -61,6 +63,7 @@ The command `algokit bootstrap npm` installs Node.js project dependencies by sea
 Here is an example outcome of running `algokit bootstrap npm` command:
 
 ```
+$ ~ algokit bootstrap npm
 Installing npm dependencies
 npm:
 npm: added 17 packages, and audited 18 packages in 3s
@@ -81,6 +84,7 @@ The command `algokit bootstrap poetry` does two main jobs:
 Here is an example outcome of running `algokit bootstrap poetry` command:
 
 ```
+$ ~ algokit bootstrap poetry
 Installing Python dependencies and setting up Python virtual environment via Poetry
 poetry:
 poetry: Installing dependencies from lock file
