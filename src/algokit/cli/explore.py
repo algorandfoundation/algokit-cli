@@ -44,7 +44,7 @@ def get_dappflow_url(network: NetworkConfiguration) -> str:
     return f"https://app.dappflow.org/setup-config?{query_string}"
 
 
-@click.command("explore", help="Explore the specified network in the browser using Dappflow")
+@click.command("explore", help="Explore the specified network in the browser using Dappflow.")
 @click.argument("network", type=click.Choice(list(NETWORKS)), default="sandbox", required=False)
 def explore_command(network: str) -> None:
     url = get_dappflow_url(NETWORKS[network])

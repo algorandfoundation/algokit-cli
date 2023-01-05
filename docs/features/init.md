@@ -10,6 +10,7 @@ Git is a prerequisite for the init command as it is used to clone templates and 
 The simplest use of the command is to just run `algokit init` and you will then be guided through selecting a template and configuring options for that template e.g.
 
 ```
+$ ~ algokit init
 ? Name of project / directory to create the project in:  my-smart-contract
 ? Select a project template:  beaker
 🎤 Package author name
@@ -88,11 +89,8 @@ To find out the key for a specific answer you can either look at `.copier-answer
 
 By combining a number of options, it is possible to initialize a new project without any interaction. For example, to create a project named `my-smart-contract` using the `beaker` template with no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values, you could execute the following:
 
-`algokit init -n my-smart-contract -t beaker --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults`
-
-Which outputs
-
 ```
+$ ~ algokit init -n my-smart-contract -t beaker --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template

@@ -10,10 +10,10 @@ $ algokit
 
 **zsh**
 ```
-% algokit bootstrap
+$ ~ algokit <Press Tab>
 bootstrap    -- Bootstrap AlgoKit project dependencies.
 completions  -- Install and Uninstall AlgoKit shell integration.
-config       -- Configure AlgoKit options
+config       -- Configure AlgoKit options.
 doctor       -- Run the Algorand doctor CLI.
 explore      -- Explore the specified network in the...
 goal         -- Run the Algorand goal CLI against the AlgoKit Sandbox.
@@ -30,6 +30,7 @@ To setup the completions, AlgoKit provides commands that will modify the current
 
 To [install](../cli/index.md#install) completions for the current shell execute `algokit completions install`. You should see output similar to below
 ```
+$ ~ algokit completions install
 AlgoKit completions installed for zsh 🎉
 Restart shell or run `. ~/.zshrc` to enable completions
 ```
@@ -39,6 +40,7 @@ After installing the completions don't forget to restart the shell to begin usin
 
 To [uninstall](../cli/index.md#uninstall) completions for the current shell run `algokit completions uninstall`
 ```
+$ ~ algokit completions uninstall
 AlgoKit completions uninstalled for zsh 🎉
 ```
 
