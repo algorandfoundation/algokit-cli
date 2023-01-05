@@ -12,6 +12,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 ## Features
 
+- [AlgoKit Doctor](docs/features/doctor.md) - Check AlgoKit installation and dependencies
 - [AlgoKit Sandbox](docs/features/sandbox.md) - Manage a locally sandboxed private Algorand network
 
 ## Roadmap
@@ -69,9 +70,9 @@ NOTE: this method will install the most recent python3 version through chocolate
 
 1. Ensure Prerequisites are installed
 
-    - [Chocolatey](https://chocolatey.org/install)
-    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
-    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
+   - [Chocolatey](https://chocolatey.org/install)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
+   - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
 
 2. Install using Chocolatey
 
@@ -90,7 +91,6 @@ NOTE: this method will install Python 3.10 as a dependency via Brew. If you alre
    - [Brew](https://docs.brew.sh/Installation)
    - [Git](https://github.com/git-guides/install-git#install-git-on-mac) should already be available if brew is installed
    - [Docker](https://docs.docker.com/desktop/install/mac-install/) (or `brew install --cask docker-desktop`)
-   
 
 2. Install using Brew
 
