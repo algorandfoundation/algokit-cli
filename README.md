@@ -17,6 +17,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 - [AlgoKit Doctor](docs/features/doctor.md) - Check AlgoKit installation and dependencies
 - [AlgoKit Explore](docs/features/explore.md) - Explore Algorand Blockchains using Dappflow
 - [AlgoKit Goal](docs/features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
+- [AlgoKit Init](docs/features/init.md) - Initialize Algorand projects from templates
 - [AlgoKit Sandbox](docs/features/sandbox.md) - Manage a locally sandboxed private Algorand network
 
 ## Roadmap
@@ -56,7 +57,8 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 AlgoKit has some runtime dependencies that also need to be available for particular commands.
 
-Note: You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
+> __Note__
+>  You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
 - Git - Git is used when creating and updating projects from templates
 - Docker - Docker is used to run the AlgoKit Sandbox environment
@@ -70,13 +72,16 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 ## Install AlgoKit on Windows
 
-NOTE: this method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> __Note__ 
+> This method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure Prerequisites are installed
 
    - [Chocolatey](https://chocolatey.org/install)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
+      > __Note__
+      > See [here](docs/features/sandbox.md#prerequisites) for more tips on installing Docker on Windows
 
 2. Install using Chocolatey
 
@@ -88,7 +93,8 @@ NOTE: this method will install the most recent python3 version through chocolate
 
 ## Install AlgoKit on Mac
 
-NOTE: this method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> __Note__ 
+> This method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure Prerequisites are installed
 
@@ -112,7 +118,8 @@ NOTE: this method will install Python 3.10 as a dependency via Brew. If you alre
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
    - [Python 3.10+](https://www.python.org/downloads/)
 
-     NOTE: There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
+     > __Note__ 
+     > There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
 
    - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
 

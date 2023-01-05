@@ -4,7 +4,8 @@ This directory contains the nuspec file to define the [Chocolatey](https://choco
 
 # Installing
 
-NOTE: this will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained in [Installing](../../../README.md).
+> __Note__
+> This will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained in [Installing](../../../README.md).
 
 1. Ensure chocolatey is installed - https://chocolatey.org/install
 2. Run `choco install algokit` from an administrator powershell/cmd/terminal window
@@ -16,7 +17,8 @@ NOTE: this will install the most recent python3 version through chocolatey. If y
 
 1. Ensure wheel file is built `poetry build` (make sure there's only a single file in _dist_ directory)
 2. Set version field in _algokit.nuspec_
-   - NOTE: versions with a pre-release suffix such as 1.2.3-beta are automaticaly designated as pre-release packages by chocolatey
+   > __Note__
+   > Versions with a pre-release suffix such as 1.2.3-beta are automatically designated as pre-release packages by chocolatey
 3. `cd .\scripts\chocolatey\algokit`
 4. `choco pack`
 5. `choco apikey --api-key [API_KEY_HERE] -source https://push.chocolatey.org/`

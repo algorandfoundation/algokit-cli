@@ -25,7 +25,8 @@ sandbox      -- Manage the AlgoKit sandbox.
 
 To setup the completions, AlgoKit provides commands that will modify the current users interactive shell script (`.bashrc`/`.zshrc`).
 
-Note: If you would prefer AlgoKit to not modify your interactive shell scripts you can install the completions yourself by following the instructions [here](https://click.palletsprojects.com/en/8.1.x/shell-completion/)
+> __Note__
+> If you would prefer AlgoKit to not modify your interactive shell scripts you can install the completions yourself by following the instructions [here](https://click.palletsprojects.com/en/8.1.x/shell-completion/)
 
 To [install](../cli/index.md#install) completions for the current shell execute `algokit completions install`. You should see output similar to below
 ```
