@@ -16,6 +16,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 - [AlgoKit Completions](docs/features/completions.md) - Install shell completions for AlgoKit
 - [AlgoKit Doctor](docs/features/doctor.md) - Check AlgoKit installation and dependencies
 - [AlgoKit Explore](docs/features/explore.md) - Explore Algorand Blockchains using Dappflow
+- [AlgoKit Goal](docs/features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
 - [AlgoKit Sandbox](docs/features/sandbox.md) - Manage a locally sandboxed private Algorand network
 
 ## Roadmap
