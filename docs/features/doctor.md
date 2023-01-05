@@ -4,7 +4,7 @@ The AlgoKit Doctor feature allows you to check the Algokit installation along wi
 
 ## Functionality
 
-The AlgoKit Doctor allows you to make sure that your system has the dependencies minimum right version are installed. All passed checks will appear in your command line natural color while non-critical error will be in yellow color and the critical results will be in red. The critical services for AlgoKit to run are: Docker, docker compose and git.
+The AlgoKit Doctor allows you to make sure that your system has the correct dependencies installed and they satisfy the minimum required version. All passed checks will appear in your command line natural color while warnings will be in yellow and errors will be in red. The critical services for AlgoKit to run are: Docker, docker compose and git.
 
 Please run this command to if you are facing a issue running AlgoKit. It is recommend to run it before submitting an issue to AlgoKit team. You can copy the contents of the Doctor command message (in Markdown format) to your clipboard by providing the `-c` flag to the command as follows `algokit doctor -c`
 
@@ -47,4 +47,4 @@ docker compose: 2.1.3
   install via https://docs.docker.com/compose/install/
 ```
 
-For more details about `AlgoKit doctor` command, please refer to [AlgoKit CLI](../cli/index.md)
+For more details about `AlgoKit doctor` command, please refer to [AlgoKit CLI](../cli/index.md#doctor)
