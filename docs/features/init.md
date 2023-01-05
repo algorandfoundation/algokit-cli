@@ -13,7 +13,7 @@ The simplest use of the command is to just run `algokit init` and you will then 
 ? Name of project / directory to create the project in:  my-smart-contract
 ? Select a project template:  beaker
 🎤 Package author name
-   Al Gorand
+   Algorand Foundation
 🎤 Package author email
    al@algorand.foundation
 🎤 Do you want to add VSCode configuration?
@@ -80,15 +80,15 @@ or `algokit init --template-url https://github.com/algorandfoundation/algokit-be
 
 ### Answers
 
-Answers to specific template prompts can be provided with the `--answer key value` option, which can be used multiple times for each prompt. Quotes can be used for values with spaces e.g. `--answer author_name "Al Gorand"`
+Answers to specific template prompts can be provided with the `--answer key value` option, which can be used multiple times for each prompt. Quotes can be used for values with spaces e.g. `--answer author_name "Algorand Foundation"`
 
 To find out the key for a specific answer you can either look at `.copier-answers.yml` in the root folder of a project created via `algokit init` or in the `copier.yaml` file of a template repo e.g. for the [beaker template](https://github.com/algorandfoundation/algokit-beaker-default-template/blob/main/copier.yaml)
 
 ## Non-interactive project initialization
 
-By combining a number of options it is possible to initialize a new project without any interaction. For example to create a project named `my-smart-contract` using the `beaker` template, no git, no bootstrapping, the author name of `Al Gorand`, and defaults for all other values you could execute the following.
+By combining a number of options it is possible to initialize a new project without any interaction. For example to create a project named `my-smart-contract` using the `beaker` template, no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values you could execute the following.
 
-`algokit init -n my-smart-contract -t beaker --no-git --no-bootstrap --answer author_name "Al Gorand" --defaults`
+`algokit init -n my-smart-contract -t beaker --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults`
 
 Which outputs
 
