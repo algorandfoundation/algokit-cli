@@ -1,6 +1,6 @@
 # AlgoKit Doctor
 
-The AlgoKit Doctor feature allows you to check the Algokit installation along with its dependencies.
+The AlgoKit Doctor feature allows you to check the AlgoKit installation along with its dependencies.
 
 ## Functionality
 
