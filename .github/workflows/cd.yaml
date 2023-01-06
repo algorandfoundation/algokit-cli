@@ -55,7 +55,9 @@ jobs:
 
       - name: Get branch name
         shell: bash
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        run: |
+          echo ${GITHUB_REF#refs/heads/}
+          echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: get_branch
 
       - name: Set Git user as GitHub actions
@@ -64,6 +66,8 @@ jobs:
       - name: Create Continuous Deployment - Feature Branch
         if: steps.get_branch.outputs.branch != 'main' && inputs.production_release != 'true'
         run: |
+          echo $(poetry run semantic-release print-version --current)
+
           poetry run semantic-release \
             --prerelease \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
