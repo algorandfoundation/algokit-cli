@@ -61,42 +61,46 @@ jobs:
       - name: Set Git user as GitHub actions
         run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
 
-      - name: Create Continuous Deployment Release
-        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
+      - name: Create Continuous Deployment - Feature Branch
+        if: steps.get_branch.outputs.branch != 'main' && inputs.production_release != 'true'
         run: |
           poetry run semantic-release \
+            -v DEBUG \
             --prerelease \
-            --define=branch=main \
-            publish
-          gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
-        # --define=upload_to_repository=true \
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-
-      - name: Create Production Release
-        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
-        run: |
-          poetry run semantic-release \
-            --define=version_source="commit" \
-            --define=branch=main \
-            publish
-        # --define=upload_to_repository=true \
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-
-      - name: Create Feature Branch Release
-        if: steps.get_branch.outputs.branch != 'main'
-        run: |
-          poetry run semantic-release \
-            --prerelease \
+            --patch \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             publish
+          gh release edit --prerelease "$(git describe $(git rev-list --tags --max-count=1))"
+        # --define=upload_to_repository=true \
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Create Continuous Deployment - Beta (non-prod)
+        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
+        run: |
+          poetry run semantic-release \
+            -v DEBUG \
+            --prerelease \
+            --define=branch=main \
+            publish
           gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
+        # --define=upload_to_repository=true \
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Create Continuous Deployment - Production
+        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
+        run: |
+          poetry run semantic-release \
+            -v DEBUG \
+            --define=version_source="commit" \
+            --define=branch=main \
+            publish
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
