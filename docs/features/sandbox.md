@@ -18,6 +18,8 @@ If you are on Windows then you will need WSL 2 installed first, for which you ca
 
 The AlgoKit Sandbox is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the Sandbox to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
 
+If you haven't issued any transactions and you restart the indexer container (or execute `algokit sandbox stop` then `algokit sandbox start`, or restart your computer and execute `algokit sandbox start`) then the indexer will be stuck in an infinite starting loop. This is a [known issue in Algorand Sandbox](https://github.com/algorand/sandbox/issues/163) that should be resolved in the future. If this happens you can simply reset the sandbox via `algokit sandbox reset`.
+
 ## Supported operating environments
 
 We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit Sandbox is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
@@ -54,15 +56,31 @@ Once the Sandbox has started, the following endpoints will be available:
 - tealdbg port:
   - address: http://localhost:9392
 
+### Stopping and Resetting the Sandbox
+
+To stop the sandbox you can execute `algokit sandbox stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit sandbox start`.
+
+To reset the sandbox you can execute `algokit sandbox reset`, which will tear down the existing containers, refresh the container definition from the latest stored within AlgoKit and update to the latest Docker images. If you want to keep the same container spec and versions as you currently have, but quickly tear down and start a new instance then run `algokit sandbox reset --no-update`.
+
+### Viewing transactions in the Sandbox
+
+You can see a web-based user interface of the current state of your Sandbox including all transactions by using the [AlgoKit Explore](./explore.md) feature, e.g. by executing `algokit sandbox explore`.
+
+### Executing goal commands against AlgoKit Sandbox
+
+See the [AlgoKit Goal](./goal.md) feature. You can also execute `algokit sandbox console` to open a [Bash shell which allows you to run the goal commandline](./goal.md#running-multiple-commands).
+
 ### Getting access to the private key of the faucet account
 
-If you want to use the Sandbox then you need to get the private key of the initial wallet so you can transfer ALGOs out of it to other accounts you create. There are two ways to do this:
+If you want to use the Sandbox then you need to get the private key of the initial wallet so you can transfer ALGOs out of it to other accounts you create.
+
+There are two ways to do this:
 
 **Option 1: Manually via goal**
 
 ```
-docker exec algokit_algod goal account list
-docker exec algokit_algod goal account export -a {address_from_an_online_account_from_above_command_output}
+algokit goal account list
+algokit goal account export -a {address_from_an_online_account_from_above_command_output}
 ```
 
 **Option 2: Automatically via kmd API**
@@ -137,3 +155,5 @@ export function getKmdClient(): Kmd {
   );
 }
 ```
+
+For more details about the `AlgoKit sandbox` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#sandbox).

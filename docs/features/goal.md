@@ -1,8 +1,8 @@
 # AlgoKit goal
 
-AlgoKit goal command provides the user with a mechanism to run goal cli commands against the current AlgoKit sandbox.
+AlgoKit goal command provides the user with a mechanism to run [goal cli](https://developer.algorand.org/docs/clis/goal/goal/) commands against the current [AlgoKit Sandbox](./sandbox.md).
 
-You can explore all possible goal commands by running `algokit goal` and the results would be as follows:
+You can explore all possible goal commands by running `algokit goal` e.g.:
 
 ```
 $ ~ algokit goal
@@ -39,7 +39,7 @@ $ ~ algokit goal
  Use "goal [command] --help" for more information about a command.
 ```
 
-For instance, running this command `algokit goal report` would result in the following:
+For instance, running `algokit goal report` would result in output like:
 
 ```
 $ ~ algokit goal report
@@ -64,7 +64,7 @@ $ ~ algokit goal report
  Genesis hash: vEg1NCh6SSXwS6O5HAfjYCCNAs4ug328s3RYMr9syBg=
 ```
 
-If the sandbox `algod` docker container is not present or not running, the command will fails as follows, respectively:
+If the AlgoKit Sandbox `algod` docker container is not present or not running, the command will fail with a clear error, e.g.:
 
 ```
 $ ~ algokit goal
@@ -78,4 +78,17 @@ $ ~ algokit goal
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
 
-For more details about `AlgoKit goal` command, please refer to [AlgoKit CLI](../cli/index.md#goal)
+## Running multiple commands
+
+If you want to run multiple commands or interact with the filesystem you can execute `algokit goal --console`. This will open a [Bash](https://www.gnu.org/software/bash/) shell session on the `algod` Docker container and from there you can execute goal directly, e.g.:
+
+```
+$ algokit goal --console
+Opening Bash console on the algod node; execute `exit` to return to original console
+root@82d41336608a:~# goal account list
+[online]        C62QEFC7MJBPHAUDMGVXGZ7WRWFAF3XYPBU3KZKOFHYVUYDGU5GNWS4NWU      C62QEFC7MJBPHAUDMGVXGZ7WRWFAF3XYPBU3KZKOFHYVUYDGU5GNWS4NWU      4000000000000000 microAlgos
+[online]        DVPJVKODAVEKWQHB4G7N6QA3EP7HKAHTLTZNWMV4IVERJQPNGKADGURU7Y      DVPJVKODAVEKWQHB4G7N6QA3EP7HKAHTLTZNWMV4IVERJQPNGKADGURU7Y      4000000000000000 microAlgos
+[online]        4BH5IKMDDHEJEOZ7T5LLT4I7EVIH5XCOTX3TPVQB3HY5TUBVT4MYXJOZVA      4BH5IKMDDHEJEOZ7T5LLT4I7EVIH5XCOTX3TPVQB3HY5TUBVT4MYXJOZVA      2000000000000000 microAlgos
+```
+
+For more details about the `AlgoKit goal` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#goal).
