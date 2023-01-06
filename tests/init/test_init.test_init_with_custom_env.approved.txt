@@ -1,5 +1,4 @@
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template gh:algorandfoundation/algokit-beaker-default-template
-No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
