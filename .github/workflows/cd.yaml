@@ -71,6 +71,7 @@ jobs:
           poetry run semantic-release \
             -v DEBUG \
             --prerelease \
+            --patch \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             publish
@@ -87,7 +88,9 @@ jobs:
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
         run: |
           poetry run semantic-release \
+            -v DEBUG \
             --prerelease \
+            --minor \
             --define=branch=main \
             publish
           gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
@@ -101,6 +104,7 @@ jobs:
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
         run: |
           poetry run semantic-release \
+            -v DEBUG \
             --define=version_source="commit" \
             --define=branch=main \
             publish
