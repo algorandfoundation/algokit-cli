@@ -172,3 +172,4 @@ cython_debug/
 
 #Sphinx
 .doctrees/
+docs/cli/temp.md
