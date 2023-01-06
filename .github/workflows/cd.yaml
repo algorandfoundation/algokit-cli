@@ -66,17 +66,24 @@ jobs:
       - name: Create Continuous Deployment - Feature Branch
         if: steps.get_branch.outputs.branch != 'main' && inputs.production_release != 'true'
         run: |
+          echo "----------"
           echo "Before Publish"
           echo $(poetry run semantic-release print-version --current)
+          echo "last tag"
+          echo $(git describe $(git rev-list --tags --max-count=1))
+          echo "----------"
           poetry run semantic-release \
             -v DEBUG \
             --prerelease \
-            --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
+            --define=prerelease_tag=beta-${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             publish
           echo "After Publish"
+          echo "----------"
           echo $(poetry run semantic-release print-version --current)
-          gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
+          echo "last tag"
+          echo $(git describe $(git rev-list --tags --max-count=1))
+          gh release edit --prerelease "v$(git describe $(git rev-list --tags --max-count=1))"
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
