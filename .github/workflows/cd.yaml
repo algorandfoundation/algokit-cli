@@ -69,6 +69,7 @@ jobs:
           echo "Before Publish"
           echo $(poetry run semantic-release print-version --current)
           poetry run semantic-release \
+            -v DEBUG \
             --prerelease \
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
