@@ -1,3 +1,6 @@
+# AlgoKit CLI Reference Documentation
+
+
 - [algokit](#algokit)
     - [Options](#options)
     - [--version](#--version)
@@ -167,7 +170,7 @@ Specify shell to install algokit completions for.
 
 ## config
 
-Configure AlgoKit options
+Configure AlgoKit options.
 
 ```shell
 algokit config [OPTIONS] COMMAND [ARGS]...
@@ -175,10 +178,14 @@ algokit config [OPTIONS] COMMAND [ARGS]...
 
 ### version-prompt
 
-Enables or disables version prompt
+Controls whether AlgoKit checks and prompts for new versions.
+Set to [disable] to prevent AlgoKit performing this check permanently, or [enable] to resume checking.
+If no argument is provided then outputs current setting.
+
+Also see –skip-version-check which can be used to disable check for a single command.
 
 ```shell
-algokit config version-prompt [OPTIONS] [ENABLE]
+algokit config version-prompt [OPTIONS] [[enable|disable]]
 ```
 
 ### Arguments
@@ -203,7 +210,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 
 ## explore
 
-Explore the specified network in the browser using Dappflow
+Explore the specified network in the browser using Dappflow.
 
 ```shell
 algokit explore [OPTIONS] [[sandbox|testnet|mainnet]]
