@@ -4,31 +4,33 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 
 AlgoKit gets developers of all levels up and running with a familiar, fun and productive development environment in minutes. The goal of AlgoKit is to help developers build and launch secure, automated production-ready applications rapidly.
 
-[Install AlgoKit](#install)
+[Install AlgoKit](#install) | [Documentation](./docs/algokit.md)
 
 ## Use Cases
 
-- Building and deploying Algorand PyTEAL smart contracts
+The list of use cases supported by AlgoKit will evolve over time, but currently includes:
 
-For user guide and how to use AlgoKit, please refer to [docs](./docs/algokit.md)
+- Quickly run, explore and interact with a local Algorand Sandbox
+- Building, testing and deploying Algorand PyTEAL smart contracts
 
-## Roadmap
+For a user guide and guidance on how to use AlgoKit, please refer to the [docs](./docs/algokit.md).
 
-This tool is currently in early development. Feel free to explore the repository and install the tool, but be aware that this is a work in progress and features may not be stable at this stage.
+Future use cases are likely to include:
 
+- Quickly deploy [standardised](https://github.com/algorandfoundation/ARCs/#arcs-algorand-requests-for-comments), audited smart contracts
 - Building and deploying Algorand dApps
 
 ## Guiding Principles
 
 Algorand AlgoKit is guided by the following solution principles which flow through to the applications created by developers.
 
-1. **Cohesive dev tool suite**: Using AlgoKit should feel professional and cohesive, like it was designed to work together, for the developer; not against them. Developers are guided towards delivering end-to-end, high quality outcomes on MainNet so they and Algorand are more likely to be successful.
+1. **Cohesive developer tool suite**: Using AlgoKit should feel professional and cohesive, like it was designed to work together, for the developer; not against them. Developers are guided towards delivering end-to-end, high quality outcomes on MainNet so they and Algorand are more likely to be successful.
 2. **Seamless onramp**: New developers have a seamless experience to get started and they are guided into a pit of success with best practices, supported by great training collateral; you should be able to go from nothing to debugging code in 5 minutes.
 3. **Leverage existing ecosystem**: AlgoKit functionality gets into the hands of Algorand developers quickly by building on top of the existing ecosystem wherever possible and aligned to these principles.
 4. **Sustainable**: AlgoKit should be built in a flexible fashion with long-term maintenance in mind. Updates to latest patches in dependencies, Algorand protocol development updates, and community contributions and feedback will all feed in to the evolution of the software.
 5. **Secure by default**: Include defaults, patterns and tooling that help developers write secure code and reduce the likelihood of security incidents in the Algorand ecosystem. This solution should help Algorand be the most secure Blockchain ecosystem.
-6. **Extensible**: Be extensible for community contribution rather than stifling innovation, bottlenecking all changes through the Algorand Foundation and preventing the opportunity for other ecosystems being represented (e.g. Go, Rust, etc.). This helps make devs feel welcome and is part of the dev experience, plus it makes it easier to add features sustainably.
-7. **Meet devs where they are**: Make Blockchain development mainstream by giving all developers an idiomatic development experience in the operating system, IDE and language they are comfortable with so they can dive in quickly and have less they need to learn before being productive.
+6. **Extensible**: Be extensible for community contribution rather than stifling innovation, bottle-necking all changes through the Algorand Foundation and preventing the opportunity for other ecosystems being represented (e.g. Go, Rust, etc.). This helps make developers feel welcome and is part of the developer experience, plus it makes it easier to add features sustainably.
+7. **Meet developers where they are**: Make Blockchain development mainstream by giving all developers an idiomatic development experience in the operating system, IDE and language they are comfortable with so they can dive in quickly and have less they need to learn before being productive.
 8. **Modular components**: Solution components should be modular and loosely coupled to facilitate efficient parallel development by small, effective teams, reduced architectural complexity and allowing developers to pick and choose the specific tools and capabilities they want to use based on their needs and what they are comfortable with.
 
 ## Is this for me?
@@ -47,13 +49,17 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-AlgoKit has some runtime dependencies that also need to be available for particular commands.
+The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
+
+AlgoKit also has some runtime dependencies that also need to be available for particular commands.
 
 > **Note**
-> You can install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
+> You can still install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
 - Git - Git is used when creating and updating projects from templates
-- Docker - Docker is used to run the AlgoKit Sandbox environment
+- Docker - Docker Compose (and by association, Docker) is used to run the AlgoKit Sandbox environment, we require Docker Compose 2.5.0+
+
+## Cross-platform installation
 
 AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/) see below for specific installation instructions.
 
@@ -65,15 +71,15 @@ AlgoKit can be installed using OS specific package managers, or using the python
 ## Install AlgoKit on Windows
 
 > **Note**
-> This method will install the most recent python3 version through chocolatey. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> This method will install the most recent python3 version [via chocolatey](https://community.chocolatey.org/packages/python). If you already have python 3.10+ installed, you may [prefer to use pipx directly instead](#install-algokit-with-pipx-on-any-os) so you can control the python version used.
 
-1. Ensure Prerequisites are installed
+1. Ensure prerequisites are installed
 
    - [Chocolatey](https://chocolatey.org/install)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
      > **Note**
-     > See [here](docs/features/sandbox.md#prerequisites) for more tips on installing Docker on Windows
+     > See [our Sandbox documentation](docs/features/sandbox.md#prerequisites) for more tips on installing Docker on Windows
 
 2. Install using Chocolatey
 
@@ -88,7 +94,7 @@ AlgoKit can be installed using OS specific package managers, or using the python
 > **Note**
 > This method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
-1. Ensure Prerequisites are installed
+1. Ensure prerequisites are installed
 
    - [Brew](https://docs.brew.sh/Installation)
    - [Git](https://github.com/git-guides/install-git#install-git-on-mac) should already be available if brew is installed
@@ -104,27 +110,27 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 ## Install AlgoKit on Linux
 
-1. Ensure Prerequisites are installed
+1. Ensure prerequisites are installed
 
-   - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
-   - [Docker](https://docs.docker.com/desktop/install/linux-install/)
    - [Python 3.10+](https://www.python.org/downloads/)
 
      > **Note**
      > There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
 
    - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
+   - [Docker](https://docs.docker.com/desktop/install/linux-install/)
 
 2. Continue with step 2 in the following section to install via [pipx](#install-algokit-with-pipx-on-any-os)
 
 ## Install AlgoKit with pipx on any OS
 
-1. Ensure Prerequisites are installed
+1. Ensure desired prerequisites are installed
 
-   - [Git](https://github.com/git-guides/install-git)
-   - [Docker](https://docs.docker.com/get-docker/)
    - [Python 3.10+](https://www.python.org/downloads/)
    - [pipx](https://pypa.github.io/pipx/installation/)
+   - [Git](https://github.com/git-guides/install-git)
+   - [Docker](https://docs.docker.com/get-docker/)
 
 2. Install using pipx
 
@@ -136,13 +142,13 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 ## Verify installation
 
-Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to
+Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to:
 
 ```
 algokit, version 0.8.0
 ```
 
-It is also recommended to run `algokit doctor` to verify there are no issues in your local environment
+It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit. The output of this command will look similar to:
 
 ```
 timestamp: 2023-01-03T06:41:10+00:00
@@ -164,3 +170,5 @@ If you are experiencing a problem with AlgoKit, feel free to submit an issue via
 https://github.com/algorandfoundation/algokit-cli/issues/new
 Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`
 ```
+
+Per the above output, the doctor command output is a helpful tool if you need to ask for support or [raise an issue](https://github.com/algorandfoundation/algokit-cli/issues/new).

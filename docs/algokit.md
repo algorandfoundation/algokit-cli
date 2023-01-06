@@ -6,20 +6,21 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 
 For details on how to use individual features see the following
 
-- [AlgoKit Bootstrap](./features/bootstrap.md) - Bootstrap AlgoKit project dependencies
-- [AlgoKit Completions](./features/completions.md) - Install shell completions for AlgoKit
-- [AlgoKit Doctor](/features/doctor.md) - Check AlgoKit installation and dependencies
-- [AlgoKit Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
-- [AlgoKit Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
-- [AlgoKit Sandbox](./features/sandbox.md) - Manage a locally sandboxed private Algorand network
+- [Bootstrap](./features/bootstrap.md) - Bootstrap AlgoKit project dependencies
+- [Completions](./features/completions.md) - Install shell completions for AlgoKit
+- [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
+- [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
+- [Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
+- [Init](./features/init.md) - Explore Algorand Blockchains using Dappflow
+- [Sandbox](./features/sandbox.md) - Quickly initialize new projects using official Algorand Templates or community provided templates.
 
 ## AlgoKit CLI options
 
-AlgoKit has a number of global options that can impact all commands
+AlgoKit has a number of global options that can impact all commands. Note: these global options must be appended to `algokit` and appear before a command, e.g. `algokit -v sandbox start`, but not `algokit sandbox start -v`. The exception to this is `-h`, which can be appended to any command or sub-command to see contextual help information.
 
-- `-h, --help` The help option can be used on any command to get details on any command, its sub-commands and options
-- `-v, --verbose` Enables DEBUG logging, useful when troubleshooting
-- `--color / --no-color` Enables or disables output of console styling, also supports the [NO_COLOR](https://no-color.org) environment variable
-- `--skip-version-check` Skips version checking and prompting for a single command, this can also be disabled [permanently](./cli/index.md#version-prompt) with `algokit config version-prompt disable`
+- `-h, --help` The help option can be used on any command to get details on any command, its sub-commands and options.
+- `-v, --verbose` Enables DEBUG logging, useful when troubleshooting or if you want to peek under the covers and learn what AlgoKit CLI is doing.
+- `--color / --no-color` Enables or disables output of console styling, we also support the [NO_COLOR](https://no-color.org) environment variable.
+- `--skip-version-check` Skips updated AlgoKit version checking and prompting for that execution, this can also be disabled [permanently on a given machine](./cli/index.md#version-prompt) with `algokit config version-prompt disable`.
 
-See also [AlgoKit CLI Reference](./cli/index.md)
+See also the [AlgoKit CLI Reference](./cli/index.md), which details every command, sub-command and option.

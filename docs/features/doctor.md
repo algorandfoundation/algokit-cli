@@ -1,12 +1,12 @@
 # AlgoKit Doctor
 
-The AlgoKit Doctor feature allows you to check the AlgoKit installation along with its dependencies.
+The AlgoKit Doctor feature allows you to check your AlgoKit installation along with its dependencies. This is useful for diagnosing potential issues with using AlgoKit.
 
 ## Functionality
 
-The AlgoKit Doctor allows you to make sure that your system has the correct dependencies installed and they satisfy the minimum required version. All passed checks will appear in your command line natural color while warnings will be in yellow and errors will be in red. The critical services for AlgoKit to run are: Docker, docker compose and git.
+The AlgoKit Doctor allows you to make sure that your system has the correct dependencies installed and they satisfy the minimum required versions. All passed checks will appear in your command line natural color while warnings will be in yellow (warning) and errors or missing critical services will be in red (error). The critical services that AlgoKit will check for (since they are [directly used by certain commands](../../README.md#prerequisites)): Docker, docker compose and git.
 
-Please run this command to if you are facing a issue running AlgoKit. It is recommend to run it before submitting an issue to AlgoKit team. You can copy the contents of the Doctor command message (in Markdown format) to your clipboard by providing the `-c` flag to the command as follows `algokit doctor -c`
+Please run this command to if you are facing a issue running AlgoKit. It is recommend to run it before [submitting an issue to AlgoKit](https://github.com/algorandfoundation/algokit-cli/issues/new). You can copy the contents of the Doctor command message (in Markdown format) to your clipboard by providing the `-c` flag to the command as follows `algokit doctor -c`.
 
 # Examples
 
@@ -48,4 +48,4 @@ docker compose: 2.1.3
   install via https://docs.docker.com/compose/install/
 ```
 
-For more details about `AlgoKit doctor` command, please refer to [AlgoKit CLI](../cli/index.md#doctor)
+For more details about the `AlgoKit doctor` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#doctor).
