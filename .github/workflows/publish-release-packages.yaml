@@ -22,7 +22,7 @@ on:
       release:
         required: true
         type: string
-        description: "The github release which will be published"
+        description: "The existing github release which will be published (e.g. 0.1.0)"
       do_brew:
         required: false
         default: true
