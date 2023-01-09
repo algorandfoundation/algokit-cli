@@ -75,8 +75,8 @@ jobs:
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
       - name: Create Continuous Deployment - Beta (non-prod)
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
@@ -90,8 +90,8 @@ jobs:
         # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
       - name: Create Continuous Deployment - Production
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
@@ -100,12 +100,12 @@ jobs:
             -v DEBUG \
             --define=version_source="commit" \
             --define=branch=main \
+            --define=upload_to_repository=true \
             publish
-        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPOSITORY_USERNAME: ${{ secrets.PYPI_TOKEN }}
-          REPOSITORY_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          REPOSITORY_USERNAME: __token__
+          REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
