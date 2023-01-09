@@ -114,12 +114,6 @@ jobs:
           path: dist/algokit-*-py3-none-any.whl
           if-no-files-found: error
 
-      - name: Update homebrew formula
-        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
-        run: scripts/update-brew-formula.sh "dist/algokit-*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
-        env:
-          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
-
   cd-publish-release-packages:
     name: Publish Release Packages
     needs: release
