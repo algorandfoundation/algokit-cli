@@ -139,11 +139,10 @@ EOF
 }
 
 create_pr() {
-  export GH_TOKEN=$TAP_GITHUB_TOKEN
   local full_ruby=`realpath $ruby`  
   echo "Cloning $homebrew_tap_repo..."
   clone_dir=`mktemp -d`
-  git clone "https://${TAP_GITHUB_TOKEN}@github.com/${homebrew_tap_repo}.git" $clone_dir
+  git clone "https://oauth2:${TAP_GITHUB_TOKEN}@github.com/${homebrew_tap_repo}.git" $clone_dir
 
   echo "Commiting Formula/$ruby..."
   pushd $clone_dir
@@ -151,14 +150,31 @@ create_pr() {
   git checkout -b $dest_branch
   mkdir -p $clone_dir/Formula
   cp $full_ruby $clone_dir/Formula
+  message="Updating $command to $version"
   git add .
-  git commit --message "Updating $command to $version"
+  git commit --message "$message"
 
   echo "Pushing $dest_branch..."
   git push -u origin HEAD:$dest_branch
 
   echo "Creating a pull request..."
-  gh pr create --fill
+  # can't use gh because it doesn't support fine grained access tokens yet https://github.com/github/roadmap/issues/622
+cat << EOF > pr_body.json
+{
+  "title": "${message}",
+  "head": "${dest_branch}",
+  "base": "main"
+}
+EOF
+
+  curl \
+    --fail \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $TAP_GITHUB_TOKEN"\
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    https://api.github.com/repos/${homebrew_tap_repo}/pulls \
+    -d @pr_body.json
   pr_exit_code=$?
 
   popd
