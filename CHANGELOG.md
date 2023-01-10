@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.1 (2023-01-10)
+### Fix
+* Adding installation documentation update re: pipx ([`75d3590`](https://github.com/algorandfoundation/algokit-cli/commit/75d359022f9fc3a3cf3ac8d21b16a449e42b1857))
+* Temporarily turning off PyPi publishing while we decide on the final package name ([`6c1a2e2`](https://github.com/algorandfoundation/algokit-cli/commit/6c1a2e25d2de00a9052b7db700d8681d75b09e6a))
+
 ## v0.1.0 (2023-01-09)
 ### Feature
 * Windows Chocolatey package ([#80](https://github.com/algorandfoundation/algokit-cli/issues/80)) ([`3f4bb04`](https://github.com/algorandfoundation/algokit-cli/commit/3f4bb04ee3ce09e7ca9ab843453f50f6a3eab98c))
