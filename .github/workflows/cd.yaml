@@ -100,8 +100,8 @@ jobs:
             -v DEBUG \
             --define=version_source="commit" \
             --define=branch=main \
-            --define=upload_to_repository=true \
             publish
+        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
