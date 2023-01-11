@@ -66,31 +66,33 @@ create_cask() {
   echo "Outputting $ruby..."
 
 cat << EOF > $ruby
+# typed: false
+# frozen_string_literal: true
+
 cask "$command" do
   version "$version"
   sha256 "$sha256"
-  
-  url "$url"
+
+  url "$repo/releases/download/v#{version}/algokit_cli-#{version}-py3-none-any.whl"
   name "$command"
   desc "$desc"
   homepage "$homepage"
-  container type: :naked
 
   depends_on formula: "pipx"
-  
-  installer script: {
-    executable: "pipx",
-    args: ["install", "#{staged_path}/$wheel"],
-  }
+  container type: :naked
 
   installer script: {
+    executable: "pipx",
+    args:       ["install", "#{staged_path}/$wheel"],
+  }
+  installer script: {
     executable: "bash",
-    args: ["-c", "echo $(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
+    args:       ["-c", "echo $(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
   }
 
   uninstall script: {
     executable: "bash",
-    args: ["#{staged_path}/uninstall.sh"]
+    args:       ["#{staged_path}/uninstall.sh"],
   }
 end
 EOF
@@ -109,12 +111,12 @@ create_pr() {
   clone_dir=`mktemp -d`
   git clone "https://oauth2:${TAP_GITHUB_TOKEN}@github.com/${homebrew_tap_repo}.git" $clone_dir
 
-  echo "Commiting Cask/$ruby..."
+  echo "Commiting Casks/$ruby..."
   pushd $clone_dir
   dest_branch="$command-update-$version"
   git checkout -b $dest_branch
-  mkdir -p $clone_dir/Cask
-  cp $full_ruby $clone_dir/Cask
+  mkdir -p $clone_dir/Casks
+  cp $full_ruby $clone_dir/Casks
   message="Updating $command to $version"
   git add .
   git commit --message "$message"
