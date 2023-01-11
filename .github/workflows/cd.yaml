@@ -111,7 +111,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: algokit-cli
-          path: dist/algokit-*-py3-none-any.whl
+          path: dist/algokit*-py3-none-any.whl
           if-no-files-found: error
 
   cd-publish-release-packages:
