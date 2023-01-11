@@ -1,10 +1,13 @@
 [tool.poetry]
-name = "algokit"
+name = "algokit-cli"
 version = "0.1.1"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
 readme = "README.md"
+packages = [
+  { include = "algokit", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
