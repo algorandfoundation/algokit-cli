@@ -5,11 +5,13 @@ wheel_files=( $1 )
 wheel_file=${wheel_files[0]}
 homebrew_tap_repo=$2
 
+#globals
+command=algokit
+
 #error codes
 MISSING_WHEEL=1
-RESOURCE_GENERATION_FAILED=2
-FORMULA_GENERATION_FAILED=3
-PR_CREATION_FAILED=4
+CASK_GENERATION_FAILED=2
+PR_CREATION_FAILED=3
 
 if [[ ! -f $wheel_file ]]; then
   >&2 echo "$wheel_file not found. 🚫"
@@ -18,55 +20,21 @@ else
   echo "Found $wheel_file 🎉"
 fi
 
-create_resources() {
-  local wheel=`realpath $1`
-  local package=$2
-  local output=$3
-
-  echo "Creating temp directory."
-  local temp=`mktemp -d`
-  pushd $temp >/dev/null
-
-  echo "Creating python virtual environment."
-  python3 -m venv venv
-  source venv/bin/activate
-
-  echo "Using poet to generate resources."
-  pip install $wheel homebrew-pypi-poet
-  #also strip out resource block for referenced package
-  local resources=`poet $package | sed "/resource \"$package\" do/{N;N;N;N;d;}"`
-
-  echo "Cleanup."
-  deactivate
-  popd >/dev/null
-  rm -rf $temp
-  
-  echo "Saving resources to $output"
-  echo "$resources" > $output
-  lines=`wc -l < $output`
-  
-  expected_lines=4 #assumption that there is at least one dependency
-  if [[ ! -f $output || "$lines" -lt "$expected_lines" ]]; then
-    >&2 echo "Failed to generate $output 🚫"
-    exit $RESOURCE_GENERATION_FAILED
-  else
-    echo "Created $output 🎉"
-  fi
-}
-
 get_metadata() {
   local field=$1
   grep "^$field:" $metadata | cut -f 2 -d : | xargs
 }
 
-create_formula() {
+create_cask() {
   repo="https://github.com/${GITHUB_REPOSITORY}"
   homepage="$repo"
   
   wheel=`basename $wheel_file`
-  echo "Creating brew formula from $wheel_file"
+  echo "Creating brew cask from $wheel_file"
 
-  #determine version and release tag from .whl
+  #determine package_name, version and release tag from .whl
+  package_name=`echo $wheel | cut -d- -f1`
+
   version=None
   version_regex="-([0-9]+\.[0-9]+\.[0-9]+)b?([0-9]*)-"
   if [[ $wheel_file =~ $version_regex ]]; then
@@ -82,57 +50,54 @@ create_formula() {
   echo Version: $version
   echo Release Tag: $release_tag
 
-  url="$repo/archive/refs/tags/$release_tag.tar.gz"
+  url="$repo/releases/download/$release_tag/$wheel"
   #get other metadata from wheel
   unzip -o $wheel_file -d . >/dev/null 2>&1
   metadata=`echo $wheel | cut -f 1,2 -d "-"`.dist-info/METADATA
 
-  command=`get_metadata Name`
   desc=`get_metadata Summary`
   license=`get_metadata License`
 
   echo "Calculating sha256 of $url..."
   sha256=`curl -s -L $url | sha256sum | cut -f 1 -d ' '`
 
-  echo "Determining resources for $command..."
-  create_resources $wheel_file $command resources.txt
-  resources=`cat resources.txt`
-
-  formula=`echo ${command:0:1} | tr  '[a-z]' '[A-Z]'`${command:1}
   ruby=${command}.rb
-  head="git+$repo.git"
-
+  
   echo "Outputting $ruby..."
 
 cat << EOF > $ruby
-class $formula < Formula
-  include Language::Python::Virtualenv
-
+cask "$command" do
+  version "$version"
+  sha256 "$sha256"
+  
+  url "$url"
+  name "$command"
   desc "$desc"
   homepage "$homepage"
-  url "$url"
-  sha256 "$sha256"
-  license "$license"
-  head "$head", branch: "main"
+  container type: :naked
 
-  depends_on "pipx"
-  depends_on "python@3.10"
+  depends_on formula: "pipx"
+  
+  installer script: {
+    executable: "pipx",
+    args: ["install", "#{staged_path}/$wheel"],
+  }
 
-$resources
+  installer script: {
+    executable: "bash",
+    args: ["-c", "echo $(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
+  }
 
-  def install
-    virtualenv_install_with_resources
-  end
-
-  test do
-    assert_equal "$command, version $version", shell_output(bin/"$command --version").strip
-  end
+  uninstall script: {
+    executable: "bash",
+    args: ["#{staged_path}/uninstall.sh"]
+  }
 end
 EOF
 
   if [[ ! -f $ruby ]]; then
     >&2 echo "Failed to generate $ruby 🚫"
-    exit $FORMULA_GENERATION_FAILED
+    exit $CASK_GENERATION_FAILED
   else
     echo "Created $ruby 🎉"
   fi
@@ -144,12 +109,12 @@ create_pr() {
   clone_dir=`mktemp -d`
   git clone "https://oauth2:${TAP_GITHUB_TOKEN}@github.com/${homebrew_tap_repo}.git" $clone_dir
 
-  echo "Commiting Formula/$ruby..."
+  echo "Commiting Cask/$ruby..."
   pushd $clone_dir
   dest_branch="$command-update-$version"
   git checkout -b $dest_branch
-  mkdir -p $clone_dir/Formula
-  cp $full_ruby $clone_dir/Formula
+  mkdir -p $clone_dir/Cask
+  cp $full_ruby $clone_dir/Cask
   message="Updating $command to $version"
   git add .
   git commit --message "$message"
@@ -190,7 +155,7 @@ EOF
   fi
 }
 
-create_formula
+create_cask
 create_pr
 
 echo Done.
