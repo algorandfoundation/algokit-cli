@@ -96,9 +96,10 @@ jobs:
           poetry run semantic-release \
             -v DEBUG \
             --define=version_source="commit" \
+            --define=patch_without_tag=true \
+            --define=upload_to_repository=true \
             --define=branch=main \
             publish
-        # --define=upload_to_repository=true \
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
