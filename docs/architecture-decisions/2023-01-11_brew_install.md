@@ -69,7 +69,7 @@ This option uses a cask which does not have the maintenance overhead of a formul
 * Fast build time on release
 
 **Cons**
-* Less discoverable install for end users `brew install --cask algorandfoundation/algokit`
+* Less discoverable install for end users `brew install algorandfoundation/algokit`
 * AlgoKit does not meet the stated criteria for a cask and as such it would unlikely to be approved as a cask in the official Homebrew Repo if that was a desired future state
 * More effort to implement a new way of installing via brew
 
