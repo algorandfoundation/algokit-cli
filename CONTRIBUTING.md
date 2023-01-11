@@ -96,3 +96,5 @@ As part of developing AlgoKit we are documenting key architecture decisions usin
 
 - [2022-11-14: AlgoKit sandbox approach](docs/architecture-decisions/2022-11-14_sandbox-approach.md)
 - [2022-11-22: Beaker testing strategy](docs/architecture-decisions/2022-11-22_beaker-testing-strategy.md)
+- [2023-01-11: HomeBrew install strategy](docs/architecture-decisions/2023-01-11_brew_install.md)
+- [2023-01-11: Beaker productionisation review](docs/architecture-decisions/2023-01-11_beaker_productionisation_review.md)
