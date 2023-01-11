@@ -26,9 +26,6 @@ jobs:
     name: Build Python
     uses: ./.github/workflows/build-python.yaml
     needs: ci-check-python
-    with:
-      # The artifact is published below after the version number is set
-      shouldPublish: false
 
   release:
     name: Release Library
@@ -111,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: algokit-cli
-          path: dist/algokit-*-py3-none-any.whl
+          path: dist/algokit*-py3-none-any.whl
           if-no-files-found: error
 
   cd-publish-release-packages:

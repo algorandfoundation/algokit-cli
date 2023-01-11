@@ -59,8 +59,8 @@ jobs:
       - name: Set Git user as GitHub actions
         run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
 
-      - name: Update homebrew formula
-        run: scripts/update-brew-formula.sh "dist/algokit-*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
+      - name: Update homebrew cask
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
 
@@ -91,7 +91,7 @@ jobs:
       - name: Get artifact details
         id: get_artifact
         run: |
-          $wheelFileName = Get-ChildItem -File -Filter algokit-*-py3-none-any.whl dist
+          $wheelFileName = Get-ChildItem -File -Filter algokit*-py3-none-any.whl dist
           if ($wheelFileName.count -ne 1) {
               Throw "Packaging error. build artifact contained $($wheelFileName.count) normally named wheel files"
           }
