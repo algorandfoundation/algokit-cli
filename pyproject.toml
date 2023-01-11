@@ -13,7 +13,7 @@ httpx = "^0.23.1"
 copier = "^7.1.0a0"
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
-shellingham = "^1.5.0"
+shellingham = "^1.5.0.post1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
