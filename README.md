@@ -134,12 +134,9 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 2. Install using pipx
 
-> **Note**
-> This method is not yet working while we decide on what the PyPi package name will be.
-
-   - ~~Install AlgoKit: `pipx install algokit`~~
-   - ~~Update AlgoKit: `pipx upgrade algokit`~~
-   - ~~Remove AlgoKit: `pipx uninstall algokit`~~
+   - Install AlgoKit: `pipx install algokit-cli`
+   - Update AlgoKit: `pipx upgrade algokit-cli`
+   - Remove AlgoKit: `pipx uninstall algokit-cli`
 
 3. [Verify installation](#verify-installation)
 
