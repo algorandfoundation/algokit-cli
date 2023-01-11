@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.2 (2023-01-11)
+### Documentation
+* Approved ([`19eb063`](https://github.com/algorandfoundation/algokit-cli/commit/19eb063a2d8327884a5856939db4e0ea157ac26f))
+* Remove --cask from Option 3 ([`cfa3b73`](https://github.com/algorandfoundation/algokit-cli/commit/cfa3b73099f6da94420bdfc9541bbce4d521993d))
+
 ## v0.1.1 (2023-01-10)
 ### Fix
 * Adding installation documentation update re: pipx ([`75d3590`](https://github.com/algorandfoundation/algokit-cli/commit/75d359022f9fc3a3cf3ac8d21b16a449e42b1857))
