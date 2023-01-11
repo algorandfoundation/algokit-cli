@@ -1,8 +1,8 @@
 # HomeBrew install strategy
 
 - **Status**: Draft
-- **Owner:** 
-- **Deciders**: 
+- **Owner:** Daniel McGregor
+- **Deciders**: Daniel McGregor, Rob Moore, Alessandro Ferrari
 - **Date created**: 2023-01-11
 - **Date decided:** TBD
 
