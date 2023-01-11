@@ -26,9 +26,6 @@ jobs:
     name: Build Python
     uses: ./.github/workflows/build-python.yaml
     needs: ci-check-python
-    with:
-      # The artifact is published below after the version number is set
-      shouldPublish: false
 
   release:
     name: Release Library

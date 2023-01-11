@@ -1,17 +1,6 @@
 name: Build, Test and Publish Python
 
-on:
-  workflow_call:
-    inputs:
-      shouldPublish:
-        description: "To publish the (Python 3.10, Ubuntu) artifact or not, default is false"
-        required: false
-        type: boolean
-        default: false
-      artifactName:
-        required: false
-        type: string
-        description: "Artifact name - Required when shouldPublish is true"
+on: [workflow_call]
 
 jobs:
   build-python:
@@ -53,11 +42,3 @@ jobs:
 
       - name: Build Wheel
         run: poetry build --format wheel
-
-      - name: Upload artifact - using Python 3.10 on ubuntu-latest
-        if: inputs.shouldPublish == true && matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ inputs.artifactName }}
-          path: dist/algokit-*-py3-none-any.whl
-          if-no-files-found: error
