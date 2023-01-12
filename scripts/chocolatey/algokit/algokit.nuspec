@@ -6,7 +6,7 @@
     <version>0.1.0-beta</version> <!-- note, no semantic version 2.0 support. So beta.17 needs to be beta17 https://github.com/chocolatey/choco/issues/1610 -->
     <packageSourceUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/scripts/chocolatey</packageSourceUrl>
     <owners>wilsonwaters</owners>
-    <title>algokit</title>
+    <title>AlgoKit</title>
     <authors>Algorand Foundation</authors>
     <projectUrl>https://www.algorand.foundation/developers</projectUrl>
     <iconUrl>https://www.algorand.com/assets/media-kit/logos/logo-marks/png/algorand_logo_mark_black.png</iconUrl>
@@ -15,6 +15,7 @@
     <projectSourceUrl>https://github.com/algorandfoundation/algokit-cli</projectSourceUrl>
     <docsUrl>https://github.com/algorandfoundation/algokit-cli</docsUrl>
     <bugTrackerUrl>https://github.com/algorandfoundation/algokit-cli/issues</bugTrackerUrl>
+    <releaseNotes>https://github.com/algorandfoundation/algokit-cli/blob/main/CHANGELOG.md</releaseNotes>
     <tags>algokit algorand developers python typescript hello-world smart-contract beaker</tags>
     <summary>The Algorand AlgoKit CLI is the one-stop shop tool for developers building on the Algorand network.</summary>
     <description><![CDATA[AlgoKit gets developers of all levels up and running with a familiar, fun and productive development environment in minutes.
