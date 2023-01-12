@@ -269,12 +269,141 @@ Rename methods in `beaker.lib.*` to start with an uppercase. Although going agai
 
 ### (4) Key decorator improvements
 
-Refactor some of the Beaker decorators to fix some bugs and improve user experience:
+Refactor some of the Beaker decorators to fix some bugs and improve user experience.
 
-- Allow decorators to be stackable so multiple decorators can be combined onto a single method, allowing for things like multiple on-completions to trigger a given method, etc.
-- Remove `@internal` since it's buggy (if you don't pass any parameter in to it or pass in a teal type of `None` then it doesn't actually work and the method gets inlined) and with (1) it's unneeded since you can use `Subroutine` from PyTEAL (since the methods don't need to be artificially modified to remove `self` anymore)
-- Allow for bare methods to be controlled (not currently possible, today it's inferred by convention, which is dangerous and can lead to erroneous situations) and have reasonable defaults (the default today is bare methods are always used if there are no method parameters, even though ARC-4 recommends sparing use of bare methods). Instead, we propose that there is a `bare_method` boolean parameter on the various method decorators that is set to `True` by default for non-`@external` decorators and `False` for `@external`, which matches the common usage patterns we've seen, but is overridable by the user so they can take control.
+End state:
+
+```python
+# for user convenience, rather than having to import + use MethodConfig
+OnCompleteActionName: TypeAlias = Literal[
+    "no_op",
+    "opt_in",
+    "close_out",
+    "clear_state",
+    "update_application",
+    "delete_application",
+]
+
+HandlerFunc: TypeAlias = Callable[..., Expr]
+DecoratorFunc: TypeAlias = Callable[[HandlerFunc], HandlerFunc]
+
+class Application:  
+    # the main decorator, capable of handling both ABI and Bare method registration
+    def external(
+        self, 
+        fn: HandlerFunc | None = None,
+        /,
+        *,
+        # note: retain existing behaviour of if method_config is None, default to no_op with CallConfig.CALL
+        method_config: MethodConfig | dict[OnCompleteActionName, CallConfig] | None = None,  
+        name: str | None = None,
+        authorize: SubroutineFnWrapper | None = None,
+        bare: bool = False,
+        read_only: bool = False,
+        override: bool | None = False,
+    ) -> HandlerFunc | DecoratorFunc:
+        ...
+    
+    # the below are just "shortcuts" to @external for simple/common use cases    
+    def create(
+        self,
+        fn: HandlerFunc | None = None,
+        /,
+        *,
+        allow_call: bool = False,
+        name: str | None = None,
+        authorize: SubroutineFnWrapper | None = None,
+        bare: bool = False,
+        read_only: bool = False,
+        override: bool | None = False,
+    ) -> HandlerFunc | DecoratorFunc:
+        ...
+    
+    
+    def <delete|update|opt_in|clear_state|close_out|no_op>(
+        self,
+        fn: HandlerFunc | None = None,
+        /,
+        *,
+        allow_call: bool = True,
+        allow_create: bool = False,
+        name: str | None = None,
+        authorize: SubroutineFnWrapper | None = None,
+        bare: bool = False,
+        read_only: bool = False,
+        override: bool | None = False,
+    ) -> HandlerFunc | DecoratorFunc:
+        ...
+```
+
+For reference, the current state:
+
+```python
+def internal(
+    return_type_or_handler: TealType | HandlerFunc,
+) -> HandlerFunc | DecoratorFunc:
+    ...
+
+def external(
+    func: HandlerFunc | None = None,
+    /,
+    *,
+    name: str | None = None,
+    authorize: SubroutineFnWrapper | None = None,
+    method_config: MethodConfig | None = None,
+    read_only: bool = False,
+) -> HandlerFunc | DecoratorFunc:
+    ...
+
+def bare_external(
+    no_op: CallConfig | None = None,
+    opt_in: CallConfig | None = None,
+    clear_state: CallConfig | None = None,
+    delete_application: CallConfig | None = None,
+    update_application: CallConfig | None = None,
+    close_out: CallConfig | None = None,
+) -> Callable[..., HandlerFunc]:
+    ...
+
+
+def create(
+    fn: HandlerFunc | None = None,
+    /,
+    *,
+    authorize: SubroutineFnWrapper | None = None,
+    method_config: Optional[MethodConfig] | None = None,
+) -> HandlerFunc | DecoratorFunc:
+    ...
+
+
+def <delete|update|opt_in|clear_state|close_out|no_op>(
+    fn: HandlerFunc | None = None, /, *, authorize: SubroutineFnWrapper | None = None
+) -> HandlerFunc | DecoratorFunc:
+    ...
+```
+
+Changes:
+- Remove `@internal`:
+  - if you don't pass a TealType parameter to it, i.e. intend to create an ABI internal routine, it actually just inlines the code currently due to a bug
+  - when passing in a TealType parameter to it, i.e. intent to create a normal subroutine, then in combination with (1) it will be unneeded since you can use `Subroutine` from PyTEAL (since the methods don't need to be artificially modified to remove `self` anymore) 
+- Add `bare: bool` option:
+  - Currently, this is not able to be controlled by the user - for `<create|delete|update|opt_in|clear_state|close_out|no_op>` decorators, they will create a bare method if the function takes no parameters other than maybe a `self` parameter. This has some down-sides:
+    1. The user might want an ABI method rather than a bare method. In this case, currently they could use `@external(method_config=...)`, but for simple cases this is not as easy to read/type and is not intuitive to discover in the first place.
+    2. The user might have more than one method that takes no parameters that is able to be called with a given `OnCompletionAction`, currently this would produce a `BareOverwriteError` in Beaker. Again, the work-around exists of calling `@external` instead, but it would be nicer and more intuitive to add a `bare` option to control this explicitly.
+  - The above Python methods have `bare: bool = False`. An alternative option would be to make this `bare: bool | None = None`, where `None` would retain the current behaviour of inspecting the method signature to see if it takes parameters or not. 
+- Remove `@bare_external`:
+  - Mostly unused, and doesn't provide the same options as the other decorators (e.g. `authorize`)
+  - Instead, we can replace the case of a single option being passed to it, with the equivalent named method:  for example `@bare_external(opt_in=CallConfig.CALL)` becomes `@opt_in(bare=True)`
+  - For the multi-argument case: `@bare_external(no_op=CallConfig.CREATE, opt_in=CallConfig.CALL)` becomes `@external(method_config={"no_op": CallConfig.CREATE, "opt_in": CallConfig.CALL}, bare=True)`
+* Add optional `name` option to all decorators, not just `@external`.
+* Add `allow_call` and `allow_create` options to shortcut methods (except `@create` shortcut which should always allow `CallConfig.CREATE`).
+* Remove `method_config` from `@create` shortcut - the default behaviour will remain unchanged, but any usages with `method_config` specified would be equivalent to just using `@external` directly.
+* Add `override: bool | None = False` parameter.
+  - If `False` (the suggested default), an error will be raised if an ABI or Bare method would replace one already registered in the Application. For bare methods, this would be keyed on the `OnCompleteAction`, and for ABI methods should be based on the method signature (ie `ABIReturnSubroutine.method_signature()`). This is suggested as the default to prevent unexpected cases of overriding, especially when using blueprints/templates from the future Smart Contracts Library.
+  - If `True`, then an error will be raised if it *does not* replace an already registered ABI or Bare method. This is similar to Java's `@Override` annotation, and can allow the user to be explicit and thus prevent unexpectedly _not_ replacing an existing method.
+  - If `None`, then methods will be overwritten if present, and no error will be raised if not already present. This option is here for maximum flexibility, but should perhaps be discouraged.
+
 
 ### (5) Beaker state refactor
 
-Refactor of the `beaker.state` internal interfaces to improve user extensibility and significantly simplify the Beaker codebase to improve maintainability.
+Refactor of the `beaker.state` internal interfaces to simplify Beaker code base, make it easier to add new state wrappers, and to pave the way for future enhancements. This will have a side effect of allowing users to create their own state wrappers without having to modify `beaker` itself, although we recommend marking these interfaces as internal and subject to change - at least initially.
