@@ -83,8 +83,12 @@ cask "$command" do
 
   installer script: {
     executable:   "pipx",
-    args:         ["install", "--force", "#{staged_path}/$wheel"],
+    args:         ["install", "--force", "#{staged_path}/algokit-#{version}-py3-none-any.whl"],
     print_stderr: false,
+  }
+  installer script: {
+    executable: "pipx",
+    args:       ["ensurepath"],
   }
   installer script: {
     executable: "bash",
