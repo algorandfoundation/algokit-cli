@@ -82,12 +82,13 @@ cask "$command" do
   container type: :naked
 
   installer script: {
-    executable: "pipx",
-    args:       ["install", "#{staged_path}/$wheel"],
+    executable:   "pipx",
+    args:         ["install", "--force", "#{staged_path}/$wheel"],
+    print_stderr: false,
   }
   installer script: {
     executable: "bash",
-    args:       ["-c", "echo $(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
+    args:       ["-c", "echo \$(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
   }
 
   uninstall script: {
