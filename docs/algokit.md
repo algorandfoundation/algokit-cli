@@ -11,7 +11,7 @@ For details on how to use individual features see the following
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
 - [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
 - [Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
-- [Init](./features/init.md) - Explore Algorand Blockchains using Dappflow
+- [Init](./features/init.md) - Initializes a new project from a template
 - [Sandbox](./features/sandbox.md) - Quickly initialize new projects using official Algorand Templates or community provided templates.
 
 ## AlgoKit CLI options
