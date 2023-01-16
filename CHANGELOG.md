@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2023-01-16)
+### Feature
+* Update windows install instructions and bump version so PyPi will accept new release ([#154](https://github.com/algorandfoundation/algokit-cli/issues/154)) ([`5ff5223`](https://github.com/algorandfoundation/algokit-cli/commit/5ff52237172bddf06d3ff845b18e77c31dce9b11))
+
 ## v0.1.3 (2023-01-16)
 ### Documentation
 * Update pipx install instructions ([`e91a06a`](https://github.com/algorandfoundation/algokit-cli/commit/e91a06a38f5b278e9ac26dfef5d7c4833633e750))
