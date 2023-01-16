@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.1.3 (2023-01-16)
+### Documentation
+* Update pipx install instructions ([`e91a06a`](https://github.com/algorandfoundation/algokit-cli/commit/e91a06a38f5b278e9ac26dfef5d7c4833633e750))
+
 ## v0.1.2 (2023-01-11)
 ### Documentation
 * Approved ([`19eb063`](https://github.com/algorandfoundation/algokit-cli/commit/19eb063a2d8327884a5856939db4e0ea157ac26f))
