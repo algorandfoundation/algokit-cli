@@ -83,9 +83,18 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 2. Install using Chocolatey
 
-   - Install AlgoKit: `choco install algokit`
-   - Update AlgoKit: `choco upgrade algokit`
-   - Remove AlgoKit: `choco uninstall algokit`
+   - Install AlgoKit: ~~`choco install algokit`~~
+      > **Note**
+      > The AlgoKit Chocolatey package is not yet available, in the mean time using the following steps  
+      ```
+      choco install python3
+      pip install --user pipx
+      python -m pipx ensurepath
+      python -m pipx install algokit
+      ```
+      Recommended: Add the path to pipx.exe to your path.
+   - Update AlgoKit: ~~`choco upgrade algokit`~~ `pipx upgrade algokit`
+   - Remove AlgoKit: ~~`choco uninstall algokit`~~ `pipx uninstall algokit`
 
 3. [Verify installation](#verify-installation)
 
