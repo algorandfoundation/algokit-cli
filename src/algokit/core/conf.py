@@ -3,8 +3,7 @@ import platform
 from importlib import metadata
 from pathlib import Path
 
-PACKAGE_NAME = "algokit-cli"
-COMMAND_NAME = "algokit"
+PACKAGE_NAME = "algokit"
 
 
 def get_app_config_dir() -> Path:
@@ -35,7 +34,7 @@ def get_app_state_dir() -> Path:
 
 def _get_relative_app_path(base_dir: str) -> Path:
     path = Path(base_dir).expanduser()
-    result = path / COMMAND_NAME
+    result = path / PACKAGE_NAME
     result.mkdir(parents=True, exist_ok=True)
     return result
 

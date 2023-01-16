@@ -73,7 +73,7 @@ cask "$command" do
   version "$version"
   sha256 "$sha256"
 
-  url "$repo/releases/download/v#{version}/algokit_cli-#{version}-py3-none-any.whl"
+  url "$repo/releases/download/v#{version}/algokit-#{version}-py3-none-any.whl"
   name "$command"
   desc "$desc"
   homepage "$homepage"
