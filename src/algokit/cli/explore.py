@@ -20,7 +20,7 @@ class NetworkConfiguration(NetworkConfigurationRequired, total=False):
 
 
 NETWORKS: dict[str, NetworkConfiguration] = {
-    "sandbox": {
+    "localnet": {
         "algod_url": DEFAULT_ALGOD_SERVER,
         "indexer_url": DEFAULT_ALGOD_SERVER,
         "algod_port": DEFAULT_ALGOD_PORT,
@@ -45,7 +45,7 @@ def get_dappflow_url(network: NetworkConfiguration) -> str:
 
 
 @click.command("explore", help="Explore the specified network in the browser using Dappflow.")
-@click.argument("network", type=click.Choice(list(NETWORKS)), default="sandbox", required=False)
+@click.argument("network", type=click.Choice(list(NETWORKS)), default="localnet", required=False)
 def explore_command(network: str) -> None:
     url = get_dappflow_url(NETWORKS[network])
     click.launch(url)

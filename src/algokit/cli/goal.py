@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 @click.command(
     "goal",
-    short_help="Run the Algorand goal CLI against the AlgoKit Sandbox.",
+    short_help="Run the Algorand goal CLI against the AlgoKit LocalNet.",
     context_settings={
         "ignore_unknown_options": True,
     },
@@ -35,7 +35,7 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
         result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
         if result.exit_code != 0:
             raise click.ClickException(
-                "Error executing goal;" + " ensure the Sandbox is started by executing `algokit sandbox status`"
+                "Error executing goal;" + " ensure the LocalNet is started by executing `algokit localnet status`"
             )
 
     else:
@@ -46,5 +46,5 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
             stdout_log_level=logging.INFO,
             prefix_process=False,
             bad_return_code_error_message="Error executing goal;"
-            + " ensure the Sandbox is started by executing `algokit sandbox status`",
+            + " ensure the LocalNet is started by executing `algokit localnet status`",
         )
