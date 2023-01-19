@@ -4,8 +4,8 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Sandbox compose file does not require updating
-Starting the AlgoKit sandbox now...
+Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
-Started; execute `algokit sandbox status` to check the status.
+Started; execute `algokit localnet status` to check the status.

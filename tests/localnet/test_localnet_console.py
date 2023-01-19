@@ -11,7 +11,7 @@ def test_goal_console(proc_mock: ProcMock, mocker: MockerFixture):
         ["docker", "exec"], 0, "STDOUT+STDERR"
     )
 
-    result = invoke("sandbox console")
+    result = invoke("localnet console")
 
     assert result.exit_code == 0
     verify(result.output)

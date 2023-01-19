@@ -20,4 +20,4 @@ Version: 1.2.1
 Status: Error
 # indexer-db status
 Status: Running
-Error: At least one container isn't running; execute `algokit sandbox start` to start the Sandbox
+Error: At least one container isn't running; execute `algokit localnet start` to start the LocalNet
