@@ -154,15 +154,15 @@ AlgoKit can be installed using OS specific package managers, or using the python
 Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to:
 
 ```
-algokit, version 0.8.0
+algokit, version 0.2.0
 ```
 
 It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit. The output of this command will look similar to:
 
 ```
-timestamp: 2023-01-03T06:41:10+00:00
-AlgoKit: 0.1.0
-AlgoKit Python: 3.11.0 (main, Oct 26 2022, 19:06:18) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
+timestamp: 2023-01-19T01:22:07+00:00
+AlgoKit: 0.2.0
+AlgoKit Python: 3.11.1 (main, Dec 23 2022, 09:28:24) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
 OS: macOS-13.1-arm64-arm-64bit
 docker: 20.10.21
 docker compose: 2.13.0
@@ -170,10 +170,10 @@ git: 2.37.1
 python: 3.10.9 (location:  /opt/homebrew/bin/python)
 python3: 3.10.9 (location:  /opt/homebrew/bin/python3)
 pipx: 1.1.0
-poetry: 1.2.2
+poetry: 1.3.2
 node: 18.12.1
 npm: 8.19.2
-brew: 3.6.16
+brew: 3.6.18
 
 If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
 https://github.com/algorandfoundation/algokit-cli/issues/new
