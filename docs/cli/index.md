@@ -44,7 +44,7 @@
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
     - [-a, --answer  ](#-a---answer--)
-  - [sandbox](#sandbox)
+  - [localnet](#localnet)
     - [console](#console)
     - [explore](#explore-1)
     - [reset](#reset)
@@ -213,7 +213,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 Explore the specified network in the browser using Dappflow.
 
 ```shell
-algokit explore [OPTIONS] [[sandbox|testnet|mainnet]]
+algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 ```
 
 ### Arguments
@@ -224,7 +224,7 @@ Optional argument
 
 ## goal
 
-Run the Algorand goal CLI against the AlgoKit Sandbox.
+Run the Algorand goal CLI against the AlgoKit LocalNet.
 
 ```shell
 algokit goal [OPTIONS] [GOAL_ARGS]...
@@ -284,64 +284,64 @@ Whether to run algokit bootstrap to bootstrap the new project’s dependencies.
 ### -a, --answer <key> <value>
 Answers key/value pairs to pass to the template.
 
-## sandbox
+## localnet
 
-Manage the AlgoKit sandbox.
+Manage the AlgoKit LocalNet.
 
 ```shell
-algokit sandbox [OPTIONS] COMMAND [ARGS]...
+algokit localnet [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### console
 
-Run the Algorand goal CLI against the AlgoKit Sandbox via a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
+Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
 
 ```shell
-algokit sandbox console [OPTIONS]
+algokit localnet console [OPTIONS]
 ```
 
 ### explore
 
-Explore the AlgoKit Sandbox using Dappflow
+Explore the AlgoKit LocalNet using Dappflow
 
 ```shell
-algokit sandbox explore [OPTIONS]
+algokit localnet explore [OPTIONS]
 ```
 
 ### reset
 
-Reset the AlgoKit Sandbox.
+Reset the AlgoKit LocalNet.
 
 ```shell
-algokit sandbox reset [OPTIONS]
+algokit localnet reset [OPTIONS]
 ```
 
 ### Options
 
 
 ### --update, --no-update
-Enable or disable updating to the latest available Sandbox version
+Enable or disable updating to the latest available LocalNet version
 
 ### start
 
-Start the AlgoKit Sandbox.
+Start the AlgoKit LocalNet.
 
 ```shell
-algokit sandbox start [OPTIONS]
+algokit localnet start [OPTIONS]
 ```
 
 ### status
 
-Check the status of the AlgoKit Sandbox.
+Check the status of the AlgoKit LocalNet.
 
 ```shell
-algokit sandbox status [OPTIONS]
+algokit localnet status [OPTIONS]
 ```
 
 ### stop
 
-Stop the AlgoKit Sandbox.
+Stop the AlgoKit LocalNet.
 
 ```shell
-algokit sandbox stop [OPTIONS]
+algokit localnet stop [OPTIONS]
 ```

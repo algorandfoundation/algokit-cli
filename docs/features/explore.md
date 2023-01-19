@@ -1,10 +1,10 @@
 # AlgoKit explore
 
-AlgoKit provides a quick shortcut to [explore](../cli/index.md#explore) various Algorand networks using [Dappflow](https://app.dappflow.org/) including the [local sandbox instance](./sandbox.md)!
+AlgoKit provides a quick shortcut to [explore](../cli/index.md#explore) various Algorand networks using [Dappflow](https://app.dappflow.org/) including [AlogKit LocalNet](./localnet.md)!
 
 ## Sandbox
 
-The following three commands are all equivalent and will open Dappflow pointing to the local [AlgoKit Sandbox](./sandbox.md) instance:
+The following three commands are all equivalent and will open Dappflow pointing to the local [AlgoKit LocalNet](./localnet.md) instance:
 
 - `algokit explore`
 - `algokit explore sandbox`

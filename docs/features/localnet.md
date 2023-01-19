@@ -1,14 +1,14 @@
-# AlgoKit Sandbox
+# AlgoKit LocalNet
 
-The AlgoKit Sandbox feature allows you to manage (start, stop, reset, manage) a locally sandboxed private Algorand network. This allows you to interact and deploy changes against your own Algorand network without needing to worry about funding TestNet accounts, information you submit being publicly visible or being connected to an active Internet connection (once the network has been started).
+The AlgoKit LocalNet feature allows you to manage (start, stop, reset, manage) a locally sandboxed private Algorand network. This allows you to interact and deploy changes against your own Algorand network without needing to worry about funding TestNet accounts, information you submit being publicly visible or being connected to an active Internet connection (once the network has been started).
 
-AlgoKit Sandbox uses Docker images that are optimised for a great dev experience. This means the Docker images are small and start fast. It also means that features suited to developers are enabled such as KMD (so you can programmatically get faucet private keys).
+AlgoKit LocalNet uses Docker images that are optimised for a great dev experience. This means the Docker images are small and start fast. It also means that features suited to developers are enabled such as KMD (so you can programmatically get faucet private keys).
 
-The philosophy we take with AlgoKit Sandbox is that you should treat it as an ephemeral network. This means assume it could be reset at any time - don't store data on there that you can't recover / recreate. We have optimised the AlgoKit Sandbox experience to minimise situations where the network will get reset to improve the experience, but it can and will still happen in a number of situations.
+The philosophy we take with AlgoKit LocalNet is that you should treat it as an ephemeral network. This means assume it could be reset at any time - don't store data on there that you can't recover / recreate. We have optimised the AlgoKit LocalNet experience to minimise situations where the network will get reset to improve the experience, but it can and will still happen in a number of situations.
 
 ## Prerequisites
 
-AlgoKit Sandbox relies on Docker and Docker Compose being present and running on your system.
+AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system.
 
 You can install Docker by following the [official installation instructions](https://docs.docker.com/get-docker/). Most of the time this will also install Docker Compose, but if not you can [follow the instructions](https://docs.docker.com/compose/install/) for that too.
 
@@ -16,23 +16,23 @@ If you are on Windows then you will need WSL 2 installed first, for which you ca
 
 ## Known issues
 
-The AlgoKit Sandbox is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the Sandbox to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
+The AlgoKit LocalNet is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the LocalNet to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
 
-If you haven't issued any transactions and you restart the indexer container (or execute `algokit sandbox stop` then `algokit sandbox start`, or restart your computer and execute `algokit sandbox start`) then the indexer will be stuck in an infinite starting loop. This is a [known issue in Algorand Sandbox](https://github.com/algorand/sandbox/issues/163) that should be resolved in the future. If this happens you can simply reset the sandbox via `algokit sandbox reset`.
+If you haven't issued any transactions and you restart the indexer container (or execute `algokit localnet stop` then `algokit localnet start`, or restart your computer and execute `algokit localnet start`) then the indexer will be stuck in an infinite starting loop. This is a [known issue in Algorand Sandbox](https://github.com/algorand/sandbox/issues/163) that should be resolved in the future. If this happens you can simply reset the sandbox via `algokit localnet reset`.
 
 ## Supported operating environments
 
-We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit Sandbox is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
+We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
 
 ## Functionality
 
-### Creating / starting the Sandbox
+### Creating / starting the LocalNet
 
-To create / start your AlgoKit Sandbox instance you can run `algokit sandbox start`. This will:
+To create / start your AlgoKit LocalNet instance you can run `algokit localnet start`. This will:
 
 - Detect if you have Docker and Docker Compose installed
 - Detect if you have the Docker engine running
-- Create a new Docker Compose deployment for AlgoKit Sandbox if it doesn't already exist
+- Create a new Docker Compose deployment for AlgoKit LocalNet if it doesn't already exist
 - (Re-)Start the containers
 
 If it's the first time running it on your machine then it will download the following images from DockerHub:
@@ -41,9 +41,9 @@ If it's the first time running it on your machine then it will download the foll
 - [`makerxau/algorand-indexer-dev`](https://hub.docker.com/r/makerxau/algorand-indexer-dev) (~25 MB)
 - [`postgres:13-alpine`](https://hub.docker.com/_/postgres) (~80 MB)
 
-Once they have downloaded, it won't try and re-download images unless you perform a `algokit sandbox reset`.
+Once they have downloaded, it won't try and re-download images unless you perform a `algokit localnet reset`.
 
-Once the Sandbox has started, the following endpoints will be available:
+Once the LocalNet has started, the following endpoints will be available:
 
 - [algod](https://developer.algorand.org/docs/rest-apis/algod/v2/):
   - address: http://localhost:4001
@@ -56,23 +56,23 @@ Once the Sandbox has started, the following endpoints will be available:
 - tealdbg port:
   - address: http://localhost:9392
 
-### Stopping and Resetting the Sandbox
+### Stopping and Resetting the LocalNet
 
-To stop the sandbox you can execute `algokit sandbox stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit sandbox start`.
+To stop the LocalNet you can execute `algokit localnet stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit localnet start`.
 
-To reset the sandbox you can execute `algokit sandbox reset`, which will tear down the existing containers, refresh the container definition from the latest stored within AlgoKit and update to the latest Docker images. If you want to keep the same container spec and versions as you currently have, but quickly tear down and start a new instance then run `algokit sandbox reset --no-update`.
+To reset the LocalNet you can execute `algokit localnet reset`, which will tear down the existing containers, refresh the container definition from the latest stored within AlgoKit and update to the latest Docker images. If you want to keep the same container spec and versions as you currently have, but quickly tear down and start a new instance then run `algokit localnet reset --no-update`.
 
-### Viewing transactions in the Sandbox
+### Viewing transactions in the LocalNet
 
-You can see a web-based user interface of the current state of your Sandbox including all transactions by using the [AlgoKit Explore](./explore.md) feature, e.g. by executing `algokit sandbox explore`.
+You can see a web-based user interface of the current state of your LocalNet including all transactions by using the [AlgoKit Explore](./explore.md) feature, e.g. by executing `algokit localnet explore`.
 
-### Executing goal commands against AlgoKit Sandbox
+### Executing goal commands against AlgoKit LocalNet
 
-See the [AlgoKit Goal](./goal.md) feature. You can also execute `algokit sandbox console` to open a [Bash shell which allows you to run the goal commandline](./goal.md#running-multiple-commands).
+See the [AlgoKit Goal](./goal.md) feature. You can also execute `algokit localnet console` to open a [Bash shell which allows you to run the goal commandline](./goal.md#running-multiple-commands).
 
 ### Getting access to the private key of the faucet account
 
-If you want to use the Sandbox then you need to get the private key of the initial wallet so you can transfer ALGOs out of it to other accounts you create.
+If you want to use the LocalNet then you need to get the private key of the initial wallet so you can transfer ALGOs out of it to other accounts you create.
 
 There are two ways to do this:
 
@@ -85,7 +85,7 @@ algokit goal account export -a {address_from_an_online_account_from_above_comman
 
 **Option 2: Automatically via kmd API**
 
-Needing to do this manual step every time you spin up a new development environment or reset your Sandbox is frustrating. Instead, it's useful to have code that uses the Sandbox APIs to automatically retrieve the private key of the default account. The following `getSandboxDefaultAccount` function will help you achieve that. It's written in TypeScript, but the equivalent will work with [the Algorand SDK in other languages](https://developer.algorand.org/).
+Needing to do this manual step every time you spin up a new development environment or reset your LocalNet is frustrating. Instead, it's useful to have code that uses the Sandbox APIs to automatically retrieve the private key of the default account. The following `getSandboxDefaultAccount` function will help you achieve that. It's written in TypeScript, but the equivalent will work with [the Algorand SDK in other languages](https://developer.algorand.org/).
 
 ```typescript
 // account.ts
@@ -156,4 +156,4 @@ export function getKmdClient(): Kmd {
 }
 ```
 
-For more details about the `AlgoKit sandbox` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#sandbox).
+For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#localnet).
