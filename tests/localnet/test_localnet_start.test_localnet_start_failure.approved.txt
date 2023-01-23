@@ -3,12 +3,10 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-Deleting any existing Sandbox...
-DEBUG: Running 'docker compose down' in '{app_config}/sandbox'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
-Starting the AlgoKit sandbox now...
+DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
+Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
-Started; execute `algokit sandbox status` to check the status.
+Error: Failed to start LocalNet

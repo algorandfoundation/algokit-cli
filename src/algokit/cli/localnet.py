@@ -19,8 +19,8 @@ from algokit.core.utils import is_minimum_version
 logger = logging.getLogger(__name__)
 
 
-@click.group("sandbox", short_help="Manage the AlgoKit sandbox.")
-def sandbox_group() -> None:
+@click.group("localnet", short_help="Manage the AlgoKit LocalNet.")
+def localnet_group() -> None:
     try:
         compose_version_result = proc.run(DOCKER_COMPOSE_VERSION_COMMAND)
     except IOError as ex:
@@ -56,8 +56,8 @@ def sandbox_group() -> None:
     proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
-@sandbox_group.command("start", short_help="Start the AlgoKit Sandbox.")
-def start_sandbox() -> None:
+@localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
+def start_localnet() -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
@@ -66,31 +66,33 @@ def start_sandbox() -> None:
     elif compose_file_status is ComposeFileStatus.UP_TO_DATE:
         logger.debug("Sandbox compose file does not require updating")
     else:
-        logger.warning("Sandbox definition is out of date; please run algokit sandbox reset")
+        logger.warning("Sandbox definition is out of date; please run algokit localnet reset")
     sandbox.up()
 
 
-@sandbox_group.command("stop", short_help="Stop the AlgoKit Sandbox.")
-def stop_sandbox() -> None:
+@localnet_group.command("stop", short_help="Stop the AlgoKit LocalNet.")
+def stop_localnet() -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
-        logger.debug("Sandbox compose file does not exist yet; run `algokit sandbox start` to start the Sandbox")
+        logger.debug(
+            "Sandbox compose file does not exist yet; run `algokit localnet start` to start the AlgoKit LocalNet"
+        )
     else:
         sandbox.stop()
 
 
-@sandbox_group.command("reset", short_help="Reset the AlgoKit Sandbox.")
+@localnet_group.command("reset", short_help="Reset the AlgoKit LocalNet.")
 @click.option(
     "--update/--no-update",
     default=True,
-    help="Enable or disable updating to the latest available Sandbox version",
+    help="Enable or disable updating to the latest available LocalNet version",
 )
-def reset_sandbox(update: bool) -> None:  # noqa: FBT001
+def reset_localnet(update: bool) -> None:  # noqa: FBT001
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
-        logger.debug("Existing Sandbox not found; creating from scratch...")
+        logger.debug("Existing LocalNet not found; creating from scratch...")
         sandbox.write_compose_file()
     else:
         sandbox.down()
@@ -105,15 +107,15 @@ def reset_sandbox(update: bool) -> None:  # noqa: FBT001
 SERVICE_NAMES = ("algod", "indexer", "indexer-db")
 
 
-@sandbox_group.command("status", short_help="Check the status of the AlgoKit Sandbox.")
-def sandbox_status() -> None:
+@localnet_group.command("status", short_help="Check the status of the AlgoKit LocalNet.")
+def localnet_status() -> None:
     sandbox = ComposeSandbox()
     ps = sandbox.ps()
     ps_by_name = {stats["Service"]: stats for stats in ps}
     # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),
     # then they will be missing from the output dictionary
     if set(SERVICE_NAMES) != ps_by_name.keys():
-        raise click.ClickException("Sandbox has not been initialized yet, please run 'algokit sandbox start'")
+        raise click.ClickException("LocalNet has not been initialized yet, please run 'algokit localnet start'")
     # initialise output dict by setting status
     output_by_name = {
         name: {"Status": "Running" if ps_by_name[name]["State"] == "running" else "Not running"}
@@ -135,21 +137,21 @@ def sandbox_status() -> None:
     # return non-zero if any container is not running
     if not all(item["Status"] == "Running" for item in output_by_name.values()):
         raise click.ClickException(
-            "At least one container isn't running; execute `algokit sandbox start` to start the Sandbox"
+            "At least one container isn't running; execute `algokit localnet start` to start the LocalNet"
         )
 
 
-@sandbox_group.command(
+@localnet_group.command(
     "console",
-    short_help="Run the Algorand goal CLI against the AlgoKit Sandbox via a Bash console"
+    short_help="Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash console"
     + " so you can execute multiple goal commands and/or interact with a filesystem.",
 )
 @click.pass_context
-def sandbox_console(context: click.Context) -> None:
+def localnet_console(context: click.Context) -> None:
     context.invoke(goal_command, console=True)
 
 
-@sandbox_group.command("explore", short_help="Explore the AlgoKit Sandbox using Dappflow")
+@localnet_group.command("explore", short_help="Explore the AlgoKit LocalNet using Dappflow")
 @click.pass_context
-def sandbox_explore(context: click.Context) -> None:
+def localnet_explore(context: click.Context) -> None:
     context.invoke(explore_command)

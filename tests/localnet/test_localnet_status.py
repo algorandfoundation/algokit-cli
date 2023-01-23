@@ -8,7 +8,7 @@ from utils.click_invoker import invoke
 from utils.proc_mock import ProcMock
 
 
-def test_sandbox_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -73,13 +73,13 @@ def test_sandbox_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, h
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 0
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -142,13 +142,13 @@ def test_sandbox_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, h
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -210,13 +210,13 @@ def test_sandbox_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMo
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -272,13 +272,13 @@ def test_sandbox_status_service_not_started(app_dir_mock: AppDirs, proc_mock: Pr
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -338,13 +338,13 @@ def test_sandbox_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock,
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
+def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -383,52 +383,52 @@ def test_sandbox_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMo
             )
         ],
     )
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock):
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
     proc_mock.should_bad_exit_on("docker compose stop")
 
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_no_existing_definition(app_dir_mock: AppDirs, proc_mock: ProcMock):
-    result = invoke("sandbox status")
+def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs, proc_mock: ProcMock):
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_sandbox_status_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_status_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock):
     proc_mock.should_fail_on("docker compose version")
 
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output)
 
 
-def test_sandbox_status_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_status_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock):
     proc_mock.should_bad_exit_on("docker compose version")
 
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output)
 
 
-def test_sandbox_status_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_status_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock):
     proc_mock.should_bad_exit_on("docker version")
 
-    result = invoke("sandbox status")
+    result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output)

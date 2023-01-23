@@ -61,19 +61,19 @@ class ComposeSandbox:
         )
 
     def up(self) -> None:
-        logger.info("Starting the AlgoKit sandbox now...")
+        logger.info("Starting AlgoKit LocalNet now...")
         self._run_compose_command(
-            "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start Sandbox"
+            "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start LocalNet"
         )
-        logger.info("Started; execute `algokit sandbox status` to check the status.")
+        logger.info("Started; execute `algokit localnet status` to check the status.")
 
     def stop(self) -> None:
-        logger.info("Stopping the AlgoKit sandbox now...")
-        self._run_compose_command("stop", bad_return_code_error_message="Failed to stop Sandbox")
-        logger.info("Sandbox Stopped; execute `algokit sandbox start` to start it again.")
+        logger.info("Stopping AlgoKit LocalNet now...")
+        self._run_compose_command("stop", bad_return_code_error_message="Failed to stop LocalNet")
+        logger.info("Sandbox Stopped; execute `algokit localnet start` to start it again.")
 
     def down(self) -> None:
-        logger.info("Deleting any existing Sandbox...")
+        logger.info("Deleting any existing LocalNet...")
         self._run_compose_command("down", stdout_log_level=logging.DEBUG)
 
     def pull(self) -> None:
