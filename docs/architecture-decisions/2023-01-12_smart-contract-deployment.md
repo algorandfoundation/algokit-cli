@@ -9,7 +9,7 @@
 
 ## Context
 
-AlgoKit will provide an end-to-end development and deployment experience that includes support for the end-to-end smart contract lifecycle:
+AlgoKit will provide an end-to-end development and deployment experience that includes support for the end-to-end smart contract development lifecycle:
 
 1. Development
    1. **Write** smart contracts
@@ -17,8 +17,8 @@ AlgoKit will provide an end-to-end development and deployment experience that in
    3. **Verify** the TEAL Templates maintain [output stability](../articles/output_stability.md) and any other static code quality checks
 2. Deployment
    1. **Substitute** deploy-time parameters into TEAL Templates to create final TEAL code
-   2. **Compile** the TEAL to create byte code
-   3. **Deploy** the byte code to one or more Algorand networks (e.g. Sandbox, TestNet, MainNet) to create Deployed Application(s)
+   2. **Compile** the TEAL to create byte code using algod
+   3. **Deploy** the byte code to one or more Algorand networks (e.g. LocalNet, TestNet, MainNet) to create Deployed Application(s)
 3. Runtime
    1. **Validate** the deployed app via automated testing of the smart contracts to provide confidence in their correctness
    2. **Call** deployed smart contract with runtime parameters to utilise it
@@ -32,34 +32,50 @@ This decision record covers the different options and high level design for how 
 ## Requirements
 
 - We support the different activities defined above under Deployment and Runtime: Substitute, Compile, Deploy, Validate and Call
-- We support the ability to provide deploy-time (e.g. static values that are passed into instances of a contract that get output), deploy-time (e.g. network specific addresses or IDs, etc.) and run-time (e.g. call arguments) values to smart contracts
+- We support the ability to provide dev-time (e.g. static values that are passed into instances of a contract that get output), deploy-time (e.g. network specific addresses or IDs, etc.) and run-time (e.g. call arguments) values to smart contracts
 - We support deploying smart contracts that have been output by any means (Beaker or otherwise) that creates TEAL templates (logic signature or approval & clear) and (for an app) an [ABI](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0004.md) and an [app spec](https://github.com/algorandfoundation/ARCs/pull/150)
-- We support calling smart contracts with multiple languages / programming ecosystems
+- We support calling smart contracts with multiple languages / programming ecosystems (with AlgoKit providing Python and TypeScript implementations)
 - We support generating type-safe smart contract clients based on the smart contract definition
-- We support deploying smart contracts to AlgoKit Sandbox, TestNet and Mainnet
+- We support deploying smart contracts to AlgoKit LocalNet, TestNet and Mainnet
 - We support deploying manually and via continuous deployment pipeline
 
 ## Principles
 
-- **[AlgoKit Guiding Principles](../../README.md#Guiding-Principles)** - specifically Cohesive developer tool suite, Seamless onramp, Secure by default, and Modular components
+- [AlgoKit Guiding Principles](../../README.md#Guiding-Principles) - specifically:
+  - **Cohesive developer tool suite**
+  - **Seamless onramp**
+  - **Secure by default**
+  - **Modular components**
 - **Continuous Delivery** - support the ability for software developers to adopt a [Continuous Delivery](https://continuousdelivery.com/) approach to reduce risk, namely by supporting:
   - [Deployment pipelines](https://continuousdelivery.com/implementing/patterns/#the-deployment-pipeline) that build once and deploy to similar environments (that bit is nicely facilitated by the blockchain!) consistently
   - [Automated testing](https://continuousdelivery.com/implementing/architecture/)
-- **Facilitate correctness** - smart contract development is higher risk than many other types of development, standard practice involves deploying an immutable contract that must be right from the beginning; AlgoKit should help developers fall into the pit of success and produce higher quality output that is more likely to be correct
+- **Facilitate correctness** - smart contract development is higher risk than many other types of development, standard practice involves deploying an immutable contract that must be right from the beginning; AlgoKit should help developers fall into the pit of success and produce higher quality output that is more likely to be correct while having flexibility to opt-in to other behaviours as needed
 
 ## Decisions and design
+
+The following design decisions need to be considered, and are discussed below:
+
+- TEAL Templates and deploy-time parameter substitution
+- Generated / Type-safe clients
+- Deployment and development decoupling
+- Upgradeable and deletable contracts
+- Mnemonic storage and retrieval
+- Contract identification
+- Automated vs manual deployments
+- Output stability testing
+- Validation testing
 
 ### TEAL Templates and deploy-time parameter substitution
 
 The above diagram includes a TEAL Templates step separate from the final TEAL that gets deployed. A fair question may be to ask if this extra step is really needed?
 
-There are two considerations to make to help answer this question:
+There are two key considerations to help answer this question:
 
 1. Should development and deployment be decoupled from each other (i.e. happen at a separate time)?
    - If we couple development and deployment together then it necessitates that at deploy time you have the same programming environment running that's needed for the smart contract development. So, if you (for instance) were building a smart contract in Python using PyTEAL or Beaker, but deploying the smart contract using TypeScript that means you need a deployment environment that supports both Node.js _and_ Python. This makes it harder to follow the Modular components principle.
-   - If development and deployment are coupled together it rules out using Continuous Delivery since it forces you to build the deployment artifact at the same time as you are deploying it. This means you miss out on the confidence and risk benefit of knowing that when you are deploying to (say) MainNet you are deploying the same artifact that was successfully deployed and tested on (say) TestNet and AlgoKit Sandbox (let alone passes any other checks you decide to run as part of Continuous Integration like automated tests, static code analysis, etc.).
+   - If development and deployment are coupled together it rules out using Continuous Delivery since it forces you to build the deployment artifact at the same time as you are deploying it. This means you miss out on the confidence and risk benefit of knowing that when you are deploying to (say) MainNet you are deploying the same artifact that was successfully deployed and tested on (say) TestNet and AlgoKit LocalNet (let alone passes any other checks you decide to run as part of Continuous Integration like automated tests, static code analysis, etc.).
    - If development and deployment are coupled together it means we aren't perform an [output stability](../articles/output_stability.md) test so we don't get notified if we make a change that results in a different smart contract (which may then affect things like hashes for smart contract auditing review comparison, unintended introduction of security vulnerabilities, etc.).
-   - Based on all of this, decoupling development and deployment is a very helpful thing for a smart contract and aligns with all of the above-stated Principles more closely.
+   - Based on all of this, decoupling development and deployment is a very helpful thing for a smart contract and aligns with all of the above-stated principles more closely.
 2. Do we need to provide deploy-time parameters?
    - When deploying a smart contract to a network (say MainNet), there are likely to be certain parameters that will be different from deploying to a different network (say TestNet), e.g.:
      - If you are calling another smart contract, say an Oracle, then the application ID will change between networks.
@@ -154,7 +170,7 @@ Smart contracts are a powerful capability that can be used for anything from loc
 These different risk profiles have an impact on the functionality that is exposed within a smart contract. Two key examples of this are:
 
 - **Upgradeable smart contracts** - Whether or not a smart contract can be updated inline (and keep existing state and app ID / address characteristics) or they are immutable
-- **Deletable mart contracts** - Whether or not a smart contract can be deleted or is permanent
+- **Deletable smart contracts** - Whether or not a smart contract can be deleted or is permanent
 
 Immutability and permanence are useful architectural properties in certain circumstances (similarly mutability and impermanence in others). For example:
 
@@ -183,7 +199,7 @@ The goal of AlgoKit is to create a development experience that is productive and
 - All provided smart contract templates are by default immutable
 - An immutability automated test is included by default to ensure that smart contracts can't be upgraded by the contract creator (this would have to be deleted by a developer, who is then opting in to the consequences of that)
 - All provided smart contract templates are by default permanent when deployed to MainNet, but deletable elsewhere to facilitate an iterative development experience
-- Client code will include mechanisms to dynamically find deployed applications in Sandbox and TestNet environments to support delete/recreate flows and improve the developer experience
+- Client code will include mechanisms to dynamically find deployed applications in LocalNet and TestNet environments to support delete/recreate flows and improve the developer experience
 - MainNet deployments will immediately (i.e. before any usage occurs) check that smart contracts are not upgradeable by the creator account by default (with an explicit opt-out option available for smart contracts that are meant to be upgradeable, which in turn will issue a warning to the developer to explain the implications)
 - MainNet deployments will immediately (i.e. before any usage occurs) check that smart contracts are not deletable by the creator account by default (with an explicit opt-out option available for smart contracts that are meant to be deletable, which in turn will issue a warning to the developer to explain the implications)
 
@@ -191,16 +207,16 @@ The goal of AlgoKit is to create a development experience that is productive and
 
 When deploying and interacting with a smart contract, you need to have access to the private key of an account. This is a secret and must be handled with care, as exposing a private key can be disastrous, and while [rekeying](https://developer.algorand.org/docs/get-details/accounts/rekey/) is possible if it's not done fast enough you can still loose assets, be victim to malicious calls and experience a painful user experience going forward (wallet support for rekeyed accounts is limited).
 
-Another consideration is the network being deployed to / called. If you are interacting with the local Sandbox network then mnemonics are all, but meaningless since you can simply reset the Sandbox and regenerate new accounts on the fly (and fund them with essentially unlimited ALGOs). If you are interacting with TestNet then mnemonics may hold TestNet ALGOs, which while difficult to get in large numbers, are more an inconvenience than a serious commercial problem to lose.
+Another consideration is the network being deployed to / called. If you are interacting with the LocalNet network then mnemonics are all, but meaningless since you can simply reset the LocalNet and regenerate new accounts on the fly (and fund them with essentially unlimited ALGOs). If you are interacting with TestNet then mnemonics may hold TestNet ALGOs, which while difficult to get in large numbers, are more an inconvenience than a serious commercial problem to lose.
 
-Finally, when interacting with Sandbox to create a smooth developer experience it's ideal to automatically generate and fund any accounts that are being used so the developer doesn't have to manually do this every time the Sandbox is reset. Even better, it's ideal if this can be done in a way that idempotently gets a consistently private key for a given "named account" so that subsequent calls use the same account (mimicking what happens in TestNet or MainNet when using a particular private key for a given "named account").
+Finally, when interacting with LocalNet to create a smooth developer experience it's ideal to automatically generate and fund any accounts that are being used so the developer doesn't have to manually do this every time the LocalNet is reset. Even better, it's ideal if this can be done in a way that idempotently gets a consistently private key for a given "named account" so that subsequent calls use the same account (mimicking what happens in TestNet or MainNet when using a particular private key for a given "named account").
 
 Given all of this, the suggested approach that AlgoKit takes is:
 
-- Sandbox accounts are by default automatically and idempotently generated against a named account by using a named wallet via [Kmd](https://developer.algorand.org/docs/clis/kmd/) and are automatically funded using the Sandbox faucet account (the private key for which is automatically retrieved using Kmd).
+- LocalNet accounts are by default automatically and idempotently generated against a named account by using a named wallet via [Kmd](https://developer.algorand.org/docs/clis/kmd/) and are automatically funded using the LocalNet faucet account (the private key for which is automatically retrieved using Kmd).
 - Where they are needed mnemonics will be provided using environment variables to follow [twelve factor app conventions](https://12factor.net/config), this is an industry standard approach to handling secrets and is easy to support cross-platform and cross-programming language as well as using encrypted secrets on CI/CD pipelines.
 - An option will be provided for deployments that allows for deployments using ephemeral accounts that then get rekeyed to a separate, known [break-glass](https://www.beyondtrust.com/blog/entry/provide-security-privileged-accounts-with-break-glass-process) account (the private key of which is not available to the deploying process) will be provided to allow for developers to deploy using a break-glass setup.
-- A `DISPENSER_MNEMONIC` environment variable will be expected when deploying to non-Sandbox environments, and will be encouraged to be a separate account just used for that purpose to limit [blast radius](https://www.lepide.com/blog/what-is-a-blast-radius-in-data-security-terms/), so that funds needed for deployments or calls can be automatically provided by convention, including for ephemeral accounts.
+- A `DISPENSER_MNEMONIC` environment variable will be expected when deploying to non-LocalNet environments, and will be encouraged to be a separate account just used for that purpose to limit [blast radius](https://www.lepide.com/blog/what-is-a-blast-radius-in-data-security-terms/), so that funds needed for deployments or calls can be automatically provided by convention, including for ephemeral accounts.
 - The Algokit CLI will allow for mnemonics to be provided to it for a given project, which will get stored in a encrypted form within the .gitignore'd `.env` file with a project-specific random encryption key stored on that machine. This prevents cursory exploitation and accidental exposure through screen-sharing, but won't protect users with an exploited machine from having them exposed. For this reason, developers will be discouraged from storing MainNet mnemonics in that way and will need to acknowledge that risk.
 - AlgoKit will provide example CI/CD templates that illustrate how to construct a deployment pipeline that includes MainNet deployments using secret storage for mnemonics so developers won't need to handle MainNet mnemonics on their local machine.
 
@@ -210,13 +226,13 @@ Being able to identify an existing deployed instance of a given smart contract i
 
 - It avoids the need to hardcode application IDs
 - It makes things easier to automate, including automated deployments and testing of smart contracts and the apps that call them
-- It allows the deployer of a smart contract to detect if that smart contract is already deployed and if so handle it appropriately (e.g. do nothing vs upgrade vs delete and create vs leave alone and create) depending on whether that smart contract is immutable and/or permanent and the network being deployed to (e.g. Sandbox vs TestNet vs MainNet)
+- It allows the deployer of a smart contract to detect if that smart contract is already deployed and if so handle it appropriately (e.g. do nothing vs upgrade vs delete and create vs leave alone and create) depending on whether that smart contract is immutable and/or permanent and the network being deployed to (e.g. LocalNet vs TestNet vs MainNet)
 
-As soon as a contract is not immutable, or is immutable and not permanent then the application ID of the smart contract for a given network will change over time. And, if a smart contract is immutable and permanent then net new versions may still be deployed, or at the very least the contract will change across networks (e.g. Sandbox vs TestNet vs MainNet). Because of this it's important to support dynamic resolution of application IDs.
+As soon as a contract is not immutable, or is immutable and not permanent then the application ID of the smart contract for a given network will change over time. And, if a smart contract is immutable and permanent then net new versions may still be deployed, or at the very least the contract will change across networks (e.g. LocalNet vs TestNet vs MainNet). Because of this it's important to support dynamic resolution of application IDs.
 
 It's important to consider whether the smart contract needs to be resolved on-chain or off-chain.
 
-Resolving on-chain is harder to achieve dynamically, but there are some key patterns that can be used, e.g.:
+Resolving on-chain is harder to achieve dynamically, but there are some patterns that can be used, e.g.:
 
 - Storing the application ID in (e.g. Global) state and providing a creator-only ABI method that can be called as part of deployment of the dependant contract to update the stored application ID.
 - [Lookup/registry contract](https://research.csiro.au/blockchainpatterns/general-patterns/contract-structural-patterns/contract-registry/) that returns the ID of a named contract and that lookup contract allows said ID to be updated.
@@ -240,16 +256,118 @@ In order to provide the simplest implementation possible to handle this complexi
 
 More sophisticated options could potentially by implemented in the future.
 
+### Automated vs manual deployments
+
+In order to support Continuous Delivery for smart contracts there is a need to support automated deployments of smart contracts via deployment pipeline.
+
+This presents a number of challenges to solve for though:
+
+- The deployment pipeline needs to determine if the smart contract already exists or not in the network being deployed to
+- Depending on whether the contract is immutable and/or permanent and if it already exists or not in the network being deployed to, the pipeline needs to handle upgrade, deletion and/or creation of the contract (and this behaviour may need to be switched depending on the network being deployed to)
+- In order to protect integrity of MainNet contracts the deployment process should probably have some safeguards for MainNet that by default prevent destructive operations and require some kind of human opt-in to perform those operations
+- Exposing private key mnemonics for MainNet necessitates they are "hot wallets" which may be undesirable for privileged accounts responsible for high value smart contracts (e.g. smart contracts locking $m's or $b's), alternatively low privilege scenarios may benefit from (encrypted secret) mnemonic storage to improve developer experience and operational overhead
+- Supporting cold storage wallets for high privilege accounts, without resorting the manual deployments (which present their own risks) is tricky
+- There are many deployment pipeline technologies available on the market and providing support for many of them is an impractical amount of effort.
+- Should manual deployments be supported as well as automated deployments to make it easier for developers to perform ad hoc deployments (e.g. when quickly testing concepts, or doing a one-off deployment) and improve developer flexibility
+
+The proposed AlgoKit implementation for v1 that provides a balance of flexibility vs implementation effort, while aligning to the principles is as follows:
+
+- A GitHub Actions implementation is provided in the default template, since GitHub is a highly capable and prevalent option and is free for Open Source and basic private usage (the community can contribute other CI/CD implementations if desired)
+- The "Contract identification" v1 implementation suggested above is followed to determine if a contract already exists for the network being deployed to
+- The "Mnemonic storage and retrieval" v1 implementation suggested above is followed to facilitate a secure, but flexible implementation for how to handle private keys for ad hoc manual deployments and CI/CD pipelines
+- Cold wallets won't be supported for now, but is recommended as a future exploration, in the meantime that scenario can be implemented by using the rekey technique mentioned in "Mnemonic storage and retrieval"
+
 ### Output stability testing
+
+Ensuring [output stability](../articles/output_stability.md) is useful for smart contract development. It helps ensure that you can refactor code without making an inadvertent change to the smart contract, ensure that a smart contract output isn't changed from any output that is audited, and ensure that there is a clear mechanism to manually review the smart contract output before it's (re-)deployed.
+
+There are three broad approaches that could be taken by AlgoKit to help facilitate output stability testing:
+
+1. Include documentation that recommends this kind of testing and provides examples for how to implement it
+2. Include a Git-based approach in default AlgoKit template(s), that requires you to stage changes to the existing smart contract output (per decoupling development and deployment) using normal Git workflows otherwise the test will fail (meaning it will fail locally and on continuous integration pipeline)
+3. Include an [approval-testing](https://approvaltests.com/) based approach in default AlgoKit template(s), that results in an approved TEAL file that is committed
+
+A documentation-only approach strays away from the "Facilitate correctness" and "Secure by default" principles where we want to help developers fall into the pit of success by default.
+
+Approval testing is a handy technique that is established in the industry, but in this case results in the TEAL output being committed twice, which is a confusing duplication. Furthermore, by ensuring the automated test is against the output that will get deployed it ensures there is a coherence between the TEAL being tested and the TEAL being deployed.
+
+With this in mind, the proposal is for AlgoKit to include a Git-based output stability test by default, but per the "Modular components" principle there is a template option to exclude those tests.
 
 ### Validation testing
 
-### Automated vs manual deployments
+In order to provide confidence in the correctness of a smart contract it's important to exercise testing to validate the smart contract operates as expected.
 
-### Testnet deployments
+There are a few possible approaches that could be taken by AlgoKit to help facilitate this:
 
-.env (unencrypted is fine as long as it's in .gitignore) or ci/cd or kmd or algokit stores in config?
+1. **Documentation** - Include documentation that recommends this kind of testing and provides examples for how to implement it
+2. **Manual testing** - Encourage a manual testing approach using (for example) the ABI user interface in dAppFlow, by providing an AlgoKit CLI command that sends the user there along with the ABI definition and contract ID resulting in a manual testing experience for the deployed contract with low friction
+3. **Automated integration tests** - Facilitate automated testing by issuing real transactions against a LocalNet and/or TestNet network
+4. **Automated dry run tests** - Facilitate automated testing using the [Dry Run endpoint](https://developer.algorand.org/docs/rest-apis/algod/v2/#post-v2tealdryrun) to simulate what would happen when executing the contract under certain scenarios (e.g. [Graviton](https://github.com/algorand/graviton/blob/main/graviton/README.md))
+5. **TEAL emulator** - Facilitate automated testing against a TEAL emulator (e.g. [Algo Builder Runtime](https://algobuilder.dev/api/runtime/index.html))
 
-### Mainnet deployments
+#### Documentation
 
-by default don't allow mainnet deployment via ci/cd or locally (maybe present txn for signing?), allow ci/cd with once-only deployment by default?
+**Pros**
+
+- Least effort to implement
+
+**Cons**
+
+- Doesn't follow the principles of "Seamless onramp", "Continuous Delivery" or "Facilitate correctness"
+- Easy for users to miss
+
+#### Manual testing
+
+**Pros**
+
+- Low effort to implement
+- Facilitates a great manual testing experience for exploratory testing or situations where you want/need to manual test a contract in addition to automated testing
+
+**Cons**
+
+- Doesn't follow the principle of "Continuous Delivery" or "Facilitate correctness"
+- Doesn't provide regression coverage as the smart contract evolves during development
+
+#### Automated integration tests
+
+**Pros**
+
+- Prior art can be leveraged from MakerX (TypeScript) and [algopytest](https://github.com/DamianB-BitFlipper/algopytest) (Python), both of which provide abstractions to make it easier to produce tests that avoid intermittent failures
+- High degree of confidence - exercising the smart contract in a similar way to real users means we have a high degree of confidence in the validation
+- Good regression coverage
+
+**Cons**
+
+- This type of testing is naturally slower making it impractical to provide combinatorial coverage (relevant: [first 5 minutes of the Microtesting presentation Rob and Matt delivered in 2016](https://www.youtube.com/watch?v=pls1Vk_bw_Y))
+- This type of testing can be hard to make reliable (it's easy to get intermittent timing errors if you aren't careful)
+
+#### Automated dry run tests
+
+**Pros**
+
+- Faster test runs allows for testing a larger proportion of combinatorial coverage and adopting approaches like property-based testing to provide higher degree of confidence
+- Allows for validation of additional properties like opcode usage etc.
+
+**Cons**
+
+- Verbose / unfamiliar test setup to specify the desired state of the blockchain before the dry run (which won't be shareable code with any clients like dApps since it will be test specific)
+- Highly likely there will be a coherence gap between test setup and real-life call since
+- High effort to implement, particularly cross-platform since there isn't existing TypeScript-based prior art
+- Dry run endpoint is being replaced with a new simulate endpoint, but there isn't much available about what that endpoint will look like yet so need to decide between implementing something that is
+
+#### TEAL emulator
+
+**Pros**
+
+- Likely to be the best speed properties allowing for full combinatorial coverage
+
+**Cons**
+
+- Requires implementation and/or maintenance of a TEAL emulator, which would duplicate effort being put in by Algorand Inc. on the simulate endpoint
+- Algo Builder implementation, while being an existing solution and OpenSource requires TypeScript (so is harder to use for Python testing) and also requires a highly bespoke syntax to interact with it that won't allow for easy interoperability with AlgoKit or other things, thus not confirming with "Modular components" principle)
+
+#### Selected option
+
+Based on all of this the suggested option for AlgoKit v1 is **Automated integration tests** since it conforms to the principles well, has prior art across TypeScript and Python that can be utilised and provides developers with a lot of confidence.
+
+Post v1, it's recommended that dAppFlow integration for exploratory testing and Graviton (or similar) support should be explored to provide a range of options to empower developers with a full suite of techniques they can use.
