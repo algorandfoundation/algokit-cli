@@ -155,6 +155,8 @@ console.log(result); // Hello, World!
 
 To be fair, you could have a middle-ground and load the ABI json to populate the `method` parameter of the `addMethodCall` call, but the `methodArgs` are still problematic and there is still no intellisense.
 
+The suggested implementation for AlgoKit v1 is to provide a basic type-safe TypeScript client (leveraging either the MakerX TypeScript generator or [beaker-ts](https://github.com/algorand-devrel/beaker-ts)) and leave Python with the semi-typed implementation that Beaker currently exposes (with implementing a fully typed Python client as a future implementation effort).
+
 ### Deployment and development decoupling
 
 As discussed above, decoupling deployment and development of smart contracts is a useful technique.
