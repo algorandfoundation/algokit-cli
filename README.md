@@ -107,7 +107,9 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
    - [Brew](https://docs.brew.sh/Installation)
    - [Git](https://github.com/git-guides/install-git#install-git-on-mac) should already be available if brew is installed
-   - [Docker](https://docs.docker.com/desktop/install/mac-install/) (or `brew install --cask docker-desktop`)
+   - [Docker](https://docs.docker.com/desktop/install/mac-install/), (or `brew install --cask docker`)
+      > **Note**
+      > Docker requires MacOS 11+
 
 2. Install using Brew
 
