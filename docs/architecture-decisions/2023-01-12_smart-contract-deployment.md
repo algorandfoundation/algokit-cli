@@ -1,11 +1,11 @@
 # Smart Contract Deployment
 
-- **Status**: Draft
+- **Status**: Approved
 - **Owner:** Rob Moore
-- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Fabrice Benhamouda (Algorand Inc.)
+- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Fabrice Benhamouda (Algorand Foundation)
 - **Date created**: 2023-01-12
-- **Date decided:** TBD
-- **Date updated**: 2023-01-12
+- **Date decided:** 2023-02-04
+- **Date updated**: 2023-02-04
 
 ## Context
 
@@ -207,7 +207,7 @@ The goal of AlgoKit is to create a development experience that is productive and
 
 ### Mnemonic storage and retrieval
 
-When deploying and interacting with a smart contract, you need to have access to the private key of an account. This is a secret and must be handled with care, as exposing a private key can be disastrous, and while [rekeying](https://developer.algorand.org/docs/get-details/accounts/rekey/) is possible if it's not done fast enough you can still loose assets, be victim to malicious calls and experience a painful user experience going forward (wallet support for rekeyed accounts is limited).
+When deploying and interacting with a smart contract, you need to have access to the private key of an account. This is a secret and must be handled with care, as exposing a private key can be disastrous, and while [rekeying](https://developer.algorand.org/docs/get-details/accounts/rekey/) is possible if it's not done fast enough you can still lose assets, be victim to malicious calls and experience a painful user experience going forward (wallet support for rekeyed accounts is limited).
 
 Another consideration is the network being deployed to / called. If you are interacting with the LocalNet network then mnemonics are all, but meaningless since you can simply reset the LocalNet and regenerate new accounts on the fly (and fund them with essentially unlimited ALGOs). If you are interacting with TestNet then mnemonics may hold TestNet ALGOs, which while difficult to get in large numbers, are more an inconvenience than a serious commercial problem to lose.
 
