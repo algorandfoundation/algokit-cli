@@ -261,9 +261,11 @@ The `compile()` call is actually a transpilation call (Beaker / PyTEAL transpila
 
 The exact details of what `CompiledApplication` will look like are TBD, but should be driven by the principles outlined in the "Why?" section above. Broadly, it stands to reason it would contain the approval and clear TEAL, the ABI spec and the app spec though at least.
 
+Finally, there is likely need to use metadata from transpilation such as the mapping of source code to line numbers, but we are confident these use cases will be able to be implemented on top of the proposed change.
+
 ### (3) Renamings
 
-Renaming `version` parameter in `Application.__init__(version: int = pyteal.MAX_VERSION)` to (e.g.) `teal_version`, to be more explicit. Otherwise developers may be confused that it's the version of the specific smart contract. It may be desirable to allow `version` to continue to be specified for some time, but to raise a `DeprecationWarning`.
+Renaming `version` parameter in `Application.__init__(version: int = pyteal.MAX_VERSION)` to (e.g.) `avm_version`, to be more explicit. Otherwise developers may be confused that it's the version of the specific smart contract. It may be desirable to allow `version` to continue to be specified for some time, but to raise a `DeprecationWarning`.
 
 Rename methods in `beaker.lib.*` to start with an uppercase. Although going against PEP-8, this prevents collisions with `builtins` such as `min` and `max`, and also follows the useful convention from PyTeal where methods that produce TEAL code (vs just running Python code at transpilation time) start with uppercase such as `Add`, `Or`, `Concat`, etc.
 
@@ -287,15 +289,15 @@ OnCompleteActionName: TypeAlias = Literal[
 HandlerFunc: TypeAlias = Callable[..., Expr]
 DecoratorFunc: TypeAlias = Callable[[HandlerFunc], HandlerFunc]
 
-class Application:  
+class Application:
     # the main decorator, capable of handling both ABI and Bare method registration
     def external(
-        self, 
+        self,
         fn: HandlerFunc | None = None,
         /,
         *,
         # note: retain existing behaviour of if method_config is None, default to no_op with CallConfig.CALL
-        method_config: MethodConfig | dict[OnCompleteActionName, CallConfig] | None = None,  
+        method_config: MethodConfig | dict[OnCompleteActionName, CallConfig] | None = None,
         name: str | None = None,
         authorize: SubroutineFnWrapper | None = None,
         bare: bool = False,
@@ -303,8 +305,8 @@ class Application:
         override: bool | None = False,
     ) -> HandlerFunc | DecoratorFunc:
         ...
-    
-    # the below are just "shortcuts" to @external for simple/common use cases    
+
+    # the below are just "shortcuts" to @external for simple/common use cases
     def create(
         self,
         fn: HandlerFunc | None = None,
@@ -318,8 +320,8 @@ class Application:
         override: bool | None = False,
     ) -> HandlerFunc | DecoratorFunc:
         ...
-    
-    
+
+
     def <delete|update|opt_in|clear_state|close_out|no_op>(
         self,
         fn: HandlerFunc | None = None,
@@ -383,26 +385,27 @@ def <delete|update|opt_in|clear_state|close_out|no_op>(
 ```
 
 Changes:
+
 - Remove `@internal`:
   - if you don't pass a TealType parameter to it, i.e. intend to create an ABI internal routine, it actually just inlines the code currently due to a bug
-  - when passing in a TealType parameter to it, i.e. intent to create a normal subroutine, then in combination with (1) it will be unneeded since you can use `Subroutine` from PyTEAL (since the methods don't need to be artificially modified to remove `self` anymore) 
+  - when passing in a TealType parameter to it, i.e. intent to create a normal subroutine, then in combination with (1) it will be unneeded since you can use `Subroutine` from PyTEAL (since the methods don't need to be artificially modified to remove `self` anymore)
 - Add `bare: bool` option:
   - Currently, this is not able to be controlled by the user - for `<create|delete|update|opt_in|clear_state|close_out|no_op>` decorators, they will create a bare method if the function takes no parameters other than maybe a `self` parameter. This has some down-sides:
     1. The user might want an ABI method rather than a bare method. In this case, currently they could use `@external(method_config=...)`, but for simple cases this is not as easy to read/type and is not intuitive to discover in the first place.
     2. The user might have more than one method that takes no parameters that is able to be called with a given `OnCompletionAction`, currently this would produce a `BareOverwriteError` in Beaker. Again, the work-around exists of calling `@external` instead, but it would be nicer and more intuitive to add a `bare` option to control this explicitly.
-  - The above Python methods have `bare: bool = False`. An alternative option would be to make this `bare: bool | None = None`, where `None` would retain the current behaviour of inspecting the method signature to see if it takes parameters or not. 
+  - The above Python methods have `bare: bool = False`. An alternative option would be to make this `bare: bool | None = None`, where `None` would retain the current behaviour of inspecting the method signature to see if it takes parameters or not.
 - Remove `@bare_external`:
   - Mostly unused, and doesn't provide the same options as the other decorators (e.g. `authorize`)
-  - Instead, we can replace the case of a single option being passed to it, with the equivalent named method:  for example `@bare_external(opt_in=CallConfig.CALL)` becomes `@opt_in(bare=True)`
+  - Instead, we can replace the case of a single option being passed to it, with the equivalent named method: for example `@bare_external(opt_in=CallConfig.CALL)` becomes `@opt_in(bare=True)`
   - For the multi-argument case: `@bare_external(no_op=CallConfig.CREATE, opt_in=CallConfig.CALL)` becomes `@external(method_config={"no_op": CallConfig.CREATE, "opt_in": CallConfig.CALL}, bare=True)`
+
 * Add optional `name` option to all decorators, not just `@external`.
 * Add `allow_call` and `allow_create` options to shortcut methods (except `@create` shortcut which should always allow `CallConfig.CREATE`).
 * Remove `method_config` from `@create` shortcut - the default behaviour will remain unchanged, but any usages with `method_config` specified would be equivalent to just using `@external` directly.
 * Add `override: bool | None = False` parameter.
   - If `False` (the suggested default), an error will be raised if an ABI or Bare method would replace one already registered in the Application. For bare methods, this would be keyed on the `OnCompleteAction`, and for ABI methods should be based on the method signature (ie `ABIReturnSubroutine.method_signature()`). This is suggested as the default to prevent unexpected cases of overriding, especially when using blueprints/templates from the future Smart Contracts Library.
-  - If `True`, then an error will be raised if it *does not* replace an already registered ABI or Bare method. This is similar to Java's `@Override` annotation, and can allow the user to be explicit and thus prevent unexpectedly _not_ replacing an existing method.
+  - If `True`, then an error will be raised if it _does not_ replace an already registered ABI or Bare method. This is similar to Java's `@Override` annotation, and can allow the user to be explicit and thus prevent unexpectedly _not_ replacing an existing method.
   - If `None`, then methods will be overwritten if present, and no error will be raised if not already present. This option is here for maximum flexibility, but should perhaps be discouraged.
-
 
 ### (5) Beaker state refactor
 
