@@ -1,11 +1,11 @@
 # Beaker productionisation review
 
-- **Status**: Draft
+- **Status**: Approved
 - **Owners:** Rob Moore, Adam Chidlow
-- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Michael Diamant (Algorand Inc.), Benjamin Guidarelli (Algorand Foundation)
+- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Jason Weathersby (Algorand Foundation), Benjamin Guidarelli (Algorand Foundation), Bob Broderick (Algorand Inc.)
 - **Date created**: 2023-01-11
-- **Date decided:** TBD
-- **Date updated**: 2023-01-11
+- **Date decided:** 2023-02-04
+- **Date updated**: 2023-02-04
 
 ## Context
 
