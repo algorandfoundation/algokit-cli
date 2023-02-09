@@ -121,6 +121,15 @@ def test_doctor_with_docker_compose_version_warning(proc_mock: ProcMock, mock_do
     verify(result.output, scrubber=make_output_scrubber())
 
 
+def test_doctor_with_docker_compose_version_gitpod(proc_mock: ProcMock, mock_doctor_dependencies: None):
+    proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.10.0-gitpod.0"}'])
+
+    result = invoke("doctor")
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def test_doctor_with_docker_compose_version_unparseable(proc_mock: ProcMock, mock_doctor_dependencies: None):
     proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "TEAPOT"}'])
 
