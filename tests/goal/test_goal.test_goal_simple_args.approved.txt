@@ -1,6 +1,6 @@
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker exec algokit_algod goal account list' in '{current_working_directory}'
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal account list' in '{current_working_directory}'
  STDOUT
  STDERR

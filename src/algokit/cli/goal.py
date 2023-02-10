@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
     },
 )
 @click.option(
-    "--console/--no-console",
+    "--console",
+    is_flag=True,
     help="Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.",
     default=False,
 )
@@ -31,6 +32,8 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
     if console:
+        if goal_args:
+            logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
         result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
         if result.exit_code != 0:
@@ -39,12 +42,13 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
             )
 
     else:
-        cmd = str("docker exec algokit_algod goal").split()
+        cmd = str("docker exec --interactive --workdir /root algokit_algod goal").split()
         cmd.extend(goal_args)
         proc.run(
             cmd,
             stdout_log_level=logging.INFO,
             prefix_process=False,
+            pass_stdin=True,
             bad_return_code_error_message="Error executing goal;"
             + " ensure the LocalNet is started by executing `algokit localnet status`",
         )
