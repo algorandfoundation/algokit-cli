@@ -31,7 +31,7 @@
     - [NETWORK](#network)
   - [goal](#goal)
     - [Options](#options-4)
-    - [--console, --no-console](#--console---no-console)
+    - [--console](#--console)
     - [Arguments](#arguments-2)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
@@ -233,7 +233,7 @@ algokit goal [OPTIONS] [GOAL_ARGS]...
 ### Options
 
 
-### --console, --no-console
+### --console
 Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
 
 ### Arguments
