@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def localnet_group() -> None:
     try:
         compose_version_result = proc.run(DOCKER_COMPOSE_VERSION_COMMAND)
-    except IOError as ex:
+    except OSError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
         raise click.ClickException(

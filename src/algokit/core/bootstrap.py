@@ -1,9 +1,9 @@
 import logging
 import platform
 import sys
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from shutil import which
-from typing import Callable, Iterator
 
 import click
 import questionary
@@ -98,7 +98,7 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
             bad_return_code_error_message="poetry --version failed, please check your poetry install",
         )
         try_install_poetry = False
-    except IOError:
+    except OSError:
         try_install_poetry = True
 
     if try_install_poetry:
@@ -107,10 +107,8 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
             "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?"
         ):
             raise click.ClickException(
-                (
-                    "Unable to install poetry via pipx; please install poetry "
-                    "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
-                )
+                "Unable to install poetry via pipx; please install poetry "
+                "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
             )
         pipx_command = _find_valid_pipx_command()
         proc.run(
@@ -124,16 +122,14 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
     logger.info("Installing Python dependencies and setting up Python virtual environment via Poetry")
     try:
         proc.run(["poetry", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
-    except IOError as e:
+    except OSError as e:
         if not try_install_poetry:
             raise  # unexpected error, we already ran without IOError before
         else:
             raise click.ClickException(
-                (
-                    "Unable to access Poetry on PATH after installing it via pipx; "
-                    "check pipx installations are on your path by running `pipx ensurepath` "
-                    "and try `algokit bootstrap poetry` again."
-                )
+                "Unable to access Poetry on PATH after installing it via pipx; "
+                "check pipx installations are on your path by running `pipx ensurepath` "
+                "and try `algokit bootstrap poetry` again."
             ) from e
 
 
@@ -150,15 +146,15 @@ def bootstrap_npm(project_dir: Path) -> None:
                 stdout_log_level=logging.INFO,
                 cwd=project_dir,
             )
-        except IOError as e:
-            raise click.ClickException((f"Failed to run `npm install using {package_json_path}.")) from e
+        except OSError as e:
+            raise click.ClickException(f"Failed to run `npm install using {package_json_path}.") from e
 
 
 def _find_valid_pipx_command() -> list[str]:
     for pipx_command in _get_candidate_pipx_commands():
         try:
             pipx_version_result = proc.run([*pipx_command, "--version"])
-        except IOError:
+        except OSError:
             pass  # in case of path/permission issues, go to next candidate
         else:
             if pipx_version_result.exit_code == 0:
@@ -167,11 +163,9 @@ def _find_valid_pipx_command() -> list[str]:
     #   this is an exceptional circumstance since pipx should always be present with algokit
     #   since it's installed with brew / choco as a dependency, and otherwise is used to install algokit
     raise click.ClickException(
-        (
-            "Unable to find pipx install so that poetry can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit bootstrap poetry` again."
-        )
+        "Unable to find pipx install so that poetry can be installed; "
+        "please install pipx via https://pypa.github.io/pipx/ "
+        "and then try `algokit bootstrap poetry` again."
     )
 
 

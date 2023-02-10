@@ -188,7 +188,6 @@ def test_doctor_all_commands_not_found(
 def test_doctor_all_commands_bad_exit(
     request: pytest.FixtureRequest, mocker: MockerFixture, proc_mock: ProcMock, mock_doctor_dependencies: None
 ):
-
     for cmd in ALL_COMMANDS:
         proc_mock.should_bad_exit_on(cmd, output=["I AM A TEAPOT"])
 
