@@ -1,0 +1,2 @@
+Error: Git not found; please install git and add to path.
+See https://github.com/git-guides/install-git for more information.

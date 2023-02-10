@@ -76,23 +76,27 @@ AlgoKit can be installed using OS specific package managers, or using the python
 1. Ensure prerequisites are installed
 
    - [Chocolatey](https://chocolatey.org/install)
-   - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install git`)
-   - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install docker-desktop`)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install -y git`)
+   - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install -y docker-desktop`)
      > **Note**
      > See [our LocalNet documentation](docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
 
 2. Install using Chocolatey
 
-   - Install AlgoKit: ~~`choco install algokit`~~
+   - Install AlgoKit: ~~`choco install -y algokit`~~
       > **Note**
-      > The AlgoKit Chocolatey package is not yet available, in the mean time using the following steps  
-      ```
-      choco install python3
-      pip install --user pipx
-      python -m pipx ensurepath
-      python -m pipx install algokit
-      ```
-      Recommended: Add the path to pipx.exe to your path.
+      > The AlgoKit Chocolatey package is not yet available, in the meantime using the following steps  
+     
+     1. Install python: `choco install -y python3`
+     2. Restart the terminal to ensure Python and pip are available on the path  
+     3. Install pipx: 
+        ```
+        pip install --user pipx
+        python -m pipx ensurepath
+        ```
+     4. Install AlgoKit via pipx: `python -m pipx install algokit` 
+     5. Restart the terminal to ensure AlgoKit is available on the path
+ 
    - Update AlgoKit: ~~`choco upgrade algokit`~~ `pipx upgrade algokit`
    - Remove AlgoKit: ~~`choco uninstall algokit`~~ `pipx uninstall algokit`
 

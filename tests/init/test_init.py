@@ -61,6 +61,14 @@ def test_init_help():
     verify(result.output)
 
 
+def test_init_missing_git(mocker: MockerFixture):
+    mocker.patch.dict("sys.modules", {"copier": None})
+    result = invoke("init")
+
+    assert result.exit_code != 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def test_invalid_name():
     result = invoke("init --name invalid{name")
 
