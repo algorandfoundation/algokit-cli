@@ -89,7 +89,10 @@ def check_dependency(
         )
     if minimum_version is not None:
         try:
-            version_ok = is_minimum_version(version_output, minimum_version)
+            match = re.search(r"^\d+\.\d+\.\d+", output)
+            if not match:
+                raise Exception("Unable to parse version number")
+            version_ok = is_minimum_version(match.group(0), minimum_version)
         except Exception as ex:
             logger.debug(f"Unexpected error parsing version: {ex}", exc_info=True)
             return DoctorResult(
