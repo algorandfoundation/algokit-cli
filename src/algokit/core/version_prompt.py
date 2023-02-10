@@ -39,7 +39,7 @@ def get_latest_version_or_cached() -> str | None:
     try:
         last_checked = os.path.getmtime(version_check_path)
         version = version_check_path.read_text(encoding="utf-8")
-    except IOError:
+    except OSError:
         logger.debug(f"{version_check_path} inaccessible")
         last_checked = 0
         version = None

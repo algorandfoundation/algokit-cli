@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
-    except IOError as ex:
+    except OSError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
         raise click.ClickException(
@@ -42,7 +42,7 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
             )
 
     else:
-        cmd = str("docker exec --interactive --workdir /root algokit_algod goal").split()
+        cmd = "docker exec --interactive --workdir /root algokit_algod goal".split()
         cmd.extend(goal_args)
         proc.run(
             cmd,

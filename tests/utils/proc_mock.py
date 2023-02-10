@@ -1,6 +1,7 @@
 import dataclasses
+from collections.abc import Sequence
 from io import StringIO
-from typing import IO, Any, Sequence, TypeVar
+from typing import IO, Any, TypeVar
 
 
 class PopenMock:

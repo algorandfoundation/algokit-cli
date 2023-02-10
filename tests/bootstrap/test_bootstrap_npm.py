@@ -44,7 +44,6 @@ def test_bootstrap_npm_without_npm(
 def test_bootstrap_npm_without_package_file(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
 ):
-
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
         "bootstrap npm",

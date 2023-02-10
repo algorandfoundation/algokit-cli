@@ -2,8 +2,8 @@ import dataclasses
 import logging
 import re
 import traceback
+from collections.abc import Callable
 from shutil import which
-from typing import Callable
 
 from algokit.core import proc
 from algokit.core.utils import is_minimum_version

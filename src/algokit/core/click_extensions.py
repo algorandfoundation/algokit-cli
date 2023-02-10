@@ -1,6 +1,7 @@
+from collections.abc import Callable, Sequence
 from gettext import gettext as _
 from gettext import ngettext
-from typing import Any, Callable, Sequence
+from typing import Any
 
 import click
 

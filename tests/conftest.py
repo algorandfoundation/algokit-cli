@@ -47,7 +47,6 @@ def mock_questionary_input() -> typing.Iterator[PipeInput]:
 if os.getenv("CI"):
     set_default_reporter(reporters.PythonNativeReporter())
 else:
-
     default_reporters: list[Reporter] = (
         [
             GenericDiffReporter(
