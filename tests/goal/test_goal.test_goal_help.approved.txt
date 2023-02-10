@@ -1,6 +1,6 @@
 Usage: algokit goal [OPTIONS] [GOAL_ARGS]...
 
 Options:
-  --console / --no-console  Open a Bash console so you can execute multiple goal
-                            commands and/or interact with a filesystem.
-  -h, --help                Show this message and exit.
+  --console   Open a Bash console so you can execute multiple goal commands
+              and/or interact with a filesystem.
+  -h, --help  Show this message and exit.

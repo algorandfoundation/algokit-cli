@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import subprocess
+import sys
 from pathlib import Path
 from subprocess import Popen
 from subprocess import run as subprocess_run
@@ -27,6 +28,7 @@ def run(
     bad_return_code_error_message: str | None = None,
     prefix_process: bool = True,
     stdout_log_level: int = logging.DEBUG,
+    pass_stdin: bool = False,
 ) -> RunResult:
     """Wraps subprocess.Popen() similarly to subprocess.run() but adds: logging and streaming (unicode) I/O capture
 
@@ -41,6 +43,7 @@ def run(
         command,
         stdout=subprocess.PIPE,  # capture stdout
         stderr=subprocess.STDOUT,  # redirect stderr to stdout, so they're interleaved in the correct ordering
+        stdin=sys.stdin if pass_stdin else None,
         text=True,  # make all I/O in unicode/text
         cwd=cwd,
         env=env,
