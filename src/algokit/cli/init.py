@@ -12,11 +12,7 @@ try:
 except ImportError:
     from typing import NoReturn as Never
 
-# TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
-#       to their repo to include py.typed file
 import click
-import copier  # type: ignore
-import copier.vcs  # type: ignore
 import prompt_toolkit.document
 import questionary
 
@@ -149,6 +145,19 @@ def init_command(
     run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
+    # copier is lazy imported for two reasons
+    # 1. it is slow to import on first execution after installing
+    # 2. the import fails if git is not installed
+
+    try:
+        # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
+        #       to their repo to include py.typed file
+        import copier  # type: ignore
+    except ImportError as ex:
+        raise click.ClickException(
+            "Git not found; please install git and add to path.\n"
+            "See https://github.com/git-guides/install-git for more information."
+        ) from ex
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
@@ -235,7 +244,9 @@ def _repo_url_is_valid(url: str) -> bool:
     if not url:
         return False
     try:
-        return copier.vcs.get_repo(url) is not None
+        from copier.vcs import get_repo  # type: ignore[import]
+
+        return get_repo(url) is not None
     except Exception:
         logger.exception(f"Error parsing repo URL = {url}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
         return False
