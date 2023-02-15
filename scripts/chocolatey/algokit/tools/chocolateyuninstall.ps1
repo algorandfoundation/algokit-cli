@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = 'Stop'
 
 # ensure pipx is installed. Just in case someone has removed it manually
-python -m pip --disable-pip-version-check install --user pipx
+python -m pip --disable-pip-version-check install --user pipx 2>&1
 if ($LASTEXITCODE -ne 0) {
   Throw "Error configuring pipx for uninstalling"
 }

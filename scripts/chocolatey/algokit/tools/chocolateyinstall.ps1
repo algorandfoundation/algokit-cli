@@ -13,7 +13,7 @@ else {
 Update-SessionEnvironment
 
 # ensure pipx is installed
-python -m pip --disable-pip-version-check install --user pipx
+python -m pip --disable-pip-version-check install --user pipx 2>&1
 if ($LASTEXITCODE -ne 0) {
   Throw "Error installing pipx"
 }
