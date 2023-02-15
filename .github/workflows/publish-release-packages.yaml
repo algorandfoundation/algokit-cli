@@ -86,12 +86,13 @@ jobs:
           path: dist
 
       - name: Update chocolatey files
+        id: update_chocolatey_files
         run: scripts/update-chocolatey-package.ps1
 
       - name: Build package
         uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: pack --version ${{ steps.get_artifact.outputs.version }} .\scripts\chocolatey\algokit\algokit.nuspec
+          args: pack --version ${{ steps.update_chocolatey_files.outputs.version }} .\scripts\chocolatey\algokit\algokit.nuspec
 
       - name: Set API key
         uses: crazy-max/ghaction-chocolatey@v2
