@@ -5,15 +5,15 @@
     <id>algokit</id>
     <version>0.1.0-beta</version> <!-- note, no semantic version 2.0 support. So beta.17 needs to be beta17 https://github.com/chocolatey/choco/issues/1610 -->
     <packageSourceUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/scripts/chocolatey</packageSourceUrl>
-    <owners>wilsonwaters</owners>
+    <owners>algorand-foundation</owners>
     <title>AlgoKit</title>
     <authors>Algorand Foundation</authors>
     <projectUrl>https://www.algorand.foundation/developers</projectUrl>
-    <iconUrl>https://www.algorand.com/assets/media-kit/logos/logo-marks/png/algorand_logo_mark_black.png</iconUrl>
+    <iconUrl>https://rawcdn.githack.com/algorandfoundation/algokit-cli/733cbc7714db7d4786cb9c0de60c991c63dcc3b7/scripts/chocolatey/algokit/algorand-logo-512.png?min=1</iconUrl>
     <licenseUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/algorandfoundation/algokit-cli</projectSourceUrl>
-    <docsUrl>https://github.com/algorandfoundation/algokit-cli</docsUrl>
+    <docsUrl>https://github.com/algorandfoundation/algokit-cli/blob/main/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/algorandfoundation/algokit-cli/issues</bugTrackerUrl>
     <releaseNotes>https://github.com/algorandfoundation/algokit-cli/blob/main/CHANGELOG.md</releaseNotes>
     <tags>algokit algorand developers python typescript hello-world smart-contract beaker</tags>
@@ -21,7 +21,6 @@
     <description><![CDATA[AlgoKit gets developers of all levels up and running with a familiar, fun and productive development environment in minutes.
     The goal of AlgoKit is to help developers build and launch secure, automated production-ready applications rapidly.
     ]]></description>
-    <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <dependencies>
       <dependency id="python3" version="3.10" />
     </dependencies>

@@ -1,4 +1,5 @@
-﻿MIT License
+﻿From: https://github.com/algorandfoundation/algokit-cli/blob/main/LICENSE
+MIT License
 
 Copyright (c) 2022 Algorand Foundation
 
