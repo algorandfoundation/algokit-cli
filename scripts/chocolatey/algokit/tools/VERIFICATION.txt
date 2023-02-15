@@ -2,9 +2,10 @@
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
-Official algokit releases can be found on the Githib project page
-https://github.com/algorandfoundation/algokit-cli/releases/
-A checksum can be generated from corresponding .whl file and compared with the checksum
-specified in the chocolatey release.
+To verify this package download the .whl from the URL specified below and compare it's SHA-256 checksum with the
+below.
+
+Wheel: {wheel_url}
+SHA256: {sha256}
 
 Algorand Foundation are the authors of this software and maintainers of the Chocolatey package.
