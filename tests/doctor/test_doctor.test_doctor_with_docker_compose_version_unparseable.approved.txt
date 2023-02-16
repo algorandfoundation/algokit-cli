@@ -2,7 +2,7 @@ DEBUG: Running 'docker --version' in '{current_working_directory}'
 DEBUG: docker: Docker version 20.10.21, build baeda1f
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
 DEBUG: docker: {"version": "TEAPOT"}
-DEBUG: Unexpected error parsing version: invalid literal for int() with base 10: 'TEAPOT'
+DEBUG: Unexpected error parsing version: Unable to parse version number
 DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
 DEBUG: Running 'python --version' in '{current_working_directory}'
@@ -29,7 +29,7 @@ OS: Darwin-other-system-info
 docker: 20.10.21
 docker compose: TEAPOT
   Failed to parse version from: "TEAPOT"
-  Error: invalid literal for int() with base 10: 'TEAPOT'
+  Error: Unable to parse version number
   Unable to check against minimum version of 2.5.0
 git: 2.37.1
 python: 3.10.0 (location: /usr/local/bin/python)

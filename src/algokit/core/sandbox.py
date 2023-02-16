@@ -1,7 +1,6 @@
 import enum
 import json
 import logging
-import re
 from pathlib import Path
 from typing import Any, cast
 
@@ -216,7 +215,4 @@ DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "j
 def parse_docker_compose_version_output(output: str) -> str:
     compose_version: dict[str, str] = json.loads(output)
     compose_version_str = compose_version.get("version", "")
-    match = re.search(r"v?\d+\.\d+\.\d+", output)
-    if match:
-        return match.group(0).lstrip("v")
     return compose_version_str.lstrip("v")
