@@ -6,16 +6,16 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 [Install AlgoKit](#install) | [Documentation](./docs/algokit.md)
 
-## Use Cases
+## Capabilities
 
-The list of use cases supported by AlgoKit will evolve over time, but currently includes:
+The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
 - Quickly run, explore and interact with a local Algorand Sandbox
 - Building, testing and deploying Algorand PyTEAL smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](./docs/algokit.md).
 
-Future use cases are likely to include:
+Future capabilities are likely to include:
 
 - Quickly deploy [standardised](https://github.com/algorandfoundation/ARCs/#arcs-algorand-requests-for-comments), audited smart contracts
 - Building and deploying Algorand dApps
