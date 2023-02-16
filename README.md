@@ -10,8 +10,8 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
-- Quickly run, explore and interact with a local Algorand Sandbox
-- Building, testing and deploying Algorand PyTEAL smart contracts
+- Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
+- Building, testing and deploying [Algorand PyTEAL](https://github.com/algorand/pyteal) smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](./docs/algokit.md).
 
