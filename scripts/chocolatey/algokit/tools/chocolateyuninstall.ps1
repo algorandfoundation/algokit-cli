@@ -10,7 +10,7 @@ if ($LASTEXITCODE -ne 0) {
 &{
   #pipx outputs to stderr as part of normal execution, so ignore stderr
   $ErrorActionPreference = 'Continue'
-  python -m pipx uninstall $env:ChocolateyPackageName
+  python -m pipx uninstall $env:ChocolateyPackageName 2>&1
   if ($LASTEXITCODE -ne 0) {
     if ($cmdOutput -match "Nothing to uninstall" ) {
       Write-Output "$($env:ChocolateyPackageName) already uninstalled by pipx. Ignoring"
@@ -20,3 +20,5 @@ if ($LASTEXITCODE -ne 0) {
     }
   }
 }
+
+Uninstall-BinFile -Name algokit

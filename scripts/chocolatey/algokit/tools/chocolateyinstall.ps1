@@ -2,28 +2,10 @@
 
 $toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
-# refresh environment variables to ensure python is on path. If it was just installed
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
-else {
-  Write-Output "couldn't find chocolatey profile script"
-}
-Update-SessionEnvironment
-
 # ensure pipx is installed
-python -m pip install --disable-pip-version-check --no-warn-script-location --user pipx
+python -m pip install --disable-pip-version-check --no-warn-script-location pipx
 if ($LASTEXITCODE -ne 0) {
   Throw "Error installing pipx"
-}
-&{
-  # pipx outputs to stderr if path is already configured, so ignore that error
-  $ErrorActionPreference = 'Continue'
-  python -m pipx ensurepath
-  if ($LASTEXITCODE -ne 0) {
-    Throw "Error configuring pipx path"
-  }
 }
 
 # work out the wheel name and make sure there wasn't a packaging error
@@ -37,7 +19,7 @@ if ($wheelFileName.count -ne 1) {
 $pipxListOutput = &{
   # pipx outputs to stderr if there are no packages, so ignore that error
   $ErrorActionPreference = 'Continue'
-  python -m pipx list
+  python -m pipx list 2>&1
   if ($LASTEXITCODE -ne 0) {
     Throw "Error searching for existing packages"
   }
@@ -48,7 +30,7 @@ if ($pipxListOutput -match "$env:ChocolateyPackageName.*") {
   &{
     #pipx outputs to stderr as part of normal execution, so ignore stderr
     $ErrorActionPreference = 'Continue'
-    python -m pipx uninstall $env:ChocolateyPackageName
+    python -m pipx uninstall $env:ChocolateyPackageName 2>&1
     if ($LASTEXITCODE -ne 0) {
       Throw "Error removing existing version"
     }
@@ -59,10 +41,13 @@ if ($pipxListOutput -match "$env:ChocolateyPackageName.*") {
 &{
   #pipx outputs to stderr as part of normal execution, so ignore stderr
   $ErrorActionPreference = 'Continue'
-  python -m pipx install $wheelFileName[0].FullName
+  python -m pipx install $wheelFileName[0].FullName 2>&1
   if ($LASTEXITCODE -ne 0) {
     Throw "Error installing $($wheelFileName[0].FullName)"
   }
 }
 
-
+#setup shim
+$pipx_list = python -m pipx list --json | ConvertFrom-Json
+$algokit_path = $pipx_list.venvs.algokit.metadata.main_package.app_paths.__Path__
+Install-BinFile -Name algokit -Path $algokit_path
