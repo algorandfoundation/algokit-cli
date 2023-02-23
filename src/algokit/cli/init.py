@@ -101,6 +101,13 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     metavar="URL",
 )
 @click.option(
+    "--template-url-ref",
+    type=str,
+    default=None,
+    help="Specific tag, branch or commit to use on git repo specified with --template-url. Defaults to latest.",
+    metavar="URL",
+)
+@click.option(
     "--UNSAFE-SECURITY-accept-template-url",
     is_flag=True,
     default=False,
@@ -138,6 +145,7 @@ def init_command(
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
+    template_url_ref: str | None,
     unsafe_security_accept_template_url: bool,  # noqa: FBT001
     use_git: bool | None,
     answers: list[tuple[str, str]],
@@ -184,7 +192,7 @@ def init_command(
         if not unsafe_security_accept_template_url:
             if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
                 _fail_and_bail()
-        template = TemplateSource(url=template_url)
+        template = TemplateSource(url=template_url, commit=template_url_ref)
     else:
         template = _get_template_url()
 

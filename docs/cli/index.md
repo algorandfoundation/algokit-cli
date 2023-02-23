@@ -39,6 +39,7 @@
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
+    - [--template-url-ref ](#--template-url-ref-)
     - [--UNSAFE-SECURITY-accept-template-url](#--unsafe-security-accept-template-url)
     - [--git, --no-git](#--git---no-git)
     - [--defaults](#--defaults)
@@ -263,6 +264,10 @@ Name of an official template to use.
 
 ### --template-url <URL>
 URL to a git repo with a custom project template.
+
+
+### --template-url-ref <URL>
+Specific tag, branch or commit to use on git repo specified with –template-url. Defaults to latest.
 
 
 ### --UNSAFE-SECURITY-accept-template-url
