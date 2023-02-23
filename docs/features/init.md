@@ -80,6 +80,10 @@ As well as the official Algorand templates shown when running the init command, 
 
 e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-beaker-default-template` (that being the url of the official beaker template, the same as `algokit init -t beaker`).
 
+The `--template-url` option can be combined with `--template-url-ref` to specify a specific commit, branch or tag 
+
+e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-beaker-default-template --template-url-ref 9985005b7389c90c6afed685d75bb8e7608b2a96` 
+
 If the URL is not an official template there is a potential security risk and so to continue you must either acknowledge this prompt, or if you are in a non-interactive environment you can pass the `--UNSAFE-SECURITY-accept-template-url` option (but we generally don't recommend this option so users can review the warning message first) e.g.
 
 ```

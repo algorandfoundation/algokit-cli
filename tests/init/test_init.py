@@ -9,10 +9,10 @@ from _pytest.tmpdir import TempPathFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
-from utils.approvals import TokenScrubber, combine_scrubbers, verify
-from utils.click_invoker import invoke
 
 from tests import get_combined_verify_output
+from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
+from tests.utils.click_invoker import invoke
 
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
@@ -386,6 +386,27 @@ def test_init_template_url_and_template_name(tmp_path_factory: TempPathFactory, 
 
     assert result.exit_code == 1
     verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_template_url_and_ref(
+    tmp_path_factory: TempPathFactory,
+    mock_questionary_input: PipeInput,
+    mocker: MockerFixture,
+):
+    mock_run_copy = mocker.patch("copier.run_copy")
+    mock_run_copy.return_value.template.url_expanded = "URL"
+    ref = "abcdef123456"
+    cwd = tmp_path_factory.mktemp("cwd")
+    result = invoke(
+        "init --name myapp --no-git --no-bootstrap --defaults "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template "
+        f"--template-url-ref {ref} "
+        "--UNSAFE-SECURITY-accept-template-url",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    assert mock_run_copy.call_args.kwargs["vcs_ref"] == ref
 
 
 def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
