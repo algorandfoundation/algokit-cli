@@ -2,6 +2,28 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.0 (2023-02-23)
+### Feature
+* Add init --template-url-ref option to allow using a specific commit, tag or branch ([`5bf19a3`](https://github.com/algorandfoundation/algokit-cli/commit/5bf19a38eee8b621010956a64e2d2f9e318af9e8))
+* Rename sandbox command to localnet ([`7ee55bd`](https://github.com/algorandfoundation/algokit-cli/commit/7ee55bdd5d0a87cd3aa7af1281c0867798be79ed))
+
+### Fix
+* **doctor:** Ensuring full docker version information is visible in Doctor output to improve debugging, fixes comment in #164 ([#173](https://github.com/algorandfoundation/algokit-cli/issues/173)) ([`a2c51e8`](https://github.com/algorandfoundation/algokit-cli/commit/a2c51e8018ba7b8049dc1230f7f9c1e02c24cd15))
+* Handle git not being installed when running algokit ([`ccc5eb0`](https://github.com/algorandfoundation/algokit-cli/commit/ccc5eb0369892bb640914a5cf370072d28502d7f))
+* **doctor:** Docker compose version parsing, fixes #164 ([`c3f4ef8`](https://github.com/algorandfoundation/algokit-cli/commit/c3f4ef80f7ca0e3da0d4841c06d81d8abe0c078d))
+* Updating gitpython to resolve pip-audit vulnerability warning ([#169](https://github.com/algorandfoundation/algokit-cli/issues/169)) ([`2a10d67`](https://github.com/algorandfoundation/algokit-cli/commit/2a10d676e20f4f7d3b7d28ea24d6f5ded099d3ae))
+
+### Documentation
+* Gave context to Sandbox and PyTEAL ([`0a96e13`](https://github.com/algorandfoundation/algokit-cli/commit/0a96e13c16284dfdc8d9525310119a1351ff862a))
+* Updated use cases  -> capabilities ([`ef0527a`](https://github.com/algorandfoundation/algokit-cli/commit/ef0527a87f11651efb3061711749049d36ed6d04))
+* Added missing recommendation for type-safe client ([`26a6717`](https://github.com/algorandfoundation/algokit-cli/commit/26a6717e763811e0f9c23818d842ab0ea2fb2a99))
+* Completed draft for architecture decision for smart contract deployment ([`40faf83`](https://github.com/algorandfoundation/algokit-cli/commit/40faf83cc97f75005f54bc344999848055f70b84))
+* First draft of architecture decision for smart contract deployment ([`9e77817`](https://github.com/algorandfoundation/algokit-cli/commit/9e778170e9b4924d10b73a2fbea08accf38e3b33))
+* Rename sandbox to localnet ([`aa35da7`](https://github.com/algorandfoundation/algokit-cli/commit/aa35da72f67f3dcd35adb0866a8b1ddad17fc4fe))
+* Update example output for Verify installation section ([`14f6f90`](https://github.com/algorandfoundation/algokit-cli/commit/14f6f9058c3ffd69d8c3ce9b4b1160bdeb017a0b))
+* Fixing incorrect description for Sandbox command ([`4bea5fa`](https://github.com/algorandfoundation/algokit-cli/commit/4bea5fa06be10a1282c1627b7979380aebc6e297))
+* Fix init description in algokit.md ([#156](https://github.com/algorandfoundation/algokit-cli/issues/156)) ([`39eee95`](https://github.com/algorandfoundation/algokit-cli/commit/39eee9508f28799856692b0729bebf8b923af687))
+
 ## v0.2.0 (2023-01-16)
 ### Feature
 * Update windows install instructions and bump version so PyPi will accept new release ([#154](https://github.com/algorandfoundation/algokit-cli/issues/154)) ([`5ff5223`](https://github.com/algorandfoundation/algokit-cli/commit/5ff52237172bddf06d3ff845b18e77c31dce9b11))
