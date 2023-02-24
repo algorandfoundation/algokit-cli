@@ -8,9 +8,10 @@ from algokit.core.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
-from utils.app_dir_mock import AppDirs
-from utils.approvals import normalize_path, verify
-from utils.click_invoker import invoke
+
+from tests.utils.app_dir_mock import AppDirs
+from tests.utils.approvals import normalize_path, verify
+from tests.utils.click_invoker import invoke
 
 CURRENT_VERSION = metadata.version(PACKAGE_NAME)
 NEW_VERSION = "999.99.99"
@@ -41,6 +42,48 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
+
+
+@pytest.mark.parametrize(
+    "current_version,latest_version,warning_expected",
+    [
+        ("0.2.0", "0.3.0", True),
+        ("0.25.0", "0.30.0", True),
+        ("0.3.0", "0.29.0", True),
+        ("999.99.99", "1000.00.00", True),
+        ("999.99.99-beta", "1000.00.00", True),
+        ("999.99.99-alpha", "999.99.99-beta", True),
+        ("0.25.0", "1.0.0", True),
+        ("0.29.0", "1.0.0", True),
+        ("0.3.0", "1.0.0", True),
+        ("0.3.0", "0.2.0", False),
+        ("0.3.0", "0.3.0", False),
+        ("0.30.0", "0.25.0", False),
+        ("0.29.0", "0.3.0", False),
+        ("0.30.0", "0.30.0", False),
+        ("1.0.0", "0.25.0", False),
+        ("1.0.0", "0.29.0", False),
+        ("1.0.0", "0.3.0", False),
+        ("1.0.0", "1.0.0", False),
+        ("999.99.99", "998.0.0", False),
+        ("999.99.99", "999.99.0", False),
+        ("999.99.99", "999.99.99", False),
+        ("999.99.99-beta", "998.99.99", False),
+        ("999.99.99-beta", "999.99.99-alpha", False),
+    ],
+)
+def test_version_check_only_warns_if_newer_version_is_found(
+    app_dir_mock: AppDirs, mocker: MockerFixture, current_version: str, latest_version: str, *, warning_expected: bool
+):
+    mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = current_version
+    version_cache = app_dir_mock.app_state_dir / "last-version-check"
+    version_cache.write_text(latest_version, encoding="utf-8")
+    result = invoke("bootstrap env", skip_version_check=False)
+
+    if warning_expected:
+        assert f"version {latest_version} is available" in result.output
+    else:
+        assert f"version {latest_version} is available" not in result.output
 
 
 def test_version_check_uses_cache(app_dir_mock: AppDirs):

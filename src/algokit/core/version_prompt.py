@@ -27,10 +27,17 @@ def do_version_prompt() -> None:
         logger.debug("Could not determine latest version")
         return
 
-    if current_version != latest_version:
+    if _get_version_sequence(current_version) < _get_version_sequence(latest_version):
         logger.info(f"You are using AlgoKit version {current_version}, however version {latest_version} is available.")
     else:
         logger.debug("Current version is up to date")
+
+
+def _get_version_sequence(version: str) -> list[int | str]:
+    match = re.match(r"(\d+)\.(\d+)\.(\d+)(.*)", version)
+    if match:
+        return [int(x) for x in match.groups()[:3]] + [match.group(4)]
+    return [version]
 
 
 def get_latest_version_or_cached() -> str | None:
@@ -61,9 +68,6 @@ def get_latest_version_or_cached() -> str | None:
 
 def get_latest_github_version() -> str:
     headers = {"ACCEPT": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
-    # TODO: remove GH_TOKEN auth once algokit repo is public
-    if gh_token := os.getenv("GH_TOKEN"):
-        headers["Authorization"] = f"Bearer {gh_token}"
 
     response = httpx.get(LATEST_URL, headers=headers)
     response.raise_for_status()
