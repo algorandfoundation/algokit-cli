@@ -6,8 +6,10 @@ DEBUG: Template initialisation complete, final clone URL = {test_parent_director
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
-DEBUG: Running 'git init --initial-branch=main' in '{current_working_directory}/myapp'
+DEBUG: Running 'git init' in '{current_working_directory}/myapp'
 DEBUG: git: Initialized empty Git repository in {current_working_directory}/myapp/.git/
+DEBUG: Running 'git checkout -b main' in '{current_working_directory}/myapp'
+DEBUG: git: Switched to a new branch 'main'
 DEBUG: Running 'git add --all' in '{current_working_directory}/myapp'
 DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle' in '{current_working_directory}/myapp'
 DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle
