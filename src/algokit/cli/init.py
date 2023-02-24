@@ -381,7 +381,7 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         return success
 
     if git("init", bad_exit_warn_message="Failed to initialise git repository"):
-        if git("checkout", "-b", "main", bad_exit_warn_message="Failed to change branch to main"):
+        if git("checkout", "-b", "main", bad_exit_warn_message="Failed to name initial branch"):
             if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
                 if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
                     logger.info("🎉 Performed initial git commit successfully! 🎉")
