@@ -18,10 +18,11 @@ PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
 
 
-def make_output_scrubber(**extra_tokens: str) -> Scrubber:
+def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens: str) -> Scrubber:
     default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
     tokens = default_tokens | extra_tokens
     return combine_scrubbers(
+        *extra_scrubbers,
         click.unstyle,
         TokenScrubber(tokens=tokens),
         TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
@@ -167,7 +168,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     git_initial_commit_hash = git_rev_list.stdout[:7]
     verify(
         result.output,
-        scrubber=make_output_scrubber(git_initial_commit_hash=git_initial_commit_hash),
+        scrubber=make_output_scrubber(_remove_git_hints, git_initial_commit_hash=git_initial_commit_hash),
     )
 
 
@@ -371,7 +372,7 @@ def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_
     git_initial_commit_hash = git_rev_list.stdout[:7]
     verify(
         result.output,
-        scrubber=make_output_scrubber(git_initial_commit_hash=git_initial_commit_hash),
+        scrubber=make_output_scrubber(_remove_git_hints, git_initial_commit_hash=git_initial_commit_hash),
     )
 
 
@@ -516,3 +517,9 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory):
         ),
         scrubber=make_output_scrubber(),
     )
+
+
+def _remove_git_hints(output: str) -> str:
+    git_init_hint_prefix = "DEBUG: git: hint:"
+    lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]
+    return "\n".join(lines)
