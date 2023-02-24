@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.1 (2023-02-24)
+### Fix
+* Git versions prior to 2.28 no longer fail on algokit init ([#184](https://github.com/algorandfoundation/algokit-cli/issues/184)) ([`0559582`](https://github.com/algorandfoundation/algokit-cli/commit/0559582ba9fb27df9ab98b2a66606ddaeeaf6da0))
+* Fix version comparison when checking for new versions ([#183](https://github.com/algorandfoundation/algokit-cli/issues/183)) ([`c272658`](https://github.com/algorandfoundation/algokit-cli/commit/c2726589b2699832844d2c67c452c01ecf742824))
+
 ## v0.3.0 (2023-02-23)
 ### Feature
 * Add init --template-url-ref option to allow using a specific commit, tag or branch ([`5bf19a3`](https://github.com/algorandfoundation/algokit-cli/commit/5bf19a38eee8b621010956a64e2d2f9e318af9e8))
