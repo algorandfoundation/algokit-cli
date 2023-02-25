@@ -1,4 +1,3 @@
-import json
 import logging
 import re
 from dataclasses import dataclass
@@ -52,12 +51,19 @@ class TemplateSource:
 
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, TemplateSource]:
-    with open("templates.json") as f:
-        templates: dict[str, dict[str, str]] = json.loads(f.read())
-        return {
-            k: TemplateSource(url=v["url"], description=v.get("description"), commit=v.get("commit"))
-            for k, v in templates.items()
-        }
+    return {
+        "beaker": TemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Official starter template for Beaker applications",
+            # NOTE: leaving unpinned for now whilst this under active development, but this would be
+            # a good example of a TemplateSource that should have a commit= specified
+            # commit="",
+        ),
+        "demo-avm8": TemplateSource(
+            url="gh:algorand-devrel/demo-avm8",
+            description="Demo of new opcodes introduced in AVM8",
+        ),
+    }
 
 
 _unofficial_template_warning = (
