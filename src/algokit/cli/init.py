@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from dataclasses import dataclass
@@ -38,6 +39,7 @@ DEFAULT_ANSWERS: dict[str, str] = {
 @dataclass
 class TemplateSource:
     url: str
+    description: str | None = None
     commit: str | None = None
     """when adding a blessed template that is verified but not controlled by Algorand, 
     ensure a specific commit is used"""
@@ -50,11 +52,12 @@ class TemplateSource:
 
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, TemplateSource]:
-    return {
-        # NOTE: leaving unpinned for now whilst this under active development, but this would be
-        # a good example of a TemplateSource that should have a commit= specified
-        "beaker": TemplateSource(url="gh:algorandfoundation/algokit-beaker-default-template"),
-    }
+    with open("templates.json") as f:
+        templates: dict[str, dict[str, str]] = json.loads(f.read())
+        return {
+            k: TemplateSource(url=v["url"], description=v.get("description"), commit=v.get("commit"))
+            for k, v in templates.items()
+        }
 
 
 _unofficial_template_warning = (
@@ -146,10 +149,10 @@ def init_command(
     template_name: str | None,
     template_url: str | None,
     template_url_ref: str | None,
-    unsafe_security_accept_template_url: bool,  # noqa: FBT001
+    unsafe_security_accept_template_url: bool,
     use_git: bool | None,
     answers: list[tuple[str, str]],
-    use_defaults: bool,  # noqa: FBT001
+    use_defaults: bool,
     run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
