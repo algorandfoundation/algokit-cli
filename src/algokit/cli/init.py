@@ -59,9 +59,9 @@ def _get_blessed_templates() -> dict[str, TemplateSource]:
             # a good example of a TemplateSource that should have a commit= specified
             # commit="",
         ),
-        "demo-avm8": TemplateSource(
-            url="gh:algorand-devrel/demo-avm8",
-            description="Demo of new opcodes introduced in AVM8",
+        "playground": TemplateSource(
+            url="gh:algorand-devrel/playground",
+            description="A number of small example applications and demos",
         ),
     }
 
@@ -155,10 +155,10 @@ def init_command(
     template_name: str | None,
     template_url: str | None,
     template_url_ref: str | None,
-    unsafe_security_accept_template_url: bool,
+    unsafe_security_accept_template_url: bool,  # noqa: FBT001
     use_git: bool | None,
     answers: list[tuple[str, str]],
-    use_defaults: bool,
+    use_defaults: bool,  # noqa: FBT001
     run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
