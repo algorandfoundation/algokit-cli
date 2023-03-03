@@ -36,7 +36,8 @@ def _get_relative_app_path(base_dir: str) -> Path:
     path = Path(base_dir).expanduser()
     result = path / PACKAGE_NAME
     result.mkdir(parents=True, exist_ok=True)
-    return result
+    # resolve path in case of UWP sandbox redirection
+    return result.resolve()
 
 
 def get_current_package_version() -> str:

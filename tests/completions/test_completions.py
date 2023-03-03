@@ -46,17 +46,17 @@ def mock_default_bash_version(mocker: MockerFixture) -> None:
 class CompletionsTestContext:
     def __init__(self, expected_shell: str):
         self.home = TemporaryDirectory()
-        self.home_path = Path(self.home.name)
+        self.home_path = Path(self.home.name).resolve()
         self.profile_path = self.home_path / f".{expected_shell}rc"
         self.config_path = self.home_path / ".config"
         self.source_path = self.config_path / "algokit" / f".algokit-completions.{expected_shell}"
         self.profile_path.write_text(ORIGINAL_PROFILE_CONTENTS)
         self.env = {
             # posix
-            "HOME": self.home.name,
+            "HOME": str(self.home_path),
             "XDG_CONFIG_HOME": str(self.config_path),
             # windows
-            "USERPROFILE": self.home.name,
+            "USERPROFILE": str(self.home_path),
             "APPDATA": str(self.config_path),
         }
 
@@ -221,10 +221,11 @@ def test_completions_install_handles_config_outside_home():
     # Arrange
     context = CompletionsTestContext("bash")
     # create a different directory outside home directory for config
-    context.config = TemporaryDirectory()
-    context.source_path = Path(context.config.name) / "algokit" / ".algokit-completions.bash"
-    context.env["XDG_CONFIG_HOME"] = context.config.name
-    context.env["APPDATA"] = context.config.name
+    config = TemporaryDirectory()
+    context.config_path = Path(config.name).resolve()
+    context.source_path = context.config_path / "algokit" / ".algokit-completions.bash"
+    context.env["XDG_CONFIG_HOME"] = str(context.config_path)
+    context.env["APPDATA"] = str(context.config_path)
 
     # Act
     result = context.run_command("install", "bash")
@@ -233,8 +234,8 @@ def test_completions_install_handles_config_outside_home():
     assert result.exit_code == 0
     # content of this file is defined by click, so only assert it exists not its content
     assert context.source_path.exists()
-    output = normalize_path(result.output, context.config.name, "{config}")
-    profile = normalize_path(context.profile_contents, context.config.name, "{config}")
+    output = normalize_path(result.output, str(context.config_path), "{config}")
+    profile = normalize_path(context.profile_contents, str(context.config_path), "{config}")
     verify(get_combined_verify_output(output, "profile", profile))
 
 
