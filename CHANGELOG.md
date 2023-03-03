@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.2 (2023-03-03)
+### Fix
+* Resolve config paths in case of folder redirection e.g. UWP python ([#191](https://github.com/algorandfoundation/algokit-cli/issues/191)) ([`0c2b291`](https://github.com/algorandfoundation/algokit-cli/commit/0c2b29179d003b17909a8dc22f655dc2b11bcdb8))
+
 ## v0.3.1 (2023-02-24)
 ### Fix
 * Git versions prior to 2.28 no longer fail on algokit init ([#184](https://github.com/algorandfoundation/algokit-cli/issues/184)) ([`0559582`](https://github.com/algorandfoundation/algokit-cli/commit/0559582ba9fb27df9ab98b2a66606ddaeeaf6da0))
