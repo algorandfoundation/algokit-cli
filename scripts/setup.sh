@@ -16,7 +16,7 @@ function runInstalls () {
   if [[ $? -eq 0 ]]; then
     echo $pyenv is already installed ✅
   else
-    . ./install-pyenv.sh
+    . $SCRIPT_DIR/install-pyenv.sh
 
     if [[ $? -ne 0 ]]; then
       return 1
@@ -29,7 +29,7 @@ function runInstalls () {
   if [ $(version $pythonv) -ge $(version "$PYTHON_MIN_VERSION") ]; then
     echo "Python $pythonv is already installed ✅"
   else
-    . ./install-python.sh $PYTHON_INSTALL_VERSION
+    . $SCRIPT_DIR/install-python.sh $PYTHON_INSTALL_VERSION
     
     if [[ $? -ne 0 ]]; then
       return 1
@@ -42,7 +42,7 @@ function runInstalls () {
   if [[ $? -eq 0 ]]; then
     echo $poetryv is already installed ✅
   else
-    . ./install-poetry.sh
+    . $SCRIPT_DIR/install-poetry.sh
 
     if [[ $? -ne 0 ]]; then
       return 1
