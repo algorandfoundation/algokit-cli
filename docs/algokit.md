@@ -16,7 +16,7 @@ For details on how to use individual features see the following
 
 ## AlgoKit CLI options
 
-AlgoKit has a number of global options that can impact all commands. Note: these global options must be appended to `algokit` and appear before a command, e.g. `algokit -v sandbox start`, but not `algokit sandbox start -v`. The exception to this is `-h`, which can be appended to any command or sub-command to see contextual help information.
+AlgoKit has a number of global options that can impact all commands. Note: these global options must be appended to `algokit` and appear before a command, e.g. `algokit -v localnet start`, but not `algokit localnet start -v`. The exception to this is `-h`, which can be appended to any command or sub-command to see contextual help information.
 
 - `-h, --help` The help option can be used on any command to get details on any command, its sub-commands and options.
 - `-v, --verbose` Enables DEBUG logging, useful when troubleshooting or if you want to peek under the covers and learn what AlgoKit CLI is doing.
