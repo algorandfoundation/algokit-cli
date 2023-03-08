@@ -121,8 +121,8 @@ AlgoKit can be installed using OS specific package managers, or using the python
       > Docker requires MacOS 11+
 
 2. Install using Brew  `brew install algorandfoundation/tap/algokit`
-
-3. [Verify installation](#verify-installation)
+3. Restart the terminal to ensure AlgoKit is available on the path
+4. [Verify installation](#verify-installation)
 
 ### Maintenance 
   Some useful commands for updating or removing AlgoKit in the future.
@@ -153,11 +153,9 @@ AlgoKit can be installed using OS specific package managers, or using the python
    - [Git](https://github.com/git-guides/install-git)
    - [Docker](https://docs.docker.com/get-docker/)
 
-2. Install using pipx
-
-   - Install AlgoKit: `pipx install algokit`
-
-3. [Verify installation](#verify-installation)
+2. Install using pipx `pipx install algokit`
+3. Restart the terminal to ensure AlgoKit is available on the path
+4. [Verify installation](#verify-installation)
 
 ### Maintenance 
   Some useful commands for updating or removing AlgoKit in the future.
