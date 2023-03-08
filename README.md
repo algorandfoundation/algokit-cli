@@ -71,36 +71,41 @@ AlgoKit can be installed using OS specific package managers, or using the python
 ## Install AlgoKit on Windows
 
 > **Note**
-> This method will install the most recent python3 version [via chocolatey](https://community.chocolatey.org/packages/python). If you already have python 3.10+ installed, you may [prefer to use pipx directly instead](#install-algokit-with-pipx-on-any-os) so you can control the python version used.
+> This method will install the most recent python3 version [via winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/). If you already have python 3.10+ installed, you may [prefer to use pipx directly instead](#install-algokit-with-pipx-on-any-os) so you can control the python version used.
 
 1. Ensure prerequisites are installed
 
-   - [Chocolatey](https://chocolatey.org/install)
-   - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `choco install -y git`)
-   - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `choco install -y docker-desktop`)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
+   - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
      > **Note**
      > See [our LocalNet documentation](docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
 
-2. Install using Chocolatey
+2. Install using WinGet
 
-   - Install AlgoKit: ~~`choco install -y algokit`~~
+   1. Install python: `winget install python.python.3.11`
+   2. Restart the terminal to ensure Python and pip are available on the path
+
       > **Note**
-      > The AlgoKit Chocolatey package is not yet available, in the meantime using the following steps  
-     
-     1. Install python: `choco install -y python3`
-     2. Restart the terminal to ensure Python and pip are available on the path  
-     3. Install pipx: 
-        ```
-        pip install --user pipx
-        python -m pipx ensurepath
-        ```
-     4. Install AlgoKit via pipx: `python -m pipx install algokit` 
-     5. Restart the terminal to ensure AlgoKit is available on the path
- 
-   - Update AlgoKit: ~~`choco upgrade algokit`~~ `pipx upgrade algokit`
-   - Remove AlgoKit: ~~`choco uninstall algokit`~~ `pipx uninstall algokit`
+      > Windows has a feature called **App Execution Aliases** that provides redirects for the Python command that guide users to the 
+        Windows Store. Unfortunately these aliases can prevent normal execution of Python if Python is installed via other means, to disable them
+        search for **Manage app execution aliases** from the start menu, and then turn off entries listed as 
+        **App Installer python.exe** or **App Installer python3.exe**. 
 
+   3. Install pipx: 
+      ```
+      pip install --user pipx
+      python -m pipx ensurepath
+      ```
+   4. Install AlgoKit via pipx: `python -m pipx install algokit` 
+   5. Restart the terminal to ensure AlgoKit is available on the path
+ 
 3. [Verify installation](#verify-installation)
+
+### Maintenance 
+  Some useful commands for updating or removing AlgoKit in the future.
+  - To update AlgoKit: `pipx upgrade algokit`
+  - To remove AlgoKit: `pipx uninstall algokit`
+
 
 ## Install AlgoKit on Mac
 
@@ -115,13 +120,14 @@ AlgoKit can be installed using OS specific package managers, or using the python
       > **Note**
       > Docker requires MacOS 11+
 
-2. Install using Brew
+2. Install using Brew  `brew install algorandfoundation/tap/algokit`
+3. Restart the terminal to ensure AlgoKit is available on the path
+4. [Verify installation](#verify-installation)
 
-   - Install AlgoKit: `brew install algorandfoundation/tap/algokit`
-   - Update AlgoKit: `brew upgrade algokit`
-   - Remove AlgoKit: `brew uninstall algokit`
-
-3. [Verify installation](#verify-installation)
+### Maintenance 
+  Some useful commands for updating or removing AlgoKit in the future.
+  - To update AlgoKit: `brew upgrade algokit`
+  - To remove AlgoKit: `brew uninstall algokit`
 
 ## Install AlgoKit on Linux
 
@@ -147,13 +153,15 @@ AlgoKit can be installed using OS specific package managers, or using the python
    - [Git](https://github.com/git-guides/install-git)
    - [Docker](https://docs.docker.com/get-docker/)
 
-2. Install using pipx
+2. Install using pipx `pipx install algokit`
+3. Restart the terminal to ensure AlgoKit is available on the path
+4. [Verify installation](#verify-installation)
 
-   - Install AlgoKit: `pipx install algokit`
-   - Update AlgoKit: `pipx upgrade algokit`
-   - Remove AlgoKit: `pipx uninstall algokit`
+### Maintenance 
+  Some useful commands for updating or removing AlgoKit in the future.
+  - To update AlgoKit: `pipx upgrade algokit`
+  - To remove AlgoKit: `pipx uninstall algokit`
 
-3. [Verify installation](#verify-installation)
 
 ## Verify installation
 
