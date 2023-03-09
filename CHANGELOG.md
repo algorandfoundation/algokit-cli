@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.3.3 (2023-03-09)
+### Fix
+* Use /v2/status when querying localnet algod container ([#198](https://github.com/algorandfoundation/algokit-cli/issues/198)) ([`0fb0488`](https://github.com/algorandfoundation/algokit-cli/commit/0fb0488e7a5ebd7da22f764e9047df9c6ef7ac31))
+
+### Documentation
+* Fix references to renamed sandbox command ([#194](https://github.com/algorandfoundation/algokit-cli/issues/194)) ([`8b2910b`](https://github.com/algorandfoundation/algokit-cli/commit/8b2910b465e67c0e428cc4dde65e7a502f2fc7c0))
+* Added step in install instructions to restart terminal ([`f8e47a5`](https://github.com/algorandfoundation/algokit-cli/commit/f8e47a5ea47e6f78a39dee436381b615c794d5d5))
+* Update windows install instructions ([`e9d0a9d`](https://github.com/algorandfoundation/algokit-cli/commit/e9d0a9dc2ffc7f0998978e1fa5eceb6c94a9ce52))
+
 ## v0.3.2 (2023-03-03)
 ### Fix
 * Resolve config paths in case of folder redirection e.g. UWP python ([#191](https://github.com/algorandfoundation/algokit-cli/issues/191)) ([`0c2b291`](https://github.com/algorandfoundation/algokit-cli/commit/0c2b29179d003b17909a8dc22f655dc2b11bcdb8))
