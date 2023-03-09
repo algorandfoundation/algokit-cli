@@ -8,6 +8,7 @@ DEBUG: docker: [{"ID": "90ce27e631e4d0b048322abd01a9e68e4c899b936ad4e4e3106ad5d9
 DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
 DEBUG: HTTP Request: GET http://localhost:4001/versions "HTTP/1.1 200 OK"
 DEBUG: HTTP Request: GET http://localhost:8980/health "HTTP/1.1 200 OK"
+DEBUG: http://localhost:8980/health response: {'round': 1, 'errors': ['error'], 'version': 'v1.0'}
 # algod status
 Status: Running
 Port: 4001
@@ -20,7 +21,6 @@ Version: 1.2.1
 Status: Running
 Port: 8980
 Last round: 1
-Error(s): ['error']
 Version: v1.0
 # indexer-db status
 Status: Running
