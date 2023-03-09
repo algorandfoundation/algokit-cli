@@ -8,6 +8,7 @@ Commands:
            console so you can execute multiple goal commands and/or interact
            with a filesystem.
   explore  Explore the AlgoKit LocalNet using Dappflow
+  logs     See the output of the Docker containers
   reset    Reset the AlgoKit LocalNet.
   start    Start the AlgoKit LocalNet.
   status   Check the status of the AlgoKit LocalNet.

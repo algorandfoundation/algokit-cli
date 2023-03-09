@@ -48,8 +48,12 @@
   - [localnet](#localnet)
     - [console](#console)
     - [explore](#explore-1)
-    - [reset](#reset)
+    - [logs](#logs)
     - [Options](#options-6)
+    - [--follow, -f](#--follow--f)
+    - [--tail ](#--tail-)
+    - [reset](#reset)
+    - [Options](#options-7)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -312,6 +316,30 @@ Explore the AlgoKit LocalNet using Dappflow
 ```shell
 algokit localnet explore [OPTIONS]
 ```
+
+### logs
+
+See the output of the Docker containers
+
+```shell
+algokit localnet logs [OPTIONS]
+```
+
+### Options
+
+
+### --follow, -f
+Follow log output.
+
+
+### --tail <tail>
+Number of lines to show from the end of the logs for each container.
+
+
+* **Default**
+
+    `all`
+
 
 ### reset
 
