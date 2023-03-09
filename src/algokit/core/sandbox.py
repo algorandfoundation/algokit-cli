@@ -155,7 +155,7 @@ def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         with httpx.Client() as client:
             algod_headers = {"X-Algo-API-Token": DEFAULT_ALGOD_TOKEN}
             http_status_response = client.get(
-                f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v1/status", headers=algod_headers, timeout=3
+                f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status", headers=algod_headers, timeout=3
             )
             http_versions_response = client.get(
                 f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/versions", headers=algod_headers, timeout=3
@@ -168,8 +168,8 @@ def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
 
             # status response
             status_response = http_status_response.json()
-            results["Last round"] = status_response["lastRound"]
-            results["Time since last round"] = "%.1fs" % status_response["timeSinceLastRound"]
+            results["Last round"] = status_response["last-round"]
+            results["Time since last round"] = "%.1fs" % (status_response["time-since-last-round"] / 1e9)
             # genesis response
             genesis_response = http_versions_response.json()
             results["Genesis ID"] = genesis_response["genesis_id"]
@@ -193,15 +193,15 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
 
         results["Port"] = service_info["Publishers"][0]["PublishedPort"]
         # container specific response
-        http_response = httpx.get(f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_INDEXER_PORT}/health", timeout=5)
+        health_url = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_INDEXER_PORT}/health"
+        http_response = httpx.get(health_url, timeout=5)
 
         if http_response.status_code != httpx.codes.OK:
             return {"Status": "Error"}
 
         response = http_response.json()
+        logger.debug(f"{health_url} response: {response}")
         results["Last round"] = response["round"]
-        if "errors" in response:
-            results["Error(s)"] = response["errors"]
         results["Version"] = response["version"]
         return results
     except Exception as err:
