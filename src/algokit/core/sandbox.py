@@ -7,7 +7,7 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
-from algokit.core.proc import RunResult, run
+from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +79,20 @@ class ComposeSandbox:
     def pull(self) -> None:
         logger.info("Looking for latest Sandbox images from DockerHub...")
         self._run_compose_command("pull --ignore-pull-failures --quiet")
+
+    def logs(self, *, follow: bool = False, no_color: bool = False, tail: str | None = None) -> None:
+        compose_args = ["logs"]
+        if follow:
+            compose_args += ["--follow"]
+        if no_color:
+            compose_args += ["--no-color"]
+        if tail is not None:
+            compose_args += ["--tail", tail]
+        run_interactive(
+            ["docker", "compose", *compose_args],
+            cwd=self.directory,
+            bad_return_code_error_message="Failed to get logs, are the containers running?",
+        )
 
     def ps(self) -> list[dict[str, Any]]:
         run_results = self._run_compose_command("ps --format json", stdout_log_level=logging.DEBUG)

@@ -155,3 +155,25 @@ def localnet_console(context: click.Context) -> None:
 @click.pass_context
 def localnet_explore(context: click.Context) -> None:
     context.invoke(explore_command)
+
+
+@localnet_group.command(
+    "logs",
+    short_help="See the output of the Docker containers",
+)
+@click.option(
+    "--follow/-f",
+    is_flag=True,
+    help="Follow log output.",
+    default=False,
+)
+@click.option(
+    "--tail",
+    default="all",
+    help="Number of lines to show from the end of the logs for each container.",
+    show_default=True,
+)
+@click.pass_context
+def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
+    sandbox = ComposeSandbox()
+    sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
