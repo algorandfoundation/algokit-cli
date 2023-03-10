@@ -18,8 +18,6 @@ If you are on Windows then you will need WSL 2 installed first, for which you ca
 
 The AlgoKit LocalNet is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the LocalNet to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
 
-If you haven't issued any transactions and you restart the indexer container (or execute `algokit localnet stop` then `algokit localnet start`, or restart your computer and execute `algokit localnet start`) then the indexer will be stuck in an infinite starting loop. This is a [known issue in Algorand Sandbox](https://github.com/algorand/sandbox/issues/163) that should be resolved in the future. If this happens you can simply reset the sandbox via `algokit localnet reset`.
-
 ## Supported operating environments
 
 We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
