@@ -305,7 +305,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
 class GitRepoValidator(questionary.Validator):
     def validate(self, document: prompt_toolkit.document.Document) -> None:
         value = document.text.strip()
-        if not _repo_url_is_valid(value):
+        if value and not _repo_url_is_valid(value):
             raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
 
 
