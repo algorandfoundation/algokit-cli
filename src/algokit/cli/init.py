@@ -1,5 +1,6 @@
 import logging
 import re
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -238,8 +239,12 @@ def init_command(
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
         logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
-    logger.info("As a suggestion, if you wanted to open the project in VS Code you could execute:")
-    logger.info(f"> cd {directory_name} && code .")
+    if shutil.which("code") and (project_path / ".vscode").is_dir():
+        logger.info(
+            "VSCode configuration detected in project directory, and 'code' command is available on path, "
+            "attempting to launch VSCode"
+        )
+        proc.run(command=["code", str(project_path)])
 
 
 def _fail_and_bail() -> Never:
