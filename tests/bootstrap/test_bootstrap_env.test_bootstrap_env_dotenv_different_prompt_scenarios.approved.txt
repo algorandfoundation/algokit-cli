@@ -9,16 +9,12 @@ DEBUG: {selector}
 ? Please provide a value for TOKEN_2_WITH_MULTI_LINES_COMMENT: test value for TOKEN_2_WITH_MULTI_LINES_COMMENT
 
 ? Please provide a value for TOKEN_4_WITH_SPACES: test value for TOKEN_4_WITH_SPACES
-? Please provide a value for TOKEN_4_WITH_SPACES: test value for TOKEN_4_WITH_SPACES
 
-? Please provide a value for TOKEN_5_WITHOUT_COMMENT: test value for TOKEN_5_WITHOUT_COMMENT
 ? Please provide a value for TOKEN_5_WITHOUT_COMMENT: test value for TOKEN_5_WITHOUT_COMMENT
 # another comment
 
 ? Please provide a value for TOKEN_6_EMPTY_WITH_COMMENT: test value for TOKEN_6_EMPTY_WITH_COMMENT
-? Please provide a value for TOKEN_6_EMPTY_WITH_COMMENT: test value for TOKEN_6_EMPTY_WITH_COMMENT
 
-? Please provide a value for TOKEN_7_VALUE_WILL_BE_EMPTY:
 ? Please provide a value for TOKEN_7_VALUE_WILL_BE_EMPTY:
 ----
 .env:

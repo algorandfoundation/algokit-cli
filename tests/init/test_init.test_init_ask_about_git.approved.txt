@@ -9,7 +9,6 @@ Executed `algokit bootstrap all` in {current_working_directory}/myapp
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
 ? Would you like to initialise a git repository and perform an initial commit? Yes
-? Would you like to initialise a git repository and perform an initial commit? Yes
 DEBUG: Running 'git init' in '{current_working_directory}/myapp'
 DEBUG: git: Initialized empty Git repository in {current_working_directory}/myapp/.git/
 DEBUG: Running 'git checkout -b main' in '{current_working_directory}/myapp'

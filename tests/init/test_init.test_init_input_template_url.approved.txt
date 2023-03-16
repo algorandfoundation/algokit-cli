@@ -26,7 +26,6 @@ Valid examples:
  - ~/path/to/git/repo.bundle
 
 ? Custom template URL:  {test_parent_directory}/copier-helloworld.bundle
-? Custom template URL:  {test_parent_directory}/copier-helloworld.bundle
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle

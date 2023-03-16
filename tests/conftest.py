@@ -44,16 +44,22 @@ def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
 class CaptureOutput(PlainTextOutput):
     def __init__(self) -> None:
         super().__init__(stdout=sys.stdout)
+        self._last_output = ""
 
     def flush(self) -> None:
         if not self._buffer:
             return
 
-        data = "".join(self._buffer)
+        buffer = "".join(self._buffer)
         self._buffer = []
-        lines = [ln.rstrip() for ln in data.splitlines() if ln.strip()]
+        lines = [ln.rstrip() for ln in buffer.splitlines() if ln.strip()]
         data = "\n".join(lines) + "\n"
-        flush_stdout(sys.stdout, data)
+        if data.strip() != self._last_output.strip():
+            flush_stdout(sys.stdout, data)
+        self._last_output = data
+
+    def scroll_buffer_to_prompt(self) -> None:
+        self._last_output = ""
 
     def get_size(self) -> prompt_toolkit.data_structures.Size:
         return prompt_toolkit.data_structures.Size(rows=10_000, columns=10_000)
