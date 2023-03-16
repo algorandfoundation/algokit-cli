@@ -1,9 +1,12 @@
+import json
 from subprocess import CompletedProcess
 
 from pytest_mock import MockerFixture
-from utils.approvals import verify
-from utils.click_invoker import invoke
-from utils.proc_mock import ProcMock
+
+from tests.utils.app_dir_mock import AppDirs
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
 def test_goal_help():
@@ -13,7 +16,7 @@ def test_goal_help():
     verify(result.output)
 
 
-def test_goal_no_args(proc_mock: ProcMock, mocker: MockerFixture):
+def test_goal_no_args(proc_mock: ProcMock):
     result = invoke("goal")
 
     assert result.exit_code == 0
@@ -31,15 +34,37 @@ def test_goal_console(proc_mock: ProcMock, mocker: MockerFixture):
     verify(result.output)
 
 
-def test_goal_console_failed(proc_mock: ProcMock, mocker: MockerFixture):
+def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture):
+    (app_dir_mock.app_config_dir / "sandbox").mkdir()
+
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 1, "STDOUT+STDERR"
+    )
+
+    proc_mock.set_output(
+        ["docker", "compose", "ps", "algod", "--format", "json"],
+        output=[json.dumps([{"Name": "algokit_algod", "State": "running"}])],
     )
 
     result = invoke("goal --console")
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
+def test_goal_console_failed_algod_not_created(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture):
+    (app_dir_mock.app_config_dir / "sandbox").mkdir()
+
+    mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
+        ["docker", "exec"], 1, "bad args to goal"
+    )
+
+    proc_mock.set_output(["docker", "compose", "ps", "algod", "--format", "json"], output=[json.dumps([])])
+
+    result = invoke("goal --console")
+
+    assert result.exit_code == 1
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
 def test_goal_simple_args(proc_mock: ProcMock):

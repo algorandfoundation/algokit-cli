@@ -40,7 +40,7 @@ DEFAULT_ANSWERS: dict[str, str] = {
 class TemplateSource:
     url: str
     commit: str | None = None
-    """when adding a blessed template that is verified but not controlled by Algorand, 
+    """when adding a blessed template that is verified but not controlled by Algorand,
     ensure a specific commit is used"""
 
     def __str__(self) -> str:

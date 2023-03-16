@@ -94,8 +94,10 @@ class ComposeSandbox:
             bad_return_code_error_message="Failed to get logs, are the containers running?",
         )
 
-    def ps(self) -> list[dict[str, Any]]:
-        run_results = self._run_compose_command("ps --format json", stdout_log_level=logging.DEBUG)
+    def ps(self, service_name: str | None = None) -> list[dict[str, Any]]:
+        run_results = self._run_compose_command(
+            f"ps {service_name or ''} --format json", stdout_log_level=logging.DEBUG
+        )
         if run_results.exit_code != 0:
             return []
         data = json.loads(run_results.output)

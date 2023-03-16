@@ -76,7 +76,7 @@ TOKEN_3=test value with spaces
 TOKEN_4_WITH_NO_EQUALS_SIGN
 # another comment
 TOKEN_5_SPECIAL_CHAR=*  
-"""
+"""  # noqa: W291
     )
 
     result = invoke(
@@ -112,7 +112,7 @@ TOKEN_6_EMPTY_WITH_COMMENT=
 TOKEN_7_VALUE_WILL_BE_EMPTY=
 TOKEN_8 = value with spaces
 TOKEN_8_SPECIAL_CHAR=*  
-"""
+"""  # noqa: W291
     )
 
     # provide values for tokens

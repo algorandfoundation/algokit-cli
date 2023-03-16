@@ -3,6 +3,7 @@ import logging
 import click
 
 from algokit.core import proc
+from algokit.core.sandbox import ComposeSandbox
 
 logger = logging.getLogger(__name__)
 
@@ -36,19 +37,24 @@ def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
         result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
-        if result.exit_code != 0:
-            raise click.ClickException(
-                "Error executing goal;" + " ensure the LocalNet is started by executing `algokit localnet status`"
-            )
-
     else:
         cmd = "docker exec --interactive --workdir /root algokit_algod goal".split()
         cmd.extend(goal_args)
-        proc.run(
+        result = proc.run(
             cmd,
             stdout_log_level=logging.INFO,
             prefix_process=False,
             pass_stdin=True,
-            bad_return_code_error_message="Error executing goal;"
-            + " ensure the LocalNet is started by executing `algokit localnet status`",
         )
+    if result.exit_code != 0:
+        sandbox = ComposeSandbox()
+        ps_result = sandbox.ps("algod")
+        match ps_result:
+            case [{"State": "running"}]:
+                pass  # container is running, failure must have been with command
+            case _:
+                logger.warning(
+                    "algod container does not appear to be running, "
+                    "ensure localnet is started by executing `algokit localnet start`"
+                )
+        raise click.exceptions.Exit(result.exit_code)  # pass on the exit code
