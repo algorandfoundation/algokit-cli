@@ -1,18 +1,22 @@
 import json
 import os
+import sys
 import typing
 from pathlib import Path
 
+import prompt_toolkit.data_structures
 import pytest
 from approvaltests import Reporter, reporters, set_default_reporter  # type: ignore
 from approvaltests.reporters.generic_diff_reporter_config import create_config  # type: ignore
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
 from prompt_toolkit.application import create_app_session
 from prompt_toolkit.input import PipeInput, create_pipe_input
-from prompt_toolkit.output import DummyOutput
+from prompt_toolkit.output.flush_stdout import flush_stdout
+from prompt_toolkit.output.plain_text import PlainTextOutput
 from pytest_mock import MockerFixture
-from utils.app_dir_mock import AppDirs, tmp_app_dir
-from utils.proc_mock import ProcMock
+
+from tests.utils.app_dir_mock import AppDirs, tmp_app_dir
+from tests.utils.proc_mock import ProcMock
 
 
 @pytest.fixture
@@ -37,10 +41,28 @@ def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)
 
 
+class CaptureOutput(PlainTextOutput):
+    def __init__(self) -> None:
+        super().__init__(stdout=sys.stdout)
+
+    def flush(self) -> None:
+        if not self._buffer:
+            return
+
+        data = "".join(self._buffer)
+        self._buffer = []
+        lines = [ln.rstrip() for ln in data.splitlines() if ln.strip()]
+        data = "\n".join(lines) + "\n"
+        flush_stdout(sys.stdout, data)
+
+    def get_size(self) -> prompt_toolkit.data_structures.Size:
+        return prompt_toolkit.data_structures.Size(rows=10_000, columns=10_000)
+
+
 @pytest.fixture(scope="function")
 def mock_questionary_input() -> typing.Iterator[PipeInput]:
     with create_pipe_input() as pipe_input:
-        with create_app_session(input=pipe_input, output=DummyOutput()):
+        with create_app_session(input=pipe_input, output=CaptureOutput()):
             yield pipe_input
 
 

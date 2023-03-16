@@ -48,13 +48,21 @@ def mock_no_vscode(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def set_blessed_templates(mocker: MockerFixture):
-    from algokit.cli.init import TemplateSource
+    from algokit.cli.init import BlessedTemplateSource
 
     mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
-        "simple": TemplateSource("gh:robdmoore/copier-helloworld"),
-        "beaker": TemplateSource("gh:algorandfoundation/algokit-beaker-default-template"),
-        "beaker_with_version": TemplateSource(
-            "gh:algorandfoundation/algokit-beaker-default-template", "96fc7fd766fac607cdf5d69ee6e85ade04dddd47"
+        "simple": BlessedTemplateSource(
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
+        ),
+        "beaker": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Provides a good starting point to build Beaker smart contracts productively.",
+        ),
+        "beaker_with_version": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            commit="96fc7fd766fac607cdf5d69ee6e85ade04dddd47",
+            description="Provides a good starting point to build Beaker smart contracts productively, but pinned.",
         ),
     }
 

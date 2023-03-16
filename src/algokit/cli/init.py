@@ -36,11 +36,11 @@ DEFAULT_ANSWERS: dict[str, str] = {
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
 
-@dataclass
+@dataclass(kw_only=True)
 class TemplateSource:
     url: str
     commit: str | None = None
-    """when adding a blessed template that is verified but not controlled by Algorand, 
+    """when adding a blessed template that is verified but not controlled by Algorand,
     ensure a specific commit is used"""
 
     def __str__(self) -> str:
@@ -49,12 +49,22 @@ class TemplateSource:
         return self.url
 
 
+@dataclass(kw_only=True)
+class BlessedTemplateSource(TemplateSource):
+    description: str
+
+
 # this is a function so we can modify the values in unit tests
-def _get_blessed_templates() -> dict[str, TemplateSource]:
+def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
     return {
-        # NOTE: leaving unpinned for now whilst this under active development, but this would be
-        # a good example of a TemplateSource that should have a commit= specified
-        "beaker": TemplateSource(url="gh:algorandfoundation/algokit-beaker-default-template"),
+        "beaker": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Official starter template for Beaker applications.",
+        ),
+        "playground": BlessedTemplateSource(
+            url="gh:algorand-devrel/playground",
+            description="A number of small example applications and demos.",
+        ),
     }
 
 
@@ -181,7 +191,7 @@ def init_command(
 
     if template_name:
         blessed_templates = _get_blessed_templates()
-        template = blessed_templates[template_name]
+        template: TemplateSource = blessed_templates[template_name]
     elif template_url:
         if not _repo_url_is_valid(template_url):
             logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
@@ -315,15 +325,27 @@ class GitRepoValidator(questionary.Validator):
 
 
 def _get_template_url() -> TemplateSource:
-    blessed_templates = _get_blessed_templates()
+    description_prefix = "\n     "
+
     choice_value = questionary.select(
-        "Select a project template: ", choices=[*blessed_templates, "<enter custom url>"]
+        "Select a project template: ",
+        choices=[
+            questionary.Choice(
+                title=[("bold", key), ("", description_prefix + tmpl.description)],
+                value=tmpl,
+            )
+            for key, tmpl in _get_blessed_templates().items()
+        ]
+        + [
+            # note: can't use None as default value, that gets ignored
+            questionary.Choice(
+                title=f"<other>{description_prefix}Enter a custom URL - potentially dangerous!", value=object()
+            ),
+        ],
     ).unsafe_ask()
-    try:
-        return blessed_templates[choice_value]
-    except KeyError:
-        # user selected custom url
-        pass
+    if isinstance(choice_value, TemplateSource):
+        return choice_value
+    # else: user selected custom url
     # note we print the warning but don't prompt for confirmation like we would when the URL is passed
     # as a command line argument, instead we allow the user to return to the official selection list
     # by entering a blank string
