@@ -34,7 +34,7 @@ def setup(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
     mocker.patch("algokit.cli.bootstrap.bootstrap_env")
 
 
-def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx_mock: HTTPXMock):
+def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=LATEST_URL, json={"tag_name": f"v{NEW_VERSION}"})
 
     # bootstrap env is a nice simple command we can use to test the version check side effects
@@ -74,7 +74,7 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 )
 def test_version_check_only_warns_if_newer_version_is_found(
     app_dir_mock: AppDirs, mocker: MockerFixture, current_version: str, latest_version: str, *, warning_expected: bool
-):
+) -> None:
     mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = current_version
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text(latest_version, encoding="utf-8")
@@ -86,7 +86,7 @@ def test_version_check_only_warns_if_newer_version_is_found(
         assert f"version {latest_version} is available" not in result.output
 
 
-def test_version_check_uses_cache(app_dir_mock: AppDirs):
+def test_version_check_uses_cache(app_dir_mock: AppDirs) -> None:
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("1234.56.78", encoding="utf-8")
     result = invoke("bootstrap env", skip_version_check=False)
@@ -95,7 +95,7 @@ def test_version_check_uses_cache(app_dir_mock: AppDirs):
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDirs, httpx_mock: HTTPXMock):
+def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=LATEST_URL, json={"tag_name": f"v{NEW_VERSION}"})
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("1234.56.78", encoding="utf-8")
@@ -108,7 +108,7 @@ def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDi
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-def test_version_check_respects_disable_config(app_dir_mock: AppDirs):
+def test_version_check_respects_disable_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "disable-version-prompt").touch()
     result = invoke("bootstrap env", skip_version_check=False)
 
@@ -116,14 +116,14 @@ def test_version_check_respects_disable_config(app_dir_mock: AppDirs):
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-def test_version_check_respects_skip_option(app_dir_mock: AppDirs):
+def test_version_check_respects_skip_option(app_dir_mock: AppDirs) -> None:
     result = invoke("--skip-version-check bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     assert len(result.output.strip()) == 0
 
 
-def test_version_check_disable_version_check(app_dir_mock: AppDirs):
+def test_version_check_disable_version_check(app_dir_mock: AppDirs) -> None:
     disable_version_check_path = app_dir_mock.app_config_dir / "disable-version-prompt"
     result = invoke("config version-prompt disable")
 
@@ -132,7 +132,7 @@ def test_version_check_disable_version_check(app_dir_mock: AppDirs):
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-def test_version_check_enable_version_check(app_dir_mock: AppDirs):
+def test_version_check_enable_version_check(app_dir_mock: AppDirs) -> None:
     disable_version_check_path = app_dir_mock.app_config_dir / "disable-version-prompt"
     disable_version_check_path.touch()
     result = invoke("config version-prompt enable")

@@ -13,7 +13,7 @@ class PopenMock:
     def __enter__(self) -> "PopenMock":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):  # noqa: ANN001
+    def __exit__(self, *args: Any) -> None:
         # TODO: we should change the structure of this mocking a bit,
         #       and check that I/O cleanup was called
         pass
@@ -45,7 +45,7 @@ class CommandMockData:
 
 
 class ProcMock:
-    def __init__(self):
+    def __init__(self) -> None:
         self._mock_data: dict[tuple[str, ...], CommandMockData] = {}
 
     def _add_mock_data(self, cmd: list[str] | str, data: CommandMockData) -> None:

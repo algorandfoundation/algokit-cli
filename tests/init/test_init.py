@@ -32,7 +32,7 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
 
 
 @pytest.fixture(autouse=True, scope="module")
-def supress_copier_dependencies_debug_output():
+def supress_copier_dependencies_debug_output() -> None:
     logging.getLogger("plumbum.local").setLevel("INFO")
     logging.getLogger("asyncio").setLevel("INFO")
 
@@ -76,14 +76,14 @@ def override_bootstrap(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
 
 
-def test_init_help():
+def test_init_help() -> None:
     result = invoke("init -h")
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_init_missing_git(mocker: MockerFixture):
+def test_init_missing_git(mocker: MockerFixture) -> None:
     mocker.patch.dict("sys.modules", {"copier": None})
     result = invoke("init")
 
@@ -91,14 +91,14 @@ def test_init_missing_git(mocker: MockerFixture):
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_invalid_name():
+def test_invalid_name() -> None:
     result = invoke("init --name invalid{name")
 
     assert result.exit_code != 0
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPathFactory):
+def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -123,7 +123,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     mocker: MockerFixture,
     proc_mock: ProcMock,
     mock_questionary_input: PipeInput,
-):
+) -> None:
     mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda name: "/bin/code" if name == "code" else None
 
     cwd = tmp_path_factory.mktemp("cwd")
@@ -139,7 +139,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory):
+def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -160,7 +160,7 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
 
 def test_init_minimal_interaction_required_no_git_no_network_no_bootstrap(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     # Accept community template
@@ -182,7 +182,7 @@ def test_init_minimal_interaction_required_no_git_no_network_no_bootstrap(
 
 def test_init_minimal_interaction_required_yes_git_no_network(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("Y")
@@ -214,7 +214,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     )
 
 
-def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     (cwd / "myapp").mkdir()
@@ -229,7 +229,7 @@ def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     (cwd / "myapp").mkdir()
@@ -247,7 +247,7 @@ def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questi
 
 def test_init_existing_filename_same_as_folder_name(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "myapp").touch()
 
@@ -263,7 +263,7 @@ def test_init_existing_filename_same_as_folder_name(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("\n")
@@ -277,7 +277,7 @@ def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questio
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("Y")  # community warning
@@ -290,7 +290,7 @@ def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_quest
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     project_name = "FAKE_PROJECT"
     mock_questionary_input.send_text(project_name + "\n")
@@ -310,7 +310,7 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     # bootstrap: yes
     mock_questionary_input.send_text("Y")
@@ -324,7 +324,7 @@ def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     # bootstrap: yes
     mock_questionary_input.send_text("N")
@@ -338,7 +338,7 @@ def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_i
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     project_name = "FAKE_PROJECT"
     mock_questionary_input.send_text("\n")
@@ -359,7 +359,9 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_project_name_reenter_folder_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_project_name_reenter_folder_name(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     project_name = "FAKE_PROJECT"
     (cwd / project_name).mkdir()
@@ -385,7 +387,7 @@ def test_init_project_name_reenter_folder_name(tmp_path_factory: TempPathFactory
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("Y")  # community one
@@ -418,7 +420,9 @@ def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_
     )
 
 
-def test_init_template_url_and_template_name(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_template_url_and_template_name(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("Y")  # community warning
@@ -435,7 +439,7 @@ def test_init_template_url_and_ref(
     tmp_path_factory: TempPathFactory,
     mock_questionary_input: PipeInput,
     mocker: MockerFixture,
-):
+) -> None:
     mock_run_copy = mocker.patch("copier.run_copy")
     mock_run_copy.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"
@@ -452,7 +456,7 @@ def test_init_template_url_and_ref(
     assert mock_run_copy.call_args.kwargs["vcs_ref"] == ref
 
 
-def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mock_questionary_input.send_text("N")  # community warning
@@ -465,7 +469,7 @@ def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_ques
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     # Source for special keys https://github.com/tmbo/questionary/blob/master/tests/prompts/test_select.py
@@ -482,7 +486,7 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_official_template_name(tmp_path_factory: TempPathFactory):
+def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -508,7 +512,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory):
     )
 
 
-def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFactory):
+def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -528,7 +532,7 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_with_custom_env(tmp_path_factory: TempPathFactory):
+def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(

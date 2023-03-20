@@ -7,9 +7,10 @@ from _pytest.fixtures import FixtureRequest
 from approvaltests.pytest.py_test_namer import PyTestNamer
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
-from utils.approvals import verify
-from utils.click_invoker import invoke
-from utils.proc_mock import ProcMock
+
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
 @pytest.fixture(scope="module")
@@ -23,7 +24,7 @@ def python_base_executable() -> str:
 
 
 @pytest.fixture(autouse=True, scope="module")
-def supress_questionary_dependencies_debug_output():
+def supress_questionary_dependencies_debug_output() -> None:
     logging.getLogger("asyncio").setLevel("INFO")
 
 
@@ -41,20 +42,20 @@ def system_python_paths(request: FixtureRequest, mocker: MockerFixture) -> Magic
     return mock
 
 
-def test_base_python_path(python_base_executable: str):
+def test_base_python_path(python_base_executable: str) -> None:
     """When running in a venv (expected test mode), we should be able to resolve to base python.
     Otherwise, they should be the same"""
     assert (python_base_executable == sys.executable) == (sys.prefix == sys.base_prefix)
 
 
-def test_bootstrap_poetry_with_poetry(proc_mock: ProcMock):
+def test_bootstrap_poetry_with_poetry(proc_mock: ProcMock) -> None:
     result = invoke("bootstrap poetry")
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_bootstrap_poetry_without_poetry(proc_mock: ProcMock, mock_questionary_input: PipeInput):
+def test_bootstrap_poetry_without_poetry(proc_mock: ProcMock, mock_questionary_input: PipeInput) -> None:
     proc_mock.should_fail_on("poetry --version")
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
@@ -65,7 +66,7 @@ def test_bootstrap_poetry_without_poetry(proc_mock: ProcMock, mock_questionary_i
     verify(result.output)
 
 
-def test_bootstrap_poetry_without_poetry_failed_install(proc_mock: ProcMock, mock_questionary_input: PipeInput):
+def test_bootstrap_poetry_without_poetry_failed_install(proc_mock: ProcMock, mock_questionary_input: PipeInput) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_bad_exit_on("pipx install poetry")
     # Yes, install poetry
@@ -77,7 +78,9 @@ def test_bootstrap_poetry_without_poetry_failed_install(proc_mock: ProcMock, moc
     verify(result.output)
 
 
-def test_bootstrap_poetry_without_poetry_failed_poetry_path(proc_mock: ProcMock, mock_questionary_input: PipeInput):
+def test_bootstrap_poetry_without_poetry_failed_poetry_path(
+    proc_mock: ProcMock, mock_questionary_input: PipeInput
+) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("poetry install")
     # Yes, install poetry
@@ -105,7 +108,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
     system_python_paths: MagicMock,
     python_base_executable: str,
     mock_questionary_input: PipeInput,
-):
+) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
     # Yes, install poetry
@@ -119,7 +122,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
     proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
-):
+) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
     proc_mock.should_bad_exit_on(f"{python_base_executable} -m pipx install poetry")
@@ -134,7 +137,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
     proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
-):
+) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
     proc_mock.should_fail_on("poetry install")
@@ -149,7 +152,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
 
 def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
     proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
-):
+) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
     proc_mock.should_bad_exit_on(f"{python_base_executable} -m pipx --version")

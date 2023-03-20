@@ -13,7 +13,7 @@ from tests.utils.click_invoker import ClickInvokeResult, invoke
 ORIGINAL_PROFILE_CONTENTS = "# ORIGINAL END OF FILE\n"
 
 
-def test_completions_help():
+def test_completions_help() -> None:
     # Act
     result = invoke("completions")
 
@@ -23,7 +23,7 @@ def test_completions_help():
 
 
 @pytest.mark.parametrize("command", ["install", "uninstall"])
-def test_completions_subcommands_help(command: str):
+def test_completions_subcommands_help(command: str) -> None:
     # Act
     result = invoke(f"completions {command} --help")
 
@@ -75,7 +75,7 @@ class CompletionsTestContext:
 
 
 @pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
-def test_completions_installs_correctly_with_specified_shell(shell: str):
+def test_completions_installs_correctly_with_specified_shell(shell: str) -> None:
     # Arrange
     context = CompletionsTestContext(shell)
 
@@ -91,7 +91,7 @@ def test_completions_installs_correctly_with_specified_shell(shell: str):
     verify(get_combined_verify_output(result.output, "profile", profile), options=NamerFactory.with_parameters(shell))
 
 
-def test_completions_installs_correctly_with_detected_shell(mocker: MockerFixture):
+def test_completions_installs_correctly_with_detected_shell(mocker: MockerFixture) -> None:
     # Arrange
     mocker.patch("shellingham.detect_shell").return_value = ("bash", "/bin/bash")
     context = CompletionsTestContext("bash")
@@ -108,7 +108,7 @@ def test_completions_installs_correctly_with_detected_shell(mocker: MockerFixtur
 
 
 @pytest.mark.parametrize("shell", SUPPORTED_SHELLS)
-def test_completions_uninstalls_correctly(shell: str):
+def test_completions_uninstalls_correctly(shell: str) -> None:
     # Arrange
     context = CompletionsTestContext(shell)
 
@@ -127,7 +127,7 @@ def test_completions_uninstalls_correctly(shell: str):
 
 
 @pytest.mark.parametrize("command", ["install", "uninstall"])
-def test_completions_subcommands_with_unknown_shell_fails_gracefully(command: str, mocker: MockerFixture):
+def test_completions_subcommands_with_unknown_shell_fails_gracefully(command: str, mocker: MockerFixture) -> None:
     # Arrange
     mocker.patch("shellingham.detect_shell").return_value = None
 
@@ -140,7 +140,7 @@ def test_completions_subcommands_with_unknown_shell_fails_gracefully(command: st
 
 
 @pytest.mark.parametrize("command", ["install", "uninstall"])
-def test_completions_subcommands_with_unsupported_shell_fails_gracefully(command: str, mocker: MockerFixture):
+def test_completions_subcommands_with_unsupported_shell_fails_gracefully(command: str, mocker: MockerFixture) -> None:
     # Arrange
     mocker.patch("shellingham.detect_shell").return_value = ("pwsh", "/bin/pwsh")
 
@@ -152,7 +152,7 @@ def test_completions_subcommands_with_unsupported_shell_fails_gracefully(command
     verify(result.output, options=NamerFactory.with_parameters(command))
 
 
-def test_completions_install_is_idempotent():
+def test_completions_install_is_idempotent() -> None:
     # Arrange
     context = CompletionsTestContext("bash")
     context.run_command("install", "bash")
@@ -168,7 +168,7 @@ def test_completions_install_is_idempotent():
     verify(get_combined_verify_output(result.output, "profile", profile))
 
 
-def test_completions_uninstall_is_idempotent():
+def test_completions_uninstall_is_idempotent() -> None:
     # Arrange
     context = CompletionsTestContext("bash")
 
@@ -186,7 +186,7 @@ def test_completions_uninstall_is_idempotent():
     verify(result.output)
 
 
-def test_completions_install_handles_no_profile():
+def test_completions_install_handles_no_profile() -> None:
     # Arrange
     context = CompletionsTestContext("bash")
     context.profile_path.unlink()
@@ -201,7 +201,7 @@ def test_completions_install_handles_no_profile():
     verify(get_combined_verify_output(result.output, "profile", profile))
 
 
-def test_completions_uninstall_handles_no_profile():
+def test_completions_uninstall_handles_no_profile() -> None:
     # Arrange
     context = CompletionsTestContext("bash")
     context.run_command("install", "brew")
@@ -217,7 +217,7 @@ def test_completions_uninstall_handles_no_profile():
     verify(result.output)
 
 
-def test_completions_install_handles_config_outside_home():
+def test_completions_install_handles_config_outside_home() -> None:
     # Arrange
     context = CompletionsTestContext("bash")
     # create a different directory outside home directory for config
@@ -239,7 +239,7 @@ def test_completions_install_handles_config_outside_home():
     verify(get_combined_verify_output(output, "profile", profile))
 
 
-def test_completions_install_handles_unsupported_bash_gracefully(mocker: MockerFixture):
+def test_completions_install_handles_unsupported_bash_gracefully(mocker: MockerFixture) -> None:
     # Arrange
     _mock_bash_version(mocker, "3.2.0")
     context = CompletionsTestContext("bash")

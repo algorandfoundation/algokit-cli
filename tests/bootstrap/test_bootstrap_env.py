@@ -3,10 +3,10 @@ import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
-from utils.approvals import TokenScrubber, combine_scrubbers, verify
-from utils.click_invoker import invoke
 
 from tests import get_combined_verify_output
+from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
+from tests.utils.click_invoker import invoke
 
 
 def make_output_scrubber(**extra_tokens: str) -> Scrubber:
@@ -25,7 +25,7 @@ def make_output_scrubber(**extra_tokens: str) -> Scrubber:
     )
 
 
-def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory):
+def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -37,7 +37,7 @@ def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory):
     verify(result.output)
 
 
-def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory):
+def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env").touch()
 
@@ -50,7 +50,7 @@ def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory):
     verify(result.output)
 
 
-def test_bootstrap_env_dotenv_missing_template_exists(tmp_path_factory: TempPathFactory):
+def test_bootstrap_env_dotenv_missing_template_exists(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text("env_template_contents")
 
@@ -63,7 +63,7 @@ def test_bootstrap_env_dotenv_missing_template_exists(tmp_path_factory: TempPath
     verify(get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")))
 
 
-def test_bootstrap_env_dotenv_with_values(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_bootstrap_env_dotenv_with_values(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
         """
@@ -93,7 +93,7 @@ def test_bootstrap_env_dotenv_different_prompt_scenarios(
     mock_questionary_input: PipeInput,
     request: pytest.FixtureRequest,
     mock_os_dependency: None,
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
         """

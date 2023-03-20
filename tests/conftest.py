@@ -6,9 +6,9 @@ from pathlib import Path
 
 import prompt_toolkit.data_structures
 import pytest
-from approvaltests import Reporter, reporters, set_default_reporter  # type: ignore
-from approvaltests.reporters.generic_diff_reporter_config import create_config  # type: ignore
-from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter  # type: ignore
+from approvaltests import Reporter, reporters, set_default_reporter
+from approvaltests.reporters.generic_diff_reporter_config import create_config
+from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter
 from prompt_toolkit.application import create_app_session
 from prompt_toolkit.input import PipeInput, create_pipe_input
 from prompt_toolkit.output.flush_stdout import flush_stdout

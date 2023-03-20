@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import os
+from collections.abc import Mapping
 from pathlib import Path
 
 import click
@@ -24,7 +25,7 @@ def invoke(
     *,
     cwd: Path | None = None,
     skip_version_check: bool = True,
-    env: dict[str, str | None] | None = None,
+    env: Mapping[str, str | None] | None = None,
 ) -> ClickInvokeResult:
     from algokit.cli import algokit
 
@@ -37,8 +38,8 @@ def invoke(
         test_args = "-v --no-color"
         if skip_version_check:
             test_args = f"{test_args} --skip-version-check"
-        result = runner.invoke(algokit, f"{test_args} {args}", env=env)  # type: ignore
-        if result.exc_info is Exception:
+        result = runner.invoke(algokit, f"{test_args} {args}", env=env)
+        if result.exc_info is not None:
             logger.error("Click invocation error", exc_info=result.exc_info)
         output = normalize_path(result.stdout, str(cwd or prior_cwd), "{current_working_directory}")
         return ClickInvokeResult(exit_code=result.exit_code, output=output, exception=result.exception)
