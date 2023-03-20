@@ -1,6 +1,7 @@
 import json
 from subprocess import CompletedProcess
 
+import pytest
 from pytest_mock import MockerFixture
 
 from tests.utils.app_dir_mock import AppDirs
@@ -16,14 +17,16 @@ def test_goal_help() -> None:
     verify(result.output)
 
 
-def test_goal_no_args(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_no_args() -> None:
     result = invoke("goal")
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_goal_console(proc_mock: ProcMock, mocker: MockerFixture) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_console(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
     )
@@ -69,14 +72,16 @@ def test_goal_console_failed_algod_not_created(
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_goal_simple_args(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_simple_args() -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_goal_complex_args(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_complex_args() -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
     assert result.exit_code == 0

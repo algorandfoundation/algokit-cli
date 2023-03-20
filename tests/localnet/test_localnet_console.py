@@ -1,13 +1,14 @@
 from subprocess import CompletedProcess
 
+import pytest
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
-from tests.utils.proc_mock import ProcMock
 
 
-def test_goal_console(proc_mock: ProcMock, mocker: MockerFixture) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_console(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
     )

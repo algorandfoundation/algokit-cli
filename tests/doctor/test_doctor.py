@@ -26,7 +26,7 @@ class VersionInfoType(typing.NamedTuple):
 
 
 @pytest.fixture()
-def mock_doctor_dependencies(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
+def _mock_doctor_dependencies(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
     # Mock OS.platform
     platform_system: str = getattr(request, "param", "Darwin")
 
@@ -36,7 +36,9 @@ def mock_doctor_dependencies(request: pytest.FixtureRequest, mocker: MockerFixtu
     platform_module.platform.return_value = f"{platform_system}-other-system-info"
     platform_module.system.return_value = platform_system
     # Mock datetime
-    mocker.patch("algokit.cli.doctor.dt").datetime.now.return_value = datetime(1990, 12, 31, 10, 9, 8)
+    mocker.patch("algokit.cli.doctor.dt").datetime.now.side_effect = lambda _, tz=None: datetime(
+        1990, 12, 31, 10, 9, 8, tzinfo=tz
+    )
     # Mock shutil
     mocker.patch("algokit.core.doctor.which").side_effect = mock_shutil_which
     # Mock sys - Tuple[int, int, int, str, int]
@@ -46,7 +48,7 @@ def mock_doctor_dependencies(request: pytest.FixtureRequest, mocker: MockerFixtu
 
 
 @pytest.fixture(autouse=True)
-def mock_happy_values(proc_mock: ProcMock) -> None:
+def _mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["choco", "--version"], ["1.2.2"])
     proc_mock.set_output(["brew", "--version"], ["Homebrew 3.6.15", "Homebrew/homebrew-core (blah)"])
     proc_mock.set_output(["docker", "--version"], ["Docker version 20.10.21, build baeda1f"])
@@ -80,14 +82,16 @@ def make_output_scrubber(**extra_tokens: str) -> Scrubber:
     )
 
 
-def test_doctor_help(mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_help() -> None:
     result = invoke("doctor -h")
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_doctor_with_copy(mocker: MockerFixture, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_copy(mocker: MockerFixture) -> None:
     # Mock pyclip
     mocked_os = mocker.patch("algokit.cli.doctor.pyclip.copy")
     result = invoke("doctor -c")
@@ -98,22 +102,24 @@ def test_doctor_with_copy(mocker: MockerFixture, mock_doctor_dependencies: None)
 
 
 @pytest.mark.parametrize(
-    "mock_doctor_dependencies",
+    "_mock_doctor_dependencies",
     [
         pytest.param("Windows", id="windows"),
         pytest.param("Linux", id="linux"),
         pytest.param("Darwin", id="macOS"),
     ],
-    indirect=["mock_doctor_dependencies"],
+    indirect=["_mock_doctor_dependencies"],
 )
-def test_doctor_successful(request: pytest.FixtureRequest, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_successful(request: pytest.FixtureRequest) -> None:
     result = invoke("doctor")
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
 
 
-def test_doctor_with_docker_compose_version_warning(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_docker_compose_version_warning(proc_mock: ProcMock) -> None:
     proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.1.3"}'])
 
     result = invoke("doctor")
@@ -122,7 +128,8 @@ def test_doctor_with_docker_compose_version_warning(proc_mock: ProcMock, mock_do
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_doctor_with_docker_compose_version_gitpod(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_docker_compose_version_gitpod(proc_mock: ProcMock) -> None:
     proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.10.0-gitpod.0"}'])
 
     result = invoke("doctor")
@@ -131,7 +138,8 @@ def test_doctor_with_docker_compose_version_gitpod(proc_mock: ProcMock, mock_doc
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_doctor_with_docker_compose_version_unparseable(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_docker_compose_version_unparseable(proc_mock: ProcMock) -> None:
     proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "TEAPOT"}'])
 
     result = invoke("doctor")
@@ -157,17 +165,16 @@ ALL_COMMANDS = [
 
 
 @pytest.mark.parametrize(
-    "mock_doctor_dependencies",
+    "_mock_doctor_dependencies",
     [
         pytest.param("Windows", id="windows"),
         pytest.param("Linux", id="linux"),
         pytest.param("Darwin", id="macOS"),
     ],
-    indirect=["mock_doctor_dependencies"],
+    indirect=["_mock_doctor_dependencies"],
 )
-def test_doctor_all_commands_not_found(
-    request: pytest.FixtureRequest, proc_mock: ProcMock, mock_doctor_dependencies: None
-) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_all_commands_not_found(request: pytest.FixtureRequest, proc_mock: ProcMock) -> None:
     for cmd in ALL_COMMANDS:
         proc_mock.should_fail_on(cmd[0])
 
@@ -178,17 +185,16 @@ def test_doctor_all_commands_not_found(
 
 
 @pytest.mark.parametrize(
-    "mock_doctor_dependencies",
+    "_mock_doctor_dependencies",
     [
         pytest.param("Windows", id="windows"),
         pytest.param("Linux", id="linux"),
         pytest.param("Darwin", id="macOS"),
     ],
-    indirect=["mock_doctor_dependencies"],
+    indirect=["_mock_doctor_dependencies"],
 )
-def test_doctor_all_commands_bad_exit(
-    request: pytest.FixtureRequest, proc_mock: ProcMock, mock_doctor_dependencies: None
-) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_all_commands_bad_exit(request: pytest.FixtureRequest, proc_mock: ProcMock) -> None:
     for cmd in ALL_COMMANDS:
         proc_mock.should_bad_exit_on(cmd, output=["I AM A TEAPOT"])
 
@@ -198,7 +204,8 @@ def test_doctor_all_commands_bad_exit(
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
 
 
-def test_doctor_with_weird_values_on_mac(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_weird_values_on_mac(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["brew", "--version"], ["Homebrew 3.6.15-31-g82d89bb"])
 
     result = invoke("doctor")
@@ -207,7 +214,8 @@ def test_doctor_with_weird_values_on_mac(proc_mock: ProcMock, mock_doctor_depend
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_unparseable_python_version(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_unparseable_python_version(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["python", "--version"], ["  ", "1-2-3", "  abc  "])
 
     result = invoke("doctor")
@@ -216,7 +224,8 @@ def test_unparseable_python_version(proc_mock: ProcMock, mock_doctor_dependencie
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_unexpected_exception(mocker: MockerFixture, proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies", "proc_mock")
+def test_unexpected_exception_locating_executable(mocker: MockerFixture) -> None:
     def which_throw(_cmd: str) -> None:
         raise RuntimeError("OH NO")
 
@@ -224,11 +233,12 @@ def test_unexpected_exception(mocker: MockerFixture, proc_mock: ProcMock, mock_d
 
     result = invoke("doctor")
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_npm_permission_denied(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_npm_permission_denied(proc_mock: ProcMock) -> None:
     proc_mock.should_deny_on(["npm"])
 
     result = invoke("doctor")
@@ -237,9 +247,8 @@ def test_npm_permission_denied(proc_mock: ProcMock, mock_doctor_dependencies: No
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_new_algokit_version_available(
-    request: pytest.FixtureRequest, mocker: MockerFixture, mock_doctor_dependencies: None
-) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_new_algokit_version_available(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.doctor.get_latest_github_version").return_value = "4.5.6"
     result = invoke("doctor")
 
@@ -248,9 +257,10 @@ def test_new_algokit_version_available(
 
 
 @pytest.mark.parametrize(
-    "mock_doctor_dependencies", [pytest.param("Windows", id="windows")], indirect=["mock_doctor_dependencies"]
+    "_mock_doctor_dependencies", [pytest.param("Windows", id="windows")], indirect=["_mock_doctor_dependencies"]
 )
-def test_doctor_with_weird_values_on_windows(proc_mock: ProcMock, mock_doctor_dependencies: None) -> None:
+@pytest.mark.usefixtures("_mock_doctor_dependencies")
+def test_doctor_with_weird_values_on_windows(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])
     proc_mock.set_output(
         ["choco"], ["Chocolatey v0.10.15", "choco: Please run 'choco -?' or 'choco <command> -?' for help menu."]

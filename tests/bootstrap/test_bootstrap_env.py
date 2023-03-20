@@ -63,7 +63,8 @@ def test_bootstrap_env_dotenv_missing_template_exists(tmp_path_factory: TempPath
     verify(get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")))
 
 
-def test_bootstrap_env_dotenv_with_values(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
+@pytest.mark.usefixtures("mock_questionary_input")
+def test_bootstrap_env_dotenv_with_values(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
         """
@@ -88,11 +89,9 @@ TOKEN_5_SPECIAL_CHAR=*
     verify(get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")))
 
 
+@pytest.mark.usefixtures("_mock_os_dependency")
 def test_bootstrap_env_dotenv_different_prompt_scenarios(
-    tmp_path_factory: TempPathFactory,
-    mock_questionary_input: PipeInput,
-    request: pytest.FixtureRequest,
-    mock_os_dependency: None,
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(

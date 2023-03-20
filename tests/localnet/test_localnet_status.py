@@ -1,6 +1,7 @@
 import json
 
 import httpx
+import pytest
 from pytest_httpx import HTTPXMock
 
 from tests.utils.app_dir_mock import AppDirs
@@ -395,6 +396,7 @@ def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcM
     result = invoke("localnet status")
 
     assert result.exit_code == 1
+    assert not httpx_mock.get_request()
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
@@ -409,14 +411,16 @@ def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet status")
 
     assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_localnet_status_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("app_dir_mock")
+def test_localnet_status_without_docker(proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on("docker compose version")
 
     result = invoke("localnet status")
@@ -425,7 +429,8 @@ def test_localnet_status_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMo
     verify(result.output)
 
 
-def test_localnet_status_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("app_dir_mock")
+def test_localnet_status_without_docker_compose(proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker compose version")
 
     result = invoke("localnet status")
@@ -434,7 +439,8 @@ def test_localnet_status_without_docker_compose(app_dir_mock: AppDirs, proc_mock
     verify(result.output)
 
 
-def test_localnet_status_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("app_dir_mock")
+def test_localnet_status_without_docker_engine_running(proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker version")
 
     result = invoke("localnet status")

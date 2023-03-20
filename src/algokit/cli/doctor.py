@@ -4,14 +4,13 @@ import platform
 import sys
 
 import click
-import pyclip  # type: ignore
+import pyclip  # type: ignore[import]
 
 from algokit.core.conf import get_current_package_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
-    parse_docker_compose_version_output,
 )
 from algokit.core.version_prompt import get_latest_github_version
 
@@ -51,7 +50,6 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         ),
         "docker compose": check_dependency(
             DOCKER_COMPOSE_VERSION_COMMAND,
-            successful_output_parser=parse_docker_compose_version_output,
             minimum_version=DOCKER_COMPOSE_MINIMUM_VERSION,
             minimum_version_help=[
                 f"Docker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to run `algokit sandbox command`;",

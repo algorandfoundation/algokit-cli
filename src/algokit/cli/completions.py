@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 import click.shell_completion
-import shellingham  # type: ignore
+import shellingham  # type: ignore[import]
 
 from algokit.core.atomic_write import atomic_write
 from algokit.core.conf import get_app_config_dir
@@ -74,9 +74,11 @@ class ShellCompletion:
     @property
     def source(self) -> str:
         completion_class = click.shell_completion.get_completion_class(self.shell)
+        if completion_class is None:
+            raise click.ClickException(f"Unsupported shell for completions: {self.shell}")
         completion = completion_class(
             # class is only instantiated to get source snippet, so don't need to pass a real command
-            cli=None,  # type: ignore
+            cli=None,  # type: ignore[arg-type]
             ctx_args={},
             prog_name="algokit",
             complete_var="_ALGOKIT_COMPLETE",

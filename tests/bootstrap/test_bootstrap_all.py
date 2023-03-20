@@ -4,7 +4,6 @@ from approvaltests.pytest.py_test_namer import PyTestNamer
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
-from tests.utils.proc_mock import ProcMock
 
 
 def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory) -> None:
@@ -32,7 +31,8 @@ def test_bootstrap_all_env(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "poetry.toml").touch()
 
@@ -46,22 +46,18 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: Proc
 
 
 @pytest.mark.parametrize(
-    "mock_os_dependency",
+    "_mock_os_dependency",
     [
         pytest.param("Windows", id="windows"),
         pytest.param("Linux", id="linux"),
         pytest.param("Darwin", id="macOS"),
     ],
-    indirect=["mock_os_dependency"],
+    indirect=["_mock_os_dependency"],
 )
-def test_bootstrap_all_npm(
-    proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-) -> None:
+@pytest.mark.usefixtures("_mock_os_dependency", "proc_mock")
+def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
-
-    # proc_mock.set_output("npm install", ["<<Installed npm packages>>"])
-    # proc_mock.set_output("npm.cmd install", ["<<Installed npm.cmd packages on Windows>>"])
 
     result = invoke(
         "bootstrap all",
@@ -72,7 +68,8 @@ def test_bootstrap_all_npm(
     verify(result.output, namer=PyTestNamer(request))
 
 
-def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "pyproject.toml").write_text("[tool.poetry]", encoding="utf-8")
 
@@ -108,7 +105,8 @@ def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "empty_dir").mkdir()
     (cwd / "live_dir").mkdir()

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
     default=False,
 )
 @click.argument("goal_args", nargs=-1, type=click.UNPROCESSED)
-def goal_command(console: bool, goal_args: list[str]) -> None:  # noqa: FBT001
+def goal_command(*, console: bool, goal_args: list[str]) -> None:
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except OSError as ex:

@@ -226,9 +226,3 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
 
 
 DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
-
-
-def parse_docker_compose_version_output(output: str) -> str:
-    compose_version: dict[str, str] = json.loads(output)
-    compose_version_str = compose_version.get("version", "")
-    return compose_version_str.lstrip("v")
