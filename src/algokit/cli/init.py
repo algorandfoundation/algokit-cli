@@ -18,7 +18,6 @@ import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc
-from algokit.core.click_extensions import DeferredChoice
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator
 
@@ -100,7 +99,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "template_name",
     "--template",
     "-t",
-    type=DeferredChoice(lambda: list(_get_blessed_templates())),
+    type=click.Choice(list(_get_blessed_templates())),
     default=None,
     help="Name of an official template to use.",
 )

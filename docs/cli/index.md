@@ -266,6 +266,12 @@ Name of the project / directory / repository to create.
 Name of an official template to use.
 
 
+* **Options**
+
+    beaker | playground
+
+
+
 ### --template-url <URL>
 URL to a git repo with a custom project template.
 
