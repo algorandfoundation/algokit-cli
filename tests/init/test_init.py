@@ -37,20 +37,16 @@ def supress_copier_dependencies_debug_output():
     logging.getLogger("asyncio").setLevel("INFO")
 
 
-def bootstrap_mock(p: Path, prompt: Callable[[str], bool]):
-    click.echo(f"Executed `algokit bootstrap all` in {p}")
-
-
 @pytest.fixture(autouse=True)
 def mock_no_vscode(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda _: None
 
 
 @pytest.fixture(autouse=True)
-def set_blessed_templates(mocker: MockerFixture):
-    from algokit.cli.init import BlessedTemplateSource
+def set_blessed_templates(mocker: MockerFixture) -> None:
+    from algokit.cli.init import BlessedTemplateSource, init_command
 
-    mocker.patch("algokit.cli.init._get_blessed_templates").return_value = {
+    blessed_templates = {
         "simple": BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
@@ -65,6 +61,17 @@ def set_blessed_templates(mocker: MockerFixture):
             description="Provides a good starting point to build Beaker smart contracts productively, but pinned.",
         ),
     }
+
+    (template_param,) = (p for p in init_command.params if p.name == "template_name")
+    template_param.type = click.Choice(list(blessed_templates))
+
+    mocker.patch("algokit.cli.init._get_blessed_templates").return_value = blessed_templates
+
+
+@pytest.fixture(autouse=True)
+def override_bootstrap(mocker: MockerFixture) -> None:
+    def bootstrap_mock(p: Path, _prompt: Callable[[str], bool]) -> None:
+        click.echo(f"Executed `algokit bootstrap all` in {p}")
 
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
 
