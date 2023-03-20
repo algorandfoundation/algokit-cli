@@ -139,15 +139,18 @@ def bootstrap_npm(project_dir: Path) -> None:
         logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
     else:
         logger.info("Installing npm dependencies")
+        is_windows = platform.system() == "Windows"
+        cmd = ["npm" if not is_windows else "npm.cmd", "install"]
         try:
-            is_windows = platform.system() == "Windows"
             proc.run(
-                ["npm" if not is_windows else "npm.cmd", "install"],
+                cmd,
                 stdout_log_level=logging.INFO,
                 cwd=project_dir,
             )
         except OSError as e:
-            raise click.ClickException(f"Failed to run `npm install using {package_json_path}.") from e
+            raise click.ClickException(
+                f"Failed to run `{' '.join(cmd)}` for {package_json_path}. Is npm installed and available on PATH?"
+            ) from e
 
 
 def _find_valid_pipx_command() -> list[str]:
