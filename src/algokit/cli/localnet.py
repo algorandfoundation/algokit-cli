@@ -12,9 +12,8 @@ from algokit.core.sandbox import (
     ComposeSandbox,
     fetch_algod_status_data,
     fetch_indexer_status_data,
-    parse_docker_compose_version_output,
 )
-from algokit.core.utils import is_minimum_version
+from algokit.core.utils import extract_version_triple, is_minimum_version
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +34,14 @@ def localnet_group() -> None:
             "Docker Compose not found; please install Docker Compose and add to path.\n"
             "See https://docs.docker.com/compose/install/ for more information."
         )
-    compose_version_str = parse_docker_compose_version_output(compose_version_result.output)
+
     try:
+        compose_version_str = extract_version_triple(compose_version_result.output)
         compose_version_ok = is_minimum_version(compose_version_str, DOCKER_COMPOSE_MINIMUM_VERSION)
     except Exception:
         logger.warning(
             "Unable to extract docker compose version from output: \n"
-            + compose_version_str
+            + compose_version_result.output
             + f"\nPlease ensure a minimum of compose v{DOCKER_COMPOSE_MINIMUM_VERSION} is used",
             exc_info=True,
         )
@@ -88,7 +88,7 @@ def stop_localnet() -> None:
     default=True,
     help="Enable or disable updating to the latest available LocalNet version",
 )
-def reset_localnet(update: bool) -> None:  # noqa: FBT001
+def reset_localnet(*, update: bool) -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
@@ -144,7 +144,7 @@ def localnet_status() -> None:
 @localnet_group.command(
     "console",
     short_help="Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash console"
-    + " so you can execute multiple goal commands and/or interact with a filesystem.",
+    " so you can execute multiple goal commands and/or interact with a filesystem.",
 )
 @click.pass_context
 def localnet_console(context: click.Context) -> None:

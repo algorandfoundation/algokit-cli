@@ -84,7 +84,7 @@ class ProcMock:
     def set_output(self, cmd: list[str] | str, output: list[str]) -> None:
         self._add_mock_data(cmd, CommandMockData(output_lines=output))
 
-    def popen(self, cmd: list[str], *args: Any, **kwargs: Any) -> PopenMock:
+    def popen(self, cmd: list[str], *_args: Any, **_kwargs: Any) -> PopenMock:
         for i in reversed(range(len(cmd))):
             prefix = cmd[: i + 1]
             try:

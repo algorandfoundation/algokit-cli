@@ -27,8 +27,8 @@ AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Darwin-other-system-info
 docker: 20.10.21
-docker compose: TEAPOT
-  Failed to parse version from: "TEAPOT"
+docker compose: {"version": "TEAPOT"}
+  Failed to parse version from: "{"version": "TEAPOT"}"
   Error: Unable to parse version number
   Unable to check against minimum version of 2.5.0
 git: 2.37.1

@@ -6,10 +6,10 @@ DEBUG: Running 'git --version' in '{current_working_directory}'
 DEBUG: git: git version 2.37.1 (Apple Git-137.1)
 DEBUG: Running 'python --version' in '{current_working_directory}'
 DEBUG: python: Python 3.10.0
-DEBUG: Unexpected error checking dependency: OH NO
+DEBUG: Failed to locate python: OH NO
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: python3: Python 3.11.0
-DEBUG: Unexpected error checking dependency: OH NO
+DEBUG: Failed to locate python3: OH NO
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: 1.1.0
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
@@ -30,10 +30,8 @@ OS: Darwin-other-system-info
 docker: 20.10.21
 docker compose: 2.12.2
 git: 2.37.1
-python: Unexpected error checking dependency
-  RuntimeError: OH NO
-python3: Unexpected error checking dependency
-  RuntimeError: OH NO
+python: 3.10.0f (location: unknown)
+python3: 3.11.0f (location: unknown)
 pipx: 1.1.0
 poetry: 1.2.2
 node: 18.12.1

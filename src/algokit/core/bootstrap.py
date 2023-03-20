@@ -123,14 +123,13 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
     try:
         proc.run(["poetry", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
     except OSError as e:
-        if not try_install_poetry:
-            raise  # unexpected error, we already ran without IOError before
-        else:
+        if try_install_poetry:
             raise click.ClickException(
                 "Unable to access Poetry on PATH after installing it via pipx; "
                 "check pipx installations are on your path by running `pipx ensurepath` "
                 "and try `algokit bootstrap poetry` again."
             ) from e
+        raise  # unexpected error, we already ran without IOError before
 
 
 def bootstrap_npm(project_dir: Path) -> None:

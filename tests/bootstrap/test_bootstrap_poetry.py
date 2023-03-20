@@ -24,7 +24,7 @@ def python_base_executable() -> str:
 
 
 @pytest.fixture(autouse=True, scope="module")
-def supress_questionary_dependencies_debug_output() -> None:
+def _supress_questionary_dependencies_debug_output() -> None:
     logging.getLogger("asyncio").setLevel("INFO")
 
 
@@ -48,7 +48,8 @@ def test_base_python_path(python_base_executable: str) -> None:
     assert (python_base_executable == sys.executable) == (sys.prefix == sys.base_prefix)
 
 
-def test_bootstrap_poetry_with_poetry(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock")
+def test_bootstrap_poetry_with_poetry() -> None:
     result = invoke("bootstrap poetry")
 
     assert result.exit_code == 0
@@ -102,10 +103,10 @@ def test_bootstrap_poetry_without_poetry_failed_poetry_path(
     ],
     indirect=["system_python_paths"],
 )
+@pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path(
     request: FixtureRequest,
     proc_mock: ProcMock,
-    system_python_paths: MagicMock,
     python_base_executable: str,
     mock_questionary_input: PipeInput,
 ) -> None:
@@ -120,8 +121,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
     verify(result.output.replace(python_base_executable, "{python_base_executable}"), namer=PyTestNamer(request))
 
 
+@pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
-    proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
+    proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
@@ -135,8 +137,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))
 
 
+@pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
-    proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
+    proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")
@@ -150,8 +153,9 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))
 
 
+@pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
-    proc_mock: ProcMock, system_python_paths: MagicMock, python_base_executable: str, mock_questionary_input: PipeInput
+    proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("pipx --version")

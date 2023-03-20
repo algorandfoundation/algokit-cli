@@ -21,7 +21,7 @@ def normalize_path(content: str, path: str, token: str) -> str:
     )
 
 
-class TokenScrubber(Scrubber):  # type: ignore
+class TokenScrubber(Scrubber):  # type: ignore[misc]
     def __init__(self, tokens: dict[str, str]):
         self._tokens = tokens
 

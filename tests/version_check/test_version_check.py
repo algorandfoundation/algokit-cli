@@ -27,7 +27,7 @@ def make_scrubber(app_dir_mock: AppDirs) -> Scrubber:
 
 
 @pytest.fixture(autouse=True)
-def setup(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
+def _setup(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
     mocker.patch("algokit.core.version_prompt.get_app_config_dir").return_value = app_dir_mock.app_config_dir
     mocker.patch("algokit.core.version_prompt.get_app_state_dir").return_value = app_dir_mock.app_state_dir
     # make bootstrap env a no-op
@@ -45,7 +45,7 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 
 
 @pytest.mark.parametrize(
-    "current_version,latest_version,warning_expected",
+    ("current_version", "latest_version", "warning_expected"),
     [
         ("0.2.0", "0.3.0", True),
         ("0.25.0", "0.30.0", True),
@@ -116,7 +116,8 @@ def test_version_check_respects_disable_config(app_dir_mock: AppDirs) -> None:
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-def test_version_check_respects_skip_option(app_dir_mock: AppDirs) -> None:
+@pytest.mark.usefixtures("app_dir_mock")
+def test_version_check_respects_skip_option() -> None:
     result = invoke("--skip-version-check bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0

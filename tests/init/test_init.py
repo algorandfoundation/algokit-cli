@@ -32,18 +32,18 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
 
 
 @pytest.fixture(autouse=True, scope="module")
-def supress_copier_dependencies_debug_output() -> None:
+def _supress_copier_dependencies_debug_output() -> None:
     logging.getLogger("plumbum.local").setLevel("INFO")
     logging.getLogger("asyncio").setLevel("INFO")
 
 
 @pytest.fixture(autouse=True)
-def mock_no_vscode(mocker: MockerFixture) -> None:
+def _mock_no_vscode(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda _: None
 
 
 @pytest.fixture(autouse=True)
-def set_blessed_templates(mocker: MockerFixture) -> None:
+def _set_blessed_templates(mocker: MockerFixture) -> None:
     from algokit.cli.init import BlessedTemplateSource, init_command
 
     blessed_templates = {
@@ -69,7 +69,7 @@ def set_blessed_templates(mocker: MockerFixture) -> None:
 
 
 @pytest.fixture(autouse=True)
-def override_bootstrap(mocker: MockerFixture) -> None:
+def _override_bootstrap(mocker: MockerFixture) -> None:
     def bootstrap_mock(p: Path, _prompt: Callable[[str], bool]) -> None:
         click.echo(f"Executed `algokit bootstrap all` in {p}")
 
@@ -103,7 +103,7 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
 
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        + "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
         cwd=cwd,
     )
 
@@ -132,7 +132,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     mock_questionary_input.send_text("Y")  # reuse existing directory
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        + "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
         cwd=cwd,
     )
     assert result.exit_code == 0
@@ -144,7 +144,7 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
 
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' "
-        + "--UNSAFE-SECURITY-accept-template-url --defaults",
+        "--UNSAFE-SECURITY-accept-template-url --defaults",
         cwd=cwd,
     )
 
@@ -312,11 +312,10 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
 
 def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    # bootstrap: yes
     mock_questionary_input.send_text("Y")
     result = invoke(
         f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        + " --answer greeting hi --answer include_extra_file yes",
+        " --answer greeting hi --answer include_extra_file yes",
         cwd=cwd,
     )
 
@@ -326,11 +325,10 @@ def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_
 
 def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    # bootstrap: yes
     mock_questionary_input.send_text("N")
     result = invoke(
         f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        + " --answer greeting hi --answer include_extra_file yes",
+        " --answer greeting hi --answer include_extra_file yes",
         cwd=cwd,
     )
 
@@ -427,7 +425,7 @@ def test_init_template_url_and_template_name(
 
     mock_questionary_input.send_text("Y")  # community warning
     result = invoke(
-        ("init --name myapp --no-git --template simple " f"--template-url '{GIT_BUNDLE_PATH}' --defaults"),
+        f"init --name myapp --no-git --template simple --template-url '{GIT_BUNDLE_PATH}' --defaults",
         cwd=cwd,
     )
 
@@ -435,11 +433,8 @@ def test_init_template_url_and_template_name(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_template_url_and_ref(
-    tmp_path_factory: TempPathFactory,
-    mock_questionary_input: PipeInput,
-    mocker: MockerFixture,
-) -> None:
+@pytest.mark.usefixtures("mock_questionary_input")
+def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
     mock_run_copy = mocker.patch("copier.run_copy")
     mock_run_copy.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"

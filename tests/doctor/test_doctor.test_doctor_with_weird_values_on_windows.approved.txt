@@ -27,7 +27,7 @@ AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Windows-other-system-info
 docker: 20.10.21
 docker compose: 2.12.2
-git: 2.31.0
+git: 2.31.0.windows.1
 python: 3.10.0 (location: /usr/local/bin/python)
 python3: 3.11.0 (location: /usr/local/bin/python3)
 pipx: 1.1.0

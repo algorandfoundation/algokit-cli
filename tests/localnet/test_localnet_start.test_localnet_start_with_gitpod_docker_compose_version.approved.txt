@@ -1,8 +1,5 @@
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
-DEBUG: docker: {"version": "v2.5-dev123"}
-WARNING: Unable to extract docker compose version from output: 
-{"version": "v2.5-dev123"}
-Please ensure a minimum of compose v2.5.0 is used
+DEBUG: docker: {"version": "v2.10.0-gitpod.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR

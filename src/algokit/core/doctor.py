@@ -2,23 +2,12 @@ import dataclasses
 import logging
 import re
 import traceback
-from collections.abc import Callable
 from shutil import which
 
 from algokit.core import proc
-from algokit.core.utils import is_minimum_version
+from algokit.core.utils import extract_version_triple, is_minimum_version
 
 logger = logging.getLogger(__name__)
-
-
-def _get_version_or_first_non_blank_line(output: str) -> str:
-    match = re.search(r"\d+\.\d+\.\d+", output)
-    if match:
-        return match.group(0)
-    lines = output.splitlines()
-    non_blank_lines = filter(None, (ln.strip() for ln in lines))
-    # return first non-blank line or empty string if all blank
-    return next(non_blank_lines, "")
 
 
 @dataclasses.dataclass
@@ -28,15 +17,10 @@ class DoctorResult:
     extra_help: list[str] | None = None
 
 
-def format_exception_only(ex: Exception) -> list[str]:
-    return [ln.rstrip("\n") for ln in traceback.format_exception_only(type(ex), ex)]
-
-
 def check_dependency(
     cmd: list[str],
     *,
     missing_help: list[str] | None = None,
-    successful_output_parser: Callable[[str], str] = _get_version_or_first_non_blank_line,
     include_location: bool = False,
     minimum_version: str | None = None,
     minimum_version_help: list[str] | None = None,
@@ -45,13 +29,33 @@ def check_dependency(
 
     :param cmd: command to run
     :param missing_help: Optional additional text to display if command is not found
-    :param successful_output_parser: Optional method to trim down or parse the output of the version command.
-            If not specified, an attempt will be made to extra a major.minor.patch value,
-            otherwise the first non-blank line will be used
     :param include_location: Include the path to `command` in the output?`
     :param minimum_version: Optional value to check minimum version against.
     :param minimum_version_help: Custom help output if minimum version not met.
     """
+    result = _run_command(cmd, missing_help=missing_help)
+    if result.ok:
+        result = _process_version(
+            run_output=result.output,
+            minimum_version=minimum_version,
+            minimum_version_help=minimum_version_help,
+        )
+        if include_location:
+            try:
+                location = which(cmd[0])
+            except Exception as ex:
+                logger.debug(f"Failed to locate {cmd[0]}: {ex}", exc_info=True)
+                result.output += "f (location: unknown)"
+            else:
+                result.output += f" (location: {location})"
+    return result
+
+
+def _run_command(
+    cmd: list[str],
+    *,
+    missing_help: list[str] | None = None,
+) -> DoctorResult:
     try:
         proc_result = proc.run(cmd)
     except FileNotFoundError:
@@ -65,39 +69,42 @@ def check_dependency(
         return DoctorResult(
             ok=False,
             output="Unexpected error running command",
-            extra_help=format_exception_only(ex),
+            extra_help=_format_exception_only(ex),
         )
-
-    try:
+    else:
         if proc_result.exit_code != 0:
             return DoctorResult(
                 ok=False,
                 output=f"Command exited with code: {proc_result.exit_code}",
                 extra_help=proc_result.output.splitlines(),
             )
-        output = version_output = successful_output_parser(proc_result.output)
-        if include_location:
-            location = which(cmd[0])
-            output += f" (location: {location})"
+        return DoctorResult(ok=True, output=proc_result.output)
 
+
+def _process_version(
+    *,
+    run_output: str,
+    minimum_version: str | None,
+    minimum_version_help: list[str] | None,
+) -> DoctorResult:
+    try:
+        version_output = _get_version_or_first_non_blank_line(run_output)
     except Exception as ex:
         logger.debug(f"Unexpected error checking dependency: {ex}", exc_info=True)
         return DoctorResult(
             ok=False,
             output="Unexpected error checking dependency",
-            extra_help=format_exception_only(ex),
+            extra_help=_format_exception_only(ex),
         )
     if minimum_version is not None:
         try:
-            match = re.search(r"^\d+\.\d+\.\d+", output)
-            if not match:
-                raise Exception("Unable to parse version number")
-            version_ok = is_minimum_version(match.group(0), minimum_version)
+            version_triple = extract_version_triple(version_output)
+            version_ok = is_minimum_version(version_triple, minimum_version)
         except Exception as ex:
             logger.debug(f"Unexpected error parsing version: {ex}", exc_info=True)
             return DoctorResult(
                 ok=False,
-                output=output,
+                output=version_output,
                 extra_help=[
                     f'Failed to parse version from: "{version_output}"',
                     f"Error: {ex}",
@@ -107,7 +114,21 @@ def check_dependency(
         if not version_ok:
             return DoctorResult(
                 ok=False,
-                output=output,
+                output=version_output,
                 extra_help=(minimum_version_help or [f"Minimum version required: {minimum_version}"]),
             )
-    return DoctorResult(ok=True, output=output)
+    return DoctorResult(ok=True, output=version_output)
+
+
+def _get_version_or_first_non_blank_line(output: str) -> str:
+    match = re.search(r"\d+\.\d+\.\d+[^\s'\"(),]*", output)
+    if match:
+        return match.group()
+    lines = output.splitlines()
+    non_blank_lines = filter(None, (ln.strip() for ln in lines))
+    # return first non-blank line or empty string if all blank
+    return next(non_blank_lines, "")
+
+
+def _format_exception_only(ex: Exception) -> list[str]:
+    return [ln.rstrip("\n") for ln in traceback.format_exception_only(type(ex), ex)]

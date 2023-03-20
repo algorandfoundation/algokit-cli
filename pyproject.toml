@@ -18,7 +18,7 @@ shellingham = "^1.5.0.post1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
 black = {extras = ["d"], version = "^23.1.0"}
-ruff = "^0.0.256"
+ruff = "^0.0.257"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -48,26 +48,71 @@ docs = ["docs_generate", "docs_toc", "docs_title"]
 
 [tool.ruff]
 line-length = 120
-select = ["E", "F", "ANN", "UP", "N", "C", "B", "A", "YTT", "W", "FBT", "Q", "RUF", "I"]
-# note: remove A003 once flake8-builtins: builtins-ignorelist supported and can ignore id
-ignore = ["ANN101", "C901", "A003"]
+select = [
+  # all possible codes as of this ruff version are listed here,
+  # ones we don't want/need are commented out to make it clear
+  # which have been omitted on purpose vs which ones get added
+  # in new ruff releases and should be considered for enabling
+  "F",      # pyflakes
+  "E", "W", # pycodestyle
+  "C90",    # mccabe
+  "I",      # isort
+  "N",      # PEP8 naming
+  "UP",     # pyupgrade
+  "YTT",    # flake8-2020
+  "ANN",    # flake8-annotations
+  # "S",    # flake8-bandit
+  # "BLE",  # flake8-blind-except
+  "FBT",    # flake8-boolean-trap
+  "B",      # flake8-bugbear
+  "A",      # flake8-builtins
+  # "COM",  # flake8-commas
+  "C4",     # flake8-comprehensions
+  "DTZ",    # flake8-datetimez
+  "T10",    # flake8-debugger
+  # "DJ",   # flake8-django
+  # "EM",   # flake8-errmsg
+  # "EXE",  # flake8-executable
+  "ISC",    # flake8-implicit-str-concat
+  "ICN",    # flake8-import-conventions
+  # "G",    # flake8-logging-format
+  # "INP",  # flake8-no-pep420
+  "PIE",    # flake8-pie
+  "T20",    # flake8-print
+  "PYI",    # flake8-pyi
+  "PT",     # flake8-pytest-style
+  "Q",      # flake8-quotes
+  "RSE",    # flake8-raise
+  "RET",    # flake8-return
+  "SLF",    # flake8-self
+  "SIM",    # flake8-simplify
+  "TID",    # flake8-tidy-imports
+  "TCH",    # flake8-type-checking
+  "ARG",    # flake8-unused-arguments
+  "PTH",    # flake8-use-pathlib
+  "ERA",    # eradicate
+  # "PD",   # pandas-vet
+  "PGH",    # pygrep-hooks
+  "PL",     # pylint
+  # "TRY",  # tryceratops
+  # "NPY",  # NumPy-specific rules
+  "RUF",    # Ruff-specific rules
+]
+ignore = [
+  "ANN101", # no type for self
+  "ANN102", # no type for cls
+  "SIM108", # allow if-else in place of ternary
+  "RET505", # allow else after return
+]
 # Exclude a variety of commonly ignored directories.
 exclude = [
-    ".bzr",
     ".direnv",
-    ".eggs",
     ".git",
-    ".hg",
     ".mypy_cache",
-    ".nox",
-    ".pants.d",
     ".ruff_cache",
-    ".svn",
-    ".tox",
     ".venv",
     "__pypackages__",
     "_build",
-    "buck-out",
     "build",
     "dist",
     "node_modules",

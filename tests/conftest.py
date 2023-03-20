@@ -19,7 +19,7 @@ from tests.utils.app_dir_mock import AppDirs, tmp_app_dir
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.fixture
+@pytest.fixture()
 def proc_mock(mocker: MockerFixture) -> ProcMock:
     proc_mock = ProcMock()
     # add a default for docker compose version
@@ -29,14 +29,14 @@ def proc_mock(mocker: MockerFixture) -> ProcMock:
 
 
 @pytest.fixture()
-def mock_os_dependency(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
+def _mock_os_dependency(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
     # Mock OS.platform
     platform_system: str = getattr(request, "param", "Darwin")
     platform_module = mocker.patch("algokit.core.bootstrap.platform")
     platform_module.system.return_value = platform_system
 
 
-@pytest.fixture
+@pytest.fixture()
 def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)
 
@@ -65,11 +65,10 @@ class CaptureOutput(PlainTextOutput):
         return prompt_toolkit.data_structures.Size(rows=10_000, columns=10_000)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def mock_questionary_input() -> typing.Iterator[PipeInput]:
-    with create_pipe_input() as pipe_input:
-        with create_app_session(input=pipe_input, output=CaptureOutput()):
-            yield pipe_input
+    with create_pipe_input() as pipe_input, create_app_session(input=pipe_input, output=CaptureOutput()):
+        yield pipe_input
 
 
 if os.getenv("CI"):

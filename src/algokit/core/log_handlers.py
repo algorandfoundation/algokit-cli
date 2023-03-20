@@ -56,10 +56,10 @@ class NoExceptionFormatter(logging.Formatter):
     (without interfering with other formatters that might later want to add such information)
     """
 
-    def formatException(self, *args: Any) -> str:  # noqa: N802
+    def formatException(self, *_args: Any) -> str:  # noqa: N802
         return ""
 
-    def formatStack(self, *args: Any) -> str:  # noqa: N802
+    def formatStack(self, *_args: Any) -> str:  # noqa: N802
         return ""
 
 
@@ -78,7 +78,7 @@ class ManualExclusionFilter(logging.Filter):
         super().__init__()
         self.exclude_value = exclude_value
 
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(self, record: logging.LogRecord) -> bool:  # noqa: A003
         return getattr(record, EXCLUDE_FROM_KEY, None) != self.exclude_value
 
 

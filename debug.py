@@ -11,7 +11,7 @@ from pathlib import Path
 try:
     import click
 except ImportError:
-    print(
+    print(  # noqa: T201
         "ERROR: Couldn't import click, make sure you've run 'poetry install' and activated the virtual environment.\n"
         "For tips on getting started with developing AlgoKit CLI itself see CONTRIBUTING.md.\n",
         file=sys.stderr,

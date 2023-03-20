@@ -39,7 +39,7 @@ def _mock_bash_version(mocker: MockerFixture, version: str) -> None:
 
 
 @pytest.fixture(autouse=True)
-def mock_default_bash_version(mocker: MockerFixture) -> None:
+def _mock_default_bash_version(mocker: MockerFixture) -> None:
     _mock_bash_version(mocker, "5.2.0")
 
 

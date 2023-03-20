@@ -70,20 +70,19 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
 _unofficial_template_warning = (
     "Community templates have not been reviewed, and can execute arbitrary code.\n"
     "Please inspect the template repository, and pay particular attention to the "
-    + "values of _tasks, _migrations and _jinja_extensions in copier.yml"
+    "values of _tasks, _migrations and _jinja_extensions in copier.yml"
 )
 
 
 def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    if not value or re.match(r"^[\w\-.]+$", value):
-        return value
-    else:
+    if value is not None and not re.match(r"^[\w\-.]+$", value):
         raise click.BadParameter(
             "Received invalid value for directory name; "
-            + "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
             context,
             param,
         )
+    return value
 
 
 @click.command("init", short_help="Initializes a new project.")
@@ -152,14 +151,15 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     metavar="<key> <value>",
 )
 def init_command(
+    *,
     directory_name: str | None,
     template_name: str | None,
     template_url: str | None,
     template_url_ref: str | None,
-    unsafe_security_accept_template_url: bool,  # noqa: FBT001
+    unsafe_security_accept_template_url: bool,
     use_git: bool | None,
     answers: list[tuple[str, str]],
-    use_defaults: bool,  # noqa: FBT001
+    use_defaults: bool,
     run_bootstrap: bool | None,
 ) -> None:
     """Initializes a new project from a template."""
@@ -170,12 +170,13 @@ def init_command(
     try:
         # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
         #       to their repo to include py.typed file
-        import copier  # type: ignore
+        import copier  # type: ignore[import]
     except ImportError as ex:
         raise click.ClickException(
             "Git not found; please install git and add to path.\n"
             "See https://github.com/git-guides/install-git for more information."
         ) from ex
+
     # TODO: in general, we should probably find a way to log all command invocations to the log file?
     if template_name and template_url:
         raise click.ClickException("Cannot specify both --template and --template-url")
@@ -191,20 +192,21 @@ def init_command(
     if template_name:
         blessed_templates = _get_blessed_templates()
         template: TemplateSource = blessed_templates[template_name]
-    elif template_url:
-        if not _repo_url_is_valid(template_url):
-            logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
-            _fail_and_bail()
+    elif not template_url:
+        template = _get_template_url()
+    elif not _repo_url_is_valid(template_url):
+        logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
+        _fail_and_bail()
+    else:
         logger.warning(_unofficial_template_warning)
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
         # at the root level
-        if not unsafe_security_accept_template_url:
-            if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
-                _fail_and_bail()
+        if not (
+            unsafe_security_accept_template_url or questionary.confirm("Continue anyway?", default=False).unsafe_ask()
+        ):
+            _fail_and_bail()
         template = TemplateSource(url=template_url, commit=template_url_ref)
-    else:
-        template = _get_template_url()
 
     logger.debug(f"Attempting to initialise project in {project_path} from template {template}")
 
@@ -220,6 +222,31 @@ def init_command(
     expanded_template_url = copier_worker.template.url_expanded
     logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
 
+    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
+
+    _maybe_git_init(
+        project_path,
+        use_git=use_git,
+        commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
+    )
+
+    logger.info(
+        f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
+        "consult the documentation of your selected template 🧐"
+    )
+    if re.search("https?://", expanded_template_url):
+        # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
+        # and print it out so the user can (depending on terminal) click it to open in browser
+        logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
+    if shutil.which("code") and (project_path / ".vscode").is_dir():
+        logger.info(
+            "VSCode configuration detected in project directory, and 'code' command is available on path, "
+            "attempting to launch VSCode"
+        )
+        proc.run(command=["code", str(project_path)])
+
+
+def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or _get_run_bootstrap()
@@ -235,25 +262,10 @@ def init_command(
                 exc_info=True,
             )
 
-    if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
-        _git_init(
-            project_path, commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}"
-        )
 
-    logger.info(
-        f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
-        + "consult the documentation of your selected template 🧐"
-    )
-    if re.search("https?://", expanded_template_url):
-        # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
-        # and print it out so the user can (depending on terminal) click it to open in browser
-        logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
-    if shutil.which("code") and (project_path / ".vscode").is_dir():
-        logger.info(
-            "VSCode configuration detected in project directory, and 'code' command is available on path, "
-            "attempting to launch VSCode"
-        )
-        proc.run(command=["code", str(project_path)])
+def _maybe_git_init(project_path: Path, *, use_git: bool | None, commit_message: str) -> None:
+    if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
+        _git_init(project_path, commit_message=commit_message)
 
 
 def _fail_and_bail() -> Never:
@@ -263,11 +275,11 @@ def _fail_and_bail() -> Never:
 
 def _repo_url_is_valid(url: str) -> bool:
     """Check the repo URL is valid according to copier"""
+    from copier.vcs import get_repo  # type: ignore[import]
+
     if not url:
         return False
     try:
-        from copier.vcs import get_repo  # type: ignore[import]
-
         return get_repo(url) is not None
     except Exception:
         logger.exception(f"Error parsing repo URL = {url}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
@@ -406,18 +418,20 @@ def _git_init(project_path: Path, commit_message: str) -> None:
             logger.warning(bad_exit_warn_message)
         return success
 
-    if git("init", bad_exit_warn_message="Failed to initialise git repository"):
-        if git("checkout", "-b", "main", bad_exit_warn_message="Failed to name initial branch"):
-            if git("add", "--all", bad_exit_warn_message="Failed to add generated project files"):
-                if git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed"):
-                    logger.info("🎉 Performed initial git commit successfully! 🎉")
+    if (
+        git("init", bad_exit_warn_message="Failed to initialise git repository")
+        and git("checkout", "-b", "main", bad_exit_warn_message="Failed to name initial branch")
+        and git("add", "--all", bad_exit_warn_message="Failed to add generated project files")
+        and git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
+    ):
+        logger.info("🎉 Performed initial git commit successfully! 🎉")
 
 
 def _get_run_bootstrap() -> bool:
     return bool(
         questionary.confirm(
             "Do you want to run `algokit bootstrap` to bootstrap dependencies"
-            + " for this new project so it can be run immediately?",
+            " for this new project so it can be run immediately?",
             default=True,
         ).unsafe_ask()
     )

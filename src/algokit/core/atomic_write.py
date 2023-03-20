@@ -1,3 +1,4 @@
+import contextlib
 import os
 import shutil
 import stat
@@ -12,10 +13,8 @@ def atomic_write(file_contents: str, target_file_path: Path, mode: Literal["a", 
     temp_file_path = target_file_path.with_suffix(f"{target_file_path.suffix}.algokit~")
     try:
         # preserve file metadata if it already exists
-        try:
+        with contextlib.suppress(FileNotFoundError):
             _copy_with_metadata(target_file_path, temp_file_path)
-        except FileNotFoundError:
-            pass
         # write content to new temp file
         with temp_file_path.open(mode=mode, encoding="utf-8") as fp:
             fp.write(file_contents)
