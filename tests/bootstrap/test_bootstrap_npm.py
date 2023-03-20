@@ -1,9 +1,10 @@
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
-from utils.approvals import verify
-from utils.click_invoker import invoke
-from utils.proc_mock import ProcMock
+
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
 @pytest.mark.parametrize(
@@ -17,7 +18,7 @@ from utils.proc_mock import ProcMock
 )
 def test_bootstrap_npm_without_npm(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-):
+) -> None:
     proc_mock.should_fail_on("npm install")
     proc_mock.should_fail_on("npm.cmd install")
     cwd = tmp_path_factory.mktemp("cwd")
@@ -43,7 +44,7 @@ def test_bootstrap_npm_without_npm(
 )
 def test_bootstrap_npm_without_package_file(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
         "bootstrap npm",
@@ -65,7 +66,7 @@ def test_bootstrap_npm_without_package_file(
 )
 def test_bootstrap_npm_without_npm_and_package_file(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-):
+) -> None:
     proc_mock.should_fail_on("npm install")
     proc_mock.should_fail_on("npm.cmd install")
     cwd = tmp_path_factory.mktemp("cwd")
@@ -90,7 +91,7 @@ def test_bootstrap_npm_without_npm_and_package_file(
 )
 def test_bootstrap_npm_happy_path(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
 

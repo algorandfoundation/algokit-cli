@@ -1,15 +1,15 @@
 import json
 
 from algokit.core.sandbox import get_docker_compose_yml
-from utils.app_dir_mock import AppDirs
-from utils.approvals import verify
-from utils.click_invoker import invoke
-from utils.proc_mock import ProcMock
 
 from tests import get_combined_verify_output
+from tests.utils.app_dir_mock import AppDirs
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
-def test_localnet_start(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     result = invoke("localnet start")
 
     assert result.exit_code == 0
@@ -22,7 +22,7 @@ def test_localnet_start(app_dir_mock: AppDirs, proc_mock: ProcMock):
     )
 
 
-def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker compose up")
 
     result = invoke("localnet start")
@@ -31,7 +31,7 @@ def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock):
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
 
@@ -41,7 +41,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs, proc_mock: 
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
 
@@ -57,7 +57,7 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs, proc_mock:
     )
 
 
-def test_localnet_start_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on("docker compose version")
 
     result = invoke("localnet start")
@@ -66,7 +66,7 @@ def test_localnet_start_without_docker(app_dir_mock: AppDirs, proc_mock: ProcMoc
     verify(result.output)
 
 
-def test_localnet_start_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_without_docker_compose(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker compose version")
 
     result = invoke("localnet start")
@@ -75,7 +75,7 @@ def test_localnet_start_without_docker_compose(app_dir_mock: AppDirs, proc_mock:
     verify(result.output)
 
 
-def test_localnet_start_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_without_docker_engine_running(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker version")
 
     result = invoke("localnet start")
@@ -84,7 +84,7 @@ def test_localnet_start_without_docker_engine_running(app_dir_mock: AppDirs, pro
     verify(result.output)
 
 
-def test_localnet_start_with_old_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_with_old_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.2.1"})])
 
     result = invoke("localnet start")
@@ -93,7 +93,7 @@ def test_localnet_start_with_old_docker_compose_version(app_dir_mock: AppDirs, p
     verify(result.output)
 
 
-def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock):
+def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.5-dev123"})])
 
     result = invoke("localnet start")

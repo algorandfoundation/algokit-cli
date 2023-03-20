@@ -1,12 +1,13 @@
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
-from utils.approvals import verify
-from utils.click_invoker import invoke
-from utils.proc_mock import ProcMock
+
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
-def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory):
+def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
@@ -18,7 +19,7 @@ def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory):
     verify(result.output)
 
 
-def test_bootstrap_all_env(tmp_path_factory: TempPathFactory):
+def test_bootstrap_all_env(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").touch()
 
@@ -31,7 +32,7 @@ def test_bootstrap_all_env(tmp_path_factory: TempPathFactory):
     verify(result.output)
 
 
-def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
+def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "poetry.toml").touch()
 
@@ -55,7 +56,7 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, proc_mock: Proc
 )
 def test_bootstrap_all_npm(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_os_dependency: None
-):
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
 
@@ -71,7 +72,7 @@ def test_bootstrap_all_npm(
     verify(result.output, namer=PyTestNamer(request))
 
 
-def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
+def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "pyproject.toml").write_text("[tool.poetry]", encoding="utf-8")
 
@@ -84,7 +85,7 @@ def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, p
     verify(result.output)
 
 
-def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory):
+def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".venv").mkdir()
     (cwd / "__pycache__").mkdir()
@@ -107,7 +108,7 @@ def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory):
     verify(result.output)
 
 
-def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory, proc_mock: ProcMock):
+def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "empty_dir").mkdir()
     (cwd / "live_dir").mkdir()

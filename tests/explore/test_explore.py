@@ -1,12 +1,13 @@
 import pytest
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
-from utils.approvals import verify
-from utils.click_invoker import invoke
+
+from tests.utils.approvals import verify
+from tests.utils.click_invoker import invoke
 
 
 @pytest.mark.parametrize("command", ["", "localnet", "testnet", "mainnet"])
-def test_explore(command: str, mocker: MockerFixture):
+def test_explore(command: str, mocker: MockerFixture) -> None:
     launch_mock = mocker.patch("click.launch")
     result = invoke(f"explore {command}")
 
