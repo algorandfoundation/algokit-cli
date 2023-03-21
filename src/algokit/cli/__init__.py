@@ -15,7 +15,10 @@ from algokit.core.version_prompt import do_version_prompt, skip_version_check_op
 
 @click.group(
     help="AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.",
-    context_settings={"help_option_names": ["-h", "--help"]},
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "max_content_width": 120,
+    },
 )
 @click.version_option(package_name=PACKAGE_NAME)
 @verbose_option

@@ -3,23 +3,17 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-
-from algokit.core.bootstrap import bootstrap_any_including_subdirs
-from algokit.core.questionary_extensions import _get_confirm_default_yes_prompt
-from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
-
-try:
-    from typing import Never  # type: ignore[attr-defined]
-except ImportError:
-    from typing import NoReturn as Never
+from typing import NoReturn
 
 import click
 import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc
+from algokit.core.bootstrap import bootstrap_any_including_subdirs
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
-from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator
+from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator, get_confirm_default_yes_prompt
+from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 logger = logging.getLogger(__name__)
 
@@ -254,7 +248,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # note: we run bootstrap before git commit so that we can commit any lock files,
         # but if something goes wrong, we don't want to block
         try:
-            bootstrap_any_including_subdirs(project_path, _get_confirm_default_yes_prompt)
+            bootstrap_any_including_subdirs(project_path, get_confirm_default_yes_prompt)
         except Exception:
             logger.exception(
                 "Bootstrap failed. Once any errors above are resolved, "
@@ -268,7 +262,7 @@ def _maybe_git_init(project_path: Path, *, use_git: bool | None, commit_message:
         _git_init(project_path, commit_message=commit_message)
 
 
-def _fail_and_bail() -> Never:
+def _fail_and_bail() -> NoReturn:
     logger.info("🛑 Bailing out... 👋")
     raise click.exceptions.Exit(code=1)
 

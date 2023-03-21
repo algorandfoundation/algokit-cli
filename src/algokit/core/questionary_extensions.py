@@ -18,7 +18,7 @@ class ChainedValidator(questionary.Validator):
             validator.validate(document)
 
 
-def _get_confirm_default_yes_prompt(prompt: str) -> bool:
+def get_confirm_default_yes_prompt(prompt: str) -> bool:
     return bool(
         questionary.confirm(
             prompt,
