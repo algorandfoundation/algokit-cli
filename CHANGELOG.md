@@ -2,6 +2,21 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.0 (2023-03-22)
+### Feature
+* Increase max content width to 120 for easier reading in wider terminals ([`cadc615`](https://github.com/algorandfoundation/algokit-cli/commit/cadc6150fb0a6c7d5f1ae60ccd7bccee89fb38fb))
+* Include "extra version info" in all commands not just docker compose ([`f1c1d69`](https://github.com/algorandfoundation/algokit-cli/commit/f1c1d6992faefa26c8656121e30b894dfce32c03))
+* Detect if code is on path && .vscode exists and try to launch ([`78f8b3f`](https://github.com/algorandfoundation/algokit-cli/commit/78f8b3f7f655d7286b4c090002e09edc52f3009a))
+* Add a command to see logs from localnet docker containers ([`31c9cc4`](https://github.com/algorandfoundation/algokit-cli/commit/31c9cc4d44f2df2abcb8014dad6633232781f6e0))
+
+### Fix
+* Make failure to run npm install during bootstrap error message more explicit ([`468a186`](https://github.com/algorandfoundation/algokit-cli/commit/468a18683ebe80f671438df6a2f4bcf1d0c7c4a5))
+* When executing goal/bash inside algod container only show localnet hint if it looks like the container doesn't exist or isn't running ([`b9dc57f`](https://github.com/algorandfoundation/algokit-cli/commit/b9dc57fe24a0f28df0b4399f0f579c39ab5336d8))
+* Allow going back to template selection from custom url ([`929eefb`](https://github.com/algorandfoundation/algokit-cli/commit/929eefbd9bb8b4e38b24423980d18c0bbc09e9a3))
+
+### Documentation
+* **localnet:** Removing known LocalNet issue that is fixed ([`6747642`](https://github.com/algorandfoundation/algokit-cli/commit/6747642cc2a6b79e5cfa7b71418dfbaadbbf6659))
+
 ## v0.3.3 (2023-03-09)
 ### Fix
 * Use /v2/status when querying localnet algod container ([#198](https://github.com/algorandfoundation/algokit-cli/issues/198)) ([`0fb0488`](https://github.com/algorandfoundation/algokit-cli/commit/0fb0488e7a5ebd7da22f764e9047df9c6ef7ac31))
