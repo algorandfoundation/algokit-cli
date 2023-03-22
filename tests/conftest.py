@@ -32,8 +32,10 @@ def proc_mock(mocker: MockerFixture) -> ProcMock:
 def _mock_os_dependency(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
     # Mock OS.platform
     platform_system: str = getattr(request, "param", "Darwin")
-    platform_module = mocker.patch("algokit.core.bootstrap.platform")
-    platform_module.system.return_value = platform_system
+    bootstrap_platform_module = mocker.patch("algokit.core.bootstrap.platform")
+    bootstrap_platform_module.system.return_value = platform_system
+    init_platform_module = mocker.patch("algokit.cli.init.platform")
+    init_platform_module.system.return_value = platform_system
 
 
 @pytest.fixture()

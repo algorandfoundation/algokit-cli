@@ -1,4 +1,5 @@
 import logging
+import platform
 import re
 import shutil
 from dataclasses import dataclass
@@ -237,7 +238,8 @@ def init_command(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-        proc.run(command=["code", str(project_path)])
+        is_windows = platform.system() == "Windows"
+        proc.run(command=["code" if not is_windows else "code.cmd", str(project_path)])
 
 
 def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
