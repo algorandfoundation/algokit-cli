@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
@@ -118,16 +119,27 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
     verify(result.output, scrubber=make_output_scrubber())
 
 
+@pytest.mark.parametrize(
+    "_mock_os_dependency",
+    [
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+    ],
+    indirect=["_mock_os_dependency"],
+)
+@pytest.mark.usefixtures("_mock_os_dependency")
 def test_init_no_interaction_required_no_git_no_network_with_vscode(
     tmp_path_factory: TempPathFactory,
     mocker: MockerFixture,
     proc_mock: ProcMock,
     mock_questionary_input: PipeInput,
+    request: pytest.FixtureRequest,
 ) -> None:
     mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda name: "/bin/code" if name == "code" else None
 
     cwd = tmp_path_factory.mktemp("cwd")
     proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
+    proc_mock.set_output(["code.cmd", str(cwd / "myapp")], ["Launch project"])
     (cwd / "myapp" / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
     result = invoke(
@@ -136,7 +148,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
         cwd=cwd,
     )
     assert result.exit_code == 0
-    verify(result.output, scrubber=make_output_scrubber())
+    verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
 
 
 def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory) -> None:
@@ -485,7 +497,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --template beaker --defaults -a run_poetry_install False",
+        "init --name myapp --no-git --no-bootstrap --template beaker --defaults",
         cwd=cwd,
     )
 
@@ -532,7 +544,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
 
     result = invoke(
         (
-            "init --name myapp --no-git --template beaker --defaults "
+            "init --name myapp --no-git --no-bootstrap --template beaker --defaults "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
             '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '
             " -a run_poetry_install False"
