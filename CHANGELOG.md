@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.4.1 (2023-03-22)
+### Fix
+* **init:** Resolving issue with opening VS Code automatically on windows ([`691543d`](https://github.com/algorandfoundation/algokit-cli/commit/691543dfb7748dcb0495ceb0593dfe14e500d8fc))
+
 ## v0.4.0 (2023-03-22)
 ### Feature
 * Increase max content width to 120 for easier reading in wider terminals ([`cadc615`](https://github.com/algorandfoundation/algokit-cli/commit/cadc6150fb0a6c7d5f1ae60ccd7bccee89fb38fb))
