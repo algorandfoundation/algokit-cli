@@ -10,15 +10,9 @@ import click
 import prompt_toolkit.document
 import questionary
 
-from algokit.core import proc
+from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
-from algokit.core.questionary_extensions import (
-    NonEmptyValidator,
-    prompt_confirm,
-    prompt_select,
-    prompt_text,
-)
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 logger = logging.getLogger(__name__)
@@ -210,7 +204,10 @@ def init_command(
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
         # at the root level
-        if not (unsafe_security_accept_template_url or prompt_confirm("Continue anyway?", default=False)):
+        if not (
+            unsafe_security_accept_template_url
+            or questionary_extensions.prompt_confirm("Continue anyway?", default=False)
+        ):
             _fail_and_bail()
         template = TemplateSource(url=template_url, commit=template_url_ref)
 
@@ -256,7 +253,7 @@ def init_command(
 def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
-        run_bootstrap = use_defaults or prompt_confirm(
+        run_bootstrap = use_defaults or questionary_extensions.prompt_confirm(
             "Do you want to run `algokit bootstrap` to bootstrap dependencies"
             " for this new project so it can be run immediately?",
             default=True,
@@ -315,9 +312,9 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
     if directory_name_option is not None:
         directory_name = directory_name_option
     else:
-        directory_name = prompt_text(
+        directory_name = questionary_extensions.prompt_text(
             "Name of project / directory to create the project in: ",
-            validators=[NonEmptyValidator(), DirectoryNameValidator(base_path)],
+            validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
     project_path = base_path / directory_name.strip()
     if project_path.exists():
@@ -329,7 +326,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
         )
-        if not prompt_confirm("Continue anyway?", default=False):
+        if not questionary_extensions.prompt_confirm("Continue anyway?", default=False):
             # re-prompt only if interactive and user didn't cancel
             if directory_name_option is None:
                 return _get_project_path()
@@ -348,7 +345,7 @@ class GitRepoValidator(questionary.Validator):
 def _get_template_url() -> TemplateSource:
     description_prefix = "\n     "
 
-    choice_value = prompt_select(
+    choice_value = questionary_extensions.prompt_select(
         "Select a project template: ",
         *[
             questionary.Choice(
@@ -379,7 +376,7 @@ def _get_template_url() -> TemplateSource:
         " - ~/path/to/git/repo\n"
         " - ~/path/to/git/repo.bundle\n"
     )
-    template_url = prompt_text("Custom template URL: ", validators=[GitRepoValidator()]).strip()
+    template_url = questionary_extensions.prompt_text("Custom template URL: ", validators=[GitRepoValidator()]).strip()
     if not template_url:
         # re-prompt if empty response
         return _get_template_url()
@@ -403,7 +400,7 @@ def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) ->
         )
         return False
 
-    return use_git_option or prompt_confirm(
+    return use_git_option or questionary_extensions.prompt_confirm(
         "Would you like to initialise a git repository and perform an initial commit?",
         default=True,
     )
