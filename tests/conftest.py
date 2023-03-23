@@ -88,7 +88,7 @@ def _patch_questionary_prompts(monkeypatch: pytest.MonkeyPatch) -> None:
         message: str,
         *choices: str | questionary.Choice,
     ) -> None:
-        print(message)  # noqa: T201
+        print(f"? {message}")  # noqa: T201
         for choice in choices:
             print(  # noqa: T201
                 (choice.value if choice.title is None else "".join([token[1] for token in choice.title]))
@@ -101,7 +101,7 @@ def _patch_questionary_prompts(monkeypatch: pytest.MonkeyPatch) -> None:
             default_text = "(Y/n)"
         else:
             default_text = "(y/N)"
-        print(f"{message} {default_text}")  # noqa: T201
+        print(f"? {message} {default_text}")  # noqa: T201
 
     monkeypatch.setattr(
         questionary_extensions,

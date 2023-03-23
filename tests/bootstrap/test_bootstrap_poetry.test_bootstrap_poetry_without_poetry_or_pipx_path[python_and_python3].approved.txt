@@ -1,6 +1,6 @@
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
 Poetry not found; attempting to install it...
-We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies? (Y/n)
+? We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies? (Y/n)
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: Running '/bin/python3 -m pipx --version' in '{current_working_directory}'
 DEBUG: /bin/python3: STDOUT

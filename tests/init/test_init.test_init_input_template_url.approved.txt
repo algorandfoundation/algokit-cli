@@ -1,4 +1,4 @@
-Select a project template: 
+? Select a project template: 
 simple
      Does nothing helpful.
 beaker

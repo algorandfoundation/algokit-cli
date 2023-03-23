@@ -1,13 +1,13 @@
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
-Continue anyway? (y/N)
+? Continue anyway? (y/N)
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
-Would you like to initialise a git repository and perform an initial commit? (Y/n)
+? Would you like to initialise a git repository and perform an initial commit? (Y/n)
 DEBUG: Running 'git init' in '{current_working_directory}/myapp'
 DEBUG: git: Initialized empty Git repository in {current_working_directory}/myapp/.git/
 DEBUG: Running 'git checkout -b main' in '{current_working_directory}/myapp'
