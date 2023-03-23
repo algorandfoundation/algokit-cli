@@ -7,8 +7,7 @@ from shutil import which
 
 import click
 
-from algokit.core import proc
-from algokit.core.questionary_extensions import prompt_confirm, prompt_text
+from algokit.core import proc, questionary_extensions
 
 ENV_TEMPLATE = ".env.template"
 logger = logging.getLogger(__name__)
@@ -83,7 +82,7 @@ def bootstrap_env(project_dir: Path) -> None:
                 if var_value and not var_value[0]:
                     logger.info("".join(comment_lines))
                     var_name = var_name.strip()
-                    new_value = prompt_text(f"Please provide a value for {var_name}:")
+                    new_value = questionary_extensions.prompt_text(f"Please provide a value for {var_name}:")
                     env_file.write(f"{var_name}={new_value}\n")
                 else:
                     # this is a line with value, reset comment lines.
@@ -103,7 +102,7 @@ def bootstrap_poetry(project_dir: Path) -> None:
 
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
-        if not prompt_confirm(
+        if not questionary_extensions.prompt_confirm(
             "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
             default=True,
         ):

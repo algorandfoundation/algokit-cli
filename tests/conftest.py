@@ -79,7 +79,7 @@ def _patch_questionary_prompts(monkeypatch: pytest.MonkeyPatch) -> None:
     def log_prompt_text(
         message: str,
         *,
-        validators: ValidatorsType | None = None,  # noqa: ARG001, RUF100
+        validators: ValidatorsType | None = None,  # noqa: ARG001
         validate_while_typing: bool = False,  # noqa: ARG001
     ) -> None:
         print(f"? {message}")  # noqa: T201
