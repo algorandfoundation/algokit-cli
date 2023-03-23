@@ -403,7 +403,7 @@ def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcM
 def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
-    proc_mock.should_bad_exit_on("docker compose stop")
+    proc_mock.set_output("docker compose ps --format json", output=[json.dumps([])])
 
     result = invoke("localnet status")
 

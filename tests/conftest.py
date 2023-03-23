@@ -51,7 +51,7 @@ def mock_questionary_input() -> typing.Iterator[PipeInput]:
         yield pipe_input
 
 
-@pytest.fixture(autouse=True, scope="module")
+@pytest.fixture(autouse=True)
 def _supress_copier_dependencies_debug_output() -> None:
     logging.getLogger("plumbum.local").setLevel("INFO")
     logging.getLogger("asyncio").setLevel("INFO")
