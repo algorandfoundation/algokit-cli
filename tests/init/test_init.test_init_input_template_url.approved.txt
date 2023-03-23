@@ -1,13 +1,11 @@
-? Select a project template:  (Use arrow keys)
- » simple
+? Select a project template: 
+simple
      Does nothing helpful.
-   beaker
+beaker
      Provides a good starting point to build Beaker smart contracts productively.
-   beaker_with_version
+beaker_with_version
      Provides a good starting point to build Beaker smart contracts productively, but pinned.
-   <other>
-     Enter a custom URL - potentially dangerous!
-? Select a project template:  <other>
+<other>
      Enter a custom URL - potentially dangerous!
 WARNING: 
 Community templates have not been reviewed, and can execute arbitrary code.
@@ -25,7 +23,7 @@ Valid examples:
  - ~/path/to/git/repo
  - ~/path/to/git/repo.bundle
 
-? Custom template URL:  {test_parent_directory}/copier-helloworld.bundle
+? Custom template URL: 
 DEBUG: Attempting to initialise project in {current_working_directory}/myapp from template {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle

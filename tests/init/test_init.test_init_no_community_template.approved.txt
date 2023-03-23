@@ -1,5 +1,4 @@
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 ? Continue anyway? (y/N)
-? Continue anyway? No
 🛑 Bailing out... 👋

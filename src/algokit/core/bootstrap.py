@@ -1,20 +1,19 @@
 import logging
 import platform
 import sys
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from shutil import which
 
 import click
-import questionary
 
-from algokit.core import proc
+from algokit.core import proc, questionary_extensions
 
 ENV_TEMPLATE = ".env.template"
 logger = logging.getLogger(__name__)
 
 
-def bootstrap_any(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
+def bootstrap_any(project_dir: Path) -> None:
     env_path = project_dir / ENV_TEMPLATE
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
@@ -28,22 +27,22 @@ def bootstrap_any(project_dir: Path, install_prompt: Callable[[str], bool]) -> N
 
     if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
         logger.debug("Running `algokit bootstrap poetry`")
-        bootstrap_poetry(project_dir, install_prompt)
+        bootstrap_poetry(project_dir)
 
     if package_json_path.exists():
         logger.debug("Running `algokit bootstrap npm`")
         bootstrap_npm(project_dir)
 
 
-def bootstrap_any_including_subdirs(base_path: Path, install_prompt: Callable[[str], bool]) -> None:
-    bootstrap_any(base_path, install_prompt)
+def bootstrap_any_including_subdirs(base_path: Path) -> None:
+    bootstrap_any(base_path)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
         if sub_dir.is_dir():
             if sub_dir.name.lower() in [".venv", "node_modules", "__pycache__"]:
                 logger.debug(f"Skipping {sub_dir}")
             else:
-                bootstrap_any(sub_dir, install_prompt)
+                bootstrap_any(sub_dir)
 
 
 def bootstrap_env(project_dir: Path) -> None:
@@ -83,7 +82,7 @@ def bootstrap_env(project_dir: Path) -> None:
                 if var_value and not var_value[0]:
                     logger.info("".join(comment_lines))
                     var_name = var_name.strip()
-                    new_value = questionary.text(f"Please provide a value for {var_name}:").unsafe_ask()
+                    new_value = questionary_extensions.prompt_text(f"Please provide a value for {var_name}:")
                     env_file.write(f"{var_name}={new_value}\n")
                 else:
                     # this is a line with value, reset comment lines.
@@ -91,7 +90,7 @@ def bootstrap_env(project_dir: Path) -> None:
                 comment_lines = []
 
 
-def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -> None:
+def bootstrap_poetry(project_dir: Path) -> None:
     try:
         proc.run(
             ["poetry", "--version"],
@@ -103,8 +102,9 @@ def bootstrap_poetry(project_dir: Path, install_prompt: Callable[[str], bool]) -
 
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
-        if not install_prompt(
-            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?"
+        if not questionary_extensions.prompt_confirm(
+            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
+            default=True,
         ):
             raise click.ClickException(
                 "Unable to install poetry via pipx; please install poetry "

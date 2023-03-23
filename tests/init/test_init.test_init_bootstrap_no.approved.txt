@@ -4,5 +4,4 @@ DEBUG: Attempting to initialise project in {current_working_directory}/myapp fro
 No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle
 ? Do you want to run `algokit bootstrap` to bootstrap dependencies for this new project so it can be run immediately? (Y/n)
-? Do you want to run `algokit bootstrap` to bootstrap dependencies for this new project so it can be run immediately? No
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐

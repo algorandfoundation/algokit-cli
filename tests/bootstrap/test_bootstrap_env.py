@@ -9,20 +9,8 @@ from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
 from tests.utils.click_invoker import invoke
 
 
-def make_output_scrubber(**extra_tokens: str) -> Scrubber:
-    default_tokens = {
-        "KqueueSelector": "Using selector: KqueueSelector",
-        "EpollSelector": "Using selector: EpollSelector",
-        "IocpProactor": "Using proactor: IocpProactor",
-    }
-    tokens = default_tokens | extra_tokens
-    return combine_scrubbers(
-        click.unstyle,
-        TokenScrubber(tokens=tokens),
-        lambda t: t.replace("KqueueSelector", "selector")
-        .replace("EpollSelector", "selector")
-        .replace("IocpProactor", "selector"),
-    )
+def make_output_scrubber(**tokens: str) -> Scrubber:
+    return combine_scrubbers(click.unstyle, TokenScrubber(tokens=tokens))
 
 
 def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory) -> None:

@@ -1,4 +1,3 @@
 WARNING: Re-using existing directory, this is not recommended because if project generation fails, then we can't automatically cleanup.
 ? Continue anyway? (y/N)
-? Continue anyway? No
 🛑 Bailing out... 👋

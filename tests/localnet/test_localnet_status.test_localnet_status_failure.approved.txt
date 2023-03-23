@@ -4,5 +4,5 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
+DEBUG: docker: []
+Error: LocalNet has not been initialized yet, please run 'algokit localnet start'
