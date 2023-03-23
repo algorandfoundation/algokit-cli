@@ -44,6 +44,7 @@
     - [--git, --no-git](#--git---no-git)
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
+    - [--ide, --no-ide](#--ide---no-ide)
     - [-a, --answer  ](#-a---answer--)
   - [localnet](#localnet)
     - [console](#console)
@@ -294,6 +295,10 @@ Automatically choose default answers without asking when creating this template.
 
 ### --bootstrap, --no-bootstrap
 Whether to run algokit bootstrap to bootstrap the new project’s dependencies.
+
+
+### --ide, --no-ide
+Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.
 
 
 ### -a, --answer <key> <value>

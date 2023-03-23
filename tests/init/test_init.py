@@ -151,6 +151,27 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
 
 
+def test_init_no_interaction_required_no_git_no_network_with_no_ide(
+    tmp_path_factory: TempPathFactory,
+    mocker: MockerFixture,
+    proc_mock: ProcMock,
+    mock_questionary_input: PipeInput,
+) -> None:
+    mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda name: "/bin/code" if name == "code" else None
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
+    (cwd / "myapp" / ".vscode").mkdir(parents=True)
+    mock_questionary_input.send_text("Y")  # reuse existing directory
+    result = invoke(
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-ide",
+        cwd=cwd,
+    )
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
