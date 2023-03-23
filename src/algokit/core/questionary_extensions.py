@@ -1,5 +1,9 @@
+from collections.abc import Callable, Sequence
+from typing import Any
+
 import prompt_toolkit.document
 import questionary
+from questionary.prompts.common import build_validator
 
 
 class NonEmptyValidator(questionary.Validator):
@@ -18,10 +22,44 @@ class ChainedValidator(questionary.Validator):
             validator.validate(document)
 
 
-def get_confirm_default_yes_prompt(prompt: str) -> bool:
-    return bool(
-        questionary.confirm(
-            prompt,
-            default=True,
-        ).unsafe_ask()
-    )
+def prompt_confirm(message: str, *, default: bool) -> bool:
+    # note: we use unsafe_ask here (and everywhere else) so we don't have to
+    # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
+    # at the root level
+    result = questionary.confirm(
+        message,
+        default=default,
+    ).unsafe_ask()
+    assert isinstance(result, bool)
+    return result
+
+
+def prompt_text(
+    message: str,
+    *,
+    validators: Sequence[type[questionary.Validator] | questionary.Validator | Callable[[str], bool]] | None = None,
+    validate_while_typing: bool = False,
+) -> str:
+    if validators:
+        validate, *others = filter(None, map(build_validator, validators))
+        if others:
+            validate = ChainedValidator(validate, *others)
+    else:
+        validate = None
+    result = questionary.text(
+        message,
+        validate=validate,
+        validate_while_typing=validate_while_typing,
+    ).unsafe_ask()
+    assert isinstance(result, str)
+    return result
+
+
+def prompt_select(
+    message: str,
+    *choices: str | questionary.Choice,
+) -> Any:  # noqa: ANN401
+    return questionary.select(
+        message,
+        choices=choices,
+    ).unsafe_ask()

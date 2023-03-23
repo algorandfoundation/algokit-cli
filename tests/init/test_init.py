@@ -1,4 +1,3 @@
-import logging
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -30,12 +29,6 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
         TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
         lambda t: t.replace("{test_parent_directory}\\", "{test_parent_directory}/"),
     )
-
-
-@pytest.fixture(autouse=True, scope="module")
-def _supress_copier_dependencies_debug_output() -> None:
-    logging.getLogger("plumbum.local").setLevel("INFO")
-    logging.getLogger("asyncio").setLevel("INFO")
 
 
 @pytest.fixture(autouse=True)
@@ -71,7 +64,7 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def _override_bootstrap(mocker: MockerFixture) -> None:
-    def bootstrap_mock(p: Path, _prompt: Callable[[str], bool]) -> None:
+    def bootstrap_mock(p: Path) -> None:
         click.echo(f"Executed `algokit bootstrap all` in {p}")
 
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock

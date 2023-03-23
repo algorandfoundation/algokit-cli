@@ -13,7 +13,12 @@ import questionary
 from algokit.core import proc
 from algokit.core.bootstrap import bootstrap_any_including_subdirs
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
-from algokit.core.questionary_extensions import ChainedValidator, NonEmptyValidator, get_confirm_default_yes_prompt
+from algokit.core.questionary_extensions import (
+    NonEmptyValidator,
+    prompt_confirm,
+    prompt_select,
+    prompt_text,
+)
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 logger = logging.getLogger(__name__)
@@ -205,9 +210,7 @@ def init_command(
         # note: we use unsafe_ask here (and everywhere else) so we don't have to
         # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
         # at the root level
-        if not (
-            unsafe_security_accept_template_url or questionary.confirm("Continue anyway?", default=False).unsafe_ask()
-        ):
+        if not (unsafe_security_accept_template_url or prompt_confirm("Continue anyway?", default=False)):
             _fail_and_bail()
         template = TemplateSource(url=template_url, commit=template_url_ref)
 
@@ -253,12 +256,16 @@ def init_command(
 def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
-        run_bootstrap = use_defaults or _get_run_bootstrap()
+        run_bootstrap = use_defaults or prompt_confirm(
+            "Do you want to run `algokit bootstrap` to bootstrap dependencies"
+            " for this new project so it can be run immediately?",
+            default=True,
+        )
     if run_bootstrap:
         # note: we run bootstrap before git commit so that we can commit any lock files,
         # but if something goes wrong, we don't want to block
         try:
-            bootstrap_any_including_subdirs(project_path, get_confirm_default_yes_prompt)
+            bootstrap_any_including_subdirs(project_path)
         except Exception:
             logger.exception(
                 "Bootstrap failed. Once any errors above are resolved, "
@@ -308,11 +315,10 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
     if directory_name_option is not None:
         directory_name = directory_name_option
     else:
-        directory_name = questionary.text(
+        directory_name = prompt_text(
             "Name of project / directory to create the project in: ",
-            validate=ChainedValidator(NonEmptyValidator(), DirectoryNameValidator(base_path)),
-            validate_while_typing=False,
-        ).unsafe_ask()
+            validators=[NonEmptyValidator(), DirectoryNameValidator(base_path)],
+        )
     project_path = base_path / directory_name.strip()
     if project_path.exists():
         # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
@@ -323,7 +329,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
         )
-        if not questionary.confirm("Continue anyway?", default=False).unsafe_ask():
+        if not prompt_confirm("Continue anyway?", default=False):
             # re-prompt only if interactive and user didn't cancel
             if directory_name_option is None:
                 return _get_project_path()
@@ -342,22 +348,17 @@ class GitRepoValidator(questionary.Validator):
 def _get_template_url() -> TemplateSource:
     description_prefix = "\n     "
 
-    choice_value = questionary.select(
+    choice_value = prompt_select(
         "Select a project template: ",
-        choices=[
+        *[
             questionary.Choice(
                 title=[("bold", key), ("", description_prefix + tmpl.description)],
                 value=tmpl,
             )
             for key, tmpl in _get_blessed_templates().items()
-        ]
-        + [
-            # note: can't use None as default value, that gets ignored
-            questionary.Choice(
-                title=f"<other>{description_prefix}Enter a custom URL - potentially dangerous!", value=object()
-            ),
         ],
-    ).unsafe_ask()
+        f"<other>{description_prefix}Enter a custom URL - potentially dangerous!",
+    )
     if isinstance(choice_value, TemplateSource):
         return choice_value
     # else: user selected custom url
@@ -378,11 +379,7 @@ def _get_template_url() -> TemplateSource:
         " - ~/path/to/git/repo\n"
         " - ~/path/to/git/repo.bundle\n"
     )
-    template_url: str = (
-        questionary.text("Custom template URL: ", validate=GitRepoValidator, validate_while_typing=False)
-        .unsafe_ask()
-        .strip()
-    )
+    template_url = prompt_text("Custom template URL: ", validators=[GitRepoValidator()]).strip()
     if not template_url:
         # re-prompt if empty response
         return _get_template_url()
@@ -406,11 +403,9 @@ def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) ->
         )
         return False
 
-    return (
-        use_git_option
-        or questionary.confirm(
-            "Would you like to initialise a git repository and perform an initial commit?"
-        ).unsafe_ask()
+    return use_git_option or prompt_confirm(
+        "Would you like to initialise a git repository and perform an initial commit?",
+        default=True,
     )
 
 
@@ -429,13 +424,3 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         and git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
     ):
         logger.info("🎉 Performed initial git commit successfully! 🎉")
-
-
-def _get_run_bootstrap() -> bool:
-    return bool(
-        questionary.confirm(
-            "Do you want to run `algokit bootstrap` to bootstrap dependencies"
-            " for this new project so it can be run immediately?",
-            default=True,
-        ).unsafe_ask()
-    )

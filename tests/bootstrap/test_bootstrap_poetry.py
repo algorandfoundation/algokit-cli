@@ -1,4 +1,3 @@
-import logging
 import sys
 from unittest.mock import MagicMock
 
@@ -21,11 +20,6 @@ def python_base_executable() -> str:
     if value is None:
         pytest.fail("Python base detection failed, this should work (even in CI)")
     return value
-
-
-@pytest.fixture(autouse=True, scope="module")
-def _supress_questionary_dependencies_debug_output() -> None:
-    logging.getLogger("asyncio").setLevel("INFO")
 
 
 @pytest.fixture()
