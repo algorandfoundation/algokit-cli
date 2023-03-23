@@ -20,7 +20,7 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install --no-interaction --no-root
+        run: poetry install --no-interaction
 
       - name: Audit with pip-audit
         run: |
@@ -45,3 +45,6 @@ jobs:
 
       - name: Check types with mypy
         run: poetry run mypy
+
+      - name: Check docs are up to date
+        run: poetry run poe docs && [ $(git status --porcelain docs/ | wc -l) -eq "0" ]
