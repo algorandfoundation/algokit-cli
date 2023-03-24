@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v0.5.0 (2023-03-24)
+### Feature
+* Change playground template to point to new repo ([`805d63c`](https://github.com/algorandfoundation/algokit-cli/commit/805d63c10be3c62a3ef8d78bd2d40d1e6d1c8c5c))
+* **init:** Added --no-ide flag to allow user to prevent IDE opening ([#211](https://github.com/algorandfoundation/algokit-cli/issues/211)) ([`cd9f015`](https://github.com/algorandfoundation/algokit-cli/commit/cd9f01549fc460641bd7a64f606963efb7f4082a))
+
 ## v0.4.1 (2023-03-22)
 ### Fix
 * **init:** Resolving issue with opening VS Code automatically on windows ([`691543d`](https://github.com/algorandfoundation/algokit-cli/commit/691543dfb7748dcb0495ceb0593dfe14e500d8fc))
