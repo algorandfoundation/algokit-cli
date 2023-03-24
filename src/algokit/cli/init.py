@@ -55,7 +55,7 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             description="Official starter template for production Beaker applications.",
         ),
         "playground": BlessedTemplateSource(
-            url="gh:algorand-devrel/playground",
+            url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="A number of small example applications and demos.",
         ),
     }
