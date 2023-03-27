@@ -16,8 +16,8 @@ The simplest use of the command is to just run `algokit init` and you will then 
 
 ```
 $ ~ algokit init
-? Name of project / directory to create the project in:  my-smart-contract
 ? Select a project template:  beaker
+? Name of project / directory to create the project in:  my-smart-contract
 🎤 Package author name
    Algorand Foundation
 🎤 Package author email

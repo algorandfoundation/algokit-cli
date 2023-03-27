@@ -31,9 +31,26 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
     )
 
 
+class WhichMock:
+    def __init__(self) -> None:
+        self.paths: dict[str, str] = {}
+
+    def add(self, cmd: str, path: str | None = None) -> None:
+        self.paths[cmd] = path or f"/bin/{cmd}"
+
+    def remove(self, cmd: str) -> None:
+        self.paths.pop(cmd, None)
+
+    def which(self, cmd: str) -> str | None:
+        return self.paths.get(cmd)
+
+
 @pytest.fixture(autouse=True)
-def _mock_no_vscode(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda _: None
+def which_mock(mocker: MockerFixture) -> WhichMock:
+    which_mock = WhichMock()
+    which_mock.add("git")
+    mocker.patch("algokit.cli.init.shutil.which").side_effect = which_mock.which
+    return which_mock
 
 
 @pytest.fixture(autouse=True)
@@ -77,8 +94,8 @@ def test_init_help() -> None:
     verify(result.output)
 
 
-def test_init_missing_git(mocker: MockerFixture) -> None:
-    mocker.patch.dict("sys.modules", {"copier": None})
+def test_init_missing_git(which_mock: WhichMock) -> None:
+    which_mock.remove("git")
     result = invoke("init")
 
     assert result.exit_code != 0
@@ -123,12 +140,12 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
 @pytest.mark.usefixtures("_mock_os_dependency")
 def test_init_no_interaction_required_no_git_no_network_with_vscode(
     tmp_path_factory: TempPathFactory,
-    mocker: MockerFixture,
     proc_mock: ProcMock,
     mock_questionary_input: PipeInput,
+    which_mock: WhichMock,
     request: pytest.FixtureRequest,
 ) -> None:
-    mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda name: "/bin/code" if name == "code" else None
+    which_mock.add("code")
 
     cwd = tmp_path_factory.mktemp("cwd")
     proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
@@ -146,11 +163,11 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
 
 def test_init_no_interaction_required_no_git_no_network_with_no_ide(
     tmp_path_factory: TempPathFactory,
-    mocker: MockerFixture,
     proc_mock: ProcMock,
     mock_questionary_input: PipeInput,
+    which_mock: WhichMock,
 ) -> None:
-    mocker.patch("algokit.cli.init.shutil.which").side_effect = lambda name: "/bin/code" if name == "code" else None
+    which_mock.add("code")
 
     cwd = tmp_path_factory.mktemp("cwd")
     proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
@@ -169,8 +186,8 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' "
-        "--UNSAFE-SECURITY-accept-template-url --defaults",
+        f"init --name myapp --no-git --defaults "
+        f"--template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
 
@@ -247,7 +264,8 @@ def test_init_do_not_use_existing_folder(tmp_path_factory: TempPathFactory, mock
     mock_questionary_input.send_text("N")
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        "init --name myapp --no-git --defaults"
+        f" --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
 
@@ -260,10 +278,10 @@ def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questi
 
     (cwd / "myapp").mkdir()
     mock_questionary_input.send_text("Y")  # override
-    mock_questionary_input.send_text("Y")  # community warning
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        "init --name myapp --no-git --defaults"
+        f" --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
 
@@ -278,10 +296,10 @@ def test_init_existing_filename_same_as_folder_name(
     (cwd / "myapp").touch()
 
     mock_questionary_input.send_text("Y")  # override
-    mock_questionary_input.send_text("Y")  # community warning
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        "init --name myapp --no-git --defaults "
+        f"--template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
 
@@ -322,7 +340,7 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
     mock_questionary_input.send_text(project_name + "\n")
     mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --no-git --defaults --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url ",
         cwd=cwd,
     )
 
@@ -367,9 +385,8 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     project_name = "FAKE_PROJECT"
     mock_questionary_input.send_text("\n")
     mock_questionary_input.send_text(project_name + "\n")
-    mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --defaults",
         cwd=cwd,
     )
 
@@ -394,9 +411,8 @@ def test_init_project_name_reenter_folder_name(
     mock_questionary_input.send_text("N")
     project_name_2 = "FAKE_PROJECT_2"
     mock_questionary_input.send_text(project_name_2 + "\n")
-    mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --defaults",
         cwd=cwd,
     )
 
@@ -461,7 +477,7 @@ def test_init_template_url_and_template_name(
 
 @pytest.mark.usefixtures("mock_questionary_input")
 def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mock_run_copy = mocker.patch("copier.run_copy")
+    mock_run_copy = mocker.patch("copier.main.run_copy")
     mock_run_copy.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"
     cwd = tmp_path_factory.mktemp("cwd")
