@@ -94,7 +94,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "-t",
     type=click.Choice(list(_get_blessed_templates())),
     default=None,
-    help="Name of an official template to use.",
+    help="Name of an official template to use. To see a list of descriptions, run this command with no arguments.",
 )
 @click.option(
     "--template-url",
@@ -165,55 +165,38 @@ def init_command(
     open_ide: bool,
 ) -> None:
     """Initializes a new project from a template."""
-    # copier is lazy imported for two reasons
-    # 1. it is slow to import on first execution after installing
-    # 2. the import fails if git is not installed
 
-    try:
-        # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
-        #       to their repo to include py.typed file
-        import copier  # type: ignore[import]
-    except ImportError as ex:
+    if not shutil.which("git"):
         raise click.ClickException(
             "Git not found; please install git and add to path.\n"
             "See https://github.com/git-guides/install-git for more information."
-        ) from ex
-
-    # TODO: in general, we should probably find a way to log all command invocations to the log file?
-    if template_name and template_url:
-        raise click.ClickException("Cannot specify both --template and --template-url")
+        )
 
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
     answers_dict = DEFAULT_ANSWERS | dict(answers)
+
+    template = _get_template(
+        name=template_name,
+        url=template_url,
+        commit=template_url_ref,
+        unsafe_security_accept_template_url=unsafe_security_accept_template_url,
+    )
 
     project_path = _get_project_path(directory_name)
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
-    if template_name:
-        blessed_templates = _get_blessed_templates()
-        template: TemplateSource = blessed_templates[template_name]
-    elif not template_url:
-        template = _get_template_url()
-    elif not _repo_url_is_valid(template_url):
-        logger.error(f"Couldn't parse repo URL {template_url}. Try prefixing it with git+ ?")
-        _fail_and_bail()
-    else:
-        logger.warning(_unofficial_template_warning)
-        # note: we use unsafe_ask here (and everywhere else) so we don't have to
-        # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
-        # at the root level
-        if not (
-            unsafe_security_accept_template_url
-            or questionary_extensions.prompt_confirm("Continue anyway?", default=False)
-        ):
-            _fail_and_bail()
-        template = TemplateSource(url=template_url, commit=template_url_ref)
-
     logger.debug(f"Attempting to initialise project in {project_path} from template {template}")
 
-    copier_worker = copier.run_copy(
+    # copier is lazy imported for two reasons
+    # 1. it is slow to import on first execution after installing
+    # 2. the import fails if git is not installed (which we check above)
+    # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
+    #       to their repo to include py.typed file
+    from copier.main import run_copy  # type: ignore[import]
+
+    copier_worker = run_copy(
         template.url,
         project_path,
         data=answers_dict,
@@ -335,6 +318,39 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
     return project_path
 
 
+def _get_template(
+    *,
+    name: str | None,
+    url: str | None,
+    commit: str | None,
+    unsafe_security_accept_template_url: bool,
+) -> TemplateSource:
+    if name:
+        if url:
+            raise click.ClickException("Cannot specify both --template and --template-url")
+        if commit:
+            raise click.ClickException("--template-url-ref has no effect when template name is specified")
+        blessed_templates = _get_blessed_templates()
+        template: TemplateSource = blessed_templates[name]
+    elif not url:
+        template = _get_template_interactive()
+    else:
+        if not _repo_url_is_valid(url):
+            logger.error(f"Couldn't parse repo URL {url}. Try prefixing it with git+ ?")
+            _fail_and_bail()
+        logger.warning(_unofficial_template_warning)
+        # note: we use unsafe_ask here (and everywhere else) so we don't have to
+        # handle None returns for KeyboardInterrupt - click will handle these nicely enough for us
+        # at the root level
+        if not (
+            unsafe_security_accept_template_url
+            or questionary_extensions.prompt_confirm("Continue anyway?", default=False)
+        ):
+            _fail_and_bail()
+        template = TemplateSource(url=url, commit=commit)
+    return template
+
+
 class GitRepoValidator(questionary.Validator):
     def validate(self, document: prompt_toolkit.document.Document) -> None:
         value = document.text.strip()
@@ -342,7 +358,7 @@ class GitRepoValidator(questionary.Validator):
             raise questionary.ValidationError(message=f"Couldn't parse repo URL {value}. Try prefixing it with git+ ?")
 
 
-def _get_template_url() -> TemplateSource:
+def _get_template_interactive() -> TemplateSource:
     description_prefix = "\n     "
 
     choice_value = questionary_extensions.prompt_select(
@@ -379,7 +395,7 @@ def _get_template_url() -> TemplateSource:
     template_url = questionary_extensions.prompt_text("Custom template URL: ", validators=[GitRepoValidator()]).strip()
     if not template_url:
         # re-prompt if empty response
-        return _get_template_url()
+        return _get_template_interactive()
     return TemplateSource(url=template_url)
 
 

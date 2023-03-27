@@ -1,7 +1,6 @@
-? Name of project / directory to create the project in: 
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
-? Continue anyway? (y/N)
+? Name of project / directory to create the project in: 
 DEBUG: Attempting to initialise project in {current_working_directory}/FAKE_PROJECT from template {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle

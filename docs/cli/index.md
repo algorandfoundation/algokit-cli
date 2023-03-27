@@ -264,7 +264,7 @@ Name of the project / directory / repository to create.
 
 
 ### -t, --template <template_name>
-Name of an official template to use.
+Name of an official template to use. To see a list of descriptions, run this command with no arguments.
 
 
 * **Options**
