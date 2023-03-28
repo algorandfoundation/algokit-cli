@@ -189,7 +189,7 @@ def init_command(
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
-    logger.info("Starting template copy...")
+    logger.info("Starting template copy and render...")
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
@@ -209,7 +209,7 @@ def init_command(
         logger.debug(f"final clone URL = {expanded_template_url}")
         copier_worker.run_copy()
 
-    logger.info("Template instantiation complete!")
+    logger.info("Template render complete!")
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
 
