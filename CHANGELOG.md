@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v0.6.0 (2023-03-28)
+### Feature
+* Prompt for template first ([`91326f3`](https://github.com/algorandfoundation/algokit-cli/commit/91326f339650f9ea33ff4746f6707f507364b81a))
+
+### Documentation
+* Autogen docs ([`9803ff7`](https://github.com/algorandfoundation/algokit-cli/commit/9803ff7764090b4d5b1d661f8e7ead3b74a49d0f))
+* Added the intro tutorial ([`087852b`](https://github.com/algorandfoundation/algokit-cli/commit/087852b9be034daddca3a609bb7fd9ff0b476b6e))
+
 ## v0.5.0 (2023-03-24)
 ### Feature
 * Change playground template to point to new repo ([`805d63c`](https://github.com/algorandfoundation/algokit-cli/commit/805d63c10be3c62a3ef8d78bd2d40d1e6d1c8c5c))
