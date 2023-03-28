@@ -39,7 +39,7 @@ The target audience for this tool is software developers building applications o
 
 ## Contributing
 
-This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.MD) to learn about making improvements to the CLI tool itself, including developer setup instructions.
+This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.md) to learn about making improvements to the CLI tool itself, including developer setup instructions.
 
 # Install
 
