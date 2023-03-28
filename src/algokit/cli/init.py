@@ -53,7 +53,7 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorand-devrel/starter-algokit-beaker-template",
             description="Official starter template for Beaker applications.",
         ),
-        "beaker production": BlessedTemplateSource(
+        "beaker_production": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Official template for production Beaker applications.",
         ),
