@@ -7,21 +7,10 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-        pytest.param("Darwin", id="macOS"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency")
 def test_bootstrap_npm_without_npm(
-    proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest
+    proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mock_platform_system: str
 ) -> None:
-    proc_mock.should_fail_on("npm install")
-    proc_mock.should_fail_on("npm.cmd install")
+    proc_mock.should_fail_on(f"npm{'.cmd' if mock_platform_system == 'Windows' else ''} install")
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
 
@@ -34,16 +23,7 @@ def test_bootstrap_npm_without_npm(
     verify(result.output, namer=PyTestNamer(request))
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-        pytest.param("Darwin", id="macOS"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency", "proc_mock")
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
 def test_bootstrap_npm_without_package_file(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
@@ -55,16 +35,7 @@ def test_bootstrap_npm_without_package_file(tmp_path_factory: TempPathFactory, r
     verify(result.output, namer=PyTestNamer(request))
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-        pytest.param("Darwin", id="macOS"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency")
+@pytest.mark.usefixtures("mock_platform_system")
 def test_bootstrap_npm_without_npm_and_package_file(
     proc_mock: ProcMock, tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest
 ) -> None:
@@ -81,16 +52,7 @@ def test_bootstrap_npm_without_npm_and_package_file(
     verify(result.output, namer=PyTestNamer(request))
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-        pytest.param("Darwin", id="macOS"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency", "proc_mock")
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
 def test_bootstrap_npm_happy_path(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()

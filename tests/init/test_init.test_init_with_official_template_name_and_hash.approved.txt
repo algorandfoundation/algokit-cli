@@ -4,3 +4,4 @@ Executed `algokit bootstrap all` in {current_working_directory}/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+Your template includes a README.md file, you might want to review that as a next step.

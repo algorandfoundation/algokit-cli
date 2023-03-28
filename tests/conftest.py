@@ -30,14 +30,31 @@ def proc_mock(mocker: MockerFixture) -> ProcMock:
     return proc_mock
 
 
-@pytest.fixture()
-def _mock_os_dependency(request: pytest.FixtureRequest, mocker: MockerFixture) -> None:
-    # Mock OS.platform
-    platform_system: str = getattr(request, "param", "Darwin")
-    bootstrap_platform_module = mocker.patch("algokit.core.bootstrap.platform")
-    bootstrap_platform_module.system.return_value = platform_system
-    init_platform_module = mocker.patch("algokit.cli.init.platform")
-    init_platform_module.system.return_value = platform_system
+def _do_platform_mock(platform_system: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    import platform
+
+    monkeypatch.setattr(platform, "system", lambda: platform_system)
+    monkeypatch.setattr(platform, "platform", lambda: f"{platform_system}-other-system-info")
+
+
+@pytest.fixture(
+    params=[
+        pytest.param("Windows", id="windows"),
+        pytest.param("Linux", id="linux"),
+        pytest.param("Darwin", id="macOS"),
+    ]
+)
+def mock_platform_system(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> str:
+    platform_system: str = request.param
+    _do_platform_mock(platform_system=platform_system, monkeypatch=monkeypatch)
+    return platform_system
+
+
+@pytest.fixture(autouse=True)
+def _mock_platform_system_marker(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    marker = request.node.get_closest_marker("mock_platform_system")
+    if marker is not None:
+        _do_platform_mock(platform_system=marker.args[0], monkeypatch=monkeypatch)
 
 
 @pytest.fixture()

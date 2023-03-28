@@ -45,16 +45,7 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-        pytest.param("Darwin", id="macOS"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency", "proc_mock")
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
 def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()

@@ -129,36 +129,53 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
     verify(result.output, scrubber=make_output_scrubber())
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency")
 def test_init_no_interaction_required_no_git_no_network_with_vscode(
     tmp_path_factory: TempPathFactory,
     proc_mock: ProcMock,
     mock_questionary_input: PipeInput,
     which_mock: WhichMock,
     request: pytest.FixtureRequest,
+    mock_platform_system: str,
 ) -> None:
     which_mock.add("code")
+    proc_mock.set_output(["code" if mock_platform_system != "Windows" else "code.cmd"], ["Launch project"])
 
     cwd = tmp_path_factory.mktemp("cwd")
-    proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
-    proc_mock.set_output(["code.cmd", str(cwd / "myapp")], ["Launch project"])
-    (cwd / "myapp" / ".vscode").mkdir(parents=True)
+    app_name = "myapp"
+    project_path = cwd / app_name
+    (project_path / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
+
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
+        f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
         "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
         cwd=cwd,
     )
     assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
+@pytest.mark.mock_platform_system("Linux")
+def test_init_no_interaction_required_no_git_no_network_with_vscode_and_readme(
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_questionary_input: PipeInput, which_mock: WhichMock
+) -> None:
+    which_mock.add("code")
+    proc_mock.set_output(["code"], ["Launch project"])
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    app_name = "myapp"
+    project_path = cwd / app_name
+    (project_path / ".vscode").mkdir(parents=True)
+    (project_path / "README.txt").touch()
+    mock_questionary_input.send_text("Y")  # reuse existing directory
+
+    result = invoke(
+        f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        cwd=cwd,
+    )
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_no_interaction_required_no_git_no_network_with_no_ide(
@@ -170,9 +187,13 @@ def test_init_no_interaction_required_no_git_no_network_with_no_ide(
     which_mock.add("code")
 
     cwd = tmp_path_factory.mktemp("cwd")
-    proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
-    (cwd / "myapp" / ".vscode").mkdir(parents=True)
+    app_name = "myapp"
+    project_path = cwd / app_name
+    proc_mock.set_output(["code", str(project_path)], ["Launch project"])
+    proc_mock.set_output(["code.cmd", str(project_path)], ["Launch project"])
+    (project_path / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
+
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
         "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-ide",
