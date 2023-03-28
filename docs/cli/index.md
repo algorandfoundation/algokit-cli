@@ -90,7 +90,8 @@ Skip version checking and prompting.
 
 ## bootstrap
 
-Expedited initial setup for any developer by bootstrapping dependencies and other key development environment setup activities.
+Expedited initial setup for any developer by bootstrapping dependencies and other
+key development environment setup activities.
 
 ```shell
 algokit bootstrap [OPTIONS] COMMAND [ARGS]...
