@@ -2,9 +2,9 @@ WARNING: Community templates have not been reviewed, and can execute arbitrary c
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 DEBUG: project path = {current_working_directory}/myapp
-Starting template execution...
+Starting template copy...
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
-Template execution complete!
+Template instantiation complete!
 ? Do you want to run `algokit bootstrap` to bootstrap dependencies for this new project so it can be run immediately? (Y/n)
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐

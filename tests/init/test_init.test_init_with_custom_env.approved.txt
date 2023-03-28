@@ -1,8 +1,8 @@
 DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template
 DEBUG: project path = {current_working_directory}/myapp
-Starting template execution...
+Starting template copy...
 DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
-Template execution complete!
+Template instantiation complete!
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
