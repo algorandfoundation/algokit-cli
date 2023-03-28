@@ -367,7 +367,7 @@ algokit localnet reset [OPTIONS]
 
 
 ### --update, --no-update
-Enable or disable updating to the latest available LocalNet version
+Enable or disable updating to the latest available LocalNet version, default: don’t update
 
 ### start
 
