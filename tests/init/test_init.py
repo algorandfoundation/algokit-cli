@@ -35,8 +35,10 @@ class WhichMock:
     def __init__(self) -> None:
         self.paths: dict[str, str] = {}
 
-    def add(self, cmd: str, path: str | None = None) -> None:
-        self.paths[cmd] = path or f"/bin/{cmd}"
+    def add(self, cmd: str, path: str | None = None) -> str:
+        path = path or f"/bin/{cmd}"
+        self.paths[cmd] = path
+        return path
 
     def remove(self, cmd: str) -> None:
         self.paths.pop(cmd, None)
@@ -135,10 +137,9 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     mock_questionary_input: PipeInput,
     which_mock: WhichMock,
     request: pytest.FixtureRequest,
-    mock_platform_system: str,
 ) -> None:
-    which_mock.add("code")
-    proc_mock.set_output(["code" if mock_platform_system != "Windows" else "code.cmd"], ["Launch project"])
+    code_cmd = which_mock.add("code")
+    proc_mock.set_output([code_cmd], ["Launch project"])
 
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"
@@ -155,12 +156,11 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
 
 
-@pytest.mark.mock_platform_system("Linux")
 def test_init_no_interaction_required_no_git_no_network_with_vscode_and_readme(
     tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_questionary_input: PipeInput, which_mock: WhichMock
 ) -> None:
-    which_mock.add("code")
-    proc_mock.set_output(["code"], ["Launch project"])
+    code_cmd = which_mock.add("code")
+    proc_mock.set_output([code_cmd], ["Launch project"])
 
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"
@@ -184,13 +184,13 @@ def test_init_no_interaction_required_no_git_no_network_with_no_ide(
     mock_questionary_input: PipeInput,
     which_mock: WhichMock,
 ) -> None:
-    which_mock.add("code")
+    code_cmd = which_mock.add("code")
+    proc_mock.should_fail_on(code_cmd)
 
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"
     project_path = cwd / app_name
-    proc_mock.set_output(["code", str(project_path)], ["Launch project"])
-    proc_mock.set_output(["code.cmd", str(project_path)], ["Launch project"])
+
     (project_path / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
 
