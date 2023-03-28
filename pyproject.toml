@@ -136,7 +136,9 @@ line-length = 120
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]
-
+markers = [
+    "mock_platform_system",
+]
 [tool.mypy]
 files = ["src", "tests"]
 exclude = ["dist"]
