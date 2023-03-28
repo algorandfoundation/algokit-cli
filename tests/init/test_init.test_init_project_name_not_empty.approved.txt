@@ -1,8 +1,11 @@
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
+DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 ? Name of project / directory to create the project in: 
-DEBUG: Attempting to initialise project in {current_working_directory}/FAKE_PROJECT from template {test_parent_directory}/copier-helloworld.bundle
+DEBUG: project path = {current_working_directory}/FAKE_PROJECT
+Starting template execution...
+DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
-DEBUG: Template initialisation complete, final clone URL = {test_parent_directory}/copier-helloworld.bundle
+Template execution complete!
 Executed `algokit bootstrap all` in {current_working_directory}/FAKE_PROJECT
 🙌 Project initialized at `FAKE_PROJECT`! For template specific next steps, consult the documentation of your selected template 🧐

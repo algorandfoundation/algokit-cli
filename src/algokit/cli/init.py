@@ -181,32 +181,35 @@ def init_command(
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+    logger.debug(f"template source = {template}")
 
     project_path = _get_project_path(directory_name)
+    logger.debug(f"project path = {project_path}")
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
-    logger.debug(f"Attempting to initialise project in {project_path} from template {template}")
-
+    logger.info("Starting template execution...")
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
     # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
     #       to their repo to include py.typed file
-    from copier.main import run_copy  # type: ignore[import]
+    from copier.main import Worker  # type: ignore[import]
 
-    copier_worker = run_copy(
-        template.url,
-        project_path,
+    with Worker(
+        src_path=template.url,
+        dst_path=project_path,
         data=answers_dict,
         defaults=use_defaults,
         quiet=True,
         vcs_ref=template.commit,
-    )
+    ) as copier_worker:
+        expanded_template_url = copier_worker.template.url_expanded
+        logger.debug(f"final clone URL = {expanded_template_url}")
+        copier_worker.run_copy()
 
-    expanded_template_url = copier_worker.template.url_expanded
-    logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
+    logger.info("Template execution complete!")
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
 

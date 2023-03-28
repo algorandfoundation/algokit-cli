@@ -498,8 +498,8 @@ def test_init_template_url_and_template_name(
 
 @pytest.mark.usefixtures("mock_questionary_input")
 def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mock_run_copy = mocker.patch("copier.main.run_copy")
-    mock_run_copy.return_value.template.url_expanded = "URL"
+    mock_copier_worker_cls = mocker.patch("copier.main.Worker")
+    mock_copier_worker_cls.return_value.__enter__.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
@@ -511,7 +511,7 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     )
 
     assert result.exit_code == 0
-    assert mock_run_copy.call_args.kwargs["vcs_ref"] == ref
+    assert mock_copier_worker_cls.call_args.kwargs["vcs_ref"] == ref
 
 
 def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
