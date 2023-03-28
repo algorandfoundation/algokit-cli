@@ -35,8 +35,10 @@ class WhichMock:
     def __init__(self) -> None:
         self.paths: dict[str, str] = {}
 
-    def add(self, cmd: str, path: str | None = None) -> None:
-        self.paths[cmd] = path or f"/bin/{cmd}"
+    def add(self, cmd: str, path: str | None = None) -> str:
+        path = path or f"/bin/{cmd}"
+        self.paths[cmd] = path
+        return path
 
     def remove(self, cmd: str) -> None:
         self.paths.pop(cmd, None)
@@ -129,15 +131,6 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
     verify(result.output, scrubber=make_output_scrubber())
 
 
-@pytest.mark.parametrize(
-    "_mock_os_dependency",
-    [
-        pytest.param("Windows", id="windows"),
-        pytest.param("Linux", id="linux"),
-    ],
-    indirect=["_mock_os_dependency"],
-)
-@pytest.mark.usefixtures("_mock_os_dependency")
 def test_init_no_interaction_required_no_git_no_network_with_vscode(
     tmp_path_factory: TempPathFactory,
     proc_mock: ProcMock,
@@ -145,20 +138,44 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
     which_mock: WhichMock,
     request: pytest.FixtureRequest,
 ) -> None:
-    which_mock.add("code")
+    code_cmd = which_mock.add("code")
+    proc_mock.set_output([code_cmd], ["Launch project"])
 
     cwd = tmp_path_factory.mktemp("cwd")
-    proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
-    proc_mock.set_output(["code.cmd", str(cwd / "myapp")], ["Launch project"])
-    (cwd / "myapp" / ".vscode").mkdir(parents=True)
+    app_name = "myapp"
+    project_path = cwd / app_name
+    (project_path / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
+
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
+        f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
         "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
         cwd=cwd,
     )
     assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber(), namer=PyTestNamer(request))
+
+
+def test_init_no_interaction_required_no_git_no_network_with_vscode_and_readme(
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_questionary_input: PipeInput, which_mock: WhichMock
+) -> None:
+    code_cmd = which_mock.add("code")
+    proc_mock.set_output([code_cmd], ["Launch project"])
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    app_name = "myapp"
+    project_path = cwd / app_name
+    (project_path / ".vscode").mkdir(parents=True)
+    (project_path / "README.txt").touch()
+    mock_questionary_input.send_text("Y")  # reuse existing directory
+
+    result = invoke(
+        f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        cwd=cwd,
+    )
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_no_interaction_required_no_git_no_network_with_no_ide(
@@ -167,12 +184,16 @@ def test_init_no_interaction_required_no_git_no_network_with_no_ide(
     mock_questionary_input: PipeInput,
     which_mock: WhichMock,
 ) -> None:
-    which_mock.add("code")
+    code_cmd = which_mock.add("code")
+    proc_mock.should_fail_on(code_cmd)
 
     cwd = tmp_path_factory.mktemp("cwd")
-    proc_mock.set_output(["code", str(cwd / "myapp")], ["Launch project"])
-    (cwd / "myapp" / ".vscode").mkdir(parents=True)
+    app_name = "myapp"
+    project_path = cwd / app_name
+
+    (project_path / ".vscode").mkdir(parents=True)
     mock_questionary_input.send_text("Y")  # reuse existing directory
+
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
         "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-ide",
@@ -477,8 +498,8 @@ def test_init_template_url_and_template_name(
 
 @pytest.mark.usefixtures("mock_questionary_input")
 def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mock_run_copy = mocker.patch("copier.main.run_copy")
-    mock_run_copy.return_value.template.url_expanded = "URL"
+    mock_copier_worker_cls = mocker.patch("copier.main.Worker")
+    mock_copier_worker_cls.return_value.__enter__.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
@@ -490,7 +511,7 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     )
 
     assert result.exit_code == 0
-    assert mock_run_copy.call_args.kwargs["vcs_ref"] == ref
+    assert mock_copier_worker_cls.call_args.kwargs["vcs_ref"] == ref
 
 
 def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:

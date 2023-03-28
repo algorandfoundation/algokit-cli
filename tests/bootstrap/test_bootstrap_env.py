@@ -77,7 +77,7 @@ TOKEN_5_SPECIAL_CHAR=*
     verify(get_combined_verify_output(result.output, ".env", (cwd / ".env").read_text("utf-8")))
 
 
-@pytest.mark.usefixtures("_mock_os_dependency")
+@pytest.mark.mock_platform_system("Darwin")
 def test_bootstrap_env_dotenv_different_prompt_scenarios(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ) -> None:

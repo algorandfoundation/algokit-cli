@@ -1,5 +1,4 @@
 import logging
-import platform
 import re
 import shutil
 from dataclasses import dataclass
@@ -181,32 +180,35 @@ def init_command(
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+    logger.debug(f"template source = {template}")
 
     project_path = _get_project_path(directory_name)
+    logger.debug(f"project path = {project_path}")
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
-    logger.debug(f"Attempting to initialise project in {project_path} from template {template}")
-
+    logger.info("Starting template copy and render...")
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
     # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
     #       to their repo to include py.typed file
-    from copier.main import run_copy  # type: ignore[import]
+    from copier.main import Worker  # type: ignore[import]
 
-    copier_worker = run_copy(
-        template.url,
-        project_path,
+    with Worker(
+        src_path=template.url,
+        dst_path=project_path,
         data=answers_dict,
         defaults=use_defaults,
         quiet=True,
         vcs_ref=template.commit,
-    )
+    ) as copier_worker:
+        expanded_template_url = copier_worker.template.url_expanded
+        logger.debug(f"final clone URL = {expanded_template_url}")
+        copier_worker.run_copy()
 
-    expanded_template_url = copier_worker.template.url_expanded
-    logger.debug(f"Template initialisation complete, final clone URL = {expanded_template_url}")
+    logger.info("Template render complete!")
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
 
@@ -224,13 +226,19 @@ def init_command(
         # if the URL looks like an HTTP URL (should be the case for blessed templates), be helpful
         # and print it out so the user can (depending on terminal) click it to open in browser
         logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
-    if open_ide and shutil.which("code") and (project_path / ".vscode").is_dir():
+
+    readme_path = next(project_path.glob("README*"), None)
+    if open_ide and (project_path / ".vscode").is_dir() and (code_cmd := shutil.which("code")):
         logger.info(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-        is_windows = platform.system() == "Windows"
-        proc.run(command=["code" if not is_windows else "code.cmd", str(project_path)])
+        code_cmd_and_args = [code_cmd, str(project_path)]
+        if readme_path:
+            code_cmd_and_args.append(str(readme_path))
+        proc.run(code_cmd_and_args)
+    elif readme_path:
+        logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
 
 
 def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
