@@ -3,6 +3,9 @@ Usage: algokit [OPTIONS] COMMAND [ARGS]...
   AlgoKit is your one-stop shop to develop applications on the Algorand
   blockchain.
 
+  If you are getting started, please see the quick start tutorial:
+  https://bit.ly/algokit-intro-tutorial.
+
 Options:
   --version             Show the version and exit.
   -v, --verbose         Enable logging of DEBUG messages to the console.
@@ -11,7 +14,7 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  bootstrap    Bootstrap AlgoKit project dependencies.
+  bootstrap    Bootstrap local dependencies in an AlgoKit project.
   completions  Install and Uninstall AlgoKit shell integration.
   config       Configure AlgoKit options.
   doctor       Run the Algorand doctor CLI.

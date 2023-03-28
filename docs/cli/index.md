@@ -64,6 +64,8 @@
 
 AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.
 
+If you are getting started, please see the quick start tutorial: [https://bit.ly/algokit-intro-tutorial](https://bit.ly/algokit-intro-tutorial).
+
 ```shell
 algokit [OPTIONS] COMMAND [ARGS]...
 ```
@@ -88,7 +90,8 @@ Skip version checking and prompting.
 
 ## bootstrap
 
-Bootstrap AlgoKit project dependencies.
+Expedited initial setup for any developer by bootstrapping dependencies and other
+key development environment setup activities.
 
 ```shell
 algokit bootstrap [OPTIONS] COMMAND [ARGS]...

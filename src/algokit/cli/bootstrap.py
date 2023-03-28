@@ -8,9 +8,12 @@ from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_en
 logger = logging.getLogger(__name__)
 
 
-@click.group("bootstrap", short_help="Bootstrap AlgoKit project dependencies.")
+@click.group("bootstrap", short_help="Bootstrap local dependencies in an AlgoKit project.")
 def bootstrap_group() -> None:
-    pass
+    """
+    Expedited initial setup for any developer by bootstrapping dependencies and other
+    key development environment setup activities.
+    """
 
 
 @bootstrap_group.command(
