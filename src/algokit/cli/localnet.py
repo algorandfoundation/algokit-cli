@@ -85,8 +85,8 @@ def stop_localnet() -> None:
 @localnet_group.command("reset", short_help="Reset the AlgoKit LocalNet.")
 @click.option(
     "--update/--no-update",
-    default=True,
-    help="Enable or disable updating to the latest available LocalNet version",
+    default=False,
+    help="Enable or disable updating to the latest available LocalNet version, default: don't update",
 )
 def reset_localnet(*, update: bool) -> None:
     sandbox = ComposeSandbox()

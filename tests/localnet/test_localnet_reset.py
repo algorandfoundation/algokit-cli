@@ -51,11 +51,11 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_no_pull(app_dir_mock: AppDirs) -> None:
+def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_with_pull(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
 
-    result = invoke("localnet reset --no-update")
+    result = invoke("localnet reset --update")
 
     assert result.exit_code == 0
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
