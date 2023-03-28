@@ -23,7 +23,7 @@ In order for AlgoKit to facilitate a productive development experience it needs 
 
 ## Principles
 
-- **[AlgoKit Guiding Principles](../../README.md#Guiding-Principles)** - specifically Seamless onramp, Leverage existing ecosystem, Meet devs where they are
+- **[AlgoKit Guiding Principles](../../docs/algokit.md#Guiding-Principles)** - specifically Seamless onramp, Leverage existing ecosystem, Meet devs where they are
 - **Lightweight** - the solution should have as low an impact as possible on resources on the developers machine
 - **Fast** - the solution should start quickly, which makes for a nicer experience locally and also allows it to be used for continuous integration automation testing
 

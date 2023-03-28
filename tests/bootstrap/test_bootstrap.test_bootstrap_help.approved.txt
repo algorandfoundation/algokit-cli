@@ -1,5 +1,8 @@
 Usage: algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 
+  Expedited initial setup for any developer by bootstrapping dependencies and
+  other key development environment setup activities.
+
 Options:
   -h, --help  Show this message and exit.
 

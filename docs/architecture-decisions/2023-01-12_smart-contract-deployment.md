@@ -41,7 +41,7 @@ This decision record covers the different options and high level design for how 
 
 ## Principles
 
-- [AlgoKit Guiding Principles](../../README.md#Guiding-Principles) - specifically:
+- [AlgoKit Guiding Principles](../../docs/algokit.md#Guiding-Principles) - specifically:
   - **Cohesive developer tool suite**
   - **Seamless onramp**
   - **Secure by default**

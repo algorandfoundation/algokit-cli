@@ -14,7 +14,6 @@ from algokit.core.version_prompt import do_version_prompt, skip_version_check_op
 
 
 @click.group(
-    help="AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.",
     context_settings={
         "help_option_names": ["-h", "--help"],
         "max_content_width": 120,
@@ -25,6 +24,11 @@ from algokit.core.version_prompt import do_version_prompt, skip_version_check_op
 @color_option
 @skip_version_check_option
 def algokit(*, skip_version_check: bool) -> None:
+    """
+    AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.
+
+    If you are getting started, please see the quick start tutorial: https://bit.ly/algokit-intro-tutorial.
+    """
     if not skip_version_check:
         do_version_prompt()
 
