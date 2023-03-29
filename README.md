@@ -8,12 +8,37 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 ## What is AlgoKit?
 
-AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/):
+AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/).
 
-- [AlgoKit CLI](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
-- [AlgoKit Templates](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
-- AlgoKit Utils ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test and build Algorand solutions faster
-- [AlgoKit LocalNet](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features//localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
+![AlgoKit components](./docs/imgs/algokit-map.png)
+
+AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and deploy Algorand solutions.
+
+### Learn
+
+There are many learning resources on the [Algorand Developer Portal](https://developer.algorand.org/) and the [AlgoKit landing page](https://developer.algorand.org/algokit) has a range of links to more learning materials. In particular, check out the [quick start tutorial](https://developer.algorand.org/docs/get-started/algokit/) and the [AlgoKit detailed docs page](https://developer.algorand.org/docs/get-details/algokit/).
+
+If you need help you can access both the [Algorand Discord](https://discord.gg/84AActu3at) (pro-tip: check out the algokit channel!) and the [Algorand Forum](https://forum.algorand.org/).
+
+We have also developed an [AlgoKit video series](https://www.youtube.com/@algodevs/playlists).
+
+### Develop
+
+AlgoKit helps you develop Algorand solutions:
+
+- **Interaction**: AlgoKit exposes a number of interaction methods, namely:
+  - [**AlgoKit CLI**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
+  - [VS Code](https://code.visualstudio.com/): All AlgoKit project templates include VS Code configurations so you have a smooth out-of-the-box development experience using VS Code
+  - [Dappflow](https://dappflow.org/): AlgoKit has integrations with Dappflow; a web-based user interface that let's you visualise an Algorand network and deploy and call smart contracts via a graphical user interface
+- **Getting Started**: AlgoKit helps you get started quickly when building new solutions:
+  - [**AlgoKit Templates**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
+- **Development**: AlgoKit provides SDKs, tools and libraries that help you quickly and effectively build high quality Algorand solutions:
+  - **AlgoKit Utils** ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test, build and deploy Algorand solutions quickly and easily
+    - [algosdk](https://developer.algorand.org/docs/sdks/) ([Python](https://github.com/algorand/py-algorand-sdk#readme) | [TypeScript](https://github.com/algorand/js-algorand-sdk#readme)) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
+  - [**Beaker**](https://beaker.algo.xyz/): A productive Python framework for building Smart Contracts on Algorand.
+    - [PyTEAL](https://pyteal.readthedocs.io/en/stable/): The Python language bindings for Algorand Smart Contracts, which Beaker wraps
+    - [TEAL](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/): Transaction Execution Approval Language (TEAL) is the assembly-like language interpreted by the Algorand Virtual Machine (AVM) running within an Algorand node, which Beaker exports
+  - [**AlgoKit LocalNet**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
 
 ## What can AlgoKit help me do?
 
