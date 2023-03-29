@@ -262,7 +262,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or questionary_extensions.prompt_confirm(
             "Do you want to run `algokit bootstrap` for this new project? "
-            "This will setup the virtualenv, install and configure dependencies allowing it to be run immediately.",
+            "This will install and configure dependencies allowing it to be run immediately.",
             default=True,
         )
     if run_bootstrap:

@@ -6,5 +6,5 @@ Starting template copy and render...
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 Template render complete!
-? Do you want to run `algokit bootstrap` for this new project? This will setup the virtualenv, install and configure dependencies allowing it to be run immediately. (Y/n)
+? Do you want to run `algokit bootstrap` for this new project? This will install and configure dependencies allowing it to be run immediately. (Y/n)
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
