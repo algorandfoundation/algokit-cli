@@ -1,1 +1,5 @@
+Opening mainnet in https://app.dappflow.org using default browser
+----
+launch args:
+----
 call('https://app.dappflow.org/setup-config?algod_url=https%3A%2F%2Fmainnet-api.algonode.cloud&indexer_url=https%3A%2F%2Fmainnet-idx.algonode.cloud')
