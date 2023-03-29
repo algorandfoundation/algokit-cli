@@ -1,5 +1,9 @@
 Usage: algokit completions install [OPTIONS]
 
+  Install shell completions, this command will attempt to update the interactive
+  profile script for the current shell to support algokit completions. To
+  specify a specific shell use --shell.
+
 Options:
   --shell [bash|zsh]  Specify shell to install algokit completions for.
   -h, --help          Show this message and exit.
