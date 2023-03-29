@@ -10,7 +10,7 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/).
 
-![AlgoKit components](./docs/imgs/algokit-map.png)
+![AlgoKit components](https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/docs/imgs/algokit-map.png)
 
 AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and deploy Algorand solutions.
 
