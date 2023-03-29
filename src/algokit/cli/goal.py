@@ -23,6 +23,11 @@ logger = logging.getLogger(__name__)
 )
 @click.argument("goal_args", nargs=-1, type=click.UNPROCESSED)
 def goal_command(*, console: bool, goal_args: list[str]) -> None:
+    """
+    Run the Algorand goal CLI against the AlgoKit LocalNet.
+
+    Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
+    """
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except OSError as ex:

@@ -14,11 +14,13 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  bootstrap    Bootstrap local dependencies in an AlgoKit project.
+  bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
+               project root directory.
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
   doctor       Diagnose potential environment issues that may affect AlgoKit
   explore      Explore the specified network in the browser using Dappflow.
   goal         Run the Algorand goal CLI against the AlgoKit LocalNet.
-  init         Initializes a new project.
+  init         Initializes a new project from a template; run from project
+               parent directory.
   localnet     Manage the AlgoKit LocalNet.
