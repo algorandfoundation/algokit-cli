@@ -135,7 +135,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "--bootstrap/--no-bootstrap",
     is_flag=True,
     default=None,
-    help="Whether to run `algokit bootstrap` to bootstrap the new project's dependencies.",
+    help="Whether to run `algokit bootstrap` to install and configure the new project's dependencies locally.",
 )
 @click.option(
     "open_ide",
