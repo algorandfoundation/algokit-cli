@@ -4,16 +4,16 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 
 AlgoKit gets developers of all levels up and running with a familiar, fun and productive development environment in minutes. The goal of AlgoKit is to help developers build and launch secure, automated production-ready applications rapidly.
 
-[Install AlgoKit](#install) | [Quick Start Tutorial](./docs/tutorials/intro.md) | [Documentation](./docs/algokit.md)
+[Install AlgoKit](#install) | [Quick Start Tutorial](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/intro.md) | [Documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md)
 
 ## What is AlgoKit?
 
 AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/):
 
-- [AlgoKit CLI](./docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
-- [AlgoKit Templates](./docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
+- [AlgoKit CLI](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
+- [AlgoKit Templates](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
 - AlgoKit Utils ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test and build Algorand solutions faster
-- [AlgoKit LocalNet](./docs/features//localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
+- [AlgoKit LocalNet](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features//localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
 
 ## What can AlgoKit help me do?
 
@@ -22,7 +22,7 @@ The set of capabilities supported by AlgoKit will evolve over time, but currentl
 - Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
 - Building, testing, deploying and calling [Algorand PyTEAL](https://github.com/algorand/pyteal) / [Beaker](https://beaker.algo.xyz/) smart contracts
 
-For a user guide and guidance on how to use AlgoKit, please refer to the [docs](./docs/algokit.md).
+For a user guide and guidance on how to use AlgoKit, please refer to the [docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
 
 Future capabilities are likely to include:
 
@@ -35,7 +35,7 @@ The target audience for this tool is software developers building applications o
 
 ## How can I contribute?
 
-This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.md) to learn about making improvements to the CLI tool itself, including developer setup instructions.
+This is an open source project managed by the Algorand Foundation. See the [contributing page](https://github.com/algorandfoundation/algokit-cli/blob/main/CONTRIBUTING.md) to learn about making improvements to the CLI tool itself, including developer setup instructions.
 
 # Install
 
@@ -70,7 +70,7 @@ AlgoKit can be installed using OS specific package managers, or using the python
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
      > **Note**
-     > See [our LocalNet documentation](docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
+     > See [our LocalNet documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
 
 2. Install using WinGet
 
