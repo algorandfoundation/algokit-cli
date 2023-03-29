@@ -82,7 +82,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     return value
 
 
-@click.command("init", short_help="Initializes a new project.")
+@click.command("init", short_help="Initializes a new project from a template; run from project parent directory.")
 @click.option(
     "directory_name",
     "--name",
@@ -167,7 +167,19 @@ def init_command(
     run_bootstrap: bool | None,
     open_ide: bool,
 ) -> None:
-    """Initializes a new project from a template."""
+    """
+    Initializes a new project from a template, including prompting
+    for template specific questions to be used in template rendering.
+
+    Templates can be default templates shipped with AlgoKit, or custom
+    templates in public Git repositories.
+
+    Includes ability to initialise Git repository, run algokit bootstrap and
+    automatically open Visual Studio Code.
+
+    This should be run in the parent directory that you want the project folder
+    created in.
+    """
 
     if not shutil.which("git"):
         raise click.ClickException(

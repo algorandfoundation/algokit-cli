@@ -235,6 +235,8 @@ Optional argument
 
 Run the Algorand goal CLI against the AlgoKit LocalNet.
 
+Look at [https://developer.algorand.org/docs/clis/goal/goal/](https://developer.algorand.org/docs/clis/goal/goal/) for more information.
+
 ```shell
 algokit goal [OPTIONS] [GOAL_ARGS]...
 ```
@@ -253,7 +255,17 @@ Optional argument(s)
 
 ## init
 
-Initializes a new project from a template.
+Initializes a new project from a template, including prompting
+for template specific questions to be used in template rendering.
+
+Templates can be default templates shipped with AlgoKit, or custom
+templates in public Git repositories.
+
+Includes ability to initialise Git repository, run algokit bootstrap and
+automatically open Visual Studio Code.
+
+This should be run in the parent directory that you want the project folder
+created in.
 
 ```shell
 algokit init [OPTIONS]
