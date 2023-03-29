@@ -65,7 +65,7 @@ class ComposeSandbox:
         self._run_compose_command(
             "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start LocalNet"
         )
-        logger.info("Started; execute `algokit localnet status` to check the status.")
+        logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
 
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
