@@ -90,7 +90,7 @@ Skip version checking and prompting.
 
 ## bootstrap
 
-Expedited initial setup for any developer by bootstrapping dependencies and other
+Expedited initial setup for any developer by installing and configuring dependencies and other
 key development environment setup activities.
 
 ```shell
@@ -99,7 +99,7 @@ algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 
 ### all
 
-Bootstrap all aspects of the current directory and immediate sub directories by convention.
+Runs all bootstrap sub-commands in the current directory and immediate sub directories.
 
 ```shell
 algokit bootstrap all [OPTIONS]
@@ -107,7 +107,7 @@ algokit bootstrap all [OPTIONS]
 
 ### env
 
-Bootstrap .env file in the current working directory.
+Copies .env.template file to .env in the current working directory and prompts for any unspecified values.
 
 ```shell
 algokit bootstrap env [OPTIONS]
@@ -115,7 +115,7 @@ algokit bootstrap env [OPTIONS]
 
 ### npm
 
-Bootstrap Node.js project in the current working directory.
+Runs npm install in the current working directory to install Node.js dependencies.
 
 ```shell
 algokit bootstrap npm [OPTIONS]
@@ -123,7 +123,7 @@ algokit bootstrap npm [OPTIONS]
 
 ### poetry
 
-Bootstrap Python Poetry and install in the current working directory.
+Installs Python Poetry (if not present) and runs poetry install in the current working directory to install Python dependencies.
 
 ```shell
 algokit bootstrap poetry [OPTIONS]
