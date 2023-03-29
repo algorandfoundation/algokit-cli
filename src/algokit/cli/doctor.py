@@ -22,7 +22,7 @@ CRITICAL_COLOR = "red"
 
 @click.command(
     "doctor",
-    short_help="Run the Algorand doctor CLI.",
+    short_help="Diagnose potential environment issues that may affect AlgoKit",
     context_settings={
         "ignore_unknown_options": True,
     },
@@ -35,6 +35,10 @@ CRITICAL_COLOR = "red"
     default=False,
 )
 def doctor_command(*, copy_to_clipboard: bool) -> None:
+    """Diagnose potential environment issues that may affect AlgoKit
+
+    Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
+    potential issues."""
     os_type = platform.system()
     is_windows = os_type == "Windows"
     service_outputs = {

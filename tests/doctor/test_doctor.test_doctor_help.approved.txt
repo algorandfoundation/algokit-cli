@@ -1,5 +1,10 @@
 Usage: algokit doctor [OPTIONS]
 
+  Diagnose potential environment issues that may affect AlgoKit
+
+  Will search the system for AlgoKit dependencies and show their versions, as
+  well as identifying any potential issues.
+
 Options:
   -c, --copy-to-clipboard  Copy the contents of the doctor message (in Markdown
                            format) in your clipboard.

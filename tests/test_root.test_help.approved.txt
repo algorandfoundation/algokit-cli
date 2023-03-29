@@ -17,7 +17,7 @@ Commands:
   bootstrap    Bootstrap local dependencies in an AlgoKit project.
   completions  Install and Uninstall AlgoKit shell integration.
   config       Configure AlgoKit options.
-  doctor       Run the Algorand doctor CLI.
+  doctor       Diagnose potential environment issues that may affect AlgoKit
   explore      Explore the specified network in the browser using Dappflow.
   goal         Run the Algorand goal CLI against the AlgoKit LocalNet.
   init         Initializes a new project.
