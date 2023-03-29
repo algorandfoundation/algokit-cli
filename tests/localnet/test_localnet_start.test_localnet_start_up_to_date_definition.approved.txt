@@ -8,4 +8,4 @@ Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
-Started; execute `algokit localnet status` to check the status.
+Started; execute `algokit explore` to explore LocalNet in a web user interface.
