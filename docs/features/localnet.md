@@ -68,6 +68,12 @@ You can see a web-based user interface of the current state of your LocalNet inc
 
 See the [AlgoKit Goal](./goal.md) feature. You can also execute `algokit localnet console` to open a [Bash shell which allows you to run the goal commandline](./goal.md#running-multiple-commands).
 
+Note: if you want to copy files into the container so you can access them via goal then you can use the following:
+
+```
+docker cp foo.txt algokit_algod:/root
+```
+
 ### Getting access to the private key of the faucet account
 
 If you want to use the LocalNet then you need to get the private key of the initial wallet so you can transfer ALGOs out of it to other accounts you create.

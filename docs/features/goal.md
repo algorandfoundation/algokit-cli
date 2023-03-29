@@ -78,6 +78,14 @@ $ ~ algokit goal
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
 
+## Copying files in to the container
+
+If you want to copy files into the container so you can access them via goal then you can use the following:
+
+```
+docker cp foo.txt algokit_algod:/root
+```
+
 ## Running multiple commands
 
 If you want to run multiple commands or interact with the filesystem you can execute `algokit goal --console`. This will open a [Bash](https://www.gnu.org/software/bash/) shell session on the `algod` Docker container and from there you can execute goal directly, e.g.:
