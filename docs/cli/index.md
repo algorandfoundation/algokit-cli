@@ -315,7 +315,7 @@ Automatically choose default answers without asking when creating this template.
 
 
 ### --bootstrap, --no-bootstrap
-Whether to run algokit bootstrap to bootstrap the new project’s dependencies.
+Whether to run algokit bootstrap to install and configure the new project’s dependencies locally.
 
 
 ### --ide, --no-ide
