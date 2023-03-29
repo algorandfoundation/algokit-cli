@@ -1,1 +1,5 @@
+Opening localnet in https://app.dappflow.org using default browser
+----
+launch args:
+----
 call('https://app.dappflow.org/setup-config?algod_url=http%3A%2F%2Flocalhost&indexer_url=http%3A%2F%2Flocalhost&algod_port=4001&algod_token=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&indexer_port=8980&indexer_token=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')

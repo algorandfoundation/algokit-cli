@@ -1,9 +1,12 @@
+import logging
 from typing import TypedDict
 from urllib.parse import urlencode
 
 import click
 
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+
+logger = logging.getLogger(__name__)
 
 
 class NetworkConfigurationRequired(TypedDict):
@@ -48,4 +51,5 @@ def get_dappflow_url(network: NetworkConfiguration) -> str:
 @click.argument("network", type=click.Choice(list(NETWORKS)), default="localnet", required=False)
 def explore_command(network: str) -> None:
     url = get_dappflow_url(NETWORKS[network])
+    logger.info(f"Opening {network} in https://app.dappflow.org using default browser")
     click.launch(url)
