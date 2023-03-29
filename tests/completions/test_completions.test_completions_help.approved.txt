@@ -4,10 +4,5 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  install    Install shell completions, this command will attempt to update the
-             interactive profile script for the current shell to support algokit
-             completions. To specify a specific shell use --shell.
-  uninstall  Uninstall shell completions, this command will attempt to update
-             the interactive profile script for the current shell to remove any
-             algokit completions that have been added. To specify a specific
-             shell use --shell.
+  install    Install shell completions
+  uninstall  Uninstall shell completions
