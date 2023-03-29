@@ -8,21 +8,19 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 ## What is AlgoKit?
 
-[model image]
-
 AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/):
 
-- A commandline Interface (CLI) so you can quickly access AlgoKit capabilities
-- A template library to get you started faster
-- A set of framework libraries so you can build faster
-- A local isolated Algorand network so you can simulate real transactions and workloads
+- [AlgoKit CLI](./docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
+- [AlgoKit Templates](./docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
+- AlgoKit Utils ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test and build Algorand solutions faster
+- [AlgoKit LocalNet](./docs/features//localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
 
 ## What can AlgoKit help me do?
 
 The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
 - Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
-- Building, testing and deploying [Algorand PyTEAL](https://github.com/algorand/pyteal) smart contracts
+- Building, testing, deploying and calling [Algorand PyTEAL](https://github.com/algorand/pyteal) / [Beaker](https://beaker.algo.xyz/) smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](./docs/algokit.md).
 
@@ -40,10 +38,6 @@ The target audience for this tool is software developers building applications o
 This is an open source project managed by the Algorand Foundation. See the [contributing page](CONTRIBUTING.md) to learn about making improvements to the CLI tool itself, including developer setup instructions.
 
 # Install
-
-## ⚠️ Beta Software ⚠️
-
-**Work In Progress:** This tool is currently in the early stages of development, use at your own risk and please provide us feedback as you use it so we can make it better!
 
 ## Prerequisites
 
