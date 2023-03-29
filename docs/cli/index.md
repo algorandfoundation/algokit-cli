@@ -131,7 +131,7 @@ algokit bootstrap poetry [OPTIONS]
 
 ## completions
 
-Install and Uninstall AlgoKit shell integration.
+Install and Uninstall AlgoKit shell integrations.
 
 ```shell
 algokit completions [OPTIONS] COMMAND [ARGS]...
@@ -139,7 +139,8 @@ algokit completions [OPTIONS] COMMAND [ARGS]...
 
 ### install
 
-Install shell completions, this command will attempt to update the interactive profile script for the current shell to support algokit completions. To specify a specific shell use –shell.
+Install shell completions, this command will attempt to update the interactive profile script
+for the current shell to support algokit completions. To specify a specific shell use –shell.
 
 ```shell
 algokit completions install [OPTIONS]
@@ -159,7 +160,9 @@ Specify shell to install algokit completions for.
 
 ### uninstall
 
-Uninstall shell completions, this command will attempt to update the interactive profile script for the current shell to remove any algokit completions that have been added. To specify a specific shell use –shell.
+Uninstall shell completions, this command will attempt to update the interactive profile script
+for the current shell to remove any algokit completions that have been added.
+To specify a specific shell use –shell.
 
 ```shell
 algokit completions uninstall [OPTIONS]
@@ -179,7 +182,7 @@ Specify shell to install algokit completions for.
 
 ## config
 
-Configure AlgoKit options.
+Configure settings used by AlgoKit
 
 ```shell
 algokit config [OPTIONS] COMMAND [ARGS]...
@@ -205,7 +208,10 @@ Optional argument
 
 ## doctor
 
-Run the Algorand doctor CLI.
+Diagnose potential environment issues that may affect AlgoKit
+
+Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
+potential issues.
 
 ```shell
 algokit doctor [OPTIONS]
