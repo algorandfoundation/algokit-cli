@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.0.1 (2023-03-29)
+### Documentation
+* Reference overview image with absolute url ([`c987f84`](https://github.com/algorandfoundation/algokit-cli/commit/c987f84d3079cf88c262e21a542e60c74a71829a))
+* Added overview image ([`4c387ee`](https://github.com/algorandfoundation/algokit-cli/commit/4c387ee7fbbae2c01498dec83fa76ffd4d4990fa))
+* Make README.md links absolute ([`8435bc7`](https://github.com/algorandfoundation/algokit-cli/commit/8435bc7faaddd33e4bb204f8c965365aee097b42))
+
 ## v1.0.0 (2023-03-29)
 ### Feature
 * **localnet:** Changing the default reset behaviour to not pull images ([`6d3f10e`](https://github.com/algorandfoundation/algokit-cli/commit/6d3f10e5690f15d04d03bc38290f2c670905ba24))
