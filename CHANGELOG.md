@@ -2,6 +2,30 @@
 
 <!--next-version-placeholder-->
 
+## v1.0.0 (2023-03-29)
+### Feature
+* **localnet:** Changing the default reset behaviour to not pull images ([`6d3f10e`](https://github.com/algorandfoundation/algokit-cli/commit/6d3f10e5690f15d04d03bc38290f2c670905ba24))
+
+### Breaking
+* 1.0 release ([`68b02ad`](https://github.com/algorandfoundation/algokit-cli/commit/68b02ad49de0c8da083fcce542a76f6342ac0020))
+
+### Documentation
+* Remove mention of virtualenv when describing bootstrap command ([`302498f`](https://github.com/algorandfoundation/algokit-cli/commit/302498f21cb59eea4e01b482d3f07eecada34909))
+* Explain what running bootstrap during init will do ([`4bd58bd`](https://github.com/algorandfoundation/algokit-cli/commit/4bd58bd981eef9a382c2a16f9d0bd06ebe397ba3))
+* Added file copy advice ([`2b4882c`](https://github.com/algorandfoundation/algokit-cli/commit/2b4882c1878c07da7933d9a266f80560395fbb5f))
+* Added note about algokit explore after a localnet start ([`7a068b1`](https://github.com/algorandfoundation/algokit-cli/commit/7a068b1d90592e5eebd3f7af5a5f6d216c45ec1f))
+* Provide feedback when calling algokit explore ([`def4ef5`](https://github.com/algorandfoundation/algokit-cli/commit/def4ef5ce5bb2eb3e7b7c0dbcdbf0d4c4f8f6b1d))
+* Update --bootstrap help text on algokit init ([`ce9ebea`](https://github.com/algorandfoundation/algokit-cli/commit/ce9ebeaf9bb636f6af4cd2b98d6a32a4b4e10f15))
+* Updating auto-generated docs ([`637d534`](https://github.com/algorandfoundation/algokit-cli/commit/637d534b14c92fa3b4be27f58a0e3a950ad5d75e))
+* Command help text improvements for bootstrap and init ([`67eb3f6`](https://github.com/algorandfoundation/algokit-cli/commit/67eb3f6b79ac47abe4f4d1497db66acda5d0d4fd))
+* Update config and completions help text ([`7e0c087`](https://github.com/algorandfoundation/algokit-cli/commit/7e0c0872c1ca9ae531c69ae37dce43f44bc74634))
+* Update doctor help text ([`111bf2e`](https://github.com/algorandfoundation/algokit-cli/commit/111bf2e874fff0960ed7faf5c073dd44d8b487cd))
+* Removing incorrect references to sandbox ([`7179eb8`](https://github.com/algorandfoundation/algokit-cli/commit/7179eb8c67160671d549bd8f7114f54fb03b3fad))
+* Improving doctor command feature description ([`a8a2862`](https://github.com/algorandfoundation/algokit-cli/commit/a8a2862efc03448022df9fd2f9fa42e3ad883cde))
+* Updating bootstrap command descriptions ([`07a5fdb`](https://github.com/algorandfoundation/algokit-cli/commit/07a5fdbaa2653ab6505fd67432fac3c36ee5d711))
+* Fixing heading order in intro tutorial ([`46b5023`](https://github.com/algorandfoundation/algokit-cli/commit/46b50235b965f1e9736d3e8c67d1a95c9a13923c))
+* Getting README.md ready for 1.0 ([`815712f`](https://github.com/algorandfoundation/algokit-cli/commit/815712f83a2b56172c3cc51c7615bb33cae32b2f))
+
 ## v0.6.0 (2023-03-28)
 ### Feature
 * Prompt for template first ([`91326f3`](https://github.com/algorandfoundation/algokit-cli/commit/91326f339650f9ea33ff4746f6707f507364b81a))
