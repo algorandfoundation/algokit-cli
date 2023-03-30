@@ -2,7 +2,7 @@
 
 - **Status**: Approved
 - **Owner:** Daniel McGregor
-- **Deciders**: Daniel McGregor, Rob Moore, John Woods, Alessandro Ferrari
+- **Deciders**: Daniel McGregor, Rob Moore, John Woods, Alessandro Cappellato
 - **Date created**: 2023-01-11
 - **Date decided:** 2023-01-11
 

@@ -2,7 +2,7 @@
 
 - **Status**: Approved
 - **Owner:** Rob Moore
-- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Fabrice Benhamouda (Algorand Foundation)
+- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Cappellato (Algorand Foundation), Fabrice Benhamouda (Algorand Foundation)
 - **Date created**: 2023-01-12
 - **Date decided:** 2023-02-04
 - **Date updated**: 2023-02-04
