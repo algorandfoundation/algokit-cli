@@ -2,7 +2,7 @@
 
 - **Status**: Draft
 - **Owner:** Rob Moore
-- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Michael Diamant (Algorand Inc.), Benjamin Guidarelli (Algorand Foundation)
+- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Cappellato (Algorand Foundation), Michael Diamant (Algorand Inc.), Benjamin Guidarelli (Algorand Foundation)
 - **Date created**: 2022-11-22
 - **Date decided:** TBD
 - **Date updated**: 2022-11-28

@@ -2,7 +2,7 @@
 
 - **Status**: Approved
 - **Owner:** Rob Moore
-- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Ferrari (Algorand Foundation), Will Winder (Algorand Inc.)
+- **Deciders**: Anne Kenyon (Algorand Inc.), Alessandro Cappellato (Algorand Foundation), Will Winder (Algorand Inc.)
 - **Date created**: 2022-11-14
 - **Date decided:** 2022-11-14
 - **Date updated**: 2022-11-16
