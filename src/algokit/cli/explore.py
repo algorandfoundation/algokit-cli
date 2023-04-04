@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import TypedDict
 from urllib.parse import urlencode
 
@@ -22,13 +23,14 @@ class NetworkConfiguration(NetworkConfigurationRequired, total=False):
     indexer_token: str
 
 
+GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
 NETWORKS: dict[str, NetworkConfiguration] = {
     "localnet": {
-        "algod_url": DEFAULT_ALGOD_SERVER,
-        "indexer_url": DEFAULT_ALGOD_SERVER,
-        "algod_port": DEFAULT_ALGOD_PORT,
+        "algod_url": GITPOD_URL.replace("https://", "https://4001-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
+        "indexer_url": GITPOD_URL.replace("https://", "https://8980-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
+        "algod_port": 443 if GITPOD_URL else DEFAULT_ALGOD_PORT,
         "algod_token": DEFAULT_ALGOD_TOKEN,
-        "indexer_port": DEFAULT_INDEXER_PORT,
+        "indexer_port": 443 if GITPOD_URL else DEFAULT_INDEXER_PORT,
         "indexer_token": DEFAULT_ALGOD_TOKEN,
     },  # TODO: query these instead of using constants
     "testnet": {
