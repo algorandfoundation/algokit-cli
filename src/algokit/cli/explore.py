@@ -37,7 +37,7 @@ NETWORKS: dict[str, NetworkConfiguration] = {
         "indexer_port": 443 if GITPOD_URL else DEFAULT_INDEXER_PORT,
         "indexer_token": DEFAULT_ALGOD_TOKEN,
         "kmd_token": DEFAULT_ALGOD_TOKEN,
-        "kmd_port": 43 if GITPOD_URL else DEFAULT_ALGOD_PORT + 1,
+        "kmd_port": 443 if GITPOD_URL else DEFAULT_ALGOD_PORT + 1,
         "kmd_url": GITPOD_URL.replace("https://", "https://4002-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
     },  # TODO: query these instead of using constants
     "testnet": {
