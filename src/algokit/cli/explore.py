@@ -22,6 +22,10 @@ class NetworkConfiguration(NetworkConfigurationRequired, total=False):
     indexer_port: int
     indexer_token: str
 
+    kmd_token: str
+    kmd_url: str
+    kmd_port: int
+
 
 GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
 NETWORKS: dict[str, NetworkConfiguration] = {
@@ -32,6 +36,9 @@ NETWORKS: dict[str, NetworkConfiguration] = {
         "algod_token": DEFAULT_ALGOD_TOKEN,
         "indexer_port": 443 if GITPOD_URL else DEFAULT_INDEXER_PORT,
         "indexer_token": DEFAULT_ALGOD_TOKEN,
+        "kmd_token": DEFAULT_ALGOD_TOKEN,
+        "kmd_port": 43 if GITPOD_URL else DEFAULT_ALGOD_PORT + 1,
+        "kmd_url": GITPOD_URL.replace("https://", "https://4002-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
     },  # TODO: query these instead of using constants
     "testnet": {
         "algod_url": "https://testnet-api.algonode.cloud",
