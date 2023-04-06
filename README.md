@@ -6,6 +6,12 @@ AlgoKit gets developers of all levels up and running with a familiar, fun and pr
 
 [Install AlgoKit](#install) | [Quick Start Tutorial](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/intro.md) | [Documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md)
 
+## Related Repositories
+
+Algokit-cli integrates multiple additional repositories:
+
+* https://github.com/search?q=org%3Aalgorandfoundation+algokit-&type=repositories
+
 ## What is AlgoKit?
 
 AlgoKit compromises of a number of components that make it the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/).
