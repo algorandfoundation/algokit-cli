@@ -12,7 +12,7 @@ AlgoKit compromises of a number of components that make it the one-stop shop too
 
 ![AlgoKit components](https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/docs/imgs/algokit-map.png)
 
-AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and deploy Algorand solutions.
+AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and deploy Algorand solutions. It consists of [a number of repositories](https://github.com/search?q=org%3Aalgorandfoundation+algokit-&type=repositories), including this one.
 
 ### Learn
 
