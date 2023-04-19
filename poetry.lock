@@ -593,14 +593,14 @@ files = [
 
 [[package]]
 name = "copier"
-version = "7.1.0a0"
+version = "7.1.0"
 description = "A library for rendering project templates."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "copier-7.1.0a0-py3-none-any.whl", hash = "sha256:2e339d31a58afba10eddc6aa8f2368bfe919504ff4913c6c570faf6e7b5637c5"},
-    {file = "copier-7.1.0a0.tar.gz", hash = "sha256:036e776b37563cd4fe7e76080f05808eb7b14d3debfe50fdc292844cc028eafb"},
+    {file = "copier-7.1.0-py3-none-any.whl", hash = "sha256:200284c0bac56aea765991f4ee972c6475f8de4cf017dd0a7e21f061d15c0244"},
+    {file = "copier-7.1.0.tar.gz", hash = "sha256:a15737bc6669cfc741622c9978c45314ff808412a727b4b3968ff982d923fe46"},
 ]
 
 [package.dependencies]
@@ -609,7 +609,7 @@ dunamai = ">=1.7.0"
 funcy = ">=1.17"
 jinja2 = ">=3.1.1"
 jinja2-ansible-filters = ">=1.3.1"
-packaging = ">=21.0"
+packaging = ">=23.0"
 pathspec = ">=0.9.0"
 plumbum = ">=1.6.9"
 pydantic = ">=1.10.2"
@@ -2866,7 +2866,6 @@ category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "wcwidth-0.2.6-py2.py3-none-any.whl", hash = "sha256:795b138f6875577cd91bba52baf9e445cd5118fd32723b460e30a0af30ea230e"},
     {file = "wcwidth-0.2.6.tar.gz", hash = "sha256:a5220780a404dbe3353789870978e472cfe477761f06ee55077256e509b156d0"},
 ]
 
@@ -3016,4 +3015,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "db1222026bee8b4b48b99af7975f4bdeea7a3ce112d65a2b3b235cf056102649"
+content-hash = "5fbaa5fadaa5e4b5cd49dd8c142c75c734f6a16be81037be9e224b6fe444c534"
