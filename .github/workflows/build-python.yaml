@@ -11,10 +11,6 @@ jobs:
         os: ["ubuntu-latest", "windows-latest"]
         python: ["3.10"]
     runs-on: ${{ matrix.os }}
-    permissions:
-      pull-requests: write
-      contents: read
-      id-token: write
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
