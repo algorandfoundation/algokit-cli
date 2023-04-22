@@ -8,11 +8,9 @@ The philosophy we take with AlgoKit LocalNet is that you should treat it as an e
 
 ## Prerequisites
 
-AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system.
+AlgoKit LocalNet relies on **Docker** and **Docker Compose** being present and running on your system.
 
-You can install Docker by following the [official installation instructions](https://docs.docker.com/get-docker/). Most of the time this will also install Docker Compose, but if not you can [follow the instructions](https://docs.docker.com/compose/install/) for that too.
-
-If you are on Windows then you will need WSL 2 installed first, for which you can find the [official installation instructions](https://learn.microsoft.com/en-us/windows/wsl/install). If you are using Windows 10 then ensure you are on the latest version to reduce likelihood of installation problems.
+You can install both by following the [official installation instructions](https://docs.docker.com/get-docker/).
 
 ## Known issues
 
