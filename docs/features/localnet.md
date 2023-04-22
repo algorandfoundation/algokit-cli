@@ -14,7 +14,7 @@ You can install Docker by following the [official installation instructions](htt
 
 If you are on Windows then you will need WSL 2 installed first, for which you can find the [official installation instructions](https://learn.microsoft.com/en-us/windows/wsl/install). If you are using Windows 10 then ensure you are on the latest version to reduce likelihood of installation problems.
 
-If you prefer so, the Windows 10 Pro supported Hyper-V Docker backend can be used instead of the WLS2 backend.
+Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.docker.com/desktop/install/windows-install/) for Docker can be used instead of the WSL 2 backend.
 
 ## Known issues
 
