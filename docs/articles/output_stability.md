@@ -1,1 +1,5 @@
 # Smart Contract Output Stability
+
+Smart contracts are analogous to low level firmware software development; it's a highly memory and compute constrained environment, with a high risk of vulnerabilities due to lower level access to memory and less developer-oriented security tooling. Because of this, the assembly language code that is output for a smart contract is important - a change to an opcode could inadvertently add a security vulnerability, or significantly change the execution or memory profile. As such ensuring that, even if code is refactored, if there are no intended changes to a smart contract that the assembly language output of the smart contract is the same is important. We refer to this property as **output stability**.
+
+We recommend having "output stability tests" that require a developer to explicitly opt-in to accepting a change in the output of a smart contract's assembly code otherwise the automated build would fail and the contract can't be deployed (assuming automated deployment).
