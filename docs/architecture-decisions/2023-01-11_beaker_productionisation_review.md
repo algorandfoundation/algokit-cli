@@ -226,7 +226,7 @@ The deferment of the `compile()` call is actually a necessary part of recommenda
 
 The immediate `compile()` has issues such as requiring implementors (i.e. subclasses) to call `super().__init__()` as a **final** step in their own `__init__` method - any code that runs after the super init call will have no effect on the application produced!
 
-Immediate compilation also reduces the control the user has over the output. Although currently the only parameter that `compile` takes is a `client`, it might be useful to add (optional) parameters here to control the compilation. For example, if you can pass in the list of optimisations that should be applied, that allows you to have [output stability](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/architecture-decisions/2022-11-22_beaker-testing-strategy.md#context) of your smart contract code if new optimisations are added in the future.
+Immediate compilation also reduces the control the user has over the output. Although currently the only parameter that `compile` takes is a `client`, it might be useful to add (optional) parameters here to control the compilation. For example, if you can pass in the list of optimisations that should be applied, that allows you to have [output stability](../articles/output_stability.md) of your smart contract code if new optimisations are added in the future.
 
 The separation of compiled state outside of `Application` simplifies the design, and can be done mostly transparently to end-users.
 
