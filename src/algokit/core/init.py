@@ -2,7 +2,9 @@ from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[im
 
 
 def populate_default_answers(worker: Worker) -> None:
-    """Helper function to pre-populate Worker.data with default answers, based on Worker.answers implementation.
+    """Helper function to pre-populate Worker.data with default answers, based on Worker.answers implementation (see
+    https://github.com/copier-org/copier/blob/v7.1.0/copier/main.py#L363).
+
     Used as a work-around for the behaviour of Worker(default=True, ...) which in >=7.1 raises an error instead of
     prompting if no default is provided"""
     answers = AnswersMap(
