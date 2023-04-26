@@ -4,8 +4,8 @@ Please inspect the template repository, and pay particular attention to the valu
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 DEBUG: project path = {current_working_directory}/myapp
 Starting template copy and render...
-DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
+DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
