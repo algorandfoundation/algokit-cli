@@ -212,14 +212,17 @@ def init_command(
     #       to their repo to include py.typed file
     from copier.main import Worker  # type: ignore[import]
 
+    from algokit.core.init import populate_default_answers
+
     with Worker(
         src_path=template.url,
         dst_path=project_path,
         data=answers_dict,
-        defaults=use_defaults,
         quiet=True,
         vcs_ref=template.commit,
     ) as copier_worker:
+        if use_defaults:
+            populate_default_answers(copier_worker)
         expanded_template_url = copier_worker.template.url_expanded
         logger.debug(f"final clone URL = {expanded_template_url}")
         copier_worker.run_copy()
