@@ -113,8 +113,9 @@ AlgoKit can be installed using OS specific package managers, or using the python
       pip install --user pipx
       python -m pipx ensurepath
       ```
-   4. Install AlgoKit via pipx: `python -m pipx install algokit`
-   5. Restart the terminal to ensure AlgoKit is available on the path
+   4. Restart the terminal to ensure pipx is available on the path
+   5. Install AlgoKit via pipx: `pipx install algokit`
+   6. Restart the terminal to ensure AlgoKit is available on the path
 
 3. [Verify installation](#verify-installation)
 
@@ -128,17 +129,17 @@ Some useful commands for updating or removing AlgoKit in the future.
 ## Install AlgoKit on Mac
 
 > **Note**
-> This method will install Python 3.10 as a dependency via Brew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
+> This method will install Python 3.10 as a dependency via Homebrew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure prerequisites are installed
 
-   - [Brew](https://docs.brew.sh/Installation)
-   - [Git](https://github.com/git-guides/install-git#install-git-on-mac) should already be available if brew is installed
+   - [Homebrew](https://docs.brew.sh/Installation)
+   - [Git](https://github.com/git-guides/install-git#install-git-on-mac) (should already be available if `brew` is installed)
    - [Docker](https://docs.docker.com/desktop/install/mac-install/), (or `brew install --cask docker`)
      > **Note**
      > Docker requires MacOS 11+
 
-2. Install using Brew `brew install algorandfoundation/tap/algokit`
+2. Install using Homebrew `brew install algorandfoundation/tap/algokit`
 3. Restart the terminal to ensure AlgoKit is available on the path
 4. [Verify installation](#verify-installation)
 
@@ -189,7 +190,7 @@ Some useful commands for updating or removing AlgoKit in the future.
 Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to:
 
 ```
-algokit, version 0.2.0
+algokit, version 1.0.1
 ```
 
 > **Note**
@@ -203,8 +204,8 @@ algokit, version 0.2.0
 It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit. The output of this command will look similar to:
 
 ```
-timestamp: 2023-01-19T01:22:07+00:00
-AlgoKit: 0.2.0
+timestamp: 2023-03-27T01:23:45+00:00
+AlgoKit: 1.0.1
 AlgoKit Python: 3.11.1 (main, Dec 23 2022, 09:28:24) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
 OS: macOS-13.1-arm64-arm-64bit
 docker: 20.10.21
