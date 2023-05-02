@@ -14,6 +14,8 @@ You can install Docker by following the [official installation instructions](htt
 
 If you are on Windows then you will need WSL 2 installed first, for which you can find the [official installation instructions](https://learn.microsoft.com/en-us/windows/wsl/install). If you are using Windows 10 then ensure you are on the latest version to reduce likelihood of installation problems.
 
+Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.docker.com/desktop/install/windows-install/) for Docker can be used instead of the WSL 2 backend.
+
 ## Known issues
 
 The AlgoKit LocalNet is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the LocalNet to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.

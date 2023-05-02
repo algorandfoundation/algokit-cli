@@ -548,7 +548,8 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --no-bootstrap --template beaker --defaults",
+        "init --name myapp --no-git --no-bootstrap --template beaker --defaults "
+        "-a author_name None -a author_email None ",
         cwd=cwd,
     )
 
@@ -574,7 +575,8 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --template beaker_with_version --defaults -a run_poetry_install False",
+        "init --name myapp --no-git --template beaker_with_version --defaults -a run_poetry_install False "
+        "-a author_name None -a author_email None ",
         cwd=cwd,
     )
 
@@ -596,6 +598,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     result = invoke(
         (
             "init --name myapp --no-git --no-bootstrap --template beaker --defaults "
+            "-a author_name None -a author_email None "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
             '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '
             " -a run_poetry_install False"
