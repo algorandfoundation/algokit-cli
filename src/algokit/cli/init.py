@@ -273,11 +273,12 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # but if something goes wrong, we don't want to block
         try:
             bootstrap_any_including_subdirs(project_path)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(
                 "Bootstrap failed. Once any errors above are resolved, "
                 f"you can run `algokit bootstrap` in {project_path}",
-                exc_info=True,
+                exc_info=e,
             )
 
 
