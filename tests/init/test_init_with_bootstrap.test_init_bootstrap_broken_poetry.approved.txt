@@ -1,0 +1,18 @@
+WARNING: Community templates have not been reviewed, and can execute arbitrary code.
+Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
+DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
+WARNING: Re-using existing directory, this is not recommended because if project generation fails, then we can't automatically cleanup.
+? Continue anyway? (y/N)
+DEBUG: project path = {current_working_directory}/myapp
+Starting template copy and render...
+DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
+No git tags found in template; using HEAD as ref
+Template render complete!
+DEBUG: Checking {current_working_directory}/myapp for bootstrapping needs
+DEBUG: Running `algokit bootstrap poetry`
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+ERROR: Received an error while attempting bootstrap: poetry --version failed, please check your poetry install
+ERROR: Bootstrap failed. Once any errors above are resolved, you can run `algokit bootstrap` in {current_working_directory}/myapp
+🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
