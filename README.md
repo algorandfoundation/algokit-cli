@@ -12,7 +12,7 @@ AlgoKit compromises of a number of components that make it the one-stop shop too
 
 ![AlgoKit components](https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/docs/imgs/algokit-map.png)
 
-AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and deploy Algorand solutions. It consists of [a number of repositories](https://github.com/search?q=org%3Aalgorandfoundation+algokit-&type=repositories), including this one.
+AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and [**operate**](#operate) Algorand solutions. It consists of [a number of repositories](https://github.com/search?q=org%3Aalgorandfoundation+algokit-&type=repositories), including this one.
 
 ### Learn
 
@@ -39,6 +39,12 @@ AlgoKit helps you develop Algorand solutions:
     - [PyTEAL](https://pyteal.readthedocs.io/en/stable/): The Python language bindings for Algorand Smart Contracts, which Beaker wraps
     - [TEAL](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/): Transaction Execution Approval Language (TEAL) is the assembly-like language interpreted by the Algorand Virtual Machine (AVM) running within an Algorand node, which Beaker exports
   - [**AlgoKit LocalNet**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
+
+### Operate
+
+AlgoKit can help you deploy and operate Algorand solutions.
+
+AlgoKit comes with out-of-the-box [Continuous Integration / Continuous Deployment (CI/CD) templates](https://github.com/algorandfoundation/algokit-beaker-default-template) that help you rapidly set up best-practice software delivery processes that ensure you build quality in and have a solution that can evolve
 
 ## What can AlgoKit help me do?
 
@@ -195,11 +201,11 @@ algokit, version 1.0.1
 
 > **Note**
 > If you get receive one of the following errors:
-> * `command not found: algokit` (bash/zsh)
-> * `The term 'algokit' is not recognized as the name of a cmdlet, function, script file, or operable program.` (PowerShell)
+>
+> - `command not found: algokit` (bash/zsh)
+> - `The term 'algokit' is not recognized as the name of a cmdlet, function, script file, or operable program.` (PowerShell)
 >
 > Then ensure that `algokit` is available on the PATH by running `pipx ensurepath` and restarting the terminal.
-
 
 It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit. The output of this command will look similar to:
 
