@@ -7,5 +7,6 @@ jobs:
     uses: algorandfoundation/gh_zendesk_sync/.github/workflows/github_zendesk_issue_closed.yml@main
     with:
       ZENDESK_TENANT_NAME: ${{ vars.ZENDESK_TENANT_NAME }}
+      ISSUE_LABEL: makerx
     secrets:
       ZENDESK_AUTH_TOKEN: ${{ secrets.ZENDESK_AUTH_TOKEN }}
