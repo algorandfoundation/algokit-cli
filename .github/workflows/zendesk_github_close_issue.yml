@@ -1,0 +1,11 @@
+name: Close GitHub issue on Zendesk ticket solved
+on:
+  repository_dispatch:
+    types:
+      - zendesk_github_close_issue
+permissions:
+  issues: write
+jobs:
+  close_issue:
+    name: Close GitHub issue
+    uses: algorandfoundation/gh_zendesk_sync/.github/workflows/zendesk_github_close_issue.yml@main
