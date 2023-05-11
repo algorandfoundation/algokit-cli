@@ -91,75 +91,11 @@ algokit goal account export -a {address_from_an_online_account_from_above_comman
 
 **Option 2: Automatically via kmd API**
 
-Needing to do this manual step every time you spin up a new development environment or reset your LocalNet is frustrating. Instead, it's useful to have code that uses the Sandbox APIs to automatically retrieve the private key of the default account. The following `getSandboxDefaultAccount` function will help you achieve that. It's written in TypeScript, but the equivalent will work with [the Algorand SDK in other languages](https://developer.algorand.org/).
+Needing to do this manual step every time you spin up a new development environment or reset your LocalNet is frustrating. Instead, it's useful to have code that uses the Sandbox APIs to automatically retrieve the private key of the default account.
 
-```typescript
-// account.ts
-import algosdk, { Account, Algodv2 } from "algosdk";
-import { getKmdClient } from "./client";
+AlgoKit Utils provides methods to help you do this:
 
-export async function isSandbox(client: Algodv2): Promise<boolean> {
-  const params = await client.getTransactionParams().do();
-
-  return params.genesisID === "devnet-v1" || params.genesisID === "sandnet-v1";
-}
-
-export function getAccountFromMnemonic(mnemonic: string): Account {
-  return algosdk.mnemonicToSecretKey(mnemonic);
-}
-
-export async function getSandboxDefaultAccount(
-  client: Algodv2
-): Promise<Account> {
-  if (!(await isSandbox(client))) {
-    throw "Can't get default account from non Sandbox network";
-  }
-
-  const kmd = getKmdClient();
-  const wallets = await kmd.listWallets();
-
-  // Sandbox starts with a single wallet called 'unencrypted-default-wallet', with heaps of tokens
-  const defaultWalletId = wallets.wallets.filter(
-    (w: any) => w.name === "unencrypted-default-wallet"
-  )[0].id;
-
-  const defaultWalletHandle = (await kmd.initWalletHandle(defaultWalletId, ""))
-    .wallet_handle_token;
-  const defaultKeyIds = (await kmd.listKeys(defaultWalletHandle)).addresses;
-
-  // When you create accounts using goal they get added to this wallet so check for an account that's actually a default account
-  let i = 0;
-  for (i = 0; i < defaultKeyIds.length; i++) {
-    const key = defaultKeyIds[i];
-    const account = await client.accountInformation(key).do();
-    if (account.status !== "Offline" && account.amount > 1000_000_000) {
-      break;
-    }
-  }
-
-  const defaultAccountKey = (
-    await kmd.exportKey(defaultWalletHandle, "", defaultKeyIds[i])
-  ).private_key;
-
-  const defaultAccountMnemonic = algosdk.secretKeyToMnemonic(defaultAccountKey);
-  return getAccountFromMnemonic(defaultAccountMnemonic);
-}
-```
-
-To get the `Kmd` instance you can use something like this (tweak it based on where you retrieve your ALGOD token and server from):
-
-```typescript
-// client.ts
-import { Kmd } from "algosdk";
-
-// KMD client allows you to export private keys, which is useful to get the default account in a sandbox network
-export function getKmdClient(): Kmd {
-  return new Kmd(
-    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "http://localhost",
-    "4002"
-  );
-}
-```
+* TypeScript - [`ensureFunded`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#ensurefunded) and [`getDispenserAccount`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#dispenser)
+* Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
 
 For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#localnet).
