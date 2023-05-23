@@ -17,6 +17,16 @@ def snake_case(s: str) -> str:
     s.replace('-', ' '))).split()).lower()
 
 
+def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> str:
+    client_name = str(output).replace("%parent_dir%", snake_case(application_file.parent.name))
+
+    if str(output).find("%name%") > 0:
+        application_json = json.load(open(str(application_file)))
+        client_name = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
+
+    return client_name
+
+
 def check_node_installed() -> None:
     try:
         subprocess.run(["node", "--version"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -26,23 +36,24 @@ def check_node_installed() -> None:
         ) from e
 
 
-def walk_dir(app_spec: pathlib.Path, output: pathlib.Path) -> None:
-    for child in app_spec.iterdir():
-        if child.is_dir():
-            walk_dir(child, output)
-        elif child.name.lower() == "application.json":
-            output_replaced = str(output).replace("%parent_dir%", snake_case(child.parent.name))
-
-            if str(output).find("%name%") > 0:
-                application_file = open(str(child))
-                application_json = json.load(application_file)
-                output_replaced = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
-
-            logger.info(
-                f"Generating Python client code for application specified in {child} and writing to {output_replaced}"
-            )
-            algokit_client_generator.generate_client(child, pathlib.Path(output_replaced))
-
+def generate_clients(app_spec: pathlib.Path, output: pathlib.Path) -> None:
+    if app_spec.is_dir():
+        for child in app_spec.iterdir():
+            if child.is_dir():
+                generate_clients(child, output)
+            elif child.name.lower() == "application.json":
+                formatted_output = format_client_name(output=output, application_file=child)
+                logger.info(
+                    f"Generating Python client code for application specified in {child} and writing to {formatted_output}"
+                )
+                algokit_client_generator.generate_client(child, pathlib.Path(formatted_output))
+    else:
+        formatted_output = format_client_name(output=output, application_file=app_spec)
+        logger.info(
+            f"Generating Python client code for application specified in {app_spec} and writing to {formatted_output}"
+        )
+        algokit_client_generator.generate_client(app_spec, pathlib.Path(formatted_output))
+                
 
 
 @click.group("generate", short_help="Generate code for an AlgoKit application.")
@@ -110,7 +121,7 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output_path}"
         )
     elif language.lower() == "python":
-        walk_dir(app_spec=pathlib.Path(app_spec), output=pathlib.Path(output))
+        generate_clients(app_spec=pathlib.Path(app_spec), output=pathlib.Path(output))
 
         # algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
         # logger.info(
