@@ -1,0 +1,2 @@
+DEBUG: Running 'node --version' in '{current_working_directory}'
+Error: The TypeScript generator requires Node.js and npx to be installed. Please install Node.js to continue.

@@ -1,0 +1,7 @@
+Usage: algokit generate [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  client  Generate a client.

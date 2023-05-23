@@ -1,27 +1,25 @@
+import json
 import logging
 import pathlib
-import subprocess
+from re import sub
 
 import algokit_client_generator
 import click
-import json
-from re import sub
+
+from algokit.core import proc
 
 logger = logging.getLogger(__name__)
 
 
 def snake_case(s: str) -> str:
-  return '_'.join(
-    sub('([A-Z][a-z]+)', r' \1',
-    sub('([A-Z]+)', r' \1',
-    s.replace('-', ' '))).split()).lower()
+    return "_".join(sub("([A-Z][a-z]+)", r" \1", sub("([A-Z]+)", r" \1", s.replace("-", " "))).split()).lower()
 
 
 def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> str:
     client_name = str(output).replace("%parent_dir%", snake_case(application_file.parent.name))
 
     if str(output).find("%name%") > 0:
-        application_json = json.load(open(str(application_file)))
+        application_json = json.load(pathlib.Path.open(application_file))
         client_name = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
 
     return client_name
@@ -29,8 +27,10 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
 
 def check_node_installed() -> None:
     try:
-        subprocess.run(["node", "--version"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
+        proc.run(
+            ["node", "--version"], bad_return_code_error_message="node --version failed, please check your node install"
+        )
+    except OSError as e:
         raise click.ClickException(
             "The TypeScript generator requires Node.js and npx to be installed. Please install Node.js to continue."
         ) from e
@@ -44,7 +44,8 @@ def generate_clients(app_spec: pathlib.Path, output: pathlib.Path) -> None:
             elif child.name.lower() == "application.json":
                 formatted_output = format_client_name(output=output, application_file=child)
                 logger.info(
-                    f"Generating Python client code for application specified in {child} and writing to {formatted_output}"
+                    f"Generating Python client code for application specified in "
+                    f"{child} and writing to {formatted_output}"
                 )
                 algokit_client_generator.generate_client(child, pathlib.Path(formatted_output))
     else:
@@ -53,7 +54,6 @@ def generate_clients(app_spec: pathlib.Path, output: pathlib.Path) -> None:
             f"Generating Python client code for application specified in {app_spec} and writing to {formatted_output}"
         )
         algokit_client_generator.generate_client(app_spec, pathlib.Path(formatted_output))
-                
 
 
 @click.group("generate", short_help="Generate code for an AlgoKit application.")
@@ -63,12 +63,12 @@ def generate_group() -> None:
 
 @generate_group.command("client")
 @click.option(
-    'app_spec',
-    '--appspec',
-    '-a',
+    "app_spec",
+    "--appspec",
+    "-a",
     type=click.Path(exists=True, dir_okay=True, resolve_path=True),
-    default='./application.json',
-    help='Path to the application specification file'
+    default="./application.json",
+    help="Path to the application specification file",
 )
 @click.option(
     "output",
@@ -102,7 +102,7 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
 
     if language.lower() == "typescript":
         check_node_installed()
-        subprocess.run(
+        proc.run(
             [
                 "npx",
                 "--yes",
@@ -111,11 +111,9 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
                 "-a",
                 app_spec,
                 "-o",
-                output_path,
+                output,
             ],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            bad_return_code_error_message="npx failed, please check your npm",
         )
         logger.info(
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output_path}"
@@ -123,7 +121,7 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
     elif language.lower() == "python":
         generate_clients(app_spec=pathlib.Path(app_spec), output=pathlib.Path(output))
 
-        # algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
-        # logger.info(
-        #     f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
-        # )
+        algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
+        logger.info(
+            f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
+        )
