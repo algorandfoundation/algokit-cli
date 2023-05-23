@@ -4,8 +4,17 @@ import subprocess
 
 import algokit_client_generator
 import click
+import json
+from re import sub
 
 logger = logging.getLogger(__name__)
+
+
+def snake_case(s: str) -> str:
+  return '_'.join(
+    sub('([A-Z][a-z]+)', r' \1',
+    sub('([A-Z]+)', r' \1',
+    s.replace('-', ' '))).split()).lower()
 
 
 def check_node_installed() -> None:
@@ -17,6 +26,25 @@ def check_node_installed() -> None:
         ) from e
 
 
+def walk_dir(app_spec: pathlib.Path, output: pathlib.Path) -> None:
+    for child in app_spec.iterdir():
+        if child.is_dir():
+            walk_dir(child, output)
+        elif child.name.lower() == "application.json":
+            output_replaced = str(output).replace("%parent_dir%", snake_case(child.parent.name))
+
+            if str(output).find("%name%") > 0:
+                application_file = open(str(child))
+                application_json = json.load(application_file)
+                output_replaced = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
+
+            logger.info(
+                f"Generating Python client code for application specified in {child} and writing to {output_replaced}"
+            )
+            algokit_client_generator.generate_client(child, pathlib.Path(output_replaced))
+
+
+
 @click.group("generate", short_help="Generate code for an AlgoKit application.")
 def generate_group() -> None:
     pass
@@ -24,12 +52,12 @@ def generate_group() -> None:
 
 @generate_group.command("client")
 @click.option(
-    "app_spec",
-    "--appspec",
-    "-a",
-    type=click.Path(exists=True, dir_okay=False, resolve_path=True),
-    default="./application.json",
-    help="Path to the application specification file",
+    'app_spec',
+    '--appspec',
+    '-a',
+    type=click.Path(exists=True, dir_okay=True, resolve_path=True),
+    default='./application.json',
+    help='Path to the application specification file'
 )
 @click.option(
     "output",
@@ -82,7 +110,9 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output_path}"
         )
     elif language.lower() == "python":
-        algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
-        logger.info(
-            f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
-        )
+        walk_dir(app_spec=pathlib.Path(app_spec), output=pathlib.Path(output))
+
+        # algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
+        # logger.info(
+        #     f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
+        # )
