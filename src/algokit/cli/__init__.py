@@ -5,10 +5,10 @@ from algokit.cli.completions import completions_group
 from algokit.cli.config import config_group
 from algokit.cli.doctor import doctor_command
 from algokit.cli.explore import explore_command
+from algokit.cli.generate import generate_group
 from algokit.cli.goal import goal_command
 from algokit.cli.init import init_command
 from algokit.cli.localnet import localnet_group
-from algokit.cli.generate import generate_group
 from algokit.core.conf import PACKAGE_NAME
 from algokit.core.log_handlers import color_option, verbose_option
 from algokit.core.version_prompt import do_version_prompt, skip_version_check_option

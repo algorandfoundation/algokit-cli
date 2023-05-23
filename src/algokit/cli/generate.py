@@ -1,68 +1,88 @@
-import os
-import subprocess
 import logging
-import click
-import algokit_client_generator
 import pathlib
+import subprocess
+
+import algokit_client_generator
+import click
 
 logger = logging.getLogger(__name__)
 
 
-def check_node_installed():
+def check_node_installed() -> None:
     try:
         subprocess.run(["node", "--version"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
         raise click.ClickException(
-            "The TypeScript generator requires Node.js and npx to be installed. Please install Node.js to continue.")
+            "The TypeScript generator requires Node.js and npx to be installed. Please install Node.js to continue."
+        ) from e
 
 
 @click.group("generate", short_help="Generate code for an AlgoKit application.")
-def generate_group():
+def generate_group() -> None:
     pass
 
 
 @generate_group.command("client")
 @click.option(
-    'app_spec',
-    '--appspec',
-    '-a',
+    "app_spec",
+    "--appspec",
+    "-a",
     type=click.Path(exists=True, dir_okay=False, resolve_path=True),
-    default='./application.json',
-    help='Path to the application specification file'
+    default="./application.json",
+    help="Path to the application specification file",
 )
 @click.option(
-    'output',
-    '--output',
-    '-o',
+    "output",
+    "--output",
+    "-o",
     type=click.Path(exists=False, dir_okay=False, resolve_path=True),
-    default='./client_generated.py',
-    help='Path to the output file'
+    default="./client_generated.py",
+    help="Path to the output file",
 )
 @click.option(
-    '--language',
-    help='Programming language of the generated client code'
+    "--language",
+    default=None,
+    type=click.Choice(["python", "typescript"]),
+    help="Programming language of the generated client code",
 )
-def generate_client(app_spec: str, output: str, language: str):
+def generate_client(app_spec: str, output: str, language: str | None) -> None:
     """
     Generate a client.
     """
+    output_path = pathlib.Path(output)
     if language is None:
-        _, extension = os.path.splitext(output)
-        if extension == '.ts':
-            language = 'typescript'
-        elif extension == '.py':
-            language = 'python'
+        extension = output_path.suffix
+        if extension == ".ts":
+            language = "typescript"
+        elif extension == ".py":
+            language = "python"
         else:
-            raise click.ClickException(f"Unsupported file extension: {extension}."
-                                       f"Please use '.py' for Python or .ts' for TypeScript.")
+            raise click.ClickException(
+                f"Unsupported file extension: {extension}. Please use '.py' for Python or .ts' for TypeScript."
+            )
 
-    if language.lower() == 'typescript':
+    if language.lower() == "typescript":
         check_node_installed()
-        subprocess.run(["npx", "--yes", "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1", "generate", "-a",
-                        app_spec, "-o", output], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        logger.info(f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}")
-    elif language.lower() == 'python':
-        algokit_client_generator.generate_client(pathlib.Path(app_spec), pathlib.Path(output))
-        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
-    else:
-        raise click.ClickException(f"Unsupported language: {language}. Please select 'python' or 'typescript'.")
+        subprocess.run(
+            [
+                "npx",
+                "--yes",
+                "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
+                "generate",
+                "-a",
+                app_spec,
+                "-o",
+                output_path,
+            ],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        logger.info(
+            f"Generating TypeScript client code for application specified in {app_spec} and writing to {output_path}"
+        )
+    elif language.lower() == "python":
+        algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
+        logger.info(
+            f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
+        )
