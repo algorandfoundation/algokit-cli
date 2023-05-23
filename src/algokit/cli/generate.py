@@ -1,3 +1,4 @@
+import os
 import subprocess
 import logging
 import click
@@ -39,16 +40,29 @@ def generate_group():
 )
 @click.option(
     '--language',
-    default='python',
     help='Programming language of the generated client code'
 )
 def generate_client(app_spec: str, output: str, language: str):
     """
     Generate a client.
     """
-    if language == 'typescript':
+    if language is None:
+        _, extension = os.path.splitext(output)
+        if extension == '.ts':
+            language = 'typescript'
+        elif extension == '.py':
+            language = 'python'
+        else:
+            raise click.ClickException(f"Unsupported file extension: {extension}."
+                                       f"Please use '.py' for Python or .ts' for TypeScript.")
+
+    if language.lower() == 'typescript':
         check_node_installed()
-
-    logger.info(f"Generating {language} client code for application specified in {app_spec} and writing to {output}")
-
-    algokit_client_generator.generate_client(pathlib.Path(app_spec), pathlib.Path(output))
+        subprocess.run(["npx", "--yes", "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1", "generate", "-a",
+                        app_spec, "-o", output], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        logger.info(f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}")
+    elif language.lower() == 'python':
+        algokit_client_generator.generate_client(pathlib.Path(app_spec), pathlib.Path(output))
+        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
+    else:
+        raise click.ClickException(f"Unsupported language: {language}. Please select 'python' or 'typescript'.")
