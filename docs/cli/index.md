@@ -29,13 +29,19 @@
   - [explore](#explore)
     - [Arguments](#arguments-1)
     - [NETWORK](#network)
-  - [goal](#goal)
+  - [generate](#generate)
+    - [client](#client)
     - [Options](#options-4)
+    - [-a, --appspec ](#-a---appspec-)
+    - [-o, --output ](#-o---output-)
+    - [--language ](#--language-)
+  - [goal](#goal)
+    - [Options](#options-5)
     - [--console](#--console)
     - [Arguments](#arguments-2)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-5)
+    - [Options](#options-6)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -50,11 +56,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-6)
+    - [Options](#options-7)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-7)
+    - [Options](#options-8)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -236,6 +242,42 @@ algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 
 ### NETWORK
 Optional argument
+
+## generate
+
+Generate code for an AlgoKit application.
+
+```shell
+algokit generate [OPTIONS] COMMAND [ARGS]...
+```
+
+### client
+
+Generate a client.
+
+```shell
+algokit generate client [OPTIONS]
+```
+
+### Options
+
+
+### -a, --appspec <app_spec>
+Path to the application specification file
+
+
+### -o, --output <output>
+Path to the output file
+
+
+### --language <language>
+Programming language of the generated client code
+
+
+* **Options**
+
+    python | typescript
+
 
 ## goal
 
