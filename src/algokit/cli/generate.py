@@ -89,6 +89,7 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
     Generate a client.
     """
     output_path = pathlib.Path(output)
+    app_spec_path = pathlib.Path(app_spec)
     if language is None:
         extension = output_path.suffix
         if extension == ".ts":
@@ -116,12 +117,13 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
             bad_return_code_error_message="npx failed, please check your npm",
         )
         logger.info(
-            f"Generating TypeScript client code for application specified in {app_spec} and writing to {output_path}"
+            f"Generating TypeScript client code for application specified in "
+            f"{app_spec_path} and writing to {output_path}"
         )
     elif language.lower() == "python":
-        generate_clients(app_spec=pathlib.Path(app_spec), output=pathlib.Path(output))
+        generate_clients(app_spec=app_spec_path, output=output_path)
 
-        algokit_client_generator.generate_client(pathlib.Path(app_spec), output_path)
+        algokit_client_generator.generate_client(app_spec_path, output_path)
         logger.info(
-            f"Generating Python client code for application specified in {app_spec} and writing to {output_path}"
+            f"Generating Python client code for application specified in {app_spec_path} and writing to {output_path}"
         )
