@@ -253,7 +253,7 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 
 ### client
 
-Generate a client.
+typed ApplicationClient from and ARC-32 application.json
 
 ```shell
 algokit generate client [OPTIONS]
@@ -263,7 +263,7 @@ algokit generate client [OPTIONS]
 
 
 ### -a, --appspec <app_spec>
-Path to the application specification file
+Path to an application specification file or a directory to recursively search for application.json
 
 
 ### -o, --output <output>
