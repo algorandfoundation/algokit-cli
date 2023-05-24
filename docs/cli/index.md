@@ -245,7 +245,7 @@ Optional argument
 
 ## generate
 
-Generate code for an AlgoKit application.
+Generate code for an Algorand project.
 
 ```shell
 algokit generate [OPTIONS] COMMAND [ARGS]...
@@ -253,7 +253,7 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 
 ### client
 
-typed ApplicationClient from and ARC-32 application.json
+Create a typed ApplicationClient from an ARC-32 application.json
 
 ```shell
 algokit generate client [OPTIONS]
@@ -267,7 +267,7 @@ Path to an application specification file or a directory to recursively search f
 
 
 ### -o, --output <output>
-Path to the output file
+Path to the output file. The following tokens can be used to substitute into the output path: %name%, %parent_dir%
 
 
 ### --language <language>

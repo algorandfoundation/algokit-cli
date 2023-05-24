@@ -1,7 +1,9 @@
 Usage: algokit generate [OPTIONS] COMMAND [ARGS]...
 
+  Generate code for an Algorand project.
+
 Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  client  typed ApplicationClient from and ARC-32 application.json
+  client  Create a typed ApplicationClient from an ARC-32 application.json

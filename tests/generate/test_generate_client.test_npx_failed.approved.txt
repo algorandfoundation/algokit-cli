@@ -1,4 +1,4 @@
 DEBUG: Running 'npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o {current_working_directory}/client.ts' in '{current_working_directory}'
 DEBUG: npx: STDOUT
 DEBUG: npx: STDERR
-Error: Failed to run n p x for {current_working_directory}/application.json.
+Error: Failed to run npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o {current_working_directory}/client.ts for {current_working_directory}/application.json.

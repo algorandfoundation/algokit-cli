@@ -29,19 +29,20 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
 def generate_client_by_language(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
     if language.lower() == "typescript":
         is_windows = platform.system() == "Windows"
-        cmd = "npx" if not is_windows else "npx.cmd"
+        npx = "npx" if not is_windows else "npx.cmd"
+        cmd = [
+            npx,
+            "--yes",
+            "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
+            "generate",
+            "-a",
+            str(app_spec),
+            "-o",
+            str(output),
+        ]
         try:
             proc.run(
-                [
-                    cmd,
-                    "--yes",
-                    "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
-                    "generate",
-                    "-a",
-                    str(app_spec),
-                    "-o",
-                    str(output),
-                ],
+                cmd,
                 bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}.",
             )
         except OSError as e:
@@ -67,9 +68,9 @@ def generate_recursive_clients(app_spec: pathlib.Path, output: pathlib.Path, lan
         generate_client_by_language(app_spec=app_spec, output=formatted_output, language=language)
 
 
-@click.group("generate", short_help="Generate code for an AlgoKit application.")
+@click.group("generate")
 def generate_group() -> None:
-    pass
+    """Generate code for an Algorand project."""
 
 
 @generate_group.command("client")
@@ -87,7 +88,8 @@ def generate_group() -> None:
     "-o",
     type=click.Path(exists=False, dir_okay=False, resolve_path=True),
     default="./client_generated.py",
-    help="Path to the output file. The following tokens can be used to substitute into the output path: %name%, %parent_dir% ",
+    help="Path to the output file. The following tokens can be used to substitute into the output path:"
+    " %name%, %parent_dir% ",
 )
 @click.option(
     "--language",
@@ -97,7 +99,7 @@ def generate_group() -> None:
 )
 def generate_client(app_spec: str, output: str, language: str | None) -> None:
     """
-    typed ApplicationClient from and ARC-32 application.json
+    Create a typed ApplicationClient from an ARC-32 application.json
     """
     output_path = pathlib.Path(output)
     app_spec_path = pathlib.Path(app_spec)
