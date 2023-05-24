@@ -123,7 +123,3 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
     elif language.lower() == "python":
         generate_clients(app_spec=app_spec_path, output=output_path)
 
-        algokit_client_generator.generate_client(app_spec_path, output_path)
-        logger.info(
-            f"Generating Python client code for application specified in {app_spec_path} and writing to {output_path}"
-        )
