@@ -68,7 +68,7 @@ def generate_group() -> None:
     "-a",
     type=click.Path(exists=True, dir_okay=True, resolve_path=True),
     default="./application.json",
-    help="Path to the application specification file",
+    help="Path to an application specification file or a directory to recursively search for application.json",
 )
 @click.option(
     "output",
@@ -86,7 +86,7 @@ def generate_group() -> None:
 )
 def generate_client(app_spec: str, output: str, language: str | None) -> None:
     """
-    Generate a client.
+    typed ApplicationClient from and ARC-32 application.json
     """
     output_path = pathlib.Path(output)
     app_spec_path = pathlib.Path(app_spec)
@@ -98,7 +98,8 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
             language = "python"
         else:
             raise click.ClickException(
-                f"Unsupported file extension: {extension}. Please use '.py' for Python or .ts' for TypeScript."
+                "Could not determine language from file extension, Please use the --language option to specify a "
+                "target language"
             )
 
     if language.lower() == "typescript":
