@@ -4,4 +4,4 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  client  Generate a client.
+  client  typed ApplicationClient from and ARC-32 application.json

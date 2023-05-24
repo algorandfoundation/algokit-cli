@@ -26,43 +26,31 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
     return pathlib.Path(client_name)
 
 
-def check_node_installed() -> None:
-    try:
-        proc.run(
-            ["npx", "--version"], bad_return_code_error_message="npx --version failed, please check your npx install"
-        )
-    except OSError as e:
-        raise click.ClickException(
-            "The TypeScript generator requires Node.js and npx to be installed. Please install Node.js to continue."
-        ) from e
-
-def generate_client_by_language (app_spec: pathlib.Path, output: pathlib.Path, language:str) -> None:
+def generate_client_by_language(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
     if language.lower() == "typescript":
-        check_node_installed()
         is_windows = platform.system() == "Windows"
         cmd = "npx" if not is_windows else "npx.cmd"
-        proc.run(
-            [
-                cmd,
-                "--yes",
-                "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
-                "generate",
-                "-a",
-                str(app_spec),
-                "-o",
-                str(output),
-            ],
-            bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}. Is npx installed and available on PATH?",
-        )
+        try:
+            proc.run(
+                [
+                    cmd,
+                    "--yes",
+                    "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
+                    "generate",
+                    "-a",
+                    str(app_spec),
+                    "-o",
+                    str(output),
+                ],
+                bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}.",
+            )
+        except OSError as e:
+            raise click.ClickException("Typescript generator requires Node.js and npx to be installed.") from e
         logger.info(
-            f"Generating TypeScript client code for application specified in "
-            f"{app_spec} and writing to {output}"
+            f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}"
         )
     elif language.lower() == "python":
-        logger.info(
-            f"Generating Python client code for application specified in "
-            f"{app_spec} and writing to {output}"
-        )
+        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
         algokit_client_generator.generate_client(app_spec, pathlib.Path(output))
 
 
