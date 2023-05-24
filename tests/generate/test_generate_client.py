@@ -37,7 +37,7 @@ def test_generate_client_typescript(application_json: pathlib.Path) -> None:
     result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(result.output.replace("npx.cmd", "npx"))
     assert (application_json.parent / "client.ts").exists()
     assert (application_json.parent / "client.ts").read_text()
 
@@ -54,7 +54,7 @@ def test_npx_missing(proc_mock: ProcMock, application_json: pathlib.Path) -> Non
     result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(result.output.replace("npx.cmd", "npx"))
 
 
 def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
@@ -69,4 +69,4 @@ def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None
     result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(result.output.replace("npx.cmd", "npx"))
