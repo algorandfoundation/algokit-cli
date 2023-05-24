@@ -87,7 +87,7 @@ def generate_group() -> None:
     "-o",
     type=click.Path(exists=False, dir_okay=False, resolve_path=True),
     default="./client_generated.py",
-    help="Path to the output file",
+    help="Path to the output file. The following tokens can be used to substitute into the output path: %name%, %parent_dir% ",
 )
 @click.option(
     "--language",
