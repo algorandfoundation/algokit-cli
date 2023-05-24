@@ -28,7 +28,7 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
 def check_node_installed() -> None:
     try:
         proc.run(
-            ["node", "--version"], bad_return_code_error_message="node --version failed, please check your node install"
+            ["npx", "--version"], bad_return_code_error_message="npx --version failed, please check your npx install"
         )
     except OSError as e:
         raise click.ClickException(
@@ -124,6 +124,3 @@ def generate_client(app_spec: str, output: str, language: str | None) -> None:
         generate_clients(app_spec=app_spec_path, output=output_path)
 
         algokit_client_generator.generate_client(app_spec_path, output_path)
-        logger.info(
-            f"Generating Python client code for application specified in {app_spec_path} and writing to {output_path}"
-        )
