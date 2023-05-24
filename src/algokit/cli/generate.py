@@ -19,7 +19,7 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
     client_name = str(output).replace("%parent_dir%", snake_case(application_file.parent.name))
 
     if str(output).find("%name%") > 0:
-        application_json = json.load(pathlib.Path.open(application_file))
+        application_json = json.loads(application_file.read_text())
         client_name = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
 
     return client_name
