@@ -1,4 +1,2 @@
-Generating Python client code for application specified in {current_working_directory}/application.json and writing to {current_working_directory}/client.py
+Generating Python client code for application specified in /private/var/folders/gp/5nmg6s7j40v50p92vt1q5m0c0000gn/T/pytest-of-negarabbasi/pytest-21/cwd0/application.json and writing to {current_working_directory}/client.py
 Output typed client for HelloWorldApp to {current_working_directory}/client.py
-Output typed client for HelloWorldApp to {current_working_directory}/client.py
-Generating Python client code for application specified in {current_working_directory}/application.json and writing to {current_working_directory}/client.py

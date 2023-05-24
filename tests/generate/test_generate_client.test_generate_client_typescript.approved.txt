@@ -1,8 +1,8 @@
-DEBUG: Running 'node --version' in '{current_working_directory}'
-DEBUG: node: v20.2.0
-DEBUG: Running 'npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o {current_working_directory}/client.ts' in '{current_working_directory}'
-DEBUG: npx: Reading application.json file from path {current_working_directory}/application.json
+DEBUG: Running 'npx --version' in '{current_working_directory}'
+DEBUG: npx: 9.6.6
+DEBUG: Running 'npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a /private/var/folders/gp/5nmg6s7j40v50p92vt1q5m0c0000gn/T/pytest-of-negarabbasi/pytest-22/cwd0/application.json -o {current_working_directory}/client.ts' in '{current_working_directory}'
+DEBUG: npx: Reading application.json file from path /private/var/folders/gp/5nmg6s7j40v50p92vt1q5m0c0000gn/T/pytest-of-negarabbasi/pytest-22/cwd0/application.json
 DEBUG: npx: Generating TS client for HelloWorldApp
 DEBUG: npx: Writing TS client to {current_working_directory}/client.ts
 DEBUG: npx: Operation completed successfully
-Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to {current_working_directory}/client.ts
+Generating TypeScript client code for application specified in /private/var/folders/gp/5nmg6s7j40v50p92vt1q5m0c0000gn/T/pytest-of-negarabbasi/pytest-22/cwd0/application.json and writing to {current_working_directory}/client.ts
