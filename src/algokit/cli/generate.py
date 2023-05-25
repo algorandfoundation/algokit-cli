@@ -30,7 +30,11 @@ def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> 
 
 
 def generate_client_by_language(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
-    if language.lower() == "typescript":
+    if language.lower() == "python":
+        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
+        algokit_client_generator.generate_client(app_spec, pathlib.Path(output))
+
+    elif language.lower() == "typescript":
         is_windows = platform.system() == "Windows"
         npx = "npx" if not is_windows else "npx.cmd"
         cmd = [
@@ -53,9 +57,6 @@ def generate_client_by_language(app_spec: pathlib.Path, output: pathlib.Path, la
         logger.info(
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}"
         )
-    elif language.lower() == "python":
-        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
-        algokit_client_generator.generate_client(app_spec, pathlib.Path(output))
 
 
 def generate_recursive_clients(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
