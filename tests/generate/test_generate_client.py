@@ -3,7 +3,7 @@ import shutil
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.generate import format_client_name, snake_case
+from algokit.cli.generate import TYPESCRIPT_NPX_PACKAGE, format_client_name, snake_case
 from approvaltests.namer import NamerFactory
 
 from tests.utils.approvals import verify
@@ -65,11 +65,11 @@ def test_generate_client_typescript(
 
 def test_npx_missing(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
     proc_mock.should_fail_on(
-        f"npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
+        f"npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} "
         f"-o {application_json.parent / 'client.ts'}"
     )
     proc_mock.should_fail_on(
-        f"npx.cmd --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
+        f"npx.cmd --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} "
         f"-o {application_json.parent / 'client.ts'}"
     )
     result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
@@ -80,11 +80,11 @@ def test_npx_missing(proc_mock: ProcMock, application_json: pathlib.Path) -> Non
 
 def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
     proc_mock.should_bad_exit_on(
-        f"npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
+        f"npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} "
         f"-o {application_json.parent / 'client.ts'}"
     )
     proc_mock.should_bad_exit_on(
-        f"npx.cmd --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
+        f"npx.cmd --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} "
         f"-o {application_json.parent / 'client.ts'}"
     )
     result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
@@ -103,12 +103,12 @@ def test_snake_case() -> None:
 
 
 def test_format_client_name(application_json: pathlib.Path) -> None:
-    output = pathlib.Path("./output/%name%.txt")
+    output = "./output/%name%.txt"
     result = format_client_name(output=output, application_file=application_json)
     result_str = str(result).replace("\\", "/")
     assert result_str == "output/hello_world_app.txt"
 
-    output = pathlib.Path("./output/%parent_dir%.txt")
+    output = "./output/%parent_dir%.txt"
     result = format_client_name(output=output, application_file=application_json)
     result_str = str(result).replace("\\", "/")
     assert result_str == f"output/{application_json.parent.name}.txt"

@@ -262,7 +262,7 @@ algokit generate client [OPTIONS]
 ### Options
 
 
-### -a, --appspec <app_spec>
+### -a, --appspec <app_spec_or_dir>
 Path to an application specification file or a directory to recursively search for application.json
 
 

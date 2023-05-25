@@ -1,2 +1,3 @@
+Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to {current_working_directory}/client.ts
 DEBUG: Running 'npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o {current_working_directory}/client.ts' in '{current_working_directory}'
 Error: Typescript generator requires Node.js and npx to be installed.

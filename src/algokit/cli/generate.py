@@ -1,8 +1,10 @@
 import json
 import logging
-import pathlib
 import platform
 import re
+from collections.abc import Callable
+from pathlib import Path
+from typing import Literal
 
 import algokit_client_generator
 import click
@@ -10,6 +12,10 @@ import click
 from algokit.core import proc
 
 logger = logging.getLogger(__name__)
+
+TypedClientGenerator = Callable[[Path, Path], None]
+AllowedLanguages = Literal["python", "typescript"]
+TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1"
 
 
 def snake_case(s: str) -> str:
@@ -19,57 +25,52 @@ def snake_case(s: str) -> str:
     return re.sub(r"[-\s]", "_", s).lower()
 
 
-def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> pathlib.Path:
-    client_name = str(output).replace("%parent_dir%", snake_case(application_file.parent.name))
+def format_client_name(output: str, application_file: Path) -> Path:
+    client_name = output.replace("%parent_dir%", snake_case(application_file.parent.name))
 
-    if "%name%" in str(output):
+    if "%name%" in output:
         application_json = json.loads(application_file.read_text())
-        client_name = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
+        client_name = output.replace("%name%", snake_case(application_json["contract"]["name"]))
 
-    return pathlib.Path(client_name)
+    return Path(client_name)
 
 
-def generate_client_by_language(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
-    if language.lower() == "python":
-        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
-        algokit_client_generator.generate_client(app_spec, pathlib.Path(output))
+def _generate_python_client(app_spec: Path, output: Path) -> None:
+    logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
+    algokit_client_generator.generate_client(app_spec, Path(output))
 
-    elif language.lower() == "typescript":
-        is_windows = platform.system() == "Windows"
-        npx = "npx" if not is_windows else "npx.cmd"
-        cmd = [
-            npx,
-            "--yes",
-            "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1",
-            "generate",
-            "-a",
-            str(app_spec),
-            "-o",
-            str(output),
-        ]
-        try:
-            proc.run(
-                cmd,
-                bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}.",
-            )
-        except OSError as e:
-            raise click.ClickException("Typescript generator requires Node.js and npx to be installed.") from e
-        logger.info(
-            f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}"
+
+def _generate_typescript_client(app_spec: Path, output: Path) -> None:
+    is_windows = platform.system() == "Windows"
+    npx = "npx.cmd" if is_windows else "npx"
+    cmd = [
+        npx,
+        "--yes",
+        TYPESCRIPT_NPX_PACKAGE,
+        "generate",
+        "-a",
+        str(app_spec),
+        "-o",
+        str(output),
+    ]
+    logger.info(f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}")
+    try:
+        proc.run(
+            cmd,
+            bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}.",
         )
+    except OSError as e:
+        raise click.ClickException("Typescript generator requires Node.js and npx to be installed.") from e
 
 
-def generate_recursive_clients(app_spec: pathlib.Path, output: pathlib.Path, language: str) -> None:
-    if app_spec.is_dir():
-        for child in app_spec.iterdir():
-            if child.is_dir():
-                generate_recursive_clients(app_spec=child, output=output, language=language)
-            elif child.name.lower() == "application.json":
-                formatted_output = format_client_name(output=output, application_file=child)
-                generate_client_by_language(app_spec=child, output=formatted_output, language=language)
-    else:
-        formatted_output = format_client_name(output=output, application_file=app_spec)
-        generate_client_by_language(app_spec=app_spec, output=formatted_output, language=language)
+EXTENSION_TO_LANGUAGE: dict[str, AllowedLanguages] = {
+    ".py": "python",
+    ".ts": "typescript",
+}
+LANGUAGE_TO_GENERATOR: dict[AllowedLanguages, TypedClientGenerator] = {
+    "python": _generate_python_client,
+    "typescript": _generate_typescript_client,
+}
 
 
 @click.group("generate")
@@ -79,7 +80,7 @@ def generate_group() -> None:
 
 @generate_group.command("client")
 @click.option(
-    "app_spec",
+    "app_spec_or_dir",
     "--appspec",
     "-a",
     type=click.Path(exists=True, dir_okay=True, resolve_path=True),
@@ -98,25 +99,23 @@ def generate_group() -> None:
 @click.option(
     "--language",
     default=None,
-    type=click.Choice(["python", "typescript"]),
+    type=click.Choice(list(LANGUAGE_TO_GENERATOR.keys())),
     help="Programming language of the generated client code",
 )
-def generate_client(app_spec: str, output: str, language: str | None) -> None:
+def generate_client(app_spec_or_dir: str, output: str, language: AllowedLanguages | None) -> None:
     """
     Create a typed ApplicationClient from an ARC-32 application.json
     """
-    output_path = pathlib.Path(output)
-    app_spec_path = pathlib.Path(app_spec)
+    app_spec_path = Path(app_spec_or_dir)
     if language is None:
-        extension = output_path.suffix
-        if extension == ".ts":
-            language = "typescript"
-        elif extension == ".py":
-            language = "python"
-        else:
+        language = EXTENSION_TO_LANGUAGE.get(Path(output).suffix)
+        if language is None:
             raise click.ClickException(
                 "Could not determine language from file extension, Please use the --language option to specify a "
                 "target language"
             )
 
-    generate_recursive_clients(app_spec=app_spec_path, output=output_path, language=language)
+    app_specs = list(app_spec_path.rglob("application.json")) if app_spec_path.is_dir() else [app_spec_path]
+    for app_spec in app_specs:
+        formatted_output = format_client_name(output=output, application_file=app_spec)
+        LANGUAGE_TO_GENERATOR[language](app_spec, formatted_output)
