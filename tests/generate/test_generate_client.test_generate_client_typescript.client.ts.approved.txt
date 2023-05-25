@@ -1,0 +1,6 @@
+DEBUG: Running 'npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o {current_working_directory}/client.ts' in '{current_working_directory}'
+DEBUG: npx: Reading application.json file from path {current_working_directory}/application.json
+DEBUG: npx: Generating TS client for HelloWorldApp
+DEBUG: npx: Writing TS client to {current_working_directory}/client.ts
+DEBUG: npx: Operation completed successfully
+Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to {current_working_directory}/client.ts
