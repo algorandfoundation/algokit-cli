@@ -22,7 +22,7 @@ def snake_case(s: str) -> str:
 def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> pathlib.Path:
     client_name = str(output).replace("%parent_dir%", snake_case(application_file.parent.name))
 
-    if str(output).find("%name%") > 0:
+    if "%name%" in str(output):
         application_json = json.loads(application_file.read_text())
         client_name = str(output).replace("%name%", snake_case(application_json["contract"]["name"]))
 
