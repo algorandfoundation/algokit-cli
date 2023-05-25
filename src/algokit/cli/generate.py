@@ -2,7 +2,7 @@ import json
 import logging
 import pathlib
 import platform
-from re import sub
+import re
 
 import algokit_client_generator
 import click
@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 def snake_case(s: str) -> str:
-    return "_".join(sub("([A-Z][a-z]+)", r" \1", sub("([A-Z]+)", r" \1", s.replace("-", " "))).split()).lower()
+    s = s.replace("-", " ")
+    s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
+    s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
+    return re.sub(r"[-\s]", "_", s).lower()
 
 
 def format_client_name(output: pathlib.Path, application_file: pathlib.Path) -> pathlib.Path:
