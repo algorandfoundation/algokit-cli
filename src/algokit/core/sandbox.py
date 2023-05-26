@@ -43,6 +43,10 @@ class ComposeSandbox:
             compose_content = self.compose_file_path.read_text()
             config_content = self.algod_config_file_path.read_text()
         except FileNotFoundError:
+            # treat as out of date if compose file exists but algod config doesn't
+            # so that existing setups aren't suddenly reset
+            if self.compose_file_path.exists():
+                return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
             if compose_content == self._latest_yaml and config_content == self._latest_config_json:
