@@ -1,76 +1,11 @@
-import json
 import logging
-import platform
-import re
-from collections.abc import Callable
 from pathlib import Path
-from typing import Literal
 
-import algokit_client_generator
 import click
 
-from algokit.core import proc
+from algokit.core.typed_client_generation import ClientGenerator
 
 logger = logging.getLogger(__name__)
-
-TypedClientGenerator = Callable[[Path, Path], None]
-AllowedLanguages = Literal["python", "typescript"]
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@v2.0.0-beta.1"
-
-
-def snake_case(s: str) -> str:
-    s = s.replace("-", " ")
-    s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
-    s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
-    return re.sub(r"[-\s]", "_", s).lower()
-
-
-def format_client_name(output: str, application_file: Path) -> Path:
-    client_name = output.replace("%parent_dir%", snake_case(application_file.parent.name))
-
-    if "%name%" in output:
-        application_json = json.loads(application_file.read_text())
-        client_name = output.replace("%name%", snake_case(application_json["contract"]["name"]))
-
-    return Path(client_name)
-
-
-def _generate_python_client(app_spec: Path, output: Path) -> None:
-    logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
-    algokit_client_generator.generate_client(app_spec, Path(output))
-
-
-def _generate_typescript_client(app_spec: Path, output: Path) -> None:
-    is_windows = platform.system() == "Windows"
-    npx = "npx.cmd" if is_windows else "npx"
-    cmd = [
-        npx,
-        "--yes",
-        TYPESCRIPT_NPX_PACKAGE,
-        "generate",
-        "-a",
-        str(app_spec),
-        "-o",
-        str(output),
-    ]
-    logger.info(f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}")
-    try:
-        proc.run(
-            cmd,
-            bad_return_code_error_message=f"Failed to run {' '.join(cmd)} for {app_spec}.",
-        )
-    except OSError as e:
-        raise click.ClickException("Typescript generator requires Node.js and npx to be installed.") from e
-
-
-EXTENSION_TO_LANGUAGE: dict[str, AllowedLanguages] = {
-    ".py": "python",
-    ".ts": "typescript",
-}
-LANGUAGE_TO_GENERATOR: dict[AllowedLanguages, TypedClientGenerator] = {
-    "python": _generate_python_client,
-    "typescript": _generate_typescript_client,
-}
 
 
 @click.group("generate")
@@ -79,43 +14,56 @@ def generate_group() -> None:
 
 
 @generate_group.command("client")
-@click.option(
-    "app_spec_or_dir",
-    "--appspec",
-    "-a",
-    type=click.Path(exists=True, dir_okay=True, resolve_path=True),
-    default="./application.json",
-    help="Path to an application specification file or a directory to recursively search for application.json",
+@click.argument(
+    "app_spec_path_or_dir",
+    type=click.Path(exists=True, dir_okay=True, resolve_path=True, path_type=Path),
 )
 @click.option(
-    "output",
+    "output_path_pattern",
     "--output",
     "-o",
-    type=click.Path(exists=False, dir_okay=False, resolve_path=True),
-    default="./client_generated.py",
+    type=click.Path(exists=False),
+    default=None,
     help="Path to the output file. The following tokens can be used to substitute into the output path:"
-    " %name%, %parent_dir% ",
+    " {contract_name}, {app_spec_dir}",
 )
 @click.option(
     "--language",
+    "-l",
     default=None,
-    type=click.Choice(list(LANGUAGE_TO_GENERATOR.keys())),
+    type=click.Choice(ClientGenerator.languages()),
     help="Programming language of the generated client code",
 )
-def generate_client(app_spec_or_dir: str, output: str, language: AllowedLanguages | None) -> None:
+def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None) -> None:
     """
     Create a typed ApplicationClient from an ARC-32 application.json
+
+    Supply the path to an application specification file or a directory to recursively search
+    for "application.json" files
     """
-    app_spec_path = Path(app_spec_or_dir)
-    if language is None:
-        language = EXTENSION_TO_LANGUAGE.get(Path(output).suffix)
-        if language is None:
+    if language is not None:
+        generator = ClientGenerator.create_for_language(language)
+    elif output_path_pattern is not None:
+        extension = Path(output_path_pattern).suffix
+        try:
+            generator = ClientGenerator.create_for_extension(extension)
+        except KeyError as ex:
             raise click.ClickException(
                 "Could not determine language from file extension, Please use the --language option to specify a "
                 "target language"
-            )
+            ) from ex
+    else:
+        raise click.ClickException(
+            "One of --language or --output is required to determine the client langauge to generate"
+        )
 
-    app_specs = list(app_spec_path.rglob("application.json")) if app_spec_path.is_dir() else [app_spec_path]
+    if not app_spec_path_or_dir.is_dir():
+        app_specs = [app_spec_path_or_dir]
+    else:
+        app_specs = list(app_spec_path_or_dir.rglob("application.json"))
+        if not app_specs:
+            raise click.ClickException("No app specs found")
     for app_spec in app_specs:
-        formatted_output = format_client_name(output=output, application_file=app_spec)
-        LANGUAGE_TO_GENERATOR[language](app_spec, formatted_output)
+        output_path = generator.resolve_output_path(app_spec, output_path_pattern)
+        if output_path is not None:
+            generator.generate(app_spec, output_path)
