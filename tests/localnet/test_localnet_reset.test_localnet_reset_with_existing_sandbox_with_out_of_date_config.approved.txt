@@ -22,11 +22,20 @@ name: "algokit_sandbox"
 services:
   algod:
     container_name: algokit_algod
-    image: makerxau/algorand-sandbox-dev:latest
+    image: algorand/algod:latest
     ports:
-      - 4001:4001
-      - 4002:4002
+      - 4001:8080
+      - 4002:7833
       - 9392:9392
+    environment:
+      DEV_MODE: 1
+      START_KMD: 1
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    volumes:
+      - type: bind
+        source: ./algod_config.json
+        target: /etc/algorand/config.json
 
   indexer:
     container_name: algokit_indexer
@@ -36,6 +45,7 @@ services:
     restart: unless-stopped
     environment:
       ALGOD_HOST: algod
+      ALGOD_PORT: 8080
       POSTGRES_HOST: indexer-db
       POSTGRES_PORT: 5432
       POSTGRES_USER: algorand
@@ -48,6 +58,8 @@ services:
   indexer-db:
     container_name: algokit_postgres
     image: postgres:13-alpine
+    ports:
+      - 5443:5432
     user: postgres
     environment:
       POSTGRES_USER: algorand
