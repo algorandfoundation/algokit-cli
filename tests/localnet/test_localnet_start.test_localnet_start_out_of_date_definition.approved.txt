@@ -9,7 +9,8 @@ DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}
 docker: STDOUT
 docker: STDERR
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
-----
-{app_config}/sandbox/docker-compose.yml:
-----
+
+{app_config}/sandbox/docker-compose.yml
+out of date config
+{app_config}/sandbox/algod_config.json
 out of date config

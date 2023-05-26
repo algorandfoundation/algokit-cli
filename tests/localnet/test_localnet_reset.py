@@ -1,5 +1,5 @@
 import pytest
-from algokit.core.sandbox import get_docker_compose_yml
+from algokit.core.sandbox import get_config_json, get_docker_compose_yml
 
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
@@ -26,15 +26,20 @@ def test_localnet_reset_without_existing_sandbox(app_dir_mock: AppDirs) -> None:
 def test_localnet_reset_with_existing_sandbox_with_out_of_date_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text("out of date config")
 
     result = invoke("localnet reset")
 
     assert result.exit_code == 0
     verify(
-        get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
-            "{app_config}/sandbox/docker-compose.yml",
-            (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+        "\n".join(
+            [
+                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                "{app_config}/sandbox/docker-compose.yml",
+                (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+                "{app_config}/sandbox/algod_config.json",
+                (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),
+            ]
         )
     )
 
@@ -43,6 +48,7 @@ def test_localnet_reset_with_existing_sandbox_with_out_of_date_config(app_dir_mo
 def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
 
     result = invoke("localnet reset")
 
@@ -54,6 +60,7 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
 def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_with_pull(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
 
     result = invoke("localnet reset --update")
 

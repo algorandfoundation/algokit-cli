@@ -28,24 +28,31 @@ class ComposeSandbox:
             logger.debug("Sandbox directory does not exist yet; creating it")
             self.directory.mkdir()
         self._latest_yaml = get_docker_compose_yml()
+        self._latest_config_json = get_config_json()
 
     @property
     def compose_file_path(self) -> Path:
         return self.directory / "docker-compose.yml"
 
+    @property
+    def algod_config_file_path(self) -> Path:
+        return self.directory / "algod_config.json"
+
     def compose_file_status(self) -> ComposeFileStatus:
         try:
-            content = self.compose_file_path.read_text()
+            compose_content = self.compose_file_path.read_text()
+            config_content = self.algod_config_file_path.read_text()
         except FileNotFoundError:
             return ComposeFileStatus.MISSING
         else:
-            if content == self._latest_yaml:
+            if compose_content == self._latest_yaml and config_content == self._latest_config_json:
                 return ComposeFileStatus.UP_TO_DATE
             else:
                 return ComposeFileStatus.OUT_OF_DATE
 
     def write_compose_file(self) -> None:
         self.compose_file_path.write_text(self._latest_yaml)
+        self.algod_config_file_path.write_text(self._latest_config_json)
 
     def _run_compose_command(
         self,
@@ -111,6 +118,13 @@ DEFAULT_ALGOD_PORT = 4001
 DEFAULT_INDEXER_PORT = 8980
 
 
+def get_config_json() -> str:
+    return (
+        '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
+        ' "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}"'
+    )
+
+
 def get_docker_compose_yml(
     name: str = "algokit",
     algod_port: int = DEFAULT_ALGOD_PORT,
@@ -124,11 +138,20 @@ name: "{name}_sandbox"
 services:
   algod:
     container_name: {name}_algod
-    image: makerxau/algorand-sandbox-dev:latest
+    image: algorand/algod:latest
     ports:
-      - {algod_port}:4001
-      - {kmd_port}:4002
+      - {algod_port}:8080
+      - {kmd_port}:7833
       - {tealdbg_port}:9392
+    environment:
+      DEV_MODE: 1
+      START_KMD: 1
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    volumes:
+      - type: bind
+        source: ./algod_config.json
+        target: /etc/algorand/config.json
 
   indexer:
     container_name: {name}_indexer
@@ -138,6 +161,7 @@ services:
     restart: unless-stopped
     environment:
       ALGOD_HOST: algod
+      ALGOD_PORT: 8080
       POSTGRES_HOST: indexer-db
       POSTGRES_PORT: 5432
       POSTGRES_USER: algorand
@@ -150,6 +174,8 @@ services:
   indexer-db:
     container_name: {name}_postgres
     image: postgres:13-alpine
+    ports:
+      - 5443:5432
     user: postgres
     environment:
       POSTGRES_USER: algorand
