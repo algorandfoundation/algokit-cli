@@ -119,7 +119,10 @@ DEFAULT_INDEXER_PORT = 8980
 
 
 def get_config_json() -> str:
-    return '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}"'
+    return (
+        '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
+        ' "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}"'
+    )
 
 
 def get_docker_compose_yml(
