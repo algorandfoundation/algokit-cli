@@ -13,9 +13,8 @@ DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}
 docker: STDOUT
 docker: STDERR
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
-----
-{app_config}/sandbox/docker-compose.yml:
-----
+
+{app_config}/sandbox/docker-compose.yml
 version: '3'
 name: "algokit_sandbox"
 
@@ -65,3 +64,6 @@ services:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexer_db
+
+{app_config}/sandbox/algod_config.json
+{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}"
