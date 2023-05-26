@@ -67,6 +67,25 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     )
 
 
+@pytest.mark.usefixtures("proc_mock")
+def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: AppDirs) -> None:
+    (app_dir_mock.app_config_dir / "sandbox").mkdir()
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
+
+    result = invoke("localnet start")
+
+    assert result.exit_code == 0
+    verify(
+        "\n".join(
+            [
+                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                "{app_config}/sandbox/docker-compose.yml",
+                (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+            ]
+        )
+    )
+
+
 @pytest.mark.usefixtures("app_dir_mock")
 def test_localnet_start_without_docker(proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on("docker compose version")

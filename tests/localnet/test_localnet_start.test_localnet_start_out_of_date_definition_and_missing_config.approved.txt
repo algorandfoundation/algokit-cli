@@ -1,0 +1,14 @@
+DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
+DEBUG: docker: {"version": "v2.5.0"}
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+WARNING: Sandbox definition is out of date; please run algokit localnet reset
+Starting AlgoKit LocalNet now...
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
+docker: STDOUT
+docker: STDERR
+Started; execute `algokit explore` to explore LocalNet in a web user interface.
+
+{app_config}/sandbox/docker-compose.yml
+out of date config
