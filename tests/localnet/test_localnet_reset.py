@@ -33,11 +33,13 @@ def test_localnet_reset_with_existing_sandbox_with_out_of_date_config(app_dir_mo
     assert result.exit_code == 0
     verify(
         "\n".join(
-            [result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
-            "{app_config}/sandbox/docker-compose.yml",
-            (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
-            "{app_config}/sandbox/algod_config.json",
-            (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),]
+            [
+                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                "{app_config}/sandbox/docker-compose.yml",
+                (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+                "{app_config}/sandbox/algod_config.json",
+                (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),
+            ]
         )
     )
 

@@ -56,11 +56,13 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     assert result.exit_code == 0
     verify(
         "\n".join(
-            [result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
-            "{app_config}/sandbox/docker-compose.yml",
-            (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
-            "{app_config}/sandbox/algod_config.json",
-            (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),]
+            [
+                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                "{app_config}/sandbox/docker-compose.yml",
+                (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
+                "{app_config}/sandbox/algod_config.json",
+                (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),
+            ]
         )
     )
 
