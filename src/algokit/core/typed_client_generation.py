@@ -61,7 +61,8 @@ class ClientGenerator(abc.ABC):
         )
         output_path = Path(output_resolved)
         if output_path.exists() and not output_path.is_file():
-            raise OSError("TODO")
+            logger.error(f"Could not output to {output_path} as it already exists and is a directory")
+            return None
         return output_path
 
     @abc.abstractmethod

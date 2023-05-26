@@ -101,6 +101,52 @@ def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None
     verify(result.output)
 
 
+def test_generate_client_recursive(
+    tmp_path_factory: TempPathFactory,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    json_file = pathlib.Path(__file__).parent / "application.json"
+
+    dir_paths = [cwd / "dir1", cwd / "dir2", cwd / "dir2" / "sub_dir"]
+    for dir_path in dir_paths:
+        dir_path.mkdir(parents=True, exist_ok=True)
+        shutil.copy(json_file, dir_path / "application.json")
+
+    result = invoke("generate client -o {app_spec_dir}/output.py .", cwd=cwd)
+    assert result.exit_code == 0
+    verify(result.output.replace("\\", "/"))
+
+    assert all((dir_path / "output.py").exists() for dir_path in dir_paths)
+    assert all((dir_path / "output.py").read_text() for dir_path in dir_paths)
+
+
+def test_generate_client_no_app_spec_found(
+    tmp_path_factory: TempPathFactory,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    dir_paths = [cwd / "dir1", cwd / "dir2", cwd / "dir2" / "sub_dir"]
+    for dir_path in dir_paths:
+        dir_path.mkdir(parents=True, exist_ok=True)
+
+    result = invoke("generate client -o output.py .", cwd=cwd)
+    assert result.exit_code == 1
+    verify(result.output.replace("\\", "/"))
+
+
+def test_generate_client_output_path_is_dir(
+    tmp_path_factory: TempPathFactory,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    json_file = pathlib.Path(__file__).parent / "application.json"
+    shutil.copy(json_file, cwd / "application.json")
+    (cwd / "hello_world_app.py").mkdir()
+
+    result = invoke("generate client -o {app_spec_dir}/{contract_name}.py .", cwd=cwd)
+    assert result.exit_code == 0
+    verify(result.output.replace("\\", "/"))
+
+
 def test_snake_case() -> None:
     assert _snake_case("SnakeCase") == "snake_case"
     assert _snake_case("snakeCase") == "snake_case"
@@ -108,7 +154,3 @@ def test_snake_case() -> None:
     assert _snake_case("snake_case") == "snake_case"
     assert _snake_case("SNAKE_CASE") == "snake_case"
     assert _snake_case("Snake_Case") == "snake_case"
-
-
-# def test_format_client_name(application_json: pathlib.Path) -> None:
-#
