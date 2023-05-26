@@ -60,7 +60,7 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
     if not app_spec_path_or_dir.is_dir():
         app_specs = [app_spec_path_or_dir]
     else:
-        app_specs = list(app_spec_path_or_dir.rglob("application.json"))
+        app_specs = sorted(app_spec_path_or_dir.rglob("application.json"))
         if not app_specs:
             raise click.ClickException("No app specs found")
     for app_spec in app_specs:
