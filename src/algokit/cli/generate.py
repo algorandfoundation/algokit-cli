@@ -35,12 +35,10 @@ def generate_group() -> None:
     help="Programming language of the generated client code",
 )
 def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None) -> None:
-    """
-    Create a typed ApplicationClient from an ARC-32 application.json
+    """Create a typed ApplicationClient from an ARC-32 application.json
 
     Supply the path to an application specification file or a directory to recursively search
-    for "application.json" files
-    """
+    for "application.json" files"""
     if language is not None:
         generator = ClientGenerator.create_for_language(language)
     elif output_path_pattern is not None:
