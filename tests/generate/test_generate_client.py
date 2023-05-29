@@ -1,22 +1,50 @@
-import pathlib
 import shutil
+from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.generate import format_client_name, snake_case
+from algokit.core.typed_client_generation import TYPESCRIPT_NPX_PACKAGE, _snake_case
 from approvaltests.namer import NamerFactory
+from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+from tests.utils.which_mock import WhichMock
+
+DirWithAppSpecFactory = Callable[[Path], Path]
 
 
 @pytest.fixture()
-def application_json(tmp_path_factory: TempPathFactory) -> pathlib.Path:
-    cwd = tmp_path_factory.mktemp("cwd")
-    json_file = pathlib.Path(__file__).parent / "application.json"
-    shutil.copy(json_file, cwd / "application.json")
-    return cwd / "application.json"
+def cwd(tmp_path_factory: TempPathFactory) -> Path:
+    return tmp_path_factory.mktemp("cwd")
+
+
+@pytest.fixture()
+def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
+    app_spec_example_path = Path(__file__).parent / "application.json"
+
+    def factory(app_spec_dir: Path) -> Path:
+        app_spec_dir.mkdir(exist_ok=True, parents=True)
+        app_spec_path = app_spec_dir / "application.json"
+        shutil.copy(app_spec_example_path, app_spec_path)
+        return app_spec_path
+
+    return factory
+
+
+@pytest.fixture()
+def application_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
+    return dir_with_app_spec_factory(cwd)
+
+
+@pytest.fixture(autouse=True)
+def which_mock(mocker: MockerFixture) -> WhichMock:
+    which_mock = WhichMock()
+    which_mock.add("npx")
+    mocker.patch("algokit.core.typed_client_generation.shutil.which").side_effect = which_mock.which
+    return which_mock
 
 
 def test_generate_help() -> None:
@@ -26,89 +54,107 @@ def test_generate_help() -> None:
     verify(result.output)
 
 
+def test_generate_no_options(application_json: Path) -> None:
+    result = invoke("generate client .", cwd=application_json.parent)
+    assert result.exit_code != 0
+    verify(result.output)
+
+
 @pytest.mark.parametrize(
-    ("output_path", "expected_output_path"),
+    ("options", "expected_output_path"),
     [
-        ("client.py", "client.py"),
-        ("client_%name%.py", "client_hello_world_app.py"),
+        ("-o client.py", "client.py"),
+        ("--output {contract_name}.py", "hello_world_app.py"),
+        ("-l python", "hello_world_app_client.py"),
+        ("-o client.ts --language python", "client.ts"),
     ],
 )
-def test_generate_client_python(
-    application_json: pathlib.Path, output_path: pathlib.Path, expected_output_path: pathlib.Path
-) -> None:
-    result = invoke(f"generate client -a {application_json.name} -o {output_path}", cwd=application_json.parent)
+def test_generate_client_python(application_json: Path, options: str, expected_output_path: Path) -> None:
+    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 0
-    verify(result.output.replace("\\", "/"), options=NamerFactory.with_parameters(output_path))
+    verify(result.output.replace("\\", "/"), options=NamerFactory.with_parameters(*options.split()))
     assert (application_json.parent / expected_output_path).exists()
     assert (application_json.parent / expected_output_path).read_text()
 
 
 @pytest.mark.parametrize(
-    ("output_path", "expected_output_path"),
+    ("options", "expected_output_path"),
     [
-        ("client.ts", "client.ts"),
-        ("client_%name%.ts", "client_hello_world_app.ts"),
+        ("-o client.ts", "client.ts"),
+        ("--output {contract_name}.ts", "HelloWorldApp.ts"),
+        ("-l typescript", "HelloWorldAppClient.ts"),
+        ("-o client.py --language typescript", "client.py"),
     ],
 )
 def test_generate_client_typescript(
-    application_json: pathlib.Path, output_path: pathlib.Path, expected_output_path: pathlib.Path
+    proc_mock: ProcMock,
+    application_json: Path,
+    options: str,
+    expected_output_path: Path,
 ) -> None:
-    result = invoke(f"generate client -a {application_json.name} -o {output_path}", cwd=application_json.parent)
+    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
-    verify(
-        result.output.replace("npx.cmd", "npx").replace("\\", "/"), options=NamerFactory.with_parameters(output_path)
-    )
-    assert (application_json.parent / expected_output_path).exists()
-    assert (application_json.parent / expected_output_path).read_text()
+    verify(result.output.replace("\\", "/"), options=NamerFactory.with_parameters(*options.split()))
+    assert proc_mock.called == [
+        f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+    ]
 
 
-def test_npx_missing(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
-    proc_mock.should_fail_on(
-        f"npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
-        f"-o {application_json.parent / 'client.ts'}"
-    )
-    proc_mock.should_fail_on(
-        f"npx.cmd --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
-        f"-o {application_json.parent / 'client.ts'}"
-    )
-    result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
+def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:
+    which_mock.remove("npx")
+    result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output.replace("npx.cmd", "npx"))
+    verify(result.output)
 
 
-def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
-    proc_mock.should_bad_exit_on(
-        f"npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
-        f"-o {application_json.parent / 'client.ts'}"
-    )
-    proc_mock.should_bad_exit_on(
-        f"npx.cmd --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {application_json} "
-        f"-o {application_json.parent / 'client.ts'}"
-    )
-    result = invoke(f"generate client -a {application_json.name} -o client.ts", cwd=application_json.parent)
+def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
+    proc_mock.should_bad_exit_on(f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
+    result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output.replace("npx.cmd", "npx"))
+    verify(result.output)
+
+
+def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> None:
+    dir_paths = [
+        cwd / "dir1",
+        cwd / "dir2",
+        cwd / "dir2" / "sub_dir",
+    ]
+    for dir_path in dir_paths:
+        dir_with_app_spec_factory(dir_path)
+
+    result = invoke("generate client -o {app_spec_dir}/output.py .", cwd=cwd)
+    assert result.exit_code == 0
+    verify(result.output.replace("\\", "/"))
+
+    for dir_path in dir_paths:
+        output_path = dir_path / "output.py"
+        assert output_path.exists()
+        assert output_path.read_text()
+
+
+def test_generate_client_no_app_spec_found(cwd: Path) -> None:
+    result = invoke("generate client -o output.py .", cwd=cwd)
+    assert result.exit_code == 1
+    verify(result.output.replace("\\", "/"))
+
+
+def test_generate_client_output_path_is_dir(application_json: Path) -> None:
+    cwd = application_json.parent
+    (cwd / "hello_world_app.py").mkdir()
+
+    result = invoke("generate client -o {contract_name}.py .", cwd=cwd)
+    assert result.exit_code == 0
+    verify(result.output.replace("\\", "/"))
 
 
 def test_snake_case() -> None:
-    assert snake_case("SnakeCase") == "snake_case"
-    assert snake_case("snakeCase") == "snake_case"
-    assert snake_case("snake-case") == "snake_case"
-    assert snake_case("snake_case") == "snake_case"
-    assert snake_case("SNAKE_CASE") == "snake_case"
-    assert snake_case("Snake_Case") == "snake_case"
-
-
-def test_format_client_name(application_json: pathlib.Path) -> None:
-    output = pathlib.Path("./output/%name%.txt")
-    result = format_client_name(output=output, application_file=application_json)
-    result_str = str(result).replace("\\", "/")
-    assert result_str == "output/hello_world_app.txt"
-
-    output = pathlib.Path("./output/%parent_dir%.txt")
-    result = format_client_name(output=output, application_file=application_json)
-    result_str = str(result).replace("\\", "/")
-    assert result_str == f"output/{application_json.parent.name}.txt"
+    assert _snake_case("SnakeCase") == "snake_case"
+    assert _snake_case("snakeCase") == "snake_case"
+    assert _snake_case("snake-case") == "snake_case"
+    assert _snake_case("snake_case") == "snake_case"
+    assert _snake_case("SNAKE_CASE") == "snake_case"
+    assert _snake_case("Snake_Case") == "snake_case"

@@ -32,13 +32,14 @@
   - [generate](#generate)
     - [client](#client)
     - [Options](#options-4)
-    - [-a, --appspec ](#-a---appspec-)
     - [-o, --output ](#-o---output-)
-    - [--language ](#--language-)
+    - [-l, --language ](#-l---language-)
+    - [Arguments](#arguments-2)
+    - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
     - [Options](#options-5)
     - [--console](#--console)
-    - [Arguments](#arguments-2)
+    - [Arguments](#arguments-3)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
     - [Options](#options-6)
@@ -255,22 +256,21 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 
 Create a typed ApplicationClient from an ARC-32 application.json
 
+Supply the path to an application specification file or a directory to recursively search
+for “application.json” files
+
 ```shell
-algokit generate client [OPTIONS]
+algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
 ```
 
 ### Options
 
 
-### -a, --appspec <app_spec>
-Path to an application specification file or a directory to recursively search for application.json
+### -o, --output <output_path_pattern>
+Path to the output file. The following tokens can be used to substitute into the output path: {contract_name}, {app_spec_dir}
 
 
-### -o, --output <output>
-Path to the output file. The following tokens can be used to substitute into the output path: %name%, %parent_dir%
-
-
-### --language <language>
+### -l, --language <language>
 Programming language of the generated client code
 
 
@@ -278,6 +278,12 @@ Programming language of the generated client code
 
     python | typescript
 
+
+### Arguments
+
+
+### APP_SPEC_PATH_OR_DIR
+Required argument
 
 ## goal
 
