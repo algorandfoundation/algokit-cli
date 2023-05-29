@@ -1,5 +1,6 @@
-import pathlib
 import shutil
+from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -12,13 +13,30 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
+DirWithAppSpecFactory = Callable[[Path], Path]
+
 
 @pytest.fixture()
-def application_json(tmp_path_factory: TempPathFactory) -> pathlib.Path:
-    cwd = tmp_path_factory.mktemp("cwd")
-    json_file = pathlib.Path(__file__).parent / "application.json"
-    shutil.copy(json_file, cwd / "application.json")
-    return cwd / "application.json"
+def cwd(tmp_path_factory: TempPathFactory) -> Path:
+    return tmp_path_factory.mktemp("cwd")
+
+
+@pytest.fixture()
+def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
+    app_spec_example_path = Path(__file__).parent / "application.json"
+
+    def factory(app_spec_dir: Path) -> Path:
+        app_spec_dir.mkdir(exist_ok=True, parents=True)
+        app_spec_path = app_spec_dir / "application.json"
+        shutil.copy(app_spec_example_path, app_spec_path)
+        return app_spec_path
+
+    return factory
+
+
+@pytest.fixture()
+def application_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
+    return dir_with_app_spec_factory(cwd)
 
 
 @pytest.fixture(autouse=True)
@@ -36,7 +54,7 @@ def test_generate_help() -> None:
     verify(result.output)
 
 
-def test_generate_no_options(application_json: pathlib.Path) -> None:
+def test_generate_no_options(application_json: Path) -> None:
     result = invoke("generate client .", cwd=application_json.parent)
     assert result.exit_code != 0
     verify(result.output)
@@ -51,9 +69,7 @@ def test_generate_no_options(application_json: pathlib.Path) -> None:
         ("-o client.ts --language python", "client.ts"),
     ],
 )
-def test_generate_client_python(
-    application_json: pathlib.Path, options: str, expected_output_path: pathlib.Path
-) -> None:
+def test_generate_client_python(application_json: Path, options: str, expected_output_path: Path) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 0
@@ -73,9 +89,9 @@ def test_generate_client_python(
 )
 def test_generate_client_typescript(
     proc_mock: ProcMock,
-    application_json: pathlib.Path,
+    application_json: Path,
     options: str,
-    expected_output_path: pathlib.Path,
+    expected_output_path: Path,
 ) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
@@ -85,7 +101,7 @@ def test_generate_client_typescript(
     ]
 
 
-def test_npx_missing(application_json: pathlib.Path, which_mock: WhichMock) -> None:
+def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:
     which_mock.remove("npx")
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
@@ -93,7 +109,7 @@ def test_npx_missing(application_json: pathlib.Path, which_mock: WhichMock) -> N
     verify(result.output)
 
 
-def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None:
+def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
     proc_mock.should_bad_exit_on(f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
@@ -101,48 +117,36 @@ def test_npx_failed(proc_mock: ProcMock, application_json: pathlib.Path) -> None
     verify(result.output)
 
 
-def test_generate_client_recursive(
-    tmp_path_factory: TempPathFactory,
-) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-    json_file = pathlib.Path(__file__).parent / "application.json"
-
-    dir_paths = [cwd / "dir1", cwd / "dir2", cwd / "dir2" / "sub_dir"]
+def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> None:
+    dir_paths = [
+        cwd / "dir1",
+        cwd / "dir2",
+        cwd / "dir2" / "sub_dir",
+    ]
     for dir_path in dir_paths:
-        dir_path.mkdir(parents=True, exist_ok=True)
-        shutil.copy(json_file, dir_path / "application.json")
+        dir_with_app_spec_factory(dir_path)
 
     result = invoke("generate client -o {app_spec_dir}/output.py .", cwd=cwd)
     assert result.exit_code == 0
     verify(result.output.replace("\\", "/"))
 
-    assert all((dir_path / "output.py").exists() for dir_path in dir_paths)
-    assert all((dir_path / "output.py").read_text() for dir_path in dir_paths)
-
-
-def test_generate_client_no_app_spec_found(
-    tmp_path_factory: TempPathFactory,
-) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-
-    dir_paths = [cwd / "dir1", cwd / "dir2", cwd / "dir2" / "sub_dir"]
     for dir_path in dir_paths:
-        dir_path.mkdir(parents=True, exist_ok=True)
+        output_path = dir_path / "output.py"
+        assert output_path.exists()
+        assert output_path.read_text()
 
+
+def test_generate_client_no_app_spec_found(cwd: Path) -> None:
     result = invoke("generate client -o output.py .", cwd=cwd)
     assert result.exit_code == 1
     verify(result.output.replace("\\", "/"))
 
 
-def test_generate_client_output_path_is_dir(
-    tmp_path_factory: TempPathFactory,
-) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-    json_file = pathlib.Path(__file__).parent / "application.json"
-    shutil.copy(json_file, cwd / "application.json")
+def test_generate_client_output_path_is_dir(application_json: Path) -> None:
+    cwd = application_json.parent
     (cwd / "hello_world_app.py").mkdir()
 
-    result = invoke("generate client -o {app_spec_dir}/{contract_name}.py .", cwd=cwd)
+    result = invoke("generate client -o {contract_name}.py .", cwd=cwd)
     assert result.exit_code == 0
     verify(result.output.replace("\\", "/"))
 
