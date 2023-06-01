@@ -3,7 +3,8 @@ from pathlib import Path
 
 import click
 
-from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_env, bootstrap_npm, bootstrap_poetry
+from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_env, bootstrap_npm, bootstrap_poetry, \
+    version_check
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def bootstrap_group() -> None:
 def bootstrap_all() -> None:
     cwd = Path.cwd()
     bootstrap_any_including_subdirs(cwd)
+    version_check()
     logger.info(f"Finished bootstrapping {cwd}")
 
 
