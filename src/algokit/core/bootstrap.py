@@ -1,5 +1,4 @@
 import logging
-import os
 import platform
 import sys
 from collections.abc import Iterator
@@ -7,7 +6,7 @@ from pathlib import Path
 from shutil import which
 
 import click
-import toml
+import tomli
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
@@ -224,17 +223,15 @@ def _get_base_python_path() -> str | None:
     return this_python
 
 
-def version_check(cwd) -> None:
+def version_check(cwd: Path) -> None:
     """
     Checks the current version of AlgoKit against the minimum required version specified in algokit.toml.
     """
     try:
-        config = toml.load(os.path.join(cwd, "algokit.toml"))
+        with Path.open(cwd / ".algokit.toml", "rb") as f:
+            config = tomli.load(f)
         min_version = config["algokit"]["min_version"]
-
         algokit_version = get_current_package_version()
-        if algokit_version is None:
-            logger.debug("Could not determine latest version")
         if version.parse(algokit_version) < version.parse(min_version):
             logger.warning(
                 f"This template requires algokit version {min_version} or higher, "
