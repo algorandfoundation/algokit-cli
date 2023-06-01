@@ -1,4 +1,5 @@
 import logging
+import os
 import platform
 import sys
 from collections.abc import Iterator
@@ -223,12 +224,12 @@ def _get_base_python_path() -> str | None:
     return this_python
 
 
-def version_check() -> None:
+def version_check(cwd) -> None:
     """
     Checks the current version of AlgoKit against the minimum required version specified in algokit.toml.
     """
     try:
-        config = toml.load("algokit.toml")
+        config = toml.load(os.path.join(cwd, "algokit.toml"))
         min_version = config["algokit"]["min_version"]
 
         algokit_version = get_current_package_version()

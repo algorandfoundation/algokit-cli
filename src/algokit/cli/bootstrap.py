@@ -30,7 +30,7 @@ def bootstrap_group() -> None:
 def bootstrap_all() -> None:
     cwd = Path.cwd()
     bootstrap_any_including_subdirs(cwd)
-    version_check()
+    version_check(cwd)
     logger.info(f"Finished bootstrapping {cwd}")
 
 
