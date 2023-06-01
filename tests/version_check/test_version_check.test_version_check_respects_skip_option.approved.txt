@@ -1,2 +1,1 @@
 DEBUG: No .algokit.toml file found in the project directory.
-.env already exists; skipping bootstrap of .env

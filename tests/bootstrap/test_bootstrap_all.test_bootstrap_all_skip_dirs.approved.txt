@@ -1,4 +1,4 @@
-DEBUG: No .algokit.toml file found in the current directory.
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/.venv
 DEBUG: Skipping {current_working_directory}/__pycache__
