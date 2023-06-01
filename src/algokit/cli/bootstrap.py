@@ -3,8 +3,13 @@ from pathlib import Path
 
 import click
 
-from algokit.core.bootstrap import bootstrap_any_including_subdirs, bootstrap_env, bootstrap_npm, bootstrap_poetry, \
-    version_check
+from algokit.core.bootstrap import (
+    bootstrap_any_including_subdirs,
+    bootstrap_env,
+    bootstrap_npm,
+    bootstrap_poetry,
+    version_check,
+)
 
 logger = logging.getLogger(__name__)
 

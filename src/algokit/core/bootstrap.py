@@ -6,12 +6,11 @@ from pathlib import Path
 from shutil import which
 
 import click
+import toml
+from packaging import version
 
 from algokit.core import proc, questionary_extensions
-
-import toml
-from algokit.core.version_prompt import get_latest_version_or_cached
-from packaging import version
+from algokit.core.conf import get_current_package_version
 
 ENV_TEMPLATE = ".env.template"
 logger = logging.getLogger(__name__)
@@ -229,17 +228,19 @@ def version_check() -> None:
     Checks the current version of AlgoKit against the minimum required version specified in algokit.toml.
     """
     try:
-        config = toml.load('algokit.toml')
-        min_version = config['algokit']['min_version']
+        config = toml.load("algokit.toml")
+        min_version = config["algokit"]["min_version"]
 
-        algokit_version = get_latest_version_or_cached()
+        algokit_version = get_current_package_version()
         if algokit_version is None:
             logger.debug("Could not determine latest version")
         if version.parse(algokit_version) < version.parse(min_version):
-            logger.warning(f"This template requires algokit version {min_version} or higher, "
-                           f"but you have algokit version {algokit_version}. "
-                           f"Please update algokit.")
+            logger.warning(
+                f"This template requires algokit version {min_version} or higher, "
+                f"but you have algokit version {algokit_version}. "
+                f"Please update algokit."
+            )
     except FileNotFoundError:
-        logger.info("No algokit.toml file found in the current directory.")
+        logger.debug("No algokit.toml file found in the current directory.")
     except KeyError:
-        logger.warning("No 'min_version' specified in algokit.toml file.")
+        logger.debug("No 'min_version' specified in algokit.toml file.")
