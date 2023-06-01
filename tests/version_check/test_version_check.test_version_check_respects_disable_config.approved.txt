@@ -1,1 +1,2 @@
 DEBUG: Version prompt disabled
+DEBUG: No .algokit.toml file found in the current directory.

@@ -8,6 +8,7 @@ Starting template copy and render...
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 Template render complete!
+DEBUG: No .algokit.toml file found in the current directory.
 DEBUG: Checking {current_working_directory}/myapp for bootstrapping needs
 DEBUG: Running `algokit bootstrap poetry`
 DEBUG: Running 'poetry --version' in '{current_working_directory}'

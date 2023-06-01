@@ -1,2 +1,3 @@
+DEBUG: No .algokit.toml file found in the current directory.
 DEBUG: {current_working_directory}/.env doesn't exist yet
 No .env or .env.template file; nothing to do here, skipping bootstrap of .env

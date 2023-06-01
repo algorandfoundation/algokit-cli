@@ -3,6 +3,8 @@ from pathlib import Path
 
 import click
 from _pytest.tmpdir import TempPathFactory
+from algokit.core.bootstrap import ALGOKIT_CONFIG
+from algokit.core.conf import get_current_package_version
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 
@@ -45,3 +47,24 @@ def test_init_bootstrap_broken_poetry(
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_bootstrap_version_fail(
+    tmp_path_factory: TempPathFactory,
+    mock_questionary_input: PipeInput,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    app_name = "myapp"
+    project_path = cwd / app_name
+    project_path.mkdir()
+    (project_path / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
+    mock_questionary_input.send_text("Y")  # reuse existing directory
+
+    result = invoke(
+        f"init -n {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
+        " --answer greeting hi --answer include_extra_file yes --bootstrap",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber(current_version=get_current_package_version()))

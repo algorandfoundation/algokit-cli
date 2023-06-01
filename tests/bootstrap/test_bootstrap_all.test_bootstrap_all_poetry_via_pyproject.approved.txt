@@ -1,3 +1,4 @@
+DEBUG: No .algokit.toml file found in the current directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Running `algokit bootstrap poetry`
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
@@ -7,5 +8,4 @@ Installing Python dependencies and setting up Python virtual environment via Poe
 DEBUG: Running 'poetry install' in '{current_working_directory}'
 poetry: STDOUT
 poetry: STDERR
-DEBUG: No .algokit.toml file found in the current directory.
 Finished bootstrapping {current_working_directory}

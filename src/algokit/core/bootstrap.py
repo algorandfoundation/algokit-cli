@@ -224,7 +224,7 @@ def _get_base_python_path() -> str | None:
     return this_python
 
 
-def version_check(project_dir: Path) -> None:
+def project_minimum_algokit_version_check(project_dir: Path, *, ignore_version_check_fail: bool = False) -> None:
     """
     Checks the current version of AlgoKit against the minimum required version specified in the AlgoKit config file.
     """
@@ -234,11 +234,14 @@ def version_check(project_dir: Path) -> None:
         min_version = config["algokit"]["min_version"]
         algokit_version = get_current_package_version()
         if version.parse(algokit_version) < version.parse(min_version):
-            logger.warning(
+            message = (
                 f"This template requires AlgoKit version {min_version} or higher, "
-                f"but you have AlgoKit version {algokit_version}. "
-                f"Please update AlgoKit."
+                f"but you have AlgoKit version {algokit_version}. Please update AlgoKit."
             )
+            if ignore_version_check_fail:
+                logger.warning(message)
+            else:
+                raise click.ClickException(message)
     except FileNotFoundError:
         logger.debug(f"No {ALGOKIT_CONFIG} file found in the current directory.")
     except KeyError:

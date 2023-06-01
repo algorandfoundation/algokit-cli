@@ -29,6 +29,19 @@ def test_bootstrap_all_algokit_min_version(tmp_path_factory: TempPathFactory) ->
         cwd=cwd,
     )
 
+    assert result.exit_code == 1
+    verify(result.output.replace(current_version, "{current_version}"))
+
+
+def test_bootstrap_all_algokit_min_version_ignore_error(tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    current_version = get_current_package_version()
+    (cwd / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
+    result = invoke(
+        "bootstrap --force all",
+        cwd=cwd,
+    )
+
     assert result.exit_code == 0
     verify(result.output.replace(current_version, "{current_version}"))
 

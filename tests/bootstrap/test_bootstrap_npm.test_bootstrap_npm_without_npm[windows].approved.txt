@@ -1,3 +1,4 @@
+DEBUG: No .algokit.toml file found in the current directory.
 Installing npm dependencies
 DEBUG: Running 'npm.cmd install' in '{current_working_directory}'
 Error: Failed to run `npm.cmd install` for {current_working_directory}/package.json. Is npm installed and available on PATH?

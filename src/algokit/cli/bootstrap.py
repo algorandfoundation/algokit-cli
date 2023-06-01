@@ -8,20 +8,24 @@ from algokit.core.bootstrap import (
     bootstrap_env,
     bootstrap_npm,
     bootstrap_poetry,
-    version_check,
+    project_minimum_algokit_version_check,
 )
 
 logger = logging.getLogger(__name__)
 
 
+@click.option(
+    "force", "--force", is_flag=True, default=False, help="Continue even if minimum AlgoKit version is not met"
+)
 @click.group(
     "bootstrap", short_help="Bootstrap local dependencies in an AlgoKit project; run from project root directory."
 )
-def bootstrap_group() -> None:
+def bootstrap_group(*, force: bool) -> None:
     """
     Expedited initial setup for any developer by installing and configuring dependencies and other
     key development environment setup activities.
     """
+    project_minimum_algokit_version_check(Path.cwd(), ignore_version_check_fail=force)
 
 
 @bootstrap_group.command(
@@ -30,7 +34,6 @@ def bootstrap_group() -> None:
 def bootstrap_all() -> None:
     cwd = Path.cwd()
     bootstrap_any_including_subdirs(cwd)
-    version_check(cwd)
     logger.info(f"Finished bootstrapping {cwd}")
 
 

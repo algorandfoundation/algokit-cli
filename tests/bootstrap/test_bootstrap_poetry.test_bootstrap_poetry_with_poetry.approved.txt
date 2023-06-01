@@ -1,3 +1,4 @@
+DEBUG: No .algokit.toml file found in the current directory.
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
 DEBUG: poetry: STDERR
