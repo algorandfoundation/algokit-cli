@@ -6,7 +6,11 @@ from pathlib import Path
 from shutil import which
 
 import click
-import tomli
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
@@ -230,7 +234,7 @@ def project_minimum_algokit_version_check(project_dir: Path, *, ignore_version_c
     """
     try:
         config_path = project_dir / ALGOKIT_CONFIG
-        config = tomli.loads(config_path.read_text("utf-8"))
+        config = tomllib.loads(config_path.read_text("utf-8"))
         min_version = config["algokit"]["min_version"]
         algokit_version = get_current_package_version()
         if version.parse(algokit_version) < version.parse(min_version):
