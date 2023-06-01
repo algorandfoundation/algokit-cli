@@ -1,5 +1,7 @@
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from algokit.core.bootstrap import ALGOKIT_CONFIG
+from algokit.core.conf import get_current_package_version
 from approvaltests.pytest.py_test_namer import PyTestNamer
 
 from tests.utils.approvals import verify
@@ -16,6 +18,19 @@ def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory) -> None:
 
     assert result.exit_code == 0
     verify(result.output)
+
+
+def test_bootstrap_all_algokit_min_version(tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    current_version = get_current_package_version()
+    (cwd / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
+    result = invoke(
+        "bootstrap all",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output.replace(current_version, "{current_version}"))
 
 
 def test_bootstrap_all_env(tmp_path_factory: TempPathFactory) -> None:

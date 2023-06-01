@@ -4,4 +4,5 @@ Installing npm dependencies
 DEBUG: Running 'npm.cmd install' in '{current_working_directory}'
 npm.cmd: STDOUT
 npm.cmd: STDERR
+DEBUG: No .algokit.toml file found in the current directory.
 Finished bootstrapping {current_working_directory}

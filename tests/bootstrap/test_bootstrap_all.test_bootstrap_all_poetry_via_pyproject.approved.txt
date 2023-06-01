@@ -7,4 +7,5 @@ Installing Python dependencies and setting up Python virtual environment via Poe
 DEBUG: Running 'poetry install' in '{current_working_directory}'
 poetry: STDOUT
 poetry: STDERR
+DEBUG: No .algokit.toml file found in the current directory.
 Finished bootstrapping {current_working_directory}

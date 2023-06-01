@@ -5,4 +5,5 @@ DEBUG: Checking {current_working_directory}/boring_dir for bootstrapping needs
 DEBUG: Checking {current_working_directory}/double_nested_dir for bootstrapping needs
 DEBUG: Checking {current_working_directory}/empty_dir for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/node_modules
+DEBUG: No .algokit.toml file found in the current directory.
 Finished bootstrapping {current_working_directory}
