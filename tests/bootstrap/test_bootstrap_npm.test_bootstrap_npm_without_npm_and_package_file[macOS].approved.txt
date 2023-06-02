@@ -1,1 +1,2 @@
+DEBUG: No .algokit.toml file found in the project directory.
 {current_working_directory}/package.json doesn't exist; nothing to do here, skipping bootstrap of npm

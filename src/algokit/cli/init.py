@@ -10,7 +10,7 @@ import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.bootstrap import bootstrap_any_including_subdirs
+from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
@@ -272,6 +272,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # note: we run bootstrap before git commit so that we can commit any lock files,
         # but if something goes wrong, we don't want to block
         try:
+            project_minimum_algokit_version_check(project_path)
             bootstrap_any_including_subdirs(project_path)
         except Exception as e:
             logger.error(f"Received an error while attempting bootstrap: {e}")

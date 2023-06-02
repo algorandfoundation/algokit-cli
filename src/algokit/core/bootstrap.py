@@ -7,9 +7,17 @@ from shutil import which
 
 import click
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+from packaging import version
+
 from algokit.core import proc, questionary_extensions
+from algokit.core.conf import get_current_package_version
 
 ENV_TEMPLATE = ".env.template"
+ALGOKIT_CONFIG = ".algokit.toml"
 logger = logging.getLogger(__name__)
 
 
@@ -218,3 +226,47 @@ def _get_base_python_path() -> str | None:
                 return str(candidate_path)
     # give up, we tried...
     return this_python
+
+
+def get_min_algokit_version(project_dir: Path) -> str | None:
+    try:
+        config_path = project_dir / ALGOKIT_CONFIG
+        try:
+            config_text = config_path.read_text("utf-8")
+        except FileNotFoundError:
+            logger.debug(f"No {ALGOKIT_CONFIG} file found in the project directory.")
+            return None
+
+        config = tomllib.loads(config_text)
+
+        try:
+            min_version = config["algokit"]["min_version"]
+        except KeyError:
+            logger.debug(f"No 'min_version' specified in {ALGOKIT_CONFIG} file.")
+            return None
+        assert isinstance(min_version, str)
+
+        return min_version
+    except Exception as ex:
+        logger.debug(f"Unexpected error inspecting AlgoKit config: {ex}")
+        return None
+
+
+def project_minimum_algokit_version_check(project_dir: Path, *, ignore_version_check_fail: bool = False) -> None:
+    """
+    Checks the current version of AlgoKit against the minimum required version specified in the AlgoKit config file.
+    """
+
+    min_version = get_min_algokit_version(project_dir)
+    if min_version is None:
+        return
+    algokit_version = get_current_package_version()
+    if version.parse(algokit_version) < version.parse(min_version):
+        message = (
+            f"This template requires AlgoKit version {min_version} or higher, "
+            f"but you have AlgoKit version {algokit_version}. Please update AlgoKit."
+        )
+        if ignore_version_check_fail:
+            logger.warning(message)
+        else:
+            raise click.ClickException(message)

@@ -8,41 +8,43 @@
     - [--color, --no-color](#--color---no-color)
     - [--skip-version-check](#--skip-version-check)
   - [bootstrap](#bootstrap)
+    - [Options](#options-1)
+    - [--force](#--force)
     - [all](#all)
     - [env](#env)
     - [npm](#npm)
     - [poetry](#poetry)
   - [completions](#completions)
     - [install](#install)
-    - [Options](#options-1)
+    - [Options](#options-2)
     - [--shell ](#--shell-)
     - [uninstall](#uninstall)
-    - [Options](#options-2)
+    - [Options](#options-3)
     - [--shell ](#--shell--1)
   - [config](#config)
     - [version-prompt](#version-prompt)
     - [Arguments](#arguments)
     - [ENABLE](#enable)
   - [doctor](#doctor)
-    - [Options](#options-3)
+    - [Options](#options-4)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
     - [Arguments](#arguments-1)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-4)
+    - [Options](#options-5)
     - [-o, --output ](#-o---output-)
     - [-l, --language ](#-l---language-)
     - [Arguments](#arguments-2)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-5)
+    - [Options](#options-6)
     - [--console](#--console)
     - [Arguments](#arguments-3)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-6)
+    - [Options](#options-7)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -57,11 +59,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-7)
+    - [Options](#options-8)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-8)
+    - [Options](#options-9)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -103,6 +105,12 @@ key development environment setup activities.
 ```shell
 algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 ```
+
+### Options
+
+
+### --force
+Continue even if minimum AlgoKit version is not met
 
 ### all
 

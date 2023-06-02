@@ -1,3 +1,4 @@
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Running `algokit bootstrap poetry`
 DEBUG: Running 'poetry --version' in '{current_working_directory}'

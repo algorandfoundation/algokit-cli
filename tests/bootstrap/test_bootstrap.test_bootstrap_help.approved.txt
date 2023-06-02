@@ -4,6 +4,7 @@ Usage: algokit bootstrap [OPTIONS] COMMAND [ARGS]...
   dependencies and other key development environment setup activities.
 
 Options:
+  --force     Continue even if minimum AlgoKit version is not met
   -h, --help  Show this message and exit.
 
 Commands:

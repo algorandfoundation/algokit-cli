@@ -116,12 +116,11 @@ def test_version_check_respects_disable_config(app_dir_mock: AppDirs) -> None:
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
-@pytest.mark.usefixtures("app_dir_mock")
-def test_version_check_respects_skip_option() -> None:
+def test_version_check_respects_skip_option(app_dir_mock: AppDirs) -> None:
     result = invoke("--skip-version-check bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
-    assert len(result.output.strip()) == 0
+    verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
 def test_version_check_disable_version_check(app_dir_mock: AppDirs) -> None:

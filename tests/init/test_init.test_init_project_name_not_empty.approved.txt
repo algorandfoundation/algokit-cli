@@ -7,5 +7,6 @@ Starting template copy and render...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
+DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/FAKE_PROJECT
 🙌 Project initialized at `FAKE_PROJECT`! For template specific next steps, consult the documentation of your selected template 🧐
