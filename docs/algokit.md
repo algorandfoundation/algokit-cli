@@ -10,6 +10,7 @@ For details on how to use individual features see the following
 - [Completions](./features/completions.md) - Install shell completions for AlgoKit
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
 - [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
+- [Generate](./features/generate.md) - Generate code for an Algorand project
 - [Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
 - [Init](./features/init.md) - Quickly initialize new projects using official Algorand Templates or community provided templates.
 - [LocalNet](./features/localnet.md) - Manage a locally sandboxed private Algorand network.
