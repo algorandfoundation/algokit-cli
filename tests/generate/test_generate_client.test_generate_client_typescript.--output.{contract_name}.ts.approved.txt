@@ -1,4 +1,4 @@
 Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to HelloWorldApp.ts
-DEBUG: Running '/bin/npx --yes @algorandfoundation/algokit-client-generator@v2.0.0-beta.1 generate -a {current_working_directory}/application.json -o HelloWorldApp.ts' in '{current_working_directory}'
+DEBUG: Running '/bin/npx --yes @algorandfoundation/algokit-client-generator@^2 generate -a {current_working_directory}/application.json -o HelloWorldApp.ts' in '{current_working_directory}'
 DEBUG: /bin/npx: STDOUT
 DEBUG: /bin/npx: STDERR
