@@ -10,9 +10,12 @@ both Python and TypeScript available as target languages.
 ### Prerequisites
 
 To generate Python clients AlgoKit itself is the only dependency.
-To generate TypeScript clients an install of Node.js and npx is also required.
+To generate TypeScript clients an installation of Node.js and npx is also required.
 
-Each generated client will also have a dependency on `algosdk` and `algokit-utils` libraries using the Python or JavaScript versions of both as appropriate.
+Each generated client will also have a dependency on `algokit-utils` libraries for the target language:
+
+* Python clients require: `algokit-utils@^1.2`
+* TypeScript clients require: `@algorandfoundation/algokit-utils@^2.0`
 
 ### Output tokens
 
