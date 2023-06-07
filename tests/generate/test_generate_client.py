@@ -16,6 +16,10 @@ from tests.utils.which_mock import WhichMock
 DirWithAppSpecFactory = Callable[[Path], Path]
 
 
+def _normalize_output(output: str) -> str:
+    return output.replace("\\", "/").replace(TYPESCRIPT_NPX_PACKAGE, "{typed_client_package}")
+
+
 @pytest.fixture()
 def cwd(tmp_path_factory: TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
@@ -73,7 +77,7 @@ def test_generate_client_python(application_json: Path, options: str, expected_o
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 0
-    verify(result.output.replace("\\", "/"), options=NamerFactory.with_parameters(*options.split()))
+    verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
     assert (application_json.parent / expected_output_path).exists()
     assert (application_json.parent / expected_output_path).read_text()
 
@@ -95,7 +99,10 @@ def test_generate_client_typescript(
 ) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
-    verify(result.output.replace("\\", "/"), options=NamerFactory.with_parameters(*options.split()))
+    verify(
+        _normalize_output(result.output),
+        options=NamerFactory.with_parameters(*options.split()),
+    )
     assert proc_mock.called == [
         f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
     ]
@@ -106,7 +113,7 @@ def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_normalize_output(result.output))
 
 
 def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
@@ -114,7 +121,7 @@ def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_normalize_output(result.output))
 
 
 def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> None:
@@ -128,7 +135,7 @@ def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWith
 
     result = invoke("generate client -o {app_spec_dir}/output.py .", cwd=cwd)
     assert result.exit_code == 0
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
     for dir_path in dir_paths:
         output_path = dir_path / "output.py"
@@ -139,7 +146,7 @@ def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWith
 def test_generate_client_no_app_spec_found(cwd: Path) -> None:
     result = invoke("generate client -o output.py .", cwd=cwd)
     assert result.exit_code == 1
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 def test_generate_client_output_path_is_dir(application_json: Path) -> None:
@@ -148,7 +155,7 @@ def test_generate_client_output_path_is_dir(application_json: Path) -> None:
 
     result = invoke("generate client -o {contract_name}.py .", cwd=cwd)
     assert result.exit_code == 0
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 def test_snake_case() -> None:
