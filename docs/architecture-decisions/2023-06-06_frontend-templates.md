@@ -1,6 +1,6 @@
 # Frontend Templates
 
-- **Status**: Draft
+- **Status**: Draft (rev 2)
 - **Owner:** Altynbek Orumbayev
 - **Deciders**: TBD
 - **Date created**: 2023-06-06
@@ -25,111 +25,111 @@ AlgoKit v2 aims provide an end-to-end development and deployment experience that
 
 Expanding AlgoKit templating capabilities is a non-trivial task that requires careful consideration of the trade-offs between the different approaches. The following section outlines the different options that were considered and the trade-offs associated with each of them.
 
-The table below summarizes key points of each implementation option, consequent section dive into each of the options in more detail.
+### Prerequisites
 
-| Options                                  | Pros                                                        | Cons                                                                                                                                                           |
-| ---------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Extend Existing Smart Contract Templates | Cohesive developer experience, Simplified project structure | Limited flexibility, Increased complexity                                                                                                                      |
-| Monorepo Approach                        | Flexibility, Cohesive developer experience                  | Increased complexity, Potential for confusion                                                                                                                  |
-| Separate Frontend Templates              | Flexibility, Simplified maintenance                         | Longer and more complex `init` invocation command (can be solved by interacively asking for extra details on templates during init phase), Versioning overhead |
-| Hybrid Approach                          | Flexibility, Simplified maintenance                         | Increased complexity, Implementation complexity, Versioning overhead                                                                                           |
+I believe the following is a list of challenges that is common to all of the options and needs to be addressed:
 
-### Option 1. Extend Existing Smart Contract Templates
+a) A set of new parameters for `.algokit.toml` file that will allow frontend codebases to quickly figure out the default path to generated typed clients. This will allow frontend templates to quickly import the generated typed clients and start interacting with the smart contract. Default templates provided by AlgoKit can rely on `copier` to pre-define the paths while an external frontend template can rely on the new parameters to figure out the path to the generated typed client.
 
-In this approach, we would extend the existing smart contract templates to include frontend code. This would mean that each template would contain both the smart contract and frontend code.
+b) A new `dev` mode represented as a set of deployment configurations OR a new command for the algokit-cli that will allow a developer to Deploy Contract -> Spin up local frontend -> Interact with the contract via the frontend in sandbox mode. This will allow developers to quickly access, test and iterate on entire codebase e2e.
 
-A generalized project structure for this approach would look as follows:
+### Option 1. Monorepo Approach
+
+In this approach, we can extend the existing templates to include frontend code. This would turn the template repositories into monorepos housing both frontend and backend code. This approach also implies tight coupling between the frontend and backend code, as they will live in the same repository. While sacrificing flexibility, I believe there is an equal amount of challenges in maintaining separate frontends and backends in separate repos. This approach is also consistent with the current approach of bundling smart contracts and typed clients in a single repository.
+
+#### Pros
+
+- The codebase is located in a single repository, improving code visibility and coordination.
+- Versioning is simpler as all code lives in one repo.
+- Ability to have a very polished frontend client tailored specifically for the smart contract template.
+- Collaboration among maintainers of official templates becomes easier as all code lives in one repo and it is easier to coordinate and observe changes.
+
+#### Cons
+
+- Without proper supervision over automation, the repository may become large and complex, leading to slower CI/CD pipeline execution times.
+- It might violate the principle of modularity and loosely coupled components, which can be beneficial for parallel development and reduced complexity.
+
+#### Examples
+
+Folder structure (ref official beaker template):
 
 ```md
-template repository
-├── Smart Contract Template
-│ ├── Contracts Code
-│ └── Frontend Code
-└── CI/CD and Deployment Configurations
+.
+├── README.md
+├── copier.yaml
+├── poetry.lock
+├── poetry.toml
+├── pyproject.toml
+├── template_content
+├── contracts
+├── frontend
+├── .algokit.toml // with new params that aid with frontend templating
+└── ...
+├── tests
+└── tests_generated
 ```
 
-#### Pros
+A good reference example of bundling frontends and backens in a single repo that relies on jinja: https://github.com/tiangolo/full-stack-fastapi-postgresql/tree/master
 
-- Cohesive developer experience - developers would be able to get started with dApp development by simply cloning the template repository and running the `init` command.
-- Simplified project structure - developers would be able to focus on the development of the dApp without having to worry about the project structure.
+---
 
-#### Cons
+### Option 2. Separate templates repositories
 
-- Limited flexibility - developers would be limited to the frontend and backend code that is included in the template.
-- Increased complexity - the complexity of the templates would increase as the number of templates increases. In addition, using `copier` for templatizing large variety of templates would require a lot of boilerplate code and solid test coverage that will increase in complexity as number of templates grow inside the monorepo.
-
-### Option 2. Monorepo Approach
-
-In this approach, we would create a monorepo that would contain all of the different templates. This would mean that each template would be a separate package within the monorepo.
-
-A generalized project structure for this approach would look as follows:
-
-```md
-templates monorepo
-├── Smart Contract Template 1
-│ ├── Contracts Code
-│ └── Frontend Code
-├── Smart Contract Template 2
-│ ├── Contracts Code
-│ └── Frontend Code
-└── CI/CD and Deployment Configurations
-```
+In this scenario, the frontend and backend templates are maintained independently. The CLI tool will accept --backend and --frontend URLs separately, allowing developers to mix and match different smart contract templates with different frontend components.
 
 #### Pros
 
-- Flexibility - developers would be able to mix and match different templates.
-- Cohesive developer experience - developers would be able to get started with dApp development by simply cloning the template repository via the `init` command, followed by selection of specific combination of backend/frontend available in official templates monorepo.
+- Greater flexibility for developers, as they can choose to mix and match different frontend and backend templates.
+- Easier to maintain due to separate concerns (aligns with principle 8 on modularity).
+  Simplifies version control for each individual component.
 
 #### Cons
 
-- Increased complexity - the complexity of the templates would increase as the number of templates increases. In addition, using `copier` for templatizing large variety of templates would require a lot of boilerplate code and solid test coverage that will increase in complexity as number of templates grow inside the monorepo.
-- Potential for confusion - developers would have to be aware of the different templates available in the monorepo and the different combinations of templates that are supported. This can be addressed by enhancing the cli to provide a list of available templates and the different combinations of templates that are supported during initialization.
+- Command invocation becomes longer, which may not be ideal for seamless onramp as it increases the complexity for new developers. However, this can be mitigated by providing a default template that includes both frontend and backend code.
+- Integration between frontend and backend will require additional work, especially around utilities that need to figure out how to import the typed client to frontend as well.
+- Versioning may become more complex as there are multiple repositories involved, especially considering the size of the team where ability to collaborate on a single codebase may be more beneficial.
+- Ideally will require an additional set of utilities to generate template repositories for people building their own templates (as currently algokit does not provide any automated mechanism to do so other than copying official templates and modifying them)
 
-### Option 3. Separate Frontend Templates
+#### Examples
 
-In this approach, we propose a new `type` of template repositories called `frontend` templates. These templates would contain only the frontend code and would be used in conjunction with the existing smart contract templates.
+- Example init with default frontend templates (assuming that algokit cli has a set of pre-defined frontend templates):
 
-A generalized project structure for this approach would look as follows:
+  ```bash
+  $ algokit init --template-url ...
+  $ ? Select frontend component: [React, Vue, Next, Angular, Svelte, None]
+  $ ...
+  ```
 
-```md
-Template repository
-├── Smart Contract Template (pulled from contracts template repo of choice)
-│ └── Contracts Code
-├── Frontend Template (pulled from frontend template repo of choice)
-│ └── Frontend Code
-└── CI/CD and Deployment Configurations
-```
+- Example init with external frontend templates:
+
+  ```bash
+  $ algokit init --template-url ... --frontend-url ...
+  $ ...
+  ```
+
+---
+
+### Option 3. Hybrid approach
+
+In this approach, we can have a default frontend code template included with the backend in a monorepo but also provide the option for developers to specify a separate frontend template URL if desired.
 
 #### Pros
 
-- Flexibility - developers would be able to mix and match different templates, which can be enhanced by providing an interactive selector during the `init` command.
-- Simplified maintenance - the frontend templates would be maintained separately from the smart contract templates. This would allow for easier maintenance and extension of the templates.
+- Combines the benefits of both monorepo and separate templates approach.
+- Gives developers more flexibility while maintaining an official templates monorepo.
+- Gives template creators a choice to either make a community template or contribute to an existing set of official templates (with a tradeoff on potentially longer PR reviews and etc).
 
 #### Cons
 
-- Longer and more complex `init` invocation command - developers would have to specify the frontend template that they want to use during the `init` command invocation. This can be addressed by enhancing the cli to provide a list of available frontend templates during initialization in interactive manner, hiding the complexity of the initial command.
-- Versioning overhead - versioning of the frontend templates would have to be managed separately from the smart contract templates. This can be addressed by using the same versioning scheme for both the smart contract and frontend templates.
+- May add complexity to the CLI tool's implementation.
+- Integration between frontend and backend will require additional work to implement a
+  mechanism that allows swapping out the default frontend template with a custom one from provided url and aliasing/moving the generated typed client into the frontend.
 
-### Option 4. Hybrid Approach
-
-In this approach, we would combine the monorepo approach with the separate frontend templates approach. This would mean that we would create a monorepo that would contain all of the different smart contract and frontend templates while still allowing developers to install external community based smart contract and frontend templates.
-
-#### Pros
-
-- Flexibility - developers would be able to mix and match different templates.
-- Simplified maintenance - the frontend templates would be maintained separately from the smart contract templates. This would allow for easier maintenance and extension of the templates.
-
-#### Cons
-
-- Increased complexity - the complexity of the templates would increase as the number of templates increases. In addition, using `copier` for templatizing large variety of templates would require a lot of boilerplate code and solid test coverage that will increase in complexity as number of templates grow inside the monorepo.
-- Implementation complexity - the implementation of this approach would be more complex than the other approaches as it will require proper implementation of the monorepos as well as support for external community based templates outside of the monorepo.
-- Versioning overhead - versioning of the frontend templates would have to be managed separately from the smart contract templates. This can be addressed by using the same versioning scheme for both the smart contract and frontend templates.
+---
 
 ## Preferred option
 
-Based on the principles outlined in the problem statement, the best approach would seem to be to create separate frontend templates or use a hybrid approach where we maintain a monorepo with all official template packages while still supporting frontend community templates. Despite additional overhead in initial implementation, this approach provides the most flexibility and aligns with the principle of meeting developers where they are. It also supports the principle of modularity and allows for sustainable, long-term maintenance.
-
-While the invocation command would become longer, this is a minor inconvenience compared to the benefits of flexibility and simplicity. The CLI tool could be extended to provide sensible defaults and shortcuts to mitigate this issue.
+Keeping AlgoKit principles in mind, the Hybrid Approach might be the most balanced starting point. It can allow us as a team to collaborate on a single repository while also providing other developers the flexibility to use separate combinations of frontend templates if desired. Additionally, this approach can be implemented in 2 steps where we start with a monorepo and then extend it to support external frontend templates after further feedback and evaluation on developer experience.
 
 ## Selected option
 
@@ -138,14 +138,14 @@ To be discussed.
 ## Open questions
 
 - Do we want to support scenarios when users already have a ready made frontend repository and want to potentially embedd algokit into it - or we are primarily focusing on solid user experience in regards to initialization and bootstrapping of the templates?
-- How do we want to handle cases when user selects python typed client during initialization? Do we want to provide a default python based frontend template or do we want to provide a list of available frontend templates that are compatible with the selected typed client? In most popular frontend frameworks a python client would be of no use unless we provide a python based frontend template OR treat it as a special use case when python client needs to be placed on a backend server.
+- How do we want to handle cases when user select python typed client during initialization? Do we want to provide a default python based frontend template or do we want to provide a list of available frontend templates that are compatible with the selected typed client? In most popular frontend frameworks a python client would be of no use unless we provide a python based frontend template OR treat it as a special use case when python client needs to be placed on a backend server.
 - Which exact smart contract scenarios in regards to frontend are we handling. Some devs may have multiple smart contracts, some require to be deployed separately from the frontend, some may require frontend to handle deployments and upgrades. Do we opt in to only support the scenario where contract is deployed completely separately from the frontend and frontend is only used to interact with the contract? Or do we want to support more complex scenarios where frontend is used to deploy and upgrade the contract?
 
 # Next Steps
 
-The next steps would be to:
+The next steps assuming either option 1 or 3 is picked, would be to:
 
-1. Create frontend templates for most popular web frameworks used by Algorand community (React, Next, Vue or else).
-2. Extend the CLI tool to support separate URLs for frontend and backend templates.
+1. Pick a most popular web framework used by Algorand community (React, Next, Vue or else) and implement a templatized version of it into monorepo.
+2. Extend the CLI tool to support separate optional flag for external frontend templates (while defaulting to official templates from monorepo that bundle official frontends).
 3. Test the new templates and CLI tool functionality.
 4. Update the AlgoKit documentation to explain how to use the new frontend templates.
