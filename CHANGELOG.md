@@ -2,6 +2,32 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.0 (2023-06-07)
+
+### Feature
+
+* Adding minimum required version for algokit. ([#273](https://github.com/algorandfoundation/algokit-cli/issues/273)) ([`10aacc2`](https://github.com/algorandfoundation/algokit-cli/commit/10aacc2c17acc55c47d69674e9ace780313aee46))
+* Use official Algorand Docker images for LocalNet ([#268](https://github.com/algorandfoundation/algokit-cli/issues/268)) ([`fc5106c`](https://github.com/algorandfoundation/algokit-cli/commit/fc5106cc773a4672eb1ec8614bb60ed2dc61be42))
+* Add generate client command ([#266](https://github.com/algorandfoundation/algokit-cli/issues/266)) ([`b885fb1`](https://github.com/algorandfoundation/algokit-cli/commit/b885fb16b3b9a49231a6b786d1156bd7b202fb12))
+
+### Fix
+
+* Don't reset localnet if only algod_config.json is missing ([#269](https://github.com/algorandfoundation/algokit-cli/issues/269)) ([`ff3ef56`](https://github.com/algorandfoundation/algokit-cli/commit/ff3ef560565bdb92951fa7d6e3bbf4437db873a0))
+* Bootstrap failure during init now shows the error to avoid confusion ([`8a36e82`](https://github.com/algorandfoundation/algokit-cli/commit/8a36e82497cc342082d71df5c327837ddad221a4))
+* Workaround ValueError raised when using --defaults flag with copier 7.1 ([#256](https://github.com/algorandfoundation/algokit-cli/issues/256)) ([`e224070`](https://github.com/algorandfoundation/algokit-cli/commit/e22407074bf8c8ce2b1576379c90df76a70f6df9))
+
+### Documentation
+
+* Document typed client dependency ([#275](https://github.com/algorandfoundation/algokit-cli/issues/275)) ([`87d7233`](https://github.com/algorandfoundation/algokit-cli/commit/87d7233bd35a1b896d15e0aea3f63e738738254f))
+* Add example usage for typed clients ([`16d91f5`](https://github.com/algorandfoundation/algokit-cli/commit/16d91f5d3e5ef0115826780bc1daa918fbf031a8))
+* Add generate docs ([#270](https://github.com/algorandfoundation/algokit-cli/issues/270)) ([`da8e46d`](https://github.com/algorandfoundation/algokit-cli/commit/da8e46dfda97e514be17955ad39986f42b93b5e2))
+* Update localnet docs to include links to AlgoKit Utils ([`6e937a8`](https://github.com/algorandfoundation/algokit-cli/commit/6e937a8ff487955063ac1023c51ac3c83f5cbb01))
+* README update ([`8702e45`](https://github.com/algorandfoundation/algokit-cli/commit/8702e45c25eb2ec422587e307151037fbf6c1914))
+* Changes to wording of output stability snippet ([`f378013`](https://github.com/algorandfoundation/algokit-cli/commit/f378013db7b52c5d69f71ba606fbe3f8f50fa843))
+* Added output stability article content ([`c3a89f1`](https://github.com/algorandfoundation/algokit-cli/commit/c3a89f14b461ec2a22b23f3e423d107bff72fbb9))
+* Include note about pipx ensurepath ([`847013d`](https://github.com/algorandfoundation/algokit-cli/commit/847013d1733f3b11ed6d3c64b223e84dd7bc1124))
+* Link to repo search, fixes #240 ([`2550f6f`](https://github.com/algorandfoundation/algokit-cli/commit/2550f6ff147fd3de9f5da6dee470e9f214500c20))
+
 ## v1.0.1 (2023-03-29)
 ### Documentation
 * Reference overview image with absolute url ([`c987f84`](https://github.com/algorandfoundation/algokit-cli/commit/c987f84d3079cf88c262e21a542e60c74a71829a))
