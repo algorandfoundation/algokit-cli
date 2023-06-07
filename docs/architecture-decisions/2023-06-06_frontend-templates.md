@@ -41,7 +41,7 @@ In this approach, we would extend the existing smart contract templates to inclu
 A generalized project structure for this approach would look as follows:
 
 ```md
-Bootstrapped template repository
+template repository
 ├── Smart Contract Template
 │ ├── Contracts Code
 │ └── Frontend Code
@@ -65,7 +65,7 @@ In this approach, we would create a monorepo that would contain all of the diffe
 A generalized project structure for this approach would look as follows:
 
 ```md
-Bootstrapped template repository
+templates monorepo
 ├── Smart Contract Template 1
 │ ├── Contracts Code
 │ └── Frontend Code
@@ -92,7 +92,7 @@ In this approach, we propose a new `type` of template repositories called `front
 A generalized project structure for this approach would look as follows:
 
 ```md
-Bootstrapped template repository
+Template repository
 ├── Smart Contract Template (pulled from contracts template repo of choice)
 │ └── Contracts Code
 ├── Frontend Template (pulled from frontend template repo of choice)
