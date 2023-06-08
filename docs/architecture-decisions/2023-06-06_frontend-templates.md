@@ -1,11 +1,11 @@
 # Frontend Templates
 
-- **Status**: Draft (rev 2)
+- **Status**: Draft (rev 3)
 - **Owner:** Altynbek Orumbayev
 - **Deciders**: TBD
 - **Date created**: 2023-06-06
 - **Date decided:** TBD
-- **Date updated**: 2023-06-07
+- **Date updated**: 2023-06-08
 
 ## Context
 
@@ -25,127 +25,109 @@ AlgoKit v2 aims provide an end-to-end development and deployment experience that
 
 Expanding AlgoKit templating capabilities is a non-trivial task that requires careful consideration of the trade-offs between the different approaches. The following section outlines the different options that were considered and the trade-offs associated with each of them.
 
-### Prerequisites
+> Refer to git history to see old revisions of the document. After further discussions with the team we are now aligned on the separate repositories approach. Hence the sections below are updated to reflect the new approach.
 
-I believe the following is a list of challenges that is common to all of the options and needs to be addressed:
+## The proposal
 
-a) A set of new parameters for `.algokit.toml` file that will allow frontend codebases to quickly figure out the default path to generated typed clients. This will allow frontend templates to quickly import the generated typed clients and start interacting with the smart contract. Default templates provided by AlgoKit can rely on `copier` to pre-define the paths while an external frontend template can rely on the new parameters to figure out the path to the generated typed client.
+The proposal consists of 2 main parts. On a high level, the ideas revolve around giving developers a choice on how they want to couple AlgoKit backend and frontend templates if they like to use custom templates. The other is focused on providing an official full-stack template that bundles both backend and frontend templates together, while also serving as an example for template builders on how to efficiently couple their backend and frontend templates.
 
-b) A new `dev` mode represented as a set of deployment configurations OR a new command for the algokit-cli that will allow a developer to Deploy Contract -> Spin up local frontend -> Interact with the contract via the frontend in sandbox mode. This will allow developers to quickly access, test and iterate on entire codebase e2e.
-
-### Option 1. Monorepo Approach
-
-In this approach, we can extend the existing templates to include frontend code. This would turn the template repositories into monorepos housing both frontend and backend code. This approach also implies tight coupling between the frontend and backend code, as they will live in the same repository. While sacrificing flexibility, I believe there is an equal amount of challenges in maintaining separate frontends and backends in separate repos. This approach is also consistent with the current approach of bundling smart contracts and typed clients in a single repository.
-
-#### Pros
-
-- The codebase is located in a single repository, improving code visibility and coordination.
-- Versioning is simpler as all code lives in one repo.
-- Ability to have a very polished frontend client tailored specifically for the smart contract template.
-- Collaboration among maintainers of official templates becomes easier as all code lives in one repo and it is easier to coordinate and observe changes.
-
-#### Cons
-
-- Without proper supervision over automation, the repository may become large and complex, leading to slower CI/CD pipeline execution times.
-- It might violate the principle of modularity and loosely coupled components, which can be beneficial for parallel development and reduced complexity.
-
-#### Examples
-
-Folder structure (ref official beaker template):
-
-```md
-.
-├── README.md
-├── copier.yaml
-├── poetry.lock
-├── poetry.toml
-├── pyproject.toml
-├── template_content
-├── contracts
-├── frontend
-├── .algokit.toml // with new params that aid with frontend templating
-└── ...
-├── tests
-└── tests_generated
-```
-
-A good reference example of bundling frontends and backens in a single repo that relies on jinja: https://github.com/tiangolo/full-stack-fastapi-postgresql/tree/master
+The addendums to the proposal also explores orthogonal ideas that can further improve the CLI tooling itself by providing a way for any existing non web-3 frontend project be converted into a full-stack dApp with minimal efforts. Lastly, it expands on improving incentives for developers to build and maintain their own templates.
 
 ---
 
-### Option 2. Separate templates repositories
+### Part 1. Independent frontend templates
 
-In this scenario, the frontend and backend templates are maintained independently. The CLI tool will accept --backend and --frontend URLs separately, allowing developers to mix and match different smart contract templates with different frontend components.
+> TLDR: Independent frontend templates will be created to provide developers with a highly customizable dApp starter project, built on AlgoKit's principles of modularity, maintainability, and flexibility. The templates will also serve as a reference for template builders.
 
-#### Pros
+The following aims to provide a seamless onramp for developers to get started with highly customizable dApp starter projects. The idea is to create a set of separate official frontend template repositories to serve as:
+a) A reference for template builders on how to create standalone frontend templates that can be then further coupled with any backend template.
+b) Expand on AlgoKit principles of modularity, maintainability and flexibility by giving developers a choice of preffered technological stack.
 
-- Greater flexibility for developers, as they can choose to mix and match different frontend and backend templates.
-- Easier to maintain due to separate concerns (aligns with principle 8 on modularity).
-  Simplifies version control for each individual component.
+The official standalone frontend templates can be build by reusing already established best practices and templates from official backend repositores and by continuing reliance on `copier` for template automation. Another important consideration to keep in mind is that with the introduction of frontend templates we need to establish a clear separation of concerns between the backend and frontend templates to ensure modularity.
 
-#### Cons
+![Diagram 1](assets/2023-06-06_frontend-templates/modular_templates.jpg)
 
-- Command invocation becomes longer, which may not be ideal for seamless onramp as it increases the complexity for new developers. However, this can be mitigated by providing a default template that includes both frontend and backend code.
-- Integration between frontend and backend will require additional work, especially around utilities that need to figure out how to import the typed client to frontend as well.
-- Versioning may become more complex as there are multiple repositories involved, especially considering the size of the team where ability to collaborate on a single codebase may be more beneficial.
-- Ideally will require an additional set of utilities to generate template repositories for people building their own templates (as currently algokit does not provide any automated mechanism to do so other than copying official templates and modifying them)
+As demonstrated on the diagram above, the only glue connecting the backend and frontend is the generated typed client. Neither backend or frontend templates should be concerned with the other but instead provide modular interfaces that clearly indicate to developers on how to integrate the two. From a perspective of a backend template, the typed client can be seen as a `public` folder in modern web frameworks, a static asset that can be reused by any frontend template. Frontend templates on the other hand are mostly standard web projects with an additional layer of utilities that optionally allow them to be integrated with typed clients produced by backend templates.
 
-#### Examples
+#### Higher level overview
 
-- Example init with default frontend templates (assuming that algokit cli has a set of pre-defined frontend templates):
+The main scenario to support for this part is to allow developers to use official starter templates to bootstrap end to end dApp projects.
 
-  ```bash
-  $ algokit init --template-url ...
-  $ ? Select frontend component: [React, Vue, Next, Angular, Svelte, None]
-  $ ...
-  ```
+![Diagram 2](assets/2023-06-06_frontend-templates/scenario_1.jpg)
 
-- Example init with external frontend templates:
+As demonstrated above the dev experience will consist of executing an `algokit init` command for the preffered backends and frontends.
 
-  ```bash
-  $ algokit init --template-url ... --frontend-url ...
-  $ ...
-  ```
+It gives user a choice and responsibility to then decide how to integrate the two components depending on their project needs. To improve this however, we should **additionally introduce a new utility** that will serve as a tool to automate linking with the typed client that backend templates will be generating. Implementation specific details can be discussed separately is it goes out of scope of this Architecture Decision Record.
 
 ---
 
-### Option 3. Hybrid approach
+### Part 2. End-to-end starter repositories
 
-In this approach, we can have a default frontend code template included with the backend in a monorepo but also provide the option for developers to specify a separate frontend template URL if desired.
+> TLDR: End-to-end starter repositories are designed to offer developers an official starter template for bootstrapping dApp projects. This is achieved by efficiently bundling backend and frontend templates to facilitate easy maintenance and smooth onboarding.
 
-#### Pros
+#### Higher level overview
 
-- Combines the benefits of both monorepo and separate templates approach.
-- Gives developers more flexibility while maintaining an official templates monorepo.
-- Gives template creators a choice to either make a community template or contribute to an existing set of official templates (with a tradeoff on potentially longer PR reviews and etc).
+The main scenario to support for this part is to allow developers to use official starter templates to bootstrap end to end dApp projects.
 
-#### Cons
+![Diagram 2](assets/2023-06-06_frontend-templates/scenario_2.jpg)
 
-- May add complexity to the CLI tool's implementation.
-- Integration between frontend and backend will require additional work to implement a
-  mechanism that allows swapping out the default frontend template with a custom one from provided url and aliasing/moving the generated typed client into the frontend.
+As demonstrated above the user experience will consist of a single execution of `algokit init` command pointed at official fullstack template repository. The full stack templates are responsible for bundling both backend and frontend templates together and providing a seamless onramp for developers to get started with dApp development. The way repositories are bundled should be easy to maintain and should not duplicate individual backend and frontend repositories to avoid redundant maintenance, instead it should expand on metatemplating capabilities of `copier` to allow for efficient reuse of existing standalone backend/frontend templates.
+
+### Addendum 1. Converting _ANY_ frontend projects into dApps.
+
+> TLDR: The approach aims to enhance the algokit-cli codebase's adaptability, enabling easy transformation of existing frontend projects into web3 dApps.
+
+This orthogonal approach proposes to improve capabilities of the algokit-cli codebase by making it adaptable to various frontend stacks to allow anyone to easily convert their existing frontend projects into web3 dApps.
+
+The implementation specific details will consist of deriving a set of bare minimum requirements for such feature to scan and understand the structure of frontend where algokit is being embedded and performing necessary modifications to project's files. A detailed discussion can be held in a scope separate from this Architecture Decision Record.
+
+> This approach can be explored and maintained without overlapping with main proposal on frontend templates.
+
+### Addendum 2. Website for choosing preferred frontend and backend repositories.
+
+> TLDR: The approach proposes a website to enhance the discoverability of official and community-based algokit templates, thereby incentivizing template builders to create and maintain their own templates.
+
+This orthogonal approach proposes to improve discoverability of official and community based algokit templates by providing a simple static website. The website can consist of minimalistic UI components for picking preffered backend, frontend and then a `Generate` button that will output copy-pasteable algokit CLI commands to spin up a project with the selected templates.
+
+As a specific example, the website can be hosted on [AwesomeAlgo](https://awesomealgo.com) website, thus ensuring that this is an open-source community maintaned entrypoint for discovering and using algokit templates. Removing the need and maintenance overhead on our teams to maintain it as official resource.
+
+Lastly, community template builders will get a platform to increase discoverability of their templates and further incentivise them to build and maintain them. While developers using the templates can support creators of templates by donating to their projects (a simple tipping mechanism for Algo and ASAs can be embedded into the website) or by contributing to the templates themselves.
+
+> This approach can be explored and maintained without overlapping with main proposal on frontend templates.
 
 ---
 
-## Preferred option
+## Final decision
 
-Keeping AlgoKit principles in mind, the Hybrid Approach might be the most balanced starting point. It can allow us as a team to collaborate on a single repository while also providing other developers the flexibility to use separate combinations of frontend templates if desired. Additionally, this approach can be implemented in 2 steps where we start with a monorepo and then extend it to support external frontend templates after further feedback and evaluation on developer experience.
+To be decided
 
-## Selected option
-
-To be discussed.
+> The final decision is being finalized but the team is currently leaning in favor towards the proposal outlined in the Architecture Decision Record. Hence, this revision excluded the details of other options considered and adds more decision specific details to the approach with having separate self-sufficient frontend templates.
 
 ## Open questions
 
-- Do we want to support scenarios when users already have a ready made frontend repository and want to potentially embedd algokit into it - or we are primarily focusing on solid user experience in regards to initialization and bootstrapping of the templates?
-- How do we want to handle cases when user select python typed client during initialization? Do we want to provide a default python based frontend template or do we want to provide a list of available frontend templates that are compatible with the selected typed client? In most popular frontend frameworks a python client would be of no use unless we provide a python based frontend template OR treat it as a special use case when python client needs to be placed on a backend server.
-- Which exact smart contract scenarios in regards to frontend are we handling. Some devs may have multiple smart contracts, some require to be deployed separately from the frontend, some may require frontend to handle deployments and upgrades. Do we opt in to only support the scenario where contract is deployed completely separately from the frontend and frontend is only used to interact with the contract? Or do we want to support more complex scenarios where frontend is used to deploy and upgrade the contract?
+- Python typed clients are not going to be too relevant for scenarios where they need to be integrated with frontends given that in majority of cases a developer would prefer a TS typed client. Hence, how do we ensure that user gets a clear information and indication on when to use Python typed clients vs TS typed clients?
+- - Would we want to introduce a notion of non smart contract based backend templates that can be used to plug in the python typed clients and spin up servers that can be used to build APIs that interact with the smart contracts?
 
-# Next Steps
+## Next steps
 
-The next steps assuming either option 1 or 3 is picked, would be to:
+After the final decision is made, the action items necessary to implement the described proposal can be outlined as follows:
 
-1. Pick a most popular web framework used by Algorand community (React, Next, Vue or else) and implement a templatized version of it into monorepo.
-2. Extend the CLI tool to support separate optional flag for external frontend templates (while defaulting to official templates from monorepo that bundle official frontends).
-3. Test the new templates and CLI tool functionality.
-4. Update the AlgoKit documentation to explain how to use the new frontend templates.
+1. **Design and Development of Independent Frontend Templates**: This involves selecting appropriate technology stacks and building out the templates. Each of these templates should be able to work with the generated typed client from the backend.
+
+2. **Development of AlgoKit CLI Linking Utility**: As per the proposal, a new CLI utility should be introduced that will automate the linking between frontend and backend templates with the typed client.
+
+3. **Development of End-to-End Starter Repositories**: This involves building comprehensive templates that bundle both frontend and backend components. These templates should be designed to be easy to maintain and should leverage the metatemplating capabilities of `copier` for efficient reuse of existing standalone templates.
+
+4. **Integration and Testing**: Ensure proper integration between frontend and backend templates. Also, extensive testing should be done to ensure smooth functioning and a seamless onramp experience for the developers.
+
+5. **Documentation**: Write comprehensive documentation covering the use of the new templates, how to integrate them, and the utility for linking them with the typed client. This documentation should also include how-to guides and sample applications to help developers get started.
+
+6. **Addendum 1 - Converting ANY Frontend Projects into dApps**: Start a separate discussion and potentially a project to research the feasibility of this idea. If feasible, design and implement a method that allows developers to convert their existing non-web3 frontend projects into dApps using AlgoKit.
+
+7. **Addendum 2 - Development of Template Selection Website**: Plan and execute the development of a minimalist UI that allows developers to easily discover and select their preferred templates. This should also allow them to easily generate the necessary AlgoKit CLI commands for their project setup.
+
+8. **Community Engagement**: Engage the developer community to drive contributions to the template repositories. This includes encouraging template builders to contribute and supporting developers using the templates with issues and suggestions.
+
+9. **Continuous Review and Maintenance**: Regularly review the templates to ensure they are up to date with changes in technology and AlgoKit principles. Continuous maintenance should also be carried out to ensure the templates remain functional and relevant.
+
+Regarding the open questions, these should be discussed in detail to clarify how to handle Python typed clients and the potential introduction of non-smart contract based backend templates. These discussions may lead to additional actions as required.
