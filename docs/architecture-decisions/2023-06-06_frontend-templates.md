@@ -41,9 +41,9 @@ The addendums to the proposal also explores orthogonal ideas that can further im
 
 The following aims to provide a seamless onramp for developers to get started with highly customizable dApp starter projects. The idea is to create a set of separate official frontend template repositories to serve as:
 a) A reference for template builders on how to create standalone frontend templates that can be then further coupled with any backend template.
-b) Expand on AlgoKit principles of modularity, maintainability and flexibility by giving developers a choice of preffered technological stack.
+b) Expand on AlgoKit principles of modularity, maintainability and flexibility by giving developers a choice of preferred technological stack.
 
-The official standalone frontend templates can be build by reusing already established best practices and templates from official backend repositores and by continuing reliance on `copier` for template automation. Another important consideration to keep in mind is that with the introduction of frontend templates we need to establish a clear separation of concerns between the backend and frontend templates to ensure modularity.
+The official standalone frontend templates can be build by reusing already established best practices and templates from official backend repositories and by continuing reliance on `copier` for template automation. Another important consideration to keep in mind is that with the introduction of frontend templates we need to establish a clear separation of concerns between the backend and frontend templates to ensure modularity.
 
 ![Diagram 1](assets/2023-06-06_frontend-templates/modular_templates.jpg)
 
@@ -55,7 +55,7 @@ The main scenario to support for this part is to allow developers to use officia
 
 ![Diagram 2](assets/2023-06-06_frontend-templates/scenario_1.jpg)
 
-As demonstrated above the dev experience will consist of executing an `algokit init` command for the preffered backends and frontends.
+As demonstrated above the dev experience will consist of executing an `algokit init` command for the preferred backends and frontends.
 
 It gives user a choice and responsibility to then decide how to integrate the two components depending on their project needs. To improve this however, we should **additionally introduce a new utility** that will serve as a tool to automate linking with the typed client that backend templates will be generating. Implementation specific details can be discussed separately is it goes out of scope of this Architecture Decision Record.
 
@@ -71,7 +71,7 @@ The main scenario to support for this part is to allow developers to use officia
 
 ![Diagram 2](assets/2023-06-06_frontend-templates/scenario_2.jpg)
 
-As demonstrated above the user experience will consist of a single execution of `algokit init` command pointed at official fullstack template repository. The full stack templates are responsible for bundling both backend and frontend templates together and providing a seamless onramp for developers to get started with dApp development. The way repositories are bundled should be easy to maintain and should not duplicate individual backend and frontend repositories to avoid redundant maintenance, instead it should expand on metatemplating capabilities of `copier` to allow for efficient reuse of existing standalone backend/frontend templates.
+As demonstrated above the user experience will consist of a single execution of `algokit init` command pointed at official full-stack template repository. The full stack templates are responsible for bundling both backend and frontend templates together and providing a seamless onramp for developers to get started with dApp development. The way repositories are bundled should be easy to maintain and should not duplicate individual backend and frontend repositories to avoid redundant maintenance, instead it should expand on metatemplating capabilities of `copier` to allow for efficient reuse of existing standalone backend/frontend templates.
 
 ### Addendum 1. Converting _ANY_ frontend projects into dApps.
 
@@ -87,11 +87,11 @@ The implementation specific details will consist of deriving a set of bare minim
 
 > TLDR: The approach proposes a website to enhance the discoverability of official and community-based algokit templates, thereby incentivizing template builders to create and maintain their own templates.
 
-This orthogonal approach proposes to improve discoverability of official and community based algokit templates by providing a simple static website. The website can consist of minimalistic UI components for picking preffered backend, frontend and then a `Generate` button that will output copy-pasteable algokit CLI commands to spin up a project with the selected templates.
+This orthogonal approach proposes to improve discoverability of official and community based algokit templates by providing a simple static website. The website can consist of minimalistic UI components for picking preferred backend, frontend and then a `Generate` button that will output copyable algokit CLI commands to spin up a project with the selected templates.
 
-As a specific example, the website can be hosted on [AwesomeAlgo](https://awesomealgo.com) website, thus ensuring that this is an open-source community maintaned entrypoint for discovering and using algokit templates. Removing the need and maintenance overhead on our teams to maintain it as official resource.
+As a specific example, the website can be hosted on [AwesomeAlgo](https://awesomealgo.com) website, thus ensuring that this is an open-source community maintained entry-point for discovering and using algokit templates. Removing the need and maintenance overhead on our teams to maintain it as official resource.
 
-Lastly, community template builders will get a platform to increase discoverability of their templates and further incentivise them to build and maintain them. While developers using the templates can support creators of templates by donating to their projects (a simple tipping mechanism for Algo and ASAs can be embedded into the website) or by contributing to the templates themselves.
+Lastly, community template builders will get a platform to increase discoverability of their templates and further incentivize them to build and maintain them. While developers using the templates can support creators of templates by donating to their projects (a simple tipping mechanism for Algo and ASAs can be embedded into the website) or by contributing to the templates themselves.
 
 > This approach can be explored and maintained without overlapping with main proposal on frontend templates.
 
