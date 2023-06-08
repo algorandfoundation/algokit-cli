@@ -9,7 +9,7 @@
 
 ## Context
 
-AlgoKit v2 aims provide an end-to-end development and deployment experience that includes support for the end-to-end smart contract and dApp development lifecycle. With the release of the typed clients feature - developers are now able to reduce the time it takes to fully integrate the interactions between the contract and the frontend components powering the e2e dapp user experience. Hence, as a logical continuation, the following ADR aims to expand on the current capabilities of AlgoKit to support the `frontend` templates, an [AlgoKit Principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles) compliant approach towards simplifying integrations of smart contracts with the dApp frontend components.
+AlgoKit v2 aims provide an end-to-end development and deployment experience that includes support for the end-to-end smart contract and dApp development lifecycle. With the release of the typed clients feature - developers are now able to reduce the time it takes to fully integrate the interactions between the contract and the frontend components powering the end-to-end dapp user experience. Hence, as a logical continuation, the following Architecture Decision Record aims to expand on the current capabilities of AlgoKit to support the `frontend` templates, an [AlgoKit Principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles) compliant approach towards simplifying integrations of smart contracts with the dApp frontend components.
 
 ## Requirements
 
