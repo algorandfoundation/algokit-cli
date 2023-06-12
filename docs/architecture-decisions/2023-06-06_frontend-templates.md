@@ -1,10 +1,10 @@
 # Frontend Templates
 
-- **Status**: Draft (rev 3)
+- **Status**: Approved
 - **Owner:** Altynbek Orumbayev
-- **Deciders**: TBD
+- **Deciders**: Rob Moore, Daniel McGregor, Adam Chidlow
 - **Date created**: 2023-06-06
-- **Date decided:** TBD
+- **Date decided:** 2023-06-09
 - **Date updated**: 2023-06-08
 
 ## Context
