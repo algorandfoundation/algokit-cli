@@ -138,13 +138,13 @@ files = [
 
 [[package]]
 name = "algokit-client-generator"
-version = "1.0.0"
+version = "1.0.1"
 description = "Algorand typed client Generator"
 category = "main"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "algokit_client_generator-1.0.0-py3-none-any.whl", hash = "sha256:500bfae5b189634cdf160cbaf0541b7c6153ff647efbd34ee01f403c0482ea90"},
+    {file = "algokit_client_generator-1.0.1-py3-none-any.whl", hash = "sha256:83027cdaa75893b53adca0046bf84d845bc1730eabca0a462ea39352c3dd49ae"},
 ]
 
 [package.dependencies]
@@ -3131,4 +3131,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c1072296f76b9c288cccf72322fd1d9700d1901f3e7875a6a2a2dc1170d179ff"
+content-hash = "e4e78d60457e84b1eed4ba18bb145093e92461cd5db572f87e7489b318e4cb32"
