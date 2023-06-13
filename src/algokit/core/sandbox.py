@@ -1,6 +1,7 @@
 import enum
 import json
 import logging
+import time
 from pathlib import Path
 from typing import Any, cast
 
@@ -76,7 +77,11 @@ class ComposeSandbox:
         self._run_compose_command(
             "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start LocalNet"
         )
-        logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
+        logger.debug("AlgoKit LocalNet started, waiting for health check")
+        if _wait_for_algod():
+            logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
+        else:
+            logger.warning("AlgoKit LocalNet failed to return a successful health check")
 
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
@@ -120,6 +125,25 @@ DEFAULT_ALGOD_SERVER = "http://localhost"
 DEFAULT_ALGOD_TOKEN = "a" * 64
 DEFAULT_ALGOD_PORT = 4001
 DEFAULT_INDEXER_PORT = 8980
+DEFAULT_WAIT_FOR_ALGOD = 30
+DEFAULT_HEALTH_TIMEOUT = 1
+
+
+def _wait_for_algod() -> bool:
+    end_time = time.time() + DEFAULT_WAIT_FOR_ALGOD
+    health_url = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/health"
+    while time.time() < end_time:
+        try:
+            health = httpx.get(health_url, timeout=DEFAULT_HEALTH_TIMEOUT)
+        except httpx.RequestError:
+            logger.debug("AlgoKit LocalNet health request failed, waiting", exc_info=True)
+        else:
+            if health.is_success:
+                logger.debug("AlgoKit LocalNet health check successful, algod is ready")
+                return True
+            logger.debug(f"AlgoKit LocalNet health check returned {health.status_code}, waiting")
+        time.sleep(DEFAULT_HEALTH_TIMEOUT)
+    return False
 
 
 def get_config_json() -> str:
