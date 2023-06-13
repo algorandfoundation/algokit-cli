@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.3 (2023-06-13)
+
+### Fix
+
+* Update python algokit-client-generator ([#283](https://github.com/algorandfoundation/algokit-cli/issues/283)) ([`5330baa`](https://github.com/algorandfoundation/algokit-cli/commit/5330baaf8617a1b5b640d5efecdcbe05fd2ea2a3))
+
 ## v1.1.2 (2023-06-13)
 
 ### Fix
