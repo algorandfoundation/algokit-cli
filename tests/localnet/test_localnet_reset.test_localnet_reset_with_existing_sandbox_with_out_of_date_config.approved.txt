@@ -13,7 +13,7 @@ DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
-DEBUG: HTTP Request: GET http://localhost:4001/health "HTTP/1.1 200 OK"
+DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
 DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 
