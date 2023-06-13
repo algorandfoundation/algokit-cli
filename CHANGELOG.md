@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.2 (2023-06-13)
+
+### Fix
+
+* Use /v2/status for algod health check ([#282](https://github.com/algorandfoundation/algokit-cli/issues/282)) ([`91e5e36`](https://github.com/algorandfoundation/algokit-cli/commit/91e5e36886edfa5d90f6aaf77f9db6a666bbdc43))
+
 ## v1.1.1 (2023-06-13)
 
 ### Fix
