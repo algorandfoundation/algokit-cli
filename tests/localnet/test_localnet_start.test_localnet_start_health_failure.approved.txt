@@ -4,15 +4,14 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Sandbox directory does not exist yet; creating it
-DEBUG: Existing LocalNet not found; creating from scratch...
+DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
-DEBUG: HTTP Request: GET http://localhost:4001/health "HTTP/1.1 200 OK"
-DEBUG: AlgoKit LocalNet health check successful, algod is ready
-Started; execute `algokit explore` to explore LocalNet in a web user interface.
+DEBUG: AlgoKit LocalNet health request failed
+WARNING: AlgoKit LocalNet failed to return a successful health check
 ----
 {app_config}/sandbox/docker-compose.yml:
 ----
