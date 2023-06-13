@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.1 (2023-06-13)
+
+### Fix
+
+* Add check for localnet start to wait for algod to be ready ([#281](https://github.com/algorandfoundation/algokit-cli/issues/281)) ([`dff0a5d`](https://github.com/algorandfoundation/algokit-cli/commit/dff0a5d45fb79317509f6a44fa3fc37b93a2d8af))
+
+### Documentation
+
+* Updating adr header to reflect status and deciders ([`b84a07d`](https://github.com/algorandfoundation/algokit-cli/commit/b84a07dee0c1b5fc9060b806feeb07c41b4cd4fd))
+
 ## v1.1.0 (2023-06-07)
 
 ### Feature
