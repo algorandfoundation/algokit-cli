@@ -127,22 +127,25 @@ DEFAULT_ALGOD_PORT = 4001
 DEFAULT_INDEXER_PORT = 8980
 DEFAULT_WAIT_FOR_ALGOD = 30
 DEFAULT_HEALTH_TIMEOUT = 1
+ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/health"
 
 
 def _wait_for_algod() -> bool:
     end_time = time.time() + DEFAULT_WAIT_FOR_ALGOD
-    health_url = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/health"
+    last_exception: httpx.RequestError | None = None
     while time.time() < end_time:
         try:
-            health = httpx.get(health_url, timeout=DEFAULT_HEALTH_TIMEOUT)
-        except httpx.RequestError:
-            logger.debug("AlgoKit LocalNet health request failed, waiting", exc_info=True)
+            health = httpx.get(ALGOD_HEALTH_URL, timeout=DEFAULT_HEALTH_TIMEOUT)
+        except httpx.RequestError as ex:
+            last_exception = ex
         else:
             if health.is_success:
                 logger.debug("AlgoKit LocalNet health check successful, algod is ready")
                 return True
             logger.debug(f"AlgoKit LocalNet health check returned {health.status_code}, waiting")
         time.sleep(DEFAULT_HEALTH_TIMEOUT)
+    if last_exception:
+        logger.debug("AlgoKit LocalNet health request failed", exc_info=last_exception)
     return False
 
 

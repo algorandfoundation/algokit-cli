@@ -10,7 +10,7 @@ DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
-DEBUG: AlgoKit LocalNet health request failed, waiting
+DEBUG: AlgoKit LocalNet health request failed
 WARNING: AlgoKit LocalNet failed to return a successful health check
 ----
 {app_config}/sandbox/docker-compose.yml:

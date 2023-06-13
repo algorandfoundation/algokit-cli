@@ -1,4 +1,5 @@
 import pytest
+from algokit.core.sandbox import ALGOD_HEALTH_URL
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
@@ -11,4 +12,4 @@ def algod_health_fast_timings(mocker: MockerFixture) -> None:  # noqa: ignore[PT
 
 @pytest.fixture()
 def health_success(httpx_mock: HTTPXMock) -> None:  # noqa: ignore[PT004]
-    httpx_mock.add_response(url="http://localhost:4001/health")
+    httpx_mock.add_response(url=ALGOD_HEALTH_URL)

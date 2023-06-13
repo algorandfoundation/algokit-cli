@@ -2,7 +2,7 @@ import json
 
 import httpx
 import pytest
-from algokit.core.sandbox import get_config_json, get_docker_compose_yml
+from algokit.core.sandbox import ALGOD_HEALTH_URL, get_config_json, get_docker_compose_yml
 from pytest_httpx import HTTPXMock
 
 from tests import get_combined_verify_output
@@ -28,7 +28,7 @@ def test_localnet_start(app_dir_mock: AppDirs) -> None:
 
 @pytest.mark.usefixtures("proc_mock")
 def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
-    httpx_mock.add_exception(httpx.RemoteProtocolError("No response"), url="http://localhost:4001/health")
+    httpx_mock.add_exception(httpx.RemoteProtocolError("No response"), url=ALGOD_HEALTH_URL)
     result = invoke("localnet start")
 
     assert result.exit_code == 0
@@ -43,7 +43,7 @@ def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXM
 
 @pytest.mark.usefixtures("proc_mock")
 def test_localnet_start_health_bad_status(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
-    httpx_mock.add_response(status_code=500, url="http://localhost:4001/health")
+    httpx_mock.add_response(status_code=500, url=ALGOD_HEALTH_URL)
     result = invoke("localnet start")
 
     assert result.exit_code == 0
