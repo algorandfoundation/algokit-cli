@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.4 (2023-06-14)
+
+### Fix
+
+* Update typescript algokit-client-generator ([#284](https://github.com/algorandfoundation/algokit-cli/issues/284)) ([`37d5082`](https://github.com/algorandfoundation/algokit-cli/commit/37d5082f86fd3db43ebb7c96558a484267883067))
+
 ## v1.1.3 (2023-06-13)
 
 ### Fix
