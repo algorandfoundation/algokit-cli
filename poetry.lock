@@ -188,7 +188,7 @@ test = ["pytest"]
 name = "altgraph"
 version = "0.17.3"
 description = "Python graph (network) package"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 files = [
@@ -1306,7 +1306,7 @@ testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-chec
 name = "macholib"
 version = "1.16.2"
 description = "Mach-O header analysis and editing"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 files = [
@@ -1751,7 +1751,7 @@ files = [
 name = "pefile"
 version = "2023.2.7"
 description = "Python PE parsing module"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.0"
 files = [
@@ -2136,7 +2136,7 @@ plugins = ["importlib-metadata"]
 name = "pyinstaller"
 version = "5.12.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "<3.12,>=3.7"
 files = [
@@ -2170,7 +2170,7 @@ hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 name = "pyinstaller-hooks-contrib"
 version = "2023.3"
 description = "Community maintained hooks for PyInstaller"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2390,7 +2390,7 @@ files = [
 name = "pywin32-ctypes"
 version = "0.2.0"
 description = ""
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 files = [
@@ -2638,7 +2638,7 @@ files = [
 name = "setuptools"
 version = "67.8.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3219,5 +3219,5 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 
 [metadata]
 lock-version = "2.0"
-python-versions = "<3.12,>=3.10"
-content-hash = "8f878dc527735ea963ec2b2e4baa387f0390123e49b23c16758d5d456f2604eb"
+python-versions = "^3.10"
+content-hash = "3504d1f951509ebcfe3dc86842ccf960dd64ecc11ce77e602a86868c8d96e74e"
