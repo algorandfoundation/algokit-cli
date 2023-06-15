@@ -284,4 +284,4 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         return {"Status": "Error"}
 
 
-DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "--version"]
