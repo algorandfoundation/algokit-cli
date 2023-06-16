@@ -1,4 +1,23 @@
-# AlgoKit CLI
+<div align="center">
+<a href="https://github.com/algorandfoundation/algokit-cli"><img src="https://bafybeihfrtfg4vcufkcqmrtslkhx737ppz2fgn2lnctsd6waduqhhhibye.ipfs.nftstorage.link/" width=60%></a>
+</div>
+
+<p align="center">
+    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md">
+      <img src="https://img.shields.io/badge/docs-repository-00dc94?logo=github&style=flat.svg" />
+    </a>
+    <a target="_blank" href="https://developer.algorand.org/algokit/">
+      <img src="https://img.shields.io/badge/learn-AlgoKit-00dc94?logo=algorand&mac=flat.svg" />
+    </a>
+    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli">
+      <img src="https://img.shields.io/github/stars/algorandfoundation/algokit-cli?color=00dc94&logo=star&style=flat" />
+    </a>
+    <a target="_blank" href="https://developer.algorand.org/algokit/">
+      <img  src="https://api.visitorbadge.io/api/visitors?path=algorandfoundation%2Falgokit-cli&countColor=%2300dc94&style=flat" />
+    </a>
+</p>
+
+---
 
 The Algorand AlgoKit CLI is the one-stop shop tool for developers building on the [Algorand network](https://www.algorand.com/).
 
