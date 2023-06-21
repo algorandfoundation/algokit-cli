@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.1.6 (2023-06-21)
+
+### Fix
+
+* Increase timeout when doing algod health check ([#290](https://github.com/algorandfoundation/algokit-cli/issues/290)) ([`2b39970`](https://github.com/algorandfoundation/algokit-cli/commit/2b39970c53d358050639fbcb02ab6e99c1808d98))
+
+### Documentation
+
+* Adding readme assets ([`e300fa9`](https://github.com/algorandfoundation/algokit-cli/commit/e300fa929850b1f3677cb3545b8f284e8f3a7ef9))
+
 ## v1.1.5 (2023-06-15)
 
 ### Fix
