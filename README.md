@@ -3,18 +3,10 @@
 </div>
 
 <p align="center">
-    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md">
-      <img src="https://img.shields.io/badge/docs-repository-00dc94?logo=github&style=flat.svg" />
-    </a>
-    <a target="_blank" href="https://developer.algorand.org/algokit/">
-      <img src="https://img.shields.io/badge/learn-AlgoKit-00dc94?logo=algorand&mac=flat.svg" />
-    </a>
-    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli">
-      <img src="https://img.shields.io/github/stars/algorandfoundation/algokit-cli?color=00dc94&logo=star&style=flat" />
-    </a>
-    <a target="_blank" href="https://developer.algorand.org/algokit/">
-      <img  src="https://api.visitorbadge.io/api/visitors?path=algorandfoundation%2Falgokit-cli&countColor=%2300dc94&style=flat" />
-    </a>
+    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md"><img src="https://img.shields.io/badge/docs-repository-00dc94?logo=github&style=flat.svg" /></a>
+    <a target="_blank" href="https://developer.algorand.org/algokit/"><img src="https://img.shields.io/badge/learn-AlgoKit-00dc94?logo=algorand&mac=flat.svg" /></a>
+    <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli"><img src="https://img.shields.io/github/stars/algorandfoundation/algokit-cli?color=00dc94&logo=star&style=flat" /></a>
+    <a target="_blank" href="https://developer.algorand.org/algokit/"><img  src="https://vbr.wocr.tk/badge?page_id=algorandfoundation%2Falgokit-cli&color=%2300dc94&style=flat" /></a>
 </p>
 
 ---
