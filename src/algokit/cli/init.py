@@ -254,15 +254,29 @@ def init_command(
         # and print it out so the user can (depending on terminal) click it to open in browser
         logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
 
+    # Check if a README file exists
     readme_path = next(project_path.glob("README*"), None)
+
+    # Check if a .workspace file exists
+    workspace_file = next(project_path.glob("*.code-workspace"), None)
+
     if open_ide and (project_path / ".vscode").is_dir() and (code_cmd := shutil.which("code")):
+        target_path = str(project_path)
+
         logger.info(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-        code_cmd_and_args = [code_cmd, str(project_path)]
+
+        if workspace_file:
+            logger.info(f"Detected VSCode workspace file. Opening workspace: {workspace_file}")
+            target_path = str(workspace_file)
+
+        code_cmd_and_args = [code_cmd, target_path]
+
         if readme_path:
             code_cmd_and_args.append(str(readme_path))
+
         proc.run(code_cmd_and_args)
     elif readme_path:
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
