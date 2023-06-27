@@ -13,7 +13,7 @@ from algokit.core import proc
 
 logger = logging.getLogger(__name__)
 
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@^2.2.1"
+TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@^2.2.2"
 
 
 def _snake_case(s: str) -> str:
