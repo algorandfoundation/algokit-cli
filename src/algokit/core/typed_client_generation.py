@@ -27,8 +27,8 @@ class ClientGenerator(abc.ABC):
     language: ClassVar[str]
     extension: ClassVar[str]
 
-    _by_language: dict[str, type["ClientGenerator"]] = {}
-    _by_extension: dict[str, type["ClientGenerator"]] = {}
+    _by_language: dict[str, type["ClientGenerator"]] = {}  # noqa: RUF012
+    _by_extension: dict[str, type["ClientGenerator"]] = {}  # noqa: RUF012
 
     def __init_subclass__(cls, language: str, extension: str) -> None:
         cls.language = language
