@@ -1,9 +1,20 @@
+import logging
 import os
 import platform
+import sys
 from importlib import metadata
 from pathlib import Path
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
+from algokit.core.constants import ALGOKIT_CONFIG
+
 PACKAGE_NAME = "algokit"
+
+logger = logging.getLogger(__name__)
 
 
 def get_app_config_dir() -> Path:
@@ -42,3 +53,27 @@ def _get_relative_app_path(base_dir: str) -> Path:
 
 def get_current_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
+
+
+def get_algokit_config(project_dir: Path, config_filename: str = ALGOKIT_CONFIG) -> dict | None:
+    """
+    Load and parse a TOML configuration file.
+    :param project_dir: Project directory path.
+    :param config_filename: Configuration filename.
+    :return: A dictionary containing the configuration or None if not found.
+    """
+    try:
+        config_path = project_dir / config_filename
+        config_text = config_path.read_text("utf-8")
+    except FileNotFoundError:
+        logger.debug(f"No {config_filename} file found in the project directory.")
+        return None
+    except Exception as ex:
+        logger.debug(f"Unexpected error reading {config_filename} file: {ex}")
+        return None
+
+    try:
+        return tomllib.loads(config_text)
+    except Exception as ex:
+        logger.debug(f"Error parsing {config_filename} file: {ex}")
+        return None

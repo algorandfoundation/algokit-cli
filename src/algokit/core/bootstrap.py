@@ -7,17 +7,18 @@ from shutil import which
 
 import click
 
+from algokit.core.constants import ALGOKIT_CONFIG
+
 if sys.version_info >= (3, 11):
-    import tomllib
+    pass
 else:
-    import tomli as tomllib
+    pass
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.conf import get_current_package_version
+from algokit.core.conf import get_algokit_config, get_current_package_version
 
 ENV_TEMPLATE = ".env.template"
-ALGOKIT_CONFIG = ".algokit.toml"
 logger = logging.getLogger(__name__)
 
 
@@ -230,14 +231,10 @@ def _get_base_python_path() -> str | None:
 
 def get_min_algokit_version(project_dir: Path) -> str | None:
     try:
-        config_path = project_dir / ALGOKIT_CONFIG
-        try:
-            config_text = config_path.read_text("utf-8")
-        except FileNotFoundError:
-            logger.debug(f"No {ALGOKIT_CONFIG} file found in the project directory.")
-            return None
+        config = get_algokit_config(project_dir)
 
-        config = tomllib.loads(config_text)
+        if config is None:
+            return None
 
         try:
             min_version = config["algokit"]["min_version"]

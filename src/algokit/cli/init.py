@@ -11,8 +11,8 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
+from algokit.core.constants import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
-from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +162,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
-def init_command(  # noqa: PLR0913
+def init_command(
     *,
     directory_name: str | None,
     template_name: str | None,

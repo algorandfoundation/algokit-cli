@@ -1,0 +1,6 @@
+Do you want to use a dispenser account? [y/N]: N
+No .env file found at {current_working_directory}/.env.betanet, loading default configuration for betanet.
+DEBUG: HTTP Request: GET https://betanet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
+echo: HelloWorld

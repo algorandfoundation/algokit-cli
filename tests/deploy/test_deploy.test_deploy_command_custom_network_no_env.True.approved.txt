@@ -1,0 +1,5 @@
+Do you want to use a dispenser account? [y/N]: N
+WARNING: Failed to load network name from http://localhost due to HTTP error.
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
+echo: HelloWorld

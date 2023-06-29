@@ -3,109 +3,74 @@
 # 3. User can overwrite them by creating a config file in the project root
 
 
-import configparser
 import logging
 import os
 import sys
 from pathlib import Path
 
 import click
+import httpx
+from dotenv import dotenv_values
 
 from algokit.core import proc
-from algokit.core.bootstrap import ALGOKIT_CONFIG
+from algokit.core.conf import get_algokit_config
+from algokit.core.constants import ALGOKIT_CONFIG, ALGORAND_NETWORKS, AlgorandNetworkConfiguration
 
 if sys.version_info >= (3, 11):
-    import tomllib
+    pass
 else:
-    import tomli as tomllib
+    pass
 
 logger = logging.getLogger(__name__)
 
 
-def _generate_config(  # noqa: PLR0913
-    algod_server: str,
-    indexer_server: str,
-    algod_token: str = "",
-    algod_port: str = "",
-    indexer_token: str = "",
-    indexer_port: str = "",
-) -> dict[str, str]:
-    return {
-        "ALGOD_TOKEN": algod_token,
-        "ALGOD_SERVER": algod_server,
-        "ALGOD_PORT": algod_port,
-        "INDEXER_TOKEN": indexer_token,
-        "INDEXER_SERVER": indexer_server,
-        "INDEXER_PORT": indexer_port,
-    }
+def get_genesis_network_name(deploy_config: dict) -> str | None:
+    """
+    Get the network name from the genesis block.
+    :param deploy_config: Deploy configuration.
+    :return: Network name.
+    """
 
+    algod_server = deploy_config.get("ALGOD_SERVER")
 
-REQUIRED_KEYS = [
-    "ALGOD_TOKEN",
-    "ALGOD_SERVER",
-    "ALGOD_PORT",
-    "INDEXER_TOKEN",
-    "INDEXER_SERVER",
-    "INDEXER_PORT",
-]
+    if not algod_server:
+        raise click.ClickException("Missing ALGOD_SERVER in deploy configuration.")
 
-DEPLOY_CONFIGS = {
-    "localnet": _generate_config(
-        algod_token="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        algod_server="http://localhost",
-        algod_port="4001",
-        indexer_token="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        indexer_server="http://localhost",
-        indexer_port="8980",
-    ),
-    "testnet": _generate_config(
-        algod_server="https://testnet-api.algonode.cloud",
-        indexer_server="https://testnet-idx.algonode.cloud",
-    ),
-    "mainnet": _generate_config(
-        algod_server="https://mainnet-api.algonode.cloud",
-        indexer_server="https://mainnet-idx.algonode.cloud",
-    ),
-    "betanet": _generate_config(
-        algod_server="https://betanet-api.algonode.cloud",
-        indexer_server="https://betanet-idx.algonode.cloud",
-    ),
-}
+    try:
+        genesis_response = httpx.get(f"{algod_server}/genesis")
+        genesis_response.raise_for_status()
+        return genesis_response.json()["network"] if genesis_response.status_code == 200 else None  # noqa: PLR2004
+    except httpx.HTTPError:
+        logger.warning(f"Failed to load network name from {algod_server} due to HTTP error.", exc_info=True)
+        return None
 
 
 def load_deploy_config(network: str, project_dir: Path) -> dict:
     """
-    Parse the .env file if it exists and load configurations.
+    Load the deploy configuration for the given network.
     :param network: Network name.
     :param project_dir: Project directory path.
-    :return: A dictionary containing the configuration.
+    :return: Deploy configuration.
     """
 
-    env_file_path = project_dir / ".env"
-    if env_file_path.exists():
-        config = configparser.ConfigParser()
-        with env_file_path.open() as f:
-            config.read_string("[config]\n" + f.read())
+    env_file_path = project_dir / f".env.{network}"
+    if not env_file_path.exists():
+        if network in ALGORAND_NETWORKS:
+            logger.info(f"No .env file found at {env_file_path}, loading default configuration for {network}.")
+            return dict(ALGORAND_NETWORKS.get(network, {}))
 
-        # Extract network configuration
-        network_config = {}
-        prefix = f"{network.upper()}_"
-        for key, value in config["config"].items():
-            # Strip the network prefix from each key
-            if key.startswith(prefix):
-                new_key = key[len(prefix) :]
-                network_config[new_key] = value
+        raise click.ClickException(f"No .env file found at {env_file_path}")
 
-        # Fill missing keys with empty strings
-        for required_key in REQUIRED_KEYS:
-            if required_key not in network_config:
-                logger.warning(f"Warning: {required_key} is missing, filling with an empty string.")
-                network_config[required_key] = ""
+    # Extract network configuration
+    network_config = dotenv_values(env_file_path, verbose=True, interpolate=True)
 
-        return network_config
-    else:
-        logger.info(f"No .env file found, loading default configuration for {network}.")
-        return DEPLOY_CONFIGS.get(network, {})
+    # Fill missing keys with empty strings
+    for required_key in list(AlgorandNetworkConfiguration.__annotations__.keys()):
+        if required_key not in network_config:
+            logger.warning(f"Warning: {required_key} is missing, filling with an empty string.")
+            network_config[required_key] = ""
+
+    return network_config
 
 
 def load_deploy_command(network_name: str, project_dir: Path) -> str:
@@ -117,23 +82,19 @@ def load_deploy_command(network_name: str, project_dir: Path) -> str:
     """
 
     # Load and parse the TOML configuration file
-    config_path = project_dir / ALGOKIT_CONFIG
-    try:
-        config_content = config_path.read_text("utf-8")
-    except FileNotFoundError:
-        logger.debug(f"No {ALGOKIT_CONFIG} file found in the project directory.")
-        raise click.ClickException(f"No {ALGOKIT_CONFIG} file found in the project directory.") from None
+    config = get_algokit_config(project_dir)
 
-    try:
-        config = tomllib.loads(config_content)
-    except FileNotFoundError:
-        raise click.ClickException(f"Configuration file '{config_path}' not found.") from None
+    if not config:
+        raise click.ClickException(
+            f"Couldn't load {ALGOKIT_CONFIG} file. Ensure deploy command is specified, either via "
+            f"--custom-deploy-command or inside {ALGOKIT_CONFIG} file."
+        )
 
     # Extract the deploy command for the given network
     try:
-        return config["deploy"][network_name]["command"]
+        return str(config["deploy"][network_name]["command"])
     except KeyError:
-        raise click.ClickException(f"Configuration file '{config_path}' not found.") from None
+        raise click.ClickException(f"Deploy command is not specified in '{ALGOKIT_CONFIG}' file.") from None
 
 
 def execute_deploy_command(command: str, deploy_config: dict, project_dir: Path | None) -> None:

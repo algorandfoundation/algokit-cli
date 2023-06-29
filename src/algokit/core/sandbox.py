@@ -8,6 +8,15 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
+from algokit.core.constants import (
+    ALGOD_HEALTH_URL,
+    DEFAULT_ALGOD_PORT,
+    DEFAULT_ALGOD_SERVER,
+    DEFAULT_ALGOD_TOKEN,
+    DEFAULT_HEALTH_TIMEOUT,
+    DEFAULT_INDEXER_PORT,
+    DEFAULT_WAIT_FOR_ALGOD,
+)
 from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
@@ -119,15 +128,6 @@ class ComposeSandbox:
         data = json.loads(run_results.output)
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
-
-
-DEFAULT_ALGOD_SERVER = "http://localhost"
-DEFAULT_ALGOD_TOKEN = "a" * 64
-DEFAULT_ALGOD_PORT = 4001
-DEFAULT_INDEXER_PORT = 8980
-DEFAULT_WAIT_FOR_ALGOD = 60
-DEFAULT_HEALTH_TIMEOUT = 1
-ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 
 
 def _wait_for_algod() -> bool:

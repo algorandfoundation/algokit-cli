@@ -3,8 +3,8 @@ from pathlib import Path
 
 import click
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.bootstrap import ALGOKIT_CONFIG
 from algokit.core.conf import get_current_package_version
+from algokit.core.constants import ALGOKIT_CONFIG
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 

@@ -20,7 +20,7 @@ class RunResult:
     output: str
 
 
-def run(  # noqa: PLR0913
+def run(
     command: list[str],
     *,
     cwd: Path | None = None,
