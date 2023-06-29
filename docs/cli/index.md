@@ -25,26 +25,33 @@
     - [version-prompt](#version-prompt)
     - [Arguments](#arguments)
     - [ENABLE](#enable)
-  - [doctor](#doctor)
+  - [deploy](#deploy)
     - [Options](#options-4)
-    - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
-  - [explore](#explore)
+    - [--custom-deploy-command ](#--custom-deploy-command-)
+    - [--ci](#--ci)
+    - [--prod](#--prod)
     - [Arguments](#arguments-1)
     - [NETWORK](#network)
+  - [doctor](#doctor)
+    - [Options](#options-5)
+    - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
+  - [explore](#explore)
+    - [Arguments](#arguments-2)
+    - [NETWORK](#network-1)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-5)
+    - [Options](#options-6)
     - [-o, --output ](#-o---output-)
     - [-l, --language ](#-l---language-)
-    - [Arguments](#arguments-2)
+    - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-6)
+    - [Options](#options-7)
     - [--console](#--console)
-    - [Arguments](#arguments-3)
+    - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-7)
+    - [Options](#options-8)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -59,11 +66,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-8)
+    - [Options](#options-9)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-9)
+    - [Options](#options-10)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -221,6 +228,34 @@ algokit config version-prompt [OPTIONS] [[enable|disable]]
 ### ENABLE
 Optional argument
 
+## deploy
+
+Deploy smart contracts from AlgoKit compliant repository.
+
+```shell
+algokit deploy [OPTIONS] NETWORK
+```
+
+### Options
+
+
+### --custom-deploy-command <custom_deploy_command>
+Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
+
+
+### --ci
+Skip interactive prompt for mnemonics, expects them to be set as environment variables.
+
+
+### --prod
+Skip warning prompt for deployments to a mainnet.
+
+### Arguments
+
+
+### NETWORK
+Required argument
+
 ## doctor
 
 Diagnose potential environment issues that may affect AlgoKit
@@ -243,7 +278,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 Explore the specified network in the browser using Dappflow.
 
 ```shell
-algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
+algokit explore [OPTIONS] [[localnet|testnet|betanet|mainnet]]
 ```
 
 ### Arguments
