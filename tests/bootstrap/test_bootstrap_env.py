@@ -28,6 +28,22 @@ def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory) -> None:
 def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env").touch()
+    (cwd / ".env.template").touch()
+
+    result = invoke(
+        "bootstrap env",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_bootstrap_env_multiple_templates(tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ".env.template").touch()
+    (cwd / ".env.localnet.template").touch()
+    (cwd / ".env.testnet.template").touch()
 
     result = invoke(
         "bootstrap env",
@@ -64,8 +80,8 @@ TOKEN_3=test value with spaces
 
 TOKEN_4_WITH_NO_EQUALS_SIGN
 # another comment
-TOKEN_5_SPECIAL_CHAR=*  
-"""  # noqa: W291
+TOKEN_5_SPECIAL_CHAR=*
+"""
     )
 
     result = invoke(
@@ -91,15 +107,15 @@ TOKEN_1=123
 TOKEN_2_WITH_MULTI_LINES_COMMENT=
 TOKEN_3=test value
 
-TOKEN_4_WITH_SPACES =               
+TOKEN_4_WITH_SPACES =
 TOKEN_5_WITHOUT_COMMENT=
 TOKEN_WITH_NO_EQUALS_SIGN
 # another comment
 TOKEN_6_EMPTY_WITH_COMMENT=
 TOKEN_7_VALUE_WILL_BE_EMPTY=
 TOKEN_8 = value with spaces
-TOKEN_8_SPECIAL_CHAR=*  
-"""  # noqa: W291
+TOKEN_8_SPECIAL_CHAR=*
+"""
     )
 
     # provide values for tokens

@@ -1,0 +1,10 @@
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: {current_working_directory}/.env.localnet doesn't exist yet
+DEBUG: {current_working_directory}/.env.localnet.template exists
+Copying {current_working_directory}/.env.localnet.template to {current_working_directory}/.env.localnet and prompting for empty values
+DEBUG: {current_working_directory}/.env doesn't exist yet
+DEBUG: {current_working_directory}/.env.template exists
+Copying {current_working_directory}/.env.template to {current_working_directory}/.env and prompting for empty values
+DEBUG: {current_working_directory}/.env.testnet doesn't exist yet
+DEBUG: {current_working_directory}/.env.testnet.template exists
+Copying {current_working_directory}/.env.testnet.template to {current_working_directory}/.env.testnet and prompting for empty values
