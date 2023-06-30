@@ -58,6 +58,7 @@ def bootstrap_any_including_subdirs(base_path: Path) -> None:
 def bootstrap_env(project_dir: Path) -> None:
     # List all .env*.template files in the directory
     env_template_paths = glob.glob(str(project_dir / ENV_TEMPLATE_PATTERN))
+    env_template_paths.sort()
 
     # If no template files found, log it
     if not env_template_paths:
