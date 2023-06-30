@@ -23,7 +23,7 @@ def extract_mnemonics(skip_mnemonics_prompts: bool, network: str) -> tuple[str |
     :param network: The name of the network ('localnet', 'testnet', 'mainnet', etc.)
     :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
     """
-    deployer_mnemonic = os.environ.get(DEPLOYER_KEY, None)
+    deployer_mnemonic = os.environ.get(DEPLOYER_KEY, "")
     dispenser_mnemonic = os.environ.get(DISPENSER_KEY, None)
 
     is_not_localnet = network != LOCALNET
