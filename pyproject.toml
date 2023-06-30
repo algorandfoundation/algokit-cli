@@ -21,7 +21,7 @@ python-dotenv = "^1.0.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
 black = {extras = ["d"], version = "^23.1.0"}
-ruff = "^0.0.257"
+ruff = "^0.0.275"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
