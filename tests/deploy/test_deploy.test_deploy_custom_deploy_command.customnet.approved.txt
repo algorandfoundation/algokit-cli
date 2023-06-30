@@ -1,9 +1,9 @@
 Starting deployment process on customnet network...
 Project directory: {current_working_directory}
-Using deploy command: echo CustomCommandExecuted
+Using deploy command: python -c print("HelloWorld")
 Do you want to use a dispenser account? [y/N]: N
 Loaded deployment configuration.
 WARNING: Failed to load network name from http://localhost due to HTTP error.
 Deploying smart contracts from AlgoKit compliant repository 🚀
-DEBUG: Running 'echo CustomCommandExecuted' in '{current_working_directory}'
-echo: CustomCommandExecuted
+DEBUG: Running 'python -c print("HelloWorld")' in '{current_working_directory}'
+python: HelloWorld

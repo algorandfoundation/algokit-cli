@@ -77,7 +77,7 @@ def test_deploy_default_networks_no_env(network: str, tmp_path_factory: TempPath
     if network != LOCALNET:
         os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
-    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "echo HelloWorld"\n')
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
     input_answers = ["N" if network != LOCALNET else ""]
 
@@ -100,7 +100,7 @@ def test_deploy_custom_network_env(has_env: bool, tmp_path_factory: TempPathFact
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
     network = CUSTOMNET
 
-    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "echo HelloWorld"\n')
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
     if has_env:
         (cwd / f".env.{network}").write_text(DUMMY_NETWORK_CONF)
@@ -121,7 +121,7 @@ def test_deploy_custom_network_env_genesis_call(env_network: str, tmp_path_facto
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
     network = CUSTOMNET
 
-    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "echo HelloWorld"\n')
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
     (cwd / f".env.{network}").write_text(
         f"""
     ALGOD_SERVER={ALGORAND_NETWORKS[env_network]['ALGOD_SERVER']}
@@ -145,7 +145,7 @@ def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory) -> 
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
     # Setup algokit configuration file
-    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "echo HelloWorld"\n')
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
     # Running with --prod flag
     result = invoke(
@@ -163,8 +163,7 @@ def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFa
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
-    custom_command = "echo CustomCommandExecuted"
-
+    custom_command = 'python -c print("HelloWorld")'
     if network == CUSTOMNET:
         (cwd / f".env.{network}").write_text(DUMMY_NETWORK_CONF)
 
@@ -191,7 +190,7 @@ def test_deploy_skip_mnemonics_prompts(tmp_path_factory: TempPathFactory) -> Non
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
     # Setup algokit configuration file
-    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "echo HelloWorld"\n')
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
     # Running with --ci flag to skip mnemonics prompts
     result = invoke(
