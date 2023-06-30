@@ -1,2 +1,0 @@
-Do you want to use a dispenser account? [y/N]: N
-Error: No .env file found at {current_working_directory}/.env.customnet

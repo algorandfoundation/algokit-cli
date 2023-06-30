@@ -1,4 +1,8 @@
+Starting deployment process on localnet network...
+Project directory: {current_working_directory}
+Using deploy command: echo HelloWorld
 No .env file found at {current_working_directory}/.env.localnet, loading default configuration for localnet.
+Loaded deployment configuration.
 Deploying smart contracts from AlgoKit compliant repository 🚀
 DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
 echo: HelloWorld

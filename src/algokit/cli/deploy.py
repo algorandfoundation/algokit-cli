@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from algokit.core.constants import DEFAULT_NETWORKS, DEPLOYER_KEY, DISPENSER_KEY, LOCALNET, MAINNET
 from algokit.core.deploy import (
     execute_deploy_command,
     get_genesis_network_name,
@@ -13,13 +14,8 @@ from algokit.core.deploy import (
 
 logger = logging.getLogger(__name__)
 
-LOCALNET = "localnet"
-MAINNET = "mainnet"
-DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
-DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
-
-def extract_env_variables(skip_mnemonics_prompts: bool, network: str) -> tuple[str, str | None]:  # noqa: FBT001
+def extract_mnemonics(skip_mnemonics_prompts: bool, network: str) -> tuple[str | None, str | None]:  # noqa: FBT001
     """
     Extract environment variables, prompt user if needed.
 
@@ -27,7 +23,7 @@ def extract_env_variables(skip_mnemonics_prompts: bool, network: str) -> tuple[s
     :param network: The name of the network ('localnet', 'testnet', 'mainnet', etc.)
     :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
     """
-    deployer_mnemonic = os.environ.get(DEPLOYER_KEY, "")
+    deployer_mnemonic = os.environ.get(DEPLOYER_KEY, None)
     dispenser_mnemonic = os.environ.get(DISPENSER_KEY, None)
 
     is_not_localnet = network != LOCALNET
@@ -48,7 +44,9 @@ def extract_env_variables(skip_mnemonics_prompts: bool, network: str) -> tuple[s
 
 
 @click.command("deploy")
-@click.argument("network", type=str, default=LOCALNET, required=True)
+@click.argument(
+    "network", type=str, default=LOCALNET, required=True, callback=(lambda _ctx, _param, value: value.lower())
+)
 @click.option(
     "custom_deploy_command",
     "--custom-deploy-command",
@@ -77,17 +75,24 @@ def deploy_command(
     is_production_environment: bool,  # noqa: FBT001
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
+    logger.info(f"Starting deployment process on {network} network...")
+
     project_dir = Path.cwd()
+    logger.info(f"Project directory: {project_dir}")
+
     deploy_command = custom_deploy_command or load_deploy_command(network_name=network, project_dir=project_dir)
-    deployer_mnemonic, dispenser_mnemonic = extract_env_variables(skip_mnemonics_prompts, network)
+    logger.info(f"Using deploy command: {deploy_command}")
+
+    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(skip_mnemonics_prompts, network)
 
     if not deployer_mnemonic and network != LOCALNET:
         raise click.ClickException("Error: Deployer Mnemonic must be provided via env var or via cli input.")
 
     deploy_config = load_deploy_config(network, project_dir)
+    logger.info("Loaded deployment configuration.")
 
     if not is_production_environment:
-        network_name = network if network == LOCALNET else get_genesis_network_name(deploy_config) or network
+        network_name = network if network in DEFAULT_NETWORKS else get_genesis_network_name(deploy_config) or network
 
         if MAINNET in network_name:
             click.confirm(

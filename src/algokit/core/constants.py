@@ -16,6 +16,15 @@ DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
 
+LOCALNET = "localnet"
+MAINNET = "mainnet"
+BETANET = "betanet"
+TESTNET = "testnet"
+
+DEFAULT_NETWORKS = [LOCALNET, MAINNET, BETANET, TESTNET]
+
+DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
+DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
 # ===============================
 # Network configuration constants
@@ -42,7 +51,7 @@ class AlgorandNetworkConfigurationWithKMD(AlgorandNetworkConfiguration, total=Fa
 
 
 ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfigurationWithKMD] = {
-    "localnet": {
+    LOCALNET: {
         "ALGOD_SERVER": GITPOD_URL.replace("https://", "https://4001-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
         "INDEXER_SERVER": GITPOD_URL.replace("https://", "https://8980-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
         "ALGOD_PORT": str(443 if GITPOD_URL else DEFAULT_ALGOD_PORT),
@@ -53,7 +62,7 @@ ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfi
         "KMD_PORT": str(443 if GITPOD_URL else DEFAULT_ALGOD_PORT + 1),
         "KMD_URL": GITPOD_URL.replace("https://", "https://4002-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
     },
-    "testnet": {
+    TESTNET: {
         "ALGOD_TOKEN": "",
         "ALGOD_SERVER": "https://testnet-api.algonode.cloud",
         "ALGOD_PORT": "",
@@ -61,7 +70,7 @@ ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfi
         "INDEXER_SERVER": "https://testnet-idx.algonode.cloud",
         "INDEXER_PORT": "",
     },
-    "betanet": {
+    BETANET: {
         "ALGOD_TOKEN": "",
         "ALGOD_SERVER": "https://betanet-api.algonode.cloud",
         "ALGOD_PORT": "",
@@ -69,7 +78,7 @@ ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfi
         "INDEXER_SERVER": "https://betanet-idx.algonode.cloud",
         "INDEXER_PORT": "",
     },
-    "mainnet": {
+    MAINNET: {
         "ALGOD_TOKEN": "",
         "ALGOD_SERVER": "https://mainnet-api.algonode.cloud",
         "ALGOD_PORT": "",

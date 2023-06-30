@@ -1,0 +1,10 @@
+Starting deployment process on mainnet network...
+Project directory: {current_working_directory}
+Using deploy command: echo HelloWorld
+Do you want to use a dispenser account? [y/N]: N
+No .env file found at {current_working_directory}/.env.mainnet, loading default configuration for mainnet.
+Loaded deployment configuration.
+You are about to deploy to the MainNet. Are you sure you want to continue? [y/N]: Y
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
+echo: HelloWorld

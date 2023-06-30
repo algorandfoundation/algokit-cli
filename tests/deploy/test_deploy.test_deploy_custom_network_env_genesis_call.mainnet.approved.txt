@@ -1,0 +1,14 @@
+Starting deployment process on customnet network...
+Project directory: {current_working_directory}
+Using deploy command: echo HelloWorld
+Do you want to use a dispenser account? [y/N]: N
+WARNING: Warning: ALGOD_PORT is missing, filling with an empty string.
+WARNING: Warning: ALGOD_TOKEN is missing, filling with an empty string.
+WARNING: Warning: INDEXER_PORT is missing, filling with an empty string.
+WARNING: Warning: INDEXER_TOKEN is missing, filling with an empty string.
+Loaded deployment configuration.
+DEBUG: HTTP Request: GET https://mainnet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
+You are about to deploy to the MainNet. Are you sure you want to continue? [y/N]: Y
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
+echo: HelloWorld

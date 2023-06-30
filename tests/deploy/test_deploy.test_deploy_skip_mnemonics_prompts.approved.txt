@@ -1,0 +1,8 @@
+Starting deployment process on testnet network...
+Project directory: {current_working_directory}
+Using deploy command: echo HelloWorld
+No .env file found at {current_working_directory}/.env.testnet, loading default configuration for testnet.
+Loaded deployment configuration.
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo HelloWorld' in '{current_working_directory}'
+echo: HelloWorld

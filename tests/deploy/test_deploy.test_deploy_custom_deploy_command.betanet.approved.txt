@@ -1,0 +1,9 @@
+Starting deployment process on betanet network...
+Project directory: {current_working_directory}
+Using deploy command: echo CustomCommandExecuted
+Do you want to use a dispenser account? [y/N]: N
+No .env file found at {current_working_directory}/.env.betanet, loading default configuration for betanet.
+Loaded deployment configuration.
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'echo CustomCommandExecuted' in '{current_working_directory}'
+echo: CustomCommandExecuted
