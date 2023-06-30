@@ -165,7 +165,12 @@ def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFa
 
     custom_command = 'python -c print("HelloWorld")'
     if network == CUSTOMNET:
-        (cwd / f".env.{network}").write_text(DUMMY_NETWORK_CONF)
+        (cwd / f".env.{network}").write_text(
+            f"""
+                ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}
+                INDEXER_SERVER={ALGORAND_NETWORKS[TESTNET]['INDEXER_SERVER']}
+            """
+        )
 
     input_answers = ["N" if network != LOCALNET else ""]
 
