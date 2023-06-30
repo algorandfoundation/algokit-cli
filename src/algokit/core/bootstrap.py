@@ -19,19 +19,19 @@ from packaging import version
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config, get_current_package_version
 
-ENV_TEMPLATE = ".env.template"
+ENV_TEMPLATE_PATTERN = ".env*.template"
 logger = logging.getLogger(__name__)
 
 
 def bootstrap_any(project_dir: Path) -> None:
-    env_path = project_dir / ENV_TEMPLATE
+    env_template_paths = glob.glob(str(project_dir / ENV_TEMPLATE_PATTERN))
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
     package_json_path = project_dir / "package.json"
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
-    if env_path.exists():
+    if env_template_paths:
         logger.debug("Running `algokit bootstrap env`")
         bootstrap_env(project_dir)
 
@@ -57,7 +57,7 @@ def bootstrap_any_including_subdirs(base_path: Path) -> None:
 
 def bootstrap_env(project_dir: Path) -> None:
     # List all .env*.template files in the directory
-    env_template_paths = glob.glob(str(project_dir / ".env*.template"))
+    env_template_paths = glob.glob(str(project_dir / ENV_TEMPLATE_PATTERN))
 
     # If no template files found, log it
     if not env_template_paths:
