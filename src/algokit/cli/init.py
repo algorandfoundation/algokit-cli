@@ -61,14 +61,6 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="A number of small example applications and demos.",
         ),
-        "react": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-react-frontend-template",
-            description="Official template for React frontend applications (smart contracts not included).",
-        ),
-        "fullstack": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-fullstack-template",
-            description="Official template for production fullstack applications (React + Beaker).",
-        ),
     }
 
 
