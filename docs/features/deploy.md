@@ -5,7 +5,7 @@ Deploy your smart contracts effortlessly to various networks with the AlgoKit De
 ## Usage
 
 ```sh
-$ algokit deploy [OPTIONS] NETWORK
+$ algokit deploy [OPTIONS] [NETWORK]
 ```
 
 This command deploys smart contracts from an AlgoKit compliant repository to the specified network.
@@ -50,7 +50,9 @@ command = "poetry run python -m smart_contracts deploy"
 
 For each network you're deploying to, you need to have a corresponding `.env.[network_name]` file. This file should contain environment variables specific to that network.
 
-**Note**: Creating `.env.[network_name]` files is only necessary if you're deploying to a custom network or if you want to override the default network configurations provided by AlgoKit. AlgoKit comes with predefined configurations for popular networks like `TestNet`, `MainNet`, `BetaNet`, or AlgoKit's `LocalNet`.
+Alternatively you can also set environment variables in a `.env` file at the root of your project. This single file will be loaded by default if no other `.env.[network_name]` file is found. This is useful if you're deploying to a single network and don't want to create a `.env.[network_name]` file.
+
+**Please Note**: Creating `.env.[network_name]` or `.env` files is only necessary if you're deploying to a custom network or if you want to override the default network configurations provided by AlgoKit. AlgoKit comes with predefined configurations for popular networks like `TestNet`, `MainNet`, `BetaNet`, or AlgoKit's `LocalNet`.
 
 You can examine the exact default configurations in the [constants](../../src/algokit/core/constants.py) file or visit [AlgoNode](https://algonode.io/) for more details on network configurations that AlgoKit relies on by default.
 
@@ -65,6 +67,18 @@ $ algokit deploy testnet
 ```
 
 This command deploys the smart contracts to the testnet.
+
+> **Please Note**: If you are deploying to a custom network, for additional security measures, algokit will load the nework name from genesis endpoint of your ALGOD_SERVER url, if that name will contain any mention of `mainnet` and you are not using `--prod` flag, algokit will show a warning message and ask for confirmation.
+
+### Custom Project Directory
+
+By default, the deploy command looks for the `.algokit.toml` file in the current working directory. You can specify a custom project directory using the `--project-dir` option.
+
+Example:
+
+```sh
+$ algokit deploy testnet --project-dir="path/to/project"
+```
 
 ### Custom Deploy Command
 
