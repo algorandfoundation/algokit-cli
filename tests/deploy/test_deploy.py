@@ -150,7 +150,12 @@ def test_deploy_custom_network_env(has_env: bool, tmp_path_factory: TempPathFact
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
     if has_env:
-        (cwd / f".env.{network}").write_text(DUMMY_NETWORK_CONF)
+        (cwd / f".env.{network}").write_text(
+            # Use a dummy network that doesn't require running localnet but is queryable
+            f"""
+             ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}
+            """
+        )
 
     result = invoke(
         f"deploy {network}",
