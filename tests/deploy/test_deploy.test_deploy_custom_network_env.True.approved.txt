@@ -3,7 +3,7 @@ Project directory: {current_working_directory}
 Using deploy command: python -c print('HelloWorld')
 Do you want to use a dispenser account? [y/N]: N
 Loaded deployment configuration.
-WARNING: Failed to load network name from http://localhost due to HTTP error.
+DEBUG: HTTP Request: GET http://localhost:4001/genesis "HTTP/1.1 200 OK"
 Deploying smart contracts from AlgoKit compliant repository 🚀
 DEBUG: Running 'python -c print('HelloWorld')' in '{current_working_directory}'
 python: HelloWorld

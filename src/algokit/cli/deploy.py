@@ -61,18 +61,26 @@ def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[st
     default=False,
     help="Skip warning prompt for deployments to a mainnet.",
 )
+@click.option(
+    "project_dir",
+    "--project-dir",
+    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True),
+    default=None,
+    help="Specify the project directory. If not provided, current working directory will be used.",
+)
 def deploy_command(
     *,
     network: str,
     custom_deploy_command: str,
     skip_mnemonics_prompts: bool,
     is_production_environment: bool,
+    project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
     network = network.lower()
     logger.info(f"Starting deployment process on {network} network...")
 
-    project_dir = Path.cwd()
+    project_dir = Path(project_dir) if project_dir else Path.cwd()
     logger.info(f"Project directory: {project_dir}")
 
     deploy_command = custom_deploy_command or load_deploy_command(network_name=network, project_dir=project_dir)

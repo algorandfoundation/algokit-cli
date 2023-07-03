@@ -2,10 +2,6 @@ Starting deployment process on customnet network...
 Project directory: {current_working_directory}
 Using deploy command: python -c print("HelloWorld")
 Do you want to use a dispenser account? [y/N]: N
-WARNING: Warning: ALGOD_PORT is missing, filling with an empty string.
-WARNING: Warning: ALGOD_TOKEN is missing, filling with an empty string.
-WARNING: Warning: INDEXER_PORT is missing, filling with an empty string.
-WARNING: Warning: INDEXER_TOKEN is missing, filling with an empty string.
 Loaded deployment configuration.
 DEBUG: HTTP Request: GET https://testnet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
 Deploying smart contracts from AlgoKit compliant repository 🚀

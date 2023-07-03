@@ -30,6 +30,7 @@
     - [--custom-deploy-command ](#--custom-deploy-command-)
     - [--ci](#--ci)
     - [--prod](#--prod)
+    - [--project-dir ](#--project-dir-)
     - [Arguments](#arguments-1)
     - [NETWORK](#network)
   - [doctor](#doctor)
@@ -233,7 +234,7 @@ Optional argument
 Deploy smart contracts from AlgoKit compliant repository.
 
 ```shell
-algokit deploy [OPTIONS] NETWORK
+algokit deploy [OPTIONS] [NETWORK]
 ```
 
 ### Options
@@ -250,11 +251,15 @@ Skip interactive prompt for mnemonics, expects them to be set as environment var
 ### --prod
 Skip warning prompt for deployments to a mainnet.
 
+
+### --project-dir <project_dir>
+Specify the project directory. If not provided, current working directory will be used.
+
 ### Arguments
 
 
 ### NETWORK
-Required argument
+Optional argument
 
 ## doctor
 

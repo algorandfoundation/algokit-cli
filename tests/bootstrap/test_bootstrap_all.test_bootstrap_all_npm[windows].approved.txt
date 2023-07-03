@@ -1,5 +1,7 @@
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
+DEBUG: Running `algokit bootstrap env`
+No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
 DEBUG: Running `algokit bootstrap npm`
 Installing npm dependencies
 DEBUG: Running 'npm.cmd install' in '{current_working_directory}'

@@ -13,7 +13,11 @@ from dotenv import dotenv_values, load_dotenv
 
 from algokit.core import proc
 from algokit.core.conf import get_algokit_config
-from algokit.core.constants import ALGOKIT_CONFIG, ALGORAND_NETWORKS, AlgorandNetworkConfiguration
+from algokit.core.constants import (
+    ALGOKIT_CONFIG,
+    ALGORAND_NETWORKS,
+    AlgorandNetworkConfigurationRequired,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +83,7 @@ def load_deploy_config(network: str, project_dir: Path) -> dict:
     network_config = dotenv_values(dotenv_file, verbose=True, interpolate=True)
 
     # Fill missing keys with empty strings
-    for required_key in AlgorandNetworkConfiguration.__annotations__:
+    for required_key in AlgorandNetworkConfigurationRequired.__annotations__:
         if required_key not in network_config:
             logger.warning(f"Warning: {required_key} is missing, filling with an empty string.")
             network_config[required_key] = ""

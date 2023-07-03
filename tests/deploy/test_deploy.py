@@ -94,6 +94,53 @@ def test_deploy_default_networks_no_env(network: str, tmp_path_factory: TempPath
     verify(result.output, options=NamerFactory.with_parameters(network))
 
 
+@pytest.mark.parametrize("network", [BETANET, CUSTOMNET])
+def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+
+    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
+    network_key = network if network == BETANET else MAINNET
+    (cwd / ".env").write_text(
+        f"""
+    ALGOD_SERVER={ALGORAND_NETWORKS[network_key]['ALGOD_SERVER']}
+    """
+    )
+
+    input_answers = ["N"]
+
+    if network_key == MAINNET:
+        input_answers.append("Y")
+
+    result = invoke(f"deploy {network}", cwd=cwd, input="\n".join(input_answers))
+
+    assert result.exit_code == 0 if network == LOCALNET else 1
+    verify(result.output, options=NamerFactory.with_parameters(network))
+
+
+@pytest.mark.parametrize("generic_env", [True, False])
+def test_deploy_custom_project_dir(generic_env: bool, tmp_path_factory: TempPathFactory) -> None:  # noqa: FBT001
+    cwd = tmp_path_factory.mktemp("cwd")
+    network = TESTNET
+    custom_folder = cwd / "custom_folder"
+    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+
+    (custom_folder).mkdir()
+    (custom_folder / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
+    (custom_folder / (".env" if generic_env else f".env.{network}")).write_text(
+        f"""
+    ALGOD_SERVER={ALGORAND_NETWORKS[network]['ALGOD_SERVER']}
+    """
+    )
+
+    input_answers = ["N"]
+
+    result = invoke(f"deploy {network} --project-dir={custom_folder}", cwd=cwd, input="\n".join(input_answers))
+
+    assert result.exit_code == 0 if network == LOCALNET else 1
+    verify(result.output, options=NamerFactory.with_parameters(generic_env))
+
+
 @pytest.mark.parametrize("has_env", [True, False])
 def test_deploy_custom_network_env(has_env: bool, tmp_path_factory: TempPathFactory) -> None:  # noqa: FBT001
     cwd = tmp_path_factory.mktemp("cwd")

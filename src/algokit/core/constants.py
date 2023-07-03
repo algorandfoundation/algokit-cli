@@ -32,13 +32,13 @@ DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
 class AlgorandNetworkConfigurationRequired(TypedDict):
     ALGOD_SERVER: str
-    INDEXER_SERVER: str
 
 
 class AlgorandNetworkConfiguration(AlgorandNetworkConfigurationRequired, total=False):
     ALGOD_PORT: str
     ALGOD_TOKEN: str
 
+    INDEXER_SERVER: str
     INDEXER_PORT: str
     INDEXER_TOKEN: str
 
