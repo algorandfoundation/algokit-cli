@@ -18,14 +18,6 @@ from approvaltests.namer import NamerFactory
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
-DUMMY_NETWORK_CONF = """
-ALGOD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-ALGOD_SERVER=http://localhost
-ALGOD_PORT=4001
-INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-INDEXER_SERVER=http://localhost
-INDEXER_PORT=8980
-"""
 CUSTOMNET = "customnet"
 
 
@@ -135,7 +127,10 @@ def test_deploy_custom_project_dir(generic_env: bool, tmp_path_factory: TempPath
 
     input_answers = ["N"]
 
-    result = invoke(f"deploy {network} --project-dir={custom_folder}", cwd=cwd, input="\n".join(input_answers))
+    # Below is needed for escpaing the backslash in the path on Windows
+    # Works on Linux as well since \\ doesnt exist in the path in such cases
+    path = str(custom_folder.absolute()).replace("\\", r"\\")
+    result = invoke(f"deploy {network} --project-dir={path}", cwd=cwd, input="\n".join(input_answers))
 
     assert result.exit_code == 0 if network == LOCALNET else 1
     verify(result.output, options=NamerFactory.with_parameters(generic_env))
@@ -177,7 +172,6 @@ def test_deploy_custom_network_env_genesis_call(env_network: str, tmp_path_facto
     (cwd / f".env.{network}").write_text(
         f"""
     ALGOD_SERVER={ALGORAND_NETWORKS[env_network]['ALGOD_SERVER']}
-    INDEXER_SERVER={ALGORAND_NETWORKS[env_network]['INDEXER_SERVER']}
     """
     )
 
@@ -220,7 +214,6 @@ def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFa
         (cwd / f".env.{network}").write_text(
             f"""
                 ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}
-                INDEXER_SERVER={ALGORAND_NETWORKS[TESTNET]['INDEXER_SERVER']}
             """
         )
 
