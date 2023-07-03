@@ -7,24 +7,18 @@ from pathlib import Path
 from shutil import which
 
 import click
-
-from algokit.core.constants import ALGOKIT_CONFIG
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config, get_current_package_version
+from algokit.core.constants import ALGOKIT_CONFIG
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 logger = logging.getLogger(__name__)
 
 
 def bootstrap_any(project_dir: Path) -> None:
-    env_template_paths = glob.glob(str(project_dir / ENV_TEMPLATE_PATTERN))
+    env_template_paths = project_dir.glob(ENV_TEMPLATE_PATTERN)
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
     package_json_path = project_dir / "package.json"

@@ -31,7 +31,7 @@ CUSTOMNET = "customnet"
 
 # Unit tests for extract_mnemonics function
 def test_extract_mnemonics() -> None:
-    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(True, LOCALNET)  # noqa: FBT003
+    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(skip_mnemonics_prompts=True, network=LOCALNET)
     assert not deployer_mnemonic
     assert not dispenser_mnemonic
 
@@ -40,12 +40,12 @@ def test_extract_mnemonics() -> None:
     os.environ[DISPENSER_KEY] = "test_dispenser_mnemonic"
 
     # Test extraction with skip_mnemonics_prompts=True
-    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(True, LOCALNET)  # noqa: FBT003
+    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(skip_mnemonics_prompts=True, network=LOCALNET)
     assert deployer_mnemonic == "test_deployer_mnemonic"
     assert dispenser_mnemonic == "test_dispenser_mnemonic"
 
     # Test extraction with skip_mnemonics_prompts=False and network != LOCALNET
-    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(False, TESTNET)  # noqa: FBT003
+    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(skip_mnemonics_prompts=False, network=TESTNET)
     assert deployer_mnemonic == "test_deployer_mnemonic"
     assert dispenser_mnemonic == "test_dispenser_mnemonic"
 

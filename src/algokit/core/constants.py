@@ -1,4 +1,3 @@
-# mypy: disable-error-code="typeddict-unknown-key"
 import os
 from typing import TypedDict
 
@@ -50,7 +49,7 @@ class AlgorandNetworkConfigurationWithKMD(AlgorandNetworkConfiguration, total=Fa
     KMD_PORT: str
 
 
-ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfigurationWithKMD] = {
+localnet_config: dict[str, AlgorandNetworkConfigurationWithKMD] = {
     LOCALNET: {
         "ALGOD_SERVER": GITPOD_URL.replace("https://", "https://4001-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
         "INDEXER_SERVER": GITPOD_URL.replace("https://", "https://8980-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
@@ -61,7 +60,10 @@ ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfi
         "KMD_TOKEN": DEFAULT_ALGOD_TOKEN,
         "KMD_PORT": str(443 if GITPOD_URL else DEFAULT_ALGOD_PORT + 1),
         "KMD_URL": GITPOD_URL.replace("https://", "https://4002-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
-    },
+    }
+}
+
+other_networks_config: dict[str, AlgorandNetworkConfiguration] = {
     TESTNET: {
         "ALGOD_TOKEN": "",
         "ALGOD_SERVER": "https://testnet-api.algonode.cloud",
@@ -86,4 +88,9 @@ ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfi
         "INDEXER_SERVER": "https://mainnet-idx.algonode.cloud",
         "INDEXER_PORT": "",
     },
+}
+
+ALGORAND_NETWORKS: dict[str, AlgorandNetworkConfiguration | AlgorandNetworkConfigurationWithKMD] = {
+    **localnet_config,
+    **other_networks_config,
 }
