@@ -1,5 +1,5 @@
 WARNING: This template requires AlgoKit version 999.99.99 or higher, but you have AlgoKit version {current_version}. Please update AlgoKit.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
 Finished bootstrapping {current_working_directory}

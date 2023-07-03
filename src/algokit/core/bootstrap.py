@@ -56,7 +56,7 @@ def bootstrap_env(project_dir: Path) -> None:
 
     # If no template files found, log it
     if not env_template_paths:
-        logger.info("No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.")
+        logger.info("No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.")
         return
 
     # Process each template file

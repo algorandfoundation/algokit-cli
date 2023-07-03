@@ -1,17 +1,17 @@
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
 DEBUG: Skipping {current_working_directory}/.venv
 DEBUG: Skipping {current_working_directory}/__pycache__
 DEBUG: Checking {current_working_directory}/boring_dir for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
 DEBUG: Checking {current_working_directory}/double_nested_dir for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
 DEBUG: Checking {current_working_directory}/empty_dir for bootstrapping needs
 DEBUG: Running `algokit bootstrap env`
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
 DEBUG: Skipping {current_working_directory}/node_modules
 Finished bootstrapping {current_working_directory}

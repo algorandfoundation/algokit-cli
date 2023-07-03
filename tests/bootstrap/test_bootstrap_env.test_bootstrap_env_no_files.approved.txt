@@ -1,2 +1,2 @@
 DEBUG: No .algokit.toml file found in the project directory.
-No .env or .env.{any_name}.template files found; nothing to do here, skipping bootstrap.
+No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.
