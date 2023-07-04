@@ -1,6 +1,6 @@
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.conf import get_current_package_version, ALGOKIT_CONFIG
+from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from approvaltests.pytest.py_test_namer import PyTestNamer
 
 from tests.utils.approvals import verify

@@ -11,8 +11,8 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
-from algokit.core.constants import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 
 logger = logging.getLogger(__name__)
 
@@ -60,14 +60,6 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
         "playground": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="A number of small example applications and demos.",
-        ),
-        "react": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-react-frontend-template",
-            description="Official template for React frontend applications (smart contracts not included).",
-        ),
-        "fullstack": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-fullstack-template",
-            description="Official template for production fullstack applications (React + Beaker).",
         ),
     }
 

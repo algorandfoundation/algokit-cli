@@ -1,11 +1,9 @@
+Loaded deployment configuration.
 Starting deployment process on mainnet network...
+Do you want to use a dispenser account? [y/N]: N
+You are about to deploy to the MainNet. Are you sure you want to continue? [y/N]: Y
 Project directory: {current_working_directory}
 Using deploy command: python -c print("HelloWorld")
-Do you want to use a dispenser account? [y/N]: N
-No .env.mainnet file found at {current_working_directory}/.env.mainnet
-No .env file found at {current_working_directory}/.env, loading default configuration for mainnet.
-Loaded deployment configuration.
-You are about to deploy to the MainNet. Are you sure you want to continue? [y/N]: Y
 Deploying smart contracts from AlgoKit compliant repository 🚀
 DEBUG: Running 'python -c print("HelloWorld")' in '{current_working_directory}'
 python: HelloWorld

@@ -1,2 +1,8 @@
-
-Aborted!
+Loaded deployment configuration.
+Starting deployment process on mainnet network...
+Do you want to use a dispenser account? [y/N]: N
+Project directory: {current_working_directory}
+Using deploy command: python -c print('HelloWorld')
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'python -c print('HelloWorld')' in '{current_working_directory}'
+python: HelloWorld

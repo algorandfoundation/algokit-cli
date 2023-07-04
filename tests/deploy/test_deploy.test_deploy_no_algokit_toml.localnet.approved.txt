@@ -1,5 +1,5 @@
-DEBUG: HTTP Request: GET http://localhost:4001/genesis "HTTP/1.1 200 OK"
-Starting deployment process on dockernet network...
+Loaded deployment configuration.
+Starting deployment process on localnet network...
 Project directory: {current_working_directory}
 DEBUG: No .algokit.toml file found in the project directory.
 Error: Couldn't load .algokit.toml file. Ensure deploy command is specified, either via --custom-deploy-command or inside .algokit.toml file.

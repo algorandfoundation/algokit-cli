@@ -5,15 +5,19 @@ from pathlib import Path
 import algokit_utils
 import click
 
-from algokit.core import constants, proc
+from algokit.core import proc
 from algokit.core.deploy import load_deploy_command, load_deploy_config
 
 logger = logging.getLogger(__name__)
 
-
-ALGORAND_MNEMONIC_LENGTH = 25
 DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
 DISPENSER_KEY = "DISPENSER_MNEMONIC"
+
+DOCKERNET = "dockernet"
+LOCALNET = "localnet"
+MAINNET = "mainnet"
+BETANET = "betanet"
+TESTNET = "testnet"
 
 
 def _validate_mnemonic(value: str) -> str:
@@ -24,7 +28,7 @@ def _validate_mnemonic(value: str) -> str:
     return value
 
 
-def ensure_mnemeonics(*, skip_mnemonics_prompts: bool) -> None:
+def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
     """
     Extract environment variables, prompt user if needed.
 
@@ -49,12 +53,14 @@ def ensure_mnemeonics(*, skip_mnemonics_prompts: bool) -> None:
         if use_dispenser:
             dispenser_mnemonic = click.prompt("dispenser-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
-    # TODO: fix this to write to os.environ instead
-    return deployer_mnemonic, dispenser_mnemonic
+    if deployer_mnemonic:
+        os.environ[DEPLOYER_KEY] = deployer_mnemonic
+    if dispenser_mnemonic:
+        os.environ[DISPENSER_KEY] = dispenser_mnemonic
 
 
 @click.command("deploy")
-@click.argument("network_or_environment_name", default=constants.LOCALNET)
+@click.argument("network", default=LOCALNET)
 @click.option(
     "custom_deploy_command",
     "--custom-deploy-command",
@@ -85,20 +91,21 @@ def ensure_mnemeonics(*, skip_mnemonics_prompts: bool) -> None:
 )
 def deploy_command(
     *,
-    network_or_environment_name: str,
+    network: str,
     custom_deploy_command: str,
     skip_mnemonics_prompts: bool,
     is_production_environment: bool,
     project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    with load_deploy_config(network_or_environment_name, project_dir):
+    with load_deploy_config(network, project_dir):
         logger.info("Loaded deployment configuration.")
-        client = algokit_utils.network_clients.get_algod_client()
-        network_name = client.suggested_params().gen
-        logger.info(
-            f"Starting deployment process on {network_name} network..."
-        )  # TODO: do we need this? makes for potentially 3x suggested_params calls
+        client = algokit_utils.get_algod_client()
+
+        logger.info(f"Starting deployment process on {network} network...")
+        if not algokit_utils.is_localnet(client):
+            ensure_mnemonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
+
         if not is_production_environment and algokit_utils.is_mainnet(client):
             click.confirm(
                 "You are about to deploy to the MainNet. Are you sure you want to continue?",
@@ -107,12 +114,8 @@ def deploy_command(
 
         logger.info(f"Project directory: {project_dir}")
 
-        command = custom_deploy_command or load_deploy_command(network_name=network_name, project_dir=project_dir)
+        command = custom_deploy_command or load_deploy_command(network_name=network, project_dir=project_dir)
         logger.info(f"Using deploy command: {command}")
-
-        if not algokit_utils.is_localnet(client):
-            # TODO: this should write to os.environ
-            ensure_mnemeonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
 
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:

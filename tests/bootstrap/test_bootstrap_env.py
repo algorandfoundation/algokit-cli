@@ -1,6 +1,7 @@
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.namer import NamerFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 
@@ -37,6 +38,30 @@ def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory) -> None:
 
     assert result.exit_code == 0
     verify(result.output)
+
+
+@pytest.mark.parametrize(
+    "env_file_name",
+    [
+        ".env.localnet.template",
+        ".env.template",
+        ".env.localnet",
+        ".env",
+    ],
+)
+def test_bootstrap_network_prefixed_envs(env_file_name: str, tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / env_file_name).touch()
+    if not env_file_name.endswith(".template"):
+        (cwd / f"{env_file_name}.template").touch()
+
+    result = invoke(
+        "bootstrap env",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, options=NamerFactory.with_parameters(env_file_name))
 
 
 def test_bootstrap_env_multiple_templates(tmp_path_factory: TempPathFactory) -> None:

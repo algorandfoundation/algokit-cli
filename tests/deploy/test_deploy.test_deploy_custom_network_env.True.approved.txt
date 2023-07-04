@@ -1,4 +1,8 @@
-DEBUG: HTTP Request: GET https://testnet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
-Starting deployment process on testnet network...
+Loaded deployment configuration.
+Starting deployment process on customnet network...
+Do you want to use a dispenser account? [y/N]: N
 Project directory: {current_working_directory}
-Error: Deploy command is not specified in '.algokit.toml' file.
+Using deploy command: python -c print('HelloWorld')
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'python -c print('HelloWorld')' in '{current_working_directory}'
+python: HelloWorld

@@ -1,1 +1,1 @@
-Error: customnet is not a known network, and no {current_working_directory}/.env.customnet file
+Error: customnet is not a known network, and no {current_working_directory}/.env.customnet or {current_working_directory}/.env file found

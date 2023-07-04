@@ -2,7 +2,7 @@ import json
 
 import httpx
 import pytest
-from algokit.core.sandbox import get_config_json, get_docker_compose_yml, ALGOD_HEALTH_URL
+from algokit.core.sandbox import ALGOD_HEALTH_URL, get_config_json, get_docker_compose_yml
 from pytest_httpx import HTTPXMock
 
 from tests import get_combined_verify_output

@@ -4,8 +4,8 @@
 import contextlib
 import logging
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import cast, Iterator
 
 import click
 import httpx
@@ -93,16 +93,20 @@ def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
     """
     current_env = os.environ.copy()
     specific_env_path = project_dir / f".env.{name}"
+    generic_env_path = project_dir / ".env"
     try:
         if default_config := ALGORAND_NETWORKS.get(name):
             os.environ.update(default_config)
-        elif not specific_env_path.exists():
-            # if it's not a well-known network name, then we expect the specific env file to exist
-            raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
+        elif specific_env_path.exists():
+            load_dotenv(specific_env_path, verbose=True, override=True)
+        elif generic_env_path.exists():
+            load_dotenv(generic_env_path, verbose=True, override=True)
+        else:
+            # if it's not a well-known network name, and no specific or generic env file exist
+            raise click.ClickException(
+                f"{name} is not a known network, and no {specific_env_path} or {generic_env_path} file found"
+            )
 
-        for path in [project_dir / ".env", specific_env_path]:
-            if path.exists():
-                load_dotenv(path, verbose=True, override=True)
         yield
     finally:
         os.environ.update(current_env)
