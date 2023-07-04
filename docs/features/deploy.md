@@ -15,6 +15,7 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 - `--custom-deploy-command TEXT`: Specifies a custom deploy command. If this option is not provided, the deploy command will be loaded from the `.algokit.toml` file.
 - `--ci`: Skips the interactive prompt for mnemonics. When using this option, mnemonics must be set as environment variables.
 - `--prod`: Skips the warning prompt for deployments to a mainnet.
+- `--project-dir DIRECTORY`: Specify the project directory. If not provided, current working directory will be used.
 - `-h, --help`: Show this message and exit.
 
 ## Functionality
