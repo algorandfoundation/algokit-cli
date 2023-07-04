@@ -9,11 +9,9 @@ from typing import cast, Iterator
 
 import click
 import httpx
-from dotenv import dotenv_values, load_dotenv
-import algokit_utils
+from dotenv import load_dotenv
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
-from algokit.core.constants import ALGORAND_NETWORKS
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,6 @@ def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
     :param deploy_config: Deploy configuration.
     :return: Network name.
     """
-
 
     algod_server = deploy_config.get("ALGOD_SERVER")
     port = deploy_config.get("ALGOD_PORT")
@@ -53,6 +50,40 @@ def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
         return None
 
 
+DEFAULT_ALGOD_SERVER = "http://localhost"
+DEFAULT_ALGOD_TOKEN = "a" * 64
+GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
+
+DOCKERNET = "dockernet"
+LOCALNET = "localnet"
+MAINNET = "mainnet"
+BETANET = "betanet"
+TESTNET = "testnet"
+
+ALGORAND_NETWORKS: dict[str, dict[str, str]] = {
+    LOCALNET: {
+        "ALGOD_SERVER": GITPOD_URL.replace("https://", "https://4001-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
+        "INDEXER_SERVER": GITPOD_URL.replace("https://", "https://8980-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
+        "ALGOD_PORT": str(443 if GITPOD_URL else 4001),
+        "ALGOD_TOKEN": DEFAULT_ALGOD_TOKEN,
+        "INDEXER_PORT": str(443 if GITPOD_URL else 8980),
+        "INDEXER_TOKEN": DEFAULT_ALGOD_TOKEN,
+    },
+    TESTNET: {
+        "ALGOD_SERVER": "https://testnet-api.algonode.cloud",
+        "INDEXER_SERVER": "https://testnet-idx.algonode.cloud",
+    },
+    BETANET: {
+        "ALGOD_SERVER": "https://betanet-api.algonode.cloud",
+        "INDEXER_SERVER": "https://betanet-idx.algonode.cloud",
+    },
+    MAINNET: {
+        "ALGOD_SERVER": "https://mainnet-api.algonode.cloud",
+        "INDEXER_SERVER": "https://mainnet-idx.algonode.cloud",
+    },
+}
+
+
 @contextlib.contextmanager
 def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
     """
@@ -64,7 +95,7 @@ def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
     specific_env_path = project_dir / f".env.{name}"
     try:
         if default_config := ALGORAND_NETWORKS.get(name):
-            os.environ.update(cast(dict[str, str], default_config))
+            os.environ.update(default_config)
         elif not specific_env_path.exists():
             # if it's not a well-known network name, then we expect the specific env file to exist
             raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")

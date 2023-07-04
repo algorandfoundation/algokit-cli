@@ -6,12 +6,14 @@ import algokit_utils
 import click
 
 from algokit.core import constants, proc
-from algokit.core.deploy import get_genesis_network_name, load_deploy_command, load_deploy_config
+from algokit.core.deploy import load_deploy_command, load_deploy_config
 
 logger = logging.getLogger(__name__)
 
 
 ALGORAND_MNEMONIC_LENGTH = 25
+DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
+DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
 
 def _validate_mnemonic(value: str) -> str:
@@ -30,14 +32,14 @@ def ensure_mnemeonics(*, skip_mnemonics_prompts: bool) -> None:
     :param network: The name of the network ('localnet', 'testnet', 'mainnet', etc.)
     :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
     """
-    deployer_mnemonic = os.getenv(constants.DEPLOYER_KEY)
-    dispenser_mnemonic = os.getenv(constants.DISPENSER_KEY)
+    deployer_mnemonic = os.getenv(DEPLOYER_KEY)
+    dispenser_mnemonic = os.getenv(DISPENSER_KEY)
 
     if deployer_mnemonic:
         _validate_mnemonic(deployer_mnemonic)
     else:
         if skip_mnemonics_prompts:
-            raise click.ClickException(f"Error: missing {constants.DEPLOYER_KEY} environment variable")
+            raise click.ClickException(f"Error: missing {DEPLOYER_KEY} environment variable")
         deployer_mnemonic = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
     if dispenser_mnemonic:

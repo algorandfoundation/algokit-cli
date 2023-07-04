@@ -127,6 +127,15 @@ class ComposeSandbox:
         return cast(list[dict[str, Any]], data)
 
 
+DEFAULT_ALGOD_SERVER = "http://localhost"
+DEFAULT_ALGOD_TOKEN = "a" * 64
+DEFAULT_ALGOD_PORT = 4001
+DEFAULT_INDEXER_PORT = 8980
+DEFAULT_WAIT_FOR_ALGOD = 60
+DEFAULT_HEALTH_TIMEOUT = 1
+ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
+
+
 def _wait_for_algod() -> bool:
     end_time = time.time() + DEFAULT_WAIT_FOR_ALGOD
     last_exception: httpx.RequestError | None = None
