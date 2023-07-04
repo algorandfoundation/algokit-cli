@@ -2,6 +2,23 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.0 (2023-07-04)
+
+### Feature
+
+* Detecting whether opening folder contains *.code-workspace file ([#294](https://github.com/algorandfoundation/algokit-cli/issues/294)) ([`e902d55`](https://github.com/algorandfoundation/algokit-cli/commit/e902d55a6077d60eb3c5b3fa809e1ba80b61b37e))
+* Adding react and fullstack templates ([#291](https://github.com/algorandfoundation/algokit-cli/issues/291)) ([`5af81f1`](https://github.com/algorandfoundation/algokit-cli/commit/5af81f100b16ce1281980ff3067df648fb5c9b4f))
+
+### Fix
+
+* Hotfixing a bug that is caused by pydantic v2 being installed as a copier dependency ([#297](https://github.com/algorandfoundation/algokit-cli/issues/297)) ([`31b580b`](https://github.com/algorandfoundation/algokit-cli/commit/31b580b2364e123fd81fdab14da93b704ea4bdda))
+* Update algokit-client-generators ([#293](https://github.com/algorandfoundation/algokit-cli/issues/293)) ([`cf0f46f`](https://github.com/algorandfoundation/algokit-cli/commit/cf0f46ffba9c3a33e75bad56195589bed3c5dc3a))
+
+### Documentation
+
+* Switching to more reliable visitors badge provider ([`51dce8b`](https://github.com/algorandfoundation/algokit-cli/commit/51dce8be83f0b72765ddffc9ea67886235d83fbb))
+* Fixing underline caused by whitespace in html tags on readme ([`f824596`](https://github.com/algorandfoundation/algokit-cli/commit/f824596d845fce31fe6d32fd9dc14fa0086746ca))
+
 ## v1.1.6 (2023-06-21)
 
 ### Fix

@@ -283,7 +283,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 Explore the specified network in the browser using Dappflow.
 
 ```shell
-algokit explore [OPTIONS] [[localnet|testnet|betanet|mainnet]]
+algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 ```
 
 ### Arguments
@@ -386,7 +386,7 @@ Name of an official template to use. To see a list of descriptions, run this com
 
 * **Options**
 
-    beaker_starter | beaker_production | playground | react | fullstack
+    beaker_starter | beaker_production | playground
 
 
 
