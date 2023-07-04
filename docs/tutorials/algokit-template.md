@@ -103,8 +103,9 @@ Example:
 ```yaml
 # copier.yaml
 project_name:
-  type: str
-  help: What is the name of your project?
+    type: str
+    help: What is the name of this project.
+    placeholder: "algorand-app"
 ```
 This would prompt the user for the project name, and the input can then be used in the template using the Jinja syntax `{{ project_name }}`.
 
@@ -115,7 +116,7 @@ This would prompt the user for the project name, and the input can then be used 
 - **Versioning**: Use `.algokit.toml` to specify the minimum compatible version of AlgoKit.
 - **Testing**: Include test configurations and scripts in your templates to encourage testing best practices.
 - **Linting and Formatting**: Integrate linters and code formatters in your templates to ensure code quality.
-
+- **Algokit Principle**: for details on generic principles on designing templates refer to algo kit design principles
 ## Conclusion
 
 Creating custom templates in AlgoKit is a powerful way to streamline your development workflow for Algorand smart contracts, whether you are using Python or TypeScript. Leveraging Copier and Jinja for templating, and incorporating best practices for modularity, documentation, and coding standards, can result in robust, flexible, and user-friendly templates that can be a valuable asset to both your own projects and the broader Algorand community.
