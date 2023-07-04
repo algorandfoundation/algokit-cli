@@ -4,7 +4,6 @@ import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.cli.deploy import extract_mnemonics
 from algokit.core.constants import (
-    ALGOKIT_CONFIG,
     ALGORAND_NETWORKS,
     BETANET,
     DEPLOYER_KEY,
@@ -13,6 +12,7 @@ from algokit.core.constants import (
     MAINNET,
     TESTNET,
 )
+from algokit.core.conf import ALGOKIT_CONFIG
 from approvaltests.namer import NamerFactory
 
 from tests.utils.approvals import verify

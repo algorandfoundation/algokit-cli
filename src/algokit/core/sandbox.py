@@ -9,13 +9,10 @@ import httpx
 
 from algokit.core.conf import get_app_config_dir
 from algokit.core.constants import (
-    ALGOD_HEALTH_URL,
     DEFAULT_ALGOD_PORT,
     DEFAULT_ALGOD_SERVER,
     DEFAULT_ALGOD_TOKEN,
-    DEFAULT_HEALTH_TIMEOUT,
     DEFAULT_INDEXER_PORT,
-    DEFAULT_WAIT_FOR_ALGOD,
 )
 from algokit.core.proc import RunResult, run, run_interactive
 
@@ -285,3 +282,6 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
 
 
 DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+DEFAULT_WAIT_FOR_ALGOD = 60
+DEFAULT_HEALTH_TIMEOUT = 1
+ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"

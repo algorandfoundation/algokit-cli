@@ -1,4 +1,3 @@
-import glob
 import logging
 import platform
 import sys
@@ -10,22 +9,20 @@ import click
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.conf import get_algokit_config, get_current_package_version
-from algokit.core.constants import ALGOKIT_CONFIG
+from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 logger = logging.getLogger(__name__)
 
 
 def bootstrap_any(project_dir: Path) -> None:
-    env_template_paths = project_dir.glob(ENV_TEMPLATE_PATTERN)
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
     package_json_path = project_dir / "package.json"
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
-    if env_template_paths:
+    if next(project_dir.glob(ENV_TEMPLATE_PATTERN), None):
         logger.debug("Running `algokit bootstrap env`")
         bootstrap_env(project_dir)
 
@@ -51,8 +48,7 @@ def bootstrap_any_including_subdirs(base_path: Path) -> None:
 
 def bootstrap_env(project_dir: Path) -> None:
     # List all .env*.template files in the directory
-    env_template_paths = glob.glob(str(project_dir / ENV_TEMPLATE_PATTERN))
-    env_template_paths.sort()
+    env_template_paths = sorted(project_dir.glob(ENV_TEMPLATE_PATTERN))
 
     # If no template files found, log it
     if not env_template_paths:
@@ -233,22 +229,16 @@ def _get_base_python_path() -> str | None:
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:
+    config = get_algokit_config(project_dir)
+    if config is None:
+        return None
     try:
-        config = get_algokit_config(project_dir)
-
-        if config is None:
-            return None
-
-        try:
-            min_version = config["algokit"]["min_version"]
-        except KeyError:
-            logger.debug(f"No 'min_version' specified in {ALGOKIT_CONFIG} file.")
-            return None
-        assert isinstance(min_version, str)
-
-        return min_version
+        return str(config["algokit"]["min_version"])
+    except KeyError:
+        logger.debug(f"No 'min_version' specified in {ALGOKIT_CONFIG} file.")
+        return None
     except Exception as ex:
-        logger.debug(f"Unexpected error inspecting AlgoKit config: {ex}")
+        logger.debug(f"Couldn't read algokit min_version from {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
 
 

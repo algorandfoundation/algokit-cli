@@ -2,20 +2,27 @@ import logging
 import os
 from pathlib import Path
 
+import algokit_utils
 import click
 
-from algokit.core.constants import DEFAULT_NETWORKS, DEPLOYER_KEY, DISPENSER_KEY, LOCALNET, MAINNET
-from algokit.core.deploy import (
-    execute_deploy_command,
-    get_genesis_network_name,
-    load_deploy_command,
-    load_deploy_config,
-)
+from algokit.core import constants, proc
+from algokit.core.deploy import get_genesis_network_name, load_deploy_command, load_deploy_config
 
 logger = logging.getLogger(__name__)
 
 
-def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[str | None, str | None]:
+ALGORAND_MNEMONIC_LENGTH = 25
+
+
+def _validate_mnemonic(value: str) -> str:
+    try:
+        algokit_utils.get_account_from_mnemonic(value)
+    except Exception as ex:
+        raise click.UsageError("Invalid mnemonic") from ex
+    return value
+
+
+def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[str, str | None]:
     """
     Extract environment variables, prompt user if needed.
 
@@ -23,23 +30,29 @@ def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[st
     :param network: The name of the network ('localnet', 'testnet', 'mainnet', etc.)
     :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
     """
-    deployer_mnemonic = os.getenv(DEPLOYER_KEY, None)
-    dispenser_mnemonic = os.getenv(DISPENSER_KEY, None)
+    deployer_mnemonic = os.getenv(constants.DEPLOYER_KEY)
+    dispenser_mnemonic = os.getenv(constants.DISPENSER_KEY)
 
-    if network != LOCALNET and not skip_mnemonics_prompts:
-        if not deployer_mnemonic:
-            deployer_mnemonic = click.prompt("deployer-mnemonic", hide_input=True)
+    if network != constants.LOCALNET:
+        if deployer_mnemonic:
+            _validate_mnemonic(deployer_mnemonic)
+        else:
+            if skip_mnemonics_prompts:
+                raise click.ClickException(f"Error: missing {constants.DEPLOYER_KEY} environment variable")
+            deployer_mnemonic = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
-        if not dispenser_mnemonic:
+        if dispenser_mnemonic:
+            _validate_mnemonic(dispenser_mnemonic)
+        elif not skip_mnemonics_prompts:
             use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
             if use_dispenser:
-                dispenser_mnemonic = click.prompt("dispenser-mnemonic", hide_input=True)
+                dispenser_mnemonic = click.prompt("dispenser-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
     return deployer_mnemonic, dispenser_mnemonic
 
 
 @click.command("deploy")
-@click.argument("network", type=str, default=LOCALNET)
+@click.argument("network_or_environment_name", default=constants.LOCALNET)
 @click.option(
     "custom_deploy_command",
     "--custom-deploy-command",
@@ -64,53 +77,53 @@ def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[st
 @click.option(
     "project_dir",
     "--project-dir",
-    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True),
-    default=None,
+    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
+    default=".",
     help="Specify the project directory. If not provided, current working directory will be used.",
 )
 def deploy_command(
     *,
-    network: str,
+    network_or_environment_name: str,
     custom_deploy_command: str,
     skip_mnemonics_prompts: bool,
     is_production_environment: bool,
     project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    network = network.lower()
-    logger.info(f"Starting deployment process on {network} network...")
+    deploy_config = load_deploy_config(network_or_environment_name, project_dir)
+    network_name = get_genesis_network_name(deploy_config) or network_or_environment_name
 
-    project_dir = Path(project_dir) if project_dir else Path.cwd()
+    logger.info(f"Starting deployment process on {network_name} network...")
+
     logger.info(f"Project directory: {project_dir}")
 
-    deploy_command = custom_deploy_command or load_deploy_command(network_name=network, project_dir=project_dir)
-    logger.info(f"Using deploy command: {deploy_command}")
+    command = custom_deploy_command or load_deploy_command(network_name=network_name, project_dir=project_dir)
+    logger.info(f"Using deploy command: {command}")
 
     deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(
         skip_mnemonics_prompts=skip_mnemonics_prompts, network=network
     )
 
-    if not deployer_mnemonic and network != LOCALNET:
-        raise click.ClickException("Error: Deployer Mnemonic must be provided via env var or via cli input.")
-
-    deploy_config = load_deploy_config(network, project_dir)
     logger.info("Loaded deployment configuration.")
 
     if not is_production_environment:
-        network_name = network
+        if network in constants.ALGORAND_NETWORKS:
+            network_name = network
+        else:
+            pass
 
-        if network not in DEFAULT_NETWORKS:
-            network_name = get_genesis_network_name(deploy_config) or network
-
-        if MAINNET in network_name:
+        if constants.MAINNET in network_name:
             click.confirm(
                 "You are about to deploy to the MainNet. Are you sure you want to continue?",
                 abort=True,
             )
 
-    deploy_config[DEPLOYER_KEY] = deployer_mnemonic
+    deploy_config[constants.DEPLOYER_KEY] = deployer_mnemonic
     if dispenser_mnemonic:
-        deploy_config[DISPENSER_KEY] = dispenser_mnemonic
+        deploy_config[constants.DISPENSER_KEY] = dispenser_mnemonic
 
     logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
-    execute_deploy_command(command=deploy_command, deploy_config=deploy_config, project_dir=project_dir)
+    try:
+        proc.run(command.split(), env=deploy_config, cwd=project_dir, stdout_log_level=logging.INFO)
+    except Exception as ex:
+        raise click.ClickException(f"Failed to execute deploy command '{command}'.") from ex

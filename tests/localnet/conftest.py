@@ -1,5 +1,5 @@
 import pytest
-from algokit.core.constants import ALGOD_HEALTH_URL
+from algokit.core.sandbox import ALGOD_HEALTH_URL
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 

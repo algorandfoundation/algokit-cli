@@ -1,10 +1,4 @@
+DEBUG: HTTP Request: GET https://betanet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
 Starting deployment process on betanet network...
 Project directory: {current_working_directory}
 Using deploy command: python -c print('HelloWorld')
-Do you want to use a dispenser account? [y/N]: N
-No .env.betanet file found at {current_working_directory}/.env.betanet
-No .env file found at {current_working_directory}/.env, loading default configuration for betanet.
-Loaded deployment configuration.
-Deploying smart contracts from AlgoKit compliant repository 🚀
-DEBUG: Running 'python -c print('HelloWorld')' in '{current_working_directory}'
-python: HelloWorld

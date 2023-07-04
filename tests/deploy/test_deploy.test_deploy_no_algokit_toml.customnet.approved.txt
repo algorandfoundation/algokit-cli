@@ -1,4 +1,1 @@
-Starting deployment process on customnet network...
-Project directory: {current_working_directory}
-DEBUG: No .algokit.toml file found in the project directory.
-Error: Couldn't load .algokit.toml file. Ensure deploy command is specified, either via --custom-deploy-command or inside .algokit.toml file.
+Error: customnet is not a known network, and no {current_working_directory}/.env.customnet file

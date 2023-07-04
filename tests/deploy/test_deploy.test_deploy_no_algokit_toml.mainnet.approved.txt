@@ -1,3 +1,4 @@
+DEBUG: HTTP Request: GET https://mainnet-api.algonode.cloud/genesis "HTTP/1.1 200 OK"
 Starting deployment process on mainnet network...
 Project directory: {current_working_directory}
 DEBUG: No .algokit.toml file found in the project directory.

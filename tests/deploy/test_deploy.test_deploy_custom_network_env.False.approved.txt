@@ -1,6 +1,1 @@
-Starting deployment process on customnet network...
-Project directory: {current_working_directory}
-Using deploy command: python -c print('HelloWorld')
-Do you want to use a dispenser account? [y/N]: N
-No .env.customnet file found at {current_working_directory}/.env.customnet
-Error: No .env file found at {current_working_directory}/.env
+Error: customnet is not a known network, and no {current_working_directory}/.env.customnet file
