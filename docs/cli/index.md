@@ -346,7 +346,7 @@ Name of an official template to use. To see a list of descriptions, run this com
 
 * **Options**
 
-    beaker_starter | beaker_production | playground | react | fullstack
+    beaker_starter | beaker_production | playground
 
 
 
