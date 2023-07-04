@@ -34,7 +34,7 @@ AlgoKit provides the `algokit init` command to initialize a new project using a 
 
 ### .algokit.toml
 
-This file is used to specify the minimum version of AlgoKit that is compatible with your template. This is essential to ensure that projects created with your template are always compatible with the version of AlgoKit they are using.
+This file is the AlgoKit configuration file for this project which can be used to specify the minimum version of the AlgoKit. This is essential to ensure that projects created with your template are always compatible with the version of AlgoKit they are using.
 
 Example from `algokit-beaker-default-template`:
 ```toml
@@ -45,7 +45,9 @@ This specifies that the template requires at least version `v1.1.0-beta.4` of Al
 
 ### Python Support: `pyproject.toml`
 
-For Python projects, the `pyproject.toml` file is crucial. It specifies metadata about the project and lists the dependencies required. Poetry is used for Python dependency management. This can be templated using Jinja syntax.
+Python projects in AlgoKit can leverage a wide range of tools for dependency management and project configuration. While Poetry and the `pyproject.toml` file are common choices, they are not the only options.
+If you opt to use Poetry, you'll rely on the pyproject.toml file to define the project's metadata and dependencies. This configuration file can utilize the Jinja templating syntax for customization.
+
 
 Example snippet from `algokit-beaker-default-template`:
 
@@ -68,7 +70,7 @@ This example shows how project metadata and dependencies are defined in `pyproje
 
 ### TypeScript Support: `package.json`
 
-For TypeScript projects, the `package.json` file plays a similar role as `pyproject.toml` for Python projects. It specifies metadata about the project and lists the dependencies required for smart contract development.
+For TypeScript projects, the `package.json` file plays a similar role as `pyproject.toml` can do for Python projects. It specifies metadata about the project and lists the dependencies required for smart contract development.
 
 Example snippet:
 
@@ -94,7 +96,12 @@ This example shows how Jinja syntax is used within `package.json` to allow place
 
 AlgoKit templates can include a bootstrap script. This script is automatically run after the project is initialized and can perform various setup tasks like installing dependencies or setting up databases.
 
-### Template Answers and Variables
+- `env`: Copies an `.env.template` file to `.env` in the current working directory and prompts for any unspecified values. This is a critical aspect of managing environment variables securely, ensuring that sensitive data doesn't accidentally end up in version control.
+- `poetry`: If your Python project uses Poetry for dependency management, the `poetry` command installs Poetry (if not present) and runs `poetry install` in the current working directory to install Python dependencies.
+- `npm`: If you're developing a JavaScript or TypeScript project, the `npm` command runs npm install in the current working directory to install Node.js dependencies.
+- `all`: The `all` command runs all the aforementioned bootstrap sub-commands in the current directory and its subdirectories. This command is a comprehensive way to ensure all project dependencies and environment variables are properly set up.
+
+### Predefined copier answers
 
 When initializing a new project, Copier can prompt the user for input, which is then passed to the template as variables. This is useful for customizing the new project based on user input.
 
@@ -109,6 +116,16 @@ project_name:
 ```
 This would prompt the user for the project name, and the input can then be used in the template using the Jinja syntax `{{ project_name }}`.
 
+#### Default Behaviors
+When creating an AlgoKit template, there are a few default behaviors that you can include to improve the development experience:
+
+- **Git**: If Git is installed on the user's system and the user's working directory is a Git repository, Copier will commit the newly created project as a new commit in the repository. This feature helps to maintain a clean version history for the project. If you wish to add a specific commit message for this action, you can specify a `commit_message` in the `_commit` option in your `copier.yaml` file.
+
+- **VSCode**: If the user has Visual Studio Code (VSCode) installed and the path to VSCode is added to their system's PATH, Copier can automatically open the newly created project in a new VSCode window. This is triggered by adding `vscode: true` in your `copier.yam` file.
+
+- **Bootstrap**: As previously mentioned, AlgoKit templates can include a bootstrap script that is automatically run after the project is initialized. This script can perform various setup tasks like installing dependencies or setting up databases. By default, if a `bootstrap` task is defined in the `copier.yaml`, it will be executed unless the user opts out during the prompt.
+
+By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
 ## Recommendations
 
 - **Modularity**: Break your templates into modular components that can be combined in different ways.
