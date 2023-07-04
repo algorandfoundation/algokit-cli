@@ -1,16 +1,15 @@
 # 1. User can call algokit deploy to different networks
 # 2. By default algokit cli contains configs for testnet and mainnet
 # 3. User can overwrite them by creating a config file in the project root
-
-
+import contextlib
 import logging
 import os
 from pathlib import Path
-from typing import cast
+from typing import cast, Iterator
 
 import click
 import httpx
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
 import algokit_utils
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
@@ -25,7 +24,7 @@ def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
     :param deploy_config: Deploy configuration.
     :return: Network name.
     """
-    algokit_utils.network_clients
+
 
     algod_server = deploy_config.get("ALGOD_SERVER")
     port = deploy_config.get("ALGOD_PORT")
@@ -54,32 +53,28 @@ def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
         return None
 
 
-def load_deploy_config(name: str, project_dir: Path) -> dict[str, str]:
+@contextlib.contextmanager
+def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
     :param project_dir: Project directory path.
-    :return: Deploy configuration.
     """
+    current_env = os.environ.copy()
     specific_env_path = project_dir / f".env.{name}"
+    try:
+        if default_config := ALGORAND_NETWORKS.get(name):
+            os.environ.update(cast(dict[str, str], default_config))
+        elif not specific_env_path.exists():
+            # if it's not a well-known network name, then we expect the specific env file to exist
+            raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
 
-    # cast to a more relaxed type for mypy
-    env = cast(
-        dict[str, str | None],
-        os.environ.copy(),
-    )
-
-    if default_config := ALGORAND_NETWORKS.get(name):
-        env.update(cast(dict[str, str], default_config))
-    elif not specific_env_path.exists():
-        # if it's not a well-known network name, then we expect the specific env file to exist
-        raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
-
-    for path in [project_dir / ".env", specific_env_path]:
-        if path.exists():
-            env.update(dotenv_values(path, verbose=True, interpolate=True))
-
-    return {k: v for k, v in env.items() if v is not None}
+        for path in [project_dir / ".env", specific_env_path]:
+            if path.exists():
+                load_dotenv(path, verbose=True, override=True)
+        yield
+    finally:
+        os.environ.update(current_env)
 
 
 def load_deploy_command(network_name: str, project_dir: Path) -> str:

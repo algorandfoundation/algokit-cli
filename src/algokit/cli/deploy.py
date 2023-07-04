@@ -22,7 +22,7 @@ def _validate_mnemonic(value: str) -> str:
     return value
 
 
-def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[str, str | None]:
+def ensure_mnemeonics(*, skip_mnemonics_prompts: bool) -> None:
     """
     Extract environment variables, prompt user if needed.
 
@@ -33,21 +33,21 @@ def extract_mnemonics(*, skip_mnemonics_prompts: bool, network: str) -> tuple[st
     deployer_mnemonic = os.getenv(constants.DEPLOYER_KEY)
     dispenser_mnemonic = os.getenv(constants.DISPENSER_KEY)
 
-    if network != constants.LOCALNET:
-        if deployer_mnemonic:
-            _validate_mnemonic(deployer_mnemonic)
-        else:
-            if skip_mnemonics_prompts:
-                raise click.ClickException(f"Error: missing {constants.DEPLOYER_KEY} environment variable")
-            deployer_mnemonic = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
+    if deployer_mnemonic:
+        _validate_mnemonic(deployer_mnemonic)
+    else:
+        if skip_mnemonics_prompts:
+            raise click.ClickException(f"Error: missing {constants.DEPLOYER_KEY} environment variable")
+        deployer_mnemonic = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
-        if dispenser_mnemonic:
-            _validate_mnemonic(dispenser_mnemonic)
-        elif not skip_mnemonics_prompts:
-            use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
-            if use_dispenser:
-                dispenser_mnemonic = click.prompt("dispenser-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
+    if dispenser_mnemonic:
+        _validate_mnemonic(dispenser_mnemonic)
+    elif not skip_mnemonics_prompts:
+        use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
+        if use_dispenser:
+            dispenser_mnemonic = click.prompt("dispenser-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
+    # TODO: fix this to write to os.environ instead
     return deployer_mnemonic, dispenser_mnemonic
 
 
@@ -90,40 +90,30 @@ def deploy_command(
     project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    deploy_config = load_deploy_config(network_or_environment_name, project_dir)
-    network_name = get_genesis_network_name(deploy_config) or network_or_environment_name
-
-    logger.info(f"Starting deployment process on {network_name} network...")
-
-    logger.info(f"Project directory: {project_dir}")
-
-    command = custom_deploy_command or load_deploy_command(network_name=network_name, project_dir=project_dir)
-    logger.info(f"Using deploy command: {command}")
-
-    deployer_mnemonic, dispenser_mnemonic = extract_mnemonics(
-        skip_mnemonics_prompts=skip_mnemonics_prompts, network=network
-    )
-
-    logger.info("Loaded deployment configuration.")
-
-    if not is_production_environment:
-        if network in constants.ALGORAND_NETWORKS:
-            network_name = network
-        else:
-            pass
-
-        if constants.MAINNET in network_name:
+    with load_deploy_config(network_or_environment_name, project_dir):
+        logger.info("Loaded deployment configuration.")
+        client = algokit_utils.network_clients.get_algod_client()
+        network_name = client.suggested_params().gen
+        logger.info(
+            f"Starting deployment process on {network_name} network..."
+        )  # TODO: do we need this? makes for potentially 3x suggested_params calls
+        if not is_production_environment and algokit_utils.is_mainnet(client):
             click.confirm(
                 "You are about to deploy to the MainNet. Are you sure you want to continue?",
                 abort=True,
             )
 
-    deploy_config[constants.DEPLOYER_KEY] = deployer_mnemonic
-    if dispenser_mnemonic:
-        deploy_config[constants.DISPENSER_KEY] = dispenser_mnemonic
+        logger.info(f"Project directory: {project_dir}")
 
-    logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
-    try:
-        proc.run(command.split(), env=deploy_config, cwd=project_dir, stdout_log_level=logging.INFO)
-    except Exception as ex:
-        raise click.ClickException(f"Failed to execute deploy command '{command}'.") from ex
+        command = custom_deploy_command or load_deploy_command(network_name=network_name, project_dir=project_dir)
+        logger.info(f"Using deploy command: {command}")
+
+        if not algokit_utils.is_localnet(client):
+            # TODO: this should write to os.environ
+            ensure_mnemeonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
+
+        logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
+        try:
+            proc.run(command.split(), cwd=project_dir, stdout_log_level=logging.INFO)
+        except Exception as ex:
+            raise click.ClickException(f"Failed to execute deploy command '{command}'.") from ex
