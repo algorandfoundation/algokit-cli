@@ -94,9 +94,11 @@ This example shows how Jinja syntax is used within `package.json` to allow place
 
 ### Bootstrap Option
 
-AlgoKit templates can include a bootstrap script. This script is automatically run after the project is initialized and can perform various setup tasks like installing dependencies or setting up databases.
+When instantiating your template via AlgoKit CLI it will optionally prompt the user to automatically run [algokit bootstrap](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/bootstrap.md) after the project is initialized and can perform various setup tasks like installing dependencies or setting up databases.
 
-- `env`: Copies an `.env.template` file to `.env` in the current working directory and prompts for any unspecified values. This is a critical aspect of managing environment variables securely, ensuring that sensitive data doesn't accidentally end up in version control.
+- `env`: Searches for and copies an `.env*.template` file to an equivalent `.env*` file in the current working directory, prompting for any unspecified values. This feature is integral for securely managing environment variables, as it prevents sensitive data from inadvertently ending up in version control.
+ By default, Algokit will scan for network-prefixed `.env` variables (e.g., `.env.localnet`), which can be particularly useful when relying on the [Algokit deploy command](https://github.com/algorandfoundation/algokit-cli/blob/deploy-command/docs/features/deploy.md). If no such prefixed files are located, Algokit will then attempt to load default `.env` files. This functionality provides greater flexibility for different network configurations.
+
 - `poetry`: If your Python project uses Poetry for dependency management, the `poetry` command installs Poetry (if not present) and runs `poetry install` in the current working directory to install Python dependencies.
 - `npm`: If you're developing a JavaScript or TypeScript project, the `npm` command runs npm install in the current working directory to install Node.js dependencies.
 - `all`: The `all` command runs all the aforementioned bootstrap sub-commands in the current directory and its subdirectories. This command is a comprehensive way to ensure all project dependencies and environment variables are properly set up.
@@ -117,13 +119,13 @@ project_name:
 This would prompt the user for the project name, and the input can then be used in the template using the Jinja syntax `{{ project_name }}`.
 
 #### Default Behaviors
-When creating an AlgoKit template, there are a few default behaviors that you can include to improve the development experience:
+When creating an AlgoKit template, there are a few default behaviors that you can expect to be provided by algokit-cli itself without introducing any extra code to your templates:
 
-- **Git**: If Git is installed on the user's system and the user's working directory is a Git repository, Copier will commit the newly created project as a new commit in the repository. This feature helps to maintain a clean version history for the project. If you wish to add a specific commit message for this action, you can specify a `commit_message` in the `_commit` option in your `copier.yaml` file.
+- **Git**: If Git is installed on the user's system and the user's working directory is a Git repository, AlgoKit CLI will commit the newly created project as a new commit in the repository. This feature helps to maintain a clean version history for the project. If you wish to add a specific commit message for this action, you can specify a `commit_message` in the `_commit` option in your `copier.yaml` file.
 
-- **VSCode**: If the user has Visual Studio Code (VSCode) installed and the path to VSCode is added to their system's PATH, Copier can automatically open the newly created project in a new VSCode window. This is triggered by adding `vscode: true` in your `copier.yam` file.
+- **VSCode**: If the user has Visual Studio Code (VSCode) installed and the path to VSCode is added to their system's PATH, AlgoKit CLI will automatically open the newly created VSCode window unless user provides specific flags into the init command.
 
-- **Bootstrap**: As previously mentioned, AlgoKit templates can include a bootstrap script that is automatically run after the project is initialized. This script can perform various setup tasks like installing dependencies or setting up databases. By default, if a `bootstrap` task is defined in the `copier.yaml`, it will be executed unless the user opts out during the prompt.
+- **Bootstrap**: AlgoKit CLI is equipped to execute a bootstrap script after a project has been initialized. This script, included in AlgoKit templates, can be automatically run to perform various setup tasks, such as installing dependencies or setting up databases. This is managed by AlgoKit CLI and not within the user-created codebase. By default, if a `bootstrap` task is defined in the `copier.yaml`, AlgoKit CLI will execute it, unless the user opts out during the prompt.
 
 By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
 ## Recommendations
@@ -133,7 +135,7 @@ By combining predefined Copier answers with these default behaviors, you can cre
 - **Versioning**: Use `.algokit.toml` to specify the minimum compatible version of AlgoKit.
 - **Testing**: Include test configurations and scripts in your templates to encourage testing best practices.
 - **Linting and Formatting**: Integrate linters and code formatters in your templates to ensure code quality.
-- **Algokit Principle**: for details on generic principles on designing templates refer to algo kit design principles
+- **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles).
 ## Conclusion
 
 Creating custom templates in AlgoKit is a powerful way to streamline your development workflow for Algorand smart contracts, whether you are using Python or TypeScript. Leveraging Copier and Jinja for templating, and incorporating best practices for modularity, documentation, and coding standards, can result in robust, flexible, and user-friendly templates that can be a valuable asset to both your own projects and the broader Algorand community.
