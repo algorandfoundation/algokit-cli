@@ -46,6 +46,7 @@ def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
     if dispenser_mnemonic := os.getenv(DISPENSER_KEY):
         _validate_mnemonic(dispenser_mnemonic, key=DISPENSER_KEY)
     elif not skip_mnemonics_prompts:
+        # TODO: should we _really_ always prompt for this?
         use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
         if use_dispenser:
             os.environ[DISPENSER_KEY] = click.prompt(
@@ -66,6 +67,7 @@ def _get_network_name_from_environment() -> str:
 
 
 @click.command("deploy")
+# TODO: think about default experience here, especially with .env file that might specify network params
 @click.argument("network_or_environment_name", default=LOCALNET)
 @click.option(
     "--command",

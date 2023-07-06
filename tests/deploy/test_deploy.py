@@ -128,32 +128,21 @@ def test_deploy_default_networks_no_env(
     verify(result.output, options=NamerFactory.with_parameters(network))
 
 
-@pytest.mark.parametrize("network", [BETANET, CUSTOMNET])
-def test_deploy_generic_env(
-    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
-) -> None:
-    mock_network_genesis(network)
+def test_deploy_custom_env_no_file(tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis) -> None:
+    name = "staging"
+    mock_network_genesis(TESTNET)
 
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
-    network_key = network if network == BETANET else MAINNET
-    (cwd / ".env").write_text(
-        f"""
-    ALGOD_SERVER={ALGORAND_NETWORKS[network_key]['ALGOD_SERVER']}
-    """
-    )
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(name))
 
     input_answers = ["N"]
 
-    if network_key == MAINNET:
-        input_answers.append("Y")
+    result = invoke(f"deploy {name}", cwd=cwd, input="\n".join(input_answers))
 
-    result = invoke(f"deploy {network}", cwd=cwd, input="\n".join(input_answers))
-
-    assert result.exit_code == 0 if network == LOCALNET else 1
-    verify(result.output, options=NamerFactory.with_parameters(network))
+    assert result.exit_code == 1
+    verify(result.output)
 
 
 @pytest.mark.parametrize("generic_env", [True, False])
