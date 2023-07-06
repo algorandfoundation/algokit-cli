@@ -1,10 +1,12 @@
 import os
+import typing as t
+from unittest import mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.cli.deploy import DEPLOYER_KEY, DISPENSER_KEY, ensure_mnemonics
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.deploy import ALGORAND_NETWORKS, BETANET, LOCALNET, MAINNET, TESTNET
+from algokit.core.deploy import ALGORAND_NETWORKS, BETANET, LOCALNET, LOCALNET_ALIASES, MAINNET, TESTNET
 from approvaltests.namer import NamerFactory
 from click import ClickException
 from pytest_mock import MockerFixture
@@ -20,13 +22,24 @@ def _mock_validate_mnemonic(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.deploy._validate_mnemonic", side_effect=lambda value, *_args, **_kwargs: value)
 
 
+MockNetworkGenesis = t.Callable[[str], None]
+
+
+@pytest.fixture()
+def mock_network_genesis(mocker: MockerFixture) -> MockNetworkGenesis:
+    def patch(key: str) -> None:
+        mocker.patch(
+            "algokit.cli.deploy._get_network_name_from_environment",
+            return_value=key if key != LOCALNET else LOCALNET_ALIASES[0],
+        )
+
+    return patch
+
+
 # Your test can then simply use this fixture
+@mock.patch.dict("os.environ", {DEPLOYER_KEY: "", DISPENSER_KEY: ""})
 def test_extract_mnemonics() -> None:
     # Check when environment variables are not set
-    if DEPLOYER_KEY in os.environ:
-        del os.environ[DEPLOYER_KEY]
-    if DISPENSER_KEY in os.environ:
-        del os.environ[DISPENSER_KEY]
     with pytest.raises(ClickException):
         ensure_mnemonics(skip_mnemonics_prompts=True)
 
@@ -41,15 +54,13 @@ def test_extract_mnemonics() -> None:
     assert os.environ[DEPLOYER_KEY] == "test_deployer_mnemonic"
     assert os.environ[DISPENSER_KEY] == "test_dispenser_mnemonic"
 
-    # Clean up environment variables
-    del os.environ[DEPLOYER_KEY]
-    del os.environ[DISPENSER_KEY]
-
 
 # Approvals tests for deploy command
 @pytest.mark.parametrize("network", ["", LOCALNET, TESTNET, MAINNET, BETANET, CUSTOMNET])
-def test_deploy_no_algokit_toml(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+def test_deploy_no_algokit_toml(
+    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
+    mock_network_genesis(network)
 
     if network != LOCALNET:
         os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -70,8 +81,10 @@ def test_deploy_no_algokit_toml(network: str, tmp_path_factory: TempPathFactory,
 
 
 @pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET])
-def test_deploy_default_networks_no_env(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+def test_deploy_default_networks_no_env(
+    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     if network != LOCALNET:
@@ -95,8 +108,10 @@ def test_deploy_default_networks_no_env(network: str, tmp_path_factory: TempPath
 
 
 @pytest.mark.parametrize("network", [BETANET, CUSTOMNET])
-def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+def test_deploy_generic_env(
+    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -122,10 +137,10 @@ def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory, moc
 
 @pytest.mark.parametrize("generic_env", [True, False])
 def test_deploy_custom_project_dir(
-    generic_env: bool, tmp_path_factory: TempPathFactory, mocker: MockerFixture  # noqa: FBT001
+    generic_env: bool, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis  # noqa: FBT001
 ) -> None:
     network = TESTNET
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
@@ -152,10 +167,10 @@ def test_deploy_custom_project_dir(
 
 @pytest.mark.parametrize("has_env", [True, False])
 def test_deploy_custom_network_env(
-    has_env: bool, tmp_path_factory: TempPathFactory, mocker: MockerFixture  # noqa: FBT001
+    has_env: bool, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis  # noqa: FBT001
 ) -> None:
     network = CUSTOMNET
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -180,9 +195,11 @@ def test_deploy_custom_network_env(
     verify(result.output, options=NamerFactory.with_parameters(has_env))
 
 
-def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+def test_deploy_is_production_environment(
+    tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
     network = MAINNET
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -202,8 +219,10 @@ def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory, moc
 
 
 @pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET])
-def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+def test_deploy_custom_deploy_command(
+    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -233,9 +252,11 @@ def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFa
     verify(result.output, options=NamerFactory.with_parameters(network))
 
 
-def test_deploy_skip_mnemonics_prompts(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+def test_deploy_skip_mnemonics_prompts(
+    tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+) -> None:
     network = TESTNET
-    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
 

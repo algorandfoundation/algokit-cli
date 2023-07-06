@@ -105,7 +105,7 @@ def deploy_command(
     with load_deploy_config(network_or_environment_name, project_dir):
         logger.info("Loaded deployment configuration.")
         network_name = _get_network_name_from_environment()
-        logger.info(f"Starting deployment process on {network_name} network...")
+        logger.info(f"Starting deployment process for network '{network_name}'...")
         if network_name not in LOCALNET_ALIASES:
             ensure_mnemonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
 
