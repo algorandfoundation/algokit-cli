@@ -1,11 +1,10 @@
 import os
-from unittest.mock import MagicMock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.deploy import BETANET, DEPLOYER_KEY, DISPENSER_KEY, LOCALNET, MAINNET, TESTNET, ensure_mnemonics
+from algokit.cli.deploy import DEPLOYER_KEY, DISPENSER_KEY, ensure_mnemonics
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.deploy import ALGORAND_NETWORKS
+from algokit.core.deploy import ALGORAND_NETWORKS, BETANET, LOCALNET, MAINNET, TESTNET
 from approvaltests.namer import NamerFactory
 from click import ClickException
 from pytest_mock import MockerFixture
@@ -18,17 +17,7 @@ CUSTOMNET = "customnet"
 
 @pytest.fixture(autouse=True)
 def _mock_validate_mnemonic(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._validate_mnemonic", return_value=None)
-
-
-@pytest.fixture(autouse=True)
-def mock_is_mainnet(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("algokit.cli.deploy.algokit_utils.is_mainnet", return_value=False)
-
-
-@pytest.fixture(autouse=True)
-def mock_is_localnet(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("algokit.cli.deploy.algokit_utils.is_localnet", return_value=LOCALNET)
+    mocker.patch("algokit.cli.deploy._validate_mnemonic", side_effect=lambda value, *_args, **_kwargs: value)
 
 
 # Your test can then simply use this fixture
@@ -59,8 +48,9 @@ def test_extract_mnemonics() -> None:
 
 # Approvals tests for deploy command
 @pytest.mark.parametrize("network", ["", LOCALNET, TESTNET, MAINNET, BETANET, CUSTOMNET])
-def test_deploy_no_algokit_toml(network: str, tmp_path_factory: TempPathFactory, mock_is_localnet: MagicMock) -> None:
-    mock_is_localnet.return_value = network == LOCALNET
+def test_deploy_no_algokit_toml(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
     if network != LOCALNET:
         os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
@@ -80,10 +70,9 @@ def test_deploy_no_algokit_toml(network: str, tmp_path_factory: TempPathFactory,
 
 
 @pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET])
-def test_deploy_default_networks_no_env(
-    network: str, tmp_path_factory: TempPathFactory, mock_is_localnet: MagicMock
-) -> None:
-    mock_is_localnet.return_value = network == LOCALNET
+def test_deploy_default_networks_no_env(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
     cwd = tmp_path_factory.mktemp("cwd")
     if network != LOCALNET:
         os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
@@ -106,9 +95,10 @@ def test_deploy_default_networks_no_env(
 
 
 @pytest.mark.parametrize("network", [BETANET, CUSTOMNET])
-def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory, mock_is_localnet: MagicMock) -> None:
+def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
     cwd = tmp_path_factory.mktemp("cwd")
-    mock_is_localnet.return_value = network == LOCALNET
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
@@ -132,11 +122,12 @@ def test_deploy_generic_env(network: str, tmp_path_factory: TempPathFactory, moc
 
 @pytest.mark.parametrize("generic_env", [True, False])
 def test_deploy_custom_project_dir(
-    generic_env: bool, tmp_path_factory: TempPathFactory, mock_is_localnet: MagicMock  # noqa: FBT001
+    generic_env: bool, tmp_path_factory: TempPathFactory, mocker: MockerFixture  # noqa: FBT001
 ) -> None:
-    mock_is_localnet.return_value = False
-    cwd = tmp_path_factory.mktemp("cwd")
     network = TESTNET
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
+    cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
@@ -161,12 +152,13 @@ def test_deploy_custom_project_dir(
 
 @pytest.mark.parametrize("has_env", [True, False])
 def test_deploy_custom_network_env(
-    has_env: bool, tmp_path_factory: TempPathFactory, mock_is_localnet: MagicMock  # noqa: FBT001
+    has_env: bool, tmp_path_factory: TempPathFactory, mocker: MockerFixture  # noqa: FBT001
 ) -> None:
-    mock_is_localnet.return_value = False
+    network = CUSTOMNET
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
-    network = CUSTOMNET
 
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
 
@@ -188,9 +180,11 @@ def test_deploy_custom_network_env(
     verify(result.output, options=NamerFactory.with_parameters(has_env))
 
 
-def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
     network = MAINNET
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
+    cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
     # Setup algokit configuration file
@@ -208,13 +202,11 @@ def test_deploy_is_production_environment(tmp_path_factory: TempPathFactory) -> 
 
 
 @pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET])
-def test_deploy_custom_deploy_command(
-    network: str, tmp_path_factory: TempPathFactory, mock_is_mainnet: MagicMock, mock_is_localnet: MagicMock
-) -> None:
+def test_deploy_custom_deploy_command(network: str, tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
-    mock_is_mainnet.return_value = network == MAINNET
-    mock_is_localnet.return_value = network == LOCALNET
 
     custom_command = 'python -c print("HelloWorld")'
     if network == CUSTOMNET:
@@ -241,9 +233,12 @@ def test_deploy_custom_deploy_command(
     verify(result.output, options=NamerFactory.with_parameters(network))
 
 
-def test_deploy_skip_mnemonics_prompts(tmp_path_factory: TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_deploy_skip_mnemonics_prompts(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
     network = TESTNET
+    mocker.patch("algokit.cli.deploy._get_network_name_from_environment", return_value=network)
+
+    cwd = tmp_path_factory.mktemp("cwd")
+
     os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
 
     # Setup algokit configuration file

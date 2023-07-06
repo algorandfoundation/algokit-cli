@@ -54,7 +54,7 @@ DEFAULT_ALGOD_SERVER = "http://localhost"
 DEFAULT_ALGOD_TOKEN = "a" * 64
 GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
 
-DOCKERNET = "dockernet"
+LOCALNET_ALIASES = ("devnet", "sandnet", "dockernet")
 LOCALNET = "localnet"
 MAINNET = "mainnet"
 BETANET = "betanet"
@@ -93,29 +93,35 @@ def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
     """
     current_env = os.environ.copy()
     specific_env_path = project_dir / f".env.{name}"
-    generic_env_path = project_dir / ".env"
     try:
+        # first, we load in any defaults if "name" is a known network name
         if default_config := ALGORAND_NETWORKS.get(name):
-            os.environ.update(default_config)
-        elif specific_env_path.exists():
-            load_dotenv(specific_env_path, verbose=True, override=True)
-        elif generic_env_path.exists():
-            load_dotenv(generic_env_path, verbose=True, override=True)
-        else:
-            # if it's not a well-known network name, and no specific or generic env file exist
-            raise click.ClickException(
-                f"{name} is not a known network, and no {specific_env_path} or {generic_env_path} file found"
-            )
+            # note we don't "update" here, if there is already an existing
+            # environment variable we don't want to overwrite it with a network default,
+            # so we just use `setdefault` instead
+            for k, v in default_config.items():
+                os.environ.setdefault(k, v)
+        # if it's not a well-known network name, then we expect the specific env file to exist,
+        # if it doesn't then fail fast here
+        elif not specific_env_path.exists():
+            raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
 
+        # next we load in the .env file if it exists, and finally the .env.name specific file
+        for path in [project_dir / ".env", specific_env_path]:
+            if path.exists():
+                # TODO: do we really want to override here?
+                load_dotenv(path, verbose=True, override=True)
         yield
     finally:
+        # restore the environment variables
+        # TODO: test this out, this seems blunt
         os.environ.update(current_env)
 
 
-def load_deploy_command(network_name: str, project_dir: Path) -> str:
+def load_deploy_command(name: str, project_dir: Path) -> str:
     """
-    Load the deploy command for the given network from .algokit.toml file.
-    :param network_name: Network name.
+    Load the deploy command for the given network/environment from .algokit.toml file.
+    :param name: Network or environment name.
     :param project_dir: Project directory path.
     :return: Deploy command.
     """
@@ -131,6 +137,8 @@ def load_deploy_command(network_name: str, project_dir: Path) -> str:
 
     # Extract the deploy command for the given network
     try:
-        return str(config["deploy"][network_name]["command"])
+        return str(config["deploy"][name]["command"])
     except KeyError:
-        raise click.ClickException(f"Deploy command is not specified in '{ALGOKIT_CONFIG}' file.") from None
+        raise click.ClickException(
+            f"Deploy command for '{name}' is not specified in '{ALGOKIT_CONFIG}' file."
+        ) from None
