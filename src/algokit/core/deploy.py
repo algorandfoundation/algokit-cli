@@ -1,16 +1,15 @@
 # 1. User can call algokit deploy to different networks
 # 2. By default algokit cli contains configs for testnet and mainnet
 # 3. User can overwrite them by creating a config file in the project root
-import contextlib
 import logging
 import os
-from collections.abc import Iterator
 from pathlib import Path
 
 import click
 import httpx
 from dotenv import load_dotenv
 
+from algokit.core import sandbox
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 
 logger = logging.getLogger(__name__)
@@ -50,9 +49,7 @@ def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
         return None
 
 
-DEFAULT_ALGOD_SERVER = "http://localhost"
-DEFAULT_ALGOD_TOKEN = "a" * 64
-GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
+GITPOD_URL = os.getenv("GITPOD_WORKSPACE_URL")
 
 LOCALNET_ALIASES = ("devnet", "sandnet", "dockernet")
 LOCALNET = "localnet"
@@ -62,12 +59,19 @@ TESTNET = "testnet"
 
 ALGORAND_NETWORKS: dict[str, dict[str, str]] = {
     LOCALNET: {
-        "ALGOD_SERVER": GITPOD_URL.replace("https://", "https://4001-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
-        "INDEXER_SERVER": GITPOD_URL.replace("https://", "https://8980-") if GITPOD_URL else DEFAULT_ALGOD_SERVER,
-        "ALGOD_PORT": str(443 if GITPOD_URL else 4001),
-        "ALGOD_TOKEN": DEFAULT_ALGOD_TOKEN,
-        "INDEXER_PORT": str(443 if GITPOD_URL else 8980),
-        "INDEXER_TOKEN": DEFAULT_ALGOD_TOKEN,
+        "ALGOD_SERVER": sandbox.DEFAULT_ALGOD_SERVER,
+        "ALGOD_PORT": str(sandbox.DEFAULT_ALGOD_PORT),
+        "ALGOD_TOKEN": sandbox.DEFAULT_ALGOD_TOKEN,
+        "INDEXER_SERVER": sandbox.DEFAULT_ALGOD_SERVER,
+        "INDEXER_PORT": str(sandbox.DEFAULT_INDEXER_PORT),
+        "INDEXER_TOKEN": sandbox.DEFAULT_ALGOD_TOKEN,
+    }
+    if not GITPOD_URL
+    else {
+        "ALGOD_SERVER": GITPOD_URL.replace("https://", f"https://{sandbox.DEFAULT_ALGOD_PORT}-"),
+        "ALGOD_TOKEN": sandbox.DEFAULT_ALGOD_TOKEN,
+        "INDEXER_SERVER": GITPOD_URL.replace("https://", f"https://{sandbox.DEFAULT_INDEXER_PORT}-"),
+        "INDEXER_TOKEN": sandbox.DEFAULT_ALGOD_TOKEN,
     },
     TESTNET: {
         "ALGOD_SERVER": "https://testnet-api.algonode.cloud",
@@ -84,38 +88,30 @@ ALGORAND_NETWORKS: dict[str, dict[str, str]] = {
 }
 
 
-@contextlib.contextmanager
-def load_deploy_config(name: str, project_dir: Path) -> Iterator[None]:
+def load_deploy_config(name: str, project_dir: Path) -> None:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
     :param project_dir: Project directory path.
     """
-    current_env = os.environ.copy()
     specific_env_path = project_dir / f".env.{name}"
-    try:
-        # first, we load in any defaults if "name" is a known network name
-        if default_config := ALGORAND_NETWORKS.get(name):
-            # note we don't "update" here, if there is already an existing
-            # environment variable we don't want to overwrite it with a network default,
-            # so we just use `setdefault` instead
-            for k, v in default_config.items():
-                os.environ.setdefault(k, v)
-        # if it's not a well-known network name, then we expect the specific env file to exist,
-        # if it doesn't then fail fast here
-        elif not specific_env_path.exists():
-            raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
+    # first, we load in any defaults if "name" is a known network name
+    if default_config := ALGORAND_NETWORKS.get(name):
+        # note we don't "update" here, if there is already an existing
+        # environment variable we don't want to overwrite it with a network default,
+        # so we just use `setdefault` instead
+        for k, v in default_config.items():
+            os.environ.setdefault(k, v)
+    # if it's not a well-known network name, then we expect the specific env file to exist,
+    # if it doesn't then fail fast here
+    elif not specific_env_path.exists():
+        raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
 
-        # next we load in the .env file if it exists, and finally the .env.name specific file
-        for path in [project_dir / ".env", specific_env_path]:
-            if path.exists():
-                # TODO: do we really want to override here?
-                load_dotenv(path, verbose=True, override=True)
-        yield
-    finally:
-        # restore the environment variables
-        # TODO: test this out, this seems blunt
-        os.environ.update(current_env)
+    # next we load in the .env file if it exists, and finally the .env.name specific file
+    for path in [project_dir / ".env", specific_env_path]:
+        if path.exists():
+            # TODO: do we really want to override here?
+            load_dotenv(path, verbose=True, override=True)
 
 
 def load_deploy_command(name: str, project_dir: Path) -> str:

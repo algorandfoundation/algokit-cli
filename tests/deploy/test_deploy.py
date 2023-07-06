@@ -17,9 +17,14 @@ from tests.utils.click_invoker import invoke
 CUSTOMNET = "customnet"
 
 
-@pytest.fixture(autouse=True)
-def _mock_validate_mnemonic(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.deploy._validate_mnemonic", side_effect=lambda value, *_args, **_kwargs: value)
+VALID_MNEMONIC1 = (
+    "until random potato live stove poem toddler deliver give traffic vapor genuine "
+    "supply wonder few gap penalty ask cluster high throw own milk ability issue"
+)
+VALID_MNEMONIC2 = (
+    "cruise sustain matrix bulb bind aisle fox copper antenna arctic brief video cactus "
+    "high rough lawn secret dignity inmate remember early pudding collect about trick"
+)
 
 
 MockNetworkGenesis = t.Callable[[str], None]
@@ -38,21 +43,31 @@ def mock_network_genesis(mocker: MockerFixture) -> MockNetworkGenesis:
 
 # Your test can then simply use this fixture
 @mock.patch.dict("os.environ", {DEPLOYER_KEY: "", DISPENSER_KEY: ""})
-def test_extract_mnemonics() -> None:
+def test_extract_mnemonics_unset() -> None:
     # Check when environment variables are not set
-    with pytest.raises(ClickException):
+    with pytest.raises(ClickException, match=f"missing {DEPLOYER_KEY}"):
         ensure_mnemonics(skip_mnemonics_prompts=True)
 
-    # Set environment variables for the test
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
-    os.environ[DISPENSER_KEY] = "test_dispenser_mnemonic"
 
-    # Test extraction with skip_mnemonics_prompts=True
+@mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2})
+def test_extract_mnemonics_set() -> None:
     ensure_mnemonics(skip_mnemonics_prompts=True)
 
     # Assert that the environment variables are not changed
-    assert os.environ[DEPLOYER_KEY] == "test_deployer_mnemonic"
-    assert os.environ[DISPENSER_KEY] == "test_dispenser_mnemonic"
+    assert os.environ[DEPLOYER_KEY] == VALID_MNEMONIC1
+    assert os.environ[DISPENSER_KEY] == VALID_MNEMONIC2
+
+
+@mock.patch.dict("os.environ", {DEPLOYER_KEY: "abc", DISPENSER_KEY: VALID_MNEMONIC1})
+def test_extract_mnemonics_invalid_deployer() -> None:
+    with pytest.raises(ClickException, match=f"Invalid mnemonic for {DEPLOYER_KEY}"):
+        ensure_mnemonics(skip_mnemonics_prompts=True)
+
+
+@mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: "abc"})
+def test_extract_mnemonics_invalid_dispenser() -> None:
+    with pytest.raises(ClickException, match=f"Invalid mnemonic for {DISPENSER_KEY}"):
+        ensure_mnemonics(skip_mnemonics_prompts=True)
 
 
 # Approvals tests for deploy command
@@ -63,7 +78,7 @@ def test_deploy_no_algokit_toml(
     mock_network_genesis(network)
 
     if network != LOCALNET:
-        os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+        os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     cwd = tmp_path_factory.mktemp("cwd")
 
@@ -87,15 +102,14 @@ def test_deploy_default_networks_no_env(
     mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
+    input_answers: list[str] = []
     if network != LOCALNET:
-        os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+        os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
+        if network == MAINNET:
+            input_answers.append("Y")
+        input_answers.append("N")
 
-    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
-
-    input_answers = ["N" if network != LOCALNET else ""]
-
-    if network == MAINNET:
-        input_answers.append("Y")
+    (cwd / ALGOKIT_CONFIG).write_text(f'[deploy.{network}]\ncommand = "python -c print("HelloWorld")"\n')
 
     result = invoke(
         f"deploy {network}",
@@ -114,7 +128,7 @@ def test_deploy_generic_env(
     mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
     network_key = network if network == BETANET else MAINNET
@@ -144,7 +158,7 @@ def test_deploy_custom_project_dir(
 
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     (custom_folder).mkdir()
     (custom_folder / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
@@ -173,9 +187,14 @@ def test_deploy_custom_network_env(
     mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
+    (cwd / ALGOKIT_CONFIG).write_text(
+        f"""
+[deploy.{network}]
+command = "python -c print('HelloWorld')"
+"""
+    )
 
     if has_env:
         (cwd / f".env.{network}").write_text(
@@ -202,7 +221,7 @@ def test_deploy_is_production_environment(
     mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     # Setup algokit configuration file
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
@@ -225,7 +244,7 @@ def test_deploy_custom_deploy_command(
     mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     custom_command = 'python -c print("HelloWorld")'
     if network == CUSTOMNET:
@@ -235,10 +254,11 @@ def test_deploy_custom_deploy_command(
             """
         )
 
-    input_answers = ["N" if network != LOCALNET else ""]
-
-    if network == MAINNET:
-        input_answers.append("Y")
+    input_answers: list[str] = []
+    if network != LOCALNET:
+        if network == MAINNET:
+            input_answers.append("Y")
+        input_answers.append("N")
 
     # Running with --custom-deploy-command flag
     result = invoke(
@@ -260,7 +280,7 @@ def test_deploy_skip_mnemonics_prompts(
 
     cwd = tmp_path_factory.mktemp("cwd")
 
-    os.environ[DEPLOYER_KEY] = "test_deployer_mnemonic"
+    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     # Setup algokit configuration file
     (cwd / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")

@@ -7,6 +7,7 @@ import click
 
 from algokit.core import proc
 from algokit.core.deploy import LOCALNET, LOCALNET_ALIASES, MAINNET, load_deploy_command, load_deploy_config
+from algokit.core.utils import isolate_environ_changes
 
 logger = logging.getLogger(__name__)
 
@@ -56,16 +57,18 @@ def _get_network_name_from_environment() -> str:
     # TODO: have tests exercise this function
     algod_client = algokit_utils.get_algod_client()
     network_genesis = algod_client.genesis()
-    assert isinstance(network_genesis, dict)
-    network_name = network_genesis["network"]
-    assert isinstance(network_name, str)
-    return network_name
+    match network_genesis:
+        case {"network": str(network_name)}:
+            return network_name
+        case _:
+            logger.debug(f"No network found in genesis result: {network_genesis!r}")
+            raise click.ClickException("Unable to extract network name from genesis response")
 
 
 @click.command("deploy")
 @click.argument("network_or_environment_name", default=LOCALNET)
 @click.option(
-    "custom_deploy_command",
+    "command",
     "--custom-deploy-command",
     type=str,
     default=None,
@@ -95,36 +98,39 @@ def _get_network_name_from_environment() -> str:
 def deploy_command(
     *,
     network_or_environment_name: str,
-    custom_deploy_command: str | None,
+    command: str | None,
     skip_mnemonics_prompts: bool,
     is_production_environment: bool,
     project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    # TODO: do we want to walk up for env/config?
-    with load_deploy_config(network_or_environment_name, project_dir):
+
+    logger.debug(f"Deploying from project directory: {project_dir}")
+
+    if command is None:
+        command = load_deploy_command(name=network_or_environment_name, project_dir=project_dir)
+    logger.info(f"Using deploy command: {command}")
+
+    """Deploy smart contracts from AlgoKit compliant repository."""
+    with isolate_environ_changes():
+        # TODO: do we want to walk up for env/config?
+        load_deploy_config(network_or_environment_name, project_dir)
         logger.info("Loaded deployment configuration.")
+        logger.info("Checking deployment network...")
         network_name = _get_network_name_from_environment()
         logger.info(f"Starting deployment process for network '{network_name}'...")
         if network_name not in LOCALNET_ALIASES:
+            if network_name == MAINNET and not is_production_environment:
+                click.confirm(
+                    "You are about to deploy to the MainNet. Are you sure you want to continue?",
+                    abort=True,
+                )
             ensure_mnemonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
-
-        if not is_production_environment and network_name == MAINNET:
-            click.confirm(
-                "You are about to deploy to the MainNet. Are you sure you want to continue?",
-                abort=True,
-            )
-
-        logger.info(f"Project directory: {project_dir}")
-
-        if custom_deploy_command is not None:
-            command = custom_deploy_command
-        else:
-            command = load_deploy_command(name=network_or_environment_name, project_dir=project_dir)
-        logger.info(f"Using deploy command: {command}")
 
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
+            # TODO: tests should exercise env var passing
             proc.run(command.split(), cwd=project_dir, stdout_log_level=logging.INFO)
         except Exception as ex:
+            #
             raise click.ClickException(f"Failed to execute deploy command '{command}'.") from ex
