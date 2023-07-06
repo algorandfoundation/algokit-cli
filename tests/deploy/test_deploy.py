@@ -160,7 +160,7 @@ def test_deploy_custom_project_dir(
     custom_folder = cwd / "custom_folder"
     os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    (custom_folder).mkdir()
+    custom_folder.mkdir()
     (custom_folder / ALGOKIT_CONFIG).write_text(f"[deploy.{network}]\ncommand = \"python -c print('HelloWorld')\"\n")
     (custom_folder / (".env" if generic_env else f".env.{network}")).write_text(
         f"""

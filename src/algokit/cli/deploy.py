@@ -104,14 +104,12 @@ def deploy_command(
     project_dir: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-
     logger.debug(f"Deploying from project directory: {project_dir}")
 
     if command is None:
         command = load_deploy_command(name=network_or_environment_name, project_dir=project_dir)
     logger.info(f"Using deploy command: {command}")
 
-    """Deploy smart contracts from AlgoKit compliant repository."""
     with isolate_environ_changes():
         # TODO: do we want to walk up for env/config?
         load_deploy_config(network_or_environment_name, project_dir)
@@ -130,7 +128,11 @@ def deploy_command(
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
             # TODO: tests should exercise env var passing
-            proc.run(command.split(), cwd=project_dir, stdout_log_level=logging.INFO)
-        except Exception as ex:
-            #
-            raise click.ClickException(f"Failed to execute deploy command '{command}'.") from ex
+            result = proc.run(command.split(), cwd=project_dir, stdout_log_level=logging.INFO)
+        except FileNotFoundError as ex:
+            raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
+        except PermissionError as ex:
+            raise click.ClickException("Failed to execute deploy command, permission denied") from ex
+        else:
+            if result.exit_code != 0:
+                raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
