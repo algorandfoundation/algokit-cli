@@ -68,29 +68,27 @@ def _get_network_name_from_environment() -> str:
 @click.command("deploy")
 @click.argument("network_or_environment_name", default=LOCALNET)
 @click.option(
-    "command",
-    "--custom-deploy-command",
+    "--command",
+    "-C",
     type=str,
     default=None,
     help="Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.",
 )
 @click.option(
-    "skip_mnemonics_prompts",
-    "--ci",
-    is_flag=True,
-    default=False,
-    help="Skip interactive prompt for mnemonics, expects them to be set as environment variables.",
+    "--interactive/--non-interactive",
+    " /--ci",
+    default=lambda: not os.getenv("CI"),
+    help="Enable/disable interactive prompts. If the CI environment variable is set, this defaults to off",
 )
 @click.option(
-    "is_production_environment",
-    "--prod",
+    "--enable-prod-deploys",
     is_flag=True,
     default=False,
     help="Skip warning prompt for deployments to a mainnet.",
 )
 @click.option(
-    "project_dir",
-    "--project-dir",
+    "--path",
+    "-P",
     type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
     default=".",
     help="Specify the project directory. If not provided, current working directory will be used.",
@@ -99,36 +97,40 @@ def deploy_command(
     *,
     network_or_environment_name: str,
     command: str | None,
-    skip_mnemonics_prompts: bool,
-    is_production_environment: bool,
-    project_dir: Path,
+    interactive: bool,
+    enable_prod_deploys: bool,
+    path: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    logger.debug(f"Deploying from project directory: {project_dir}")
+    logger.debug(f"Deploying from project directory: {path}")
 
     if command is None:
-        command = load_deploy_command(name=network_or_environment_name, project_dir=project_dir)
+        command = load_deploy_command(name=network_or_environment_name, project_dir=path)
     logger.info(f"Using deploy command: {command}")
 
     with isolate_environ_changes():
         # TODO: do we want to walk up for env/config?
-        load_deploy_config(network_or_environment_name, project_dir)
+        load_deploy_config(network_or_environment_name, path)
         logger.info("Loaded deployment configuration.")
         logger.info("Checking deployment network...")
         network_name = _get_network_name_from_environment()
         logger.info(f"Starting deployment process for network '{network_name}'...")
         if network_name not in LOCALNET_ALIASES:
-            if network_name == MAINNET and not is_production_environment:
+            if network_name == MAINNET and not enable_prod_deploys:
+                if not interactive:
+                    raise click.ClickException(
+                        "To deploy to mainnet non interactively, --enable-prod-deploys must be specified"
+                    )
                 click.confirm(
                     "You are about to deploy to the MainNet. Are you sure you want to continue?",
                     abort=True,
                 )
-            ensure_mnemonics(skip_mnemonics_prompts=skip_mnemonics_prompts)
+            ensure_mnemonics(skip_mnemonics_prompts=not interactive)
 
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
             # TODO: tests should exercise env var passing
-            result = proc.run(command.split(), cwd=project_dir, stdout_log_level=logging.INFO)
+            result = proc.run(command.split(), cwd=path, stdout_log_level=logging.INFO)
         except FileNotFoundError as ex:
             raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
         except PermissionError as ex:

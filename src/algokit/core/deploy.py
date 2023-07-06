@@ -128,7 +128,7 @@ def load_deploy_command(name: str, project_dir: Path) -> str:
     if not config:
         raise click.ClickException(
             f"Couldn't load {ALGOKIT_CONFIG} file. Ensure deploy command is specified, either via "
-            f"--custom-deploy-command or inside {ALGOKIT_CONFIG} file."
+            f"--command or inside {ALGOKIT_CONFIG} file."
         )
 
     # Extract the deploy command for the given network

@@ -173,7 +173,7 @@ def test_deploy_custom_project_dir(
     # Below is needed for escpaing the backslash in the path on Windows
     # Works on Linux as well since \\ doesnt exist in the path in such cases
     path = str(custom_folder.absolute()).replace("\\", r"\\")
-    result = invoke(f"deploy {network} --project-dir={path}", cwd=cwd, input="\n".join(input_answers))
+    result = invoke(f"deploy {network} --path={path}", cwd=cwd, input="\n".join(input_answers))
 
     assert result.exit_code == 0 if network == LOCALNET else 1
     verify(result.output, options=NamerFactory.with_parameters(generic_env))
@@ -228,7 +228,7 @@ def test_deploy_is_production_environment(
 
     # Running with --prod flag
     result = invoke(
-        f"deploy {network} --prod",
+        f"deploy {network} --enable-prod-deploys",
         cwd=cwd,
         input="N",
     )
@@ -260,9 +260,9 @@ def test_deploy_custom_deploy_command(
             input_answers.append("Y")
         input_answers.append("N")
 
-    # Running with --custom-deploy-command flag
+    # Running with --command flag
     result = invoke(
-        f"deploy {network} --custom-deploy-command '{custom_command}'",
+        f"deploy {network} --command '{custom_command}'",
         cwd=cwd,
         input="\n".join(input_answers),
     )
