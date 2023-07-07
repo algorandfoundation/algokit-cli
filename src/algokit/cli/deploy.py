@@ -1,12 +1,13 @@
 import logging
 import os
+import shlex
 from pathlib import Path
 
 import algokit_utils
 import click
 
 from algokit.core import proc
-from algokit.core.deploy import LOCALNET, LOCALNET_ALIASES, MAINNET, load_deploy_command, load_deploy_config
+from algokit.core.deploy import LOCALNET_ALIASES, MAINNET, load_deploy_command, load_deploy_config
 from algokit.core.utils import isolate_environ_changes
 
 logger = logging.getLogger(__name__)
@@ -56,19 +57,20 @@ def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
 
 def _get_network_name_from_environment() -> str:
     # TODO: have tests exercise this function
+    logger.debug("Getting algod client from environment variables")
     algod_client = algokit_utils.get_algod_client()
+    logger.debug(f"Querying algod network genesis, server = {algod_client.algod_address}")
     network_genesis = algod_client.genesis()
+    logger.debug(f"Genesis response: {network_genesis!r}")
     match network_genesis:
         case {"network": str(network_name)}:
             return network_name
         case _:
-            logger.debug(f"No network found in genesis result: {network_genesis!r}")
             raise click.ClickException("Unable to extract network name from genesis response")
 
 
 @click.command("deploy")
-# TODO: think about default experience here, especially with .env file that might specify network params
-@click.argument("network_or_environment_name", default=LOCALNET)
+@click.argument("network_or_environment_name", default=None, required=False)
 @click.option(
     "--command",
     "-C",
@@ -96,7 +98,7 @@ def _get_network_name_from_environment() -> str:
 )
 def deploy_command(
     *,
-    network_or_environment_name: str,
+    network_or_environment_name: str | None,
     command: str | None,
     interactive: bool,
     mainnet_prompt: bool,
@@ -104,18 +106,23 @@ def deploy_command(
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
     logger.debug(f"Deploying from project directory: {path}")
-
-    if command is None:
-        command = load_deploy_command(name=network_or_environment_name, project_dir=path)
-    logger.info(f"Using deploy command: {command}")
-
     with isolate_environ_changes():
         # TODO: do we want to walk up for env/config?
+        logger.info("Loading deployment configuration...")
         load_deploy_config(network_or_environment_name, path)
-        logger.info("Loaded deployment configuration.")
-        logger.info("Checking deployment network...")
+        logger.debug("Checking deployment network...")
         network_name = _get_network_name_from_environment()
-        logger.info(f"Starting deployment process for network '{network_name}'...")
+        logger.debug(f"Network name is {network_name}")
+        if command is not None:
+            command_parts = shlex.split(command)
+        else:
+            # use the name supplied on command line if there was one, otherwise use the network name
+            deploy_name = network_or_environment_name or network_name
+            logger.debug(f"Loading deploy command for {deploy_name}")
+            command_parts = load_deploy_command(name=deploy_name, project_dir=path)
+        logger.info(f"Using deploy command: {command}")
+
+        logger.info(f"Starting deployment process on {network_name} network...")
         if network_name not in LOCALNET_ALIASES:
             if network_name == MAINNET and mainnet_prompt:
                 if not interactive:
@@ -131,7 +138,7 @@ def deploy_command(
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
             # TODO: tests should exercise env var passing
-            result = proc.run(command.split(), cwd=path, stdout_log_level=logging.INFO)
+            result = proc.run(command_parts, cwd=path, stdout_log_level=logging.INFO)
         except FileNotFoundError as ex:
             raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
         except PermissionError as ex:

@@ -98,7 +98,7 @@ def test_deploy_no_algokit_toml(
 def _deploy_command(name: str) -> str:
     return f"""
 [deploy.{name}]
-command = "python -c print('HelloWorld')"
+command = "python -c 'print(\\"HelloWorld\\")'"
 """
 
 
@@ -219,7 +219,7 @@ def test_deploy_is_production_environment(
 
     # Running with --prod flag
     result = invoke(
-        f"deploy {network} --enable-prod-deploys",
+        f"deploy {network} --no-mainnet-prompt",
         cwd=cwd,
         input="N",
     )
@@ -237,13 +237,8 @@ def test_deploy_custom_deploy_command(
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    custom_command = 'python -c print("HelloWorld")'
-    if network == CUSTOMNET:
-        (cwd / f".env.{network}").write_text(
-            f"""
-                ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}
-            """
-        )
+    if network not in ALGORAND_NETWORKS:
+        (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}")
 
     input_answers: list[str] = []
     if network != LOCALNET:
@@ -253,7 +248,7 @@ def test_deploy_custom_deploy_command(
 
     # Running with --command flag
     result = invoke(
-        f"deploy {network} --command '{custom_command}'",
+        f"deploy {network} --command 'python -c print(123)'",
         cwd=cwd,
         input="\n".join(input_answers),
     )

@@ -3,6 +3,7 @@
 # 3. User can overwrite them by creating a config file in the project root
 import logging
 import os
+import shlex
 from pathlib import Path
 
 import click
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_genesis_network_name(deploy_config: dict[str, str]) -> str | None:
     """
-    Get the network name from the genesis block.
+    Get the network name from 1the genesis block.
     :param deploy_config: Deploy configuration.
     :return: Network name.
     """
@@ -88,12 +89,21 @@ ALGORAND_NETWORKS: dict[str, dict[str, str]] = {
 }
 
 
-def load_deploy_config(name: str, project_dir: Path) -> None:
+def load_deploy_config(name: str | None, project_dir: Path) -> None:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
     :param project_dir: Project directory path.
     """
+    general_env_path = project_dir / ".env"
+    # if no "name" is supplied, we load only the .env file,
+    # and expect that to contain e.g. ALGOD_SERVER which can tell us
+    # the network name
+    if name is None:
+        if general_env_path.exists():
+            # TODO: do we really want to override here?
+            load_dotenv(verbose=True, override=True)
+        return
     specific_env_path = project_dir / f".env.{name}"
     # first, we load in any defaults if "name" is a known network name
     if default_config := ALGORAND_NETWORKS.get(name):
@@ -108,13 +118,13 @@ def load_deploy_config(name: str, project_dir: Path) -> None:
         raise click.ClickException(f"{name} is not a known network, and no {specific_env_path} file")
 
     # next we load in the .env file if it exists, and finally the .env.name specific file
-    for path in [project_dir / ".env", specific_env_path]:
+    for path in [general_env_path, specific_env_path]:
         if path.exists():
             # TODO: do we really want to override here?
             load_dotenv(path, verbose=True, override=True)
 
 
-def load_deploy_command(name: str, project_dir: Path) -> str:
+def load_deploy_command(name: str | None, project_dir: Path) -> list[str]:
     """
     Load the deploy command for the given network/environment from .algokit.toml file.
     :param name: Network or environment name.
@@ -131,10 +141,27 @@ def load_deploy_command(name: str, project_dir: Path) -> str:
             f"--command or inside {ALGOKIT_CONFIG} file."
         )
 
-    # Extract the deploy command for the given network
-    try:
-        return str(config["deploy"][name]["command"])
-    except KeyError:
-        raise click.ClickException(
-            f"Deploy command for '{name}' is not specified in '{ALGOKIT_CONFIG}' file."
-        ) from None
+    match deploy_table := config.get("deploy"):
+        case None:
+            raise click.ClickException(f"No deployment commands specified in '{ALGOKIT_CONFIG}' file")
+        case dict():
+            pass
+        case _:
+            raise click.ClickException(f"Bad data for deploy in '{ALGOKIT_CONFIG}' file: {deploy_table}")
+    assert isinstance(deploy_table, dict)
+
+    for tbl in [deploy_table.get(name), deploy_table]:
+        match tbl:
+            case {"command": str(command)}:
+                try:
+                    return shlex.split(command)
+                except Exception as ex:
+                    raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
+            case {"command": list(command_parts)}:
+                return [str(x) for x in command_parts]
+
+    if name is None:
+        msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
+    else:
+        msg = f"Deploy command for '{name}' is not specified in '{ALGOKIT_CONFIG}' file, and no generic command."
+    raise click.ClickException(msg)

@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 import sys
+import typing as t
 from importlib import metadata
 from pathlib import Path
 
@@ -54,14 +55,15 @@ def get_current_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
 
 
-def get_algokit_config(project_dir: Path) -> dict | None:
+def get_algokit_config(project_dir: Path) -> dict[str, t.Any] | None:
     """
     Load and parse a TOML configuration file. Will never throw.
     :param project_dir: Project directory path.
     :return: A dictionary containing the configuration or None if not found.
     """
+    config_path = project_dir / ALGOKIT_CONFIG
+    logger.debug(f"Attempting to load project config from {config_path}")
     try:
-        config_path = project_dir / ALGOKIT_CONFIG
         config_text = config_path.read_text("utf-8")
     except FileNotFoundError:
         logger.debug(f"No {ALGOKIT_CONFIG} file found in the project directory.")
