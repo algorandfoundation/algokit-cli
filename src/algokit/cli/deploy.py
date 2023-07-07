@@ -114,15 +114,14 @@ def deploy_command(
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
     logger.debug(f"Deploying from project directory: {path}")
+    if command is None:
+        logger.debug("Loading deploy command from project config")
+        command = load_deploy_command(name=environment_name, project_dir=path)
+    logger.info(f"Using deploy command: {' '.join(command)}")
     with isolate_environ_changes():
         # TODO: do we want to walk up for env/config?
         logger.info("Loading deployment configuration...")
         load_deploy_config(environment_name, path)
-        if command is None:
-            logger.debug("Loading deploy command from project config")
-            command = load_deploy_command(name=environment_name, project_dir=path)
-        logger.info(f"Using deploy command: {' '.join(command)}")
-
         if not _is_localnet():
             ensure_mnemonics(skip_mnemonics_prompts=not interactive)
 

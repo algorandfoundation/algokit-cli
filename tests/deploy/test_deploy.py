@@ -5,8 +5,8 @@ from unittest import mock
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.cli.deploy import DEPLOYER_KEY, DISPENSER_KEY, ensure_mnemonics
+from algokit.cli.explore import NETWORKS
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.deploy import ALGORAND_NETWORKS, BETANET, LOCALNET, LOCALNET_ALIASES, MAINNET, TESTNET
 from approvaltests.namer import NamerFactory
 from click import ClickException
 from pytest_mock import MockerFixture
@@ -15,7 +15,11 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 CUSTOMNET = "customnet"
-
+LOCALNET_ALIASES = ("devnet", "sandnet", "dockernet")
+LOCALNET = "localnet"
+MAINNET = "mainnet"
+BETANET = "betanet"
+TESTNET = "testnet"
 
 VALID_MNEMONIC1 = (
     "until random potato live stove poem toddler deliver give traffic vapor genuine "
@@ -34,8 +38,8 @@ MockNetworkGenesis = t.Callable[[str], None]
 def mock_network_genesis(mocker: MockerFixture) -> MockNetworkGenesis:
     def patch(key: str) -> None:
         mocker.patch(
-            "algokit.cli.deploy._get_network_name_from_environment",
-            return_value=key if key != LOCALNET else LOCALNET_ALIASES[0],
+            "algokit.cli.deploy._is_localnet",
+            return_value=key not in [*LOCALNET_ALIASES, LOCALNET],
         )
 
     return patch
@@ -160,7 +164,7 @@ def test_deploy_custom_project_dir(
     (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
     (custom_folder / (".env" if generic_env else f".env.{network}")).write_text(
         f"""
-    ALGOD_SERVER={ALGORAND_NETWORKS[network]['ALGOD_SERVER']}
+    ALGOD_SERVER={NETWORKS[network]['algod_url']}
     """
     )
 
@@ -191,7 +195,7 @@ def test_deploy_custom_network_env(
         (cwd / f".env.{network}").write_text(
             # Use a dummy network that doesn't require running localnet but is queryable
             f"""
-             ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}
+             ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}
             """
         )
 
@@ -237,8 +241,8 @@ def test_deploy_custom_deploy_command(
     cwd = tmp_path_factory.mktemp("cwd")
     os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    if network not in ALGORAND_NETWORKS:
-        (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={ALGORAND_NETWORKS[TESTNET]['ALGOD_SERVER']}")
+    if network not in NETWORKS:
+        (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}")
 
     input_answers: list[str] = []
     if network != LOCALNET:
