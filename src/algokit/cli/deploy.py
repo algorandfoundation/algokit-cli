@@ -78,14 +78,13 @@ def _get_network_name_from_environment() -> str:
 )
 @click.option(
     "--interactive/--non-interactive",
-    " /--ci",
-    default=lambda: not os.getenv("CI"),
-    help="Enable/disable interactive prompts. If the CI environment variable is set, this defaults to off",
+    " /--ci",  # this aliases --non-interactive to --ci
+    default=lambda: "CI" not in os.environ,
+    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
 @click.option(
-    "--enable-prod-deploys",
-    is_flag=True,
-    default=False,
+    "--mainnet-prompt/--no-mainnet-prompt",
+    default=True,
     help="Skip warning prompt for deployments to a mainnet.",
 )
 @click.option(
@@ -100,7 +99,7 @@ def deploy_command(
     network_or_environment_name: str,
     command: str | None,
     interactive: bool,
-    enable_prod_deploys: bool,
+    mainnet_prompt: bool,
     path: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
@@ -118,10 +117,10 @@ def deploy_command(
         network_name = _get_network_name_from_environment()
         logger.info(f"Starting deployment process for network '{network_name}'...")
         if network_name not in LOCALNET_ALIASES:
-            if network_name == MAINNET and not enable_prod_deploys:
+            if network_name == MAINNET and mainnet_prompt:
                 if not interactive:
                     raise click.ClickException(
-                        "To deploy to mainnet non interactively, --enable-prod-deploys must be specified"
+                        "To deploy to mainnet non-interactively, --no-mainnet-prompt must also be specified"
                     )
                 click.confirm(
                     "You are about to deploy to the MainNet. Are you sure you want to continue?",
