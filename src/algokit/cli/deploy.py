@@ -1,13 +1,14 @@
 import logging
 import os
 import shlex
+import typing as t
 from pathlib import Path
 
 import algokit_utils
 import click
 
 from algokit.core import proc
-from algokit.core.deploy import LOCALNET_ALIASES, MAINNET, load_deploy_command, load_deploy_config
+from algokit.core.deploy import load_deploy_command, load_deploy_config
 from algokit.core.utils import isolate_environ_changes
 
 logger = logging.getLogger(__name__)
@@ -37,15 +38,21 @@ def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
     :param skip_mnemonics_prompts: A boolean indicating if user prompt should be skipped.
     :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
     """
+    deployer_mnemonic_in_env: bool
     if deployer_mnemonic := os.getenv(DEPLOYER_KEY):
         _validate_mnemonic(deployer_mnemonic, key=DEPLOYER_KEY)
+        deployer_mnemonic_in_env = True
     else:
+        deployer_mnemonic_in_env = False
         if skip_mnemonics_prompts:
             raise click.ClickException(f"Error: missing {DEPLOYER_KEY} environment variable")
         os.environ[DEPLOYER_KEY] = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
 
     if dispenser_mnemonic := os.getenv(DISPENSER_KEY):
         _validate_mnemonic(dispenser_mnemonic, key=DISPENSER_KEY)
+    elif deployer_mnemonic_in_env:
+        # don't prompt for dispenser mnemonic if deployer mnemonic was in env vars
+        pass
     elif not skip_mnemonics_prompts:
         # TODO: should we _really_ always prompt for this?
         use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
@@ -55,26 +62,33 @@ def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
             )
 
 
-def _get_network_name_from_environment() -> str:
+def _is_localnet() -> bool:
     # TODO: have tests exercise this function
     logger.debug("Getting algod client from environment variables")
     algod_client = algokit_utils.get_algod_client()
-    logger.debug(f"Querying algod network genesis, server = {algod_client.algod_address}")
-    network_genesis = algod_client.genesis()
-    logger.debug(f"Genesis response: {network_genesis!r}")
-    match network_genesis:
-        case {"network": str(network_name)}:
-            return network_name
-        case _:
-            raise click.ClickException("Unable to extract network name from genesis response")
+    return algokit_utils.is_localnet(algod_client)
+
+
+class CommandParamType(click.types.StringParamType):
+    name = "command"
+
+    def convert(
+        self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None  # noqa: ANN401
+    ) -> list[str]:
+        str_value = super().convert(value=value, param=param, ctx=ctx)
+        try:
+            return shlex.split(str_value)
+        except Exception as ex:
+            logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
+            raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
 
 
 @click.command("deploy")
-@click.argument("network_or_environment_name", default=None, required=False)
+@click.argument("environment_name", default=None, required=False)
 @click.option(
     "--command",
     "-C",
-    type=str,
+    type=CommandParamType(),
     default=None,
     help="Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.",
 )
@@ -85,11 +99,6 @@ def _get_network_name_from_environment() -> str:
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
 @click.option(
-    "--mainnet-prompt/--no-mainnet-prompt",
-    default=True,
-    help="Skip warning prompt for deployments to a mainnet.",
-)
-@click.option(
     "--path",
     "-P",
     type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
@@ -98,10 +107,9 @@ def _get_network_name_from_environment() -> str:
 )
 def deploy_command(
     *,
-    network_or_environment_name: str | None,
-    command: str | None,
+    environment_name: str | None,
+    command: list[str] | None,
     interactive: bool,
-    mainnet_prompt: bool,
     path: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
@@ -109,36 +117,19 @@ def deploy_command(
     with isolate_environ_changes():
         # TODO: do we want to walk up for env/config?
         logger.info("Loading deployment configuration...")
-        load_deploy_config(network_or_environment_name, path)
-        logger.debug("Checking deployment network...")
-        network_name = _get_network_name_from_environment()
-        logger.debug(f"Network name is {network_name}")
-        if command is not None:
-            command_parts = shlex.split(command)
-        else:
-            # use the name supplied on command line if there was one, otherwise use the network name
-            deploy_name = network_or_environment_name or network_name
-            logger.debug(f"Loading deploy command for {deploy_name}")
-            command_parts = load_deploy_command(name=deploy_name, project_dir=path)
-        logger.info(f"Using deploy command: {command}")
+        load_deploy_config(environment_name, path)
+        if command is None:
+            logger.debug("Loading deploy command from project config")
+            command = load_deploy_command(name=environment_name, project_dir=path)
+        logger.info(f"Using deploy command: {' '.join(command)}")
 
-        logger.info(f"Starting deployment process on {network_name} network...")
-        if network_name not in LOCALNET_ALIASES:
-            if network_name == MAINNET and mainnet_prompt:
-                if not interactive:
-                    raise click.ClickException(
-                        "To deploy to mainnet non-interactively, --no-mainnet-prompt must also be specified"
-                    )
-                click.confirm(
-                    "You are about to deploy to the MainNet. Are you sure you want to continue?",
-                    abort=True,
-                )
+        if not _is_localnet():
             ensure_mnemonics(skip_mnemonics_prompts=not interactive)
 
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
             # TODO: tests should exercise env var passing
-            result = proc.run(command_parts, cwd=path, stdout_log_level=logging.INFO)
+            result = proc.run(command, cwd=path, stdout_log_level=logging.INFO)
         except FileNotFoundError as ex:
             raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
         except PermissionError as ex:
