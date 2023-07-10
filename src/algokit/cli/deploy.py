@@ -67,6 +67,9 @@ def deploy_command(
     path: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
+    if environment_name:
+        environment_name = environment_name.lower()
+
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
     config = load_deploy_config(name=environment_name, project_dir=path)
@@ -82,7 +85,7 @@ def deploy_command(
             )
         raise click.ClickException(msg)
     logger.info(f"Using deploy command: {' '.join(config.command)}")
-    # TODO: do we want to walk up for env/config?
+    # TODO: [future-note] do we want to walk up for env/config?
     logger.info("Loading deployment environment variables...")
     config_dotenv = load_env_files(environment_name, path)
     # environment variables take precedence over those in .env* files
@@ -91,7 +94,6 @@ def deploy_command(
         _ensure_environment_secrets(config_env, config.environment_secrets, skip_mnemonics_prompts=not interactive)
     logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
     try:
-        # TODO: tests should exercise env var passing
         result = proc.run(config.command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
     except FileNotFoundError as ex:
         raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex

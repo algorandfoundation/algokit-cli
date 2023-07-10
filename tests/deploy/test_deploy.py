@@ -1,15 +1,16 @@
-import os
-import typing as t
+from unittest import mock
 
+import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from algokit.cli.deploy import _ensure_environment_secrets
 from algokit.cli.explore import NETWORKS
 from algokit.core.conf import ALGOKIT_CONFIG
 from approvaltests.namer import NamerFactory
-from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 CUSTOMNET = "customnet"
 LOCALNET_ALIASES = ("devnet", "sandnet", "dockernet")
@@ -17,6 +18,8 @@ LOCALNET = "localnet"
 MAINNET = "mainnet"
 BETANET = "betanet"
 TESTNET = "testnet"
+DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
+DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
 VALID_MNEMONIC1 = (
     "until random potato live stove poem toddler deliver give traffic vapor genuine "
@@ -28,252 +31,241 @@ VALID_MNEMONIC2 = (
 )
 
 
-MockNetworkGenesis = t.Callable[[str], None]
+@pytest.fixture(autouse=True)
+def _set_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(DEPLOYER_KEY, VALID_MNEMONIC1)
 
 
-@pytest.fixture()
-def mock_network_genesis(mocker: MockerFixture) -> MockNetworkGenesis:
-    def patch(key: str) -> None:
-        mocker.patch(
-            "algokit.cli.deploy._is_localnet",
-            return_value=key not in [*LOCALNET_ALIASES, LOCALNET],
-        )
+def _deploy_command(*, environment: str, prefixed: bool, exclude_command: bool = False) -> str:
+    command = 'command = "python -c \'print(\\"HelloWorld\\")\'"' if not exclude_command else ""
 
-    return patch
+    if prefixed:
+        return f"""
+[deploy.{environment}]
+{command}
+environment_secrets = [
+  "DEPLOYER_MNEMONIC"
+]
+"""
+    return f"""
+[deploy]
+{command}
+environment_secrets = [
+  "DEPLOYER_MNEMONIC"
+]
+"""
 
 
-# TODO: this should be tested through testing the deploy command,
-#       not unit testing this short function
-# # Your test can then simply use this fixture
-# @mock.patch.dict("os.environ", {DEPLOYER_KEY: "", DISPENSER_KEY: ""})
-# def test_extract_mnemonics_unset() -> None:
-#     # Check when environment variables are not set
-#     with pytest.raises(ClickException, match=f"missing {DEPLOYER_KEY}"):
-#
-#
-# @mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2})
-# def test_extract_mnemonics_set() -> None:
-#
-#     # Assert that the environment variables are not changed
-#
-#
-# @mock.patch.dict("os.environ", {DEPLOYER_KEY: "abc", DISPENSER_KEY: VALID_MNEMONIC1})
-# def test_extract_mnemonics_invalid_deployer() -> None:
-#     with pytest.raises(ClickException, match=f"Invalid mnemonic for {DEPLOYER_KEY}"):
-#
-#
-# @mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: "abc"})
-# def test_extract_mnemonics_invalid_dispenser() -> None:
-#     with pytest.raises(ClickException, match=f"Invalid mnemonic for {DISPENSER_KEY}"):
-#
+def _dummy_env() -> str:
+    return """
+ALGOD_SERVER=https://testnet-api.algonode.cloud
+"""
+
+
+# Unit tests for mnemonics
+
+
+def test_ensure_environment_secrets_unset() -> None:
+    # Define a fake 'click.prompt' that raises an Exception to simulate user interrupt (Ctrl+C)
+    def mock_prompt(
+        text: str,  # noqa: ARG001
+        hide_input: bool,  # noqa: FBT001, ARG001
+    ) -> str:
+        raise Exception("Simulated user interrupt")
+
+    # Patch 'click.prompt' with our fake version
+    with mock.patch("click.prompt", new=mock_prompt):
+        config_env: dict[str, str] = {}
+        environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
+        with pytest.raises(click.ClickException, match=f"Error: missing {DEPLOYER_KEY} environment variable"):
+            _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=True)
+
+
+def test_ensure_environment_secrets_set() -> None:
+    config_env: dict[str, str] = {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2}
+    environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
+    _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=True)
+    assert config_env[DEPLOYER_KEY] == VALID_MNEMONIC1
+    assert config_env[DISPENSER_KEY] == VALID_MNEMONIC2
+
+
+def test_ensure_environment_secrets_prompt() -> None:
+    # Define a fake 'click.prompt' that returns a fixed mnemonic
+    def mock_prompt(
+        text: str,  # noqa: ARG001
+        hide_input: bool,  # noqa: FBT001, ARG001
+    ) -> str:
+        return VALID_MNEMONIC1
+
+    # Patch 'click.prompt' with our fake version
+    with mock.patch("click.prompt", new=mock_prompt):
+        config_env: dict[str, str] = {}
+        environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
+        _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=False)
+        assert config_env[DEPLOYER_KEY] == VALID_MNEMONIC1
+        assert config_env[DISPENSER_KEY] == VALID_MNEMONIC1
 
 
 # Approvals tests for deploy command
-@pytest.mark.parametrize("network", ["", LOCALNET, TESTNET, MAINNET, BETANET, CUSTOMNET])
-def test_deploy_no_algokit_toml(
-    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
-) -> None:
-    mock_network_genesis(network)
 
-    if network != LOCALNET:
-        os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
+def test_deploy_no_algokit_toml(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        f"deploy {network}",
+        "deploy ",
         cwd=cwd,
         input="N",
     )
 
     assert result.exit_code == 1
-    verify(
-        result.output,
-        options=NamerFactory.with_parameters(network),
+    verify(result.output)
+
+
+@pytest.mark.usefixtures("proc_mock")
+def test_deploy_check_passed_env_vars(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
+    (cwd / f".env.{TESTNET}").write_text(_dummy_env())
+
+    # Running with --command flag
+    result = invoke(
+        f"deploy {TESTNET}",
+        cwd=cwd,
     )
 
+    # Check if the custom deploy command is used
+    assert result.exit_code == 0
+    assert DEPLOYER_KEY in proc_mock.env
+    assert proc_mock.env[DEPLOYER_KEY] == str(VALID_MNEMONIC1)
+    verify(result.output)
 
-def _deploy_command(name: str) -> str:
-    return f"""
-[deploy.{name}]
-command = "python -c 'print(\\"HelloWorld\\")'"
-"""
 
-
-@pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET])
-def test_deploy_default_networks_no_env(
-    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
-) -> None:
-    mock_network_genesis(network)
-
+@pytest.mark.parametrize(
+    ("environment"),
+    [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET],
+)
+def test_deploy_various_networks_with_prefixed_env(*, environment: str, tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     input_answers: list[str] = []
-    if network != LOCALNET:
-        os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
-        if network == MAINNET:
-            input_answers.append("Y")
-        input_answers.append("N")
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=environment, prefixed=True))
+    (cwd / (f".env.{environment}")).write_text(_dummy_env())
 
     result = invoke(
-        f"deploy {network}",
+        f"deploy {environment}",
         cwd=cwd,
         input="\n".join(input_answers),
     )
 
     assert result.exit_code == 0
-    verify(result.output, options=NamerFactory.with_parameters(network))
+    verify(result.output, options=NamerFactory.with_parameters(environment))
 
 
-def test_deploy_custom_env_no_file(tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis) -> None:
-    name = "staging"
-    mock_network_genesis(TESTNET)
-
+@pytest.mark.parametrize(
+    ("environment"),
+    [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET],
+)
+def test_deploy_various_networks_with_generic_env(*, environment: str, tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
+    input_answers: list[str] = []
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(name))
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=environment, prefixed=False))
+    (cwd / (".env")).write_text(_dummy_env())
 
-    input_answers = ["N"]
+    result = invoke(
+        "deploy",
+        cwd=cwd,
+        input="\n".join(input_answers),
+    )
 
-    result = invoke(f"deploy {name}", cwd=cwd, input="\n".join(input_answers))
-
-    assert result.exit_code == 1
-    verify(result.output)
+    assert result.exit_code == 0
+    verify(result.output, options=NamerFactory.with_parameters(environment))
 
 
-@pytest.mark.parametrize("generic_env", [True, False])
-def test_deploy_custom_project_dir(
-    generic_env: bool, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis  # noqa: FBT001
+@pytest.mark.parametrize("prefixed_env", [True, False])
+def test_deploy_custom_env_no_file(
+    *,
+    prefixed_env: bool,
+    tmp_path_factory: TempPathFactory,
 ) -> None:
-    network = TESTNET
-    mock_network_genesis(network)
+    cwd = tmp_path_factory.mktemp("cwd")
 
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=prefixed_env))
+
+    result = invoke(
+        f"deploy {TESTNET if prefixed_env else ''}",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == (1 if prefixed_env else 0)
+    verify(result.output, options=NamerFactory.with_parameters(prefixed_env))
+
+
+def test_deploy_custom_project_dir(
+    tmp_path_factory: TempPathFactory,
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
     custom_folder.mkdir()
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
-    (custom_folder / (".env" if generic_env else f".env.{network}")).write_text(
-        f"""
-    ALGOD_SERVER={NETWORKS[network]['algod_url']}
-    """
-    )
+    (custom_folder / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
+    (custom_folder / f".env.{TESTNET}").write_text(_dummy_env())
 
     input_answers = ["N"]
 
     # Below is needed for escpaing the backslash in the path on Windows
     # Works on Linux as well since \\ doesnt exist in the path in such cases
     path = str(custom_folder.absolute()).replace("\\", r"\\")
-    result = invoke(f"deploy {network} --path={path}", cwd=cwd, input="\n".join(input_answers))
-
-    assert result.exit_code == 0 if network == LOCALNET else 1
-    verify(result.output, options=NamerFactory.with_parameters(generic_env))
-
-
-@pytest.mark.parametrize("has_env", [True, False])
-def test_deploy_custom_network_env(
-    has_env: bool, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis  # noqa: FBT001
-) -> None:
-    network = CUSTOMNET
-    mock_network_genesis(network)
-
-    cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
-
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
-
-    if has_env:
-        (cwd / f".env.{network}").write_text(
-            # Use a dummy network that doesn't require running localnet but is queryable
-            f"""
-             ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}
-            """
-        )
-
-    result = invoke(
-        f"deploy {network}",
-        cwd=cwd,
-        input="N",
-    )
-
-    assert result.exit_code == 0 if network == LOCALNET else 1
-    verify(result.output, options=NamerFactory.with_parameters(has_env))
-
-
-def test_deploy_is_production_environment(
-    tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
-) -> None:
-    network = MAINNET
-    mock_network_genesis(network)
-
-    cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
-
-    # Setup algokit configuration file
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
-
-    # Running with --prod flag
-    result = invoke(
-        f"deploy {network} --no-mainnet-prompt",
-        cwd=cwd,
-        input="N",
-    )
+    result = invoke(f"deploy {TESTNET} --path={path}", cwd=cwd, input="\n".join(input_answers))
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-@pytest.mark.parametrize("network", [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET])
 def test_deploy_custom_deploy_command(
-    network: str, tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+    tmp_path_factory: TempPathFactory,
 ) -> None:
-    mock_network_genesis(network)
-
     cwd = tmp_path_factory.mktemp("cwd")
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
 
-    if network not in NETWORKS:
-        (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}")
-
-    input_answers: list[str] = []
-    if network != LOCALNET:
-        if network == MAINNET:
-            input_answers.append("Y")
-        input_answers.append("N")
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True, exclude_command=True))
+    (cwd / f".env.{TESTNET}").write_text(_dummy_env())
 
     # Running with --command flag
     result = invoke(
-        f"deploy {network} --command 'python -c print(123)'",
+        f"deploy {TESTNET} --command 'python -c print(123)'",
         cwd=cwd,
-        input="\n".join(input_answers),
     )
 
     # Check if the custom deploy command is used
     assert result.exit_code == 0
-    verify(result.output, options=NamerFactory.with_parameters(network))
+    verify(result.output)
 
 
-def test_deploy_skip_mnemonics_prompts(
-    tmp_path_factory: TempPathFactory, mock_network_genesis: MockNetworkGenesis
+@pytest.mark.parametrize("use_ci", [True, False])
+def test_deploy_mnemonic_prompts(
+    *, use_ci: bool, tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     network = TESTNET
-    mock_network_genesis(network)
 
     cwd = tmp_path_factory.mktemp("cwd")
 
-    os.environ[DEPLOYER_KEY] = VALID_MNEMONIC1
+    if not use_ci:
+        monkeypatch.delenv(DEPLOYER_KEY)
 
     # Setup algokit configuration file
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(network))
+    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
+    (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}")
 
     # Running with --ci flag to skip mnemonics prompts
     result = invoke(
-        f"deploy {network} --ci",
+        f"deploy {network} {'--ci' if use_ci else ''}",
         cwd=cwd,
+        input="Ctrl+C" if not use_ci else None,
     )
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(
+        result.output.replace("DEPLOYER_MNEMONIC: ", "DEPLOYER_MNEMONIC:"), options=NamerFactory.with_parameters(use_ci)
+    )

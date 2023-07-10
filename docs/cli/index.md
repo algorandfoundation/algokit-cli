@@ -1,58 +1,60 @@
 # AlgoKit CLI Reference Documentation
 
-
 - [algokit](#algokit)
-    - [Options](#options)
-    - [--version](#--version)
-    - [-v, --verbose](#-v---verbose)
-    - [--color, --no-color](#--color---no-color)
-    - [--skip-version-check](#--skip-version-check)
+  - [Options](#options)
+  - [--version](#--version)
+  - [-v, --verbose](#-v---verbose)
+  - [--color, --no-color](#--color---no-color)
+  - [--skip-version-check](#--skip-version-check)
   - [bootstrap](#bootstrap)
     - [Options](#options-1)
     - [--force](#--force)
     - [all](#all)
+    - [Options](#options-2)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [env](#env)
+    - [Options](#options-3)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [npm](#npm)
     - [poetry](#poetry)
   - [completions](#completions)
     - [install](#install)
-    - [Options](#options-2)
+    - [Options](#options-4)
     - [--shell ](#--shell-)
     - [uninstall](#uninstall)
-    - [Options](#options-3)
+    - [Options](#options-5)
     - [--shell ](#--shell--1)
   - [config](#config)
     - [version-prompt](#version-prompt)
     - [Arguments](#arguments)
     - [ENABLE](#enable)
   - [deploy](#deploy)
-    - [Options](#options-4)
-    - [--custom-deploy-command ](#--custom-deploy-command-)
-    - [--ci](#--ci)
-    - [--prod](#--prod)
-    - [--project-dir ](#--project-dir-)
+    - [Options](#options-6)
+    - [-C, --command ](#-c---command-)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
+    - [-P, --path ](#-p---path-)
     - [Arguments](#arguments-1)
-    - [NETWORK](#network)
+    - [ENVIRONMENT_NAME](#environment_name)
   - [doctor](#doctor)
-    - [Options](#options-5)
+    - [Options](#options-7)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
     - [Arguments](#arguments-2)
-    - [NETWORK](#network-1)
+    - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-6)
+    - [Options](#options-8)
     - [-o, --output ](#-o---output-)
     - [-l, --language ](#-l---language-)
     - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-7)
+    - [Options](#options-9)
     - [--console](#--console)
     - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-8)
+    - [Options](#options-10)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -62,16 +64,16 @@
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
     - [--ide, --no-ide](#--ide---no-ide)
-    - [-a, --answer  ](#-a---answer--)
+    - [-a, --answer ](#-a---answer--)
   - [localnet](#localnet)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-9)
+    - [Options](#options-11)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-10)
+    - [Options](#options-12)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -89,20 +91,20 @@ algokit [OPTIONS] COMMAND [ARGS]...
 
 ### Options
 
-
 ### --version
+
 Show the version and exit.
 
-
 ### -v, --verbose
+
 Enable logging of DEBUG messages to the console.
 
-
 ### --color, --no-color
+
 Force enable or disable of console output styling.
 
-
 ### --skip-version-check
+
 Skip version checking and prompting.
 
 ## bootstrap
@@ -116,8 +118,8 @@ algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 
 ### Options
 
-
 ### --force
+
 Continue even if minimum AlgoKit version is not met
 
 ### all
@@ -128,6 +130,12 @@ Runs all bootstrap sub-commands in the current directory and immediate sub direc
 algokit bootstrap all [OPTIONS]
 ```
 
+### Options
+
+### --interactive, --non-interactive, --ci
+
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
 ### env
 
 Copies .env.template file to .env in the current working directory and prompts for any unspecified values.
@@ -135,6 +143,12 @@ Copies .env.template file to .env in the current working directory and prompts f
 ```shell
 algokit bootstrap env [OPTIONS]
 ```
+
+### Options
+
+### --interactive, --non-interactive, --ci
+
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
 ### npm
 
@@ -171,15 +185,13 @@ algokit completions install [OPTIONS]
 
 ### Options
 
-
 ### --shell <shell>
+
 Specify shell to install algokit completions for.
 
+- **Options**
 
-* **Options**
-
-    bash | zsh
-
+  bash | zsh
 
 ### uninstall
 
@@ -193,15 +205,13 @@ algokit completions uninstall [OPTIONS]
 
 ### Options
 
-
 ### --shell <shell>
+
 Specify shell to install algokit completions for.
 
+- **Options**
 
-* **Options**
-
-    bash | zsh
-
+  bash | zsh
 
 ## config
 
@@ -225,8 +235,8 @@ algokit config version-prompt [OPTIONS] [[enable|disable]]
 
 ### Arguments
 
-
 ### ENABLE
+
 Optional argument
 
 ## deploy
@@ -234,31 +244,27 @@ Optional argument
 Deploy smart contracts from AlgoKit compliant repository.
 
 ```shell
-algokit deploy [OPTIONS] [NETWORK]
+algokit deploy [OPTIONS] [ENVIRONMENT_NAME]
 ```
 
 ### Options
 
+### -C, --command <command>
 
-### --custom-deploy-command <custom_deploy_command>
 Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
 
+### --interactive, --non-interactive, --ci
 
-### --ci
-Skip interactive prompt for mnemonics, expects them to be set as environment variables.
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
+### -P, --path <path>
 
-### --prod
-Skip warning prompt for deployments to a mainnet.
-
-
-### --project-dir <project_dir>
 Specify the project directory. If not provided, current working directory will be used.
 
 ### Arguments
 
+### ENVIRONMENT_NAME
 
-### NETWORK
 Optional argument
 
 ## doctor
@@ -274,8 +280,8 @@ algokit doctor [OPTIONS]
 
 ### Options
 
-
 ### -c, --copy-to-clipboard
+
 Copy the contents of the doctor message (in Markdown format) in your clipboard.
 
 ## explore
@@ -288,8 +294,8 @@ algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 
 ### Arguments
 
-
 ### NETWORK
+
 Optional argument
 
 ## generate
@@ -313,24 +319,22 @@ algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
 
 ### Options
 
-
 ### -o, --output <output_path_pattern>
+
 Path to the output file. The following tokens can be used to substitute into the output path: {contract_name}, {app_spec_dir}
 
-
 ### -l, --language <language>
+
 Programming language of the generated client code
 
+- **Options**
 
-* **Options**
-
-    python | typescript
-
+  python | typescript
 
 ### Arguments
 
-
 ### APP_SPEC_PATH_OR_DIR
+
 Required argument
 
 ## goal
@@ -345,14 +349,14 @@ algokit goal [OPTIONS] [GOAL_ARGS]...
 
 ### Options
 
-
 ### --console
+
 Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
 
 ### Arguments
 
-
 ### GOAL_ARGS
+
 Optional argument(s)
 
 ## init
@@ -375,50 +379,48 @@ algokit init [OPTIONS]
 
 ### Options
 
-
 ### -n, --name <directory_name>
+
 Name of the project / directory / repository to create.
 
-
 ### -t, --template <template_name>
+
 Name of an official template to use. To see a list of descriptions, run this command with no arguments.
 
+- **Options**
 
-* **Options**
-
-    beaker_starter | beaker_production | playground
-
-
+  beaker_starter | beaker_production | playground
 
 ### --template-url <URL>
+
 URL to a git repo with a custom project template.
 
-
 ### --template-url-ref <URL>
+
 Specific tag, branch or commit to use on git repo specified with –template-url. Defaults to latest.
 
-
 ### --UNSAFE-SECURITY-accept-template-url
+
 Accept the specified template URL, acknowledging the security implications of arbitrary code execution trusting an unofficial template.
 
-
 ### --git, --no-git
+
 Initialise git repository in directory after creation.
 
-
 ### --defaults
+
 Automatically choose default answers without asking when creating this template.
 
-
 ### --bootstrap, --no-bootstrap
+
 Whether to run algokit bootstrap to install and configure the new project’s dependencies locally.
 
-
 ### --ide, --no-ide
+
 Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.
 
-
 ### -a, --answer <key> <value>
+
 Answers key/value pairs to pass to the template.
 
 ## localnet
@@ -455,19 +457,17 @@ algokit localnet logs [OPTIONS]
 
 ### Options
 
-
 ### --follow, -f
+
 Follow log output.
 
-
 ### --tail <tail>
+
 Number of lines to show from the end of the logs for each container.
 
+- **Default**
 
-* **Default**
-
-    `all`
-
+  `all`
 
 ### reset
 
@@ -479,8 +479,8 @@ algokit localnet reset [OPTIONS]
 
 ### Options
 
-
 ### --update, --no-update
+
 Enable or disable updating to the latest available LocalNet version, default: don’t update
 
 ### start

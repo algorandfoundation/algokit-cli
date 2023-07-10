@@ -57,7 +57,6 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
 
     # ensure there is at least some config under [deploy] and that it's a dict type
     # (which should implicitly exist even if only [deploy.{name}] exists)
-    # TODO: fact check myself ^
     match deploy_table := config.get("deploy"):
         case dict():
             pass  # expected case
@@ -79,11 +78,11 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
             case {"command": list(command_parts)}:
                 deploy_config.command = [str(x) for x in command_parts]
             case {"command": bad_data}:
-                raise click.ClickException(f"BAD BAD BAD {bad_data}")
+                raise click.ClickException(f"Invalid data provided under 'command' key: {bad_data}")
         match tbl:
             case {"environment_secrets": list(env_names)}:
                 deploy_config.environment_secrets = [str(x) for x in env_names]
             case {"environment_secrets": bad_data}:
-                raise click.ClickException(f"DAB DAB DAB {bad_data}")
+                raise click.ClickException(f"Invalid data provided under 'environment_secrets' key: {bad_data}")
 
     return deploy_config

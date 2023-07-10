@@ -48,6 +48,7 @@ class ProcMock:
     def __init__(self) -> None:
         self._mock_data: dict[tuple[str, ...], CommandMockData] = {}
         self.called: list[list[str]] = []
+        self.env: dict[str, str] = {}
 
     def _add_mock_data(self, cmd: list[str] | str, data: CommandMockData) -> None:
         cmd_list = tuple(cmd.split() if isinstance(cmd, str) else cmd)
@@ -85,8 +86,9 @@ class ProcMock:
     def set_output(self, cmd: list[str] | str, output: list[str]) -> None:
         self._add_mock_data(cmd, CommandMockData(output_lines=output))
 
-    def popen(self, cmd: list[str], *_args: Any, **_kwargs: Any) -> PopenMock:
+    def popen(self, cmd: list[str], env: dict[str, str], *_args: Any, **_kwargs: Any) -> PopenMock:
         self.called.append(cmd)
+        self.env = env
         for i in reversed(range(len(cmd))):
             prefix = cmd[: i + 1]
             try:
