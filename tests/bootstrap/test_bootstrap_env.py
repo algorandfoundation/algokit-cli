@@ -120,7 +120,7 @@ TOKEN_5_SPECIAL_CHAR=*
 
 @pytest.mark.mock_platform_system("Darwin")
 def test_bootstrap_env_dotenv_different_prompt_scenarios(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
@@ -142,6 +142,8 @@ TOKEN_8 = value with spaces
 TOKEN_8_SPECIAL_CHAR=*
 """
     )
+    # remove ci flag from env (when running in github actions)
+    monkeypatch.delenv("CI")
 
     # provide values for tokens
     mock_questionary_input.send_text("test value for TOKEN_2_WITH_MULTI_LINES_COMMENT")
