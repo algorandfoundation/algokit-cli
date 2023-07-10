@@ -7,30 +7,29 @@ import shlex
 from pathlib import Path
 
 import click
-from dotenv import load_dotenv
+import dotenv
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 
 logger = logging.getLogger(__name__)
 
 
-def load_env_files(name: str | None, project_dir: Path) -> None:
+def load_env_files(name: str | None, project_dir: Path) -> dict[str, str | None]:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
     :param project_dir: Project directory path.
     """
     general_env_path = project_dir / ".env"
+    result: dict[str, str | None] = {}
     if general_env_path.exists():
-        # TODO: do we really want to override here?
-        load_dotenv(general_env_path, verbose=True, override=True)
+        result = dotenv.dotenv_values(general_env_path, verbose=True)
     if name is not None:
         specific_env_path = project_dir / f".env.{name}"
-        if specific_env_path.exists():
-            # TODO: do we really want to override here?
-            load_dotenv(specific_env_path, verbose=True, override=True)
-        else:
+        if not specific_env_path.exists():
             raise click.ClickException(f"No such file: {specific_env_path}")
+        result |= dotenv.dotenv_values(specific_env_path, verbose=True)
+    return result
 
 
 @dataclasses.dataclass(kw_only=True)

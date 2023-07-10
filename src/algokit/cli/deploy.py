@@ -9,17 +9,18 @@ import click
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG
 from algokit.core.deploy import load_deploy_config, load_env_files
-from algokit.core.utils import isolate_environ_changes
 
 logger = logging.getLogger(__name__)
 
 
-def _ensure_environment_secrets(environment_secrets: list[str], *, skip_mnemonics_prompts: bool) -> None:
+def _ensure_environment_secrets(
+    config_env: dict[str, str], environment_secrets: list[str], *, skip_mnemonics_prompts: bool
+) -> None:
     for key in environment_secrets:
-        if not os.getenv(key):
+        if not config_env.get(key):
             if skip_mnemonics_prompts:
                 raise click.ClickException(f"Error: missing {key} environment variable")
-            os.environ[key] = click.prompt(key, hide_input=True)
+            config_env[key] = click.prompt(key, hide_input=True)
 
 
 class CommandParamType(click.types.StringParamType):
@@ -80,19 +81,19 @@ def deploy_command(
     logger.info(f"Using deploy command: {' '.join(config.command)}")
     # TODO: do we want to walk up for env/config?
     logger.info("Loading deployment environment variables...")
-    with isolate_environ_changes():  # TODO: yeet this
-        load_env_files(environment_name, path)
-        if config.environment_secrets:
-            _ensure_environment_secrets(config.environment_secrets, skip_mnemonics_prompts=not interactive)
-
-        logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
-        try:
-            # TODO: tests should exercise env var passing
-            result = proc.run(config.command, cwd=path, stdout_log_level=logging.INFO)
-        except FileNotFoundError as ex:
-            raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
-        except PermissionError as ex:
-            raise click.ClickException("Failed to execute deploy command, permission denied") from ex
-        else:
-            if result.exit_code != 0:
-                raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+    config_dotenv = load_env_files(environment_name, path)
+    # environment variables take precedence over those in .env* files
+    config_env = {**os.environ, **{k: v for k, v in config_dotenv.items() if v is not None}}
+    if config.environment_secrets:
+        _ensure_environment_secrets(config_env, config.environment_secrets, skip_mnemonics_prompts=not interactive)
+    logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
+    try:
+        # TODO: tests should exercise env var passing
+        result = proc.run(config.command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
+    except FileNotFoundError as ex:
+        raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
+    except PermissionError as ex:
+        raise click.ClickException("Failed to execute deploy command, permission denied") from ex
+    else:
+        if result.exit_code != 0:
+            raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
