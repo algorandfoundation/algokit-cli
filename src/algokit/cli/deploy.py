@@ -4,69 +4,22 @@ import shlex
 import typing as t
 from pathlib import Path
 
-import algokit_utils
 import click
 
 from algokit.core import proc
-from algokit.core.deploy import load_deploy_command, load_deploy_config
+from algokit.core.conf import ALGOKIT_CONFIG
+from algokit.core.deploy import load_deploy_config, load_env_files
 from algokit.core.utils import isolate_environ_changes
 
 logger = logging.getLogger(__name__)
 
-DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
-DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
-
-def _validate_mnemonic(value: str, *, key: str | None = None) -> str:
-    # TODO: add test for this
-    try:
-        algokit_utils.get_account_from_mnemonic(value)
-    except Exception as ex:
-        if key is None:
-            msg = "Invalid mnemonic"
-        else:
-            msg = f"Invalid mnemonic for {key}"
-        raise click.ClickException(msg) from ex
-    else:
-        return value
-
-
-def ensure_mnemonics(*, skip_mnemonics_prompts: bool) -> None:
-    """
-    Extract environment variables, prompt user if needed.
-
-    :param skip_mnemonics_prompts: A boolean indicating if user prompt should be skipped.
-    :return: A tuple containing deployer_mnemonic and dispenser_mnemonic.
-    """
-    deployer_mnemonic_in_env: bool
-    if deployer_mnemonic := os.getenv(DEPLOYER_KEY):
-        _validate_mnemonic(deployer_mnemonic, key=DEPLOYER_KEY)
-        deployer_mnemonic_in_env = True
-    else:
-        deployer_mnemonic_in_env = False
-        if skip_mnemonics_prompts:
-            raise click.ClickException(f"Error: missing {DEPLOYER_KEY} environment variable")
-        os.environ[DEPLOYER_KEY] = click.prompt("deployer-mnemonic", hide_input=True, value_proc=_validate_mnemonic)
-
-    if dispenser_mnemonic := os.getenv(DISPENSER_KEY):
-        _validate_mnemonic(dispenser_mnemonic, key=DISPENSER_KEY)
-    elif deployer_mnemonic_in_env:
-        # don't prompt for dispenser mnemonic if deployer mnemonic was in env vars
-        pass
-    elif not skip_mnemonics_prompts:
-        # TODO: should we _really_ always prompt for this?
-        use_dispenser = click.confirm("Do you want to use a dispenser account?", default=False)
-        if use_dispenser:
-            os.environ[DISPENSER_KEY] = click.prompt(
-                "dispenser-mnemonic", hide_input=True, value_proc=_validate_mnemonic
-            )
-
-
-def _is_localnet() -> bool:
-    # TODO: have tests exercise this function
-    logger.debug("Getting algod client from environment variables")
-    algod_client = algokit_utils.get_algod_client()
-    return algokit_utils.is_localnet(algod_client)
+def _ensure_environment_secrets(environment_secrets: list[str], *, skip_mnemonics_prompts: bool) -> None:
+    for key in environment_secrets:
+        if not os.getenv(key):
+            if skip_mnemonics_prompts:
+                raise click.ClickException(f"Error: missing {key} environment variable")
+            os.environ[key] = click.prompt(key, hide_input=True)
 
 
 class CommandParamType(click.types.StringParamType):
@@ -114,21 +67,28 @@ def deploy_command(
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
     logger.debug(f"Deploying from project directory: {path}")
-    if command is None:
-        logger.debug("Loading deploy command from project config")
-        command = load_deploy_command(name=environment_name, project_dir=path)
-    logger.info(f"Using deploy command: {' '.join(command)}")
-    with isolate_environ_changes():
-        # TODO: do we want to walk up for env/config?
-        logger.info("Loading deployment configuration...")
-        load_deploy_config(environment_name, path)
-        if not _is_localnet():
-            ensure_mnemonics(skip_mnemonics_prompts=not interactive)
+    logger.debug("Loading deploy command from project config")
+    config = load_deploy_config(name=environment_name, project_dir=path)
+    if command is not None:
+        config.command = command
+    elif config.command is None:
+        if environment_name is None:
+            msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
+        else:
+            msg = f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, and no generic command."
+        raise click.ClickException(msg)
+    logger.info(f"Using deploy command: {' '.join(config.command)}")
+    # TODO: do we want to walk up for env/config?
+    logger.info("Loading deployment environment variables...")
+    with isolate_environ_changes():  # TODO: yeet this
+        load_env_files(environment_name, path)
+        if config.environment_secrets:
+            _ensure_environment_secrets(config.environment_secrets, skip_mnemonics_prompts=not interactive)
 
         logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
         try:
             # TODO: tests should exercise env var passing
-            result = proc.run(command, cwd=path, stdout_log_level=logging.INFO)
+            result = proc.run(config.command, cwd=path, stdout_log_level=logging.INFO)
         except FileNotFoundError as ex:
             raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
         except PermissionError as ex:

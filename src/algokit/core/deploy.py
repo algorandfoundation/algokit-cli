@@ -1,6 +1,7 @@
 # 1. User can call algokit deploy to different networks
 # 2. By default algokit cli contains configs for testnet and mainnet
 # 3. User can overwrite them by creating a config file in the project root
+import dataclasses
 import logging
 import shlex
 from pathlib import Path
@@ -13,7 +14,7 @@ from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 logger = logging.getLogger(__name__)
 
 
-def load_deploy_config(name: str | None, project_dir: Path) -> None:
+def load_env_files(name: str | None, project_dir: Path) -> None:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
@@ -32,7 +33,13 @@ def load_deploy_config(name: str | None, project_dir: Path) -> None:
             raise click.ClickException(f"No such file: {specific_env_path}")
 
 
-def load_deploy_command(name: str | None, project_dir: Path) -> list[str]:
+@dataclasses.dataclass(kw_only=True)
+class DeployConfig:
+    command: list[str] | None = None
+    environment_secrets: list[str] | None = None
+
+
+def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
     """
     Load the deploy command for the given network/environment from .algokit.toml file.
     :param name: Network or environment name.
@@ -49,27 +56,35 @@ def load_deploy_command(name: str | None, project_dir: Path) -> list[str]:
             f"--command or inside {ALGOKIT_CONFIG} file."
         )
 
+    # ensure there is at least some config under [deploy] and that it's a dict type
+    # (which should implicitly exist even if only [deploy.{name}] exists)
+    # TODO: fact check myself ^
     match deploy_table := config.get("deploy"):
-        case None:
-            raise click.ClickException(f"No deployment commands specified in '{ALGOKIT_CONFIG}' file")
         case dict():
-            pass
+            pass  # expected case
+        case None:
+            raise click.ClickException(f"No deployment config specified in '{ALGOKIT_CONFIG}' file")
         case _:
             raise click.ClickException(f"Bad data for deploy in '{ALGOKIT_CONFIG}' file: {deploy_table}")
-    assert isinstance(deploy_table, dict)
 
-    for tbl in [deploy_table.get(name), deploy_table]:
+    assert isinstance(deploy_table, dict)  # because mypy is not all-knowing
+
+    deploy_config = DeployConfig()
+    for tbl in [deploy_table, deploy_table.get(name)]:
         match tbl:
             case {"command": str(command)}:
                 try:
-                    return shlex.split(command)
+                    deploy_config.command = shlex.split(command)
                 except Exception as ex:
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
             case {"command": list(command_parts)}:
-                return [str(x) for x in command_parts]
+                deploy_config.command = [str(x) for x in command_parts]
+            case {"command": bad_data}:
+                raise click.ClickException(f"BAD BAD BAD {bad_data}")
+        match tbl:
+            case {"environment_secrets": list(env_names)}:
+                deploy_config.environment_secrets = [str(x) for x in env_names]
+            case {"environment_secrets": bad_data}:
+                raise click.ClickException(f"DAB DAB DAB {bad_data}")
 
-    if name is None:
-        msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
-    else:
-        msg = f"Deploy command for '{name}' is not specified in '{ALGOKIT_CONFIG}' file, and no generic command."
-    raise click.ClickException(msg)
+    return deploy_config

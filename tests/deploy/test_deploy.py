@@ -1,14 +1,11 @@
 import os
 import typing as t
-from unittest import mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.deploy import DEPLOYER_KEY, DISPENSER_KEY, ensure_mnemonics
 from algokit.cli.explore import NETWORKS
 from algokit.core.conf import ALGOKIT_CONFIG
 from approvaltests.namer import NamerFactory
-from click import ClickException
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
@@ -45,33 +42,30 @@ def mock_network_genesis(mocker: MockerFixture) -> MockNetworkGenesis:
     return patch
 
 
-# Your test can then simply use this fixture
-@mock.patch.dict("os.environ", {DEPLOYER_KEY: "", DISPENSER_KEY: ""})
-def test_extract_mnemonics_unset() -> None:
-    # Check when environment variables are not set
-    with pytest.raises(ClickException, match=f"missing {DEPLOYER_KEY}"):
-        ensure_mnemonics(skip_mnemonics_prompts=True)
-
-
-@mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2})
-def test_extract_mnemonics_set() -> None:
-    ensure_mnemonics(skip_mnemonics_prompts=True)
-
-    # Assert that the environment variables are not changed
-    assert os.environ[DEPLOYER_KEY] == VALID_MNEMONIC1
-    assert os.environ[DISPENSER_KEY] == VALID_MNEMONIC2
-
-
-@mock.patch.dict("os.environ", {DEPLOYER_KEY: "abc", DISPENSER_KEY: VALID_MNEMONIC1})
-def test_extract_mnemonics_invalid_deployer() -> None:
-    with pytest.raises(ClickException, match=f"Invalid mnemonic for {DEPLOYER_KEY}"):
-        ensure_mnemonics(skip_mnemonics_prompts=True)
-
-
-@mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: "abc"})
-def test_extract_mnemonics_invalid_dispenser() -> None:
-    with pytest.raises(ClickException, match=f"Invalid mnemonic for {DISPENSER_KEY}"):
-        ensure_mnemonics(skip_mnemonics_prompts=True)
+# TODO: this should be tested through testing the deploy command,
+#       not unit testing this short function
+# # Your test can then simply use this fixture
+# @mock.patch.dict("os.environ", {DEPLOYER_KEY: "", DISPENSER_KEY: ""})
+# def test_extract_mnemonics_unset() -> None:
+#     # Check when environment variables are not set
+#     with pytest.raises(ClickException, match=f"missing {DEPLOYER_KEY}"):
+#
+#
+# @mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2})
+# def test_extract_mnemonics_set() -> None:
+#
+#     # Assert that the environment variables are not changed
+#
+#
+# @mock.patch.dict("os.environ", {DEPLOYER_KEY: "abc", DISPENSER_KEY: VALID_MNEMONIC1})
+# def test_extract_mnemonics_invalid_deployer() -> None:
+#     with pytest.raises(ClickException, match=f"Invalid mnemonic for {DEPLOYER_KEY}"):
+#
+#
+# @mock.patch.dict("os.environ", {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: "abc"})
+# def test_extract_mnemonics_invalid_dispenser() -> None:
+#     with pytest.raises(ClickException, match=f"Invalid mnemonic for {DISPENSER_KEY}"):
+#
 
 
 # Approvals tests for deploy command

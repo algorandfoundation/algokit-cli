@@ -15,7 +15,6 @@ questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.0.post1"
 algokit-client-generator = "^1.0.2"
-algokit-utils = "^1.3.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 # workaround for issue with copier dependency spec allowing major upgrade to pydantic v2
