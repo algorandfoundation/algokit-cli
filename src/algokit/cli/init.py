@@ -287,7 +287,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # but if something goes wrong, we don't want to block
         try:
             project_minimum_algokit_version_check(project_path)
-            bootstrap_any_including_subdirs(project_path)
+            bootstrap_any_including_subdirs(project_path, ci_mode=False)
         except Exception as e:
             logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(

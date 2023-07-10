@@ -76,7 +76,10 @@ def deploy_command(
         if environment_name is None:
             msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
         else:
-            msg = f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, and no generic command."
+            msg = (
+                f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, "
+                "and no generic command."
+            )
         raise click.ClickException(msg)
     logger.info(f"Using deploy command: {' '.join(config.command)}")
     # TODO: do we want to walk up for env/config?
