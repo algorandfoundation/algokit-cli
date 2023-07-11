@@ -255,7 +255,7 @@ def test_deploy_mnemonic_prompts(
     monkeypatch.delenv("CI", raising=False)
 
     if not use_ci:
-        monkeypatch.delenv(DEPLOYER_KEY)
+        monkeypatch.delenv(DEPLOYER_KEY, raising=False)
 
     # Setup algokit configuration file
     (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
