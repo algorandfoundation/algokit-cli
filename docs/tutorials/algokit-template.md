@@ -138,6 +138,7 @@ By combining predefined Copier answers with these default behaviors, you can cre
 - **Testing**: Include test configurations and scripts in your templates to encourage testing best practices.
 - **Linting and Formatting**: Integrate linters and code formatters in your templates to ensure code quality.
 - **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles).
+
 ## Conclusion
 
 Creating custom templates in AlgoKit is a powerful way to streamline your development workflow for Algorand smart contracts, whether you are using Python or TypeScript. Leveraging Copier and Jinja for templating, and incorporating best practices for modularity, documentation, and coding standards, can result in robust, flexible, and user-friendly templates that can be a valuable asset to both your own projects and the broader Algorand community.
