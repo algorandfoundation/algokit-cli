@@ -137,8 +137,11 @@ def test_deploy_check_passed_env_vars(tmp_path_factory: TempPathFactory, proc_mo
 
     # Check if the custom deploy command is used
     assert result.exit_code == 0
-    assert DEPLOYER_KEY in proc_mock.env
-    assert proc_mock.env[DEPLOYER_KEY] == str(VALID_MNEMONIC1)
+    assert len(proc_mock.called) == 1
+    called_env = proc_mock.called[0].env
+    assert isinstance(called_env, dict)
+    assert DEPLOYER_KEY in called_env
+    assert called_env[DEPLOYER_KEY] == str(VALID_MNEMONIC1)
     verify(result.output)
 
 
