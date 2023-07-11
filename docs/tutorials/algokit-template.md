@@ -129,6 +129,7 @@ When creating an AlgoKit template, there are a few default behaviors that you ca
 - **Bootstrap**: AlgoKit CLI is equipped to execute a bootstrap script after a project has been initialized. This script, included in AlgoKit templates, can be automatically run to perform various setup tasks, such as installing dependencies or setting up databases. This is managed by AlgoKit CLI and not within the user-created codebase. By default, if a `bootstrap` task is defined in the `copier.yaml`, AlgoKit CLI will execute it, unless the user opts out during the prompt.
 
 By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
+
 ## Recommendations
 
 - **Modularity**: Break your templates into modular components that can be combined in different ways.
