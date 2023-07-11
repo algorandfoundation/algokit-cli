@@ -7,6 +7,7 @@ We will also refer to the official [`algokit-beaker-default-template`](https://g
 
 ## Table of Contents
 
+-[Quick Start](#quick-start)
 - [Overview of AlgoKit Templates](#overview-of-algokit-templates)
   - [Copier/Jinja](#copierjinja)
   - [AlgoKit Functionality with Templates](#algokit-functionality-with-templates)
@@ -15,9 +16,16 @@ We will also refer to the official [`algokit-beaker-default-template`](https://g
   - [Python Support: pyproject.toml](#python-support-pyprojecttoml)
   - [TypeScript Support: package.json](#typescript-support-packagejson)
   - [Bootstrap Option](#bootstrap-option)
-  - [Template Answers and Variables](#template-answers-and-variables)
+  - [Predefined Copier Answers](#Predefined-Copier-Answers)
+  - [Default Behaviors](#default-behaviors)
 - [Recommendations](#recommendations)
 - [Conclusion](#conclusion)
+
+## Quick Start
+For users who are keen on getting started with creating AlgoKit templates, you can follow these quick steps:
+
+1. Click on `Use this template`->`Create a new repository` on [algokit-beaker-default-template](https://github.com/algorandfoundation/algokit-beaker-default-template) Github page. This will create a new reference repository with clean git history, allowing you to start modifying and transforming the base beaker template into your own custom template. 
+2. Modify the cloned template according to your specific needs. You can refer to the remainder of this tutorial for an understanding of expected behaviors from the AlgoKit side, Copier - the templating framework, and key concepts related to the default files you will encounter in the reference template.
 
 ## Overview of AlgoKit Templates
 
@@ -104,7 +112,7 @@ When instantiating your template via AlgoKit CLI it will optionally prompt the u
 - `npm`: If you're developing a JavaScript or TypeScript project, the `npm` command runs npm install in the current working directory to install Node.js dependencies.
 - `all`: The `all` command runs all the aforementioned bootstrap sub-commands in the current directory and its subdirectories. This command is a comprehensive way to ensure all project dependencies and environment variables are properly set up.
 
-### Predefined copier answers
+### Predefined Copier Answers
 
 When initializing a new project, Copier can prompt the user for input, which is then passed to the template as variables. This is useful for customizing the new project based on user input.
 
