@@ -49,25 +49,24 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
     # Load and parse the TOML configuration file
     config = get_algokit_config(project_dir)
 
-    if not config:
-        raise click.ClickException(
-            f"Couldn't load {ALGOKIT_CONFIG} file. Ensure deploy command is specified, either via "
-            f"--command or inside {ALGOKIT_CONFIG} file."
-        )
+    deploy_config = DeployConfig()
+
+    if config is None:
+        # in the case of no algokit toml file, we return the (empty) defaults
+        return deploy_config
 
     # ensure there is at least some config under [deploy] and that it's a dict type
     # (which should implicitly exist even if only [deploy.{name}] exists)
     match deploy_table := config.get("deploy"):
         case dict():
-            pass  # expected case
+            pass  # expected case if there is a file with deploy config
         case None:
-            raise click.ClickException(f"No deployment config specified in '{ALGOKIT_CONFIG}' file")
+            return deploy_config  # file has no deploy config, we return with (empty) defaults
         case _:
             raise click.ClickException(f"Bad data for deploy in '{ALGOKIT_CONFIG}' file: {deploy_table}")
 
     assert isinstance(deploy_table, dict)  # because mypy is not all-knowing
 
-    deploy_config = DeployConfig()
     for tbl in [deploy_table, deploy_table.get(name)]:
         match tbl:
             case {"command": str(command)}:

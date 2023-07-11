@@ -70,9 +70,9 @@ def deploy_command(
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
     config = load_deploy_config(name=environment_name, project_dir=path)
-    if command is not None:
+    if command:
         config.command = command
-    elif config.command is None:
+    elif not config.command:
         if environment_name is None:
             msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
         else:
@@ -93,9 +93,9 @@ def deploy_command(
     try:
         result = proc.run(config.command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
     except FileNotFoundError as ex:
-        raise click.ClickException("Failed to execute deploy command, command wasn't found") from ex
+        raise click.ClickException(f"Failed to execute deploy command, '{config.command[0]}' wasn't found") from ex
     except PermissionError as ex:
-        raise click.ClickException("Failed to execute deploy command, permission denied") from ex
+        raise click.ClickException(f"Failed to execute deploy command '{config.command[0]}', permission denied") from ex
     else:
         if result.exit_code != 0:
             raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")

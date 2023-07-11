@@ -1,9 +1,8 @@
-from unittest import mock
+import sys
+from pathlib import Path
 
-import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.deploy import _ensure_environment_secrets
 from algokit.cli.explore import NETWORKS
 from algokit.core.conf import ALGOKIT_CONFIG
 from approvaltests.namer import NamerFactory
@@ -62,63 +61,76 @@ ALGOD_SERVER=https://testnet-api.algonode.cloud
 """
 
 
-# Unit tests for mnemonics
+# DIMENSIONS:
+# - algokit.toml
+#   - missing
+#   - invalid configs (e.g. empty array)
+#   - {name} overrides
+#   - {name} setting with no "base case"
+# - .env and/or .env.{name}
+# - os.environ
+# - CI (interactivity) mode
+# - path option
 
 
-def test_ensure_environment_secrets_unset() -> None:
-    # Define a fake 'click.prompt' that raises an Exception to simulate user interrupt (Ctrl+C)
-    def mock_prompt(
-        text: str,  # noqa: ARG001
-        hide_input: bool,  # noqa: FBT001, ARG001
-    ) -> str:
-        raise Exception("Simulated user interrupt")
-
-    # Patch 'click.prompt' with our fake version
-    with mock.patch("click.prompt", new=mock_prompt):
-        config_env: dict[str, str] = {}
-        environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
-        with pytest.raises(click.ClickException, match=f"Error: missing {DEPLOYER_KEY} environment variable"):
-            _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=True)
-
-
-def test_ensure_environment_secrets_set() -> None:
-    config_env: dict[str, str] = {DEPLOYER_KEY: VALID_MNEMONIC1, DISPENSER_KEY: VALID_MNEMONIC2}
-    environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
-    _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=True)
-    assert config_env[DEPLOYER_KEY] == VALID_MNEMONIC1
-    assert config_env[DISPENSER_KEY] == VALID_MNEMONIC2
-
-
-def test_ensure_environment_secrets_prompt() -> None:
-    # Define a fake 'click.prompt' that returns a fixed mnemonic
-    def mock_prompt(
-        text: str,  # noqa: ARG001
-        hide_input: bool,  # noqa: FBT001, ARG001
-    ) -> str:
-        return VALID_MNEMONIC1
-
-    # Patch 'click.prompt' with our fake version
-    with mock.patch("click.prompt", new=mock_prompt):
-        config_env: dict[str, str] = {}
-        environment_secrets: list[str] = [DEPLOYER_KEY, DISPENSER_KEY]
-        _ensure_environment_secrets(config_env, environment_secrets, skip_mnemonics_prompts=False)
-        assert config_env[DEPLOYER_KEY] == VALID_MNEMONIC1
-        assert config_env[DISPENSER_KEY] == VALID_MNEMONIC1
-
-
-# Approvals tests for deploy command
-
-
-def test_deploy_no_algokit_toml(tmp_path_factory: TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-
+def test_command_invocation_and_command_splitting(tmp_path: Path) -> None:
+    config_data = """
+[deploy]
+command = ["not", "used"]
+    """.strip()
+    (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
+    python_executable = sys.executable
     result = invoke(
-        "deploy ",
-        cwd=cwd,
-        input="N",
+        [
+            "deploy",
+            "--command",
+            # note: spaces around the string inside print are important,
+            # we need to test the usage of shlex.split vs str.split, to handle
+            # splitting inside quotes properly
+            f"{python_executable} -c 'print(\" test_command_invocation \")'",
+        ],
+        cwd=tmp_path,
     )
+    assert result.exit_code == 0
+    verify(result.output.replace(python_executable, "<sys.executable>"))
 
-    assert result.exit_code == 1
+
+def test_command_splitting_from_config(tmp_path: Path) -> None:
+    python_executable = sys.executable
+    # note: spaces around the string inside print are important,
+    # we need to test the usage of shlex.split vs str.split, to handle
+    # splitting inside quotes properly
+    config_data = rf"""
+[deploy]
+command = "{python_executable} -c 'print(\" test_command_invocation \")'"
+    """.strip()
+    (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
+    result = invoke("deploy", cwd=tmp_path)
+    assert result.exit_code == 0
+    verify(result.output.replace(python_executable, "<sys.executable>"))
+
+
+def test_command_not_found(proc_mock: ProcMock) -> None:
+    cmd = "gm"
+    proc_mock.should_fail_on([cmd])
+    result = invoke(["deploy", "--command", cmd])
+    assert result.exit_code != 0
+    verify(result.output)
+
+
+def test_command_not_executable(proc_mock: ProcMock) -> None:
+    cmd = "gm"
+    proc_mock.should_deny_on([cmd])
+    result = invoke(["deploy", "--command", cmd])
+    assert result.exit_code != 0
+    verify(result.output)
+
+
+def test_command_bad_exit_code(proc_mock: ProcMock) -> None:
+    cmd = "gm"
+    proc_mock.should_bad_exit_on([cmd], output=["it is not morning"])
+    result = invoke(["deploy", "--command", cmd])
+    assert result.exit_code != 0
     verify(result.output)
 
 

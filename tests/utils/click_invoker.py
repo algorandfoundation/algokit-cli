@@ -21,7 +21,7 @@ class ClickInvokeResult:
 
 
 def invoke(
-    args: str,
+    args: str | list[str],
     *,
     cwd: Path | None = None,
     skip_version_check: bool = True,
@@ -39,7 +39,10 @@ def invoke(
         test_args = "-v --no-color"
         if skip_version_check:
             test_args = f"{test_args} --skip-version-check"
-        result = runner.invoke(algokit, f"{test_args} {args}", env=env, input=input)
+        if isinstance(args, str):
+            result = runner.invoke(algokit, f"{test_args} {args}", env=env, input=input)
+        else:
+            result = runner.invoke(algokit, args=[*test_args.split(), *args], env=env, input=input)
         if result.exc_info and not isinstance(result.exc_info[1], SystemExit):
             logger.error("Click invocation error", exc_info=result.exc_info)
         output = normalize_path(result.stdout, str(cwd or prior_cwd), "{current_working_directory}")
