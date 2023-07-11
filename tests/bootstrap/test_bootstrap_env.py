@@ -143,7 +143,7 @@ TOKEN_8_SPECIAL_CHAR=*
 """
     )
     # remove ci flag from env (when running in github actions)
-    monkeypatch.delenv("CI")
+    monkeypatch.delenv("CI", raising=False)
 
     # provide values for tokens
     mock_questionary_input.send_text("test value for TOKEN_2_WITH_MULTI_LINES_COMMENT")

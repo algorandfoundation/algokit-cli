@@ -75,7 +75,7 @@ This way, you can define common deployment logic and environment secrets in the 
 
 ## Deploying to a Specific Network
 
-The command requires a `ENVIRONMENT` argument, which specifies the network environment to which the smart contracts will be deployed. The network argument is not case-sensitive.
+The command requires a `ENVIRONMENT` argument, which specifies the network environment to which the smart contracts will be deployed. Please note, the `environment` argument is case-sensitive.
 
 Example:
 

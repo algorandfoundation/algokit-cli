@@ -252,7 +252,7 @@ def test_deploy_mnemonic_prompts(
     cwd = tmp_path_factory.mktemp("cwd")
 
     # remove ci flag from env (when running in github actions)
-    monkeypatch.delenv("CI")
+    monkeypatch.delenv("CI", raising=False)
 
     if not use_ci:
         monkeypatch.delenv(DEPLOYER_KEY)

@@ -67,9 +67,6 @@ def deploy_command(
     path: Path,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    if environment_name:
-        environment_name = environment_name.lower()
-
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
     config = load_deploy_config(name=environment_name, project_dir=path)
