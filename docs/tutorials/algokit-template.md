@@ -4,6 +4,7 @@ This README serves as a guide on how to create custom templates for AlgoKit, a t
 Creating templates in AlgoKit involves the use of various configuration files and a templating engine to generate project structures that are tailored to your needs.
 This guide will cover the key concepts and best practices for creating templates in AlgoKit.
 We will also refer to the official [`algokit-beaker-default-template`](https://github.com/algorandfoundation/algokit-beaker-default-template) as an example.
+
 ## Table of Contents
 
 - [Overview of AlgoKit Templates](#overview-of-algokit-templates)
