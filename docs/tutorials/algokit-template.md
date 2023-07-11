@@ -119,6 +119,7 @@ project_name:
 This would prompt the user for the project name, and the input can then be used in the template using the Jinja syntax `{{ project_name }}`.
 
 #### Default Behaviors
+
 When creating an AlgoKit template, there are a few default behaviors that you can expect to be provided by algokit-cli itself without introducing any extra code to your templates:
 
 - **Git**: If Git is installed on the user's system and the user's working directory is a Git repository, AlgoKit CLI will commit the newly created project as a new commit in the repository. This feature helps to maintain a clean version history for the project. If you wish to add a specific commit message for this action, you can specify a `commit_message` in the `_commit` option in your `copier.yaml` file.
