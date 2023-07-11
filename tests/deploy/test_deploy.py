@@ -295,8 +295,11 @@ environment_secrets = [
 
 # environment_secrets set
 def test_secrets_prompting_via_stdin(
-    tmp_path_factory: TempPathFactory, mocker: MockerFixture, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # ensure Github Actions CI env var is not overriding behavior
+    monkeypatch.delenv("CI", raising=False)
+
     # mock click.prompt
     cwd = tmp_path_factory.mktemp("cwd")
 
