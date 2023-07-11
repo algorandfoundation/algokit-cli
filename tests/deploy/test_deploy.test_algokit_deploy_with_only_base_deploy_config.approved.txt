@@ -1,0 +1,8 @@
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+Using deploy command: command_a
+Loading deployment environment variables...
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running 'command_a' in '{current_working_directory}'
+command_a: picked base deploy command

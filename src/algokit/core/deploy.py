@@ -1,6 +1,3 @@
-# 1. User can call algokit deploy to different networks
-# 2. By default algokit cli contains configs for testnet and mainnet
-# 3. User can overwrite them by creating a config file in the project root
 import dataclasses
 import logging
 import shlex

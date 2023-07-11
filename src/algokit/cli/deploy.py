@@ -86,7 +86,7 @@ def deploy_command(
     logger.info("Loading deployment environment variables...")
     config_dotenv = load_env_files(environment_name, path)
     # environment variables take precedence over those in .env* files
-    config_env = {**os.environ, **{k: v for k, v in config_dotenv.items() if v is not None}}
+    config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
     if config.environment_secrets:
         _ensure_environment_secrets(config_env, config.environment_secrets, skip_mnemonics_prompts=not interactive)
     logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")

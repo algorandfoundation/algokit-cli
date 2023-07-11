@@ -3,74 +3,89 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.explore import NETWORKS
 from algokit.core.conf import ALGOKIT_CONFIG
-from approvaltests.namer import NamerFactory
+from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
-CUSTOMNET = "customnet"
-LOCALNET_ALIASES = ("devnet", "sandnet", "dockernet")
-LOCALNET = "localnet"
-MAINNET = "mainnet"
-BETANET = "betanet"
-TESTNET = "testnet"
-DEPLOYER_KEY = "DEPLOYER_MNEMONIC"
-DISPENSER_KEY = "DISPENSER_MNEMONIC"
 
-VALID_MNEMONIC1 = (
-    "until random potato live stove poem toddler deliver give traffic vapor genuine "
-    "supply wonder few gap penalty ask cluster high throw own milk ability issue"
-)
-VALID_MNEMONIC2 = (
-    "cruise sustain matrix bulb bind aisle fox copper antenna arctic brief video cactus "
-    "high rough lawn secret dignity inmate remember early pudding collect about trick"
-)
-
-
-@pytest.fixture(autouse=True)
-def _set_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv(DEPLOYER_KEY, VALID_MNEMONIC1)
-
-
-def _deploy_command(*, environment: str, prefixed: bool, exclude_command: bool = False) -> str:
-    command = 'command = "python -c \'print(\\"HelloWorld\\")\'"' if not exclude_command else ""
-
-    if prefixed:
-        return f"""
-[deploy.{environment}]
-{command}
-environment_secrets = [
-  "DEPLOYER_MNEMONIC"
-]
-"""
-    return f"""
+def test_algokit_config_empty_array(tmp_path_factory: TempPathFactory) -> None:
+    empty_array_config = """
 [deploy]
-{command}
-environment_secrets = [
-  "DEPLOYER_MNEMONIC"
-]
-"""
+command = []
+    """.strip()
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(empty_array_config, encoding="utf-8")
+    (cwd / ".env").touch()
+    result = invoke(["deploy"], cwd=cwd)
+
+    assert result.exit_code != 0
+    verify(result.output)
 
 
-def _dummy_env() -> str:
-    return """
-ALGOD_SERVER=https://testnet-api.algonode.cloud
-"""
+def test_algokit_config_invalid_syntax(tmp_path_factory: TempPathFactory) -> None:
+    invalid_config = """
+{"dummy": "json"}
+    """.strip()
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(invalid_config, encoding="utf-8")
+    (cwd / ".env").touch()
+    result = invoke(["deploy"], cwd=cwd)
+
+    assert result.exit_code != 0
+    verify(result.output)
 
 
-# DIMENSIONS:
-# - algokit.toml
-#   - missing
-#   - invalid configs (e.g. empty array)
-#   - {name} overrides
-#   - {name} setting with no "base case"
-# - .env and/or .env.{name}
-# - os.environ
-# - CI (interactivity) mode
-# - path option
+def test_algokit_config_name_overrides(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+    python_executable = sys.executable
+    config_with_override = """
+[deploy]
+command = "command_a"
+
+[deploy.localnet]
+command = "command_b"
+
+[deploy.testnet]
+command = "command_c"
+    """.strip()
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_override, encoding="utf-8")
+    (cwd / ".env").touch()
+    (cwd / ".env.localnet").touch()
+    (cwd / ".env.testnet").touch()
+
+    proc_mock.set_output(["command_c"], ["picked testnet"])
+
+    result = invoke(["deploy", "testnet"], cwd=cwd)
+
+    assert result.exit_code == 0
+    verify(result.output.replace(python_executable, "<sys.executable>"))
+
+
+def test_algokit_config_name_no_base(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+    python_executable = sys.executable
+    config_with_override = """
+[deploy.localnet]
+command = "command_a"
+
+[deploy.testnet]
+command = "command_b"
+    """.strip()
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_override, encoding="utf-8")
+    (cwd / ".env.localnet").touch()
+    (cwd / ".env.testnet").touch()
+
+    proc_mock.set_output(["command_a"], ["picked localnet"])
+
+    result = invoke(["deploy", "localnet"], cwd=cwd)
+
+    assert result.exit_code == 0
+    verify(result.output.replace(python_executable, "<sys.executable>"))
 
 
 def test_command_invocation_and_command_splitting(tmp_path: Path) -> None:
@@ -110,7 +125,7 @@ command = "{python_executable} -c 'print(\" test_command_invocation \")'"
     verify(result.output.replace(python_executable, "<sys.executable>"))
 
 
-def test_command_not_found(proc_mock: ProcMock) -> None:
+def test_command_not_found_and_no_config(proc_mock: ProcMock) -> None:
     cmd = "gm"
     proc_mock.should_fail_on([cmd])
     result = invoke(["deploy", "--command", cmd])
@@ -134,156 +149,208 @@ def test_command_bad_exit_code(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock")
-def test_deploy_check_passed_env_vars(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory) -> None:
+    config_with_override = """
+[deploy.localnet]
+command = "command_a"
+    """.strip()
     cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_override, encoding="utf-8")
+    (cwd / ".env").touch()
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
-    (cwd / f".env.{TESTNET}").write_text(_dummy_env())
+    result = invoke(["deploy", "localnet"], cwd=cwd)
 
-    # Running with --command flag
-    result = invoke(
-        f"deploy {TESTNET}",
-        cwd=cwd,
-    )
-
-    # Check if the custom deploy command is used
-    assert result.exit_code == 0
-    assert len(proc_mock.called) == 1
-    called_env = proc_mock.called[0].env
-    assert isinstance(called_env, dict)
-    assert DEPLOYER_KEY in called_env
-    assert called_env[DEPLOYER_KEY] == str(VALID_MNEMONIC1)
+    assert result.exit_code == 1
     verify(result.output)
 
 
-@pytest.mark.parametrize(
-    ("environment"),
-    [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET],
-)
-def test_deploy_various_networks_with_prefixed_env(*, environment: str, tmp_path_factory: TempPathFactory) -> None:
+def test_algokit_env_and_name_correct_set(
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    env_config = """
+ENV_A=GENERIC_ENV_A
+ENV_B=GENERIC_ENV_B
+ENV_C=GENERIC_ENV_C
+    """.strip()
+
+    env_name_config = """
+ENV_A=LOCALNET_ENV_A
+ENV_B=LOCALNET_ENV_B
+    """.strip()
+
+    monkeypatch.setenv("ENV_A", "ENVIRON_ENV_A")
+
+    config_with_deploy_name = """
+[deploy]
+command = "command_a"
+
+[deploy.localnet]
+command = "command_b"
+    """.strip()
+
     cwd = tmp_path_factory.mktemp("cwd")
-    input_answers: list[str] = []
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_deploy_name, encoding="utf-8")
+    (cwd / ".env").write_text(env_config, encoding="utf-8")
+    (cwd / ".env.localnet").write_text(env_name_config, encoding="utf-8")
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=environment, prefixed=True))
-    (cwd / (f".env.{environment}")).write_text(_dummy_env())
+    proc_mock.set_output(["command_b"], ["picked localnet"])
 
-    result = invoke(
-        f"deploy {environment}",
-        cwd=cwd,
-        input="\n".join(input_answers),
-    )
+    result = invoke(["deploy", "localnet"], cwd=cwd)
+
+    assert proc_mock.called[0].env
+    passed_env_vars = proc_mock.called[0].env
+
+    assert passed_env_vars["ENV_A"] == "ENVIRON_ENV_A"  # os.environ is highest loading priority
+    assert passed_env_vars["ENV_B"] == "LOCALNET_ENV_B"  # then .env.{name}
+    assert passed_env_vars["ENV_C"] == "GENERIC_ENV_C"  # lastly .env
+
+    verify(result.output)
+
+
+def test_algokit_deploy_only_base_deploy_config(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
+    config_with_only_base_deploy = """
+[deploy]
+command = "command_a"
+    """.strip()
+
+    env_config = """
+ENV_A=GENERIC_ENV_A
+    """.strip()
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
+    (cwd / ".env").write_text(env_config, encoding="utf-8")
+
+    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+
+    result = invoke(["deploy"], cwd=cwd)
 
     assert result.exit_code == 0
-    verify(result.output, options=NamerFactory.with_parameters(environment))
+    assert proc_mock.called[0].env
+    passed_env_vars = proc_mock.called[0].env
+
+    assert passed_env_vars["ENV_A"] == "GENERIC_ENV_A"
+
+    verify(result.output.replace(sys.executable, "<sys.executable>"))
 
 
-@pytest.mark.parametrize(
-    ("environment"),
-    [BETANET, LOCALNET, TESTNET, MAINNET, CUSTOMNET],
-)
-def test_deploy_various_networks_with_generic_env(*, environment: str, tmp_path_factory: TempPathFactory) -> None:
+def test_ci_flag_interactivity_mode_via_env(
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture, monkeypatch: pytest.MonkeyPatch, proc_mock: ProcMock
+) -> None:
+    monkeypatch.setenv("CI", "true")
     cwd = tmp_path_factory.mktemp("cwd")
-    input_answers: list[str] = []
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=environment, prefixed=False))
-    (cwd / (".env")).write_text(_dummy_env())
+    mock_prompt = mocker.patch("click.prompt")
 
-    result = invoke(
-        "deploy",
-        cwd=cwd,
-        input="\n".join(input_answers),
-    )
+    config_with_only_base_deploy = """
+[deploy]
+command = "command_a"
+environment_secrets = [
+    "DEPLOYER_MNEMONIC"
+]
+    """.strip()
 
-    assert result.exit_code == 0
-    verify(result.output, options=NamerFactory.with_parameters(environment))
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
+    (cwd / ".env").touch()
+
+    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+
+    result = invoke(["deploy"], cwd=cwd)
+
+    mock_prompt.assert_not_called()
+    assert result.exit_code != 0
+
+    verify(result.output)
 
 
-@pytest.mark.parametrize("prefixed_env", [True, False])
-def test_deploy_custom_env_no_file(
-    *,
-    prefixed_env: bool,
-    tmp_path_factory: TempPathFactory,
+def test_ci_flag_interactivity_mode_via_cli(
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture, proc_mock: ProcMock
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=prefixed_env))
+    mock_prompt = mocker.patch("click.prompt")
 
-    result = invoke(
-        f"deploy {TESTNET if prefixed_env else ''}",
-        cwd=cwd,
-    )
+    config_with_only_base_deploy = """
+[deploy]
+command = "command_a"
+environment_secrets = [
+    "DEPLOYER_MNEMONIC"
+]
+    """.strip()
 
-    assert result.exit_code == (1 if prefixed_env else 0)
-    verify(result.output, options=NamerFactory.with_parameters(prefixed_env))
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
+    (cwd / ".env").touch()
+
+    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+
+    result = invoke(["deploy", "--ci"], cwd=cwd)
+
+    mock_prompt.assert_not_called()
+    assert result.exit_code != 0
+
+    verify(result.output)
+
+
+# environment_secrets set
+def test_secrets_prompting_via_stdin(
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture, proc_mock: ProcMock
+) -> None:
+    # mock click.prompt
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_prompt = mocker.patch("click.prompt", return_value="secret_value")
+    config_with_only_base_deploy = """
+[deploy]
+command = "command_a"
+environment_secrets = [
+    "DEPLOYER_MNEMONIC"
+]
+    """.strip()
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
+    (cwd / ".env").touch()
+    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+
+    result = invoke(["deploy"], cwd=cwd)
+    mock_prompt.assert_called_once()  # ensure called
+    assert result.exit_code == 0  # ensure success
+
+    # assert that entered value is passed to proc run
+    assert proc_mock.called[0].env
+    called_env = proc_mock.called[0].env
+    assert "DEPLOYER_MNEMONIC" in called_env
+    assert called_env["DEPLOYER_MNEMONIC"] == "secret_value"
+
+    verify(result.output)
 
 
 def test_deploy_custom_project_dir(
     tmp_path_factory: TempPathFactory,
+    proc_mock: ProcMock,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
 
     custom_folder.mkdir()
-    (custom_folder / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
-    (custom_folder / f".env.{TESTNET}").write_text(_dummy_env())
+    (custom_folder / ALGOKIT_CONFIG).write_text(
+        """
+[deploy]
+command = "command_a"
+    """.strip(),
+        encoding="utf-8",
+    )
+    (custom_folder / ".env.testnet").touch()
+    proc_mock.set_output(["command_a"], ["picked base deploy command"])
 
     input_answers = ["N"]
 
     # Below is needed for escpaing the backslash in the path on Windows
     # Works on Linux as well since \\ doesnt exist in the path in such cases
     path = str(custom_folder.absolute()).replace("\\", r"\\")
-    result = invoke(f"deploy {TESTNET} --path={path}", cwd=cwd, input="\n".join(input_answers))
+    result = invoke(f"deploy testnet --path={path}", cwd=cwd, input="\n".join(input_answers))
 
     assert result.exit_code == 0
     verify(result.output)
-
-
-def test_deploy_custom_deploy_command(
-    tmp_path_factory: TempPathFactory,
-) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True, exclude_command=True))
-    (cwd / f".env.{TESTNET}").write_text(_dummy_env())
-
-    # Running with --command flag
-    result = invoke(
-        f"deploy {TESTNET} --command 'python -c print(123)'",
-        cwd=cwd,
-    )
-
-    # Check if the custom deploy command is used
-    assert result.exit_code == 0
-    verify(result.output)
-
-
-@pytest.mark.parametrize("use_ci", [True, False])
-def test_deploy_mnemonic_prompts(
-    *, use_ci: bool, tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    network = TESTNET
-
-    cwd = tmp_path_factory.mktemp("cwd")
-
-    # remove ci flag from env (when running in github actions)
-    monkeypatch.delenv("CI", raising=False)
-
-    if not use_ci:
-        monkeypatch.delenv(DEPLOYER_KEY, raising=False)
-
-    # Setup algokit configuration file
-    (cwd / ALGOKIT_CONFIG).write_text(_deploy_command(environment=TESTNET, prefixed=True))
-    (cwd / f".env.{network}").write_text(f"ALGOD_SERVER={NETWORKS[TESTNET]['algod_url']}")
-
-    # Running with --ci flag to skip mnemonics prompts
-    result = invoke(
-        f"deploy {network} {'--ci' if use_ci else ''}",
-        cwd=cwd,
-        input="Ctrl+C" if not use_ci else None,
-    )
-
-    assert result.exit_code == 0
-    verify(
-        result.output.replace("DEPLOYER_MNEMONIC: ", "DEPLOYER_MNEMONIC:"), options=NamerFactory.with_parameters(use_ci)
-    )
