@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import shlex
 import typing as t
 from pathlib import Path
@@ -31,7 +32,8 @@ class CommandParamType(click.types.StringParamType):
     ) -> list[str]:
         str_value = super().convert(value=value, param=param, ctx=ctx)
         try:
-            return shlex.split(str_value)
+            is_windows = platform.system() == "Windows"
+            return shlex.split(str_value, posix=not is_windows)
         except Exception as ex:
             logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
             raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex

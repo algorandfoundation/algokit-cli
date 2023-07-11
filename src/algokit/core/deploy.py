@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import platform
 import shlex
 from pathlib import Path
 
@@ -68,7 +69,8 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
         match tbl:
             case {"command": str(command)}:
                 try:
-                    deploy_config.command = shlex.split(command)
+                    is_windows = platform.system() == "Windows"
+                    deploy_config.command = shlex.split(command, posix=not is_windows)
                 except Exception as ex:
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
             case {"command": list(command_parts)}:
