@@ -46,23 +46,20 @@ The logic for loading environment variables is as follows:
 
 AlgoKit uses a configuration file called `.algokit.toml` in the root of your project. The configuration file can be created using the `algokit init` command. This file will define the deployment commands for the various network environments that you want to target.
 
-Here's an example of what the `.algokit.toml` file might look like:
+Here's an example of what the `.algokit.toml` file might look like. The example below will always prompt for the deployer mnemonic secret (unless specified in env variables) for any network, except for the localnet, where it will not prompt for any secrets.
 
 ```toml
 [algokit]
 min_version = "v{lastest_version}"
 
 [deploy]
-command = "your command"
+command = "poetry run python -m smart_contracts deploy"
 environment_secrets = [
-  "YOUR_COMMON_SECRET",
+  "DEPLOYER_MNEMONIC",
 ]
 
 [deploy.localnet]
-command = "your localnet-specific command"  # Optional. If not specified, the generic command from [deploy] will be used.
-environment_secrets = [
-  "YOUR_LOCALNET_SECRET",
-]
+environment_secrets = []
 ```
 
 The `command` key under each `[deploy.{network_name}]` section should contain a string that represents the deployment command for that particular network. If a `command` key is not provided in a network-specific section, the command from the general `[deploy]` section will be used.
@@ -123,7 +120,7 @@ $ algokit deploy testnet --ci
 $ algokit deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
-This example shows how to deploy smart contracts to the testnet using a custom deploy command and skipping the warning prompt. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.
+This example shows how to deploy smart contracts to the testnet using a custom deploy command. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.
 
 ## Further Reading
 
