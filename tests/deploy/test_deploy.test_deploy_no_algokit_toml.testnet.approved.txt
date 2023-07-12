@@ -1,5 +1,0 @@
-DEBUG: Deploying from project directory: {current_working_directory}
-DEBUG: Loading deploy command from project config
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-Error: Couldn't load .algokit.toml file. Ensure deploy command is specified, either via --command or inside .algokit.toml file.

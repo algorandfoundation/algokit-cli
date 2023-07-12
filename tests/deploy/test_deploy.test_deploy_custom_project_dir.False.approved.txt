@@ -1,8 +1,0 @@
-Loaded deployment configuration.
-Starting deployment process on testnet network...
-Do you want to use a dispenser account? [y/N]: N
-Project directory: {current_working_directory}/custom_folder
-Using deploy command: python -c print('HelloWorld')
-Deploying smart contracts from AlgoKit compliant repository 🚀
-DEBUG: Running 'python -c print('HelloWorld')' in '{current_working_directory}/custom_folder'
-python: HelloWorld
