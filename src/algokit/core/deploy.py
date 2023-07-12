@@ -1,7 +1,6 @@
 import dataclasses
 import logging
 import platform
-import shlex
 from pathlib import Path
 
 import click
@@ -86,5 +85,11 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
 
 
 def parse_command(command: str) -> list[str]:
-    is_windows = platform.system() == "Windows"
-    return shlex.split(command, posix=not is_windows)
+    if platform.system() == "Windows":
+        import mslex
+
+        return mslex.split(command)
+    else:
+        import shlex
+
+        return shlex.split(command)
