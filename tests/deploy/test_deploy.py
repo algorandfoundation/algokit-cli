@@ -13,6 +13,10 @@ from tests.utils.proc_mock import ProcMock
 PYTHON_EXECUTABLE = sys.executable
 # need to use an escaped python executable path in config files for windows
 PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
+# note: spaces around the string inside print are important,
+# we need to test the usage of shlex.split vs str.split, to handle
+# splitting inside quotes properly
+TEST_PYTHON_COMMAND = "print(' test_command_invocation ')"
 
 
 def test_algokit_config_empty_array(tmp_path_factory: TempPathFactory) -> None:
@@ -100,10 +104,7 @@ command = ["not", "used"]
         [
             "deploy",
             "--command",
-            # note: spaces around the string inside print are important,
-            # we need to test the usage of shlex.split vs str.split, to handle
-            # splitting inside quotes properly
-            f"""{PYTHON_EXECUTABLE} -c 'print(" test_command_invocation ")'""",
+            f'{PYTHON_EXECUTABLE} -c "{TEST_PYTHON_COMMAND}"',
         ],
         cwd=tmp_path,
     )
@@ -117,7 +118,7 @@ def test_command_splitting_from_config(tmp_path: Path) -> None:
     # splitting inside quotes properly
     config_data = rf"""
 [deploy]
-command = "{PYTHON_EXECUTABLE_ESCAPED} -c 'print(\" test_command_invocation \")'"
+command = "{PYTHON_EXECUTABLE_ESCAPED} -c \"{TEST_PYTHON_COMMAND}\""
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
     result = invoke("deploy", cwd=tmp_path)
@@ -131,7 +132,7 @@ def test_command_without_splitting_from_config(tmp_path: Path) -> None:
     # splitting inside quotes properly
     config_data = rf"""
 [deploy]
-command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "print(\" test_command_invocation \")"]
+command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
     result = invoke("deploy", cwd=tmp_path)
