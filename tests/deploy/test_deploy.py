@@ -44,7 +44,6 @@ def test_algokit_config_invalid_syntax(tmp_path_factory: TempPathFactory) -> Non
 
 
 def test_algokit_config_name_overrides(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
-    python_executable = sys.executable
     config_with_override = """
 [deploy]
 command = "command_a"
@@ -66,11 +65,10 @@ command = "command_c"
     result = invoke(["deploy", "testnet"], cwd=cwd)
 
     assert result.exit_code == 0
-    verify(result.output.replace(python_executable, "<sys.executable>"))
+    verify(result.output)
 
 
 def test_algokit_config_name_no_base(tmp_path_factory: TempPathFactory, proc_mock: ProcMock) -> None:
-    python_executable = sys.executable
     config_with_override = """
 [deploy.localnet]
 command = "command_a"
@@ -88,7 +86,7 @@ command = "command_b"
     result = invoke(["deploy", "localnet"], cwd=cwd)
 
     assert result.exit_code == 0
-    verify(result.output.replace(python_executable, "<sys.executable>"))
+    verify(result.output)
 
 
 def test_command_invocation_and_command_splitting(tmp_path: Path) -> None:
@@ -232,7 +230,7 @@ ENV_A=GENERIC_ENV_A
 
     assert passed_env_vars["ENV_A"] == "GENERIC_ENV_A"
 
-    verify(result.output.replace(sys.executable, "<sys.executable>"))
+    verify(result.output)
 
 
 def test_ci_flag_interactivity_mode_via_env(
