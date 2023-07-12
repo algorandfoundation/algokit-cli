@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 import click
@@ -31,9 +32,15 @@ def bootstrap_group(*, force: bool) -> None:
 @bootstrap_group.command(
     "all", short_help="Runs all bootstrap sub-commands in the current directory and immediate sub directories."
 )
-def bootstrap_all() -> None:
+@click.option(
+    "--interactive/--non-interactive",
+    " /--ci",  # this aliases --non-interactive to --ci
+    default=lambda: "CI" not in os.environ,
+    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
+)
+def bootstrap_all(*, interactive: bool) -> None:
     cwd = Path.cwd()
-    bootstrap_any_including_subdirs(cwd)
+    bootstrap_any_including_subdirs(cwd, ci_mode=not interactive)
     logger.info(f"Finished bootstrapping {cwd}")
 
 
@@ -42,8 +49,14 @@ def bootstrap_all() -> None:
     short_help="Copies .env.template file to .env in the current working directory "
     "and prompts for any unspecified values.",
 )
-def env() -> None:
-    bootstrap_env(Path.cwd())
+@click.option(
+    "--interactive/--non-interactive",
+    " /--ci",  # this aliases --non-interactive to --ci
+    default=lambda: "CI" not in os.environ,
+    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
+)
+def env(*, interactive: bool) -> None:
+    bootstrap_env(Path.cwd(), ci_mode=not interactive)
 
 
 @bootstrap_group.command(

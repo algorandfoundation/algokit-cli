@@ -44,10 +44,16 @@ class CommandMockData:
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
 
 
+@dataclasses.dataclass(kw_only=True)
+class PopenArgs:
+    command: list[str]
+    env: dict[str, str] | None
+
+
 class ProcMock:
     def __init__(self) -> None:
         self._mock_data: dict[tuple[str, ...], CommandMockData] = {}
-        self.called: list[list[str]] = []
+        self.called: list[PopenArgs] = []
 
     def _add_mock_data(self, cmd: list[str] | str, data: CommandMockData) -> None:
         cmd_list = tuple(cmd.split() if isinstance(cmd, str) else cmd)
@@ -85,8 +91,8 @@ class ProcMock:
     def set_output(self, cmd: list[str] | str, output: list[str]) -> None:
         self._add_mock_data(cmd, CommandMockData(output_lines=output))
 
-    def popen(self, cmd: list[str], *_args: Any, **_kwargs: Any) -> PopenMock:
-        self.called.append(cmd)
+    def popen(self, cmd: list[str], env: dict[str, str] | None = None, *_args: Any, **_kwargs: Any) -> PopenMock:
+        self.called.append(PopenArgs(command=cmd, env=env))
         for i in reversed(range(len(cmd))):
             prefix = cmd[: i + 1]
             try:

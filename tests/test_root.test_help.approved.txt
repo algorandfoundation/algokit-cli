@@ -18,6 +18,7 @@ Commands:
                project root directory.
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
+  deploy       Deploy smart contracts from AlgoKit compliant repository.
   doctor       Diagnose potential environment issues that may affect AlgoKit
   explore      Explore the specified network in the browser using Dappflow.
   generate     Generate code for an Algorand project.

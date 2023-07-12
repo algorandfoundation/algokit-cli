@@ -1,4 +1,5 @@
 import logging
+import os
 import platform
 import sys
 from collections.abc import Iterator
@@ -6,32 +7,25 @@ from pathlib import Path
 from shutil import which
 
 import click
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.conf import get_current_package_version
+from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
 
-ENV_TEMPLATE = ".env.template"
-ALGOKIT_CONFIG = ".algokit.toml"
+ENV_TEMPLATE_PATTERN = ".env*.template"
 logger = logging.getLogger(__name__)
 
 
-def bootstrap_any(project_dir: Path) -> None:
-    env_path = project_dir / ENV_TEMPLATE
+def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
     package_json_path = project_dir / "package.json"
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
-    if env_path.exists():
+    if next(project_dir.glob(ENV_TEMPLATE_PATTERN), None):
         logger.debug("Running `algokit bootstrap env`")
-        bootstrap_env(project_dir)
+        bootstrap_env(project_dir, ci_mode=ci_mode)
 
     if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
         logger.debug("Running `algokit bootstrap poetry`")
@@ -42,60 +36,75 @@ def bootstrap_any(project_dir: Path) -> None:
         bootstrap_npm(project_dir)
 
 
-def bootstrap_any_including_subdirs(base_path: Path) -> None:
-    bootstrap_any(base_path)
+def bootstrap_any_including_subdirs(base_path: Path, *, ci_mode: bool) -> None:
+    bootstrap_any(base_path, ci_mode=ci_mode)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
         if sub_dir.is_dir():
             if sub_dir.name.lower() in [".venv", "node_modules", "__pycache__"]:
                 logger.debug(f"Skipping {sub_dir}")
             else:
-                bootstrap_any(sub_dir)
+                bootstrap_any(sub_dir, ci_mode=ci_mode)
 
 
-def bootstrap_env(project_dir: Path) -> None:
-    env_path = project_dir / ".env"
-    env_template_path = project_dir / ENV_TEMPLATE
+def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:
+    # List all .env*.template files in the directory
+    env_template_paths = sorted(project_dir.glob(ENV_TEMPLATE_PATTERN))
 
-    if env_path.exists():
-        logger.info(".env already exists; skipping bootstrap of .env")
+    # If no template files found, log it
+    if not env_template_paths:
+        logger.info("No .env or .env.{network_name}.template files found; nothing to do here, skipping bootstrap.")
         return
 
-    logger.debug(f"{env_path} doesn't exist yet")
-    if not env_template_path.exists():
-        logger.info("No .env or .env.template file; nothing to do here, skipping bootstrap of .env")
-        return
+    # Process each template file
+    for env_template_path in env_template_paths:
+        # Determine the output file name (strip .template suffix)
+        env_path = Path(env_template_path).with_suffix("")
 
-    logger.debug(f"{env_template_path} exists")
-    logger.info(f"Copying {env_template_path} to {env_path} and prompting for empty values")
-    # find all empty values in .env file and prompt the user for a value
-    with env_template_path.open(encoding="utf-8") as env_template_file, env_path.open(
-        mode="w", encoding="utf-8"
-    ) as env_file:
-        comment_lines: list[str] = []
-        for line in env_template_file:
-            # strip newline character(s) from end of line for simpler handling
-            stripped_line = line.strip()
-            # if it is a comment line, keep it in var and continue
-            if stripped_line.startswith("#"):
-                comment_lines.append(line)
-                env_file.write(line)
-            # keep blank lines in output but don't accumulate them in comments
-            elif not stripped_line:
-                env_file.write(line)
-            else:
-                # lines not blank and not empty
-                var_name, *var_value = stripped_line.split("=", maxsplit=1)
-                # if it is an empty value, the user should be prompted for value with the comment line above
-                if var_value and not var_value[0]:
-                    logger.info("".join(comment_lines))
-                    var_name = var_name.strip()
-                    new_value = questionary_extensions.prompt_text(f"Please provide a value for {var_name}:")
-                    env_file.write(f"{var_name}={new_value}\n")
-                else:
-                    # this is a line with value, reset comment lines.
+        if env_path.exists():
+            logger.info(f"{env_path.name} already exists; skipping bootstrap of {env_path.name}")
+            continue
+
+        logger.debug(f"{env_path} doesn't exist yet")
+        logger.debug(f"{env_template_path} exists")
+        logger.info(f"Copying {env_template_path} to {env_path} and prompting for empty values")
+
+        # find all empty values in .env file and prompt the user for a value
+        with Path(env_template_path).open(encoding="utf-8") as env_template_file, env_path.open(
+            mode="w", encoding="utf-8"
+        ) as env_file:
+            comment_lines: list[str] = []
+            for line in env_template_file:
+                # strip newline character(s) from end of line for simpler handling
+                stripped_line = line.strip()
+                # if it is a comment line, keep it in var and continue
+                if stripped_line.startswith("#"):
+                    comment_lines.append(line)
                     env_file.write(line)
-                comment_lines = []
+                # keep blank lines in output but don't accumulate them in comments
+                elif not stripped_line:
+                    env_file.write(line)
+                else:
+                    # lines not blank and not empty
+                    var_name, *var_value = stripped_line.split("=", maxsplit=1)
+                    # if it is an empty value, the user should be prompted for value with the comment line above
+                    if var_value and not var_value[0]:
+                        var_name = var_name.strip()
+                        if not ci_mode:
+                            logger.info("".join(comment_lines))
+                            new_value = questionary_extensions.prompt_text(f"Please provide a value for {var_name}:")
+                            env_file.write(f"{var_name}={new_value}\n")
+                        # In CI mode, we _don't_ prompt for values, because... it's CI
+                        # we can omit the line entirely in the case of blank value,
+                        # and just to be nice we can check to make sure the var is defined in the current
+                        # env and if not, print a warning
+                        # note that due to the multiple env files, this might be an aberrant warning as
+                        # it might be for an .env<name>.template that is not used in the current CI process?
+                        elif var_name not in os.environ:
+                            logger.warning(f"Prompt skipped for {var_name} due to CI mode, but this value is not set")
+                    else:  # this is a line with value
+                        env_file.write(line)
+                    comment_lines = []
 
 
 def bootstrap_poetry(project_dir: Path) -> None:
@@ -229,26 +238,16 @@ def _get_base_python_path() -> str | None:
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:
+    config = get_algokit_config(project_dir)
+    if config is None:
+        return None
     try:
-        config_path = project_dir / ALGOKIT_CONFIG
-        try:
-            config_text = config_path.read_text("utf-8")
-        except FileNotFoundError:
-            logger.debug(f"No {ALGOKIT_CONFIG} file found in the project directory.")
-            return None
-
-        config = tomllib.loads(config_text)
-
-        try:
-            min_version = config["algokit"]["min_version"]
-        except KeyError:
-            logger.debug(f"No 'min_version' specified in {ALGOKIT_CONFIG} file.")
-            return None
-        assert isinstance(min_version, str)
-
-        return min_version
+        return str(config["algokit"]["min_version"])
+    except KeyError:
+        logger.debug(f"No 'min_version' specified in {ALGOKIT_CONFIG} file.")
+        return None
     except Exception as ex:
-        logger.debug(f"Unexpected error inspecting AlgoKit config: {ex}")
+        logger.debug(f"Couldn't read algokit min_version from {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
 
 

@@ -68,7 +68,7 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def _override_bootstrap(mocker: MockerFixture) -> None:
-    def bootstrap_mock(p: Path) -> None:
+    def bootstrap_mock(p: Path, *, ci_mode: bool) -> None:  # noqa: ARG001
         click.echo(f"Executed `algokit bootstrap all` in {p}")
 
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock

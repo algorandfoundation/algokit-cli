@@ -16,13 +16,15 @@ pyclip = "^0.7.0"
 shellingham = "^1.5.0.post1"
 algokit-client-generator = "^1.0.2"
 tomli = { version = "^2.0.1", python = "<3.11" }
+python-dotenv = "^1.0.0"
 # workaround for issue with copier dependency spec allowing major upgrade to pydantic v2
 pydantic = "^1.10.2"
+mslex = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
 black = {extras = ["d"], version = "^23.1.0"}
-ruff = "^0.0.257"
+ruff = "^0.0.275"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"

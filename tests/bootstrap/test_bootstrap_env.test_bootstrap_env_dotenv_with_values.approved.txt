@@ -1,3 +1,4 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: {current_working_directory}/.env doesn't exist yet
 DEBUG: {current_working_directory}/.env.template exists
@@ -14,4 +15,4 @@ TOKEN_3=test value with spaces
 
 TOKEN_4_WITH_NO_EQUALS_SIGN
 # another comment
-TOKEN_5_SPECIAL_CHAR=*  
+TOKEN_5_SPECIAL_CHAR=*

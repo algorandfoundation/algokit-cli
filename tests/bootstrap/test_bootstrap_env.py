@@ -1,6 +1,7 @@
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.namer import NamerFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 
@@ -28,6 +29,46 @@ def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory) -> None:
 def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env").touch()
+    (cwd / ".env.template").touch()
+
+    result = invoke(
+        "bootstrap env",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+@pytest.mark.parametrize(
+    "env_file_name",
+    [
+        ".env.localnet.template",
+        ".env.template",
+        ".env.localnet",
+        ".env",
+    ],
+)
+def test_bootstrap_network_prefixed_envs(env_file_name: str, tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / env_file_name).touch()
+    if not env_file_name.endswith(".template"):
+        (cwd / f"{env_file_name}.template").touch()
+
+    result = invoke(
+        "bootstrap env",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, options=NamerFactory.with_parameters(env_file_name))
+
+
+def test_bootstrap_env_multiple_templates(tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ".env.template").touch()
+    (cwd / ".env.localnet.template").touch()
+    (cwd / ".env.testnet.template").touch()
 
     result = invoke(
         "bootstrap env",
@@ -64,8 +105,8 @@ TOKEN_3=test value with spaces
 
 TOKEN_4_WITH_NO_EQUALS_SIGN
 # another comment
-TOKEN_5_SPECIAL_CHAR=*  
-"""  # noqa: W291
+TOKEN_5_SPECIAL_CHAR=*
+"""
     )
 
     result = invoke(
@@ -79,7 +120,7 @@ TOKEN_5_SPECIAL_CHAR=*
 
 @pytest.mark.mock_platform_system("Darwin")
 def test_bootstrap_env_dotenv_different_prompt_scenarios(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ".env.template").write_text(
@@ -91,16 +132,18 @@ TOKEN_1=123
 TOKEN_2_WITH_MULTI_LINES_COMMENT=
 TOKEN_3=test value
 
-TOKEN_4_WITH_SPACES =               
+TOKEN_4_WITH_SPACES =
 TOKEN_5_WITHOUT_COMMENT=
 TOKEN_WITH_NO_EQUALS_SIGN
 # another comment
 TOKEN_6_EMPTY_WITH_COMMENT=
 TOKEN_7_VALUE_WILL_BE_EMPTY=
 TOKEN_8 = value with spaces
-TOKEN_8_SPECIAL_CHAR=*  
-"""  # noqa: W291
+TOKEN_8_SPECIAL_CHAR=*
+"""
     )
+    # remove ci flag from env (when running in github actions)
+    monkeypatch.delenv("CI", raising=False)
 
     # provide values for tokens
     mock_questionary_input.send_text("test value for TOKEN_2_WITH_MULTI_LINES_COMMENT")

@@ -11,40 +11,51 @@
     - [Options](#options-1)
     - [--force](#--force)
     - [all](#all)
+    - [Options](#options-2)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [env](#env)
+    - [Options](#options-3)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [npm](#npm)
     - [poetry](#poetry)
   - [completions](#completions)
     - [install](#install)
-    - [Options](#options-2)
+    - [Options](#options-4)
     - [--shell ](#--shell-)
     - [uninstall](#uninstall)
-    - [Options](#options-3)
+    - [Options](#options-5)
     - [--shell ](#--shell--1)
   - [config](#config)
     - [version-prompt](#version-prompt)
     - [Arguments](#arguments)
     - [ENABLE](#enable)
+  - [deploy](#deploy)
+    - [Options](#options-6)
+    - [-C, --command ](#-c---command-)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
+    - [-P, --path ](#-p---path-)
+    - [Arguments](#arguments-1)
+    - [ENVIRONMENT_NAME](#environment_name)
   - [doctor](#doctor)
-    - [Options](#options-4)
+    - [Options](#options-7)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
-    - [Arguments](#arguments-1)
+    - [Arguments](#arguments-2)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-5)
+    - [Options](#options-8)
     - [-o, --output ](#-o---output-)
     - [-l, --language ](#-l---language-)
-    - [Arguments](#arguments-2)
+    - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-6)
+    - [Options](#options-9)
     - [--console](#--console)
-    - [Arguments](#arguments-3)
+    - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-7)
+    - [Options](#options-10)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -59,11 +70,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-8)
+    - [Options](#options-11)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-9)
+    - [Options](#options-12)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -120,6 +131,12 @@ Runs all bootstrap sub-commands in the current directory and immediate sub direc
 algokit bootstrap all [OPTIONS]
 ```
 
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
 ### env
 
 Copies .env.template file to .env in the current working directory and prompts for any unspecified values.
@@ -127,6 +144,12 @@ Copies .env.template file to .env in the current working directory and prompts f
 ```shell
 algokit bootstrap env [OPTIONS]
 ```
+
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
 ### npm
 
@@ -219,6 +242,34 @@ algokit config version-prompt [OPTIONS] [[enable|disable]]
 
 
 ### ENABLE
+Optional argument
+
+## deploy
+
+Deploy smart contracts from AlgoKit compliant repository.
+
+```shell
+algokit deploy [OPTIONS] [ENVIRONMENT_NAME]
+```
+
+### Options
+
+
+### -C, --command <command>
+Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+
+### -P, --path <path>
+Specify the project directory. If not provided, current working directory will be used.
+
+### Arguments
+
+
+### ENVIRONMENT_NAME
 Optional argument
 
 ## doctor
