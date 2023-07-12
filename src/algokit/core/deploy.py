@@ -69,8 +69,7 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
         match tbl:
             case {"command": str(command)}:
                 try:
-                    is_windows = platform.system() == "Windows"
-                    deploy_config.command = shlex.split(command, posix=not is_windows)
+                    deploy_config.command = parse_command(command)
                 except Exception as ex:
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
             case {"command": list(command_parts)}:
@@ -84,3 +83,8 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
                 raise click.ClickException(f"Invalid data provided under 'environment_secrets' key: {bad_data}")
 
     return deploy_config
+
+
+def parse_command(command: str) -> list[str]:
+    is_windows = platform.system() == "Windows"
+    return [command] if is_windows else shlex.split(command)

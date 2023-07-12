@@ -1,7 +1,5 @@
 import logging
 import os
-import platform
-import shlex
 import typing as t
 from pathlib import Path
 
@@ -9,7 +7,7 @@ import click
 
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.deploy import load_deploy_config, load_env_files
+from algokit.core.deploy import load_deploy_config, load_env_files, parse_command
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +30,7 @@ class CommandParamType(click.types.StringParamType):
     ) -> list[str]:
         str_value = super().convert(value=value, param=param, ctx=ctx)
         try:
-            is_windows = platform.system() == "Windows"
-            return shlex.split(str_value, posix=not is_windows)
+            return parse_command(str_value)
         except Exception as ex:
             logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
             raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
