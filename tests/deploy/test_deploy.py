@@ -10,6 +10,9 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
+# need to escape python executable path for windows
+PYTHON_EXECUTABLE = sys.executable.replace("\\", "\\\\")
+
 
 def test_algokit_config_empty_array(tmp_path_factory: TempPathFactory) -> None:
     empty_array_config = """
@@ -94,7 +97,6 @@ def test_command_invocation_and_command_splitting(tmp_path: Path) -> None:
 command = ["not", "used"]
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
-    python_executable = sys.executable
     result = invoke(
         [
             "deploy",
@@ -102,27 +104,26 @@ command = ["not", "used"]
             # note: spaces around the string inside print are important,
             # we need to test the usage of shlex.split vs str.split, to handle
             # splitting inside quotes properly
-            f"{python_executable} -c 'print(\" test_command_invocation \")'",
+            f"""{PYTHON_EXECUTABLE} -c 'print(" test_command_invocation ")'""",
         ],
         cwd=tmp_path,
     )
     assert result.exit_code == 0
-    verify(result.output.replace(python_executable, "<sys.executable>"))
+    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
 def test_command_splitting_from_config(tmp_path: Path) -> None:
-    python_executable = sys.executable
     # note: spaces around the string inside print are important,
     # we need to test the usage of shlex.split vs str.split, to handle
     # splitting inside quotes properly
     config_data = rf"""
 [deploy]
-command = "{python_executable} -c 'print(\" test_command_invocation \")'"
+command = "{PYTHON_EXECUTABLE} -c 'print(\" test_command_invocation \")'"
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
     result = invoke("deploy", cwd=tmp_path)
     assert result.exit_code == 0
-    verify(result.output.replace(python_executable, "<sys.executable>"))
+    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
 def test_command_not_found_and_no_config(proc_mock: ProcMock) -> None:
