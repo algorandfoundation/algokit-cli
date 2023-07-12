@@ -46,7 +46,7 @@ The logic for loading environment variables is as follows:
 
 AlgoKit uses a configuration file called `.algokit.toml` in the root of your project. The configuration file can be created using the `algokit init` command. This file will define the deployment commands for the various network environments that you want to target.
 
-Here's an example of what the `.algokit.toml` file might look like. The example below will always prompt for the deployer mnemonic secret (unless specified in env variables) for any network, except for the localnet, where it will not prompt for any secrets.
+Here's an example of what the `.algokit.toml` file might look like. When deploying it will prompt for the `DEPLOYER_MNEMONIC` secret unless it is already defined as an environment variable or is deploying to localnet.
 
 ```toml
 [algokit]
