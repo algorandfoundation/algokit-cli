@@ -7,7 +7,7 @@ We will also refer to the official [`algokit-beaker-default-template`](https://g
 
 ## Table of Contents
 
--[Quick Start](#quick-start)
+- [Quick Start](#quick-start)
 - [Overview of AlgoKit Templates](#overview-of-algokit-templates)
   - [Copier/Jinja](#copierjinja)
   - [AlgoKit Functionality with Templates](#algokit-functionality-with-templates)
