@@ -87,4 +87,4 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
 
 def parse_command(command: str) -> list[str]:
     is_windows = platform.system() == "Windows"
-    return [command] if is_windows else shlex.split(command)
+    return shlex.split(command, posix=not is_windows)
