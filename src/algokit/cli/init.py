@@ -49,17 +49,21 @@ class BlessedTemplateSource(TemplateSource):
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
     return {
-        "beaker_starter": BlessedTemplateSource(
-            url="gh:algorand-devrel/starter-algokit-beaker-template",
-            description="Official starter template for Beaker applications.",
-        ),
-        "beaker_production": BlessedTemplateSource(
+        "beaker": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for production Beaker applications.",
+            description="Official template for starter or production Beaker applications.",
+        ),
+        "react": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-react-frontend-template",
+            description="Official template for React frontend applications (smart contracts not included).",
+        ),
+        "fullstack": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-fullstack-template",
+            description="Official template for starter or production fullstack applications (React + Beaker).",
         ),
         "playground": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
-            description="A number of small example applications and demos.",
+            description="Official template showcasing a number of small example applications and demos.",
         ),
     }
 
