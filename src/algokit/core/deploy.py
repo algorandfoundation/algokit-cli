@@ -2,6 +2,7 @@ import dataclasses
 import logging
 import platform
 from pathlib import Path
+import shutil
 
 import click
 import dotenv
@@ -88,7 +89,18 @@ def parse_command(command: str) -> list[str]:
     if platform.system() == "Windows":
         import mslex
 
-        return mslex.split(command)
+        win_command = mslex.split(command)
+
+        if not win_command:
+            return win_command
+
+        cmd_path = shutil.which(win_command[0])
+        if cmd_path:
+            win_command[0] = cmd_path
+        else:
+            raise ValueError(f"Command not found: {win_command[0]}")
+
+        return win_command
     else:
         import shlex
 

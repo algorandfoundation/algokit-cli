@@ -140,26 +140,26 @@ command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
     verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
-def test_command_not_found_and_no_config(proc_mock: ProcMock) -> None:
+def test_command_not_found_and_no_config(proc_mock: ProcMock, tmp_path: Path) -> None:
     cmd = "gm"
     proc_mock.should_fail_on([cmd])
-    result = invoke(["deploy", "--command", cmd])
+    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
-def test_command_not_executable(proc_mock: ProcMock) -> None:
+def test_command_not_executable(proc_mock: ProcMock, tmp_path: Path) -> None:
     cmd = "gm"
     proc_mock.should_deny_on([cmd])
-    result = invoke(["deploy", "--command", cmd])
+    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
-def test_command_bad_exit_code(proc_mock: ProcMock) -> None:
+def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path) -> None:
     cmd = "gm"
     proc_mock.should_bad_exit_on([cmd], output=["it is not morning"])
-    result = invoke(["deploy", "--command", cmd])
+    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
