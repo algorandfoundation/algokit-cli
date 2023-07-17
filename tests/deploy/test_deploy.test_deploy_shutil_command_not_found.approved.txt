@@ -1,0 +1,4 @@
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+Error: Failed to parse command 'command_a': Command not found: command_a

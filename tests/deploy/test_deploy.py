@@ -53,10 +53,9 @@ def test_algokit_config_invalid_syntax(tmp_path_factory: TempPathFactory) -> Non
 
 
 def test_algokit_config_name_overrides(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     config_with_override = """
 [deploy]
@@ -83,10 +82,9 @@ command = "command_c"
 
 
 def test_algokit_config_name_no_base(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     config_with_override = """
 [deploy.localnet]
@@ -154,11 +152,8 @@ command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
     verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
-def test_command_not_found_and_no_config(
-    proc_mock: ProcMock, tmp_path: Path, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+def test_command_not_found_and_no_config(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     cmd = "gm"
     proc_mock.should_fail_on([cmd])
@@ -167,11 +162,8 @@ def test_command_not_found_and_no_config(
     verify(result.output)
 
 
-def test_command_not_executable(
-    proc_mock: ProcMock, tmp_path: Path, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+def test_command_not_executable(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     cmd = "gm"
     proc_mock.should_deny_on([cmd])
@@ -180,11 +172,8 @@ def test_command_not_executable(
     verify(result.output)
 
 
-def test_command_bad_exit_code(
-    proc_mock: ProcMock, tmp_path: Path, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     cmd = "gm"
     proc_mock.should_bad_exit_on([cmd], output=["it is not morning"])
@@ -193,11 +182,8 @@ def test_command_bad_exit_code(
     verify(result.output)
 
 
-def test_algokit_env_name_missing(
-    tmp_path_factory: TempPathFactory, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     config_with_override = """
 [deploy.localnet]
@@ -214,10 +200,11 @@ command = "command_a"
 
 
 def test_algokit_env_and_name_correct_set(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch, mock_platform_system: str
+    tmp_path_factory: TempPathFactory,
+    proc_mock: ProcMock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     env_config = """
 ENV_A=GENERIC_ENV_A
@@ -260,10 +247,9 @@ command = "command_b"
 
 
 def test_algokit_deploy_only_base_deploy_config(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     config_with_only_base_deploy = """
 [deploy]
@@ -296,10 +282,8 @@ def test_ci_flag_interactivity_mode_via_env(
     mocker: MockerFixture,
     monkeypatch: pytest.MonkeyPatch,
     proc_mock: ProcMock,
-    mock_platform_system: str,
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     monkeypatch.setenv("CI", "true")
     cwd = tmp_path_factory.mktemp("cwd")
@@ -332,11 +316,9 @@ def test_ci_flag_interactivity_mode_via_cli(
     tmp_path_factory: TempPathFactory,
     mocker: MockerFixture,
     proc_mock: ProcMock,
-    mock_platform_system: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     cwd = tmp_path_factory.mktemp("cwd")
 
@@ -370,10 +352,8 @@ def test_secrets_prompting_via_stdin(
     mocker: MockerFixture,
     proc_mock: ProcMock,
     monkeypatch: pytest.MonkeyPatch,
-    mock_platform_system: str,
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     # ensure Github Actions CI env var is not overriding behavior
     monkeypatch.delenv("CI", raising=False)
@@ -409,10 +389,9 @@ environment_secrets = [
 
 
 def test_deploy_custom_project_dir(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, mock_platform_system: str, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    if mock_platform_system == "Windows":
-        monkeypatch.setattr("shutil.which", _mock_shutil_which)
+    monkeypatch.setattr("shutil.which", _mock_shutil_which)
 
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
@@ -439,8 +418,7 @@ command = "command_a"
     verify(result.output)
 
 
-@pytest.mark.mock_platform_system("Windows")
-def test_deploy_windows_command_not_found(tmp_path_factory: TempPathFactory) -> None:
+def test_deploy_shutil_command_not_found(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     (cwd / ALGOKIT_CONFIG).write_text(
