@@ -1,6 +1,6 @@
 DEBUG: Deploying from project directory: {current_working_directory}
 DEBUG: Loading deploy command from project config
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-Using deploy command: command_a
+Using deploy command: /bin/command_a
 Loading deployment environment variables...
 Error: Error: missing DEPLOYER_MNEMONIC environment variable

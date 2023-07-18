@@ -70,7 +70,8 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
             case {"command": str(command)}:
                 try:
                     deploy_config.command = parse_command(command)
-                except Exception as ex:
+                except ValueError as ex:
+                    logger.debug(f"Failed to parse command string: {command}", exc_info=True)
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
             case {"command": list(command_parts)}:
                 deploy_config.command = [str(x) for x in command_parts]
@@ -89,19 +90,19 @@ def parse_command(command: str) -> list[str]:
     if platform.system() == "Windows":
         import mslex
 
-        parsed_command = mslex.split(command)
+        return mslex.split(command)
     else:
         import shlex
 
-        parsed_command = shlex.split(command)
+        return shlex.split(command)
 
-    if not parsed_command:
-        return parsed_command
 
-    cmd_path = shutil.which(parsed_command[0])
-    if cmd_path:
-        parsed_command[0] = cmd_path
-    else:
-        raise ValueError(f"Command not found: {parsed_command[0]}")
-
-    return parsed_command
+def resolve_command(command: list[str]) -> list[str]:
+    cmd, *args = command
+    # if the command has any path separators or such, don't try and resolve
+    if Path(cmd).name != cmd:
+        return command
+    resolved_cmd = shutil.which(cmd)
+    if not resolved_cmd:
+        raise click.ClickException(f"Failed to resolve deploy command, '{cmd}' wasn't found")
+    return [resolved_cmd, *args]

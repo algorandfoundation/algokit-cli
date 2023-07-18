@@ -9,6 +9,7 @@ from pytest_mock import MockerFixture
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+from tests.utils.which_mock import WhichMock
 
 PYTHON_EXECUTABLE = sys.executable
 # need to use an escaped python executable path in config files for windows
@@ -19,8 +20,11 @@ PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
 TEST_PYTHON_COMMAND = "print(' test_command_invocation ')"
 
 
-def _mock_shutil_which(cmd: str) -> str:
-    return cmd
+@pytest.fixture(autouse=True)
+def which_mock(mocker: MockerFixture) -> WhichMock:
+    which_mock = WhichMock()
+    mocker.patch("algokit.core.deploy.shutil.which").side_effect = which_mock.which
+    return which_mock
 
 
 def test_algokit_config_empty_array(tmp_path_factory: TempPathFactory) -> None:
@@ -53,10 +57,8 @@ def test_algokit_config_invalid_syntax(tmp_path_factory: TempPathFactory) -> Non
 
 
 def test_algokit_config_name_overrides(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     config_with_override = """
 [deploy]
 command = "command_a"
@@ -73,7 +75,8 @@ command = "command_c"
     (cwd / ".env.localnet").touch()
     (cwd / ".env.testnet").touch()
 
-    proc_mock.set_output(["command_c"], ["picked testnet"])
+    resolved_cmd = which_mock.add("command_c")
+    proc_mock.set_output([resolved_cmd], ["picked testnet"])
 
     result = invoke(["deploy", "testnet"], cwd=cwd)
 
@@ -82,10 +85,8 @@ command = "command_c"
 
 
 def test_algokit_config_name_no_base(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     config_with_override = """
 [deploy.localnet]
 command = "command_a"
@@ -98,7 +99,8 @@ command = "command_b"
     (cwd / ".env.localnet").touch()
     (cwd / ".env.testnet").touch()
 
-    proc_mock.set_output(["command_a"], ["picked localnet"])
+    cmd = which_mock.add("command_a")
+    proc_mock.set_output([cmd], ["picked localnet"])
 
     result = invoke(["deploy", "localnet"], cwd=cwd)
 
@@ -125,9 +127,6 @@ command = ["not", "used"]
 
 
 def test_command_splitting_from_config(tmp_path: Path) -> None:
-    # note: spaces around the string inside print are important,
-    # we need to test the usage of shlex.split vs str.split, to handle
-    # splitting inside quotes properly
     config_data = rf"""
 [deploy]
 command = "{PYTHON_EXECUTABLE_ESCAPED} -c \"{TEST_PYTHON_COMMAND}\""
@@ -139,9 +138,6 @@ command = "{PYTHON_EXECUTABLE_ESCAPED} -c \"{TEST_PYTHON_COMMAND}\""
 
 
 def test_command_without_splitting_from_config(tmp_path: Path) -> None:
-    # note: spaces around the string inside print are important,
-    # we need to test the usage of shlex.split vs str.split, to handle
-    # splitting inside quotes properly
     config_data = rf"""
 [deploy]
 command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
@@ -152,39 +148,33 @@ command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
     verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
-def test_command_not_found_and_no_config(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
+@pytest.mark.usefixtures("proc_mock")
+def test_command_not_found_and_no_config(tmp_path: Path) -> None:
     cmd = "gm"
-    proc_mock.should_fail_on([cmd])
     result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
-def test_command_not_executable(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
+def test_command_not_executable(proc_mock: ProcMock, tmp_path: Path, which_mock: WhichMock) -> None:
     cmd = "gm"
-    proc_mock.should_deny_on([cmd])
+    cmd_resolved = which_mock.add(cmd)
+    proc_mock.should_deny_on([cmd_resolved])
     result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
-def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
+def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path, which_mock: WhichMock) -> None:
     cmd = "gm"
-    proc_mock.should_bad_exit_on([cmd], output=["it is not morning"])
+    cmd_resolved = which_mock.add(cmd)
+    proc_mock.should_bad_exit_on([cmd_resolved], output=["it is not morning"])
     result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
-def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
+def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory, which_mock: WhichMock) -> None:
     config_with_override = """
 [deploy.localnet]
 command = "command_a"
@@ -193,6 +183,7 @@ command = "command_a"
     (cwd / ALGOKIT_CONFIG).write_text(config_with_override, encoding="utf-8")
     (cwd / ".env").touch()
 
+    which_mock.add("command_a")
     result = invoke(["deploy", "localnet"], cwd=cwd)
 
     assert result.exit_code == 1
@@ -200,12 +191,8 @@ command = "command_a"
 
 
 def test_algokit_env_and_name_correct_set(
-    tmp_path_factory: TempPathFactory,
-    proc_mock: ProcMock,
-    monkeypatch: pytest.MonkeyPatch,
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch, which_mock: WhichMock
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     env_config = """
 ENV_A=GENERIC_ENV_A
 ENV_B=GENERIC_ENV_B
@@ -232,7 +219,8 @@ command = "command_b"
     (cwd / ".env").write_text(env_config, encoding="utf-8")
     (cwd / ".env.localnet").write_text(env_name_config, encoding="utf-8")
 
-    proc_mock.set_output(["command_b"], ["picked localnet"])
+    cmd_resolved = which_mock.add("command_b")
+    proc_mock.set_output([cmd_resolved], ["picked localnet"])
 
     result = invoke(["deploy", "localnet"], cwd=cwd)
 
@@ -247,10 +235,8 @@ command = "command_b"
 
 
 def test_algokit_deploy_only_base_deploy_config(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     config_with_only_base_deploy = """
 [deploy]
 command = "command_a"
@@ -264,7 +250,8 @@ ENV_A=GENERIC_ENV_A
     (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
     (cwd / ".env").write_text(env_config, encoding="utf-8")
 
-    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
     result = invoke(["deploy"], cwd=cwd)
 
@@ -282,11 +269,9 @@ def test_ci_flag_interactivity_mode_via_env(
     mocker: MockerFixture,
     monkeypatch: pytest.MonkeyPatch,
     proc_mock: ProcMock,
+    which_mock: WhichMock,
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     monkeypatch.setenv("CI", "true")
-    cwd = tmp_path_factory.mktemp("cwd")
 
     mock_prompt = mocker.patch("click.prompt")
 
@@ -302,7 +287,8 @@ environment_secrets = [
     (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
     (cwd / ".env").touch()
 
-    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
     result = invoke(["deploy"], cwd=cwd)
 
@@ -316,12 +302,8 @@ def test_ci_flag_interactivity_mode_via_cli(
     tmp_path_factory: TempPathFactory,
     mocker: MockerFixture,
     proc_mock: ProcMock,
-    monkeypatch: pytest.MonkeyPatch,
+    which_mock: WhichMock,
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
-    cwd = tmp_path_factory.mktemp("cwd")
-
     mock_prompt = mocker.patch("click.prompt")
 
     config_with_only_base_deploy = """
@@ -336,7 +318,8 @@ environment_secrets = [
     (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
     (cwd / ".env").touch()
 
-    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
     result = invoke(["deploy", "--ci"], cwd=cwd)
 
@@ -352,15 +335,12 @@ def test_secrets_prompting_via_stdin(
     mocker: MockerFixture,
     proc_mock: ProcMock,
     monkeypatch: pytest.MonkeyPatch,
+    which_mock: WhichMock,
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     # ensure Github Actions CI env var is not overriding behavior
     monkeypatch.delenv("CI", raising=False)
 
     # mock click.prompt
-    cwd = tmp_path_factory.mktemp("cwd")
-
     mock_prompt = mocker.patch("click.prompt", return_value="secret_value")
     config_with_only_base_deploy = """
 [deploy]
@@ -373,7 +353,8 @@ environment_secrets = [
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ALGOKIT_CONFIG).write_text(config_with_only_base_deploy, encoding="utf-8")
     (cwd / ".env").touch()
-    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
     result = invoke(["deploy"], cwd=cwd)
     mock_prompt.assert_called_once()  # ensure called
@@ -389,10 +370,8 @@ environment_secrets = [
 
 
 def test_deploy_custom_project_dir(
-    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, monkeypatch: pytest.MonkeyPatch
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
-    monkeypatch.setattr("shutil.which", _mock_shutil_which)
-
     cwd = tmp_path_factory.mktemp("cwd")
     custom_folder = cwd / "custom_folder"
 
@@ -405,7 +384,8 @@ command = "command_a"
         encoding="utf-8",
     )
     (custom_folder / ".env.testnet").touch()
-    proc_mock.set_output(["command_a"], ["picked base deploy command"])
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
     input_answers = ["N"]
 
