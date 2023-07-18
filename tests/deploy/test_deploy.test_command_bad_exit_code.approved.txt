@@ -2,9 +2,9 @@ DEBUG: Deploying from project directory: {current_working_directory}
 DEBUG: Loading deploy command from project config
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-Using deploy command: gm
+Using deploy command: /bin/gm
 Loading deployment environment variables...
 Deploying smart contracts from AlgoKit compliant repository 🚀
-DEBUG: Running 'gm' in '{current_working_directory}'
-gm: it is not morning
+DEBUG: Running '/bin/gm' in '{current_working_directory}'
+/bin/gm: it is not morning
 Error: Deployment command exited with error code = -1

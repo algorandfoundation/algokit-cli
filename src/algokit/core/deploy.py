@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import platform
+import shutil
 from pathlib import Path
 
 import click
@@ -69,7 +70,8 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
             case {"command": str(command)}:
                 try:
                     deploy_config.command = parse_command(command)
-                except Exception as ex:
+                except ValueError as ex:
+                    logger.debug(f"Failed to parse command string: {command}", exc_info=True)
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
             case {"command": list(command_parts)}:
                 deploy_config.command = [str(x) for x in command_parts]
@@ -93,3 +95,14 @@ def parse_command(command: str) -> list[str]:
         import shlex
 
         return shlex.split(command)
+
+
+def resolve_command(command: list[str]) -> list[str]:
+    cmd, *args = command
+    # if the command has any path separators or such, don't try and resolve
+    if Path(cmd).name != cmd:
+        return command
+    resolved_cmd = shutil.which(cmd)
+    if not resolved_cmd:
+        raise click.ClickException(f"Failed to resolve deploy command, '{cmd}' wasn't found")
+    return [resolved_cmd, *args]
