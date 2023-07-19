@@ -158,7 +158,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
-def init_command(
+def init_command(  # noqa: PLR0913
     *,
     directory_name: str | None,
     template_name: str | None,
