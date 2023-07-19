@@ -1,4 +1,4 @@
-# Frontend Templates
+# Advanced `algokit generate` command
 
 - **Status**: In-progress
 - **Owner:** Altynbek Orumbayev, Inaie Ignacio
