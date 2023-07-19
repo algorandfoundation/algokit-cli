@@ -38,6 +38,9 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: volume
+        source: /Users/negarabbasi/algokit_local
+        target: /Users/negarabbasi/goal
 
   indexer:
     container_name: algokit_indexer
