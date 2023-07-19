@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import click
 
@@ -28,6 +29,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
+    local_goal_dir = str(Path.home() / "algokit_local")
+    docker_goal_dir = str(Path.home() / "goal")
+    goal_args = [arg.replace(local_goal_dir, docker_goal_dir) if Path(arg).is_file() else arg for arg in goal_args]
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except OSError as ex:
