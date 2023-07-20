@@ -11,6 +11,10 @@
 
 The [Frontend Templates ADR](./2023-06-06_frontend-templates.md) introduced and expanded on AlgoKit's principles of Modularity and Maintainability by introducing a new set of official templates for quickly bootstrapping standalone `react` and `fullstack` projects showcasing best practices and patterns for building frontend and fullstack applications with Algorand. As a logical next step, we want to enable developers to extend existing projects instantiated from official templates with new files and features.
 
+```
+[Notes for Inaie] -> Please further refine and polish any of the below sections as you see fit (proof read/sanity-check on the content would be helpful as well). Remove this note when done
+```
+
 ## Requirements
 
 ### 1. AlgoKit user should be able to use generate command to extend existing algokit compliant projects with new `files` of any kind
@@ -26,7 +30,7 @@ Overal, we want to introduce a notion of `generators` which can be viewed as a m
 
 Ruby on Rails has a similar concept of [generators](https://guides.rubyonrails.org/generators.html) which are used to create or update files within Rails projects. This can be used as a reference for inspiration.
 
-### 2. Template builder should be able to access a clear guideline and refer to official templates for examples on how to create his own `generators`
+### 2. Template builder should be able to access a clear guideline and refer to official templates for examples on how to create their own `generators`
 
 This implies extension of existing starter guidelines available for template builders on [AlgoKit Docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md) and using one or several official templates as a reference point.
 
@@ -53,22 +57,60 @@ The main idea is to rely on `_templates_suffix` in copier.yamls to define 2 sepa
 - The new generators jinja templates can be prefixed (for example) with alternative file extension for jinja files such as `.j2`. Which is also a common convention for jinja templates.
 - - This only works for files though for regular folders and cases like `{% if %}folder_name{% endif %}.j2` we need to wrap them into {% raw %} to that first pass when template initially initialized unwraps the content allowing second pass via generator to then use them as jinja templates. The only downside here is slightly longer file names for folders, but I think it's a reasonable tradeoff considering simplicity of the solution.
 
-The overal structure of the template can look as follows:
+Overview of the proposal can be summarized via the following diagram:
+
+```mermaid
+graph TB
+  T["Template Folder"]
+  T --> C["copier.yaml"]
+  T --> C1["..."]
+  T --> G[".algokit/generators"]
+
+  G --> G1["Generator 1"]
+  G1 --> E1["copier.yaml"]
+  G1 --> E2["..."]
+
+  G --> G2["..."]
+  G2 --> E3["..."]
+
+  G --> G3["Generator N"]
+  G3 --> E["copier.yaml"]
+  G3 --> E4["..."]
+```
+
+#### Pros
+
+- Generators are hidden within algokit templates and are not exposed to the end user. When user runs `algokit generate` command, he is presented with a list of available generators to choose from. This makes it easier for user to understand what generators are available and what they do.
+- Generators are self contained copier templates giving template builders flexibility to do any kind of templating logic similar to what they can already do with regular templates.
+- Majority of implementation complexity is reduced by relying on copier as a backbone for generators feature.
+
+#### Cons
+
+- Generators are somewhat tightly coupled with individual algokit templates, which implies its not necessarily a matter of copy pasting generators from one template to another. This can be a problem for community template builders who want to reuse generators from official templates. However, this can be mitigated by providing clear guidelines on how to create generators and referring to official templates as a reference point. Additionally, it seems like a reasonable tradeoff given that templates can vastly differ in type, structure, conventions and patterns and it's significantly harder to generalize the logic of generators to make them work for all templates.
+
+#### Implementation details
+
+**1. Adjusting templates structure**
+
+For instance, if we assume existing `beaker` template, the new file/folder structure can look as follows:
 
 ```
-template_content/.generators
-└── create_contract # generator name
-    ├── copier.yaml # generator copier.yaml
-    └── smart_contracts # example for adding new contracts to existing beaker template based projects
-        └── {% raw %}{{ contract_name }}{% endraw %}
-            ├── contract.py.j2
-            ├── {% raw %}{% if language == 'python' %}deploy_config.py{% endif %}{% endraw %}.j2
-            └── {% raw %}{% if language == 'typescript' %}deploy-config.ts{% endif %}{% endraw %}.j2
+template_content/.algokit # alternatively could be just `.algokit-generators`
+└── generators
+    └── {generator_name} # generator name can be anything
+        ├── copier.yaml # copier config for generator
+        └── smart_contracts # logic for adding new contracts to beaker template
+            └── {% raw %}{{ contract_name }}{% endraw %}
+                ├── contract.py.j2
+                ├── {% raw %}{% if language == 'python' %}deploy_config.py{% endif %}{% endraw %}.j2
+                └── {% raw %}{% if language == 'typescript' %}deploy-config.ts{% endif %}{% endraw %}.j2
 ...rest of the template is left as is
 copier.yml
 ```
 
-The final implementation part of the proposal is adjusting the `generator` command on `algokit-cli` to make sure it knows how to look for generators. The available generators can be provided to user via list picker (a.k.a ruby on rails style) by letting algokit scan contents of `algokit.toml` and look for `.generators` folder.
+> Please note, above is just an example that assumes the generator for adding new contracts, but the proposal is generic enough to support any kind of jinja-based templating logic.
+
+**2. Adjusting `.algokit.toml`**
 
 The proposal for new structure for defining generators in root algokit toml is as follows:
 
@@ -76,12 +118,52 @@ The proposal for new structure for defining generators in root algokit toml is a
 [generators.create_contract] # [generators.<generator_name>]
 name = "smart-contract" # user-facing name of the generator
 description = "Adds new smart contract to existing project" # description of the generator, can appear in cli for extra info
-path = ".generators/create_contract"  # path that cli should grab to forward to copier copy
+path = ".algokit/generators/create_contract"  # path that cli should grab to forward to copier copy
 ```
 
-### Option 2: TBD
+**3. Adjusting `algokit generate` command on cli**
 
----
+Next step in implementation part of the proposal is adjusting the `generator` command on `algokit-cli` to make sure it knows how to look for generators. The available generators can be provided to user via list picker (a.k.a ruby on rails style) by letting algokit scan contents of `algokit.toml` and look for `.generators` folder.
+
+```
+[Notes for Inaie] -> Please expand this section potentially proposing more specific implementation details, i think support both interactive and non interactive way (that injects them to click as per your spike you did previously on cli) would be great. This should include proposals on how invocation of generate will look like against a template repo that:
+a) has no generators
+b) has generators and user gets to pick interactively
+c) has generators, user knows what to pick and wants to run it non interactively
+
+Remove this note when done
+```
+
+**4. Testing and documentation**
+
+Lastly we need to make sure that the new feature is properly tested and documented. This includes:
+
+- Testing that the new feature works as expected on all official templates that will host generators. This will imply adding a separate test suite that pick some default template state and run generators on top of them confirming that created artifacts are placed in expected locations and have expected content. Tests should be easy to follow and expand on existing tests suite on templates without introducing extra complexity.
+- Adjusting existing documentation on [AlgoKit Docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md) to include a new tutorial sections on how to create generators and refer to official templates as a reference point.
+
+### Option 2: Wrapping generators into self contained copier templates hosted on separate repositories
+
+This option proposes to host `generators` on separate set of repositories and use them as a dependency for algokit templates.
+`algokit.toml` can be extended on template repositories to list generators they depend on.
+
+The only distinction between this option and option 1 is that generators are hosted on separate repositories and are not hidden within algokit templates. Implying that they are not tightly coupled with algokit templates and can be reused/forked by community template builders to build their own generators.
+
+#### Pros
+
+- Generators are not tightly coupled with algokit templates and can be reused/forked by community template builders to build their own generators.
+- Generators can be versioned and updated independently from algokit templates.
+
+#### Cons
+
+- Developing and maintaining generators is significantly more complex due to the need to maintain separate repositories and versioning.
+- Official maintainers and community template builders need to be put extra effort at keeping generators generic enough to be reused by other templates. Given that templates can vastly differ in type, structure, conventions and patterns, this can be a challenge.
+- Given that copier is being considered as a backbone for generators feature, drawbacks outlined for hosting templates on monorepos in the [previous adr](2023-06-06_frontend-templates.md#option-1-monolithic-template) apply here as well.
+
+## Open questions for reviewers
+
+1. What kinds of generators other than `add new contract` do we want to support on initial release (if any)?
+2. Are there any other template repositories that we want to integrate with generators other than `beaker` (`fullstack` will contain those as well as it uses `beaker` as a dependency)?
+3. What do we think is the best way to expose generators to the end user? Should we expose them as a list picker or should we let user type in the name of the generator he wants to use? Another option is to aim for both interactive vs non interactive (since its copier we can pass answers directly too) or alternatively we can dynamically link generators to click on algokit dynamically.
 
 ## Final Decision
 
