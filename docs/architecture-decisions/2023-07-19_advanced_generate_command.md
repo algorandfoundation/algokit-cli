@@ -11,26 +11,22 @@
 
 The [Frontend Templates ADR](./2023-06-06_frontend-templates.md) introduced and expanded on AlgoKit's principles of Modularity and Maintainability by introducing a new set of official templates for quickly bootstrapping standalone `react` and `fullstack` projects showcasing best practices and patterns for building frontend and fullstack applications with Algorand. As a logical next step, we want to enable developers to extend existing projects instantiated from official templates with new files and features.
 
-```
-[Notes for Inaie] -> Please further refine and polish any of the below sections as you see fit (proof read/sanity-check on the content would be helpful as well). Remove this note when done
-```
-
 ## Requirements
 
 ### 1. AlgoKit user should be able to use generate command to extend existing algokit compliant projects with new `files` of any kind
 
 This implies scenarios like:
 
-- Adding new contracts into existing and algokit compliant projects.
+- Adding new contracts into existing algokit compliant projects.
   > Algokit compliant projects are projects that were instantiated from official or community templates and follow the same structure and conventions.
 - Overriding existing files with new ones.
-- TBD
+- Adding new files into existing projects.
 
 Overal, we want to introduce a notion of `generators` which can be viewed as a modular self-sufficient template units that are hosted within template repositories and describe how to create or update files within projects instantiated from algokit templates.
 
 Ruby on Rails has a similar concept of [generators](https://guides.rubyonrails.org/generators.html) which are used to create or update files within Rails projects. This can be used as a reference for inspiration.
 
-### 2. Template builder should be able to access a clear guideline and refer to official templates for examples on how to create their own `generators`
+### 2. Template builder should be able to access a clear guideline and refer to official templates for examples on how to create `generators`
 
 This implies extension of existing starter guidelines available for template builders on [AlgoKit Docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md) and using one or several official templates as a reference point.
 
@@ -125,21 +121,35 @@ path = ".algokit/generators/create_contract"  # path that cli should grab to for
 
 Next step in implementation part of the proposal is adjusting the `generator` command on `algokit-cli` to make sure it knows how to look for generators. The available generators can be provided to user via list picker (a.k.a ruby on rails style) by letting algokit scan contents of `algokit.toml` and look for `.generators` folder.
 
-```
-[Notes for Inaie] -> Please expand this section potentially proposing more specific implementation details, i think support both interactive and non interactive way (that injects them to click as per your spike you did previously on cli) would be great. This should include proposals on how invocation of generate will look like against a template repo that:
-a) has no generators
-b) has generators and user gets to pick interactively
-c) has generators, user knows what to pick and wants to run it non interactively
+a) Has no generators
+If algokit-cli can't find any generator configured then nothing change from current implementation.
 
-Remove this note when done
+b) Has generators and user gets to pick interactively
+A new sub-command is added to the list of generate commands, that will list all available generators for the user to choose from.
+
+```cmd
+algokit-cli generate options
+
+-> contract
+   a generator
+   another generator
+```
+
+c) Has generators, user knows what to pick and wants to run it non interactively
+Using the generator configuration the sub-commands will be automatically add to the existing list of generate commands allowing the user to run them in the command line.
+
+```cmd
+algokit-cli generate client
+algokit-cli generate contract `name of the contract`
+algokit-cli generate `new command`
 ```
 
 **4. Testing and documentation**
 
 Lastly we need to make sure that the new feature is properly tested and documented. This includes:
 
-- Testing that the new feature works as expected on all official templates that will host generators. This will imply adding a separate test suite that pick some default template state and run generators on top of them confirming that created artifacts are placed in expected locations and have expected content. Tests should be easy to follow and expand on existing tests suite on templates without introducing extra complexity.
-- Adjusting existing documentation on [AlgoKit Docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md) to include a new tutorial sections on how to create generators and refer to official templates as a reference point.
+- Testing the new feature works as expected on all official templates that will host generators. This will imply adding a separate test suite that picks some default template state and run generators on top of them confirming that created artifacts are placed in expected locations and have expected content. Tests should be easy to follow and expand on existing tests suite on templates without introducing extra complexity.
+- Introduce new tutorial sections on [AlgoKit Docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md) on how to create generators and refer to official templates as a reference point.
 
 ### Option 2: Wrapping generators into self contained copier templates hosted on separate repositories
 
