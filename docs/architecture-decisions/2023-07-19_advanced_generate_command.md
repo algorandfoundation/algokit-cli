@@ -128,20 +128,25 @@ b) Has generators and user gets to pick interactively
 A new sub-command is added to the list of generate commands, that will list all available generators for the user to choose from.
 
 ```cmd
-algokit-cli generate options
+algokit-cli generate
 
--> contract
+-> client - create a typed ApplicationClient from and ARC-32 application.js
+   contract - create a new client
    a generator
    another generator
 ```
 
 c) Has generators, user knows what to pick and wants to run it non interactively
-Using the generator configuration the sub-commands will be automatically add to the existing list of generate commands allowing the user to run them in the command line.
+Using the generator configuration the `generator` will be automatically add to the existing list of generate commands allowing the user to run them in the command line.
 
 ```cmd
 algokit-cli generate client
 algokit-cli generate contract `name of the contract`
 algokit-cli generate `new command`
+```
+
+```
+Note: We need to spike if we can clear click configuration when navigating away from the template folder, or into another template.
 ```
 
 **4. Testing and documentation**
