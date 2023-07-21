@@ -1,11 +1,11 @@
 # Advanced `algokit generate` command
 
-- **Status**: In-progress
+- **Status**: In-review
 - **Owner:** Altynbek Orumbayev, Inaie Ignacio
 - **Deciders**: Rob Moore, Daniel McGregor, Alessandro Ferrari
 - **Date created**: 2023-07-19
 - **Date decided:** TBD
-- **Date updated**: 2023-07-19
+- **Date updated**: 2023-07-21
 
 ## Context
 
@@ -32,7 +32,7 @@ This implies extension of existing starter guidelines available for template bui
 
 ## Principles
 
-- **Modularity**: Artifacts dependant on `advanced algokit generate` command capabilities embedded into templates should follow guiding AlgoKit principles and expand on approaches already utilized in `react`, `fullstack` and `beaker` templates. This implies that giving developers flexibility to define any extra templating logic, allowing to create or update any files within projects instantiated from algokit templates. TODO: Refine
+- **Modularity**: Artifacts dependant on `advanced algokit generate` command capabilities embedded into templates should follow guiding AlgoKit principles and expand on approaches already utilized in `react`, `fullstack` and `beaker` templates. This implies that giving developers flexibility to define any extra templating logic, allowing to create or update any files within projects instantiated from algokit templates.
 - **Maintainability**: The `advanced algokit generate` capabilities on `algokit-cli` and related artifacts on respective official templates should be easy to maintain and extend.
 - **Seamless onramp**: Great developer experience for template builders to create their own `generators` and user experience to use them via `advanced algokit generate` command should be a priority.
 
@@ -41,7 +41,7 @@ All of the aforementioned requirements should be met in a way that is consistent
 ## Considered Options
 
 Based on preliminary research, all of the options below assume that:
-a) A `generator` is a self contained copier/jinja template that is hosted within a template repository and describes how to create or update files within projects instantiated from algokit templates. Hosting it along with the template is a necessity given that community based templates can follow different conventions, patterns and structure making it hard to attempt to generalize the logic of `generators` and make them work for all templates.
+A `generator` is a self contained copier/jinja template that is hosted within a template repository and describes how to create or update files within projects instantiated from algokit templates. Hosting it along with the template is a necessity given that community based templates can follow different conventions, patterns and structure making it hard to attempt to generalize the logic of `generators` and make them work for all templates.
 
 ### Option 1: Wrapping generators into self contained copier templates hidden within algokit templates
 
@@ -104,6 +104,8 @@ template_content/.algokit # alternatively could be just `.algokit-generators`
 copier.yml
 ```
 
+The `index.ts` and `config.py` files on beaker template need to be updated to auto import all contracts from sub folders at `smart_contracts` to eliminate the need for developers to manually import them after running the smart contract generator.
+
 > Please note, above is just an example that assumes the generator for adding new contracts, but the proposal is generic enough to support any kind of jinja-based templating logic.
 
 **2. Adjusting `.algokit.toml`**
@@ -124,29 +126,37 @@ Next step in implementation part of the proposal is adjusting the `generator` co
 a) Has no generators
 If algokit-cli can't find any generator configured then nothing change from current implementation.
 
-b) Has generators and user gets to pick interactively
-A new sub-command is added to the list of generate commands, that will list all available generators for the user to choose from.
+b) Has generators and user runs `algokit generate` command to see the list of available generators
+A new `click` command per each generator in `.algokit.toml` is added to the list of generate commands, that will list all available generators for the user to choose from.
 
-```cmd
+```bash
 algokit-cli generate
 
--> client - create a typed ApplicationClient from and ARC-32 application.js
-   contract - create a new client
-   a generator
-   another generator
+---
+
+Usage: algokit generate [OPTIONS] COMMAND [ARGS]...
+
+  Generate code for an Algorand project.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  client  Create a typed ApplicationClient from an ARC-32 application.json
+  smart-contract  Adds new smart contract to existing project
+```
+
+Then, to invoke the interactive flow via copier user runs:
+
+```bash
+algokit-cli generate smart-contract `name of the contract`
 ```
 
 c) Has generators, user knows what to pick and wants to run it non interactively
-Using the generator configuration the `generator` will be automatically add to the existing list of generate commands allowing the user to run them in the command line.
+Using the generator configuration the `generator` will automatically add new `click` commands to the existing list of generate commands allowing the user to run them in the command line.
 
-```cmd
-algokit-cli generate client
-algokit-cli generate contract `name of the contract`
-algokit-cli generate `new command`
-```
-
-```
-Note: We need to spike if we can clear click configuration when navigating away from the template folder, or into another template.
+```bash
+algokit-cli generate smart-contract -a contract_name=`name of the contract` -a language=python # passing extra arguments to generator similar to algokit init
 ```
 
 **4. Testing and documentation**
@@ -178,8 +188,15 @@ The only distinction between this option and option 1 is that generators are hos
 
 1. What kinds of generators other than `add new contract` do we want to support on initial release (if any)?
 2. Are there any other template repositories that we want to integrate with generators other than `beaker` (`fullstack` will contain those as well as it uses `beaker` as a dependency)?
-3. What do we think is the best way to expose generators to the end user? Should we expose them as a list picker or should we let user type in the name of the generator he wants to use? Another option is to aim for both interactive vs non interactive (since its copier we can pass answers directly too) or alternatively we can dynamically link generators to click on algokit dynamically.
+
+> Please note an MVP PoC is already implemented and available to play around on algokit-cli and beaker template repo under `advanced-generate-command` and `generators` branches respectively.
+> To test it out checkout the branche on cli do `pipx install . --force`, navigate to beaker template repo and checkout the branch as well, then navigate to any of the sub folders in `tests_generated`. Lastly do `algokit bootstrap all`, build the contract and execute `algokit generate` from root of that folder to play around with the feature based on the implementation proposal from Option 1.
 
 ## Final Decision
 
 ## Next steps
+
+1. Polishing the PoC on algokit-cli and adding tests
+2. Polishing the PoC on beaker template and adding tests
+3. Adding documentation for new capabilities of the generate command
+4. Adding documentation for template builders on how to create generators
