@@ -76,7 +76,7 @@ graph TB
 
 #### Pros
 
-- Generators are hidden within algokit templates and are not exposed to the end user. When user runs `algokit generate` command, he is presented with a list of available generators to choose from. This makes it easier for user to understand what generators are available and what they do.
+- Generators are hidden within algokit templates and are not exposed to the end user. When user runs `algokit generate` command, cli presents a list of available generators to choose from. This makes it easier for user to understand what generators are available and what they do.
 - Generators are self contained copier templates giving template builders flexibility to do any kind of templating logic similar to what they can already do with regular templates.
 - Majority of implementation complexity is reduced by relying on copier as a backbone for generators feature.
 
