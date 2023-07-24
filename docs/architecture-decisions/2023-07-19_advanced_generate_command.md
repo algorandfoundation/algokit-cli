@@ -1,11 +1,11 @@
 # Advanced `algokit generate` command
 
-- **Status**: In-review
+- **Status**: Approved
 - **Owner:** Altynbek Orumbayev, Inaie Ignacio
 - **Deciders**: Rob Moore, Daniel McGregor, Alessandro Ferrari
 - **Date created**: 2023-07-19
-- **Date decided:** TBD
-- **Date updated**: 2023-07-21
+- **Date decided:** 2023-07-24
+- **Date updated**: 2023-07-24
 
 ## Context
 
@@ -114,7 +114,6 @@ The proposal for new structure for defining generators in root algokit toml is a
 
 ```toml
 [generators.create_contract] # [generators.<generator_name>]
-name = "smart-contract" # user-facing name of the generator
 description = "Adds new smart contract to existing project" # description of the generator, can appear in cli for extra info
 path = ".algokit/generators/create_contract"  # path that cli should grab to forward to copier copy
 ```
@@ -193,6 +192,8 @@ The only distinction between this option and option 1 is that generators are hos
 > To test it out checkout the branche on cli do `pipx install . --force`, navigate to beaker template repo and checkout the branch as well, then navigate to any of the sub folders in `tests_generated`. Lastly do `algokit bootstrap all`, build the contract and execute `algokit generate` from root of that folder to play around with the feature based on the implementation proposal from Option 1.
 
 ## Final Decision
+
+The team approved the proposal for Option 1: Wrapping generators into self contained copier templates hidden within algokit templates.
 
 ## Next steps
 
