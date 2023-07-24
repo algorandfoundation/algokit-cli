@@ -22,7 +22,7 @@ This implies scenarios like:
 - Overriding existing files with new ones.
 - Adding new files into existing projects.
 
-Overal, we want to introduce a notion of `generators` which can be viewed as a modular self-sufficient template units that are hosted within template repositories and describe how to create or update files within projects instantiated from algokit templates.
+Overall, we want to introduce a notion of `generators` which can be viewed as a modular self-sufficient template units that are hosted within template repositories and describe how to create or update files within projects instantiated from AlgoKit templates.
 
 Ruby on Rails has a similar concept of [generators](https://guides.rubyonrails.org/generators.html) which are used to create or update files within Rails projects. This can be used as a reference for inspiration.
 
