@@ -1,0 +1,1 @@
+DEBUG: Running generator in <MagicMock name='Worker().__enter__().src_path' id='4383216400'>

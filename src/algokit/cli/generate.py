@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from algokit.core.conf import get_algokit_config
+from algokit.core.generate import load_generators
 from algokit.core.typed_client_generation import ClientGenerator
 
 logger = logging.getLogger(__name__)
@@ -68,12 +68,16 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
             generator.generate(app_spec, output_path)
 
 
-def init_generator(answers: dict, path: Path) -> None:
+def run_generator(answers: dict, path: Path) -> None:
+    """
+    Run the generator with the given answers and path.
+    :param answers: Answers to pass to the generator.
+    :param path: Path to the generator.
+    """
+
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
-    # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
-    #       to their repo to include py.typed file
     from copier.main import Worker  # type: ignore[import]
 
     cwd = Path.cwd()
@@ -88,31 +92,32 @@ def init_generator(answers: dict, path: Path) -> None:
 
 
 try:
-    cwd = Path.cwd()
-    config = get_algokit_config(cwd)
+    generators = load_generators(Path.cwd())
 
-    if config and "generators" in config:
-        for generator_data in config["generators"].values():
-            command = click.command(name=generator_data["name"], help=generator_data["description"])(init_generator)
-            command = click.option(
-                "answers",
-                "--answer",
-                "-a",
-                multiple=True,
-                help="Answers key/value pairs to pass to the template.",
-                nargs=2,
-                default=[],
-                metavar="<key> <value>",
-            )(command)
-            command = click.option(
-                "path",
-                "--path",
-                "-p",
-                help=f"Path to {generator_data['name']} generator. (Default: {generator_data['path']})",
-                type=click.Path(exists=True),
-                default=generator_data["path"],
-            )(command)
+    for generator in generators:
+        # Set the generator name and description as a new command
+        command = click.command(name=generator.name, help=generator.description)(run_generator)
 
-            generate_group.add_command(command)
+        # Add the options to the command to allow passing answers and custom path (optional)
+        command = click.option(
+            "answers",
+            "--answer",
+            "-a",
+            multiple=True,
+            help="Answers key/value pairs to pass to the template.",
+            nargs=2,
+            default=[],
+            metavar="<key> <value>",
+        )(command)
+        command = click.option(
+            "path",
+            "--path",
+            "-p",
+            help=f"Path to {generator.name} generator. (Default: {generator.description})",
+            type=click.Path(exists=True),
+            default=generator.path,
+        )(command)
+
+        generate_group.add_command(command)
 except Exception as ex:
-    logger.error(f"Error: {ex}")
+    raise click.ClickException(f"Error loading generators: {ex}") from ex
