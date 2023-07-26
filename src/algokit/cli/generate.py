@@ -3,13 +3,36 @@ from pathlib import Path
 
 import click
 
-from algokit.core.generate import load_generators
+from algokit.core.generate import load_custom_generate_commands
 from algokit.core.typed_client_generation import ClientGenerator
 
 logger = logging.getLogger(__name__)
 
 
-@click.group("generate")
+class GeneratorGroup(click.Group):
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        return_value = super().get_command(ctx, cmd_name)
+
+        if return_value is not None:
+            return return_value
+
+        commands = load_custom_generate_commands(Path.cwd())
+
+        for command in commands:
+            if command.name == cmd_name:
+                return command
+
+        return None
+
+    def list_commands(self, ctx: click.Context) -> list[str]:
+        predefined_command_names = super().list_commands(ctx)
+        dynamic_commands = load_custom_generate_commands(Path.cwd())
+        dynamic_command_names = [command.name for command in dynamic_commands if command and command.name]
+
+        return sorted(predefined_command_names + dynamic_command_names)
+
+
+@click.group("generate", cls=GeneratorGroup)
 def generate_group() -> None:
     """Generate code for an Algorand project."""
 
@@ -66,58 +89,3 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
         output_path = generator.resolve_output_path(app_spec, output_path_pattern)
         if output_path is not None:
             generator.generate(app_spec, output_path)
-
-
-def run_generator(answers: dict, path: Path) -> None:
-    """
-    Run the generator with the given answers and path.
-    :param answers: Answers to pass to the generator.
-    :param path: Path to the generator.
-    """
-
-    # copier is lazy imported for two reasons
-    # 1. it is slow to import on first execution after installing
-    # 2. the import fails if git is not installed (which we check above)
-    from copier.main import Worker  # type: ignore[import]
-
-    cwd = Path.cwd()
-    with Worker(
-        src_path=str(path),
-        dst_path=cwd,
-        data=answers,
-        quiet=True,
-    ) as copier_worker:
-        logger.debug(f"Running generator in {copier_worker.src_path}")
-        copier_worker.run_copy()
-
-
-try:
-    generators = load_generators(Path.cwd())
-
-    for generator in generators:
-        # Set the generator name and description as a new command
-        command = click.command(name=generator.name, help=generator.description)(run_generator)
-
-        # Add the options to the command to allow passing answers and custom path (optional)
-        command = click.option(
-            "answers",
-            "--answer",
-            "-a",
-            multiple=True,
-            help="Answers key/value pairs to pass to the template.",
-            nargs=2,
-            default=[],
-            metavar="<key> <value>",
-        )(command)
-        command = click.option(
-            "path",
-            "--path",
-            "-p",
-            help=f"Path to {generator.name} generator. (Default: {generator.description})",
-            type=click.Path(exists=True),
-            default=generator.path,
-        )(command)
-
-        generate_group.add_command(command)
-except Exception as ex:
-    raise click.ClickException(f"Error loading generators: {ex}") from ex

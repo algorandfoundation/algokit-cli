@@ -26,6 +26,29 @@ def _format_generator_name(name: str) -> str:
     return name.strip().replace(" ", "-").replace("_", "-")
 
 
+def _run_generator(answers: dict, path: Path) -> None:
+    """
+    Run the generator with the given answers and path.
+    :param answers: Answers to pass to the generator.
+    :param path: Path to the generator.
+    """
+
+    # copier is lazy imported for two reasons
+    # 1. it is slow to import on first execution after installing
+    # 2. the import fails if git is not installed (which we check above)
+    from copier.main import Worker  # type: ignore[import]
+
+    cwd = Path.cwd()
+    with Worker(
+        src_path=str(path),
+        dst_path=cwd,
+        data=answers,
+        quiet=True,
+    ) as copier_worker:
+        logger.debug(f"Running generator in {copier_worker.src_path}")
+        copier_worker.run_copy()
+
+
 def load_generators(project_dir: Path) -> list[Generator]:
     """
     Load the generators for the given project from .algokit.toml file.
@@ -64,3 +87,35 @@ def load_generators(project_dir: Path) -> list[Generator]:
                 generators.append(generator)
 
     return generators
+
+
+def load_custom_generate_commands(project_dir: Path) -> list[click.Command]:
+    generators = load_generators(project_dir)
+    commands = []
+
+    for generator in generators:
+        # Set the generator name and description as a new command
+        command = click.command(name=generator.name, help=generator.description)(_run_generator)
+
+        # Add the options to the command to allow passing answers and custom path (optional)
+        command = click.option(
+            "answers",
+            "--answer",
+            "-a",
+            multiple=True,
+            help="Answers key/value pairs to pass to the template.",
+            nargs=2,
+            default=[],
+            metavar="<key> <value>",
+        )(command)
+        command = click.option(
+            "path",
+            "--path",
+            "-p",
+            help=f"Path to {generator.name} generator. (Default: {generator.description})",
+            type=click.Path(exists=True),
+            default=generator.path,
+        )(command)
+        commands.append(command)
+
+    return commands

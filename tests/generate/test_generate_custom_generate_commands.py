@@ -1,7 +1,6 @@
 from collections.abc import Callable
 from pathlib import Path
 
-import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.core.conf import ALGOKIT_CONFIG
 from pytest_mock import MockerFixture
@@ -11,15 +10,8 @@ from tests.utils.click_invoker import invoke
 
 DirWithAppSpecFactory = Callable[[Path], Path]
 
-# Test dimensions
-# No generators in toml - has to be ignored
-# Invalid generic genrator in toml - has to be ignored
-# Valid generator in toml - has to be used
-# Invalid generator in toml - incorrect path
-# Valid generator in toml without description - has to be used
 
-
-def test_generate_generators_no_toml(tmp_path_factory: TempPathFactory) -> None:
+def test_generate_custom_generate_commands_no_toml(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke("generate", cwd=cwd)
@@ -28,7 +20,7 @@ def test_generate_generators_no_toml(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_generate_generators_invalid_generic_generator(tmp_path_factory: TempPathFactory) -> None:
+def test_generate_custom_generate_commands_invalid_generic_generator(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     (cwd / ALGOKIT_CONFIG).write_text(
@@ -46,8 +38,8 @@ path = "invalid"
     verify(result.output)
 
 
-def test_generate_generators_valid_generator(
-    tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch
+def test_generate_custom_generate_commands_valid_generator(
+    tmp_path_factory: TempPathFactory,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
@@ -60,16 +52,14 @@ path = "{cwd/"smart_contract"}"
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(Path, "cwd", lambda: cwd)
-
     result = invoke("generate", cwd=cwd)
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_generate_generators_valid_generator_run(
-    tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
+def test_generate_custom_generate_commands_valid_generator_run(
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
@@ -82,9 +72,7 @@ path = "{cwd/"smart_contract"}"
         encoding="utf-8",
     )
     mock_copier_worker_cls = mocker.patch("copier.main.Worker")
-    mock_copier_worker_cls.return_value.__enter__.return_value.template.url_expanded = "URL"
-
-    monkeypatch.setattr(Path, "cwd", lambda: cwd)
+    mock_copier_worker_cls.return_value.__enter__.return_value.src_path = str(cwd / "smart_contract")
 
     result = invoke("generate smart-contract", cwd=cwd)
 
@@ -93,8 +81,8 @@ path = "{cwd/"smart_contract"}"
     verify(result.output)
 
 
-def test_generate_generators_valid_generator_no_description(
-    tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch
+def test_generate_custom_generate_commands_valid_generator_no_description(
+    tmp_path_factory: TempPathFactory,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
@@ -106,16 +94,14 @@ path = "{cwd/"smart_contract"}"
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(Path, "cwd", lambda: cwd)
-
     result = invoke("generate", cwd=cwd)
 
     assert result.exit_code == 0
     verify(result.output)
 
 
-def test_generate_generators_valid_generator_invalid_path(
-    tmp_path_factory: TempPathFactory, monkeypatch: pytest.MonkeyPatch
+def test_generate_custom_generate_commands_valid_generator_invalid_path(
+    tmp_path_factory: TempPathFactory,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ALGOKIT_CONFIG).write_text(
@@ -126,8 +112,6 @@ path = "invalidpath"
     """.strip(),
         encoding="utf-8",
     )
-
-    monkeypatch.setattr(Path, "cwd", lambda: cwd)
 
     result = invoke("generate", cwd=cwd)
 
