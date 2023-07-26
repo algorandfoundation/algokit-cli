@@ -49,7 +49,7 @@ def _run_generator(answers: dict, path: Path) -> None:
         copier_worker.run_copy()
 
 
-def load_generators(project_dir: Path) -> list[Generator]:
+def _load_generators(project_dir: Path) -> list[Generator]:
     """
     Load the generators for the given project from .algokit.toml file.
     :param project_dir: Project directory path.
@@ -90,7 +90,7 @@ def load_generators(project_dir: Path) -> list[Generator]:
 
 
 def load_custom_generate_commands(project_dir: Path) -> list[click.Command]:
-    generators = load_generators(project_dir)
+    generators = _load_generators(project_dir)
     commands = []
 
     for generator in generators:
