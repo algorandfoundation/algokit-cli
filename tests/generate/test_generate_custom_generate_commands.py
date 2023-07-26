@@ -43,11 +43,13 @@ def test_generate_custom_generate_commands_valid_generator(
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
+    # Required for windows compatibility
+    smart_contract_path = str((cwd / "smart_contract").absolute()).replace("\\", r"\\")
     (cwd / ALGOKIT_CONFIG).write_text(
         f"""
 [generate.smart_contract]
 description = "Generates a new smart contract"
-path = "{cwd/"smart_contract"}"
+path = "{smart_contract_path}"
     """.strip(),
         encoding="utf-8",
     )
@@ -63,11 +65,13 @@ def test_generate_custom_generate_commands_valid_generator_run(
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
+    # Required for windows compatibility
+    smart_contract_path = str((cwd / "smart_contract").absolute()).replace("\\", r"\\")
     (cwd / ALGOKIT_CONFIG).write_text(
         f"""
 [generate.smart_contract]
 description = "Generates a new smart contract"
-path = "{cwd/"smart_contract"}"
+path = "{smart_contract_path}"
     """.strip(),
         encoding="utf-8",
     )
@@ -86,10 +90,12 @@ def test_generate_custom_generate_commands_valid_generator_no_description(
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
+    # Required for windows compatibility
+    smart_contract_path = str((cwd / "smart_contract").absolute()).replace("\\", r"\\")
     (cwd / ALGOKIT_CONFIG).write_text(
         f"""
 [generate.smart_contract]
-path = "{cwd/"smart_contract"}"
+path = "{smart_contract_path}"
     """.strip(),
         encoding="utf-8",
     )
