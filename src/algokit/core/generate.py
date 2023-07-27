@@ -85,6 +85,8 @@ def _load_generators(project_dir: Path) -> list[Generator]:
                     path=generators_config.get("path"),
                 )
                 generators.append(generator)
+            case str():
+                logger.debug(f'Invalid generator configuration key "{name}" of value "{generators_config}", skipping')
 
     return generators
 
