@@ -3,10 +3,51 @@ from pathlib import Path
 
 import click
 
-from algokit.core.generate import load_custom_generate_commands
+from algokit.core.generate import load_generators, run_generator
 from algokit.core.typed_client_generation import ClientGenerator
 
 logger = logging.getLogger(__name__)
+
+
+def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command]:
+    """
+    Load custom generate commands from .algokit.toml file.
+    :param project_dir: Project directory path.
+    :return: Custom generate commands.
+    """
+
+    generators = load_generators(project_dir)
+    commands_table: dict[str, click.Command] = {}
+
+    for generator in generators:
+
+        @click.command(
+            name=generator.name, help=generator.description or "Generator command description is not supplied."
+        )
+        @click.option(
+            "answers",
+            "--answer",
+            "-a",
+            multiple=True,
+            help="Answers key/value pairs to pass to the template.",
+            nargs=2,
+            default=[],
+            metavar="<key> <value>",
+        )
+        @click.option(
+            "path",
+            "--path",
+            "-p",
+            help=f"Path to {generator.name} generator. (Default: {generator.description})",
+            type=click.Path(exists=True),
+            default=generator.path,
+        )
+        def command(answers: dict, path: Path) -> None:
+            return run_generator(answers, path)
+
+        commands_table[generator.name] = command
+
+    return commands_table
 
 
 class GeneratorGroup(click.Group):
@@ -16,18 +57,13 @@ class GeneratorGroup(click.Group):
         if return_value is not None:
             return return_value
 
-        commands = load_custom_generate_commands(Path.cwd())
-
-        for command in commands:
-            if command.name == cmd_name:
-                return command
-
-        return None
+        commands = _load_custom_generate_commands(Path.cwd())
+        return commands.get(cmd_name)
 
     def list_commands(self, ctx: click.Context) -> list[str]:
         predefined_command_names = super().list_commands(ctx)
-        dynamic_commands = load_custom_generate_commands(Path.cwd())
-        dynamic_command_names = [command.name for command in dynamic_commands if command and command.name]
+        dynamic_commands = _load_custom_generate_commands(Path.cwd())
+        dynamic_command_names = list(dynamic_commands)
 
         return sorted(predefined_command_names + dynamic_command_names)
 

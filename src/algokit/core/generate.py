@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass(kw_only=True)
 class Generator:
-    name: str | None = None
+    name: str
+    path: str
     description: str | None = None
-    path: str | None = None
 
 
 def _format_generator_name(name: str) -> str:
@@ -26,9 +26,9 @@ def _format_generator_name(name: str) -> str:
     return name.strip().replace(" ", "-").replace("_", "-")
 
 
-def _run_generator(answers: dict, path: Path) -> None:
+def run_generator(answers: dict, path: Path) -> None:
     """
-    Run the generator with the given answers and path.
+    Run the custom generator with the given answers and path.
     :param answers: Answers to pass to the generator.
     :param path: Path to the generator.
     """
@@ -49,7 +49,7 @@ def _run_generator(answers: dict, path: Path) -> None:
         copier_worker.run_copy()
 
 
-def _load_generators(project_dir: Path) -> list[Generator]:
+def load_generators(project_dir: Path) -> list[Generator]:
     """
     Load the generators for the given project from .algokit.toml file.
     :param project_dir: Project directory path.
@@ -69,55 +69,23 @@ def _load_generators(project_dir: Path) -> list[Generator]:
 
     for name, generators_config in generators_table.items():
         match generators_config:
-            case dict():
-                if not generators_config.get("path"):
-                    logger.warning(f"Missing path for generator '{name}' in '{ALGOKIT_CONFIG}', skipping")
-                    continue
-                if not Path.exists(Path(generators_config.get("path", ""))):
-                    logger.warning(
-                        f"Path '{generators_config.get('path')}' for generator '{name}' does not exist, skipping"
-                    )
+            case {"path": str(path), **remaining}:
+                if not Path(path).exists():
+                    logger.warning(f"Path '{path}' for generator '{name}' does not exist, skipping")
                     continue
 
+                description = remaining.get("description", None)
                 generator = Generator(
                     name=_format_generator_name(name),
-                    description=generators_config.get("description"),
-                    path=generators_config.get("path"),
+                    description=str(description) if description else None,
+                    path=path,
                 )
                 generators.append(generator)
-            case str():
+
+            case {"path": _}:
+                logger.warning(f"Missing path for generator '{name}' in '{ALGOKIT_CONFIG}', skipping")
+
+            case _:
                 logger.debug(f'Invalid generator configuration key "{name}" of value "{generators_config}", skipping')
 
     return generators
-
-
-def load_custom_generate_commands(project_dir: Path) -> list[click.Command]:
-    generators = _load_generators(project_dir)
-    commands = []
-
-    for generator in generators:
-        # Set the generator name and description as a new command
-        command = click.command(name=generator.name, help=generator.description)(_run_generator)
-
-        # Add the options to the command to allow passing answers and custom path (optional)
-        command = click.option(
-            "answers",
-            "--answer",
-            "-a",
-            multiple=True,
-            help="Answers key/value pairs to pass to the template.",
-            nargs=2,
-            default=[],
-            metavar="<key> <value>",
-        )(command)
-        command = click.option(
-            "path",
-            "--path",
-            "-p",
-            help=f"Path to {generator.name} generator. (Default: {generator.description})",
-            type=click.Path(exists=True),
-            default=generator.path,
-        )(command)
-        commands.append(command)
-
-    return commands

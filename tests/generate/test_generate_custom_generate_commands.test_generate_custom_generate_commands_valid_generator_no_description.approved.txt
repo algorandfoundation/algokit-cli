@@ -9,4 +9,4 @@ Options:
 
 Commands:
   client          Create a typed ApplicationClient from an ARC-32...
-  smart-contract  Run the generator with the given answers and path.
+  smart-contract  Generator command description is not supplied.
