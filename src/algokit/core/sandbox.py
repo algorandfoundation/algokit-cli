@@ -8,6 +8,7 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
+from algokit.core.goal import get_volume_mount_path_docker, get_volume_mount_path_local
 from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
@@ -165,8 +166,8 @@ def get_docker_compose_yml(
     tealdbg_port: int = 9392,
     indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
-    goal_data_dir: str = str(Path.home() / "goal")
-    local_goal_dir = str(Path.home() / "algokit_local")
+    volume_mount_path_docker = get_volume_mount_path_docker()
+    volume_mount_path_local = get_volume_mount_path_local()
     return f"""version: '3'
 name: "{name}_sandbox"
 
@@ -188,8 +189,8 @@ services:
         source: ./algod_config.json
         target: /etc/algorand/config.json
       - type: volume
-        source: {local_goal_dir}
-        target: {goal_data_dir}
+        source: {volume_mount_path_local}
+        target: {volume_mount_path_docker}
 
   indexer:
     container_name: {name}_indexer
