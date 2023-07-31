@@ -3,7 +3,12 @@ import logging
 import click
 
 from algokit.core import proc
-from algokit.core.goal import get_volume_mount_path_docker, post_process, preprocess_command_args
+from algokit.core.goal import (
+    get_volume_mount_path_docker,
+    get_volume_mount_path_local,
+    post_process,
+    preprocess_command_args,
+)
 from algokit.core.sandbox import ComposeSandbox
 
 logger = logging.getLogger(__name__)
@@ -29,7 +34,10 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
+    volume_mount_path_local = get_volume_mount_path_local()
     volume_mount_path_docker = get_volume_mount_path_docker()
+    goal_args = list(goal_args)
+    # TODO: check if there is a way to configure click argument to be a list vs current tuple for goal_args param
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except OSError as ex:
@@ -46,7 +54,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
     else:
         cmd = "docker exec --interactive --workdir /root algokit_algod goal".split()
-        input_files, output_files, goal_args = preprocess_command_args(goal_args, volume_mount_path_docker)
+        input_files, output_files, goal_args = preprocess_command_args(
+            goal_args, volume_mount_path_local, volume_mount_path_docker
+        )
         cmd.extend(goal_args)
         result = proc.run(
             cmd,
@@ -54,8 +64,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             prefix_process=False,
             pass_stdin=True,
         )
-        post_process(input_files, output_files, volume_mount_path_docker)
+        post_process(input_files, output_files, volume_mount_path_local)
 
+    # TODO: Update this block to provide proper warnings for file/folder not found
     if result.exit_code != 0:
         sandbox = ComposeSandbox()
         ps_result = sandbox.ps("algod")

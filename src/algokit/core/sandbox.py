@@ -166,8 +166,10 @@ def get_docker_compose_yml(
     tealdbg_port: int = 9392,
     indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
-    volume_mount_path_docker = get_volume_mount_path_docker()
-    volume_mount_path_local = get_volume_mount_path_local()
+    docker_goal_mount_path = get_volume_mount_path_docker()
+    local_goal_mount_path = get_volume_mount_path_local()
+    # TODO: verify if source for bind on goal_mount can be absolute or not
+    # If not use relative path for local fs when passing to docker compose file string
     return f"""version: '3'
 name: "{name}_sandbox"
 
@@ -188,9 +190,9 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
-      - type: volume
-        source: {volume_mount_path_local}
-        target: {volume_mount_path_docker}
+      - type: bind
+        source: {local_goal_mount_path}
+        target: {docker_goal_mount_path}
 
   indexer:
     container_name: {name}_indexer
