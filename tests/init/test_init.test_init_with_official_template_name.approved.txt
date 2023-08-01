@@ -10,9 +10,4 @@ Your template includes a README.md file, you might want to review that as a next
 ----
 .env.template:
 ----
-ALGOD_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-ALGOD_SERVER=http://localhost
-ALGOD_PORT=4001
-INDEXER_TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-INDEXER_SERVER=http://localhost
-INDEXER_PORT=8980
+# this file should contain environment variables common to all environments/networks
