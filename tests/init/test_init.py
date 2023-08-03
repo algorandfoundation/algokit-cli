@@ -547,7 +547,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
             Path("myapp") / "smart_contracts",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
     verify(
         get_combined_verify_output(
             result.output, additional_name=".env.template", additional_output=env_template_file_contents
@@ -598,10 +598,10 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
             Path("myapp"),
             Path("myapp") / "README.md",
             Path("myapp") / "smart_contracts",
-            Path("myapp") / "smart_contracts" / ".env.template",
+            Path("myapp") / ".env.template",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
 
     verify(
         get_combined_verify_output(
