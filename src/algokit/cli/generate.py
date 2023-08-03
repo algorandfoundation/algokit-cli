@@ -1,4 +1,5 @@
 import logging
+import shutil
 from pathlib import Path
 
 import click
@@ -38,11 +39,17 @@ def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command
             "path",
             "--path",
             "-p",
-            help=f"Path to {generator.name} generator. (Default: {generator.description})",
+            help=f"Path to {generator.name} generator. (Default: {generator.path})",
             type=click.Path(exists=True),
             default=generator.path,
         )
         def command(answers: dict, path: Path) -> None:
+            if not shutil.which("git"):
+                raise click.ClickException(
+                    "Git not found; please install git and add to path.\n"
+                    "See https://github.com/git-guides/install-git for more information."
+                )
+
             return run_generator(answers, path)
 
         commands_table[generator.name] = command

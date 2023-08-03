@@ -8,6 +8,7 @@ from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+from tests.utils.which_mock import WhichMock
 
 DirWithAppSpecFactory = Callable[[Path], Path]
 
@@ -18,6 +19,14 @@ def cwd_with_custom_folder(tmp_path_factory: TempPathFactory) -> tuple[Path, str
     (cwd / "smart_contract").mkdir()
     # Required for windows compatibility
     return cwd, str((cwd / "smart_contract").absolute()).replace("\\", r"\\")
+
+
+@pytest.fixture()
+def which_mock(mocker: MockerFixture) -> WhichMock:
+    which_mock = WhichMock()
+    which_mock.add("git")
+    mocker.patch("algokit.cli.generate.shutil.which").side_effect = which_mock.which
+    return which_mock
 
 
 def test_generate_custom_generate_commands_no_toml(tmp_path_factory: TempPathFactory) -> None:
@@ -63,6 +72,27 @@ path = "{smart_contract_path}"
     result = invoke("generate", cwd=cwd)
 
     assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_generate_custom_generate_command_missing_git_valid_generator(
+    cwd_with_custom_folder: tuple[Path, str], which_mock: WhichMock
+) -> None:
+    which_mock.remove("git")
+
+    cwd, smart_contract_path = cwd_with_custom_folder
+    (cwd / ALGOKIT_CONFIG).write_text(
+        f"""
+[generate.smart_contract]
+description = "Generates a new smart contract"
+path = "{smart_contract_path}"
+    """.strip(),
+        encoding="utf-8",
+    )
+
+    result = invoke("generate smart-contract", cwd=cwd)
+
+    assert result.exit_code == 1
     verify(result.output)
 
 
