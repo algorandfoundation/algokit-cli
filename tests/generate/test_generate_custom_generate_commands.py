@@ -93,7 +93,9 @@ path = "{smart_contract_path}"
     result = invoke("generate smart-contract", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(
+        result.output,
+    )
 
 
 def test_generate_custom_generate_commands_valid_generator_run(
