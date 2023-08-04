@@ -81,6 +81,30 @@ def test_goal_simple_args() -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
+def test_goal_simple_args_with_input_file() -> None:
+    result = invoke("goal clerk compile approval.teal")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_simple_args_with_output_file() -> None:
+    result = invoke("goal clerk compile approval.compiled")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+@pytest.mark.usefixtures("proc_mock")
+def test_goal_simple_args_with_input_output_files() -> None:
+    result = invoke("goal clerk compile approval.teal approval.compiled")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+@pytest.mark.usefixtures("proc_mock")
 def test_goal_complex_args() -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
