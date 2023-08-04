@@ -8,7 +8,6 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
-from algokit.core.goal import get_volume_mount_path_docker, get_volume_mount_path_local
 from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
