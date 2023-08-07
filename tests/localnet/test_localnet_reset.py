@@ -1,4 +1,7 @@
+from unittest.mock import Mock
+
 import pytest
+from algokit.core import sandbox
 from algokit.core.sandbox import get_config_json, get_docker_compose_yml
 
 from tests import get_combined_verify_output
@@ -6,6 +9,8 @@ from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+
+sandbox.ComposeSandbox.check_docker_compose_for_new_image_versions = Mock()
 
 
 @pytest.mark.usefixtures("proc_mock", "health_success")

@@ -12,7 +12,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success")
+@pytest.mark.usefixtures("proc_mock", "health_success", "sandbox_mock")
 def test_localnet_start(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
@@ -26,7 +26,7 @@ def test_localnet_start(app_dir_mock: AppDirs) -> None:
     )
 
 
-@pytest.mark.usefixtures("proc_mock")
+@pytest.mark.usefixtures("proc_mock", "sandbox_mock")
 def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_exception(httpx.RemoteProtocolError("No response"), url=ALGOD_HEALTH_URL)
     result = invoke("localnet start")
@@ -41,7 +41,7 @@ def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXM
     )
 
 
-@pytest.mark.usefixtures("proc_mock")
+@pytest.mark.usefixtures("proc_mock", "sandbox_mock")
 def test_localnet_start_health_bad_status(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(status_code=500, url=ALGOD_HEALTH_URL)
     result = invoke("localnet start")
@@ -56,6 +56,8 @@ def test_localnet_start_health_bad_status(app_dir_mock: AppDirs, httpx_mock: HTT
     )
 
 
+# @pytest.mark.usefixtures("sandbox_mock")
+@pytest.mark.usefixtures("docker_cmd_mock")
 def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker compose up")
 
@@ -65,7 +67,7 @@ def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> N
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success")
+@pytest.mark.usefixtures("proc_mock", "health_success", "sandbox_mock")
 def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
@@ -77,7 +79,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success")
+@pytest.mark.usefixtures("proc_mock", "health_success", "sandbox_mock")
 def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
@@ -99,7 +101,7 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     )
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success")
+@pytest.mark.usefixtures("proc_mock", "health_success", "sandbox_mock")
 def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
@@ -158,7 +160,7 @@ def test_localnet_start_with_old_docker_compose_version(proc_mock: ProcMock) -> 
     verify(result.output)
 
 
-@pytest.mark.usefixtures("health_success")
+@pytest.mark.usefixtures("health_success", "sandbox_mock")
 def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.5-dev123"})])
 
@@ -168,7 +170,7 @@ def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: Ap
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("health_success")
+@pytest.mark.usefixtures("health_success", "sandbox_mock")
 def test_localnet_start_with_gitpod_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.10.0-gitpod.0"})])
 

@@ -1,11 +1,14 @@
 import enum
 import json
 import logging
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, cast
 
 import httpx
+import requests
+import yaml
 
 from algokit.core.conf import get_app_config_dir
 from algokit.core.proc import RunResult, run, run_interactive
@@ -119,6 +122,44 @@ class ComposeSandbox:
         data = json.loads(run_results.output)
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
+
+    def _get_local_image_version(self, image_name: str) -> str:
+        """
+        Get the local version of a Docker image
+        """
+        arg = "{{.RepoDigests}}"
+        cmd = f"docker image inspect {image_name} --format {arg}"
+        local_version = subprocess.getoutput(cmd)
+
+        # Remove brackets and split on '@' symbol and get the SHA hash
+        return local_version[1:-1].split("@")[1]
+
+    def _get_latest_image_version(self, image_name: str) -> str:
+        """
+        Get the latest version of a Docker image from Docker Hub
+        """
+        args = image_name.split(":")
+        name = args[0]
+        tag = args[1] if len(args) > 1 else "latest"
+        url = f"https://registry.hub.docker.com/v2/repositories/{name}/tags/{tag}"
+        response = requests.get(url)
+        data = response.json()
+        return data["digest"]
+
+    def check_docker_compose_for_new_image_versions(self):
+        """
+        Check Docker Compose file for new image versions
+        """
+        docker_compose = yaml.safe_load(get_docker_compose_yml())
+        services = docker_compose["services"]
+        for service_name, service_data in services.items():
+            image_name = service_data["image"]
+            if "postgres" in image_name:
+                continue
+            local_version = self._get_local_image_version(image_name)
+            latest_version = self._get_latest_image_version(image_name)
+            if local_version != latest_version:
+                logger.warning(f"{service_name} has a new version available: {latest_version}")
 
 
 DEFAULT_ALGOD_SERVER = "http://localhost"
