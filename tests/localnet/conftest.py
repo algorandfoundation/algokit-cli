@@ -6,6 +6,8 @@ from algokit.core.sandbox import ALGOD_HEALTH_URL
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
+from tests.utils.proc_mock import ProcMock
+
 
 @pytest.fixture(autouse=True)
 def algod_health_fast_timings(mocker: MockerFixture) -> None:  # noqa: ignore[PT004]
@@ -24,13 +26,16 @@ def sandbox_mock() -> None:  # noqa: PT004
 
 
 @pytest.fixture()
-def docker_cmd_mock(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.core.proc.run_interactive").return_value = "aaa"
+def docker_cmd_mock(proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        ["docker", "image", "inspect", "algorand/algod:latest", "--format", "{{.RepoDigests}}"],
+        ["algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+    )
 
-    # proc_mock.set_output(
-    #     ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
-    #     ["algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
-    # )
+    proc_mock.set_output(
+        ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
+        ["makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+    )
 
 
 @pytest.fixture()
