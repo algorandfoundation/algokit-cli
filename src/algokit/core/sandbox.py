@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import httpx
-import yaml
 
 from algokit.core.conf import get_app_config_dir
 from algokit.core.proc import RunResult, run, run_interactive
