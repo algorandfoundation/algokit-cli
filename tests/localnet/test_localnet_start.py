@@ -57,7 +57,7 @@ def test_localnet_start_health_bad_status(app_dir_mock: AppDirs, httpx_mock: HTT
 
 
 # @pytest.mark.usefixtures("sandbox_mock")
-@pytest.mark.usefixtures("docker_cmd_mock")
+@pytest.mark.usefixtures("docker_cmd_mock", "docker_httpx_mock")
 def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on("docker compose up")
 

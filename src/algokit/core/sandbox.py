@@ -1,13 +1,11 @@
 import enum
 import json
 import logging
-import subprocess
 import time
 from pathlib import Path
 from typing import Any, cast
 
 import httpx
-import requests
 import yaml
 
 from algokit.core.conf import get_app_config_dir
@@ -128,11 +126,20 @@ class ComposeSandbox:
         Get the local version of a Docker image
         """
         arg = "{{.RepoDigests}}"
-        cmd = f"docker image inspect {image_name} --format {arg}"
-        local_version = subprocess.getoutput(cmd)
+        local_version = run(
+            ["docker", "image", "inspect", image_name, "--format", arg],
+            cwd=self.directory,
+            bad_return_code_error_message="Failed to get image inspect",
+        )
+        local_version_1 = run_interactive(
+            ["docker", "image", "inspect", image_name, "--format", arg],
+            cwd=self.directory,
+            bad_return_code_error_message="Failed to get image inspect",
+            capture_output=True,
+        )
 
         # Remove brackets and split on '@' symbol and get the SHA hash
-        return local_version[1:-1].split("@")[1]
+        return local_version.output[1:-1].split("@")[1]
 
     def _get_latest_image_version(self, image_name: str) -> str:
         """
@@ -142,9 +149,12 @@ class ComposeSandbox:
         name = args[0]
         tag = args[1] if len(args) > 1 else "latest"
         url = f"https://registry.hub.docker.com/v2/repositories/{name}/tags/{tag}"
-        response = requests.get(url)
-        data = response.json()
-        return data["digest"]
+        try:
+            data = httpx.get(url=url)
+            return data.json()["digest"]
+        except Exception as err:
+            logger.debug(f"Error checking indexer status: {err}", exc_info=True)
+            return ""
 
     def check_docker_compose_for_new_image_versions(self):
         """

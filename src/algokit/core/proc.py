@@ -77,6 +77,7 @@ def run_interactive(
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
     bad_return_code_error_message: str | None = None,
+    capture_output: bool = False,
 ) -> RunResult:
     """Wraps subprocess.run() as an user interactive session and
         also adds logging of the command being executed, but not the output
@@ -86,7 +87,11 @@ def run_interactive(
     command_str = " ".join(command)
     logger.debug(f"Running '{command_str}' in '{cwd or Path.cwd()}'")
 
-    result = subprocess_run(command, cwd=cwd, env=env)
+    result = subprocess_run(command, cwd=cwd, env=env, capture_output=capture_output)
+    if capture_output is True:
+        output = result.stdout.decode("utf-8")
+    else:
+        output = ""
 
     if result.returncode == 0:
         logger.debug(f"'{command_str}' completed successfully", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
@@ -96,4 +101,4 @@ def run_interactive(
         )
         if bad_return_code_error_message:
             raise click.ClickException(bad_return_code_error_message)
-    return RunResult(command=command_str, exit_code=result.returncode, output="")
+    return RunResult(command=command_str, exit_code=result.returncode, output=output)
