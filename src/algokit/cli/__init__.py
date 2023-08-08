@@ -10,6 +10,7 @@ from algokit.cli.generate import generate_group
 from algokit.cli.goal import goal_command
 from algokit.cli.init import init_command
 from algokit.cli.localnet import localnet_group
+from algokit.cli.login import create_ci_token, dispense_command, login_command, logout_command
 from algokit.core.conf import PACKAGE_NAME
 from algokit.core.log_handlers import color_option, verbose_option
 from algokit.core.version_prompt import do_version_prompt, skip_version_check_option
@@ -35,6 +36,7 @@ def algokit(*, skip_version_check: bool) -> None:
         do_version_prompt()
 
 
+algokit.add_command(login_command)
 algokit.add_command(bootstrap_group)
 algokit.add_command(completions_group)
 algokit.add_command(config_group)
@@ -45,3 +47,6 @@ algokit.add_command(init_command)
 algokit.add_command(localnet_group)
 algokit.add_command(generate_group)
 algokit.add_command(deploy_command)
+algokit.add_command(dispense_command)
+algokit.add_command(logout_command)
+algokit.add_command(create_ci_token)
