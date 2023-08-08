@@ -1,8 +1,5 @@
-from unittest.mock import Mock
-
 import pytest
-from algokit.core import sandbox
-from algokit.core.sandbox import ALGOD_HEALTH_URL
+from algokit.core.sandbox import ALGOD_HEALTH_URL, ALGORAND_IMAGE, INDEXER_IMAGE
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
@@ -21,14 +18,14 @@ def health_success(httpx_mock: HTTPXMock) -> None:  # noqa: ignore[PT004]
 
 
 @pytest.fixture()
-def localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     proc_mock.set_output(
-        ["docker", "image", "inspect", "algorand/algod:latest", "--format", "{{.RepoDigests}}"],
+        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", "{{.RepoDigests}}"],
         ["[algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
     )
 
     proc_mock.set_output(
-        ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
+        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", "{{.RepoDigests}}"],
         ["[makerxau/algorand-indexer-dev@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
     )
 
@@ -48,14 +45,14 @@ def localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 
 @pytest.fixture()
-def localnet_out_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     proc_mock.set_output(
-        ["docker", "image", "inspect", "algorand/algod:latest", "--format", "{{.RepoDigests}}"],
+        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", "{{.RepoDigests}}"],
         ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
     )
 
     proc_mock.set_output(
-        ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
+        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", "{{.RepoDigests}}"],
         ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
     )
 
