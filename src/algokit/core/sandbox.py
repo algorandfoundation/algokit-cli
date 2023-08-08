@@ -131,13 +131,6 @@ class ComposeSandbox:
             cwd=self.directory,
             bad_return_code_error_message="Failed to get image inspect",
         )
-        local_version_1 = run_interactive(
-            ["docker", "image", "inspect", image_name, "--format", arg],
-            cwd=self.directory,
-            bad_return_code_error_message="Failed to get image inspect",
-            capture_output=True,
-        )
-
         # Remove brackets and split on '@' symbol and get the SHA hash
         return local_version.output[1:-1].split("@")[1]
 
@@ -151,12 +144,12 @@ class ComposeSandbox:
         url = f"https://registry.hub.docker.com/v2/repositories/{name}/tags/{tag}"
         try:
             data = httpx.get(url=url)
-            return data.json()["digest"]
+            return str(data.json()["digest"])
         except Exception as err:
             logger.debug(f"Error checking indexer status: {err}", exc_info=True)
             return ""
 
-    def check_docker_compose_for_new_image_versions(self):
+    def check_docker_compose_for_new_image_versions(self) -> None:
         """
         Check Docker Compose file for new image versions
         """
@@ -169,7 +162,7 @@ class ComposeSandbox:
             local_version = self._get_local_image_version(image_name)
             latest_version = self._get_latest_image_version(image_name)
             if local_version != latest_version:
-                logger.warning(f"{service_name} has a new version available: {latest_version}")
+                logger.warning(f"{service_name} has a new version available")
 
 
 DEFAULT_ALGOD_SERVER = "http://localhost"

@@ -7,6 +7,12 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{.RepoDigests}}' in '{app_config}/sandbox'
+DEBUG: docker: [algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
+DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{.RepoDigests}}' in '{app_config}/sandbox'
+DEBUG: docker: [makerxau/algorand-indexer-dev@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]
+DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest "HTTP/1.1 200 OK"
 DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'

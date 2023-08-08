@@ -21,39 +21,54 @@ def health_success(httpx_mock: HTTPXMock) -> None:  # noqa: ignore[PT004]
 
 
 @pytest.fixture()
-def sandbox_mock() -> None:  # noqa: PT004
-    sandbox.ComposeSandbox.check_docker_compose_for_new_image_versions = Mock()
-
-
-@pytest.fixture()
-def docker_cmd_mock(proc_mock: ProcMock) -> None:
+def localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     proc_mock.set_output(
         ["docker", "image", "inspect", "algorand/algod:latest", "--format", "{{.RepoDigests}}"],
-        ["algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        ["[algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
     )
 
     proc_mock.set_output(
         ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
-        ["makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        ["[makerxau/algorand-indexer-dev@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
     )
 
-
-@pytest.fixture()
-def docker_httpx_mock(httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(
         url="https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest",
         json={
-            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         },
     )
 
     httpx_mock.add_response(
         url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
         json={
-            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         },
     )
 
 
-def get_key(*args, **kwargs):
-    return "algorand/algod@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+@pytest.fixture()
+def localnet_out_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+    proc_mock.set_output(
+        ["docker", "image", "inspect", "algorand/algod:latest", "--format", "{{.RepoDigests}}"],
+        ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
+    )
+
+    proc_mock.set_output(
+        ["docker", "image", "inspect", "makerxau/algorand-indexer-dev:latest", "--format", "{{.RepoDigests}}"],
+        ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
+    )
+
+    httpx_mock.add_response(
+        url="https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest",
+        json={
+            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        },
+    )
+
+    httpx_mock.add_response(
+        url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
+        json={
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+    )
