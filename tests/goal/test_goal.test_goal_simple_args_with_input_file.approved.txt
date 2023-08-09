@@ -1,0 +1,6 @@
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal clerk group /root/goal_mount/approval.teal' in '{current_working_directory}'
+ STDOUT
+ STDERR
