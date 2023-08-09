@@ -97,8 +97,7 @@ def test_goal_simple_args_with_output_file() -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_goal_simple_args_with_input_output_files(proc_mock: ProcMock, mocker: MockerFixture) -> None:
-
+def test_goal_simple_args_with_input_output_files(proc_mock: ProcMock) -> None:
     result = invoke("goal clerk compile approval.teal -o test.compiled")
 
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
