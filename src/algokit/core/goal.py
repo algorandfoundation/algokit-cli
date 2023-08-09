@@ -1,5 +1,6 @@
 import logging
 import platform
+import re
 import shutil
 from pathlib import Path, PurePath
 
@@ -18,6 +19,11 @@ def get_volume_mount_path_docker() -> Path:
 
 def get_volume_mount_path_local() -> Path:
     return get_app_config_dir().joinpath("sandbox", "goal_mount")
+
+
+def is_path_or_filename(argument: str) -> bool:
+    filename_pattern = re.compile(r"^[\w-]+\.\w+$")
+    return filename_pattern.match(argument) is not None or len(PurePath(argument).parts) > 1
 
 
 def delete_files_from_volume_mount(filename: str, volume_mount_path_docker: Path) -> None:
@@ -45,11 +51,11 @@ def preprocess_command_args(
     output_filenames = []
     try:
         for i, arg in enumerate(command):
-            if len(PurePath(arg).parts) > 1:  # it is a path
+            if is_path_or_filename(arg):
                 arg_path = Path(arg)
                 arg_changed = docker_mount_path_local.joinpath(arg_path.name)
                 command[i] = str(arg_changed)
-                if arg_path.exists():  # it is an input file
+                if arg_path.exists() or Path.cwd().joinpath(arg_path.name).exists():  # it is an input file
                     shutil.copy(arg_path, volume_mount_path_local)
                     input_filenames.append(arg_path.name)
                 else:  # it is an output file that is not exist now
