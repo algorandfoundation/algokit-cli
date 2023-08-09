@@ -81,24 +81,26 @@ def test_goal_simple_args() -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_goal_simple_args_with_input_file() -> None:
-    result = invoke("goal clerk compile approval.teal")
+def test_goal_simple_args_with_input_file(proc_mock: ProcMock) -> None:
+    result = invoke("goal clerk group approval.teal")
 
+    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
     verify(result.output)
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_goal_simple_args_with_output_file() -> None:
+def test_goal_simple_args_with_output_file(proc_mock: ProcMock) -> None:
     result = invoke("goal account dump -o balance_record.json")
 
+    assert proc_mock.called[1].command[10] == "/root/goal_mount/balance_record.json"
     assert result.exit_code == 0
     verify(result.output)
 
 
 @pytest.mark.usefixtures("proc_mock")
 def test_goal_simple_args_with_input_output_files(proc_mock: ProcMock) -> None:
-    result = invoke("goal clerk compile approval.teal -o test.compiled")
+    result = invoke("goal clerk compile approval.teal -o approval.compiled")
 
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
     assert proc_mock.called[1].command[11] == "/root/goal_mount/test.compiled"
@@ -107,9 +109,12 @@ def test_goal_simple_args_with_input_output_files(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-def test_goal_simple_args_with_multiple_input_output_files() -> None:
+def test_goal_simple_args_with_multiple_input_output_files(proc_mock: ProcMock) -> None:
     result = invoke("goal clerk compile approval1.teal approval2.teal approval.compiled")
 
+    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval1.teal"
+    assert proc_mock.called[1].command[10] == "/root/goal_mount/approval2.teal"
+    assert proc_mock.called[1].command[11] == "/root/goal_mount/approval.compiled"
     assert result.exit_code == 0
     verify(result.output)
 
