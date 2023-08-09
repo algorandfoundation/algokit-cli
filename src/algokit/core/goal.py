@@ -55,7 +55,10 @@ def preprocess_command_args(
                 arg_path = Path(arg)
                 arg_changed = docker_mount_path_local.joinpath(arg_path.name)
                 command[i] = str(arg_changed)
-                if arg_path.exists() or Path.cwd().joinpath(arg_path.name).exists():  # it is an input file
+
+                file_exists = arg_path.exists() or Path.cwd().joinpath(arg_path.name).exists()
+                is_output_arg = i > 0 and command[i - 1] in ["-o", "--outdir", "--outfile"]
+                if file_exists and not is_output_arg:
                     shutil.copy(arg_path, volume_mount_path_local)
                     input_filenames.append(arg_path.name)
                 else:  # it is an output file that is not exist now
