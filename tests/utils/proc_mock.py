@@ -1,6 +1,5 @@
-import contextlib
 import dataclasses
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from io import StringIO
 from typing import IO, Any, TypeVar
 
@@ -43,7 +42,7 @@ class CommandMockData:
     raise_permission_denied: bool = False
     exit_code: int = 0
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
-    side_effect: Callable | None = None
+    side_effect: Any | None = None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -90,7 +89,7 @@ class ProcMock:
             mock_data.output_lines = output
         self._add_mock_data(cmd, mock_data)
 
-    def set_output(self, cmd: list[str] | str, output: list[str], side_effect: Callable | None = None) -> None:
+    def set_output(self, cmd: list[str] | str, output: list[str], side_effect: Any = None) -> None:
         """
         Set the output of a command, and optionally a side effect to be called when the command is run.
         Side effect can't have input arguments, the main utility is running extra logic on top of execution of the
@@ -124,9 +123,8 @@ class ProcMock:
         exit_code = mock_data.exit_code
         output = "\n".join(mock_data.output_lines)
 
-        with contextlib.suppress(Exception):
+        if mock_data.side_effect:
             mock_data.side_effect()
-
 
         return PopenMock(output, exit_code)
 

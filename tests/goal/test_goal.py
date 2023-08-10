@@ -102,8 +102,14 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock) -> None:
 def test_goal_simple_args_with_input_output_files(
     proc_mock: ProcMock,
     tmp_path_factory: pytest.TempPathFactory,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
+    mocked_goal_mount_path = cwd / "goal_mount"
+    mocked_goal_mount_path.mkdir()
+
+    monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda: cwd / "goal_mount")
+
     (cwd / "approval.teal").write_text(
         """
 #pragma version 8
@@ -114,7 +120,7 @@ return
     )
 
     def dump_file():
-        (cwd / "approval.compiled").write_text(
+        (mocked_goal_mount_path / "approval.compiled").write_text(
             """
 I AM COMPILED!
 """,
@@ -129,7 +135,8 @@ I AM COMPILED!
         "/root",
         "algokit_algod",
         "goal",
-        "clerkcompile",
+        "clerk",
+        "compile",
         "/root/goal_mount/approval.teal",
         "-o",
         "/root/goal_mount/approval.compiled",
