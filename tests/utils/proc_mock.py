@@ -1,5 +1,6 @@
+import contextlib
 import dataclasses
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from io import StringIO
 from typing import IO, Any, TypeVar
 
@@ -42,6 +43,7 @@ class CommandMockData:
     raise_permission_denied: bool = False
     exit_code: int = 0
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
+    side_effect: Callable | None = None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -88,8 +90,19 @@ class ProcMock:
             mock_data.output_lines = output
         self._add_mock_data(cmd, mock_data)
 
-    def set_output(self, cmd: list[str] | str, output: list[str]) -> None:
-        self._add_mock_data(cmd, CommandMockData(output_lines=output))
+    def set_output(self, cmd: list[str] | str, output: list[str], side_effect: Callable | None = None) -> None:
+        """
+        Set the output of a command, and optionally a side effect to be called when the command is run.
+        Side effect can't have input arguments, the main utility is running extra logic on top of execution of the
+        proc_mock object. Common scenario includes, generating dummy files as a side effect of invoking the command.
+
+        Args:
+            cmd: The command to set the output for
+            output: The output to return when the command is run
+            side_effect: A callable to be called when the command is run
+        """
+
+        self._add_mock_data(cmd, CommandMockData(output_lines=output, side_effect=side_effect))
 
     def popen(self, cmd: list[str], env: dict[str, str] | None = None, *_args: Any, **_kwargs: Any) -> PopenMock:
         self.called.append(PopenArgs(command=cmd, env=env))
@@ -110,6 +123,11 @@ class ProcMock:
             raise PermissionError(f"I'm sorry Dave I can't do {cmd[0]}")
         exit_code = mock_data.exit_code
         output = "\n".join(mock_data.output_lines)
+
+        with contextlib.suppress(Exception):
+            mock_data.side_effect()
+
+
         return PopenMock(output, exit_code)
 
 
