@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
@@ -8,6 +9,60 @@ from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+
+
+@pytest.fixture()
+def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    return tmp_path_factory.mktemp("cwd")
+
+
+@pytest.fixture()
+def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    mocked_goal_mount_path = cwd / "goal_mount"
+    mocked_goal_mount_path.mkdir()
+    monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda: cwd / "goal_mount")
+
+
+@pytest.fixture()
+def create_input_file(cwd: Path) -> None:
+    (cwd / "approval.teal").write_text(
+        """
+#pragma version 8
+int 1
+return
+""",
+        encoding="utf-8",
+    )
+
+
+@pytest.fixture()
+def create_input_file2(cwd: Path) -> None:
+    (cwd / "approval2.teal").write_text(
+        """
+#pragma version 8
+int 1
+return
+""",
+        encoding="utf-8",
+    )
+
+
+def dump_file(cwd: Path) -> None:
+    (cwd / "approval.compiled").write_text(
+        """
+I AM COMPILED!
+""",
+        encoding="utf-8",
+    )
+
+
+def dump_file2(cwd: Path) -> None:
+    (cwd / "balance_record.json").write_text(
+        """
+I AM COMPILED!
+""",
+        encoding="utf-8",
+    )
 
 
 def test_goal_help() -> None:
@@ -80,8 +135,25 @@ def test_goal_simple_args() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock")
-def test_goal_simple_args_with_input_file(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "create_input_file")
+def test_goal_simple_args_with_input_file(
+    proc_mock: ProcMock,
+) -> None:
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_algod",
+        "goal",
+        "clerk",
+        "group",
+        "/root/goal_mount/approval.teal",
+    ]
+
+    # TODO: set real goal output expectation
+    proc_mock.set_output(expected_arguments, output=["File compiled"])
     result = invoke("goal clerk group approval.teal")
 
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
@@ -89,8 +161,24 @@ def test_goal_simple_args_with_input_file(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock")
-def test_goal_simple_args_with_output_file(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "dump_file2")
+def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> None:
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_algod",
+        "goal",
+        "account",
+        "dump",
+        "-o",
+        "/root/goal_mount/balance_record.json",
+    ]
+
+    # TODO: set real goal output expectation
+    proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file2(cwd))
     result = invoke("goal account dump -o balance_record.json")
 
     assert proc_mock.called[1].command[10] == "/root/goal_mount/balance_record.json"
@@ -98,35 +186,12 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock")
+@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "create_input_file")
 def test_goal_simple_args_with_input_output_files(
     proc_mock: ProcMock,
-    tmp_path_factory: pytest.TempPathFactory,
-    monkeypatch: pytest.MonkeyPatch,
+    cwd: Path,
+    mocked_goal_mount_path: Path,
 ) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-    mocked_goal_mount_path = cwd / "goal_mount"
-    mocked_goal_mount_path.mkdir()
-
-    monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda: cwd / "goal_mount")
-
-    (cwd / "approval.teal").write_text(
-        """
-#pragma version 8
-int 1
-return
-""",
-        encoding="utf-8",
-    )
-
-    def dump_file() -> None:
-        (mocked_goal_mount_path / "approval.compiled").write_text(
-            """
-I AM COMPILED!
-""",
-            encoding="utf-8",
-        )
-
     expected_arguments = [
         "docker",
         "exec",
@@ -143,7 +208,7 @@ I AM COMPILED!
     ]
 
     # TODO: set real goal output expectation
-    proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file)
+    proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file(cwd))
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
@@ -154,12 +219,33 @@ I AM COMPILED!
     verify(result.output)
 
 
-def test_goal_simple_args_with_multiple_input_output_files(proc_mock: ProcMock) -> None:
-    result = invoke("goal clerk compile approval1.teal approval2.teal approval.compiled")
+@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "create_input_file", "create_input_file2")
+def test_goal_simple_args_with_multiple_input_output_files(
+    proc_mock: ProcMock,
+    cwd: Path,
+) -> None:
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_algod",
+        "goal",
+        "clerk",
+        "compile",
+        "/root/goal_mount/approval.teal",
+        "/root/goal_mount/approval2.teal",
+        "-o",
+        "/root/goal_mount/approval.compiled",
+    ]
 
-    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval1.teal"
+    proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file(cwd))
+    result = invoke("goal clerk compile approval.teal approval2.teal -o approval.compiled", cwd=cwd)
+
+    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
     assert proc_mock.called[1].command[10] == "/root/goal_mount/approval2.teal"
-    assert proc_mock.called[1].command[11] == "/root/goal_mount/approval.compiled"
+    assert proc_mock.called[1].command[12] == "/root/goal_mount/approval.compiled"
     assert result.exit_code == 0
     verify(result.output)
 

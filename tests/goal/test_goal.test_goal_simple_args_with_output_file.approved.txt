@@ -2,5 +2,4 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal account dump -o /root/goal_mount/balance_record.json' in '{current_working_directory}'
- STDOUT
- STDERR
+ File compiled

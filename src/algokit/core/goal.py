@@ -1,5 +1,4 @@
 import logging
-import platform
 import re
 import shutil
 from pathlib import Path, PurePath
@@ -10,11 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_volume_mount_path_docker() -> Path:
-    os_type = platform.system().lower()
-    if os_type == "windows":
-        return Path(r"\root\goal_mount")
-    else:
-        return Path("/root/goal_mount/")
+    return Path("/root/goal_mount/")
 
 
 def get_volume_mount_path_local() -> Path:
