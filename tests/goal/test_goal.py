@@ -119,7 +119,7 @@ return
         encoding="utf-8",
     )
 
-    def dump_file():
+    def dump_file() -> None:
         (mocked_goal_mount_path / "approval.compiled").write_text(
             """
 I AM COMPILED!
@@ -142,7 +142,7 @@ I AM COMPILED!
         "/root/goal_mount/approval.compiled",
     ]
 
-    # TODO: set real goal ouput expectation
+    # TODO: set real goal output expectation
     proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file)
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)

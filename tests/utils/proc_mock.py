@@ -1,5 +1,5 @@
 import dataclasses
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from io import StringIO
 from typing import IO, Any, TypeVar
 
@@ -89,7 +89,9 @@ class ProcMock:
             mock_data.output_lines = output
         self._add_mock_data(cmd, mock_data)
 
-    def set_output(self, cmd: list[str] | str, output: list[str], side_effect: Any = None) -> None:
+    def set_output(
+        self, cmd: list[str] | str, output: list[str], side_effect: Callable[[], None] | None = None
+    ) -> None:
         """
         Set the output of a command, and optionally a side effect to be called when the command is run.
         Side effect can't have input arguments, the main utility is running extra logic on top of execution of the

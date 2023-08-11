@@ -59,8 +59,8 @@ def preprocess_command_args(
                 file_exists = arg_path.exists() or Path.cwd().joinpath(arg_path.name).exists()
                 is_output_arg = i > 0 and command[i - 1] in ["-o", "--outdir", "--outfile"]
                 if file_exists and not is_output_arg:
-                    shutil.copy(arg_path, volume_mount_path_local)
                     input_filenames.append(arg_path.name)
+                    shutil.copy(arg_path, volume_mount_path_local)
                 else:  # it is an output file that is not exist now
                     output_filenames.append(arg_path)
     except Exception as e:
