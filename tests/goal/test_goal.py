@@ -17,14 +17,14 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture()
-def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    mocked_goal_mount_path = cwd / "goal_mount"
-    mocked_goal_mount_path.mkdir()
+def _mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    mocked_goal_mount = cwd / "goal_mount"
+    mocked_goal_mount.mkdir()
     monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda: cwd / "goal_mount")
 
 
 @pytest.fixture()
-def setup_input_files(cwd: Path, request) -> None:
+def _setup_input_files(cwd: Path, request) -> None:
     file_names = request.param
     for file_name in file_names:
         (cwd / file_name).write_text(
@@ -147,13 +147,13 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path")
-@pytest.mark.parametrize("setup_input_files", [["approval.teal"]])
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
+@pytest.mark.parametrize("_setup_input_files", [["approval.teal"]], indirect=True)
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
-    setup_input_files: list[str],
     cwd: Path,
 ) -> None:
+    (cwd / "/root/goal_mount/approval.teal").exists()
     expected_arguments = [
         "docker",
         "exec",
@@ -167,19 +167,15 @@ def test_goal_simple_args_with_input_file(
         "/root/goal_mount/approval.teal",
     ]
 
-    # TODO: set real goal output expectation
     proc_mock.set_output(expected_arguments, output=["File compiled"])
     result = invoke("goal clerk group approval.teal")
 
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
-
-    assert not (cwd / "approval.teal").exists()
-
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path")
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path")
 def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> None:
     expected_arguments = [
         "docker",
@@ -195,7 +191,6 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
         "/root/goal_mount/balance_record.json",
     ]
 
-    # TODO: set real goal output expectation
     proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_json_file(cwd))
     result = invoke("goal account dump -o balance_record.json")
 
@@ -207,13 +202,11 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path")
-@pytest.mark.parametrize("setup_input_files", [["approval.teal"]])
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
+@pytest.mark.parametrize("_setup_input_files", [["approval.teal"]], indirect=True)
 def test_goal_simple_args_with_input_output_files(
     proc_mock: ProcMock,
     cwd: Path,
-    mocked_goal_mount_path: Path,
-    setup_input_files: list[str],
 ) -> None:
     expected_arguments = [
         "docker",
@@ -230,7 +223,6 @@ def test_goal_simple_args_with_input_output_files(
         "/root/goal_mount/approval.compiled",
     ]
 
-    # TODO: set real goal output expectation
     proc_mock.set_output(expected_arguments, output=["File compiled"], side_effect=dump_file(cwd))
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
@@ -241,16 +233,14 @@ def test_goal_simple_args_with_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    assert not (cwd / "approval.teal").exists()
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path")
-@pytest.mark.parametrize("setup_input_files", [["approval1.teal", "approval2.teal"]])
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
+@pytest.mark.parametrize("_setup_input_files", [["approval1.teal", "approval2.teal"]], indirect=True)
 def test_goal_simple_args_with_multiple_input_output_files(
     proc_mock: ProcMock,
     cwd: Path,
-    setup_input_files: list[str],
 ) -> None:
     expected_arguments = [
         "docker",
@@ -278,9 +268,16 @@ def test_goal_simple_args_with_multiple_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    assert not (cwd / "approval1.teal").exists()
-    assert not (cwd / "approval2.teal").exists()
-
     verify(result.output)
 
 
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path")
+def test_goal_simple_args_with_file_error(
+    proc_mock: ProcMock,
+    cwd: Path,
+) -> None:
+    assert not (cwd / "approval.teal").exists()
+    result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
+
+    assert result.exit_code == 1
+    verify(result.output)

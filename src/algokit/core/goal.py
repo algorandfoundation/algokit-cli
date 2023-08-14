@@ -56,10 +56,13 @@ def preprocess_command_args(
                 if file_exists and not is_output_arg:
                     input_filenames.append(arg_path.name)
                     shutil.copy(arg_path, volume_mount_path_local)
-                else:  # it is an output file that is not exist now
+                elif is_output_arg:  # it is an output file that is not exist now
                     output_filenames.append(arg_path)
+                else:
+                    raise FileNotFoundError(f"{arg} does not exist.")
     except Exception as e:
         logger.error(e)
+        raise e
     return input_filenames, output_filenames, command
 
 
