@@ -43,6 +43,7 @@ class CommandMockData:
     exit_code: int = 0
     output_lines: list[str] = dataclasses.field(default_factory=lambda: ["STDOUT", "STDERR"])
     side_effect: Any | None = None
+    side_effect_args: dict[str, Any] | None = None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -90,7 +91,11 @@ class ProcMock:
         self._add_mock_data(cmd, mock_data)
 
     def set_output(
-        self, cmd: list[str] | str, output: list[str], side_effect: Callable[[], None] | None = None
+        self,
+        cmd: list[str] | str,
+        output: list[str],
+        side_effect: Callable[[Any], None] | None = None,
+        side_effect_args: dict[str, Any] | None = None,
     ) -> None:
         """
         Set the output of a command, and optionally a side effect to be called when the command is run.
@@ -103,7 +108,9 @@ class ProcMock:
             side_effect: A callable to be called when the command is run
         """
 
-        self._add_mock_data(cmd, CommandMockData(output_lines=output, side_effect=side_effect))
+        self._add_mock_data(
+            cmd, CommandMockData(output_lines=output, side_effect=side_effect, side_effect_args=side_effect_args)
+        )
 
     def popen(self, cmd: list[str], env: dict[str, str] | None = None, *_args: Any, **_kwargs: Any) -> PopenMock:
         self.called.append(PopenArgs(command=cmd, env=env))
@@ -126,7 +133,8 @@ class ProcMock:
         output = "\n".join(mock_data.output_lines)
 
         if mock_data.side_effect:
-            mock_data.side_effect()
+            side_effect_args = mock_data.side_effect_args or {}
+            mock_data.side_effect(**side_effect_args)
 
         return PopenMock(output, exit_code)
 
