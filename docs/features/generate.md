@@ -59,24 +59,24 @@ response = app_client.hello(name="World")
 
 ```typescript
 // A similar working example can be seen in the beaker_production template, when using TypeScript deployment
-import { HelloWorldAppClient } from "./artifacts/HelloWorldApp/client";
+import { HelloWorldAppClient } from './artifacts/HelloWorldApp/client'
 
 const appClient = new HelloWorldAppClient(
   {
-    resolveBy: "creatorAndName",
+    resolveBy: 'creatorAndName',
     findExistingUsing: indexer,
     sender: deployer,
     creatorAddress: deployer.addr,
   },
-  algod
-);
+  algod,
+)
 const app = await appClient.deploy({
   allowDelete: isLocal,
   allowUpdate: isLocal,
-  onSchemaBreak: isLocal ? "replace" : "fail",
-  onUpdate: isLocal ? "update" : "fail",
-});
-const response = await appClient.hello({ name: "world" });
+  onSchemaBreak: isLocal ? 'replace' : 'fail',
+  onUpdate: isLocal ? 'update' : 'fail',
+})
+const response = await appClient.hello({ name: 'world' })
 ```
 
 ### Examples
