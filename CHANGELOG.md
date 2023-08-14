@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.0 (2023-08-01)
+
+### Feature
+
+* Add new "deploy" command to execute user/template defined logic to deploy smart contracts to an Algorand network ([#295](https://github.com/algorandfoundation/algokit-cli/issues/295)) ([`6673f80`](https://github.com/algorandfoundation/algokit-cli/commit/6673f8062989172674471056baf1e8a7f34753b7))
+
+### Fix
+
+* Pip-audit dependencies ([#307](https://github.com/algorandfoundation/algokit-cli/issues/307)) ([`142dba3`](https://github.com/algorandfoundation/algokit-cli/commit/142dba3651731003936c32ff9a6144c58289c829))
+* Handle deploy commands on windows that are actually `.cmd` files or similar ([#303](https://github.com/algorandfoundation/algokit-cli/issues/303)) ([`17791c7`](https://github.com/algorandfoundation/algokit-cli/commit/17791c7ca7f5aabe510b1dcaa1d09b9ed403233b))
+
+### Documentation
+
+* Advanced algokit generate command ADR ([#305](https://github.com/algorandfoundation/algokit-cli/issues/305)) ([`cb0ac17`](https://github.com/algorandfoundation/algokit-cli/commit/cb0ac17e9afda66e74ae2c63d0729c3b34f2a4b7))
+* Adding algokit template documentation ([#300](https://github.com/algorandfoundation/algokit-cli/issues/300)) ([`6e19743`](https://github.com/algorandfoundation/algokit-cli/commit/6e19743bacf3856f91e2610cff58676a17e99deb))
+
 ## v1.2.0 (2023-07-04)
 
 ### Feature
