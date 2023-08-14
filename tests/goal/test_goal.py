@@ -147,11 +147,12 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path")
+@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path")
 @pytest.mark.parametrize("setup_input_files", [["approval.teal"]])
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
     setup_input_files: list[str],
+    cwd: Path,
 ) -> None:
     expected_arguments = [
         "docker",
@@ -172,6 +173,9 @@ def test_goal_simple_args_with_input_file(
 
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
+
+    assert not (cwd / "approval.teal").exists()
+
     verify(result.output)
 
 
@@ -197,6 +201,9 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
 
     assert proc_mock.called[1].command[10] == "/root/goal_mount/balance_record.json"
     assert result.exit_code == 0
+
+    assert (cwd / "balance_record.json").exists()
+
     verify(result.output)
 
 
@@ -232,6 +239,9 @@ def test_goal_simple_args_with_input_output_files(
     assert proc_mock.called[1].command[11] == "/root/goal_mount/approval.compiled"
 
     assert result.exit_code == 0
+
+    assert (cwd / "approval.compiled").exists()
+    assert not (cwd / "approval.teal").exists()
     verify(result.output)
 
 
@@ -264,7 +274,13 @@ def test_goal_simple_args_with_multiple_input_output_files(
     assert proc_mock.called[1].command[9] == "/root/goal_mount/approval1.teal"
     assert proc_mock.called[1].command[10] == "/root/goal_mount/approval2.teal"
     assert proc_mock.called[1].command[12] == "/root/goal_mount/approval.compiled"
+
     assert result.exit_code == 0
+
+    assert (cwd / "approval.compiled").exists()
+    assert not (cwd / "approval1.teal").exists()
+    assert not (cwd / "approval2.teal").exists()
+
     verify(result.output)
 
 
