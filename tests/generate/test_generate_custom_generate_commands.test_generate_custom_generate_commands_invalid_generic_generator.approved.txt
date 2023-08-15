@@ -1,5 +1,6 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Invalid generator configuration key "description" of value "invalid", skipping
+DEBUG: Invalid generator configuration key "path" of value "invalid", skipping
 Usage: algokit generate [OPTIONS] COMMAND [ARGS]...
 
   Generate code for an Algorand project.

@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.0 (2023-08-14)
+
+### Feature
+
+* Advanced algokit generate command ([#306](https://github.com/algorandfoundation/algokit-cli/issues/306)) ([`0381862`](https://github.com/algorandfoundation/algokit-cli/commit/038186239c6787b0e80d49ea6a0e5e4135ce4240))
+
 ## v1.3.0 (2023-08-01)
 
 ### Feature

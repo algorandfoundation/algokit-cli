@@ -1,5 +1,5 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
+WARNING: Path 'invalidpath' for generator 'smart_contract' does not exist, skipping
 Usage: algokit generate [OPTIONS] COMMAND [ARGS]...
 
   Generate code for an Algorand project.
