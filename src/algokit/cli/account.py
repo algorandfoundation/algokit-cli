@@ -1,136 +1,24 @@
 import logging
 import os
-import time
 
 import click
+import httpx
 import jwt
 import keyring
-import requests
-from auth0.authentication.token_verifier import AsymmetricSignatureVerifier, TokenVerifier
+
+from algokit.core.account import (
+    ALGORITHMS,
+    AUTH0_CI_CLIENT_ID,
+    AUTH0_USER_CLIENT_ID,
+    DISPENSER_BASE_URL,
+    DISPENSER_REQUEST_TIMEOUT,
+    KEYRING_NAMESPACE,
+    get_oauth_tokens,
+    is_authenticated,
+    set_keyring_passwords,
+)
 
 logger = logging.getLogger(__name__)
-
-# Below are public identifiers (not secrets, safe to have in vcs)
-# TODO: Move these to a config file
-AUTH0_DOMAIN = "dev-lwqrjgkkdkekto3q.au.auth0.com"
-AUTH0_USER_CLIENT_ID = "70kMcjtVcphvz33vSpvsU2OSOuAYgoxp"
-AUTH0_CI_CLIENT_ID = "4QagPR1QhaIoIoOXzoU9R12BfQ76vO5Z"
-DISPENSER_BASE_URL = "set url"
-AUTH0_AUDIENCE = DISPENSER_BASE_URL
-ALGORITHMS = ["RS256"]
-KEYRING_NAMESPACE = "algokit"
-
-
-def get_oauth_tokens(*, client_id: str = AUTH0_USER_CLIENT_ID, extra_scopes: str | None = None) -> None:
-    scope = "openid profile email " + (extra_scopes or "")
-    device_code_payload = {
-        "client_id": client_id,
-        "scope": scope.strip(),
-        "audience": AUTH0_AUDIENCE,
-    }
-    device_code_response = requests.post(f"https://{AUTH0_DOMAIN}/oauth/device/code", data=device_code_payload)
-    success_code = 200
-
-    if device_code_response.status_code != success_code:
-        logger.info("Error generating the device code")
-        raise click.ClickException("Error generating the device code")
-
-    device_code_data = device_code_response.json()
-    logger.info(f"1. On your computer or mobile device navigate to: {device_code_data['verification_uri_complete']}")
-    logger.info(f"2. Enter the following code: {device_code_data['user_code']}")
-
-    token_payload = {
-        "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-        "device_code": device_code_data["device_code"],
-        "client_id": client_id,
-        "audience": AUTH0_AUDIENCE,
-    }
-
-    authenticated = False
-    token_data = None
-    while not authenticated:
-        logger.info("Checking if the user completed the flow...")
-        token_response = requests.post(f"https://{AUTH0_DOMAIN}/oauth/token", data=token_payload)
-
-        token_data = token_response.json()
-        ok_code = 200
-
-        if token_response.status_code == ok_code:
-            validate_id_token(
-                token_data["id_token"], audience=AUTH0_USER_CLIENT_ID if "user" in scope else AUTH0_CI_CLIENT_ID
-            )
-
-            return token_data
-
-        elif token_data["error"] not in ("authorization_pending", "slow_down"):
-            logger.info(token_data["error_description"])
-            raise click.ClickException(token_data["error_description"])
-        else:
-            time.sleep(device_code_data["interval"])
-
-    return None
-
-
-def refresh_token():
-    refresh_token = keyring.get_password(KEYRING_NAMESPACE, "refresh_token")
-
-    headers = {
-        "content-type": "application/x-www-form-urlencoded",
-        "authorization": f'Bearer {keyring.get_password(KEYRING_NAMESPACE, "access_token")}',
-    }
-
-    payload = f"grant_type=refresh_token&client_id={AUTH0_USER_CLIENT_ID}&refresh_token={refresh_token}"
-
-    response = requests.post(f"https://{AUTH0_DOMAIN}/oauth/token", data=payload, headers=headers)
-    ok_code = 200
-
-    if response.status_code != ok_code:
-        logger.warning("Error refreshing the token")
-        raise click.ClickException("Error refreshing the token")
-
-    token_data = response.json()
-
-    keyring.set_password(KEYRING_NAMESPACE, "id_token", token_data["id_token"])
-    keyring.set_password(KEYRING_NAMESPACE, "access_token", token_data["access_token"])
-    if "refresh_token" in token_data:
-        keyring.set_password(KEYRING_NAMESPACE, "refresh_token", token_data["refresh_token"])
-
-
-def validate_id_token(id_token: str, audience: str):
-    """
-    Verify the token and its precedence
-
-    :param id_token:
-    """
-    jwks_url = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
-    issuer = f"https://{AUTH0_DOMAIN}/"
-    sv = AsymmetricSignatureVerifier(jwks_url)
-    tv = TokenVerifier(signature_verifier=sv, issuer=issuer, audience=audience)
-    tv.verify(id_token)
-
-
-def is_authenticated() -> bool:
-    """
-    Get the user email from the keyring
-
-    :return:
-    """
-    id_token = keyring.get_password(KEYRING_NAMESPACE, "id_token")
-    email = keyring.get_password(KEYRING_NAMESPACE, "email")
-
-    if not id_token or not email:
-        return False
-
-    decoded_token = jwt.decode(id_token, options={"verify_signature": False})
-
-    try:
-        if time.time() < decoded_token["exp"]:
-            return True
-        else:
-            refresh_token()
-            return True
-    except Exception:
-        return False
 
 
 @click.group("account")
@@ -142,10 +30,13 @@ def account_group() -> None:
 @click.option("--wallet", help="Wallet address to dispense to")
 @click.option("--amount", help="Amount to dispense", default=1000000)
 @click.option(
-    "--ci", is_flag=True, default=lambda: "CI" in os.environ, help="Whether to load access token for ci invocation"
+    "--ci",
+    is_flag=True,
+    default=False,
+    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
 def dispense_command(*, wallet: str, amount: int, ci: bool) -> None:
-    if not is_authenticated():
+    if not ci and not is_authenticated():
         logger.error("Please login first")
         return
 
@@ -160,16 +51,19 @@ def dispense_command(*, wallet: str, amount: int, ci: bool) -> None:
         raise click.ClickException("Token not found")
 
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.post(url, headers=headers, json={"walletAddress": wallet, "amount": amount})
+    response = httpx.post(
+        url, headers=headers, json={"walletAddress": wallet, "amount": amount}, timeout=DISPENSER_REQUEST_TIMEOUT
+    )
     logger.info(response.json()["message"])
 
 
 @account_group.command("logout", help="Logout of the dispenser")
 def logout_command() -> None:
-    keyring.delete_password(KEYRING_NAMESPACE, "id_token")
-    keyring.delete_password(KEYRING_NAMESPACE, "access_token")
-    keyring.delete_password(KEYRING_NAMESPACE, "refresh_token")
-    keyring.delete_password(KEYRING_NAMESPACE, "email")
+    for token in ("id_token", "access_token", "refresh_token", "email"):
+        try:
+            keyring.delete_password(KEYRING_NAMESPACE, token)
+        except Exception as e:
+            logger.debug(f"Error logging out {e} {token}")
     logger.info("Logged out")
 
 
@@ -179,7 +73,7 @@ def login_command() -> None:
         logger.info("Already authenticated")
         return
 
-    token_data = get_oauth_tokens(client_id=AUTH0_USER_CLIENT_ID, extra_scopes="context:user-request offline_access")
+    token_data = get_oauth_tokens(client_id=AUTH0_USER_CLIENT_ID, extra_scopes="offline_access context:user-request")
 
     if not token_data:
         logger.error("Error during authentication")
@@ -188,16 +82,7 @@ def login_command() -> None:
     current_user = jwt.decode(token_data["id_token"], algorithms=ALGORITHMS, options={"verify_signature": False})
 
     user_email = current_user.get("email")
-    keyring.set_password(KEYRING_NAMESPACE, "id_token", token_data["id_token"])
-    keyring.set_password(KEYRING_NAMESPACE, "access_token", token_data["access_token"])
-    if "refresh_token" in token_data:
-        keyring.set_password(KEYRING_NAMESPACE, "refresh_token", token_data["refresh_token"])
-
-    if user_email:
-        keyring.set_password(KEYRING_NAMESPACE, "email", user_email)
-        logger.info(f"Account {user_email} authenticated!")
-    else:
-        logger.warning("Email not found in the token")
+    set_keyring_passwords(token_data, user_email)
 
 
 @account_group.command("get-ci-token", help="Generate an access token for CI")
