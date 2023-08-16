@@ -2,7 +2,13 @@ import json
 
 import httpx
 import pytest
-from algokit.core.sandbox import ALGOD_HEALTH_URL, get_config_json, get_docker_compose_yml
+from algokit.core.sandbox import (
+    ALGOD_HEALTH_URL,
+    ALGORAND_IMAGE,
+    INDEXER_IMAGE,
+    get_config_json,
+    get_docker_compose_yml,
+)
 from pytest_httpx import HTTPXMock
 
 from tests import get_combined_verify_output
@@ -10,6 +16,40 @@ from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+
+
+@pytest.fixture()
+def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+    proc_mock.set_output(
+        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", "{{.Id}}"],
+        ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
+    )
+
+    proc_mock.set_output(
+        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", "{{.Id}}"],
+        ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
+    )
+
+    httpx_mock.add_response(
+        url="https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest",
+        json={
+            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        },
+    )
+
+    httpx_mock.add_response(
+        url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
+        json={
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        },
+    )
+
+
+@pytest.fixture()
+def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
+    args = "{{.Id}}"
+    proc_mock.should_fail_on(f"docker image inspect {ALGORAND_IMAGE} --format {args}")
+    proc_mock.should_fail_on(f"docker image inspect {INDEXER_IMAGE} --format {args}")
 
 
 @pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
@@ -181,6 +221,14 @@ def test_localnet_start_with_gitpod_docker_compose_version(app_dir_mock: AppDirs
 
 @pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_out_of_date")
 def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
+    result = invoke("localnet start")
+
+    assert result.exit_code == 0
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
+@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_img_check_cmd_error")
+def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
     assert result.exit_code == 0

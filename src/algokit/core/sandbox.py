@@ -120,18 +120,20 @@ class ComposeSandbox:
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
-    def _get_local_image_version(self, image_name: str) -> str:
+    def _get_local_image_version(self, image_name: str) -> str | None:
         """
         Get the local version of a Docker image
         """
-        arg = "{{.RepoDigests}}"
-        local_version = run(
-            ["docker", "image", "inspect", image_name, "--format", arg],
-            cwd=self.directory,
-            bad_return_code_error_message="Failed to get image inspect",
-        )
-        # Remove brackets and split on '@' symbol and get the SHA hash
-        return local_version.output[1:-1].split("@")[1]
+        try:
+            arg = "{{.Id}}"
+            local_version = run(
+                ["docker", "image", "inspect", image_name, "--format", arg],
+                cwd=self.directory,
+                bad_return_code_error_message="Failed to get image inspect",
+            )
+            return local_version.output
+        except Exception:
+            return None
 
     def _get_latest_image_version(self, image_name: str) -> str | None:
         """
@@ -151,19 +153,19 @@ class ComposeSandbox:
     def is_image_up_to_date(self, image_name: str) -> bool:
         local_version = self._get_local_image_version(image_name)
         latest_version = self._get_latest_image_version(image_name)
-        return local_version is None or local_version == latest_version
+        return local_version is None or latest_version is None or local_version == latest_version
 
     def check_docker_compose_for_new_image_versions(self) -> None:
         is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)
         if is_indexer_up_to_date is False:
             logger.warning(
-                "indexer has a new version available, run algokit localnet reset --update to get the latest version"
+                "indexer has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
 
         is_algorand_up_to_date = self.is_image_up_to_date(ALGORAND_IMAGE)
         if is_algorand_up_to_date is False:
             logger.warning(
-                "algod has a new version available, run algokit localnet reset --update to get the latest version"
+                "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
 
 
