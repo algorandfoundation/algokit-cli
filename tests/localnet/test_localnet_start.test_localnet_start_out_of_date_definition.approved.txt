@@ -3,10 +3,10 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{.Id}}' in '{app_config}/sandbox'
+DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Running 'docker image inspect algorand/algod:latest --format {{.Id}}' in '{app_config}/sandbox'
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 WARNING: Sandbox definition is out of date; please run algokit localnet reset

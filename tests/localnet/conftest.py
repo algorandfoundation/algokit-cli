@@ -19,14 +19,15 @@ def health_success(httpx_mock: HTTPXMock) -> None:  # noqa: ignore[PT004]
 
 @pytest.fixture()
 def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
     proc_mock.set_output(
-        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", "{{.Id}}"],
-        ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
+        ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
     )
 
     proc_mock.set_output(
-        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", "{{.Id}}"],
-        ["sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
+        ["sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
     )
 
     httpx_mock.add_response(

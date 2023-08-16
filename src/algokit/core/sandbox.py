@@ -125,13 +125,14 @@ class ComposeSandbox:
         Get the local version of a Docker image
         """
         try:
-            arg = "{{.Id}}"
+            arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
             local_version = run(
                 ["docker", "image", "inspect", image_name, "--format", arg],
                 cwd=self.directory,
                 bad_return_code_error_message="Failed to get image inspect",
             )
-            return local_version.output
+
+            return local_version.output.strip()
         except Exception:
             return None
 

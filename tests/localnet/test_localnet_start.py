@@ -20,14 +20,15 @@ from tests.utils.proc_mock import ProcMock
 
 @pytest.fixture()
 def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
     proc_mock.set_output(
-        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", "{{.Id}}"],
-        ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]"],
+        ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
+        ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n]"],
     )
 
     proc_mock.set_output(
-        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", "{{.Id}}"],
-        ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]"],
+        ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
+        ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n]"],
     )
 
     httpx_mock.add_response(
@@ -47,9 +48,9 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 @pytest.fixture()
 def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
-    args = "{{.Id}}"
-    proc_mock.should_fail_on(f"docker image inspect {ALGORAND_IMAGE} --format {args}")
-    proc_mock.should_fail_on(f"docker image inspect {INDEXER_IMAGE} --format {args}")
+    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    proc_mock.should_fail_on(["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg])
+    proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
 
 
 @pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
