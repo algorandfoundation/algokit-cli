@@ -72,7 +72,7 @@ def test_goal_help() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
 def test_goal_no_args() -> None:
     result = invoke("goal")
 
@@ -125,7 +125,7 @@ def test_goal_console_failed_algod_not_created(
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
 def test_goal_simple_args() -> None:
     result = invoke("goal account list")
 
@@ -133,7 +133,7 @@ def test_goal_simple_args() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
 def test_goal_complex_args() -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
@@ -159,7 +159,7 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_input_files", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("proc_mock", "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "transactions.txt"}]], indirect=True)
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
