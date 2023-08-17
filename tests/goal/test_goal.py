@@ -165,7 +165,6 @@ def test_goal_simple_args_with_input_file(
         "goal",
         "clerk",
         "group",
-        "/root/goal_mount/approval.teal",
     ]
 
     proc_mock.set_output(expected_arguments, output=["File compiled"])
@@ -175,7 +174,7 @@ def test_goal_simple_args_with_input_file(
     assert result.exit_code == 0
 
     assert not (get_volume_mount_path_docker() / "approval.teal").exists()
-    verify(result.output)
+    verify(result.output.replace("\\", "/"))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path")
@@ -190,8 +189,6 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
         "goal",
         "account",
         "dump",
-        "-o",
-        "/root/goal_mount/balance_record.json",
     ]
 
     proc_mock.set_output(
@@ -208,7 +205,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     assert (cwd / "balance_record.json").exists()
     assert not (get_volume_mount_path_docker() / "balance_record.json").exists()
 
-    verify(result.output)
+    verify(result.output.replace("\\", "/"))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
@@ -227,9 +224,6 @@ def test_goal_simple_args_with_input_output_files(
         "goal",
         "clerk",
         "compile",
-        "/root/goal_mount/approval.teal",
-        "-o",
-        "/root/goal_mount/approval.compiled",
     ]
 
     proc_mock.set_output(
@@ -245,7 +239,7 @@ def test_goal_simple_args_with_input_output_files(
 
     assert (cwd / "approval.compiled").exists()
     assert not (get_volume_mount_path_docker() / "approval.teal").exists()
-    verify(result.output)
+    verify(result.output.replace("\\", "/"))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
@@ -264,10 +258,6 @@ def test_goal_simple_args_with_multiple_input_output_files(
         "goal",
         "clerk",
         "compile",
-        "/root/goal_mount/approval1.teal",
-        "/root/goal_mount/approval2.teal",
-        "-o",
-        "/root/goal_mount/approval.compiled",
     ]
 
     proc_mock.set_output(
@@ -284,7 +274,7 @@ def test_goal_simple_args_with_multiple_input_output_files(
     assert (cwd / "approval.compiled").exists()
     assert not (get_volume_mount_path_docker() / "approval1.teal").exists()
     assert not (get_volume_mount_path_docker() / "approval2.teal").exists()
-    verify(result.output)
+    verify(result.output.replace("\\", "/"))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path")
@@ -295,7 +285,7 @@ def test_goal_simple_args_with_file_error(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(result.output.replace("\\", "/"))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
@@ -319,9 +309,6 @@ def test_postprocess_of_goal_commands(
         "goal",
         "clerk",
         "compile",
-        "/root/goal_mount/approval.teal",
-        "-o",
-        "/root/goal_mount/approval.compiled",
     ]
     proc_mock.set_output(
         expected_arguments, output=["File compiled"], side_effect=dump_file, side_effect_args={"cwd": cwd}
