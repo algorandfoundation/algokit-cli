@@ -3,6 +3,7 @@ from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
+from algokit.core.goal import get_volume_mount_path_docker
 from pytest_mock import MockerFixture
 
 from tests.utils.app_dir_mock import AppDirs
@@ -172,6 +173,8 @@ def test_goal_simple_args_with_input_file(
 
     assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
+
+    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
     verify(result.output)
 
 
@@ -203,6 +206,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     assert result.exit_code == 0
 
     assert (cwd / "balance_record.json").exists()
+    assert not (get_volume_mount_path_docker() / "balance_record.json").exists()
 
     verify(result.output)
 
@@ -240,6 +244,7 @@ def test_goal_simple_args_with_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
+    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
     verify(result.output)
 
 
@@ -277,6 +282,8 @@ def test_goal_simple_args_with_multiple_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
+    assert not (get_volume_mount_path_docker() / "approval1.teal").exists()
+    assert not (get_volume_mount_path_docker() / "approval2.teal").exists()
     verify(result.output)
 
 
@@ -289,3 +296,43 @@ def test_goal_simple_args_with_file_error(
 
     assert result.exit_code == 1
     verify(result.output)
+
+
+@pytest.mark.usefixtures("proc_mock", "cwd", "_mocked_goal_mount_path", "_setup_input_files")
+@pytest.mark.parametrize("_setup_input_files", [["approval.teal"]], indirect=True)
+def test_postprocess_of_goal_commands(
+    proc_mock: ProcMock,
+    cwd: Path,
+) -> None:
+    # adding some dummy files
+    (cwd / "approval.group").touch()
+    (cwd / "approval.group.sig").touch()
+    (cwd / "approval.group.sig.out").touch()
+
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_algod",
+        "goal",
+        "clerk",
+        "compile",
+        "/root/goal_mount/approval.teal",
+        "-o",
+        "/root/goal_mount/approval.compiled",
+    ]
+    proc_mock.set_output(
+        expected_arguments, output=["File compiled"], side_effect=dump_file, side_effect_args={"cwd": cwd}
+    )
+
+    result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
+    assert result.exit_code == 0
+
+    assert (cwd / "approval.compiled").exists()
+    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
+
+    assert (cwd / "approval.group").exists()
+    assert (cwd / "approval.group.sig").exists()
+    assert (cwd / "approval.group.sig.out").exists()
