@@ -34,7 +34,6 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
-    sandbox = ComposeSandbox()
     volume_mount_path_local = get_volume_mount_path_local()
     volume_mount_path_docker = get_volume_mount_path_docker()
     goal_args = list(goal_args)
@@ -48,6 +47,7 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
 
+    sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
         raise click.ClickException("Sandbox definition is out of date; please run `algokit localnet reset` first!")
