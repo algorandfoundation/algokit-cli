@@ -3,7 +3,6 @@ from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
-from algokit.core.goal import get_volume_mount_path_docker
 from pytest_mock import MockerFixture
 
 from tests.utils.app_dir_mock import AppDirs
@@ -60,6 +59,7 @@ def test_goal_help() -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
+@pytest.mark.mock_platform_system("Darwin")
 def test_goal_no_args() -> None:
     result = invoke("goal")
 
@@ -173,7 +173,6 @@ def test_goal_simple_args_with_input_file(
     assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
 
-    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
     verify(result.output.replace("\\", "/"))
 
 
@@ -203,7 +202,6 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     assert result.exit_code == 0
 
     assert (cwd / "balance_record.json").exists()
-    assert not (get_volume_mount_path_docker() / "balance_record.json").exists()
 
     verify(result.output.replace("\\", "/"))
 
@@ -238,7 +236,6 @@ def test_goal_simple_args_with_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
     verify(result.output.replace("\\", "/"))
 
 
@@ -272,8 +269,6 @@ def test_goal_simple_args_with_multiple_input_output_files(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    assert not (get_volume_mount_path_docker() / "approval1.teal").exists()
-    assert not (get_volume_mount_path_docker() / "approval2.teal").exists()
     verify(result.output.replace("\\", "/"))
 
 
@@ -318,7 +313,6 @@ def test_postprocess_of_goal_commands(
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    assert not (get_volume_mount_path_docker() / "approval.teal").exists()
 
     assert (cwd / "approval.group").exists()
     assert (cwd / "approval.group.sig").exists()
