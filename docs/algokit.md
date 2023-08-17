@@ -8,6 +8,7 @@ For details on how to use individual features see the following
 
 - [Bootstrap](./features/bootstrap.md) - Bootstrap AlgoKit project dependencies
 - [Completions](./features/completions.md) - Install shell completions for AlgoKit
+- [Deploy](./features/deploy.md) - Deploy your smart contracts effortlessly to various networks
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
 - [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
 - [Generate](./features/generate.md) - Generate code for an Algorand project
