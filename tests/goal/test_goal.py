@@ -170,7 +170,7 @@ def test_goal_simple_args_with_input_file(
     proc_mock.set_output(expected_arguments, output=["File compiled"])
     result = invoke("goal clerk group approval.teal", cwd=cwd)
 
-    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
+    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval.teal"
     assert result.exit_code == 0
     verify(result.output)
 
@@ -199,7 +199,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     )
     result = invoke("goal account dump -o balance_record.json")
 
-    assert proc_mock.called[1].command[10] == "/root/goal_mount/balance_record.json"
+    assert proc_mock.called[1].command[10].replace("\\", "/") == "/root/goal_mount/balance_record.json"
     assert result.exit_code == 0
 
     assert (cwd / "balance_record.json").exists()
@@ -234,8 +234,8 @@ def test_goal_simple_args_with_input_output_files(
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
-    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval.teal"
-    assert proc_mock.called[1].command[11] == "/root/goal_mount/approval.compiled"
+    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval.teal"
+    assert proc_mock.called[1].command[11].replace("\\", "/") == "/root/goal_mount/approval.compiled"
 
     assert result.exit_code == 0
 
@@ -270,9 +270,9 @@ def test_goal_simple_args_with_multiple_input_output_files(
     )
     result = invoke("goal clerk compile approval1.teal approval2.teal -o approval.compiled", cwd=cwd)
 
-    assert proc_mock.called[1].command[9] == "/root/goal_mount/approval1.teal"
-    assert proc_mock.called[1].command[10] == "/root/goal_mount/approval2.teal"
-    assert proc_mock.called[1].command[12] == "/root/goal_mount/approval.compiled"
+    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval1.teal"
+    assert proc_mock.called[1].command[10].replace("\\", "/") == "/root/goal_mount/approval2.teal"
+    assert proc_mock.called[1].command[12].replace("\\", "/") == "/root/goal_mount/approval.compiled"
 
     assert result.exit_code == 0
 
