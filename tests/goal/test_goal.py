@@ -59,7 +59,6 @@ def test_goal_help() -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-@pytest.mark.mock_platform_system("Darwin")
 def test_goal_no_args() -> None:
     result = invoke("goal")
 
