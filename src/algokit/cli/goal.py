@@ -9,7 +9,7 @@ from algokit.core.goal import (
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import ComposeSandbox
+from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
+    sandbox = ComposeSandbox()
     volume_mount_path_local = get_volume_mount_path_local()
     volume_mount_path_docker = get_volume_mount_path_docker()
     goal_args = list(goal_args)
@@ -46,6 +47,11 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "Docker not found; please install Docker and add to path.\n"
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
+
+    compose_file_status = sandbox.compose_file_status()
+    if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
+        raise click.ClickException("Sandbox definition is out of date; please run `algokit localnet reset` first!")
+
     if console:
         if goal_args:
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
@@ -67,7 +73,6 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     # TODO: Update this block to provide proper warnings for file/folder not found
     if result.exit_code != 0:
-        sandbox = ComposeSandbox()
         ps_result = sandbox.ps("algod")
         match ps_result:
             case [{"State": "running"}]:
