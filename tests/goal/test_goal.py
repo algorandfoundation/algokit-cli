@@ -163,7 +163,7 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "transactions.txt"}]], indirect=True)
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
@@ -191,7 +191,7 @@ def test_goal_simple_args_with_input_file(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_latest_dummy_compose")
 def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> None:
     expected_arguments = [
         "docker",
@@ -221,9 +221,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures(
-    "proc_mock", "cwd", "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose"
-)
+@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose")
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
 )
@@ -258,9 +256,7 @@ def test_goal_simple_args_with_input_output_files(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures(
-    "proc_mock", "cwd", "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose"
-)
+@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose")
 @pytest.mark.parametrize(
     "_setup_input_files",
     [
@@ -302,7 +298,7 @@ def test_goal_simple_args_with_multiple_input_output_files(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
 def test_goal_simple_args_with_file_error(
     cwd: Path,
 ) -> None:
@@ -313,7 +309,7 @@ def test_goal_simple_args_with_file_error(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose")
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
 )
