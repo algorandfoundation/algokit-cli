@@ -20,6 +20,19 @@ from algokit.core.account import (
 
 logger = logging.getLogger(__name__)
 
+assets = {
+    "ALGO": {
+        "asset_id": 0,
+        "decimals": 6,
+        "description": "Algorand token on Algorand TestNet",
+    },
+    "USDC (Wormhole)": {
+        "asset_id": 113638050,
+        "decimals": 6,
+        "description": "USDC token on Algorand TestNet via Wormhole",
+    },
+}
+
 
 @click.group("account")
 def account_group() -> None:
@@ -27,18 +40,28 @@ def account_group() -> None:
 
 
 @account_group.command("dispense", help="Dispense funds to a wallet")
-@click.option("--wallet", help="Wallet address to dispense to")
+@click.option("--wallet", help="Wallet address to dispense to", callback=lambda _, __, value: value.strip("\"'"))
 @click.option("--amount", help="Amount to dispense", default=1000000)
+@click.option(
+    "asset_title",
+    "--asset",
+    "-asa",
+    type=click.Choice(list(assets.keys())),
+    default="ALGO",
+    help="Name of an official template to use. To see a list of descriptions, run this command with no arguments.",
+)
 @click.option(
     "--ci",
     is_flag=True,
     default=False,
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
-def dispense_command(*, wallet: str, amount: int, ci: bool) -> None:
+def dispense_command(*, wallet: str, amount: int, asset_title: str, ci: bool) -> None:
     if not ci and not is_authenticated():
         logger.error("Please login first")
         return
+
+    asset = assets[asset_title]
 
     url = f"{DISPENSER_BASE_URL}/dispense"
 
@@ -52,7 +75,10 @@ def dispense_command(*, wallet: str, amount: int, ci: bool) -> None:
 
     headers = {"Authorization": f"Bearer {token}"}
     response = httpx.post(
-        url, headers=headers, json={"walletAddress": wallet, "amount": amount}, timeout=DISPENSER_REQUEST_TIMEOUT
+        url,
+        headers=headers,
+        json={"walletAddress": wallet, "amount": amount, "assetID": asset["asset_id"]},
+        timeout=DISPENSER_REQUEST_TIMEOUT,
     )
     logger.info(response.json()["message"])
 
@@ -73,7 +99,7 @@ def login_command() -> None:
         logger.info("Already authenticated")
         return
 
-    token_data = get_oauth_tokens(client_id=AUTH0_USER_CLIENT_ID, extra_scopes="offline_access context:user-request")
+    token_data = get_oauth_tokens(client_id=AUTH0_USER_CLIENT_ID, extra_scopes="dispenser_user offline_access")
 
     if not token_data:
         logger.error("Error during authentication")
@@ -81,13 +107,13 @@ def login_command() -> None:
 
     current_user = jwt.decode(token_data["id_token"], algorithms=ALGORITHMS, options={"verify_signature": False})
 
-    user_email = current_user.get("email")
-    set_keyring_passwords(token_data, user_email)
+    user_id = current_user.get("sub")
+    set_keyring_passwords(token_data, user_id)
 
 
 @account_group.command("get-ci-token", help="Generate an access token for CI")
 def get_ci_token_command() -> None:
-    token_data = get_oauth_tokens(client_id=AUTH0_CI_CLIENT_ID, extra_scopes="context:ci-request")
+    token_data = get_oauth_tokens(client_id=AUTH0_CI_CLIENT_ID, extra_scopes="dispenser_ci")
 
     if not token_data:
         logger.info("Error getting the tokens")

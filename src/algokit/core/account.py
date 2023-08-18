@@ -21,13 +21,13 @@ KEYRING_NAMESPACE = "algokit"
 DISPENSER_REQUEST_TIMEOUT = 15
 
 
-def set_keyring_passwords(token_data: dict[str, str], email: str | None = None) -> None:
+def set_keyring_passwords(token_data: dict[str, str], user_id: str | None = None) -> None:
     keyring.set_password(KEYRING_NAMESPACE, "id_token", token_data["id_token"])
     keyring.set_password(KEYRING_NAMESPACE, "access_token", token_data["access_token"])
     if "refresh_token" in token_data:
         keyring.set_password(KEYRING_NAMESPACE, "refresh_token", token_data["refresh_token"])
-    if email:
-        keyring.set_password(KEYRING_NAMESPACE, "email", email)
+    if user_id:
+        keyring.set_password(KEYRING_NAMESPACE, "user_id", user_id)
 
 
 def get_oauth_tokens(
@@ -97,10 +97,14 @@ def refresh_token() -> None:
         "authorization": f'Bearer {keyring.get_password(KEYRING_NAMESPACE, "access_token")}',
     }
 
-    payload = f"grant_type=refresh_token&client_id={AUTH0_USER_CLIENT_ID}&refresh_token={refresh_token}"
+    data = {
+        "grant_type": "refresh_token",
+        "client_id": AUTH0_USER_CLIENT_ID,
+        "refresh_token": refresh_token,
+    }
 
     response = httpx.post(
-        f"https://{AUTH0_DOMAIN}/oauth/token", json=payload, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
+        f"https://{AUTH0_DOMAIN}/oauth/token", data=data, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
     )
     ok_code = 200
 
@@ -134,9 +138,9 @@ def is_authenticated() -> bool:
     :return:
     """
     id_token = keyring.get_password(KEYRING_NAMESPACE, "id_token")
-    email = keyring.get_password(KEYRING_NAMESPACE, "email")
+    user_id = keyring.get_password(KEYRING_NAMESPACE, "user_id")
 
-    if not id_token or not email:
+    if not id_token or not user_id:
         return False
 
     decoded_token = jwt.decode(id_token, options={"verify_signature": False})
