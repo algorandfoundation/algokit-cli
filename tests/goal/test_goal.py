@@ -184,8 +184,10 @@ def test_goal_simple_args_with_input_file(
     proc_mock.set_output(expected_arguments, output=["File compiled"])
     result = invoke("goal clerk group transactions.txt", cwd=cwd)
 
-    # Setting path symbols for windows compatibility
+    # Check if the path in command has changed in preprocess step
     assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/transactions.txt"
+
+    # Check for the result status
     assert result.exit_code == 0
 
     verify(_normalize_output(result.output))
@@ -213,9 +215,13 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     )
     result = invoke("goal account dump -o balance_record.json")
 
+    # Check if the path in command has changed in preprocess step
     assert _normalize_output(proc_mock.called[1].command[10]) == "/root/goal_mount/balance_record.json"
+
+    # Check for the result status
     assert result.exit_code == 0
 
+    # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "balance_record.json").exists()
 
     verify(_normalize_output(result.output))
@@ -247,11 +253,14 @@ def test_goal_simple_args_with_input_output_files(
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
+    # Check if the paths in command have changed in preprocess step
     assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/approval.teal"
     assert _normalize_output(proc_mock.called[1].command[11]) == "/root/goal_mount/approval.compiled"
 
+    # Check for the result status
     assert result.exit_code == 0
 
+    # Check if the output file is created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
     verify(_normalize_output(result.output))
 
@@ -288,18 +297,21 @@ def test_goal_simple_args_with_multiple_input_output_files(
     )
     result = invoke("goal clerk compile approval1.teal approval2.teal -o approval.compiled", cwd=cwd)
 
+    # Check if the paths in command have changed in preprocess step
     assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/approval1.teal"
     assert _normalize_output(proc_mock.called[1].command[10]) == "/root/goal_mount/approval2.teal"
     assert _normalize_output(proc_mock.called[1].command[12]) == "/root/goal_mount/approval.compiled"
 
+    # Check for the result
     assert result.exit_code == 0
 
+    # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
     verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
-def test_goal_simple_args_with_file_error(
+def test_goal_simple_args_without_file_error(
     cwd: Path,
 ) -> None:
     assert not (cwd / "approval.teal").exists()
@@ -318,7 +330,7 @@ def test_goal_postprocess_of_command_args(
     cwd: Path,
     mocked_goal_mount_path: Path,
 ) -> None:
-    # adding some dummy files
+    # adding some dummy files to the mocked_goal_mount_path
     (mocked_goal_mount_path / "approval.group").touch()
     (mocked_goal_mount_path / "approval.group.sig").touch()
     (mocked_goal_mount_path / "approval.group.sig.out").touch()
@@ -344,8 +356,14 @@ def test_goal_postprocess_of_command_args(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
     assert result.exit_code == 0
 
+    # check if the output files is no longer in the goal_mount_path
     assert not (mocked_goal_mount_path / "approval.compiled").exists()
+
+    # check if the input/output file is in the cwd
     assert (cwd / "approval.compiled").exists()
+    assert (cwd / "approval.teal").exists()
+
+    # check if the dummy files are still there
     assert (mocked_goal_mount_path / "approval.group").exists()
     assert (mocked_goal_mount_path / "approval.group.sig").exists()
     assert (mocked_goal_mount_path / "approval.group.sig.out").exists()
