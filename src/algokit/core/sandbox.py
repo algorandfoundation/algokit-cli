@@ -165,8 +165,6 @@ def get_docker_compose_yml(
     tealdbg_port: int = 9392,
     indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
-    # TODO: verify if source for bind on goal_mount can be absolute or not
-    # If not use relative path for local fs when passing to docker compose file string
     return f"""version: '3'
 name: "{name}_sandbox"
 

@@ -71,7 +71,6 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         )
         post_process(input_files, output_files, volume_mount_path_local)
 
-    # TODO: Update this block to provide proper warnings for file/folder not found
     if result.exit_code != 0:
         ps_result = sandbox.ps("algod")
         match ps_result:
