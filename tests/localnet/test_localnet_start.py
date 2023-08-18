@@ -23,12 +23,12 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
     proc_mock.set_output(
         ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
-        ["[algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n]"],
+        ["algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
     )
 
     proc_mock.set_output(
         ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
-        ["[makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n]"],
+        ["makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
     )
 
     httpx_mock.add_response(
