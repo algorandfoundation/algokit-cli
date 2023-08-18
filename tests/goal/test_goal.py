@@ -14,6 +14,10 @@ from tests.utils.proc_mock import ProcMock
 DUMMY_CONTRACT_TEAL = """\n#pragma version 8\nint 1\nreturn\n"""
 
 
+def _normalize_output(output: str) -> str:
+    return output.replace("\\", "/")
+
+
 @pytest.fixture()
 def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
@@ -106,7 +110,7 @@ def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker:
     result = invoke("goal --console")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures("_setup_latest_dummy_compose")
@@ -122,7 +126,7 @@ def test_goal_console_failed_algod_not_created(
     result = invoke("goal --console")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path")
@@ -181,10 +185,10 @@ def test_goal_simple_args_with_input_file(
     result = invoke("goal clerk group transactions.txt", cwd=cwd)
 
     # Setting path symbols for windows compatibility
-    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/transactions.txt"
+    assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/transactions.txt"
     assert result.exit_code == 0
 
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
@@ -209,12 +213,12 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     )
     result = invoke("goal account dump -o balance_record.json")
 
-    assert proc_mock.called[1].command[10].replace("\\", "/") == "/root/goal_mount/balance_record.json"
+    assert _normalize_output(proc_mock.called[1].command[10]) == "/root/goal_mount/balance_record.json"
     assert result.exit_code == 0
 
     assert (cwd / "balance_record.json").exists()
 
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures(
@@ -245,13 +249,13 @@ def test_goal_simple_args_with_input_output_files(
 
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
-    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval.teal"
-    assert proc_mock.called[1].command[11].replace("\\", "/") == "/root/goal_mount/approval.compiled"
+    assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/approval.teal"
+    assert _normalize_output(proc_mock.called[1].command[11]) == "/root/goal_mount/approval.compiled"
 
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures(
@@ -288,14 +292,14 @@ def test_goal_simple_args_with_multiple_input_output_files(
     )
     result = invoke("goal clerk compile approval1.teal approval2.teal -o approval.compiled", cwd=cwd)
 
-    assert proc_mock.called[1].command[9].replace("\\", "/") == "/root/goal_mount/approval1.teal"
-    assert proc_mock.called[1].command[10].replace("\\", "/") == "/root/goal_mount/approval2.teal"
-    assert proc_mock.called[1].command[12].replace("\\", "/") == "/root/goal_mount/approval.compiled"
+    assert _normalize_output(proc_mock.called[1].command[9]) == "/root/goal_mount/approval1.teal"
+    assert _normalize_output(proc_mock.called[1].command[10]) == "/root/goal_mount/approval2.teal"
+    assert _normalize_output(proc_mock.called[1].command[12]) == "/root/goal_mount/approval.compiled"
 
     assert result.exit_code == 0
 
     assert (cwd / "approval.compiled").exists()
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures("proc_mock", "cwd", "mocked_goal_mount_path", "_setup_latest_dummy_compose")
@@ -306,7 +310,7 @@ def test_goal_simple_args_with_file_error(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose")
@@ -364,4 +368,4 @@ def test_goal_compose_outdated(
 
     assert result.exit_code == 1
 
-    verify(result.output.replace("\\", "/"))
+    verify(_normalize_output(result.output))
