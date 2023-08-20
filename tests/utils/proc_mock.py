@@ -106,6 +106,7 @@ class ProcMock:
             cmd: The command to set the output for
             output: The output to return when the command is run
             side_effect: A callable to be called when the command is run
+            side_effect_args: Key value paired arguments to pass to the side_effect function (optional)
         """
 
         self._add_mock_data(
