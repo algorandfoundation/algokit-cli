@@ -98,9 +98,10 @@ class ProcMock:
         side_effect_args: dict[str, Any] | None = None,
     ) -> None:
         """
-        Set the output of a command, and optionally a side effect to be called when the command is run.
-        Side effect can't have input arguments, the main utility is running extra logic on top of execution of the
-        proc_mock object. Common scenario includes, generating dummy files as a side effect of invoking the command.
+        Set the output of a command, and optionally include a side effect to be executed when the command is run. The
+        side_effect allows you to run additional logic on top of the execution of the proc_mock object. You can pass
+        arguments using side_effect_args. A common scenario includes generating dummy files as a side effect of
+        invoking the command.
 
         Args:
             cmd: The command to set the output for
