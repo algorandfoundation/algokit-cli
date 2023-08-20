@@ -87,7 +87,7 @@ When you specify a file or directory path in your `goal` command, the system wil
 For instance, if you want to compile a `teal` file:
 
 ```
-goal clerk compile /Path/to/inputfile/approval.teal -o /Path/to/outputfile/approval.compiled
+algokit goal clerk compile /Path/to/inputfile/approval.teal -o /Path/to/outputfile/approval.compiled
 ```
 Here, `/Path/to/inputfile/approval.teal` and `/Path/to/outputfile/approval.compiled` are paths on your local file system, and they will be automatically accessible to the `goal` command inside the container.
 
