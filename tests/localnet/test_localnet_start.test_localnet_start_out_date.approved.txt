@@ -5,11 +5,11 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Sandbox directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
-DEBUG: docker: makerxau/algorand-indexer-dev@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest "HTTP/1.1 200 OK"
 WARNING: indexer has a new version available, run `algokit localnet reset --update` to get the latest version
 DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
-DEBUG: docker: algorand/algod@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 WARNING: algod has a new version available, run `algokit localnet reset --update` to get the latest version
 DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
