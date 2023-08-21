@@ -185,6 +185,7 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - ./goal_mount:/root/goal_mount
 
   indexer:
     container_name: {name}_indexer

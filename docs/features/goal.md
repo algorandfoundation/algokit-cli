@@ -78,13 +78,29 @@ $ ~ algokit goal
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
 
-## Copying files in to the container
+## Working with Files in the Container
+When interacting with the container, especially if you're using tools like goal, you might need to reference files or directories. Here's how to efficiently deal with files and directories:
 
-If you want to copy files into the container so you can access them via goal then you can use the following:
+### Automatic File Mounting
+When you specify a file or directory path in your `goal` command, the system will automatically mount that path from your local filesystem into the container. This way, you don't need to copy files manually each time.
+
+For instance, if you want to compile a `teal` file:
+
+```
+algokit goal clerk compile /Path/to/inputfile/approval.teal -o /Path/to/outputfile/approval.compiled
+```
+Here, `/Path/to/inputfile/approval.teal` and `/Path/to/outputfile/approval.compiled` are paths on your local file system, and they will be automatically accessible to the `goal` command inside the container.
+
+### Manual Copying of Files
+
+In case you want to manually copy files into the container, you can do so using `docker cp`:
 
 ```
 docker cp foo.txt algokit_algod:/root
 ```
+This command copies the `foo.txt` from your local system into the root directory of the `algokit_algod` container.
+
+Note: Manual copying is optional and generally only necessary if you have specific reasons for doing so since the system will auto-mount paths specified in commands.
 
 ## Running multiple commands
 

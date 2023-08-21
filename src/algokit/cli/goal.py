@@ -3,7 +3,13 @@ import logging
 import click
 
 from algokit.core import proc
-from algokit.core.sandbox import ComposeSandbox
+from algokit.core.goal import (
+    get_volume_mount_path_docker,
+    get_volume_mount_path_local,
+    post_process,
+    preprocess_command_args,
+)
+from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +34,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
+    volume_mount_path_local = get_volume_mount_path_local()
+    volume_mount_path_docker = get_volume_mount_path_docker()
+    goal_args = list(goal_args)
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
     except OSError as ex:
@@ -37,6 +46,12 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "Docker not found; please install Docker and add to path.\n"
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
+
+    sandbox = ComposeSandbox()
+    compose_file_status = sandbox.compose_file_status()
+    if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
+        raise click.ClickException("Sandbox definition is out of date; please run `algokit localnet reset` first!")
+
     if console:
         if goal_args:
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
@@ -44,15 +59,19 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
     else:
         cmd = "docker exec --interactive --workdir /root algokit_algod goal".split()
-        cmd.extend(goal_args)
+        input_files, output_files, goal_args = preprocess_command_args(
+            goal_args, volume_mount_path_local, volume_mount_path_docker
+        )
+        cmd = cmd + goal_args
         result = proc.run(
             cmd,
             stdout_log_level=logging.INFO,
             prefix_process=False,
             pass_stdin=True,
         )
+        post_process(input_files, output_files, volume_mount_path_local)
+
     if result.exit_code != 0:
-        sandbox = ComposeSandbox()
         ps_result = sandbox.ps("algod")
         match ps_result:
             case [{"State": "running"}]:
