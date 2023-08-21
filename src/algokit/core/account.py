@@ -1,5 +1,6 @@
 import logging
 import time
+from enum import Enum
 from typing import Any
 
 import click
@@ -11,11 +12,20 @@ from auth0.authentication.token_verifier import AsymmetricSignatureVerifier, Tok
 logger = logging.getLogger(__name__)
 
 
+class DispenseApiScopes(str, Enum):
+    USER = "dispenser_user"
+    CI = "dispenser_ci"
+
+
+AUTH0_AUDIENCE = {
+    DispenseApiScopes.USER.value: "https://al-dev.dispenser-user.com",
+    DispenseApiScopes.CI.value: "https://al-dev.dispenser-ci.com",
+}
+
 AUTH0_DOMAIN = "dev-lwqrjgkkdkekto3q.au.auth0.com"
 AUTH0_USER_CLIENT_ID = "70kMcjtVcphvz33vSpvsU2OSOuAYgoxp"
 AUTH0_CI_CLIENT_ID = "4QagPR1QhaIoIoOXzoU9R12BfQ76vO5Z"
 DISPENSER_BASE_URL = ""
-AUTH0_AUDIENCE = DISPENSER_BASE_URL
 ALGORITHMS = ["RS256"]
 KEYRING_NAMESPACE = "algokit"
 DISPENSER_REQUEST_TIMEOUT = 15
@@ -31,13 +41,13 @@ def set_keyring_passwords(token_data: dict[str, str], user_id: str | None = None
 
 
 def get_oauth_tokens(
-    *, client_id: str = AUTH0_USER_CLIENT_ID, extra_scopes: str | None = None
+    *, client_id: str = AUTH0_USER_CLIENT_ID, api_scope: str, extra_scopes: str | None = None
 ) -> dict[str, Any] | None:
-    scope = "openid profile email " + (extra_scopes or "")
+    scope = f"openid profile email {api_scope} " + (extra_scopes or "")
     device_code_payload = {
         "client_id": client_id,
         "scope": scope.strip(),
-        "audience": AUTH0_AUDIENCE,
+        "audience": AUTH0_AUDIENCE[api_scope],
     }
     device_code_response = httpx.post(
         f"https://{AUTH0_DOMAIN}/oauth/device/code", data=device_code_payload, timeout=DISPENSER_REQUEST_TIMEOUT
@@ -56,7 +66,7 @@ def get_oauth_tokens(
         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         "device_code": device_code_data["device_code"],
         "client_id": client_id,
-        "audience": AUTH0_AUDIENCE,
+        "audience": AUTH0_AUDIENCE[api_scope],
     }
 
     authenticated = False

@@ -13,6 +13,7 @@ from algokit.core.account import (
     DISPENSER_BASE_URL,
     DISPENSER_REQUEST_TIMEOUT,
     KEYRING_NAMESPACE,
+    DispenseApiScopes,
     get_oauth_tokens,
     is_authenticated,
     set_keyring_passwords,
@@ -99,7 +100,9 @@ def login_command() -> None:
         logger.info("Already authenticated")
         return
 
-    token_data = get_oauth_tokens(client_id=AUTH0_USER_CLIENT_ID, extra_scopes="dispenser_user offline_access")
+    token_data = get_oauth_tokens(
+        client_id=AUTH0_USER_CLIENT_ID, api_scope=DispenseApiScopes.USER.value, extra_scopes="offline_access"
+    )
 
     if not token_data:
         logger.error("Error during authentication")
@@ -113,7 +116,7 @@ def login_command() -> None:
 
 @account_group.command("get-ci-token", help="Generate an access token for CI")
 def get_ci_token_command() -> None:
-    token_data = get_oauth_tokens(client_id=AUTH0_CI_CLIENT_ID, extra_scopes="dispenser_ci")
+    token_data = get_oauth_tokens(client_id=AUTH0_CI_CLIENT_ID, api_scope=DispenseApiScopes.CI.value)
 
     if not token_data:
         logger.info("Error getting the tokens")
