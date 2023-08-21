@@ -60,6 +60,8 @@ def localnet_group() -> None:
 def start_localnet() -> None:
     sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
+    sandbox.check_docker_compose_for_new_image_versions()
+
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Sandbox compose file does not exist yet; writing it out for the first time")
         sandbox.write_compose_file()
@@ -101,6 +103,9 @@ def reset_localnet(*, update: bool) -> None:
             sandbox.write_compose_file()
         if update:
             sandbox.pull()
+        else:
+            sandbox.check_docker_compose_for_new_image_versions()
+
     sandbox.up()
 
 
