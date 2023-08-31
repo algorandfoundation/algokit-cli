@@ -14,6 +14,7 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
+  account      Account based commands
   bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
                project root directory.
   completions  Install and Uninstall AlgoKit shell integrations.
@@ -26,3 +27,5 @@ Commands:
   init         Initializes a new project from a template; run from project
                parent directory.
   localnet     Manage the AlgoKit LocalNet.
+  login        Login account to access Dispenser API
+  logout       Logout account from Dispenser API access
