@@ -25,9 +25,52 @@ assets = {
 }
 
 
+@click.command("logout", help="Logout account from Dispenser API access")
+def logout_command() -> None:
+    """Logout from the Dispenser API access."""
+    if is_authenticated():
+        try:
+            keyring.delete_password(KEYRING_NAMESPACE, KEYRING_KEY)
+        except Exception as e:
+            logger.debug(f"Error logging out {e}")
+        logger.info("Logged out")
+    else:
+        logger.info("Not logged in! To login, run `algokit account login`")
+
+
+@click.command("login", help="Login account to access Dispenser API")
+def login_command() -> None:
+    """Login to the Dispenser API."""
+    if is_authenticated():
+        logger.info("Already authenticated")
+        return
+
+    token_data = get_oauth_tokens(api_audience=DispenseApiAudiences.USER, custom_scopes="offline_access")
+
+    if not token_data:
+        logger.error("Error during authentication")
+        raise click.ClickException("Error getting the tokens")
+
+    set_keyring_passwords(token_data)
+
+    logger.info("Logged in!")
+
+
 @click.group("account")
 def account_group() -> None:
     """Account based commands"""
+
+
+@account_group.command("logout", help="Logout account from Dispenser API access")
+@click.pass_context
+def account_logout_command(context: click.Context) -> None:
+    context.invoke(logout_command)
+
+
+@account_group.command("login", help="Login account to access Dispenser API")
+@click.pass_context
+def account_login_command(context: click.Context) -> None:
+    context.invoke(login_command)
 
 
 @account_group.command("dispense", help="Dispense funds to a wallet")
@@ -96,49 +139,6 @@ def get_withdrawal_limit(*, asset_id: int, ci: bool) -> None:
 
     if response:
         logger.info(f"Remaining daily withdrawal limit: {response.json()['amount']}")
-
-
-@click.command("logout", help="Logout account from Dispenser API access")
-def logout_command() -> None:
-    """Logout from the Dispenser API access."""
-    if is_authenticated():
-        try:
-            keyring.delete_password(KEYRING_NAMESPACE, KEYRING_KEY)
-        except Exception as e:
-            logger.debug(f"Error logging out {e}")
-        logger.info("Logged out")
-    else:
-        logger.info("Not logged in! To login, run `algokit account login`")
-
-
-@account_group.command("logout", help="Logout account from Dispenser API access")
-@click.pass_context
-def account_logout_command(context: click.Context) -> None:
-    context.invoke(logout_command)
-
-
-@click.command("login", help="Login account to access Dispenser API")
-def login_command() -> None:
-    """Login to the Dispenser API."""
-    if is_authenticated():
-        logger.info("Already authenticated")
-        return
-
-    token_data = get_oauth_tokens(api_audience=DispenseApiAudiences.USER, custom_scopes="offline_access")
-
-    if not token_data:
-        logger.error("Error during authentication")
-        raise click.ClickException("Error getting the tokens")
-
-    set_keyring_passwords(token_data)
-
-    logger.info("Logged in!")
-
-
-@account_group.command("login", help="Login account to access Dispenser API")
-@click.pass_context
-def account_login_command(context: click.Context) -> None:
-    context.invoke(login_command)
 
 
 @account_group.command("get-ci-token", help="Generate an access token for CI")

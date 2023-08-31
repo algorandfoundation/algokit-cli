@@ -55,17 +55,6 @@ AUTH_CONFIG = AuthConfig(
 )
 
 
-def get_auth_token(*, ci: bool) -> str | None:
-    """Retrieve the authorization token based on the environment"""
-    if ci:
-        return os.environ.get("CI_ACCESS_TOKEN")
-
-    try:
-        return get_keyring_data().access_token
-    except Exception as ex:
-        raise Exception("Token not found") from ex
-
-
 def process_dispenser_request(
     *, url_suffix: str, data: dict | None = None, ci: bool, method: str = "POST"
 ) -> httpx.Response | None:
@@ -115,14 +104,6 @@ def get_keyring_data() -> AccountKeyringData:
     return AccountKeyringData(**json.loads(data_str))
 
 
-def validate_id_token(id_token: str, audience: str) -> None:
-    jwks_url = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
-    issuer = f"https://{AUTH_CONFIG.domain}/"
-    sv = AsymmetricSignatureVerifier(jwks_url)
-    tv = TokenVerifier(signature_verifier=sv, issuer=issuer, audience=audience)
-    tv.verify(id_token)
-
-
 def is_authenticated() -> bool:
     try:
         data = get_keyring_data()
@@ -130,6 +111,14 @@ def is_authenticated() -> bool:
         return False
     decoded_token = jwt.decode(data.access_token, options={"verify_signature": False})
     return bool(time.time() < decoded_token.get("exp", 0))
+
+
+def validate_id_token(id_token: str, audience: str) -> None:
+    jwks_url = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
+    issuer = f"https://{AUTH_CONFIG.domain}/"
+    sv = AsymmetricSignatureVerifier(jwks_url)
+    tv = TokenVerifier(signature_verifier=sv, issuer=issuer, audience=audience)
+    tv.verify(id_token)
 
 
 def refresh_token() -> None:
@@ -150,6 +139,17 @@ def refresh_token() -> None:
         logger.warning("Error refreshing the token")
         raise Exception("Error refreshing the token")
     set_keyring_passwords(response.json())
+
+
+def get_auth_token(*, ci: bool) -> str | None:
+    """Retrieve the authorization token based on the environment"""
+    if ci:
+        return os.environ.get("CI_ACCESS_TOKEN")
+
+    try:
+        return get_keyring_data().access_token
+    except Exception as ex:
+        raise Exception("Token not found") from ex
 
 
 def get_oauth_tokens(api_audience: DispenseApiAudiences, custom_scopes: str | None = None) -> dict[str, Any] | None:
