@@ -32,7 +32,7 @@ See also the [AlgoKit CLI Reference](./cli/index.md), which details every comman
 The following tutorials guide you through various scenarios:
 
 - [AlgoKit quick start](./tutorials/intro.md)
-- [Production-ready smart contracts](./tutorials/smart-contracts.md)
+- [Creating AlgoKit templates](./tutorials/algokit-template.md)
 
 ## Guiding Principles
 

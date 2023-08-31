@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.1 (2023-08-21)
+
+### Fix
+
+* Localnet displays a warning when image is out of date ([#308](https://github.com/algorandfoundation/algokit-cli/issues/308)) ([`be5a5df`](https://github.com/algorandfoundation/algokit-cli/commit/be5a5df0883b378a0dd889b9996ff68850df5698))
+* Adding fixes to allow working with local filesystem files when interacting with algokit goal commands ([#304](https://github.com/algorandfoundation/algokit-cli/issues/304)) ([`caca2b5`](https://github.com/algorandfoundation/algokit-cli/commit/caca2b59b07817648ae7d8f208fe02f895cee92e))
+
 ## v1.4.0 (2023-08-14)
 
 ### Feature

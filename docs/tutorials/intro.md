@@ -144,7 +144,7 @@ To deploy the built Beaker smart contract application, select the `Beaker studio
 
 ![AlgoKit Dappflow](../imgs/dappflow3.png)
 
-To deploy this application again, select the `Create app` button followed by the `Create` button from the popup. You should get a `Transaction successful` message with the option to view the specific transaction in the explorer. Close out the popup and then scroll down to the `ABI` section of the page. The `hello` method should be displayed with an execute button beside it.
+To deploy this application again, select the `Create app` button followed by the `Create` button from the popup. You should get a `Transaction successful` message with the option to view the specific transaction in the explorer. Close out of the popup and then scroll down to the `ABI` section of the page. The `hello` method should be displayed with an execute button beside it.
 
 ![AlgoKit Dappflow](../imgs/dappflow4.png)
 

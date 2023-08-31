@@ -120,6 +120,55 @@ class ComposeSandbox:
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
+    def _get_local_image_version(self, image_name: str) -> str | None:
+        """
+        Get the local version of a Docker image
+        """
+        try:
+            arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+            local_version = run(
+                ["docker", "image", "inspect", image_name, "--format", arg],
+                cwd=self.directory,
+                bad_return_code_error_message="Failed to get image inspect",
+            )
+
+            return local_version.output.strip()
+        except Exception:
+            return None
+
+    def _get_latest_image_version(self, image_name: str) -> str | None:
+        """
+        Get the latest version of a Docker image from Docker Hub
+        """
+        args = image_name.split(":")
+        name = args[0]
+        tag = args[1] if len(args) > 1 else "latest"
+        url = f"https://registry.hub.docker.com/v2/repositories/{name}/tags/{tag}"
+        try:
+            data = httpx.get(url=url)
+            return str(data.json()["digest"])
+        except Exception as err:
+            logger.debug(f"Error checking indexer status: {err}", exc_info=True)
+            return None
+
+    def is_image_up_to_date(self, image_name: str) -> bool:
+        local_version = self._get_local_image_version(image_name)
+        latest_version = self._get_latest_image_version(image_name)
+        return local_version is None or latest_version is None or local_version == latest_version
+
+    def check_docker_compose_for_new_image_versions(self) -> None:
+        is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)
+        if is_indexer_up_to_date is False:
+            logger.warning(
+                "indexer has a new version available, run `algokit localnet reset --update` to get the latest version"
+            )
+
+        is_algorand_up_to_date = self.is_image_up_to_date(ALGORAND_IMAGE)
+        if is_algorand_up_to_date is False:
+            logger.warning(
+                "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
+            )
+
 
 DEFAULT_ALGOD_SERVER = "http://localhost"
 DEFAULT_ALGOD_TOKEN = "a" * 64
@@ -128,6 +177,8 @@ DEFAULT_INDEXER_PORT = 8980
 DEFAULT_WAIT_FOR_ALGOD = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
+INDEXER_IMAGE = "makerxau/algorand-indexer-dev:latest"
+ALGORAND_IMAGE = "algorand/algod:latest"
 
 
 def _wait_for_algod() -> bool:
@@ -171,7 +222,7 @@ name: "{name}_sandbox"
 services:
   algod:
     container_name: {name}_algod
-    image: algorand/algod:latest
+    image: {ALGORAND_IMAGE}
     ports:
       - {algod_port}:8080
       - {kmd_port}:7833
@@ -185,10 +236,11 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - ./goal_mount:/root/goal_mount
 
   indexer:
     container_name: {name}_indexer
-    image: makerxau/algorand-indexer-dev:latest
+    image: {INDEXER_IMAGE}
     ports:
       - {indexer_port}:8980
     restart: unless-stopped
