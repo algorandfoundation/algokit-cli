@@ -41,7 +41,7 @@ class AccountKeyringData:
     user_id: str
 
 
-CONFIG = AuthConfig(
+AUTH_CONFIG = AuthConfig(
     domain="dispenser-staging.eu.auth0.com",
     audiences={
         DispenseApiAudiences.USER: "api-staging-dispenser-user",
@@ -78,7 +78,11 @@ def process_dispenser_request(
     headers = {"Authorization": f"Bearer {get_auth_token(ci=ci)}"}
 
     # Set request arguments
-    request_args = {"url": f"{CONFIG.base_url}/{url_suffix}", "headers": headers, "timeout": DISPENSER_REQUEST_TIMEOUT}
+    request_args = {
+        "url": f"{AUTH_CONFIG.base_url}/{url_suffix}",
+        "headers": headers,
+        "timeout": DISPENSER_REQUEST_TIMEOUT,
+    }
 
     if method.upper() != "GET" and data is not None:
         request_args["json"] = data
@@ -112,8 +116,8 @@ def get_keyring_data() -> AccountKeyringData:
 
 
 def validate_id_token(id_token: str, audience: str) -> None:
-    jwks_url = f"https://{CONFIG.domain}/.well-known/jwks.json"
-    issuer = f"https://{CONFIG.domain}/"
+    jwks_url = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
+    issuer = f"https://{AUTH_CONFIG.domain}/"
     sv = AsymmetricSignatureVerifier(jwks_url)
     tv = TokenVerifier(signature_verifier=sv, issuer=issuer, audience=audience)
     tv.verify(id_token)
@@ -136,11 +140,11 @@ def refresh_token() -> None:
     }
     token_data = {
         "grant_type": "refresh_token",
-        "client_id": CONFIG.client_ids[DispenseApiAudiences.USER],
+        "client_id": AUTH_CONFIG.client_ids[DispenseApiAudiences.USER],
         "refresh_token": data.refresh_token,
     }
     response = httpx.post(
-        f"https://{CONFIG.domain}/oauth/token", data=token_data, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
+        f"https://{AUTH_CONFIG.domain}/oauth/token", data=token_data, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
     )
     if response.status_code != httpx.codes.OK:
         logger.warning("Error refreshing the token")
@@ -149,15 +153,15 @@ def refresh_token() -> None:
 
 
 def get_oauth_tokens(api_audience: DispenseApiAudiences, custom_scopes: str | None = None) -> dict[str, Any] | None:
-    scope = f"openid profile email {CONFIG.audiences[api_audience]} " + (custom_scopes or "")
+    scope = f"openid profile email {AUTH_CONFIG.audiences[api_audience]} " + (custom_scopes or "")
     device_code_payload = {
-        "client_id": CONFIG.client_ids[api_audience],
+        "client_id": AUTH_CONFIG.client_ids[api_audience],
         "scope": scope.strip(),
-        "audience": CONFIG.audiences[api_audience],
+        "audience": AUTH_CONFIG.audiences[api_audience],
     }
 
     device_code_response = httpx.post(
-        f"https://{CONFIG.domain}/oauth/device/code", data=device_code_payload, timeout=DISPENSER_REQUEST_TIMEOUT
+        f"https://{AUTH_CONFIG.domain}/oauth/device/code", data=device_code_payload, timeout=DISPENSER_REQUEST_TIMEOUT
     )
 
     if device_code_response.status_code != httpx.codes.OK:
@@ -174,17 +178,17 @@ def get_oauth_tokens(api_audience: DispenseApiAudiences, custom_scopes: str | No
         token_payload = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": device_code_data["device_code"],
-            "client_id": CONFIG.client_ids[api_audience],
-            "audience": CONFIG.audiences[api_audience],
+            "client_id": AUTH_CONFIG.client_ids[api_audience],
+            "audience": AUTH_CONFIG.audiences[api_audience],
         }
 
         token_response = httpx.post(
-            f"https://{CONFIG.domain}/oauth/token", data=token_payload, timeout=DISPENSER_REQUEST_TIMEOUT
+            f"https://{AUTH_CONFIG.domain}/oauth/token", data=token_payload, timeout=DISPENSER_REQUEST_TIMEOUT
         )
 
         token_data = token_response.json()
         if token_response.status_code == httpx.codes.OK and isinstance(token_data, dict):
-            validate_id_token(token_data["id_token"], audience=CONFIG.client_ids[api_audience])
+            validate_id_token(token_data["id_token"], audience=AUTH_CONFIG.client_ids[api_audience])
             return token_data
         elif token_data["error"] not in ("authorization_pending", "slow_down"):
             logger.info(token_data["error_description"])
