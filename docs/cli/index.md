@@ -36,26 +36,46 @@
     - [-P, --path ](#-p---path-)
     - [Arguments](#arguments-1)
     - [ENVIRONMENT_NAME](#environment_name)
-  - [doctor](#doctor)
+  - [dispenser](#dispenser)
+    - [fund](#fund)
     - [Options](#options-7)
+    - [-w, --wallet ](#-w---wallet-)
+    - [-a, --amount ](#-a---amount-)
+    - [--whole-units](#--whole-units)
+    - [--ci](#--ci)
+    - [limit](#limit)
+    - [Options](#options-8)
+    - [--whole-units](#--whole-units-1)
+    - [--ci](#--ci-1)
+    - [login](#login)
+    - [Options](#options-9)
+    - [--ci](#--ci-2)
+    - [-o, --output ](#-o---output-)
+    - [logout](#logout)
+    - [refund](#refund)
+    - [Options](#options-10)
+    - [-t, --txID ](#-t---txid-)
+    - [--ci](#--ci-3)
+  - [doctor](#doctor)
+    - [Options](#options-11)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
     - [Arguments](#arguments-2)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-8)
-    - [-o, --output ](#-o---output-)
+    - [Options](#options-12)
+    - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
     - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-9)
+    - [Options](#options-13)
     - [--console](#--console)
     - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-10)
+    - [Options](#options-14)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -70,11 +90,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-11)
+    - [Options](#options-15)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-12)
+    - [Options](#options-16)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -272,9 +292,105 @@ Specify the project directory. If not provided, current working directory will b
 ### ENVIRONMENT_NAME
 Optional argument
 
+## dispenser
+
+Interact with the AlgoKit TestNet Dispenser.
+
+```shell
+algokit dispenser [OPTIONS] COMMAND [ARGS]...
+```
+
+### fund
+
+Fund your wallet address with TestNet ALGOs.
+
+```shell
+algokit dispenser fund [OPTIONS]
+```
+
+### Options
+
+
+### -w, --wallet <wallet>
+**Required** Wallet address to fund with TestNet ALGOs.
+
+
+### -a, --amount <amount>
+**Required** Amount to fund. Defaults to microAlgos.
+
+
+### --whole-units
+Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+
+
+### --ci
+Enable/disable interactions with Dispenser API via CI access token.
+
+### limit
+
+Get information about current fund limits on your account. Resets daily.
+
+```shell
+algokit dispenser limit [OPTIONS]
+```
+
+### Options
+
+
+### --whole-units
+Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+
+
+### --ci
+Enable/disable interactions with Dispenser API via CI access token.
+
+### login
+
+Login to your Dispenser API account.
+
+```shell
+algokit dispenser login [OPTIONS]
+```
+
+### Options
+
+
+### --ci
+Generate an access token for CI. Issued for 30 days.
+
+
+### -o, --output <output>
+Output filename where you want to store the generated access token. Defaults to ci_token.txt.        Only applicable when –ci flag is set.
+
+### logout
+
+Logout of your Dispenser API account.
+
+```shell
+algokit dispenser logout [OPTIONS]
+```
+
+### refund
+
+Refund ALGOs back to the dispenser wallet address.
+
+```shell
+algokit dispenser refund [OPTIONS]
+```
+
+### Options
+
+
+### -t, --txID <tx_id>
+**Required** Transaction ID of your refund operation.
+
+
+### --ci
+Enable/disable interactions with Dispenser API via CI access token.
+
 ## doctor
 
-Diagnose potential environment issues that may affect AlgoKit
+Diagnose potential environment issues that may affect AlgoKit.
 
 Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
 potential issues.
