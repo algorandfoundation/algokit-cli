@@ -4,17 +4,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import click
-import keyring
 
 from algokit.core.dispenser import (
-    DISPENSER_KEYRING_KEY,
-    DISPENSER_KEYRING_NAMESPACE,
     DispenserApiAudiences,
+    clear_dispenser_credentials,
     get_oauth_tokens,
     is_authenticated,
     process_dispenser_request,
     revoke_refresh_token,
-    set_keyring_passwords,
+    set_dispenser_credentials,
 )
 from algokit.core.utils import is_network_available
 
@@ -55,7 +53,7 @@ def logout_command() -> None:
     if is_authenticated():
         try:
             revoke_refresh_token()
-            keyring.delete_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_KEY)
+            clear_dispenser_credentials()
         except Exception as e:
             logger.debug(f"Error logging out {e}")
             raise click.ClickException("Error logging out") from e
@@ -100,7 +98,7 @@ def login_command(*, ci: bool, output: str) -> None:
                 "Please ensure you keep this file safe or remove after copying the token!"
             )
         else:
-            set_keyring_passwords(token_data)
+            set_dispenser_credentials(token_data)
             logger.info("Logged in!")
 
     except Exception as e:

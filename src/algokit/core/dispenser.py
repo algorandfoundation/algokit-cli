@@ -1,5 +1,4 @@
 import base64
-import json
 import logging
 import os
 import time
@@ -18,7 +17,10 @@ logger = logging.getLogger(__name__)
 # Constants
 ALGORITHMS = ["RS256"]
 DISPENSER_KEYRING_NAMESPACE = "algokit_dispenser"
-DISPENSER_KEYRING_KEY = "algokit_account"
+DISPENSER_KEYRING_ID_TOKEN_KEY = "algokit_dispenser_id_token"
+DISPENSER_KEYRING_ACCESS_TOKEN_KEY = "algokit_dispenser_access_token"
+DISPENSER_KEYRING_REFRESH_TOKEN_KEY = "algokit_dispenser_refresh_token"
+DISPENSER_KEYRING_USER_ID_KEY = "algokit_dispenser_user_id"
 DISPENSER_REQUEST_TIMEOUT = 15
 DISPENSER_ACCESS_TOKEN_KEY = "DISPENSER_ACCESS_TOKEN"
 
@@ -59,15 +61,32 @@ AUTH_CONFIG = AuthConfig(
 AUTH_JWKS_URL = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
 
 
+def _get_dispenser_credential(key: str) -> str:
+    """
+    Get dispenser account credentials from the keyring.
+    """
+
+    response = keyring.get_password(DISPENSER_KEYRING_NAMESPACE, key)
+
+    if not response:
+        raise Exception(f"No keyring data found for key: {key}")
+
+    return response
+
+
 def _get_dispenser_credentials() -> AccountKeyringData:
     """
     Get dispenser account credentials from the keyring.
     """
 
-    data_str = keyring.get_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_KEY)
-    if not data_str:
-        raise Exception("No keyring data found")
-    return AccountKeyringData(**json.loads(data_str))
+    id_token = _get_dispenser_credential(DISPENSER_KEYRING_ID_TOKEN_KEY)
+    access_token = _get_dispenser_credential(DISPENSER_KEYRING_ACCESS_TOKEN_KEY)
+    refresh_token = _get_dispenser_credential(DISPENSER_KEYRING_REFRESH_TOKEN_KEY)
+    user_id = _get_dispenser_credential(DISPENSER_KEYRING_USER_ID_KEY)
+
+    return AccountKeyringData(
+        id_token=id_token, access_token=access_token, refresh_token=refresh_token, user_id=user_id
+    )
 
 
 def _get_auth_token(*, ci: bool) -> str | None:
@@ -130,7 +149,7 @@ def _refresh_user_access_token() -> None:
     )
     response.raise_for_status()
 
-    set_keyring_passwords(response.json())
+    set_dispenser_credentials(response.json())
 
 
 def _request_device_code(api_audience: DispenserApiAudiences, custom_scopes: str | None = None) -> dict[str, Any]:
@@ -208,20 +227,30 @@ def process_dispenser_request(
         raise Exception(error_message) from err
 
 
-def set_keyring_passwords(token_data: dict[str, str]) -> None:
+def set_dispenser_credentials(token_data: dict[str, str]) -> None:
     """
     Set the keyring passwords.
     """
 
     decoded_id_token = jwt.decode(token_data["id_token"], algorithms=ALGORITHMS, options={"verify_signature": False})
-    user_id = decoded_id_token.get("sub")
-    data = AccountKeyringData(
-        id_token=token_data["id_token"],
-        access_token=token_data["access_token"],
-        refresh_token=token_data.get("refresh_token", ""),
-        user_id=user_id or "",
+
+    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_ID_TOKEN_KEY, token_data["id_token"])
+    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_ACCESS_TOKEN_KEY, token_data["access_token"])
+    keyring.set_password(
+        DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_REFRESH_TOKEN_KEY, token_data.get("refresh_token", "")
     )
-    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_KEY, json.dumps(data.__dict__))
+    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_USER_ID_KEY, decoded_id_token.get("sub"))
+
+
+def clear_dispenser_credentials() -> None:
+    """
+    Clear the keyring passwords.
+    """
+
+    keyring.delete_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_ID_TOKEN_KEY)
+    keyring.delete_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_ACCESS_TOKEN_KEY)
+    keyring.delete_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_REFRESH_TOKEN_KEY)
+    keyring.delete_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_USER_ID_KEY)
 
 
 def is_authenticated() -> bool:
