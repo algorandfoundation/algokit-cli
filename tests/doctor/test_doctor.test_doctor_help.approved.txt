@@ -1,6 +1,6 @@
 Usage: algokit doctor [OPTIONS]
 
-  Diagnose potential environment issues that may affect AlgoKit
+  Diagnose potential environment issues that may affect AlgoKit.
 
   Will search the system for AlgoKit dependencies and show their versions, as
   well as identifying any potential issues.
