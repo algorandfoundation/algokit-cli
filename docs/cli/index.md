@@ -39,7 +39,7 @@
   - [dispenser](#dispenser)
     - [fund](#fund)
     - [Options](#options-7)
-    - [-w, --wallet ](#-w---wallet-)
+    - [-r, --receiver ](#-r---receiver-)
     - [-a, --amount ](#-a---amount-)
     - [--whole-units](#--whole-units)
     - [--ci](#--ci)
@@ -311,8 +311,8 @@ algokit dispenser fund [OPTIONS]
 ### Options
 
 
-### -w, --wallet <wallet>
-**Required** Wallet address to fund with TestNet ALGOs.
+### -r, --receiver <receiver>
+**Required** Receiver address to fund with TestNet ALGOs.
 
 
 ### -a, --amount <amount>
@@ -320,7 +320,7 @@ algokit dispenser fund [OPTIONS]
 
 
 ### --whole-units
-Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 
 
 ### --ci
@@ -328,7 +328,7 @@ Enable/disable interactions with Dispenser API via CI access token.
 
 ### limit
 
-Get information about current fund limits on your account. Resets daily.
+Get information about current fund limit on your account. Resets daily.
 
 ```shell
 algokit dispenser limit [OPTIONS]
@@ -338,7 +338,7 @@ algokit dispenser limit [OPTIONS]
 
 
 ### --whole-units
-Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 
 
 ### --ci

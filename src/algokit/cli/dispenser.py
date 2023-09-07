@@ -26,6 +26,11 @@ class DispenserAsset:
     description: str
 
 
+class OutputMode(enum.Enum):
+    STDOUT = "stdout"
+    FILE = "file"
+
+
 class DispenserAssetName(enum.IntEnum):
     ALGO = 0
 
@@ -37,6 +42,23 @@ assets = {
         description="Algo",
     ),
 }
+
+
+def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -> None:
+    if output_mode == OutputMode.STDOUT.value:
+        click.echo(f'\nAccess Token (valid for 30 days):\n\n{token_data["access_token"]}\n')
+        logger.warning(
+            "Your CI access token has been printed to stdout.\n"
+            "Please ensure you keep this token safe!\n"
+            "If needed, clear your terminal history after copying the token!"
+        )
+    else:
+        with Path.open(Path(output_filename), "w") as token_file:
+            token_file.write(token_data["access_token"])
+        logger.warning(
+            f"Your CI access token has been saved to `{output_filename}`.\n"
+            "Please ensure you keep this file safe or remove after copying the token!"
+        )
 
 
 class DispenserGroup(click.Group):
@@ -72,16 +94,31 @@ def logout_command() -> None:
 
 
 @dispenser_group.command("login", help="Login to your Dispenser API account.")
-@click.option("--ci", help="Generate an access token for CI. Issued for 30 days.", is_flag=True, default=False)
+@click.option(
+    "--ci", help="Generate an access token for CI. Issued for 30 days.", is_flag=True, default=False, required=False
+)
 @click.option(
     "--output",
     "-o",
+    "output_mode",
+    required=False,
+    type=click.Choice([OutputMode.STDOUT.value, OutputMode.FILE.value], case_sensitive=False),
+    default=OutputMode.STDOUT.value,
+    help="Choose the output method for the access token. Defaults to `stdout`. Only applicable when --ci flag is set",
+)
+@click.option(
+    "--file",
+    "-f",
+    "output_filename",
+    required=False,
     type=str,
-    help="Output filename where you want to store the generated access token. Defaults to `ci_token.txt`.\
-        Only applicable when --ci flag is set.",
+    help=(
+        "Output filename where you want to store the generated access token."
+        "Defaults to `ci_token.txt`. Only applicable when --ci flag is set and --output mode is `file`."
+    ),
     default="ci_token.txt",
 )
-def login_command(*, ci: bool, output: str) -> None:
+def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
     if not ci and is_authenticated():
         logger.info("Already logged in")
         return
@@ -95,13 +132,7 @@ def login_command(*, ci: bool, output: str) -> None:
             raise click.ClickException("Error obtaining auth token")
 
         if ci:
-            token_file_path = output
-            with Path.open(Path(token_file_path), "w") as token_file:
-                token_file.write(token_data["access_token"])
-            logger.warning(
-                f"Your CI access token has been saved to `{token_file_path}`.\n"
-                "Please ensure you keep this file safe or remove after copying the token!"
-            )
+            _handle_ci_token(output_mode, output_filename, token_data)
         else:
             set_dispenser_credentials(token_data)
             logger.info("Logged in!")
@@ -112,13 +143,13 @@ def login_command(*, ci: bool, output: str) -> None:
 
 
 @dispenser_group.command("fund", help="Fund your wallet address with TestNet ALGOs.")
-@click.option("--wallet", "-w", required=True, help="Wallet address to fund with TestNet ALGOs.")
+@click.option("--receiver", "-r", required=True, help="Receiver address to fund with TestNet ALGOs.")
 @click.option("--amount", "-a", required=True, help="Amount to fund. Defaults to microAlgos.", default=1000000)
 @click.option(
     "--whole-units",
     "whole_units",
     is_flag=True,
-    help="Use whole units instead of smallest divisible units (microAlgos). Disabled by default.",
+    help="Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.",
     default=False,
 )
 @click.option(
@@ -128,7 +159,7 @@ def login_command(*, ci: bool, output: str) -> None:
     default=False,
     help="Enable/disable interactions with Dispenser API via CI access token.",
 )
-def fund_command(*, wallet: str, amount: int, whole_units: bool, ci: bool) -> None:
+def fund_command(*, receiver: str, amount: int, whole_units: bool, ci: bool) -> None:
     if not ci and not is_authenticated():
         logger.error("Please login first")
         return
@@ -140,7 +171,7 @@ def fund_command(*, wallet: str, amount: int, whole_units: bool, ci: bool) -> No
     try:
         response = process_dispenser_request(
             url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}",
-            data={"walletAddress": wallet, "amount": amount, "assetID": default_asset.asset_id},
+            data={"receiver": receiver, "amount": amount, "assetID": default_asset.asset_id},
             ci=ci,
             method="POST",
         )
@@ -163,7 +194,7 @@ def refund_command(*, tx_id: str, ci: bool) -> None:
         return
 
     try:
-        response = process_dispenser_request(url_suffix="refund", data={"refundTxnID": tx_id}, ci=ci)
+        response = process_dispenser_request(url_suffix="refund", data={"refundTransactionID": tx_id}, ci=ci)
     except Exception as e:
         logger.debug("Error processing refund request: %s", e)
         raise click.ClickException(str(e)) from e
@@ -172,12 +203,12 @@ def refund_command(*, tx_id: str, ci: bool) -> None:
         logger.info(response.json()["message"])
 
 
-@dispenser_group.command("limit", help="Get information about current fund limits on your account. Resets daily.")
+@dispenser_group.command("limit", help="Get information about current fund limit on your account. Resets daily.")
 @click.option(
     "--whole-units",
     "whole_units",
     is_flag=True,
-    help="Use whole units instead of smallest divisible units (microAlgos). Disabled by default.",
+    help="Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.",
     default=False,
 )
 @click.option(

@@ -157,7 +157,7 @@ def _request_device_code(api_audience: DispenserApiAudiences, custom_scopes: str
     Request a device code for user authentication.
     """
 
-    scope = f"openid profile email {AUTH_CONFIG.audiences[api_audience]} {custom_scopes or ''}".strip()
+    scope = f"openid profile email {custom_scopes or ''}".strip()
     device_code_payload = {
         "client_id": AUTH_CONFIG.client_ids[api_audience],
         "scope": scope,

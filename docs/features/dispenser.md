@@ -1,4 +1,4 @@
-# AlgoKit TestNet Dispenser 
+# AlgoKit TestNet Dispenser
 
 The AlgoKit Dispenser feature allows you to interact with the AlgoKit TestNet Dispenser. This feature is essential for funding your wallet with TestNet ALGOs, refunding ALGOs back to the dispenser wallet, and getting information about current fund limits on your account.
 
@@ -14,7 +14,6 @@ Subcommands
 - `login`: Login to your Dispenser API account.
 - `logout`: Logout of your Dispenser API account.
 - `fund`: Fund your wallet address with TestNet ALGOs.
-
 - `refund`: Refund ALGOs back to the dispenser wallet address.
 - `limit`: Get information about current fund limits on your account.
 
@@ -47,9 +46,9 @@ $ algokit dispenser fund [OPTIONS]
 This command funds your wallet address with TestNet ALGOs.
 Options
 
-- `--wallet`, -w: Wallet address to fund with TestNet ALGOs. This option is required.
+- `--receiver`, -r: Receiver address to fund with TestNet ALGOs. This option is required.
 - `--amount`, -a: Amount to fund. Defaults to microAlgos. This option is required.
-- `--whole-units`: Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+- `--whole-units`: Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 - `--ci`: Enable/disable interactions with Dispenser API via CI access token.
 
 ## Refund
@@ -73,7 +72,7 @@ $ algokit dispenser limit [OPTIONS]
 This command gets information about current fund limits on your account. The limits reset daily.
 Options
 
-- `--whole-units`: Use whole units instead of smallest divisible units (microAlgos). Disabled by default.
+- `--whole-units`: Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 - `--ci`: Enable/disable interactions with Dispenser API via CI access token.
 
 ## Further Reading
