@@ -51,6 +51,7 @@
     - [Options](#options-9)
     - [--ci](#--ci-2)
     - [-o, --output ](#-o---output-)
+    - [-f, --file ](#-f---file-)
     - [logout](#logout)
     - [refund](#refund)
     - [Options](#options-10)
@@ -359,8 +360,18 @@ algokit dispenser login [OPTIONS]
 Generate an access token for CI. Issued for 30 days.
 
 
-### -o, --output <output>
-Output filename where you want to store the generated access token. Defaults to ci_token.txt.        Only applicable when –ci flag is set.
+### -o, --output <output_mode>
+Choose the output method for the access token. Defaults to stdout. Only applicable when –ci flag is set
+
+
+* **Options**
+
+    stdout | file
+
+
+
+### -f, --file <output_filename>
+Output filename where you want to store the generated access token.Defaults to ci_token.txt. Only applicable when –ci flag is set and –output mode is file.
 
 ### logout
 
