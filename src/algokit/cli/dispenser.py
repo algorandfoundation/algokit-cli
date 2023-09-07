@@ -39,17 +39,26 @@ assets = {
 }
 
 
-@click.group("dispenser")
+class DispenserGroup(click.Group):
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        return_value = super().get_command(ctx, cmd_name)
+
+        if return_value is None:
+            return None
+        elif is_network_available():
+            return return_value
+        else:
+            logger.error("Please connect to internet first")
+            raise click.exceptions.Exit(code=1)
+
+
+@click.group("dispenser", cls=DispenserGroup)
 def dispenser_group() -> None:
     """Interact with the AlgoKit TestNet Dispenser."""
 
 
 @dispenser_group.command("logout", help="Logout of your Dispenser API account.")
 def logout_command() -> None:
-    if not is_network_available():
-        logger.error("Please connect to internet first")
-        return
-
     if is_authenticated():
         try:
             revoke_refresh_token()
@@ -73,10 +82,6 @@ def logout_command() -> None:
     default="ci_token.txt",
 )
 def login_command(*, ci: bool, output: str) -> None:
-    if not is_network_available():
-        logger.error("Please connect to internet first")
-        return
-
     if not ci and is_authenticated():
         logger.info("Already logged in")
         return
@@ -124,10 +129,6 @@ def login_command(*, ci: bool, output: str) -> None:
     help="Enable/disable interactions with Dispenser API via CI access token.",
 )
 def fund_command(*, wallet: str, amount: int, whole_units: bool, ci: bool) -> None:
-    if not is_network_available():
-        logger.error("Please connect to internet first")
-        return
-
     if not ci and not is_authenticated():
         logger.error("Please login first")
         return
@@ -157,10 +158,6 @@ def fund_command(*, wallet: str, amount: int, whole_units: bool, ci: bool) -> No
     "--ci", is_flag=True, default=False, help="Enable/disable interactions with Dispenser API via CI access token."
 )
 def refund_command(*, tx_id: str, ci: bool) -> None:
-    if not is_network_available():
-        logger.error("Please connect to internet first")
-        return
-
     if not ci and not is_authenticated():
         logger.error("Please login first")
         return
@@ -187,10 +184,6 @@ def refund_command(*, tx_id: str, ci: bool) -> None:
     "--ci", is_flag=True, default=False, help="Enable/disable interactions with Dispenser API via CI access token."
 )
 def get_fund_limit(*, whole_units: bool, ci: bool) -> None:
-    if not is_network_available():
-        logger.error("Please connect to internet first")
-        return
-
     if not ci and not is_authenticated():
         logger.error("Please login first")
         return
