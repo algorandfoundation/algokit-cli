@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 
 from algokit.core.dispenser import (
+    DISPENSER_ACCESS_TOKEN_KEY,
     DispenserApiAudiences,
     clear_dispenser_credentials,
     get_oauth_tokens,
@@ -46,7 +47,7 @@ assets = {
 
 def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -> None:
     if output_mode == OutputMode.STDOUT.value:
-        click.echo(f'\nAccess Token (valid for 30 days):\n\n{token_data["access_token"]}\n')
+        click.echo(f'\n{DISPENSER_ACCESS_TOKEN_KEY} (valid for 30 days):\n\n{token_data["access_token"]}\n')
         logger.warning(
             "Your CI access token has been printed to stdout.\n"
             "Please ensure you keep this token safe!\n"
@@ -152,15 +153,8 @@ def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
     help="Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.",
     default=False,
 )
-@click.option(
-    "--ci",
-    "ci",
-    is_flag=True,
-    default=False,
-    help="Enable/disable interactions with Dispenser API via CI access token.",
-)
-def fund_command(*, receiver: str, amount: int, whole_units: bool, ci: bool) -> None:
-    if not ci and not is_authenticated():
+def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
+    if not is_authenticated():
         logger.error("Please login first")
         return
 
@@ -172,34 +166,26 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool, ci: bool) -> 
         response = process_dispenser_request(
             url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}",
             data={"receiver": receiver, "amount": amount, "assetID": default_asset.asset_id},
-            ci=ci,
             method="POST",
         )
     except Exception as e:
-        logger.debug("Error processing dispenser fund request: %s", e)
-        raise click.ClickException(str(e)) from e
-
-    if response:
+        logger.error(f"Error: {e}")
+    else:
         logger.info(response.json()["message"])
 
 
 @dispenser_group.command("refund", help="Refund ALGOs back to the dispenser wallet address.")
 @click.option("--txID", "-t", "tx_id", required=True, help="Transaction ID of your refund operation.")
-@click.option(
-    "--ci", is_flag=True, default=False, help="Enable/disable interactions with Dispenser API via CI access token."
-)
-def refund_command(*, tx_id: str, ci: bool) -> None:
-    if not ci and not is_authenticated():
+def refund_command(*, tx_id: str) -> None:
+    if not is_authenticated():
         logger.error("Please login first")
         return
 
     try:
-        response = process_dispenser_request(url_suffix="refund", data={"refundTransactionID": tx_id}, ci=ci)
+        response = process_dispenser_request(url_suffix="refund", data={"refundTransactionID": tx_id})
     except Exception as e:
-        logger.debug("Error processing refund request: %s", e)
-        raise click.ClickException(str(e)) from e
-
-    if response:
+        logger.error(f"Error: {e}")
+    else:
         logger.info(response.json()["message"])
 
 
@@ -211,23 +197,18 @@ def refund_command(*, tx_id: str, ci: bool) -> None:
     help="Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.",
     default=False,
 )
-@click.option(
-    "--ci", is_flag=True, default=False, help="Enable/disable interactions with Dispenser API via CI access token."
-)
-def get_fund_limit(*, whole_units: bool, ci: bool) -> None:
-    if not ci and not is_authenticated():
+def get_fund_limit(*, whole_units: bool) -> None:
+    if not is_authenticated():
         logger.error("Please login first")
         return
 
     try:
         response = process_dispenser_request(
-            url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}/limit", data={}, ci=ci, method="GET"
+            url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}/limit", data={}, method="GET"
         )
     except Exception as e:
-        logger.debug("Error getting dispenser fund limit: %s", e)
-        raise click.ClickException(str(e)) from e
-
-    if response:
+        logger.error(f"Error: {e}")
+    else:
         response_amount = response.json()["amount"]
         amount = response_amount / (10 ** assets[DispenserAssetName.ALGO].decimals) if whole_units else response_amount
         logger.info(f"Remaining daily fund limit: {amount}")

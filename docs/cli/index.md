@@ -42,21 +42,18 @@
     - [-r, --receiver ](#-r---receiver-)
     - [-a, --amount ](#-a---amount-)
     - [--whole-units](#--whole-units)
-    - [--ci](#--ci)
     - [limit](#limit)
     - [Options](#options-8)
     - [--whole-units](#--whole-units-1)
-    - [--ci](#--ci-1)
     - [login](#login)
     - [Options](#options-9)
-    - [--ci](#--ci-2)
+    - [--ci](#--ci)
     - [-o, --output ](#-o---output-)
     - [-f, --file ](#-f---file-)
     - [logout](#logout)
     - [refund](#refund)
     - [Options](#options-10)
     - [-t, --txID ](#-t---txid-)
-    - [--ci](#--ci-3)
   - [doctor](#doctor)
     - [Options](#options-11)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
@@ -323,10 +320,6 @@ algokit dispenser fund [OPTIONS]
 ### --whole-units
 Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 
-
-### --ci
-Enable/disable interactions with Dispenser API via CI access token.
-
 ### limit
 
 Get information about current fund limit on your account. Resets daily.
@@ -340,10 +333,6 @@ algokit dispenser limit [OPTIONS]
 
 ### --whole-units
 Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
-
-
-### --ci
-Enable/disable interactions with Dispenser API via CI access token.
 
 ### login
 
@@ -394,10 +383,6 @@ algokit dispenser refund [OPTIONS]
 
 ### -t, --txID <tx_id>
 **Required** Transaction ID of your refund operation.
-
-
-### --ci
-Enable/disable interactions with Dispenser API via CI access token.
 
 ## doctor
 

@@ -22,7 +22,7 @@ DISPENSER_KEYRING_ACCESS_TOKEN_KEY = "algokit_dispenser_access_token"
 DISPENSER_KEYRING_REFRESH_TOKEN_KEY = "algokit_dispenser_refresh_token"
 DISPENSER_KEYRING_USER_ID_KEY = "algokit_dispenser_user_id"
 DISPENSER_REQUEST_TIMEOUT = 15
-DISPENSER_ACCESS_TOKEN_KEY = "DISPENSER_ACCESS_TOKEN"
+DISPENSER_ACCESS_TOKEN_KEY = "ALGOKIT_DISPENSER_ACCESS_TOKEN"
 
 
 class DispenserApiAudiences(str, Enum):
@@ -89,16 +89,18 @@ def _get_dispenser_credentials() -> AccountKeyringData:
     )
 
 
-def _get_auth_token(*, ci: bool) -> str | None:
+def _get_auth_token() -> str:
     """
-    Retrieve the authorization token based on the environment
+    Retrieve the authorization token based on the environment.
+    CI environment variables take precedence over keyring.
     """
-
-    if ci:
-        return os.environ.get(DISPENSER_ACCESS_TOKEN_KEY)
-
     try:
-        return _get_dispenser_credentials().access_token
+        ci_access_token = os.environ.get(DISPENSER_ACCESS_TOKEN_KEY)
+
+        if ci_access_token:
+            logger.debug("Using CI access token over keyring credentials")
+
+        return ci_access_token if ci_access_token else _get_dispenser_credentials().access_token
     except Exception as ex:
         raise Exception("Token not found") from ex
 
@@ -199,14 +201,12 @@ def request_token(api_audience: DispenserApiAudiences, device_code: str) -> dict
     return data
 
 
-def process_dispenser_request(
-    *, url_suffix: str, data: dict | None = None, ci: bool, method: str = "POST"
-) -> httpx.Response:
+def process_dispenser_request(*, url_suffix: str, data: dict | None = None, method: str = "POST") -> httpx.Response:
     """
     Generalized method to process http requests to dispenser API
     """
 
-    headers = {"Authorization": f"Bearer {_get_auth_token(ci=ci)}"}
+    headers = {"Authorization": f"Bearer {_get_auth_token()}"}
 
     # Set request arguments
     request_args = {
@@ -220,11 +220,21 @@ def process_dispenser_request(
 
     try:
         response: httpx.Response = getattr(httpx, method.lower())(**request_args)
+        response.raise_for_status()
         return response
+
+    except httpx.HTTPStatusError as err:
+        error_message = f"Error processing dispenser API request: {err.response.status_code}"
+
+        if err.response.status_code == httpx.codes.BAD_REQUEST:
+            error_message = err.response.json()["message"]
+
+        raise Exception(error_message) from err
+
     except Exception as err:
         error_message = "Error processing dispenser API request"
         logger.debug(f"{error_message}: {err}", exc_info=True)
-        raise Exception(error_message) from err
+        raise err
 
 
 def set_dispenser_credentials(token_data: dict[str, str]) -> None:
@@ -260,15 +270,18 @@ def is_authenticated() -> bool:
     """
 
     try:
-        data = _get_dispenser_credentials()
-        rsa_pub_key = _get_access_token_rsa_pub_key(data.access_token)
+        access_token = _get_auth_token()
+        rsa_pub_key = _get_access_token_rsa_pub_key(access_token)
 
         jwt.decode(
-            data.access_token,
+            access_token,
             rsa_pub_key,
             options={"verify_signature": True},
             algorithms=ALGORITHMS,
-            audience=AUTH_CONFIG.audiences[DispenserApiAudiences.USER],
+            audience=[
+                AUTH_CONFIG.audiences[DispenserApiAudiences.USER],
+                AUTH_CONFIG.audiences[DispenserApiAudiences.CI],
+            ],
         )
 
         return True
