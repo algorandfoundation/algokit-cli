@@ -105,7 +105,7 @@ def logout_command() -> None:
     required=False,
     type=click.Choice([OutputMode.STDOUT.value, OutputMode.FILE.value], case_sensitive=False),
     default=OutputMode.STDOUT.value,
-    help="Choose the output method for the access token. Defaults to `stdout`. Only applicable when --ci flag is set",
+    help="Choose the output method for the access token. Defaults to `stdout`. Only applicable when --ci flag is set.",
 )
 @click.option(
     "--file",
