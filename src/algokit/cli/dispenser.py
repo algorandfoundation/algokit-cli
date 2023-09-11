@@ -36,13 +36,15 @@ class DispenserAssetName(enum.IntEnum):
     ALGO = 0
 
 
-assets = {
+DISPENSER_ASSETS = {
     DispenserAssetName.ALGO: DispenserAsset(
         asset_id=0,
         decimals=6,
         description="Algo",
     ),
 }
+
+DEFAULT_CI_TOKEN_FILENAME = "algokit_ci_token.txt"
 
 
 def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -> None:
@@ -115,9 +117,9 @@ def logout_command() -> None:
     type=str,
     help=(
         "Output filename where you want to store the generated access token."
-        "Defaults to `ci_token.txt`. Only applicable when --ci flag is set and --output mode is `file`."
+        f"Defaults to `{DEFAULT_CI_TOKEN_FILENAME}`. Only applicable when --ci flag is set and --output mode is `file`."
     ),
-    default="ci_token.txt",
+    default=DEFAULT_CI_TOKEN_FILENAME,
 )
 def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
     if not ci and is_authenticated():
@@ -139,7 +141,6 @@ def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
             logger.info("Logged in!")
 
     except Exception as e:
-        logger.debug(str(e))
         raise click.ClickException(str(e)) from e
 
 
@@ -158,13 +159,14 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
         logger.error("Please login first")
         return
 
-    default_asset = assets[DispenserAssetName.ALGO]
+    default_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
     if whole_units:
         amount = amount * (10**default_asset.decimals)
+        logger.debug(f"Converted algos to microAlgos: {amount}")
 
     try:
         response = process_dispenser_request(
-            url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}",
+            url_suffix=f"fund/{DISPENSER_ASSETS[DispenserAssetName.ALGO].asset_id}",
             data={"receiver": receiver, "amount": amount, "assetID": default_asset.asset_id},
             method="POST",
         )
@@ -204,11 +206,14 @@ def get_fund_limit(*, whole_units: bool) -> None:
 
     try:
         response = process_dispenser_request(
-            url_suffix=f"fund/{assets[DispenserAssetName.ALGO].asset_id}/limit", data={}, method="GET"
+            url_suffix=f"fund/{DISPENSER_ASSETS[DispenserAssetName.ALGO].asset_id}/limit", data={}, method="GET"
         )
     except Exception as e:
         logger.error(f"Error: {e}")
     else:
         response_amount = response.json()["amount"]
-        amount = response_amount / (10 ** assets[DispenserAssetName.ALGO].decimals) if whole_units else response_amount
+        amount = response_amount
+        if whole_units:
+            amount = amount / (10 ** DISPENSER_ASSETS[DispenserAssetName.ALGO].decimals)
+            logger.debug(f"Converted response microAlgos to Algos: {amount}")
         logger.info(f"Remaining daily fund limit: {amount}")

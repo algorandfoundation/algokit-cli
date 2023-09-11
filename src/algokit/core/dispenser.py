@@ -4,7 +4,7 @@ import os
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 import jwt
@@ -23,19 +23,12 @@ DISPENSER_KEYRING_REFRESH_TOKEN_KEY = "algokit_dispenser_refresh_token"
 DISPENSER_KEYRING_USER_ID_KEY = "algokit_dispenser_user_id"
 DISPENSER_REQUEST_TIMEOUT = 15
 DISPENSER_ACCESS_TOKEN_KEY = "ALGOKIT_DISPENSER_ACCESS_TOKEN"
+DISPENSER_LOGIN_TIMEOUT = 300  # 5 minutes
 
 
 class DispenserApiAudiences(str, Enum):
     USER = "staging-dispenser-api-user"
     CI = "staging-dispenser-api-ci"
-
-
-@dataclass
-class AuthConfig:
-    domain: str
-    audiences: dict[DispenserApiAudiences, str]
-    client_ids: dict[DispenserApiAudiences, str]
-    base_url: str
 
 
 @dataclass
@@ -46,19 +39,25 @@ class AccountKeyringData:
     user_id: str
 
 
-AUTH_CONFIG = AuthConfig(
-    domain="dispenser-staging.eu.auth0.com",
-    audiences={
+class ApiConfig:
+    BASE_URL = "https://api.dispenser-dev.algorandfoundation.tools"
+
+
+class AuthConfig:
+    DOMAIN = "dispenser-staging.eu.auth0.com"
+    BASE_URL = f"https://{DOMAIN}"
+    JWKS_URL = f"{BASE_URL}/.well-known/jwks.json"
+    OAUTH_TOKEN_URL = f"{BASE_URL}/oauth/token"
+    OAUTH_DEVICE_CODE_URL = f"{BASE_URL}/oauth/device/code"
+    OAUTH_REVOKE_URL = f"{BASE_URL}/oauth/revoke"
+    AUDIENCES: ClassVar[dict[str, str]] = {
         DispenserApiAudiences.USER: "api-staging-dispenser-user",
         DispenserApiAudiences.CI: "api-staging-dispenser-ci",
-    },
-    client_ids={
+    }
+    CLIENT_IDS: ClassVar[dict[str, str]] = {
         DispenserApiAudiences.USER: "flwPVx0HstfeZtGd3ZJVSwhGCFlR5v8a",
         DispenserApiAudiences.CI: "q3EWUsOmj5jINIchDxnm9gMEa10Th7Zj",
-    },
-    base_url="https://api.dispenser-dev.algorandfoundation.tools",
-)
-AUTH_JWKS_URL = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
+    }
 
 
 def _get_dispenser_credential(key: str) -> str:
@@ -110,8 +109,8 @@ def _validate_jwt_id_token(id_token: str, audience: str) -> None:
     Validate the id token.
     """
 
-    sv = AsymmetricSignatureVerifier(AUTH_JWKS_URL)
-    tv = TokenVerifier(signature_verifier=sv, issuer=f"https://{AUTH_CONFIG.domain}/", audience=audience)
+    sv = AsymmetricSignatureVerifier(AuthConfig.JWKS_URL)
+    tv = TokenVerifier(signature_verifier=sv, issuer=f"{AuthConfig.BASE_URL}/", audience=audience)
     tv.verify(id_token)
 
 
@@ -119,8 +118,7 @@ def _get_access_token_rsa_pub_key(access_token: str) -> rsa.RSAPublicKey:
     """
     Fetch the RSA public key based on provided access token.
     """
-    jwks_url = f"https://{AUTH_CONFIG.domain}/.well-known/jwks.json"
-    jwks = httpx.get(jwks_url).json()
+    jwks = httpx.get(AuthConfig.JWKS_URL).json()
     for key in jwks["keys"]:
         if key["kid"] == jwt.get_unverified_header(access_token)["kid"]:
             return rsa.RSAPublicNumbers(
@@ -143,11 +141,11 @@ def _refresh_user_access_token() -> None:
     }
     token_data = {
         "grant_type": "refresh_token",
-        "client_id": AUTH_CONFIG.client_ids[DispenserApiAudiences.USER],
+        "client_id": AuthConfig.CLIENT_IDS[DispenserApiAudiences.USER],
         "refresh_token": data.refresh_token,
     }
     response = httpx.post(
-        f"https://{AUTH_CONFIG.domain}/oauth/token", data=token_data, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
+        AuthConfig.OAUTH_TOKEN_URL, data=token_data, headers=headers, timeout=DISPENSER_REQUEST_TIMEOUT
     )
     response.raise_for_status()
 
@@ -161,13 +159,11 @@ def _request_device_code(api_audience: DispenserApiAudiences, custom_scopes: str
 
     scope = f"openid profile email {custom_scopes or ''}".strip()
     device_code_payload = {
-        "client_id": AUTH_CONFIG.client_ids[api_audience],
+        "client_id": AuthConfig.CLIENT_IDS[api_audience],
         "scope": scope,
-        "audience": AUTH_CONFIG.audiences[api_audience],
+        "audience": AuthConfig.AUDIENCES[api_audience],
     }
-    response = httpx.post(
-        f"https://{AUTH_CONFIG.domain}/oauth/device/code", data=device_code_payload, timeout=DISPENSER_REQUEST_TIMEOUT
-    )
+    response = httpx.post(AuthConfig.OAUTH_DEVICE_CODE_URL, data=device_code_payload, timeout=DISPENSER_REQUEST_TIMEOUT)
     response.raise_for_status()
 
     data = response.json()
@@ -186,12 +182,10 @@ def request_token(api_audience: DispenserApiAudiences, device_code: str) -> dict
     token_payload = {
         "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
         "device_code": device_code,
-        "client_id": AUTH_CONFIG.client_ids[api_audience],
-        "audience": AUTH_CONFIG.audiences[api_audience],
+        "client_id": AuthConfig.CLIENT_IDS[api_audience],
+        "audience": AuthConfig.AUDIENCES[api_audience],
     }
-    response = httpx.post(
-        f"https://{AUTH_CONFIG.domain}/oauth/token", data=token_payload, timeout=DISPENSER_REQUEST_TIMEOUT
-    )
+    response = httpx.post(AuthConfig.OAUTH_TOKEN_URL, data=token_payload, timeout=DISPENSER_REQUEST_TIMEOUT)
 
     data = response.json()
     if not isinstance(data, dict):
@@ -210,7 +204,7 @@ def process_dispenser_request(*, url_suffix: str, data: dict | None = None, meth
 
     # Set request arguments
     request_args = {
-        "url": f"{AUTH_CONFIG.base_url}/{url_suffix}",
+        "url": f"{ApiConfig.BASE_URL}/{url_suffix}",
         "headers": headers,
         "timeout": DISPENSER_REQUEST_TIMEOUT,
     }
@@ -242,6 +236,7 @@ def set_dispenser_credentials(token_data: dict[str, str]) -> None:
     Set the keyring passwords.
     """
 
+    # Verify signature is set to false since we already validate id_tokens in _validate_jwt_id_token
     decoded_id_token = jwt.decode(token_data["id_token"], algorithms=ALGORITHMS, options={"verify_signature": False})
 
     keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_ID_TOKEN_KEY, token_data["id_token"])
@@ -279,8 +274,8 @@ def is_authenticated() -> bool:
             options={"verify_signature": True},
             algorithms=ALGORITHMS,
             audience=[
-                AUTH_CONFIG.audiences[DispenserApiAudiences.USER],
-                AUTH_CONFIG.audiences[DispenserApiAudiences.CI],
+                AuthConfig.AUDIENCES[DispenserApiAudiences.USER],
+                AuthConfig.AUDIENCES[DispenserApiAudiences.CI],
             ],
         )
 
@@ -311,12 +306,11 @@ def revoke_refresh_token() -> None:
         logger.debug("No refresh token found, nothing to revoke.")
         return
 
-    url = f"https://{AUTH_CONFIG.domain}/oauth/revoke"
-    payload = {"token": data.refresh_token, "client_id": AUTH_CONFIG.client_ids[DispenserApiAudiences.USER]}
+    payload = {"token": data.refresh_token, "client_id": AuthConfig.CLIENT_IDS[DispenserApiAudiences.USER]}
     headers = {"content-type": "application/json"}
 
     try:
-        response = httpx.post(url, json=payload, headers=headers)
+        response = httpx.post(AuthConfig.OAUTH_REVOKE_URL, json=payload, headers=headers)
         response.raise_for_status()
         logger.debug("Token revoked successfully")
     except httpx.HTTPStatusError as ex:
@@ -339,12 +333,11 @@ def get_oauth_tokens(api_audience: DispenserApiAudiences, custom_scopes: str | N
     logger.info(f"Confirm code: {device_code_data['user_code']}")
 
     start_time = time.time()
-    timeout_interval = 300  # 5 minutes
     while True:
         token_data = request_token(api_audience, device_code_data["device_code"])
 
         if "id_token" in token_data:
-            _validate_jwt_id_token(token_data["id_token"], audience=AUTH_CONFIG.client_ids[api_audience])
+            _validate_jwt_id_token(token_data["id_token"], audience=AuthConfig.CLIENT_IDS[api_audience])
             return token_data
 
         error = token_data.get("error", "")
@@ -352,7 +345,7 @@ def get_oauth_tokens(api_audience: DispenserApiAudiences, custom_scopes: str | N
             raise Exception(token_data.get("error_description", ""))
 
         # Check if 5 minutes have passed
-        if time.time() - start_time > timeout_interval:
+        if time.time() - start_time > DISPENSER_LOGIN_TIMEOUT:
             logger.warning("Authentication cancelled. Timeout reached after 5 minutes of inactivity.")
             break
 
