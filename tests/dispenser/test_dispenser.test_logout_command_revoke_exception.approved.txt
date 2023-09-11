@@ -1,2 +1,0 @@
-DEBUG: Error logging out Failed to revoke token
-Error: Error logging out

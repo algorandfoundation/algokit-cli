@@ -1,8 +1,0 @@
-DEBUG: Access token validation error: No response can be found for GET request on https://dispenser-staging.eu.auth0.com/.well-known/jwks.json amongst:
-Match POST requests on https://dispenser-staging.eu.auth0.com/oauth/device/code
-Match POST requests on https://dispenser-staging.eu.auth0.com/oauth/token
-DEBUG: HTTP Request: POST https://dispenser-staging.eu.auth0.com/oauth/device/code "HTTP/1.1 200 OK"
-Navigate to: https://example.com/device
-Confirm code: user_code
-DEBUG: HTTP Request: POST https://dispenser-staging.eu.auth0.com/oauth/token "HTTP/1.1 200 OK"
-Logged in!

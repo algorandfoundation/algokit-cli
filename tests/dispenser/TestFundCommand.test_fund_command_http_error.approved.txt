@@ -1,0 +1,2 @@
+DEBUG: Error processing dispenser API request: Limit exceeded
+ERROR: Error: Limit exceeded

@@ -1,0 +1,2 @@
+DEBUG: HTTP Request: POST https://api.dispenser-dev.algorandfoundation.tools/refund "HTTP/1.1 200 OK"
+Successfully refunded transaction some_transaction_id

@@ -1,1 +1,0 @@
-WARNING: Not logged in! To login, run `algokit dispenser login`

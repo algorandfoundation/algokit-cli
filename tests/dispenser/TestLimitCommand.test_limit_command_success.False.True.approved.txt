@@ -1,0 +1,3 @@
+DEBUG: HTTP Request: GET https://api.dispenser-dev.algorandfoundation.tools/fund/0/limit "HTTP/1.1 200 OK"
+DEBUG: Converted response microAlgos to Algos: 1.0
+Remaining daily fund limit: 1.0
