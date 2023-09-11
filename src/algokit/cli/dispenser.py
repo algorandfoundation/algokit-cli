@@ -93,7 +93,7 @@ def logout_command() -> None:
             raise click.ClickException("Error logging out") from e
         logger.info("Logout successful")
     else:
-        logger.warning("Not logged in! To login, run `algokit dispenser login`")
+        logger.warning("Already logged out")
 
 
 @dispenser_group.command("login", help="Login to your Dispenser API account.")
