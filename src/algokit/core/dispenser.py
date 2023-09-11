@@ -287,7 +287,10 @@ def is_authenticated() -> bool:
             _refresh_user_access_token()
             return True
         except Exception:
-            logger.warning("Failed to refresh the access token. Retrying login...", exc_info=True)
+            logger.warning(
+                "Failed to refresh the access token. Please authenticate first before proceeding with this command.",
+                exc_info=True,
+            )
 
         return False
     except Exception as ex:
