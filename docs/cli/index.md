@@ -350,7 +350,7 @@ Generate an access token for CI. Issued for 30 days.
 
 
 ### -o, --output <output_mode>
-Choose the output method for the access token. Defaults to stdout. Only applicable when –ci flag is set
+Choose the output method for the access token. Defaults to stdout. Only applicable when –ci flag is set.
 
 
 * **Options**
@@ -360,7 +360,7 @@ Choose the output method for the access token. Defaults to stdout. Only applicab
 
 
 ### -f, --file <output_filename>
-Output filename where you want to store the generated access token.Defaults to ci_token.txt. Only applicable when –ci flag is set and –output mode is file.
+Output filename where you want to store the generated access token.Defaults to algokit_ci_token.txt. Only applicable when –ci flag is set and –output mode is file.
 
 ### logout
 
