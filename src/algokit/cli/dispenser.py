@@ -138,7 +138,7 @@ def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
             _handle_ci_token(output_mode, output_filename, token_data)
         else:
             set_dispenser_credentials(token_data)
-            logger.info("Logged in!")
+            logger.info("Login successful")
 
     except Exception as e:
         raise click.ClickException(str(e)) from e
