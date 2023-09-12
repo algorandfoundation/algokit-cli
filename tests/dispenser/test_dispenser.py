@@ -6,7 +6,14 @@ import httpx
 import jwt
 import pytest
 from algokit.cli.dispenser import DEFAULT_CI_TOKEN_FILENAME, DISPENSER_ASSETS, DispenserAssetName
-from algokit.core.dispenser import ApiConfig, AuthConfig
+from algokit.core.dispenser import (
+    DISPENSER_KEYRING_ACCESS_TOKEN_KEY,
+    DISPENSER_KEYRING_ID_TOKEN_KEY,
+    DISPENSER_KEYRING_REFRESH_TOKEN_KEY,
+    DISPENSER_KEYRING_USER_ID_KEY,
+    ApiConfig,
+    AuthConfig,
+)
 from approvaltests.namer import NamerFactory
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -15,22 +22,42 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
-@pytest.fixture(autouse=True)
-def _mock_keyring(mocker: MockerFixture) -> None:
-    mocker.patch("keyring.set_password")
-    mocker.patch("keyring.delete_password")
-    mocker.patch("keyring.get_password")
-    mocker.patch("jwt.decode")
-
-
 @pytest.fixture()
-def mock_keyring_get_password(mocker: MockerFixture) -> typing.Callable:
-    def _setup_mock_keyring(return_values: list[str] | None = None) -> None:
-        get_password_mock = mocker.patch("keyring.get_password")
-        if return_values:
-            get_password_mock.side_effect = return_values
+def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None], None, None]:
+    credentials: dict[str, str | None] = {
+        DISPENSER_KEYRING_ID_TOKEN_KEY: None,
+        DISPENSER_KEYRING_ACCESS_TOKEN_KEY: None,
+        DISPENSER_KEYRING_REFRESH_TOKEN_KEY: None,
+        DISPENSER_KEYRING_USER_ID_KEY: None,
+    }
 
-    return _setup_mock_keyring
+    def _get_password(namespace: str, key: str) -> str | None:  # noqa: ARG001
+        return credentials[key]
+
+    def _set_password(namespace: str, key: str, password: str) -> None:  # noqa: ARG001
+        credentials[key] = password
+
+    def _delete_password(namespace: str, key: str) -> None:  # noqa: ARG001
+        credentials[key] = None
+
+    mocker.patch("keyring.get_password", side_effect=_get_password)
+    mocker.patch("keyring.set_password", side_effect=_set_password)
+    mocker.patch("keyring.delete_password", side_effect=_delete_password)
+
+    yield credentials
+
+    # Teardown step: reset the credentials
+    for key in credentials:
+        credentials[key] = None
+
+
+def _set_mock_keyring_credentials(
+    mock_keyring: dict, id_token: str, access_token: str, refresh_token: str, user_id: str
+) -> None:
+    mock_keyring[DISPENSER_KEYRING_ID_TOKEN_KEY] = id_token
+    mock_keyring[DISPENSER_KEYRING_ACCESS_TOKEN_KEY] = access_token
+    mock_keyring[DISPENSER_KEYRING_REFRESH_TOKEN_KEY] = refresh_token
+    mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] = user_id
 
 
 @pytest.fixture()
@@ -55,6 +82,53 @@ def test_no_internet_access(command: str, mocker: MockerFixture) -> None:
     assert result.output == "ERROR: Please connect to internet first\n"
 
 
+class TestTokenRefresh:
+    def test_token_refresh_success(
+        self, mock_keyring: dict[str, str | None], mocker: MockerFixture, httpx_mock: HTTPXMock
+    ) -> None:
+        # Arrange
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
+        mocker.patch("algokit.core.dispenser.jwt.decode", return_value={"sub": "new_user_id"})
+        mocker.patch("algokit.core.dispenser._get_access_token_rsa_pub_key")
+        httpx_mock.add_response(
+            url=AuthConfig.OAUTH_TOKEN_URL,
+            method="POST",
+            json={
+                "access_token": "new_access_token",
+                "id_token": "new_id_token",
+                "refresh_token": "new_refresh_token",
+            },
+        )
+
+        # Act
+        from algokit.core.dispenser import _refresh_user_access_token
+
+        _refresh_user_access_token()
+
+        # Assert
+        assert mock_keyring[DISPENSER_KEYRING_ACCESS_TOKEN_KEY] == "new_access_token"
+        assert mock_keyring[DISPENSER_KEYRING_ID_TOKEN_KEY] == "new_id_token"
+        assert mock_keyring[DISPENSER_KEYRING_REFRESH_TOKEN_KEY] == "new_refresh_token"
+        assert mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] == "new_user_id"
+
+    def test_token_refresh_failure(
+        self, mock_keyring: dict[str, str | None], mocker: MockerFixture, httpx_mock: HTTPXMock
+    ) -> None:
+        # Arrange
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
+        mocker.patch("algokit.core.dispenser._get_access_token_rsa_pub_key")
+        httpx_mock.add_exception(httpx.HTTPError("Error response"), url=AuthConfig.OAUTH_TOKEN_URL)
+
+        # Act and Assert
+        from algokit.core.dispenser import _refresh_user_access_token
+
+        with pytest.raises(httpx.HTTPError):
+            _refresh_user_access_token()
+
+
+# Snapshot tests for dispenser commands
+
+
 class TestLogoutCommand:
     def test_logout_command_already_logged_out(self, mocker: MockerFixture) -> None:
         # Arrange
@@ -68,11 +142,11 @@ class TestLogoutCommand:
         verify(result.output)
 
     def test_logout_command_success(
-        self, mock_keyring_get_password: typing.Callable, mocker: MockerFixture, httpx_mock: HTTPXMock
+        self, mock_keyring: dict[str, str | None], mocker: MockerFixture, httpx_mock: HTTPXMock
     ) -> None:
         # Arrange
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
-        mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"])
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         httpx_mock.add_response(url=AuthConfig.OAUTH_REVOKE_URL, method="POST", status_code=200)
 
         # Act
@@ -80,14 +154,18 @@ class TestLogoutCommand:
 
         # Assert
         assert result.exit_code == 0
+        assert mock_keyring[DISPENSER_KEYRING_ID_TOKEN_KEY] is None
+        assert mock_keyring[DISPENSER_KEYRING_ACCESS_TOKEN_KEY] is None
+        assert mock_keyring[DISPENSER_KEYRING_REFRESH_TOKEN_KEY] is None
+        assert mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] is None
         verify(result.output)
 
     def test_logout_command_revoke_exception(
-        self, mock_keyring_get_password: typing.Callable, mocker: MockerFixture, httpx_mock: HTTPXMock
+        self, mock_keyring: dict[str, str | None], mocker: MockerFixture, httpx_mock: HTTPXMock
     ) -> None:
         # Arrange
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
-        mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"])
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         httpx_mock.add_exception(httpx.HTTPError("Error response"), url=AuthConfig.OAUTH_REVOKE_URL)
         clear_mock = mocker.patch("algokit.cli.dispenser.clear_dispenser_credentials")
 
@@ -112,9 +190,12 @@ class TestLoginCommand:
         assert result.exit_code == 0
         verify(result.output)
 
-    def test_login_command_success_user(self, mocker: MockerFixture, httpx_mock: HTTPXMock) -> None:
+    def test_login_command_success_user(
+        self, mock_keyring: dict[str, str | None], mocker: MockerFixture, httpx_mock: HTTPXMock
+    ) -> None:
         # Arrange
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=False)
+        mocker.patch("algokit.core.dispenser.jwt.decode", return_value={"sub": "user_id"})
         httpx_mock.add_response(
             url=AuthConfig.OAUTH_DEVICE_CODE_URL,
             method="POST",
@@ -140,6 +221,10 @@ class TestLoginCommand:
 
         # Assert
         assert result.exit_code == 0
+        assert mock_keyring[DISPENSER_KEYRING_ID_TOKEN_KEY] == "id_token"
+        assert mock_keyring[DISPENSER_KEYRING_ACCESS_TOKEN_KEY] == "access_token"
+        assert mock_keyring[DISPENSER_KEYRING_REFRESH_TOKEN_KEY] == "refresh_token"
+        assert mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] == "user_id"
         verify(result.output)
 
     @pytest.mark.parametrize(
@@ -227,17 +312,17 @@ class TestLoginCommand:
         self,
         *,
         refresh_successful: bool,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
     ) -> None:
         # Arrange
-        mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"] * 2)
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.core.dispenser._get_access_token_rsa_pub_key")
         mocker.patch("algokit.cli.dispenser.get_oauth_tokens")
         mocker.patch(
             "algokit.core.dispenser.jwt.decode",
-            side_effect=[jwt.ExpiredSignatureError("Expired token"), mocker.DEFAULT],
+            side_effect=[jwt.ExpiredSignatureError("Expired token"), {"sub": "new_user_id"}],
         )
 
         if refresh_successful:
@@ -281,7 +366,7 @@ class TestFundCommand:
         *,
         with_ci_token: bool,
         use_whole_units: bool,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
         monkeypatch: pytest.MonkeyPatch,
@@ -290,7 +375,7 @@ class TestFundCommand:
         if with_ci_token:
             monkeypatch.setenv("ALGOKIT_DISPENSER_ACCESS_TOKEN", "ci_access_token")
         else:
-            mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"] * 2)
+            _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
         amount = 1 if use_whole_units else int(1e6)
@@ -315,6 +400,7 @@ class TestFundCommand:
     ) -> None:
         # Arrange
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
+        mocker.patch("algokit.core.dispenser._get_auth_token", return_value="auth_token")
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
 
         httpx_mock.add_exception(
@@ -362,7 +448,7 @@ class TestRefundCommand:
         self,
         *,
         with_ci_token: bool,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
         monkeypatch: pytest.MonkeyPatch,
@@ -371,7 +457,7 @@ class TestRefundCommand:
         if with_ci_token:
             monkeypatch.setenv("ALGOKIT_DISPENSER_ACCESS_TOKEN", "ci_access_token")
         else:
-            mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"] * 2)
+            _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         tx_id = "some_transaction_id"
         httpx_mock.add_response(
@@ -389,12 +475,12 @@ class TestRefundCommand:
 
     def test_refund_command_http_error(
         self,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
     ) -> None:
         # Arrange
-        mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"])
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         tx_id = "some_transaction_id"
         httpx_mock.add_exception(
@@ -434,7 +520,7 @@ class TestLimitCommand:
         *,
         with_ci_token: bool,
         use_whole_units: bool,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
         monkeypatch: pytest.MonkeyPatch,
@@ -443,7 +529,7 @@ class TestLimitCommand:
         if with_ci_token:
             monkeypatch.setenv("ALGOKIT_DISPENSER_ACCESS_TOKEN", "ci_access_token")
         else:
-            mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"] * 2)
+            _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
         httpx_mock.add_response(
@@ -461,12 +547,12 @@ class TestLimitCommand:
 
     def test_limit_command_http_error(
         self,
-        mock_keyring_get_password: typing.Callable,
+        mock_keyring: dict[str, str | None],
         mocker: MockerFixture,
         httpx_mock: HTTPXMock,
     ) -> None:
         # Arrange
-        mock_keyring_get_password(return_values=["id_token", "access_token", "refresh_token", "user_id"])
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
         httpx_mock.add_exception(
