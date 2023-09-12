@@ -1,0 +1,2 @@
+DEBUG: HTTP Request: GET https://api.dispenser-dev.algorandfoundation.tools/fund/0/limit "HTTP/1.1 200 OK"
+Remaining daily fund limit: 1000000
