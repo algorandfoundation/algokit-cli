@@ -1,2 +1,0 @@
-DEBUG: Error processing dispenser API request: Transaction was already processed
-ERROR: Error: Transaction was already processed

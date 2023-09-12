@@ -1,4 +1,0 @@
-Usage: algokit dispenser refund [OPTIONS]
-Try 'algokit dispenser refund -h' for help.
-
-Error: Missing option '--txID' / '-t'.

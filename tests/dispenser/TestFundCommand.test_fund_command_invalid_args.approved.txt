@@ -1,4 +1,0 @@
-Usage: algokit dispenser fund [OPTIONS]
-Try 'algokit dispenser fund -h' for help.
-
-Error: Missing option '--receiver' / '-r'.

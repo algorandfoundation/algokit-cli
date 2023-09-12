@@ -1,2 +1,0 @@
-DEBUG: HTTP Request: POST https://api.dispenser-dev.algorandfoundation.tools/fund/0 "HTTP/1.1 200 OK"
-Successfully funded 1000000 μALGO to AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

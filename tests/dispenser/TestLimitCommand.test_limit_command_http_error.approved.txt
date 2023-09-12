@@ -1,2 +1,0 @@
-DEBUG: Error processing dispenser API request: Unable to process limit request
-ERROR: Error: Unable to process limit request

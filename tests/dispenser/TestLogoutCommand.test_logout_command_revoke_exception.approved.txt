@@ -1,2 +1,0 @@
-DEBUG: Error logging out An unexpected error occurred: Error response
-Error: Error logging out
