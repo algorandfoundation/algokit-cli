@@ -1,4 +1,5 @@
 import base64
+import contextlib
 import logging
 import os
 import time
@@ -58,6 +59,21 @@ class AuthConfig:
         DispenserApiAudiences.USER: "flwPVx0HstfeZtGd3ZJVSwhGCFlR5v8a",
         DispenserApiAudiences.CI: "q3EWUsOmj5jINIchDxnm9gMEa10Th7Zj",
     }
+
+
+class APIErrorCode:
+    DISPENSER_OUT_OF_FUNDS = "dispenser_out_of_funds"
+    FORBIDDEN = "forbidden"
+    FUND_LIMIT_EXCEEDED = "fund_limit_exceeded"
+    DISPENSER_ERROR = "dispenser_error"
+    MISSING_PARAMETERS = "missing_params"
+    AUTHORIZATION_ERROR = "authorization_error"
+    REPUTATION_REFRESH_FAILED = "reputation_refresh_failed"
+    TXN_EXPIRED = "txn_expired"
+    TXN_INVALID = "txn_invalid"
+    TXN_ALREADY_PROCESSED = "txn_already_processed"
+    INVALID_ASSET = "invalid_asset"
+    UNEXPECTED_ERROR = "unexpected_error"
 
 
 def _get_dispenser_credential(key: str) -> str:
@@ -219,8 +235,13 @@ def process_dispenser_request(*, url_suffix: str, data: dict | None = None, meth
 
     except httpx.HTTPStatusError as err:
         error_message = f"Error processing dispenser API request: {err.response.status_code}"
+        error_response = None
+        with contextlib.suppress(Exception):
+            error_response = err.response.json()
 
-        if err.response.status_code == httpx.codes.BAD_REQUEST:
+        if error_response and error_response.get("error") == APIErrorCode.FUND_LIMIT_EXCEEDED:
+            error_message = "Fund limit exceeded. Please try again later."
+        elif err.response.status_code == httpx.codes.BAD_REQUEST:
             error_message = err.response.json()["message"]
 
         raise Exception(error_message) from err

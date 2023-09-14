@@ -46,6 +46,8 @@ DISPENSER_ASSETS = {
 
 DEFAULT_CI_TOKEN_FILENAME = "algokit_ci_token.txt"
 
+NOT_AUTHENTICATED_MESSAGE = "Please login first by running `algokit dispenser login` command"
+
 
 def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -> None:
     if output_mode == OutputMode.STDOUT.value:
@@ -123,7 +125,7 @@ def logout_command() -> None:
 )
 def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
     if not ci and is_authenticated():
-        logger.info("Already logged in")
+        logger.info("You are already logged in")
         return
 
     try:
@@ -156,7 +158,7 @@ def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
 )
 def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
     if not is_authenticated():
-        logger.error("Please login first")
+        logger.error(NOT_AUTHENTICATED_MESSAGE)
         return
 
     default_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
@@ -173,22 +175,29 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
     except Exception as e:
         logger.error(f"Error: {e}")
     else:
-        logger.info(response.json()["message"])
+        response_body = response.json()
+        processed_amount = (
+            response_body["amount"] / (10**default_asset.decimals) if whole_units else response_body["amount"]
+        )
+        asset_description = default_asset.description if whole_units else f"μ{default_asset.description}"
+        logger.info(
+            f'Successfully funded {processed_amount} {asset_description}. Browse transaction at https://testnet.algoexplorer.io/tx/{response_body["txID"]}'
+        )
 
 
 @dispenser_group.command("refund", help="Refund ALGOs back to the dispenser wallet address.")
 @click.option("--txID", "-t", "tx_id", required=True, help="Transaction ID of your refund operation.")
 def refund_command(*, tx_id: str) -> None:
     if not is_authenticated():
-        logger.error("Please login first")
+        logger.error(NOT_AUTHENTICATED_MESSAGE)
         return
 
     try:
-        response = process_dispenser_request(url_suffix="refund", data={"refundTransactionID": tx_id})
+        process_dispenser_request(url_suffix="refund", data={"refundTransactionID": tx_id})
     except Exception as e:
         logger.error(f"Error: {e}")
     else:
-        logger.info(response.json()["message"])
+        logger.info("Successfully processed refund transaction")
 
 
 @dispenser_group.command("limit", help="Get information about current fund limit on your account. Resets daily.")
@@ -201,13 +210,12 @@ def refund_command(*, tx_id: str) -> None:
 )
 def get_fund_limit(*, whole_units: bool) -> None:
     if not is_authenticated():
-        logger.error("Please login first")
+        logger.error(NOT_AUTHENTICATED_MESSAGE)
         return
 
+    default_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
     try:
-        response = process_dispenser_request(
-            url_suffix=f"fund/{DISPENSER_ASSETS[DispenserAssetName.ALGO].asset_id}/limit", data={}, method="GET"
-        )
+        response = process_dispenser_request(url_suffix=f"fund/{default_asset.asset_id}/limit", data={}, method="GET")
     except Exception as e:
         logger.error(f"Error: {e}")
     else:
