@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, ClassVar
 
@@ -190,6 +191,12 @@ def _request_device_code(api_audience: DispenserApiAudiences, custom_scopes: str
     return data
 
 
+def _get_hours_until_reset(resets_at: str) -> float:
+    now_utc = datetime.now(timezone.utc)
+    reset_date = datetime.strptime(resets_at, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+    return round((reset_date - now_utc).total_seconds() / 3600, 1)
+
+
 def request_token(api_audience: DispenserApiAudiences, device_code: str) -> dict[str, Any]:
     """
     Request OAuth tokens.
@@ -239,8 +246,13 @@ def process_dispenser_request(*, url_suffix: str, data: dict | None = None, meth
         with contextlib.suppress(Exception):
             error_response = err.response.json()
 
-        if error_response and error_response.get("error") == APIErrorCode.FUND_LIMIT_EXCEEDED:
-            error_message = "Fund limit exceeded. Please try again later."
+        if error_response and error_response.get("code") == APIErrorCode.FUND_LIMIT_EXCEEDED:
+            hours_until_reset = _get_hours_until_reset(error_response.get("resetsAt"))
+            error_message = (
+                "Limit exceeded. "
+                f"Try again in ~{hours_until_reset} hours if your request doesn't exceed the daily limit."
+            )
+
         elif err.response.status_code == httpx.codes.BAD_REQUEST:
             error_message = err.response.json()["message"]
 

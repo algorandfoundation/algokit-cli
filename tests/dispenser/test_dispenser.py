@@ -12,6 +12,7 @@ from algokit.core.dispenser import (
     DISPENSER_KEYRING_REFRESH_TOKEN_KEY,
     DISPENSER_KEYRING_USER_ID_KEY,
     ApiConfig,
+    APIErrorCode,
     AuthConfig,
 )
 from approvaltests.namer import NamerFactory
@@ -20,6 +21,11 @@ from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+
+
+@pytest.fixture(autouse=True)
+def _mock_api_base_url(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.dispenser.ApiConfig.BASE_URL", "https://snapshottest.dispenser.com")
 
 
 @pytest.fixture()
@@ -383,7 +389,7 @@ class TestFundCommand:
         httpx_mock.add_response(
             url=f"{ApiConfig.BASE_URL}/fund/{algo_asset.asset_id}",
             method="POST",
-            json={"message": f"Successfully funded 1000000 μALGO to {receiver}"},
+            json={"amount": int(1e6), "txID": "dummy_tx_id"},
         )
 
         # Act
@@ -401,10 +407,28 @@ class TestFundCommand:
         # Arrange
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         mocker.patch("algokit.core.dispenser._get_auth_token", return_value="auth_token")
+
+        # Mock datetime.datetime.now() to always return a specific datetime
+        mocker.patch("algokit.core.dispenser._get_hours_until_reset", return_value=4.0)
+
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
 
         httpx_mock.add_exception(
-            httpx.HTTPError("Limit exceeded"), url=f"{ApiConfig.BASE_URL}/fund/{algo_asset.asset_id}", method="POST"
+            httpx.HTTPStatusError(
+                "Limit exceeded",
+                request=httpx.Request("POST", f"{ApiConfig.BASE_URL}/fund"),
+                response=httpx.Response(
+                    400,
+                    request=httpx.Request("POST", f"{ApiConfig.BASE_URL}/fund"),
+                    json={
+                        "code": APIErrorCode.FUND_LIMIT_EXCEEDED,
+                        "limit": 10_000_000,
+                        "resetsAt": "2023-09-19T10:07:34.024Z",
+                    },
+                ),
+            ),
+            url=f"{ApiConfig.BASE_URL}/fund/{algo_asset.asset_id}",
+            method="POST",
         )
 
         # Act
