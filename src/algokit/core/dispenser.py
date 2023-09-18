@@ -29,8 +29,8 @@ DISPENSER_LOGIN_TIMEOUT = 300  # 5 minutes
 
 
 class DispenserApiAudiences(str, Enum):
-    USER = "staging-dispenser-api-user"
-    CI = "staging-dispenser-api-ci"
+    USER = "api-staging-dispenser-user"
+    CI = "api-staging-dispenser-ci"
 
 
 @dataclass
