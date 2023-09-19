@@ -1,8 +1,10 @@
 import base64
+import contextlib
 import logging
 import os
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, ClassVar
 
@@ -27,8 +29,8 @@ DISPENSER_LOGIN_TIMEOUT = 300  # 5 minutes
 
 
 class DispenserApiAudiences(str, Enum):
-    USER = "staging-dispenser-api-user"
-    CI = "staging-dispenser-api-ci"
+    USER = "api-staging-dispenser-user"
+    CI = "api-staging-dispenser-ci"
 
 
 @dataclass
@@ -58,6 +60,21 @@ class AuthConfig:
         DispenserApiAudiences.USER: "flwPVx0HstfeZtGd3ZJVSwhGCFlR5v8a",
         DispenserApiAudiences.CI: "q3EWUsOmj5jINIchDxnm9gMEa10Th7Zj",
     }
+
+
+class APIErrorCode:
+    DISPENSER_OUT_OF_FUNDS = "dispenser_out_of_funds"
+    FORBIDDEN = "forbidden"
+    FUND_LIMIT_EXCEEDED = "fund_limit_exceeded"
+    DISPENSER_ERROR = "dispenser_error"
+    MISSING_PARAMETERS = "missing_params"
+    AUTHORIZATION_ERROR = "authorization_error"
+    REPUTATION_REFRESH_FAILED = "reputation_refresh_failed"
+    TXN_EXPIRED = "txn_expired"
+    TXN_INVALID = "txn_invalid"
+    TXN_ALREADY_PROCESSED = "txn_already_processed"
+    INVALID_ASSET = "invalid_asset"
+    UNEXPECTED_ERROR = "unexpected_error"
 
 
 def _get_dispenser_credential(key: str) -> str:
@@ -174,6 +191,12 @@ def _request_device_code(api_audience: DispenserApiAudiences, custom_scopes: str
     return data
 
 
+def _get_hours_until_reset(resets_at: str) -> float:
+    now_utc = datetime.now(timezone.utc)
+    reset_date = datetime.strptime(resets_at, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+    return round((reset_date - now_utc).total_seconds() / 3600, 1)
+
+
 def request_token(api_audience: DispenserApiAudiences, device_code: str) -> dict[str, Any]:
     """
     Request OAuth tokens.
@@ -219,8 +242,18 @@ def process_dispenser_request(*, url_suffix: str, data: dict | None = None, meth
 
     except httpx.HTTPStatusError as err:
         error_message = f"Error processing dispenser API request: {err.response.status_code}"
+        error_response = None
+        with contextlib.suppress(Exception):
+            error_response = err.response.json()
 
-        if err.response.status_code == httpx.codes.BAD_REQUEST:
+        if error_response and error_response.get("code") == APIErrorCode.FUND_LIMIT_EXCEEDED:
+            hours_until_reset = _get_hours_until_reset(error_response.get("resetsAt"))
+            error_message = (
+                "Limit exceeded. "
+                f"Try again in ~{hours_until_reset} hours if your request doesn't exceed the daily limit."
+            )
+
+        elif err.response.status_code == httpx.codes.BAD_REQUEST:
             error_message = err.response.json()["message"]
 
         raise Exception(error_message) from err

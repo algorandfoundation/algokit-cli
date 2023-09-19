@@ -1,0 +1,3 @@
+DEBUG: Access token is expired. Attempting to refresh the token...
+DEBUG: HTTP Request: POST https://dispenser-staging.eu.auth0.com/oauth/token "HTTP/1.1 200 OK"
+You are already logged in
