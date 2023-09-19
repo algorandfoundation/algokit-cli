@@ -220,8 +220,7 @@ def get_fund_limit(*, whole_units: bool) -> None:
         logger.error(f"Error: {e}")
     else:
         response_amount = response.json()["amount"]
-        amount = response_amount
-        if whole_units:
-            amount = amount / (10 ** DISPENSER_ASSETS[DispenserAssetName.ALGO].decimals)
-            logger.debug(f"Converted response microAlgos to Algos: {amount}")
-        logger.info(f"Remaining daily fund limit: {amount}")
+        processed_amount = response_amount / (10**default_asset.decimals) if whole_units else response_amount
+        asset_description = default_asset.description if whole_units else f"μ{default_asset.description}"
+
+        logger.info(f"Remaining daily fund limit: {processed_amount} {asset_description}")
