@@ -29,8 +29,8 @@ DISPENSER_LOGIN_TIMEOUT = 300  # 5 minutes
 
 
 class DispenserApiAudiences(str, Enum):
-    USER = "api-staging-dispenser-user"
-    CI = "api-staging-dispenser-ci"
+    USER = "user"
+    CI = "ci"
 
 
 @dataclass
@@ -42,23 +42,23 @@ class AccountKeyringData:
 
 
 class ApiConfig:
-    BASE_URL = "https://api.dispenser-dev.algorandfoundation.tools"
+    BASE_URL = "https://api.dispenser.algorandfoundation.tools"
 
 
 class AuthConfig:
-    DOMAIN = "dispenser-staging.eu.auth0.com"
+    DOMAIN = "dispenser-prod.eu.auth0.com"
     BASE_URL = f"https://{DOMAIN}"
     JWKS_URL = f"{BASE_URL}/.well-known/jwks.json"
     OAUTH_TOKEN_URL = f"{BASE_URL}/oauth/token"
     OAUTH_DEVICE_CODE_URL = f"{BASE_URL}/oauth/device/code"
     OAUTH_REVOKE_URL = f"{BASE_URL}/oauth/revoke"
     AUDIENCES: ClassVar[dict[str, str]] = {
-        DispenserApiAudiences.USER: "api-staging-dispenser-user",
-        DispenserApiAudiences.CI: "api-staging-dispenser-ci",
+        DispenserApiAudiences.USER: "api-prod-dispenser-user",
+        DispenserApiAudiences.CI: "api-prod-dispenser-ci",
     }
     CLIENT_IDS: ClassVar[dict[str, str]] = {
-        DispenserApiAudiences.USER: "flwPVx0HstfeZtGd3ZJVSwhGCFlR5v8a",
-        DispenserApiAudiences.CI: "q3EWUsOmj5jINIchDxnm9gMEa10Th7Zj",
+        DispenserApiAudiences.USER: "UKcJQcqFaZRQvik45QW5lsSRERUf8Ub6",
+        DispenserApiAudiences.CI: "BOZkxGUiiWkaAXZebCQ20MTIYuQSqqpI",
     }
 
 

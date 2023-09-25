@@ -34,6 +34,8 @@ Options
 - `--output`, -o: Output mode where you want to store the generated access token. Defaults to stdout. Only applicable when --ci flag is set.
 - `--file`, -f: Output filename where you want to store the generated access token. Defaults to `ci_token.txt`. Only applicable when --ci flag is set and --output mode is `file`.
 
+> Please note, algokit relies on [keyring](https://pypi.org/project/keyring/) for storing your API credentials. This implies that your credentials are stored in your system's keychain. By default it will prompt for entering your system password unless you have set it up to always allow access for `algokit-cli` to obtain API credentials.
+
 ## Logout
 
 ```zsh
@@ -65,6 +67,8 @@ This command refunds ALGOs back to the dispenser wallet address.
 Options
 
 - `--txID`, -t: Transaction ID of your refund operation. This option is required.
+
+> Please note, performing a refund operation will not immedately change your daily fund limit. Your daily fund limit is reset daily at midnigth UTC. If you have reached your daily fund limit, you will not be able to perform a refund operation until your daily fund limit is reset.
 
 ## Limit
 
