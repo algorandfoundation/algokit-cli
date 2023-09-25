@@ -91,7 +91,7 @@ def get_alias(alias_name: str) -> WalletAliasKeyringData | None:
 def get_aliases() -> list[WalletAliasKeyringData]:
     try:
         alias_keys = _get_alias_keys()
-        response = []
+        response: list[WalletAliasKeyringData] = []
 
         for alias_name in alias_keys:
             alias_data = get_alias(alias_name)
