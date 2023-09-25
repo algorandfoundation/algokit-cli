@@ -79,6 +79,17 @@
     - [start](#start)
     - [status](#status)
     - [stop](#stop)
+  - [task](#task)
+    - [wallet](#wallet)
+    - [Options](#options-13)
+    - [-a, --address ](#-a---address-)
+    - [-m, --mnemonic](#-m---mnemonic)
+    - [Arguments](#arguments-5)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-6)
+    - [ALIAS](#alias)
+    - [Arguments](#arguments-7)
+    - [ALIAS](#alias-1)
 
 # algokit
 
@@ -516,4 +527,88 @@ Stop the AlgoKit LocalNet.
 
 ```shell
 algokit localnet stop [OPTIONS]
+```
+
+## task
+
+Collection of useful utilities to help you develop on Algorand
+
+```shell
+algokit task [OPTIONS] COMMAND [ARGS]...
+```
+
+### wallet
+
+Wallet related commands.
+
+```shell
+algokit task wallet [OPTIONS] COMMAND [ARGS]...
+```
+
+#### add
+
+Add an address or account to be stored against a named alias.
+
+```shell
+algokit task wallet add [OPTIONS] ALIAS_NAME
+```
+
+### Options
+
+
+### -a, --address <address>
+**Required** The address of the account
+
+
+### -m, --mnemonic
+If specified then prompt the user for a mnemonic phrase interactively using masked input
+
+### Arguments
+
+
+### ALIAS_NAME
+Required argument
+
+#### get
+
+Get an address or account stored against a named alias.
+
+```shell
+algokit task wallet get [OPTIONS] ALIAS
+```
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### list
+
+List all addresses or accounts stored against a named alias.
+
+```shell
+algokit task wallet list [OPTIONS]
+```
+
+#### remove
+
+Remove an address or account stored against a named alias.
+
+```shell
+algokit task wallet remove [OPTIONS] ALIAS
+```
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### reset
+
+Remove all aliases.
+
+```shell
+algokit task wallet reset [OPTIONS]
 ```
