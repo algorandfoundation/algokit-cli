@@ -6,9 +6,10 @@ import keyring
 
 logger = logging.getLogger(__name__)
 
-WALLET_ALIAS_KEYRING_NAMESPACE = "algokit_wallet_alias"
-WALLET_ALIASES_KEYRING_NAMESPACE = "algokit_wallet_aliases"
-WALLET_ALIASES_KEYRING_USERNAME = "all_aliases"
+WALLET_ALIAS_KEYRING_NAMESPACE = "algokit_alias"
+WALLET_ALIASES_KEYRING_NAMESPACE = "algokit_aliases"
+WALLET_ALIASES_KEYRING_USERNAME = "aliases"
+WALLET_ALIASING_MAX_LIMIT = 50
 
 
 @dataclass
@@ -18,9 +19,15 @@ class WalletAliasKeyringData:
     private_key: str | None
 
 
+class WalletAliasingLimitError(Exception):
+    pass
+
+
 def _get_alias_keys() -> list[str]:
     try:
-        response = keyring.get_password(WALLET_ALIASES_KEYRING_NAMESPACE, username=WALLET_ALIASES_KEYRING_USERNAME)
+        response = keyring.get_password(
+            service_name=WALLET_ALIASES_KEYRING_NAMESPACE, username=WALLET_ALIASES_KEYRING_USERNAME
+        )
 
         if not response:
             return []
@@ -32,17 +39,24 @@ def _get_alias_keys() -> list[str]:
         return []
 
 
+def _update_alias_keys(alias_keys: list[str]) -> None:
+    keyring.set_password(
+        service_name=WALLET_ALIASES_KEYRING_NAMESPACE,
+        username=WALLET_ALIASES_KEYRING_USERNAME,
+        password=json.dumps(alias_keys, separators=(",", ":")),
+    )
+
+
 def _add_alias_key(alias_name: str) -> None:
     alias_keys = _get_alias_keys()
+
+    if len(alias_keys) >= WALLET_ALIASING_MAX_LIMIT:
+        raise WalletAliasingLimitError("You have reached the maximum number of aliases.")
 
     if alias_name not in alias_keys:
         alias_keys.append(alias_name)
 
-    keyring.set_password(
-        WALLET_ALIASES_KEYRING_NAMESPACE,
-        username=WALLET_ALIASES_KEYRING_USERNAME,
-        password=json.dumps(alias_keys),
-    )
+    _update_alias_keys(alias_keys)
 
 
 def _remove_alias_key(alias_name: str) -> None:
@@ -51,33 +65,61 @@ def _remove_alias_key(alias_name: str) -> None:
     if alias_name in alias_keys:
         alias_keys.remove(alias_name)
 
-    keyring.set_password(
-        WALLET_ALIASES_KEYRING_NAMESPACE,
-        username=WALLET_ALIASES_KEYRING_USERNAME,
-        password=json.dumps(alias_keys),
-    )
+    _update_alias_keys(alias_keys)
 
 
 def add_alias(alias_name: str, address: str, private_key: str | None) -> None:
-    """Add an address or account to be stored against a named alias in keyring."""
-    keyring.set_password(
-        WALLET_ALIAS_KEYRING_NAMESPACE,
-        alias_name,
-        json.dumps(
-            WalletAliasKeyringData(
-                alias=alias_name,
-                address=address,
-                private_key=private_key,
-            ).__dict__
-        ),
-    )
-    _add_alias_key(alias_name)
+    """
+    Add an address or account to be stored against a named alias in keyring.
+
+    Args:
+        alias_name (str): The name of the alias to be added.
+        address (str): The address or account to be stored against the alias.
+        private_key (str | None): The private key associated with the address or account.
+        It can be None if no private key is available.
+
+    Raises:
+        WalletAliasingLimitError: If the maximum number of aliases has been reached.
+
+    """
+
+    try:
+        _add_alias_key(alias_name)
+        keyring.set_password(
+            service_name=WALLET_ALIAS_KEYRING_NAMESPACE,
+            username=alias_name,
+            password=json.dumps(
+                WalletAliasKeyringData(
+                    alias=alias_name,
+                    address=address,
+                    private_key=private_key,
+                ).__dict__
+            ),
+        )
+    except Exception as ex:
+        logger.debug("Failed to add alias to keyring", exc_info=ex)
+        raise ex
 
 
 def get_alias(alias_name: str) -> WalletAliasKeyringData | None:
-    """Get the address or account stored against a named alias in keyring."""
+    """
+    Get the address or account stored against a named alias in the keyring.
+
+    Args:
+        alias_name (str): The name of the alias to retrieve.
+
+    Returns:
+        WalletAliasKeyringData | None: An instance of the WalletAliasKeyringData class if the alias exists,
+        otherwise None.
+
+    Example Usage:
+        alias_data = get_alias("my_alias")
+        if alias_data:
+            print(alias_data.address)
+    """
+
     try:
-        response = keyring.get_password(WALLET_ALIAS_KEYRING_NAMESPACE, alias_name)
+        response = keyring.get_password(service_name=WALLET_ALIAS_KEYRING_NAMESPACE, username=alias_name)
 
         if not response:
             return None
@@ -89,6 +131,13 @@ def get_alias(alias_name: str) -> WalletAliasKeyringData | None:
 
 
 def get_aliases() -> list[WalletAliasKeyringData]:
+    """
+    Retrieves a list of wallet aliases and their associated data from a keyring.
+
+    Returns:
+        A list of WalletAliasKeyringData objects representing the aliases and their associated data.
+    """
+
     try:
         alias_keys = _get_alias_keys()
         response: list[WalletAliasKeyringData] = []
@@ -105,6 +154,12 @@ def get_aliases() -> list[WalletAliasKeyringData]:
 
 
 def remove_alias(alias_name: str) -> None:
-    """Remove an address or account stored against a named alias in keyring."""
-    keyring.delete_password(WALLET_ALIAS_KEYRING_NAMESPACE, alias_name)
+    """
+    Remove an address or account stored against a named alias in keyring.
+
+    :param alias_name: The name of the alias to be removed.
+    :type alias_name: str
+    """
+
+    keyring.delete_password(service_name=WALLET_ALIAS_KEYRING_NAMESPACE, username=alias_name)
     _remove_alias_key(alias_name)

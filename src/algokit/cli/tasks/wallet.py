@@ -4,12 +4,41 @@ import re
 import click
 from algosdk import account, encoding, mnemonic
 
-from algokit.core.tasks.wallet import add_alias, get_alias, get_aliases, remove_alias
+from algokit.core.tasks.wallet import (
+    WALLET_ALIASING_MAX_LIMIT,
+    WalletAliasingLimitError,
+    add_alias,
+    get_alias,
+    get_aliases,
+    remove_alias,
+)
+
+
+def _validate_alias_name(alias_name: str) -> None:
+    pattern = r"^[\w-]{1,20}$"
+    if not re.match(pattern, alias_name):
+        raise click.ClickException(
+            "Invalid alias name. It should have at most 20 characters consisting of numbers, "
+            "letters, dashes, or underscores."
+        )
+
+
+def _validate_address(address: str) -> None:
+    if not encoding.is_valid_address(address):  # type: ignore[no-untyped-call]
+        raise click.ClickException("Invalid address. Please provide a valid Algorand address.")
+
+
+def _get_private_key_from_mnemonic() -> str:
+    mnemonic_phrase = click.prompt("Enter the mnemonic phrase (25 words separated by whitespace)", hide_input=True)
+    try:
+        return str(mnemonic.to_private_key(mnemonic_phrase))  # type: ignore[no-untyped-call]
+    except ValueError as err:
+        raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
 
 
 @click.group()
 def wallet() -> None:
-    """Wallet related commands."""
+    """Create short aliases for your addresses and accounts on AlgoKit CLI."""
 
 
 @wallet.command("add")
@@ -24,50 +53,37 @@ def wallet() -> None:
 )
 def add(*, alias_name: str, address: str, use_mnemonic: bool) -> None:
     """Add an address or account to be stored against a named alias."""
-    # Validate alias_name
-    if not re.match(r"^[\w-]{1,20}$", alias_name):
-        raise click.ClickException(
-            "Invalid alias name. It must conform to have at most 20 symbols consisting of numbers, "
-            "letters, dashes or underscores"
-        )
 
-    # Validate address
-    if not encoding.is_valid_address(address):  # type: ignore[no-untyped-call]
-        raise click.ClickException("Invalid address. Please provide a valid Algorand address.")
+    _validate_alias_name(alias_name)
+    _validate_address(address)
 
-    # If mnemonic flag is provided, prompt the user for a mnemonic phrase interactively using masked input
-    private_key = None
+    private_key = _get_private_key_from_mnemonic() if use_mnemonic else None
 
     if use_mnemonic:
-        mnemonic_phrase = click.prompt(
-            "Please enter the mnemonic phrase (25 words with whitespace separator)", hide_input=True
-        )
-        # Validate mnemonic
-        try:
-            private_key = mnemonic.to_private_key(mnemonic_phrase)  # type: ignore[no-untyped-call]
-        except ValueError as err:
-            raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
-
-        # Check if the address from the mnemonic matches the provided address
-        mnemonic_address = account.address_from_private_key(private_key)  # type: ignore[no-untyped-call]
-        if mnemonic_address != address:
+        derived_address = account.address_from_private_key(private_key)  # type: ignore[no-untyped-call]
+        if derived_address != address:
             click.echo(
-                "Warning: The address from the mnemonic doesn`t match the provided address. "
-                "It won`t work unless that account has been rekeyed."
+                "Warning: Address from the mnemonic doesn't match the provided address. "
+                "It won't work unless the account has been rekeyed."
             )
 
     if get_alias(alias_name):
         response = click.prompt(
-            f"Alias {alias_name} already exists. Do you want to overwrite it? (y/n)",
+            f"Alias '{alias_name}' already exists. Overwrite? (y/n)",
             type=click.Choice(["y", "n"]),
             default="n",
         )
         if response == "n":
             return
 
-    add_alias(alias_name, address, private_key)
-
-    click.echo(f"Alias `{alias_name}` added successfully.")
+    try:
+        add_alias(alias_name, address, private_key)
+    except WalletAliasingLimitError as ex:
+        raise click.ClickException(f"Reached the max of {WALLET_ALIASING_MAX_LIMIT} aliases.") from ex
+    except Exception as ex:
+        raise click.ClickException("Failed to add alias") from ex
+    else:
+        click.echo(f"Alias '{alias_name}' added successfully.")
 
 
 @wallet.command("get")
@@ -107,6 +123,7 @@ def list_all() -> None:
 @click.argument("alias", type=click.STRING)
 def remove(alias: str) -> None:
     """Remove an address or account stored against a named alias."""
+
     alias_data = get_alias(alias)
 
     if not alias_data:
@@ -120,6 +137,7 @@ def remove(alias: str) -> None:
 @wallet.command("reset")
 def reset() -> None:
     """Remove all aliases."""
+
     aliases = get_aliases()
 
     if not aliases:

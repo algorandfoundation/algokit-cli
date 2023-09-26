@@ -389,8 +389,8 @@ command = "command_a"
 
     input_answers = ["N"]
 
-    # Below is needed for escpaing the backslash in the path on Windows
-    # Works on Linux as well since \\ doesnt exist in the path in such cases
+    # Below is needed for escaping the backslash in the path on Windows
+    # Works on Linux as well since \\ doesn't exist in the path in such cases
     path = str(custom_folder.absolute()).replace("\\", r"\\")
     result = invoke(f"deploy testnet --path={path}", cwd=cwd, input="\n".join(input_answers))
 

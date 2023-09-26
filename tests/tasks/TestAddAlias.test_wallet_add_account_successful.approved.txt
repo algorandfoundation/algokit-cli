@@ -1,0 +1,4 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: Failed to get alias from keyring
+DEBUG: Failed to get alias keys from keyring
+Alias 'test_alias' added successfully.
