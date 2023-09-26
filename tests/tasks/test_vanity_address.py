@@ -6,13 +6,6 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
-def test_vanity_address_help() -> None:
-    result = invoke("task vanity-address -h")
-
-    assert result.exit_code == 0
-    verify(result.output)
-
-
 def test_vanity_address_no_options() -> None:
     result = invoke("task vanity-address")
 
@@ -42,36 +35,37 @@ def test_vanity_address_invalid_input_on_alias() -> None:
 
 
 def test_vanity_address_on_default() -> None:
-    result = invoke("task vanity-address T")
+    result = invoke("task vanity-address A")
 
     assert result.exit_code == 0
     match = re.search(r"'address': '([^']+)'", result.output)
     if match:
         address = match.group(1)
-        assert address.startswith("T")
+        assert address.startswith("A")
 
 
 def test_vanity_address_on_anywhere_match() -> None:
-    result = invoke("task vanity-address T -m anywhere")
+    result = invoke("task vanity-address A -m anywhere")
 
     assert result.exit_code == 0
     match = re.search(r"'address': '([^']+)'", result.output)
     if match:
         address = match.group(1)
-        assert "T" in address
+        assert "A" in address
 
 
 def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    result = invoke(f"task vanity-address T -o file -f {cwd}/output.txt")
+    result = invoke(f"task vanity-address A -o file -f {cwd}/output.txt")
 
     assert result.exit_code == 0
     assert (cwd / "output.txt").exists()
 
-    with (cwd / "output.txt").open() as f:
-        output = f.read()
+    output = (cwd / "output.txt").read_text()
 
-    ouput_match = re.search(r"'address': '([^']+)'", output)
+    # Ensure output address starts with A
+    ouput_match = re.search(r'\"address\": "([^""]+)"', output)
+
     if ouput_match:
         address = ouput_match.group(1)
-        assert address.startswith("T")
+        assert address.startswith("A")

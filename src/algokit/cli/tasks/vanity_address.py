@@ -60,13 +60,6 @@ def vanity_address(
     if output == "file" and output_file is None:
         raise click.ClickException("Output file is required when output is set to 'file'")
 
-    if output == "stdout":
-        logger.warning(
-            "Note: Your CI access token is displayed on the console. "
-            "Ensure its security by keeping it confidential."
-            "Consider clearing your terminal history after noting down the token."
-        )
-
     manager = Manager()
     shared_dict = manager.dict()
     shared_dict["count"] = 0
@@ -83,15 +76,23 @@ def vanity_address(
 
     end: float = timer()
 
-    result_data = {k: v for k, v in shared_dict.items() if k in ["mnemonic", "address"]}
+    result_data: dict[str, str] = {k: v for k, v in shared_dict.items() if k in ["mnemonic", "address"]}
     if output == "stdout":
+        logger.warning(
+            "Your mnemonic is displayed on the console. "
+            "Ensure its security by keeping it confidential."
+            "Consider clearing your terminal history after noting down the token.\n"
+        )
+
         click.echo(result_data)
+
     elif output == "alias" and alias is not None:
         add_to_wallet(alias, result_data)
     elif output == "file" and output_file is not None:
         output_path = Path(output_file)
         with output_path.open("w") as f:
             json.dump(result_data, f, indent=4)
+
     logger.info(f"Execution Time: {end - start:.2f} seconds")
 
 
