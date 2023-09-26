@@ -550,12 +550,12 @@ algokit task vanity-address [OPTIONS] KEYWORD
 
 
 ### -m, --match <match>
-Location where the keyword will be included. Default is Start.
+Location where the keyword will be included. Default is start.
 
 
 * **Options**
 
-    Start | Anywhere | End
+    start | anywhere | end
 
 
 
