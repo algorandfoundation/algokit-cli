@@ -51,7 +51,8 @@ def wallet() -> None:
     is_flag=True,
     help="If specified then prompt the user for a mnemonic phrase interactively using masked input",
 )
-def add(*, alias_name: str, address: str, use_mnemonic: bool) -> None:
+@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias")
+def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> None:
     """Add an address or account to be stored against a named alias."""
 
     _validate_alias_name(alias_name)
@@ -67,7 +68,7 @@ def add(*, alias_name: str, address: str, use_mnemonic: bool) -> None:
                 "It won't work unless the account has been rekeyed."
             )
 
-    if get_alias(alias_name):
+    if get_alias(alias_name) and not force:
         response = click.prompt(
             f"Alias '{alias_name}' already exists. Overwrite? (y/n)",
             type=click.Choice(["y", "n"]),
@@ -135,7 +136,8 @@ def remove(alias: str) -> None:
 
 
 @wallet.command("reset")
-def reset() -> None:
+@click.option("--force", "-f", is_flag=True, help="Allow removing all aliases without confirmation")
+def reset(*, force: bool) -> None:
     """Remove all aliases."""
 
     aliases = get_aliases()
@@ -144,14 +146,15 @@ def reset() -> None:
         click.echo("Warning: No aliases available to reset.")
         return
 
-    response = click.prompt(
-        "🚨 This is a destructive action that will clear all aliases. Are you sure?",
-        type=click.Choice(["y", "n"]),
-        default="n",
-    )
+    if not force:
+        response = click.prompt(
+            "🚨 This is a destructive action that will clear all aliases. Are you sure?",
+            type=click.Choice(["y", "n"]),
+            default="n",
+        )
 
-    if response == "n":
-        return
+        if response == "n":
+            return
 
     for alias_data in aliases:
         try:
