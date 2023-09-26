@@ -10,13 +10,14 @@ from timeit import default_timer as timer
 
 import algosdk
 import click
+from algosdk import mnemonic
 
 logger = logging.getLogger(__name__)
 SECOND = 5
 
 
 @click.command(
-    name="vanity_address",
+    name="vanity-address",
     help="""Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
     Keeping your KEYWORD under 5 characters will usually result in faster generation.
     Note: The longer the KEYWORD, the longer it may take to generate a matching address.
@@ -101,6 +102,7 @@ def generate_vanity_address(  # noqa: PLR0913
     last_log_time = start_time
     while not stop_event.is_set():
         private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
+        generated_mnemonic = mnemonic.from_private_key(private_key)  # type: ignore[no-untyped-call]
         with lock:
             shared_dict["count"] += 1
         if (
@@ -111,7 +113,7 @@ def generate_vanity_address(  # noqa: PLR0913
             stop_event.set()
 
             if shared_dict is not None:
-                shared_dict["mnemonic"] = private_key
+                shared_dict["mnemonic"] = generated_mnemonic
                 shared_dict["address"] = address
 
             return
