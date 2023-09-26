@@ -52,13 +52,20 @@ def vanity_address(
     keyword: str, match: str, output: str, alias: str | None = None, output_file: str | None = None
 ) -> None:
     if not re.match("^[A-Z2-7]+$", keyword):
-        raise click.ClickException("Invalid KEYWORD. It can only include letters A-Z and numbers 2-7.")
+        raise click.ClickException("Invalid KEYWORD. It can only include uppercase letters A-Z and numbers 2-7.")
 
     if output == "alias" and alias is None:
-        raise click.ClickException("Alias is required when output is set to 'alias'")
+        raise click.ClickException(
+            "The '--alias' option must be provided when setting the '--output' option to "
+            "'alias'. Please specify an alias for the generated address using '--alias'."
+        )
 
     if output == "file" and output_file is None:
-        raise click.ClickException("Output file is required when output is set to 'file'")
+        raise click.ClickException(
+            "When setting the '--output' option to 'file', you must also provide a path to the "
+            "output file using the '--output-file' option. Please specify the desired file path "
+            "and try again."
+        )
 
     manager = Manager()
     shared_dict = manager.dict()

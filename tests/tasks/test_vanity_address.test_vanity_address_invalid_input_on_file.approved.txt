@@ -1,1 +1,1 @@
-Error: Output file is required when output is set to 'file'
+Error: When setting the '--output' option to 'file', you must also provide a path to the output file using the '--output-file' option. Please specify the desired file path and try again.

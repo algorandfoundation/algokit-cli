@@ -1,1 +1,1 @@
-Error: Invalid KEYWORD. It can only include letters A-Z and numbers 2-7.
+Error: Invalid KEYWORD. It can only include uppercase letters A-Z and numbers 2-7.

@@ -1,1 +1,1 @@
-Error: Alias is required when output is set to 'alias'
+Error: The '--alias' option must be provided when setting the '--output' option to 'alias'. Please specify an alias for the generated address using '--alias'.
