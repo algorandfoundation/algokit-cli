@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 @click.group(name="task")
 def task_group() -> None:
-    """Collection of useful utilities to help you develop on Algorand"""
+    """Collection of useful utilities to help you develop on Algorand."""
 
 
 task_group.add_command(wallet)

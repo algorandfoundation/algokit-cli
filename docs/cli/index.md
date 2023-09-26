@@ -84,12 +84,15 @@
     - [Options](#options-13)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
+    - [-f, --force](#-f---force)
     - [Arguments](#arguments-5)
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-6)
     - [ALIAS](#alias)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias-1)
+    - [Options](#options-14)
+    - [-f, --force](#-f---force-1)
 
 # algokit
 
@@ -531,7 +534,7 @@ algokit localnet stop [OPTIONS]
 
 ## task
 
-Collection of useful utilities to help you develop on Algorand
+Collection of useful utilities to help you develop on Algorand.
 
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
@@ -539,7 +542,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### wallet
 
-Wallet related commands.
+Create short aliases for your addresses and accounts on AlgoKit CLI.
 
 ```shell
 algokit task wallet [OPTIONS] COMMAND [ARGS]...
@@ -562,6 +565,10 @@ algokit task wallet add [OPTIONS] ALIAS_NAME
 
 ### -m, --mnemonic
 If specified then prompt the user for a mnemonic phrase interactively using masked input
+
+
+### -f, --force
+Allow overwriting an existing alias
 
 ### Arguments
 
@@ -612,3 +619,9 @@ Remove all aliases.
 ```shell
 algokit task wallet reset [OPTIONS]
 ```
+
+### Options
+
+
+### -f, --force
+Allow removing all aliases without confirmation
