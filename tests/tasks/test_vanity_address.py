@@ -58,7 +58,9 @@ def test_vanity_address_on_anywhere_match() -> None:
 def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     output_file_path = Path(cwd) / "output.txt"
-    result = invoke(f"task vanity-address A -o file -f {output_file_path}")
+
+    path = str(output_file_path.absolute()).replace("\\", r"\\")
+    result = invoke(f"task vanity-address A -o file -f {path}")
 
     assert result.exit_code == 0
     assert output_file_path.exists()
