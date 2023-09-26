@@ -1,8 +1,8 @@
 import json
 import logging
 import re
-import time
-from multiprocessing import Event, Manager, Pool, cpu_count
+from multiprocessing import Manager, Pool, cpu_count
+from multiprocessing.managers import DictProxy
 from pathlib import Path
 from timeit import default_timer as timer
 
@@ -10,7 +10,7 @@ import algosdk
 import click
 
 logger = logging.getLogger(__name__)
-stop_event = Event()
+SECOND = 5
 
 
 @click.command(
@@ -32,7 +32,8 @@ stop_event = Event()
 @click.option(
     "--output",
     "-o",
-    required=True,
+    required=False,
+    default="stdout",
     type=click.Choice(["stdout", "alias", "file"]),
     help="How the output will be presented.",
 )
@@ -61,12 +62,14 @@ def vanity_address(
 
     manager = Manager()
     shared_dict = manager.dict()
+    shared_dict["count"] = 0
+    lock = manager.Lock()
+    stop_event = manager.Event()
 
     start: float = timer()
-    logger.info(f"start: {start}")
     with Pool(processes=cpu_count()) as pool:
         for _ in range(cpu_count()):
-            pool.apply_async(generate_vanity_address, (keyword, match, shared_dict))
+            pool.apply(generate_vanity_address, (keyword, match, start, lock, stop_event, shared_dict))
 
         pool.close()
         pool.join()
@@ -82,27 +85,45 @@ def vanity_address(
         output_path = Path(output_file)
         with output_path.open("w") as f:
             json.dump(result_data[1], f)
-    logger.info(f"Execution Time: {end - start:.4f} seconds")
+    logger.info(f"Execution Time: {end - start:.2f} seconds")
 
 
-def generate_vanity_address(keyword: str, match: str, shared_dict: dict | None = None) -> None:
+def generate_vanity_address(
+    keyword: str,
+    match: str,
+    start_time: float,
+    lock,
+    stop_event,
+    shared_dict: DictProxy,
+) -> None:
+    last_log_time = start_time
     while not stop_event.is_set():
         private_key, address = algosdk.account.generate_account()
+        with lock:
+            shared_dict["count"] += 1
         if (
             (match == "Start" and address.startswith(keyword))
             or (match == "Anywhere" and keyword in address)
             or (match == "End" and address.endswith(keyword))
         ):
             stop_event.set()
+
             if shared_dict is not None:
                 shared_dict["result"] = (private_key, address)
 
             return
+        elapsed_time = timer() - last_log_time
+        waiting_time = timer() - start_time
+        if elapsed_time >= SECOND:
+            log_progress(shared_dict["count"], waiting_time)
+            last_log_time = timer()
 
 
-def show_progress() -> None:
-    while not stop_event.is_set():
-        time.sleep(5)
+def log_progress(count: int, waiting_time: float) -> None:
+    logger.info(
+        f"We are still searching for a match. Please be patient. current number of addresses generated is {count}"
+        f" in the past {waiting_time:.2f} seconds"
+    )
 
 
 def add_to_wallet(alias: str, output_data: str) -> None:
