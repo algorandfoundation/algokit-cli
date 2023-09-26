@@ -56,7 +56,7 @@ def test_vanity_address_on_anywhere_match() -> None:
 
 def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    output_file_path = (cwd / "output.txt")
+    output_file_path = cwd / "output.txt"
     result = invoke(f"task vanity-address A -o file -f {output_file_path}")
 
     assert result.exit_code == 0
