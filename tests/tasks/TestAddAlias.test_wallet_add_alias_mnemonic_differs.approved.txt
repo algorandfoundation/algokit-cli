@@ -1,5 +1,5 @@
 Enter the mnemonic phrase (25 words separated by whitespace): 
 Warning: Address from the mnemonic doesn't match the provided address. It won't work unless the account has been rekeyed.
-DEBUG: Failed to get alias from keyring
+DEBUG: Failed to get alias from keyring. `test_alias` does not exist
 DEBUG: Failed to get alias keys from keyring
 Alias 'test_alias' added successfully.

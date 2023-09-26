@@ -126,7 +126,7 @@ def get_alias(alias_name: str) -> WalletAliasKeyringData | None:
 
         return WalletAliasKeyringData(**json.loads(response))
     except Exception as ex:
-        logger.debug("Failed to get alias from keyring", exc_info=ex)
+        logger.debug(f"Failed to get alias from keyring. `{alias_name}` does not exist", exc_info=ex)
         return None
 
 

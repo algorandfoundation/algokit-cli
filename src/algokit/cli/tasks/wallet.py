@@ -154,6 +154,9 @@ def reset() -> None:
         return
 
     for alias_data in aliases:
-        remove_alias(alias_data.alias)
+        try:
+            remove_alias(alias_data.alias)
+        except Exception as ex:
+            raise click.ClickException(f"Failed to remove alias {alias_data.alias}") from ex
 
     click.echo("All aliases have been cleared.")
