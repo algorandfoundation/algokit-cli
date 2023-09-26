@@ -76,15 +76,15 @@ def vanity_address(
 
     end: float = timer()
 
-    result_data = shared_dict.get("result", None)
+    result_data = {k: v for k, v in shared_dict.items() if k in ["mnemonic", "address"]}
     if output == "stdout":
-        click.echo(result_data[1])
+        click.echo(result_data)
     elif output == "alias" and alias is not None:
-        add_to_wallet(alias, result_data[1])
+        add_to_wallet(alias, result_data)
     elif output == "file" and output_file is not None:
         output_path = Path(output_file)
         with output_path.open("w") as f:
-            json.dump(result_data[1], f)
+            json.dump(result_data, f, indent=4)
     logger.info(f"Execution Time: {end - start:.2f} seconds")
 
 
@@ -109,7 +109,8 @@ def generate_vanity_address(
             stop_event.set()
 
             if shared_dict is not None:
-                shared_dict["result"] = (private_key, address)
+                shared_dict["mnemonic"] = private_key
+                shared_dict["address"] = address
 
             return
         elapsed_time = timer() - last_log_time
@@ -126,5 +127,5 @@ def log_progress(count: int, waiting_time: float) -> None:
     )
 
 
-def add_to_wallet(alias: str, output_data: str) -> None:
+def add_to_wallet(alias: str, output_data: dict) -> None:
     logger.info(f"Adding {output_data} to wallet {alias}")
