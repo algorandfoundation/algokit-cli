@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 import pytest
 
@@ -56,17 +57,16 @@ def test_vanity_address_on_anywhere_match() -> None:
 
 def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    output_file_path = cwd / "output.txt"
+    output_file_path = Path(cwd) / "output.txt"
     result = invoke(f"task vanity-address A -o file -f {output_file_path}")
 
     assert result.exit_code == 0
-    assert (cwd / "output.txt").exists()
-
-    output = (cwd / "output.txt").read_text()
+    assert output_file_path.exists()
+    output = output_file_path.read_text()
 
     # Ensure output address starts with A
-    ouput_match = re.search(r'\"address\": "([^""]+)"', output)
+    output_match = re.search(r'\"address\": "([^"]+)"', output)
 
-    if ouput_match:
-        address = ouput_match.group(1)
+    if output_match:
+        address = output_match.group(1)
         assert address.startswith("A")
