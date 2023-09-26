@@ -3,6 +3,8 @@ import logging
 import re
 from multiprocessing import Manager, Pool, cpu_count
 from multiprocessing.managers import DictProxy
+from multiprocessing.synchronize import Event as EventClass
+from multiprocessing.synchronize import Lock as LockBase
 from pathlib import Path
 from timeit import default_timer as timer
 
@@ -88,17 +90,17 @@ def vanity_address(
     logger.info(f"Execution Time: {end - start:.2f} seconds")
 
 
-def generate_vanity_address(
+def generate_vanity_address(  # noqa: PLR0913
     keyword: str,
     match: str,
     start_time: float,
-    lock,
-    stop_event,
+    lock: LockBase,
+    stop_event: EventClass,
     shared_dict: DictProxy,
 ) -> None:
     last_log_time = start_time
     while not stop_event.is_set():
-        private_key, address = algosdk.account.generate_account()
+        private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
         with lock:
             shared_dict["count"] += 1
         if (
