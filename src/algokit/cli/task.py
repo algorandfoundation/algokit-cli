@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from algokit.cli.tasks.asset import transfer
+from algokit.cli.tasks.transfer import transfer
 
 logger = logging.getLogger(__name__)
 
