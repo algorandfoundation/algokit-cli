@@ -1,6 +1,10 @@
 import logging
 
+import algokit_utils
 import click
+from algokit_utils import Account, TransferAssetParameters, TransferParameters, transfer_asset
+from algosdk.v2client.algod import AlgodClient
+import algosdk.encoding
 
 logger = logging.getLogger(__name__)
 
@@ -16,11 +20,37 @@ def transfer(  # noqa: PLR0913
     # *, if we are using booleans
     sender: str,
     receiver: str,
-    asset: str,
-    amount: str,
-    smallest_unit: str,
+    asset: int,
+    amount: int,
+    whole_units: bool,
     network: str,
+    algod_client: AlgodClient,
 ) -> None:
-    logger.info(
-        f"sender {sender} receiver {receiver} asset {asset} amount {amount} smunit {smallest_unit} network {network}"
-    )
+    # if not whole_units then amount is micro-algos if whole_units then algos (use algoAmount to convert)
+    if algosdk.encoding.is_valid_address(sender) is False:
+        raise Exception("Sender account is invalid")
+
+    if algosdk.encoding.is_valid_address(receiver) is False:
+        raise Exception("Receiver account is invalid")
+
+    from_account = Account(address=sender, private_key=mnemonic.to_private_key(mnemonic_phrase))
+
+    # if whole_units:
+    #     micro_algos = amount
+    # else
+    #     micro_algos = AlgoAmount
+
+    if asset == 0:
+        algokit_utils.transfer(
+            algod_client, TransferParameters(to_address=receiver, from_account=from_account, micro_algos=amount)
+        )
+    else:
+        transfer_asset(
+            algod_client,
+            TransferAssetParameters(
+                from_account=from_account,
+                to_address=receiver,
+                amount=amount,
+                asset_id=asset,
+            ),
+        )
