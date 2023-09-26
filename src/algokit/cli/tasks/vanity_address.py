@@ -61,9 +61,11 @@ def vanity_address(
         raise click.ClickException("Output file is required when output is set to 'file'")
 
     if output == "stdout":
-        logger.warning("Note: Your CI access token is displayed on the console. "
-                       "Ensure its security by keeping it confidential."
-                       "Consider clearing your terminal history after noting down the token.")
+        logger.warning(
+            "Note: Your CI access token is displayed on the console. "
+            "Ensure its security by keeping it confidential."
+            "Consider clearing your terminal history after noting down the token."
+        )
 
     manager = Manager()
     shared_dict = manager.dict()

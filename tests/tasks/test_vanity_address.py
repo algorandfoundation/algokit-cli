@@ -57,21 +57,3 @@ def test_vanity_address_on_anywhere_match() -> None:
     if match:
         address = match.group(1)
         assert "T" in address
-
-
-# def test_vanity_address_on_end_match() -> None:
-#     result = invoke("task vanity-address T -m end")
-#
-#     assert result.exit_code == 0
-#     match = re.search(r"'address': '([^']+)'", result.output)
-#     if match:
-#         address = match.group(1)
-#         assert address.endswith("T")
-#     verify(result.output)
-
-
-# def test_vanity_address_on_file() -> None:
-#     result = invoke("task vanity-address T -o file -f result.txt")
-#
-#     assert result.exit_code == 0
-#     verify(result.output)
