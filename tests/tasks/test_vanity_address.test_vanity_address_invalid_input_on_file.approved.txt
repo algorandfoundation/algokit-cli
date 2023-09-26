@@ -1,1 +1,1 @@
-Output file is required when output is set to 'file'
+Error: Output file is required when output is set to 'file'

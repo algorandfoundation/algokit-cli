@@ -1,4 +1,4 @@
-Usage: algokit task vanity_address [OPTIONS] KEYWORD
+Usage: algokit task vanity-address [OPTIONS] KEYWORD
 
   Generate a vanity Algorand address. Your KEYWORD can only include letters A -
   Z and numbers 2 - 7. Keeping your KEYWORD under 5 characters will usually
@@ -7,9 +7,9 @@ Usage: algokit task vanity_address [OPTIONS] KEYWORD
   keyword.
 
 Options:
-  -m, --match [Start|Anywhere|End]
+  -m, --match [start|anywhere|end]
                                   Location where the keyword will be included.
-                                  Default is Start.
+                                  Default is start.
   -o, --output [stdout|alias|file]
                                   How the output will be presented.
   -a, --alias TEXT                Alias for the address. Required if output is

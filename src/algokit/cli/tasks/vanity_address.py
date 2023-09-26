@@ -28,9 +28,9 @@ SECOND = 5
 @click.option(
     "--match",
     "-m",
-    default="Start",
-    type=click.Choice(["Start", "Anywhere", "End"]),
-    help="Location where the keyword will be included. Default is Start.",
+    default="start",
+    type=click.Choice(["start", "anywhere", "end"]),
+    help="Location where the keyword will be included. Default is start.",
 )
 @click.option(
     "--output",
@@ -52,16 +52,18 @@ def vanity_address(
     keyword: str, match: str, output: str, alias: str | None = None, output_file: str | None = None
 ) -> None:
     if not re.match("^[A-Z2-7]+$", keyword):
-        click.echo("Invalid KEYWORD. It can only include letters A-Z and numbers 2-7.")
-        return
+        raise click.ClickException("Invalid KEYWORD. It can only include letters A-Z and numbers 2-7.")
 
     if output == "alias" and alias is None:
-        click.echo("Alias is required when output is set to 'alias'")
-        return
+        raise click.ClickException("Alias is required when output is set to 'alias'")
 
     if output == "file" and output_file is None:
-        click.echo("Output file is required when output is set to 'file'")
-        return
+        raise click.ClickException("Output file is required when output is set to 'file'")
+
+    if output == "stdout":
+        logger.warning("Note: Your CI access token is displayed on the console. "
+                       "Ensure its security by keeping it confidential."
+                       "Consider clearing your terminal history after noting down the token.")
 
     manager = Manager()
     shared_dict = manager.dict()
@@ -106,9 +108,9 @@ def generate_vanity_address(  # noqa: PLR0913
         with lock:
             shared_dict["count"] += 1
         if (
-            (match == "Start" and address.startswith(keyword))
-            or (match == "Anywhere" and keyword in address)
-            or (match == "End" and address.endswith(keyword))
+            (match == "start" and address.startswith(keyword))
+            or (match == "anywhere" and keyword in address)
+            or (match == "end" and address.endswith(keyword))
         ):
             stop_event.set()
 
