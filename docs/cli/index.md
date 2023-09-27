@@ -78,6 +78,30 @@
     - [start](#start)
     - [status](#status)
     - [stop](#stop)
+  - [task](#task)
+    - [vanity-address](#vanity-address)
+    - [Options](#options-13)
+    - [-m, --match ](#-m---match-)
+    - [-o, --output ](#-o---output--1)
+    - [-a, --alias ](#-a---alias-)
+    - [-f, --output-file ](#-f---output-file-)
+    - [Arguments](#arguments-5)
+    - [KEYWORD](#keyword)
+    - [wallet](#wallet)
+    - [Options](#options-14)
+    - [-a, --address ](#-a---address-)
+    - [-m, --mnemonic](#-m---mnemonic)
+    - [-f, --force](#-f---force)
+    - [Arguments](#arguments-6)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-7)
+    - [ALIAS](#alias)
+    - [Options](#options-15)
+    - [-f, --force](#-f---force-1)
+    - [Arguments](#arguments-8)
+    - [ALIAS](#alias-1)
+    - [Options](#options-16)
+    - [-f, --force](#-f---force-2)
 
 # algokit
 
@@ -509,46 +533,147 @@ algokit localnet stop [OPTIONS]
 
 ## task
 
-Utils for an Algorand project.
+Collection of useful tasks to help you develop on Algorand.
 
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
 
-### transfer
+### vanity-address
 
-Transfer algos or asset between accounts
+Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
+Keeping your KEYWORD under 5 characters will usually result in faster generation.
+Note: The longer the KEYWORD, the longer it may take to generate a matching address.
+Please be patient if you choose a long keyword.
 
 ```shell
-algokit task transfer
+algokit task vanity-address [OPTIONS] KEYWORD
 ```
 
 ### Options
 
-### -s, --sender <sender>
 
-Address of the sender account
+### -m, --match <match>
+Location where the keyword will be included. Default is start.
 
-### -r, --receiver <receiver>
 
-Address to an account that will receive the asset(s)
+* **Options**
 
-### -id, --asset <asset>
+    start | anywhere | end
 
-ASA asset id to transfer
 
-### -a, --amount <amount>
 
-Amount to transfer
+### -o, --output <output>
+How the output will be presented.
 
-### --whole-units <whole-units>
 
-Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos).
-Disabled by default.
+* **Options**
 
-### -n, --network <network>
+    stdout | alias | file
 
-Network where the transfer will be executed
 
-- **Options**
-  localnet|testnet|mainnet
+
+### -a, --alias <alias>
+Alias for the address. Required if output is “alias”.
+
+
+### -f, --output-file <output_file>
+File to dump the output. Required if output is “file”.
+
+### Arguments
+
+
+### KEYWORD
+Required argument
+
+### wallet
+
+Create short aliases for your addresses and accounts on AlgoKit CLI.
+
+```shell
+algokit task wallet [OPTIONS] COMMAND [ARGS]...
+```
+
+#### add
+
+Add an address or account to be stored against a named alias (at most 50 aliases).
+
+```shell
+algokit task wallet add [OPTIONS] ALIAS_NAME
+```
+
+### Options
+
+
+### -a, --address <address>
+**Required** The address of the account
+
+
+### -m, --mnemonic
+If specified then prompt the user for a mnemonic phrase interactively using masked input
+
+
+### -f, --force
+Allow overwriting an existing alias
+
+### Arguments
+
+
+### ALIAS_NAME
+Required argument
+
+#### get
+
+Get an address or account stored against a named alias.
+
+```shell
+algokit task wallet get [OPTIONS] ALIAS
+```
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### list
+
+List all addresses and accounts stored against a named alias.
+
+```shell
+algokit task wallet list [OPTIONS]
+```
+
+#### remove
+
+Remove an address or account stored against a named alias.
+
+```shell
+algokit task wallet remove [OPTIONS] ALIAS
+```
+
+### Options
+
+
+### -f, --force
+Allow removing an alias without confirmation
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### reset
+
+Remove all aliases.
+
+```shell
+algokit task wallet reset [OPTIONS]
+```
+
+### Options
+
+
+### -f, --force
+Allow removing all aliases without confirmation

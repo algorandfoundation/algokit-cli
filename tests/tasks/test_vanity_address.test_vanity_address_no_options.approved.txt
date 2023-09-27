@@ -1,0 +1,4 @@
+Usage: algokit task vanity-address [OPTIONS] KEYWORD
+Try 'algokit task vanity-address -h' for help.
+
+Error: Missing argument 'KEYWORD'.

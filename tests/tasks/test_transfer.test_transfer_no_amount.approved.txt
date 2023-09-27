@@ -1,0 +1,4 @@
+Usage: algokit task transfer [OPTIONS] [[localnet|testnet|mainnet]]
+Try 'algokit task transfer -h' for help.
+
+Error: Missing option '--amount' / '-a'.

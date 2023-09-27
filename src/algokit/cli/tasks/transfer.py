@@ -1,4 +1,5 @@
 import logging
+from typing import TYPE_CHECKING
 
 import algosdk
 import algosdk.encoding
@@ -12,10 +13,17 @@ from algokit_utils import (
     get_default_localnet_config,
     transfer_asset,
 )
+from algokit_utils import (
+    transfer as transfer_algos,
+)
+
+from algokit.core.tasks.wallet import get_alias
+
+if TYPE_CHECKING:
+    from algosdk.transaction import AssetTransferTxn, PaymentTxn
 
 logger = logging.getLogger(__name__)
 
-# TODO: upon algokit aliasing being merged sender will be expanded ot work with aliases
 # TODO: upon algokit nfd lookup being implemented receiver will also allow nfd lookups
 
 
@@ -72,9 +80,9 @@ def _validate_asset_balance(sender_account_info: dict, receiver_account_info: di
 
 
 def _validate_balance(
-    sender: str, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
+    sender: Account, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
 ) -> None:
-    sender_account_info = algod_client.account_info(sender)
+    sender_account_info = algod_client.account_info(sender.address)
     receiver_account_info = algod_client.account_info(receiver)
 
     if not isinstance(sender_account_info, dict) or not isinstance(receiver_account_info, dict):
@@ -88,18 +96,35 @@ def _validate_balance(
 
 
 def _validate_inputs(
-    sender: str, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
+    sender: Account, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
 ) -> None:
-    for address in [sender, receiver]:
-        _validate_address(address)
+    _validate_address(receiver)
     _validate_balance(sender, receiver, asset_id, amount, algod_client)
 
 
+def _get_sender_account(sender: str) -> Account:
+    try:
+        _validate_address(sender)
+        pk = _get_private_key_from_mnemonic()
+        return Account(address=sender, private_key=pk)
+    except click.ClickException as ex:
+        alias_data = get_alias(sender)
+
+        if not alias_data:
+            raise click.ClickException(f"Alias `{sender}` alias does not exist.") from ex
+        if not alias_data.private_key:
+            raise click.ClickException(f"Alias `{sender}` does not have a private key.") from ex
+
+        return Account(address=alias_data.address, private_key=alias_data.private_key)
+
+
 @click.command(name="transfer")
-@click.option("--sender", "-s", type=click.STRING, help="Address of the sender account")
-@click.option("--receiver", "-r", type=click.STRING, help="Address to an account that will receive the asset(s)")
-@click.option("--asset", "--id", "asset_id", type=click.INT, help="ASA asset id to transfer", default=0)
-@click.option("--amount", "-a", type=click.INT, help="Amount to transfer")
+@click.option("--sender", "-s", type=click.STRING, help="Address or alias of the sender account", required=True)
+@click.option(
+    "--receiver", "-r", type=click.STRING, help="Address to an account that will receive the asset(s)", required=True
+)
+@click.option("--asset", "--id", "asset_id", type=click.INT, help="ASA asset id to transfer", default=0, required=False)
+@click.option("--amount", "-a", type=click.INT, help="Amount to transfer", required=True)
 @click.option(
     "--whole-units",
     "whole_units",
@@ -110,8 +135,9 @@ def _validate_inputs(
         "Disabled by default."
     ),
     default=False,
+    required=False,
 )
-@click.option("--network", "-n", help="Network where the transfer will be executed localnet|testnet|mainnet")
+@click.argument("network", type=click.Choice(["localnet", "testnet", "mainnet"]), default="localnet", required=False)
 def transfer(  # noqa: PLR0913
     *,
     sender: str,
@@ -122,33 +148,47 @@ def transfer(  # noqa: PLR0913
     network: str,
 ) -> None:
     # Trim special characters from sender and receiver addresses
-    sender = sender.strip('"')
-    receiver = receiver.strip('"')
+    sender = (sender or "").strip('"')
+    receiver = (receiver or "").strip('"')
+
+    sender_account = _get_sender_account(sender)
 
     # Get algod client
     algod_client = _get_algod_client(network)
 
     # Validate inputs
-    _validate_inputs(sender, receiver, asset_id, amount, algod_client)
+    _validate_inputs(sender_account, receiver, asset_id, amount, algod_client)
 
     # Convert amount to whole units if specified
     if whole_units:
         amount = amount * (10 ** _get_asset_decimals(asset_id, algod_client))
 
-    # Assemble sender account
-    private_key = _get_private_key_from_mnemonic()
-    from_account = Account(address=sender, private_key=private_key)
-
     # Transfer algos or assets depending on asset_id
-    if asset_id == 0:
-        transfer(algod_client, TransferParameters(to_address=receiver, from_account=from_account, micro_algos=amount))
-    else:
-        transfer_asset(
-            algod_client,
-            TransferAssetParameters(
-                from_account=from_account,
-                to_address=receiver,
-                amount=amount,
-                asset_id=asset_id,
-            ),
+    txn_response: PaymentTxn | AssetTransferTxn | None = None
+    try:
+        if asset_id == 0:
+            txn_response = transfer_algos(
+                algod_client, TransferParameters(to_address=receiver, from_account=sender_account, micro_algos=amount)
+            )
+        else:
+            txn_response = transfer_asset(
+                algod_client,
+                TransferAssetParameters(
+                    from_account=sender_account,
+                    to_address=receiver,
+                    amount=amount,
+                    asset_id=asset_id,
+                ),
+            )
+
+        if not txn_response:
+            raise click.ClickException("Failed to perform transfer")
+
+        click.echo(
+            f"Successfully performed transfer. "
+            "See details at "
+            f"https://testnet.algoexplorer.io/tx/{txn_response.get_txid()}"  # type: ignore[no-untyped-call]
         )
+
+    except Exception as err:
+        raise click.ClickException("Failed to perform transfer") from err

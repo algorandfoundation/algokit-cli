@@ -1,0 +1,3 @@
+DEBUG: `test_alias` does not exist
+DEBUG: Failed to get alias keys from keyring
+Alias 'test_alias' added successfully.

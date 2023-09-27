@@ -1,0 +1,2 @@
+🚨 This is a destructive action that will clear all aliases. Are you sure? (y, n) [n]: y
+Error: Failed to remove alias test_alias_1
