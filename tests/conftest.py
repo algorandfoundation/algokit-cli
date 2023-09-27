@@ -166,3 +166,27 @@ else:
         reporters.PythonNativeReporter(),
     ]
     set_default_reporter(reporters.FirstWorkingReporter(*default_reporters))
+
+
+@pytest.fixture()
+def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None], None, None]:
+    credentials: dict[str, str | None] = {}
+
+    def _get_password(service_name: str, username: str) -> str | None:  # noqa: ARG001
+        return credentials[username]
+
+    def _set_password(service_name: str, username: str, password: str) -> None:  # noqa: ARG001
+        credentials[username] = password
+
+    def _delete_password(service_name: str, username: str) -> None:  # noqa: ARG001
+        del credentials[username]
+
+    mocker.patch("keyring.get_password", side_effect=_get_password)
+    mocker.patch("keyring.set_password", side_effect=_set_password)
+    mocker.patch("keyring.delete_password", side_effect=_delete_password)
+
+    yield credentials
+
+    # Teardown step: reset the credentials
+    for key in credentials:
+        credentials[key] = None

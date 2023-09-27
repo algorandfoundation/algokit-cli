@@ -1,7 +1,9 @@
+import json
 import re
 from pathlib import Path
 
 import pytest
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -60,7 +62,7 @@ def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> Non
     output_file_path = Path(cwd) / "output.txt"
 
     path = str(output_file_path.absolute()).replace("\\", r"\\")
-    result = invoke(f"task vanity-address A -o file -f {path}")
+    result = invoke(f"task vanity-address A -o file --file-path {path}")
 
     assert result.exit_code == 0
     assert output_file_path.exists()
@@ -72,3 +74,25 @@ def test_vanity_address_on_file(tmp_path_factory: pytest.TempPathFactory) -> Non
     if output_match:
         address = output_match.group(1)
         assert address.startswith("A")
+
+
+def test_vanity_address_on_alias(mock_keyring: dict[str, str]) -> None:
+    alias = "test_alias"
+
+    result = invoke(f"task vanity-address A -o alias --alias {alias}")
+
+    assert result.exit_code == 0
+    assert json.loads(mock_keyring[alias])["alias"] == alias
+    assert json.loads(mock_keyring[alias])["address"].startswith("A")
+
+
+def test_vanity_address_on_existing_alias(mock_keyring: dict[str, str]) -> None:
+    alias = "test_alias"
+    mock_keyring[alias] = json.dumps({"alias": alias, "address": "B", "private_key": None})
+    mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias])
+
+    result = invoke(f"task vanity-address A -o alias --alias {alias}", input="y")
+
+    assert result.exit_code == 0
+    assert json.loads(mock_keyring[alias])["alias"] == alias
+    assert json.loads(mock_keyring[alias])["address"].startswith("A")

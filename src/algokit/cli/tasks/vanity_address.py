@@ -5,12 +5,13 @@ from pathlib import Path
 
 import click
 
-from algokit.core.tasks.vanity_address import MatchType, generate_vanity_address
+from algokit.core.tasks.vanity_address import MatchType, VanityAccount, generate_vanity_address
+from algokit.core.tasks.wallet import WALLET_ALIASING_MAX_LIMIT, WalletAliasingLimitError, add_alias, get_alias
 
 logger = logging.getLogger(__name__)
 
 
-def validate_inputs(
+def _validate_inputs(
     keyword: str,
     output: str,
     alias: str | None,
@@ -24,8 +25,29 @@ def validate_inputs(
         )
     if output == "file" and not output_file:
         raise click.ClickException(
-            "Please provide an output filename using the '--output-file' option when the output is set to 'file'."
+            "Please provide an output filename using the '--file-path' option when the output is set to 'file'."
         )
+
+
+def _store_vanity_to_alias(*, alias: str, vanity_account: VanityAccount, force: bool) -> None:
+    logger.info(f"Adding {vanity_account.address} to wallet alias named {alias}")
+    if get_alias(alias) and not force:
+        response = click.prompt(
+            f"Alias '{alias}' already exists. Overwrite?",
+            type=click.Choice(["y", "n"]),
+            default="n",
+        )
+        if response == "n":
+            return
+
+    try:
+        add_alias(alias, vanity_account.address, vanity_account.private_key)
+    except WalletAliasingLimitError as ex:
+        raise click.ClickException(f"Reached the max of {WALLET_ALIASING_MAX_LIMIT} aliases.") from ex
+    except Exception as ex:
+        raise click.ClickException("Failed to add alias") from ex
+    else:
+        click.echo(f"Alias '{alias}' added successfully.")
 
 
 @click.command(
@@ -52,21 +74,38 @@ def validate_inputs(
     type=click.Choice(["stdout", "alias", "file"]),
     help="How the output will be presented.",
 )
-@click.option("--alias", "-a", required=False, help='Alias for the address. Required if output is "alias".')
 @click.option(
-    "--output-file",
-    "-f",
-    required=False,
-    type=click.Path(),
-    help='File to dump the output. Required if output is "file".',
+    "--alias", "-a", required=False, default=None, help='Alias for the address. Required if output is "alias".'
 )
-def vanity_address(
-    keyword: str, match: MatchType, output: str, alias: str | None = None, output_file: str | None = None
+@click.option(
+    "--file-path",
+    "output_file_path",
+    required=False,
+    default=None,
+    type=click.Path(),
+    help='File path where to dump the output. Required if output is "file".',
+)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    required=False,
+    default=False,
+    help="Allow overwriting an aliases without confirmation, if output option is 'alias'.",
+)
+def vanity_address(  # noqa: PLR0913
+    *,
+    keyword: str,
+    match: MatchType,
+    output: str,
+    alias: str | None,
+    output_file_path: str | None,
+    force: bool,
 ) -> None:
     match = MatchType(match)  # Force cast since click does not yet support enums as types
-    validate_inputs(keyword, output, alias, output_file)
+    _validate_inputs(keyword, output, alias, output_file_path)
 
-    result_data = generate_vanity_address(keyword, match)
+    vanity_account = generate_vanity_address(keyword, match)
 
     if output == "stdout":
         logger.warning(
@@ -74,16 +113,12 @@ def vanity_address(
             "Ensure its security by keeping it confidential."
             "Consider clearing your terminal history after noting down the token.\n"
         )
-        click.echo(result_data)
+        click.echo(vanity_account.__dict__)
 
-    elif output == "alias" and alias is not None:
-        add_to_wallet(alias, result_data)
-    elif output == "file" and output_file is not None:
-        output_path = Path(output_file)
+    elif output == "alias" and alias:
+        _store_vanity_to_alias(alias=alias, vanity_account=vanity_account, force=force)
+    elif output == "file" and output_file_path is not None:
+        output_path = Path(output_file_path)
         with output_path.open("w") as f:
-            json.dump(result_data, f, indent=4)
+            json.dump(vanity_account.__dict__, f, indent=4)
             click.echo(f"Output written to {output_path.absolute()}")
-
-
-def add_to_wallet(alias: str, output_data: dict) -> None:
-    logger.info(f"Adding {output_data} to wallet {alias}")

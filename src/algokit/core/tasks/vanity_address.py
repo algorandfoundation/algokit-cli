@@ -1,5 +1,6 @@
 import logging
 import time
+from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import Manager, Pool, cpu_count
 from multiprocessing.managers import DictProxy
@@ -18,6 +19,13 @@ class MatchType(Enum):
     START = "start"
     ANYWHERE = "anywhere"
     END = "end"
+
+
+@dataclass
+class VanityAccount:
+    mnemonic: str
+    address: str
+    private_key: str
 
 
 def _log_progress(shared_data: DictProxy, stop_event: EventClass, start_time: float) -> None:
@@ -69,7 +77,7 @@ def _search_for_matching_address(
             return
 
 
-def generate_vanity_address(keyword: str, match: MatchType) -> dict[str, str]:
+def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
     """
     Generate a vanity address in the Algorand blockchain.
 
@@ -80,7 +88,7 @@ def generate_vanity_address(keyword: str, match: MatchType) -> dict[str, str]:
         or "end" to match addresses that end with the keyword.
 
     Returns:
-        dict[str, str]: A dictionary containing the generated mnemonic and address
+        VanityAccount: An object containing the generated mnemonic and address
         that match the specified keyword and matching criteria.
     """
 
@@ -103,4 +111,11 @@ def generate_vanity_address(keyword: str, match: MatchType) -> dict[str, str]:
 
     logger.debug(f"Vanity address generation time: {timer() - start_time:.2f} seconds")
 
-    return {key: str(shared_data[key]) for key in ["mnemonic", "address"] if key in shared_data}
+    if "mnemonic" not in shared_data or "address" not in shared_data:
+        raise Exception("No matching account was found")
+
+    return VanityAccount(
+        mnemonic=shared_data["mnemonic"],
+        address=shared_data["address"],
+        private_key=mnemonic.to_private_key(shared_data["mnemonic"]),  # type: ignore[no-untyped-call]
+    )
