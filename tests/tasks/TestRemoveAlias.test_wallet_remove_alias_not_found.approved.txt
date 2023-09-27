@@ -1,0 +1,2 @@
+DEBUG: `test_alias` does not exist
+Error: Alias `test_alias` does not exist.

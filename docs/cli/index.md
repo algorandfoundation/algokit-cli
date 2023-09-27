@@ -80,14 +80,21 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [vanity-address](#vanity-address)
+    - [wallet](#wallet)
     - [Options](#options-13)
-    - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--1)
-    - [-a, --alias ](#-a---alias-)
-    - [-f, --output-file ](#-f---output-file-)
+    - [-a, --address ](#-a---address-)
+    - [-m, --mnemonic](#-m---mnemonic)
+    - [-f, --force](#-f---force)
     - [Arguments](#arguments-5)
-    - [KEYWORD](#keyword)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-6)
+    - [ALIAS](#alias)
+    - [Options](#options-14)
+    - [-f, --force](#-f---force-1)
+    - [Arguments](#arguments-7)
+    - [ALIAS](#alias-1)
+    - [Options](#options-15)
+    - [-f, --force](#-f---force-2)
 
 # algokit
 
@@ -526,58 +533,3 @@ Stop the AlgoKit LocalNet.
 ```shell
 algokit localnet stop [OPTIONS]
 ```
-
-## task
-
-Utils for an Algorand project.
-
-```shell
-algokit task [OPTIONS] COMMAND [ARGS]...
-```
-
-### vanity-address
-
-Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
-Keeping your KEYWORD under 5 characters will usually result in faster generation.
-Note: The longer the KEYWORD, the longer it may take to generate a matching address.
-Please be patient if you choose a long keyword.
-
-```shell
-algokit task vanity-address [OPTIONS] KEYWORD
-```
-
-### Options
-
-
-### -m, --match <match>
-Location where the keyword will be included. Default is start.
-
-
-* **Options**
-
-    start | anywhere | end
-
-
-
-### -o, --output <output>
-How the output will be presented.
-
-
-* **Options**
-
-    stdout | alias | file
-
-
-
-### -a, --alias <alias>
-Alias for the address. Required if output is “alias”.
-
-
-### -f, --output-file <output_file>
-File to dump the output. Required if output is “file”.
-
-### Arguments
-
-
-### KEYWORD
-Required argument
