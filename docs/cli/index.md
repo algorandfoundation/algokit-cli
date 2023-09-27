@@ -84,24 +84,25 @@
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--1)
     - [-a, --alias ](#-a---alias-)
-    - [-f, --output-file ](#-f---output-file-)
+    - [--file-path ](#--file-path-)
+    - [-f, --force](#-f---force)
     - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-14)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
-    - [-f, --force](#-f---force)
+    - [-f, --force](#-f---force-1)
     - [Arguments](#arguments-6)
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias)
     - [Options](#options-15)
-    - [-f, --force](#-f---force-1)
+    - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
     - [Options](#options-16)
-    - [-f, --force](#-f---force-2)
+    - [-f, --force](#-f---force-3)
 
 # algokit
 
@@ -577,8 +578,12 @@ How the output will be presented.
 Alias for the address. Required if output is “alias”.
 
 
-### -f, --output-file <output_file>
-File to dump the output. Required if output is “file”.
+### --file-path <output_file_path>
+File path where to dump the output. Required if output is “file”.
+
+
+### -f, --force
+Allow overwriting an aliases without confirmation, if output option is ‘alias’.
 
 ### Arguments
 
