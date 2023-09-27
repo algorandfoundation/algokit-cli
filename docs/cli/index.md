@@ -1,12 +1,11 @@
 # AlgoKit CLI Reference Documentation
 
-
 - [algokit](#algokit)
-    - [Options](#options)
-    - [--version](#--version)
-    - [-v, --verbose](#-v---verbose)
-    - [--color, --no-color](#--color---no-color)
-    - [--skip-version-check](#--skip-version-check)
+  - [Options](#options)
+  - [--version](#--version)
+  - [-v, --verbose](#-v---verbose)
+  - [--color, --no-color](#--color---no-color)
+  - [--skip-version-check](#--skip-version-check)
   - [bootstrap](#bootstrap)
     - [Options](#options-1)
     - [--force](#--force)
@@ -65,7 +64,7 @@
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
     - [--ide, --no-ide](#--ide---no-ide)
-    - [-a, --answer  ](#-a---answer--)
+    - [-a, --answer ](#-a---answer--)
   - [localnet](#localnet)
     - [console](#console)
     - [explore](#explore-1)
@@ -92,20 +91,20 @@ algokit [OPTIONS] COMMAND [ARGS]...
 
 ### Options
 
-
 ### --version
+
 Show the version and exit.
 
-
 ### -v, --verbose
+
 Enable logging of DEBUG messages to the console.
 
-
 ### --color, --no-color
+
 Force enable or disable of console output styling.
 
-
 ### --skip-version-check
+
 Skip version checking and prompting.
 
 ## bootstrap
@@ -119,8 +118,8 @@ algokit bootstrap [OPTIONS] COMMAND [ARGS]...
 
 ### Options
 
-
 ### --force
+
 Continue even if minimum AlgoKit version is not met
 
 ### all
@@ -133,8 +132,8 @@ algokit bootstrap all [OPTIONS]
 
 ### Options
 
-
 ### --interactive, --non-interactive, --ci
+
 Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
 ### env
@@ -147,8 +146,8 @@ algokit bootstrap env [OPTIONS]
 
 ### Options
 
-
 ### --interactive, --non-interactive, --ci
+
 Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
 ### npm
@@ -186,15 +185,13 @@ algokit completions install [OPTIONS]
 
 ### Options
 
-
 ### --shell <shell>
+
 Specify shell to install algokit completions for.
 
+- **Options**
 
-* **Options**
-
-    bash | zsh
-
+  bash | zsh
 
 ### uninstall
 
@@ -208,15 +205,13 @@ algokit completions uninstall [OPTIONS]
 
 ### Options
 
-
 ### --shell <shell>
+
 Specify shell to install algokit completions for.
 
+- **Options**
 
-* **Options**
-
-    bash | zsh
-
+  bash | zsh
 
 ## config
 
@@ -240,8 +235,8 @@ algokit config version-prompt [OPTIONS] [[enable|disable]]
 
 ### Arguments
 
-
 ### ENABLE
+
 Optional argument
 
 ## deploy
@@ -254,22 +249,22 @@ algokit deploy [OPTIONS] [ENVIRONMENT_NAME]
 
 ### Options
 
-
 ### -C, --command <command>
+
 Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
 
-
 ### --interactive, --non-interactive, --ci
+
 Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
 
-
 ### -P, --path <path>
+
 Specify the project directory. If not provided, current working directory will be used.
 
 ### Arguments
 
-
 ### ENVIRONMENT_NAME
+
 Optional argument
 
 ## doctor
@@ -285,8 +280,8 @@ algokit doctor [OPTIONS]
 
 ### Options
 
-
 ### -c, --copy-to-clipboard
+
 Copy the contents of the doctor message (in Markdown format) in your clipboard.
 
 ## explore
@@ -299,8 +294,8 @@ algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 
 ### Arguments
 
-
 ### NETWORK
+
 Optional argument
 
 ## generate
@@ -324,24 +319,22 @@ algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
 
 ### Options
 
-
 ### -o, --output <output_path_pattern>
+
 Path to the output file. The following tokens can be used to substitute into the output path: {contract_name}, {app_spec_dir}
 
-
 ### -l, --language <language>
+
 Programming language of the generated client code
 
+- **Options**
 
-* **Options**
-
-    python | typescript
-
+  python | typescript
 
 ### Arguments
 
-
 ### APP_SPEC_PATH_OR_DIR
+
 Required argument
 
 ## goal
@@ -356,14 +349,14 @@ algokit goal [OPTIONS] [GOAL_ARGS]...
 
 ### Options
 
-
 ### --console
+
 Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
 
 ### Arguments
 
-
 ### GOAL_ARGS
+
 Optional argument(s)
 
 ## init
@@ -386,50 +379,48 @@ algokit init [OPTIONS]
 
 ### Options
 
-
 ### -n, --name <directory_name>
+
 Name of the project / directory / repository to create.
 
-
 ### -t, --template <template_name>
+
 Name of an official template to use. To see a list of descriptions, run this command with no arguments.
 
+- **Options**
 
-* **Options**
-
-    beaker | react | fullstack | playground
-
-
+  beaker | react | fullstack | playground
 
 ### --template-url <URL>
+
 URL to a git repo with a custom project template.
 
-
 ### --template-url-ref <URL>
+
 Specific tag, branch or commit to use on git repo specified with –template-url. Defaults to latest.
 
-
 ### --UNSAFE-SECURITY-accept-template-url
+
 Accept the specified template URL, acknowledging the security implications of arbitrary code execution trusting an unofficial template.
 
-
 ### --git, --no-git
+
 Initialise git repository in directory after creation.
 
-
 ### --defaults
+
 Automatically choose default answers without asking when creating this template.
 
-
 ### --bootstrap, --no-bootstrap
+
 Whether to run algokit bootstrap to install and configure the new project’s dependencies locally.
 
-
 ### --ide, --no-ide
+
 Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.
 
-
 ### -a, --answer <key> <value>
+
 Answers key/value pairs to pass to the template.
 
 ## localnet
@@ -466,19 +457,17 @@ algokit localnet logs [OPTIONS]
 
 ### Options
 
-
 ### --follow, -f
+
 Follow log output.
 
-
 ### --tail <tail>
+
 Number of lines to show from the end of the logs for each container.
 
+- **Default**
 
-* **Default**
-
-    `all`
-
+  `all`
 
 ### reset
 
@@ -490,8 +479,8 @@ algokit localnet reset [OPTIONS]
 
 ### Options
 
-
 ### --update, --no-update
+
 Enable or disable updating to the latest available LocalNet version, default: don’t update
 
 ### start
@@ -517,3 +506,49 @@ Stop the AlgoKit LocalNet.
 ```shell
 algokit localnet stop [OPTIONS]
 ```
+
+## task
+
+Utils for an Algorand project.
+
+```shell
+algokit task [OPTIONS] COMMAND [ARGS]...
+```
+
+### transfer
+
+Transfer algos or asset between accounts
+
+```shell
+algokit task transfer
+```
+
+### Options
+
+### -s, --sender <sender>
+
+Address of the sender account
+
+### -r, --receiver <receiver>
+
+Address to an account that will receive the asset(s)
+
+### -id, --asset <asset>
+
+ASA asset id to transfer
+
+### -a, --amount <amount>
+
+Amount to transfer
+
+### --whole-units <whole-units>
+
+Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos).
+Disabled by default.
+
+### -n, --network <network>
+
+Network where the transfer will be executed
+
+- **Options**
+  localnet|testnet|mainnet
