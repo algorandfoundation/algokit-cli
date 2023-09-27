@@ -27,7 +27,7 @@ reset Remove all aliases.
 
 ### Add
 
-This command adds an address or account to be stored against a named alias. If the `--mnemonic` flag is used, it will prompt the user for a mnemonic phrase interactively using masked input. If the `--force` flag is used, it will allow overwriting an existing alias.
+This command adds an address or account to be stored against a named alias. If the `--mnemonic` flag is used, it will prompt the user for a mnemonic phrase interactively using masked input. If the `--force` flag is used, it will allow overwriting an existing alias. Maximum number of aliases that can be stored at a time is 50.
 
 ```bash
 $ algokit wallet add [OPTIONS] ALIAS_NAME
