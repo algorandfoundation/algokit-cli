@@ -53,7 +53,7 @@ def wallet() -> None:
 )
 @click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias")
 def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> None:
-    """Add an address or account to be stored against a named alias."""
+    """Add an address or account to be stored against a named alias (at most 50 aliases)."""
 
     _validate_alias_name(alias_name)
     _validate_address(address)
@@ -70,7 +70,7 @@ def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> No
 
     if get_alias(alias_name) and not force:
         response = click.prompt(
-            f"Alias '{alias_name}' already exists. Overwrite? (y/n)",
+            f"Alias '{alias_name}' already exists. Overwrite?",
             type=click.Choice(["y", "n"]),
             default="n",
         )
@@ -104,7 +104,7 @@ def get(alias: str) -> None:
 
 @wallet.command("list")
 def list_all() -> None:
-    """List all addresses or accounts stored against a named alias."""
+    """List all addresses and accounts stored against a named alias."""
 
     aliases = get_aliases()
 
@@ -117,18 +117,35 @@ def list_all() -> None:
         for alias_data in aliases
     ]
 
-    click.echo(json.dumps(output, indent=2))
+    content = (
+        json.dumps(output, indent=2)
+        if output
+        else "You don't have any aliases stored yet. Create one using `algokit task wallet add`."
+    )
+
+    click.echo(content)
 
 
 @wallet.command("remove")
 @click.argument("alias", type=click.STRING)
-def remove(alias: str) -> None:
+@click.option("--force", "-f", is_flag=True, help="Allow removing an alias without confirmation")
+def remove(*, alias: str, force: bool) -> None:
     """Remove an address or account stored against a named alias."""
 
     alias_data = get_alias(alias)
 
     if not alias_data:
         raise click.ClickException(f"Alias `{alias}` does not exist.")
+
+    if not force:
+        response = click.prompt(
+            f"🚨 This is a destructive action that will remove the `{alias_data.alias}` alias. Are you sure?",
+            type=click.Choice(["y", "n"]),
+            default="n",
+        )
+
+        if response == "n":
+            return
 
     remove_alias(alias)
 

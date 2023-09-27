@@ -18,7 +18,7 @@ Options:
 Commands:
 add Add an address or account to be stored against a named alias.
 get Get an address or account stored against a named alias.
-list List all addresses or accounts stored against a named alias.
+list List all addresses and accounts stored against a named alias.
 remove Remove an address or account stored against a named alias.
 reset Remove all aliases.
 ```
@@ -33,7 +33,7 @@ This command adds an address or account to be stored against a named alias. If t
 $ algokit wallet add [OPTIONS] ALIAS_NAME
 ```
 
-> Please note, the command is not designed to be used in CI scope, there is not options to skip interactive masked input of mnemonic if you want to alias an Account (both private and public key) entity.
+> Please note, the command is not designed to be used in CI scope, there is no option to skip interactive masked input of the mnemonic, if you want to alias an `Account` (both private and public key) entity.
 
 #### Options
 
@@ -51,7 +51,7 @@ $ algokit wallet get ALIAS
 
 ### List
 
-This command lists all addresses or accounts stored against a named alias. If a record contains a `private_key` it will show a boolean flag indicating whether it exists, actual private key values are never exposed. As a user you can obtain the content of the stored aliases by navigating to your dedicated password manager (see [keyring details]()).
+This command lists all addresses and accounts stored against a named alias. If a record contains a `private_key` it will show a boolean flag indicating whether it exists, actual private key values are never exposed. As a user you can obtain the content of the stored aliases by navigating to your dedicated password manager (see [keyring details](https://pypi.org/project/keyring/)).
 
 ```bash
 $ algokit wallet list
@@ -85,4 +85,4 @@ To retrieve the stored mnemonic, you will need to manually navigate to your oper
 - On Windows, it uses the Credential Manager.
 - On Linux, it can use Secret Service API, KWallet, or an in-memory store depending on your setup.
 
-Remember, AlgoKit is designed to keep your sensitive information secure. Always use caution when handling mnemonics and private keys.
+> Remember, AlgoKit is designed to keep your sensitive information secure however your storage is only as secure as the device on which it is stored. Always ensure to maintain good security practices on your device, especially when dealing with mnemonics that are to be used on MainNet.

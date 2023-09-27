@@ -9,6 +9,10 @@ logger = logging.getLogger(__name__)
 WALLET_ALIAS_KEYRING_NAMESPACE = "algokit_alias"
 WALLET_ALIASES_KEYRING_NAMESPACE = "algokit_aliases"
 WALLET_ALIASES_KEYRING_USERNAME = "aliases"
+
+# Windows Credentials locker has a max limit of 1280 chars per password length.
+# Given that each alias is at most 20 chars, around ~50 alias keys can be stored within single password field.
+# Hence the limitation of 50 aliases.
 WALLET_ALIASING_MAX_LIMIT = 50
 
 
@@ -126,7 +130,7 @@ def get_alias(alias_name: str) -> WalletAliasKeyringData | None:
 
         return WalletAliasKeyringData(**json.loads(response))
     except Exception as ex:
-        logger.debug(f"Failed to get alias from keyring. `{alias_name}` does not exist", exc_info=ex)
+        logger.debug(f"`{alias_name}` does not exist", exc_info=ex)
         return None
 
 
