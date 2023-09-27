@@ -4,7 +4,6 @@ from enum import Enum
 from multiprocessing import Manager, Pool, cpu_count
 from multiprocessing.managers import DictProxy
 from multiprocessing.synchronize import Event as EventClass
-from multiprocessing.synchronize import Lock as LockBase
 from timeit import default_timer as timer
 
 import algosdk
@@ -23,22 +22,21 @@ class MatchType(Enum):
 
 def _log_progress(shared_data: DictProxy, stop_event: EventClass, start_time: float) -> None:
     """Logs progress of address matching at regular intervals."""
-
     last_log_time = start_time
 
     while not stop_event.is_set():
+        total_count = sum(count.value for count in shared_data["counts"])
         if timer() - last_log_time >= PROGRESS_REFRESH_INTERVAL_SECONDS:
             elapsed_time = timer() - start_time
             logger.info(
-                f"Still searching for a match. Iterated over {shared_data['count']} addresses "
-                f"in {elapsed_time:.2f} seconds."
+                f"Still searching for a match. Iterated over {total_count} addresses in {elapsed_time:.2f} seconds."
             )
             last_log_time = timer()
-        time.sleep(1)  # to avoid tight loop and reduce CPU usage
+        time.sleep(1)
 
 
 def _search_for_matching_address(
-    keyword: str, match: MatchType, lock: LockBase, stop_event: EventClass, shared_data: DictProxy
+    worker_id: int, keyword: str, match: MatchType, stop_event: EventClass, shared_data: DictProxy
 ) -> None:
     """
     Searches for a matching address based on the specified keyword and matching criteria.
@@ -63,8 +61,7 @@ def _search_for_matching_address(
             MatchType.END: address.endswith(keyword),
         }
 
-        with lock:
-            shared_data["count"] += 1
+        shared_data["counts"][worker_id].value += 1
 
         if match_conditions.get(match, False):
             stop_event.set()
@@ -88,14 +85,15 @@ def generate_vanity_address(keyword: str, match: MatchType) -> dict[str, str]:
     """
 
     manager = Manager()
-    shared_data = manager.dict(count=0)
-    lock = manager.Lock()
+    num_processes = cpu_count()
+    shared_data = manager.dict()
+    shared_data["counts"] = [manager.Value("i", 0) for _ in range(num_processes - 1)]
     stop_event = manager.Event()
 
     start_time: float = timer()
-    with Pool(processes=cpu_count()) as pool:
-        for _ in range(cpu_count() - 1):
-            pool.apply_async(_search_for_matching_address, (keyword, match, lock, stop_event, shared_data))
+    with Pool(processes=num_processes) as pool:
+        for worker_id in range(num_processes - 1):
+            pool.apply_async(_search_for_matching_address, (worker_id, keyword, match, stop_event, shared_data))
 
         # Start the logger process
         pool.apply_async(_log_progress, (shared_data, stop_event, start_time))
