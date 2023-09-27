@@ -1,0 +1,1 @@
+Error: Please provide an alias using the '--alias' option when the output is set to 'alias'.

@@ -1,0 +1,1 @@
+Error: Please provide an output filename using the '--output-file' option when the output is set to 'file'.
