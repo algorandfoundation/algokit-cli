@@ -60,9 +60,10 @@ $ algokit wallet list
 ### Remove
 
 This command removes an address or account stored against a named alias.
+You must confirm the prompt interactively or pass `--force` | `-f` flag to ignore the prompt.
 
 ```bash
-$ algokit wallet remove ALIAS
+$ algokit wallet remove ALIAS  [--force | -f]
 ```
 
 ### Reset
