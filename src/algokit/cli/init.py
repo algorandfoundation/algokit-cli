@@ -53,6 +53,10 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Official template for starter or production Beaker applications.",
         ),
+        "tealscript": BlessedTemplateSource(
+            url="gh:algorand-devrel/tealscript-algokit-template",
+            description="Official starter template for TEALScript applications.",
+        ),
         "react": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
