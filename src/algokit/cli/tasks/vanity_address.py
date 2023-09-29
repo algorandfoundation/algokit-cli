@@ -105,7 +105,11 @@ def vanity_address(  # noqa: PLR0913
     match = MatchType(match)  # Force cast since click does not yet support enums as types
     _validate_inputs(keyword, output, alias, output_file_path)
 
-    vanity_account = generate_vanity_address(keyword, match)
+    try:
+        vanity_account = generate_vanity_address(keyword, match)
+    except KeyboardInterrupt as ex:
+        click.echo("\nAborting vanity address generation...")
+        raise click.Abort from ex
 
     if output == "stdout":
         logger.warning(
