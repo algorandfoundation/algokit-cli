@@ -509,7 +509,7 @@ Name of an official template to use. To see a list of descriptions, run this com
 
 * **Options**
 
-    beaker | react | fullstack | playground
+    beaker | tealscript | react | fullstack | playground
 
 
 
