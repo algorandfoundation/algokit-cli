@@ -1,0 +1,1 @@
+ERROR: Please login first by running `algokit dispenser login` command

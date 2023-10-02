@@ -4,6 +4,7 @@ from algokit.cli.bootstrap import bootstrap_group
 from algokit.cli.completions import completions_group
 from algokit.cli.config import config_group
 from algokit.cli.deploy import deploy_command
+from algokit.cli.dispenser import dispenser_group
 from algokit.cli.doctor import doctor_command
 from algokit.cli.explore import explore_command
 from algokit.cli.generate import generate_group
@@ -45,3 +46,4 @@ algokit.add_command(init_command)
 algokit.add_command(localnet_group)
 algokit.add_command(generate_group)
 algokit.add_command(deploy_command)
+algokit.add_command(dispenser_group)

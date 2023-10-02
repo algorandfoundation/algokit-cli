@@ -173,3 +173,6 @@ cython_debug/
 #Sphinx
 .doctrees/
 docs/cli/temp.md
+
+# Miscellaneous
+ci_token.txt
