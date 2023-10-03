@@ -1,5 +1,6 @@
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import Manager, Pool, cpu_count
@@ -21,6 +22,15 @@ class MatchType(Enum):
     END = "end"
 
 
+MatchFunction = Callable[[str, str], bool]
+
+MATCH_FUNCTIONS: dict[MatchType, MatchFunction] = {
+    MatchType.START: lambda addr, keyword: addr.startswith(keyword),
+    MatchType.ANYWHERE: lambda addr, keyword: keyword in addr,
+    MatchType.END: lambda addr, keyword: addr.endswith(keyword),
+}
+
+
 @dataclass
 class VanityAccount:
     mnemonic: str
@@ -32,15 +42,21 @@ def _log_progress(shared_data: DictProxy, stop_event: EventClass, start_time: fl
     """Logs progress of address matching at regular intervals."""
     last_log_time = start_time
 
-    while not stop_event.is_set():
-        total_count = sum(count.value for count in shared_data["counts"])
-        if timer() - last_log_time >= PROGRESS_REFRESH_INTERVAL_SECONDS:
-            elapsed_time = timer() - start_time
-            logger.info(
-                f"Still searching for a match. Iterated over {total_count} addresses in {elapsed_time:.2f} seconds."
-            )
-            last_log_time = timer()
-        time.sleep(1)
+    try:
+        while not stop_event.is_set():
+            total_count = sum(count.value for count in shared_data["counts"])
+            if timer() - last_log_time >= PROGRESS_REFRESH_INTERVAL_SECONDS:
+                elapsed_time = timer() - start_time
+                message = (
+                    f"Iterated over ~{total_count} addresses in {elapsed_time:.2f} seconds."
+                    if total_count > 0
+                    else f"Elapsed time: {elapsed_time:.2f} seconds."
+                )
+                logger.info(f"Still searching for a match. {message}")
+                last_log_time = timer()
+            time.sleep(1)
+    except KeyboardInterrupt:
+        stop_event.set()
 
 
 def _search_for_matching_address(
@@ -59,22 +75,26 @@ def _search_for_matching_address(
         shared_data (DictProxy): A multiprocessing dictionary to share data between processes.
     """
 
-    while not stop_event.is_set():
-        private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
-        generated_mnemonic = mnemonic.from_private_key(private_key)  # type: ignore[no-untyped-call]
+    local_count = 0
+    batch_size = 1000 * (cpu_count() - 1)
 
-        match_conditions = {
-            MatchType.START: address.startswith(keyword),
-            MatchType.ANYWHERE: keyword in address,
-            MatchType.END: address.endswith(keyword),
-        }
+    try:
+        while not stop_event.is_set():
+            private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
 
-        shared_data["counts"][worker_id].value += 1
+            local_count += 1
 
-        if match_conditions.get(match, False):
-            stop_event.set()
-            shared_data.update({"mnemonic": generated_mnemonic, "address": address})
-            return
+            if local_count % batch_size == 0:
+                shared_data["counts"][worker_id].value += local_count
+                local_count = 0
+
+            if MATCH_FUNCTIONS[match](address, keyword):
+                stop_event.set()
+                generated_mnemonic = mnemonic.from_private_key(private_key)  # type: ignore[no-untyped-call]
+                shared_data.update({"mnemonic": generated_mnemonic, "address": address})
+                return
+    except KeyboardInterrupt:
+        stop_event.set()
 
 
 def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
@@ -99,7 +119,8 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
     stop_event = manager.Event()
 
     start_time: float = timer()
-    with Pool(processes=num_processes) as pool:
+    pool = Pool(processes=num_processes)
+    try:
         for worker_id in range(num_processes - 1):
             pool.apply_async(_search_for_matching_address, (worker_id, keyword, match, stop_event, shared_data))
 
@@ -108,6 +129,11 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
 
         pool.close()
         pool.join()
+    except KeyboardInterrupt as ex:
+        stop_event.set()
+        pool.terminate()
+        pool.join()
+        raise ex
 
     logger.debug(f"Vanity address generation time: {timer() - start_time:.2f} seconds")
 
