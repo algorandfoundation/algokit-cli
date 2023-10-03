@@ -101,8 +101,10 @@ def test_vanity_address_on_existing_alias(mock_keyring: dict[str, str]) -> None:
 
 def test_vanity_address_on_termination(mocker: MockerFixture) -> None:
     mock_pool = mocker.MagicMock()
-    mock_pool.apply_async.side_effect = KeyboardInterrupt()
-    mocker.patch("multiprocessing.Pool", return_value=mock_pool)
+    mock_pool.side_effect = KeyboardInterrupt()
+    # Mocking functions within the thread is tricky hence the use of side_effect on the range is used to simulate
+    # the KeyboardInterrupt
+    mocker.patch("algokit.core.tasks.vanity_address.range", side_effect=[range(2), KeyboardInterrupt()])
 
     result = invoke("task vanity-address AAAAAA")
 
