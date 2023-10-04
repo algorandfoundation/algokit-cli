@@ -1,6 +1,6 @@
 import algosdk
 import click
-from algokit_utils import Account, get_algod_client, get_default_localnet_config, opt_in
+from algokit_utils import Account, get_algod_client, get_algonode_config, get_default_localnet_config, opt_in
 
 
 def _validate_address(address: str) -> None:
@@ -17,15 +17,26 @@ def _get_private_key_from_mnemonic() -> str:
         raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
 
 
-# def _get_algod_client(network: str) -> algosdk.v2client.algod.AlgodClient:
+def _get_algod_client(network: str) -> algosdk.v2client.algod.AlgodClient:
+    network_mapping = {
+        "localnet": get_algod_client(get_default_localnet_config("algod")),
+        "testnet": get_algod_client(get_algonode_config("testnet", "algod", "")),
+        "mainnet": get_algod_client(get_algonode_config("mainnet", "algod", "")),
+    }
+    try:
+        return network_mapping[network]
+    except KeyError as err:
+        raise click.ClickException("Invalid network") from err
 
 
-def _validate_asset_balance(sender_account_info: dict, asset_id: int) -> None:
-    sender_asset_record = next(
-        (asset for asset in sender_account_info.get("assets", []) if asset["asset-id"] == asset_id), None
-    )
-    if not sender_asset_record:
-        raise click.ClickException("Sender is not opted into the asset")
+def _is_opt_in(account: Account, algod_client: algosdk.v2client.algod.AlgodClient, asset_id: int) -> None:
+    account_info = algod_client.account_info(account.address)
+    if not isinstance(account_info, dict):
+        raise click.ClickException("Invalid account info response")
+
+    asset_record = next((asset for asset in account_info.get("assets", []) if asset["asset-id"] == asset_id), None)
+    if not asset_record:
+        raise click.ClickException("this account is not opted into the asset")
 
 
 def _get_account(sender: str) -> Account:
@@ -34,19 +45,19 @@ def _get_account(sender: str) -> Account:
     return Account(address=sender, private_key=pk)
 
 
-@click.command(name="opt-in")
+@click.command(name="opt-in", help="Opt-in to an asset. This is required before you can receive an asset. ")
 @click.argument("asset_id", type=click.INT, help="Asset ID to opt-in for")
 @click.argument("account", type=click.STRING, help="Alias or Wallet for the account")
-def opt_in_function(asset_id: int, account: str) -> None:
+@click.option(
+    "--network", "-n", type=click.Choice(["localnet", "testnet", "mainnet"]), default="localnet", required=True
+)
+def opt_in_command(asset_id: int, account: str, network: str) -> None:
     account = (account or "").strip('"')
     # what to name the account variable?
     the_account = _get_account(account)
 
-    # TODO: get network from config?
-    algod_client = get_algod_client(get_default_localnet_config("algod"))
-    # TODO: check if the asset_id is already opt in
-    account_info = algod_client.account_info(the_account.address)
-    _validate_asset_balance(account_info, asset_id)
+    algod_client = _get_algod_client(network)
+    _is_opt_in(the_account, algod_client, asset_id)
 
     try:
         opt_in(algod_client=algod_client, account=the_account, asset_id=asset_id)
