@@ -45,7 +45,11 @@ def _get_account(sender: str) -> Account:
     return Account(address=sender, private_key=pk)
 
 
-@click.command(name="opt-in", help="Opt-in to an asset. This is required before you can receive an asset. ")
+@click.command(
+    name="opt-in",
+    help="Opt-in to an asset using <ID> <ACCOUNT>. This is required before you can receive an asset."
+    "Use -n to specify localnet, testnet, or mainnet.",
+)
 @click.argument("asset_id", type=click.INT, help="Asset ID to opt-in for")
 @click.argument("account", type=click.STRING, help="Alias or Wallet for the account")
 @click.option(
