@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.0 (2023-10-04)
+
+### Feature
+
+* Algokit `dispenser` ([#309](https://github.com/algorandfoundation/algokit-cli/issues/309)) ([`6b7a514`](https://github.com/algorandfoundation/algokit-cli/commit/6b7a51421d42d90192c866ff7ce7307a4b180b9c))
+
+### Documentation
+
+* Explicit reference on how to obtain the dispenser address ([#321](https://github.com/algorandfoundation/algokit-cli/issues/321)) ([`d7db09c`](https://github.com/algorandfoundation/algokit-cli/commit/d7db09c50e41ec8840f908f6a3db223622562269))
+
 ## v1.4.2 (2023-09-29)
 
 ### Documentation
