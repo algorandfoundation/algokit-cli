@@ -1,0 +1,3 @@
+DEBUG: Access token is expired. Attempting to refresh the token...
+WARNING: Failed to refresh the access token. Please authenticate first before proceeding with this command.
+Login successful
