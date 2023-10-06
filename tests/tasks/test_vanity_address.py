@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
+from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -96,3 +97,16 @@ def test_vanity_address_on_existing_alias(mock_keyring: dict[str, str]) -> None:
     assert result.exit_code == 0
     assert json.loads(mock_keyring[alias])["alias"] == alias
     assert json.loads(mock_keyring[alias])["address"].startswith("A")
+
+
+def test_vanity_address_on_termination(mocker: MockerFixture) -> None:
+    mock_pool = mocker.MagicMock()
+    mock_pool.side_effect = KeyboardInterrupt()
+    # Mocking functions within the thread is tricky hence the use of side_effect on the range is used to simulate
+    # the KeyboardInterrupt
+    mocker.patch("algokit.core.tasks.vanity_address.range", side_effect=[range(2), KeyboardInterrupt()])
+
+    result = invoke("task vanity-address AAAAAA")
+
+    assert result.exit_code == 1
+    verify(result.output)
