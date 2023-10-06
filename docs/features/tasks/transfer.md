@@ -33,7 +33,7 @@ $ ~ algokit task transfer -s {SENDER_ALIAS OR SENDER_ADDRESS} -r {RECEIVER_ADDRE
 
 By default, the amount is in microAlgos. To use whole units, use the `--whole-units` flag.
 
-### Transfer asset between accounts:
+### Transfer asset between accounts
 
 ```bash
 $ ~ algokit task transfer -s {SENDER_ALIAS OR SENDER_ADDRESS} -r {RECEIVER_ADDRESS} -a {AMOUNT} --id {ASSET_ID}

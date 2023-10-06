@@ -102,26 +102,43 @@ def _validate_inputs(
     _validate_balance(sender, receiver, asset_id, amount, algod_client)
 
 
-def _get_sender_account(sender: str) -> Account:
+def _get_account_with_private_key(address: str) -> Account:
     try:
-        _validate_address(sender)
+        _validate_address(address)
         pk = _get_private_key_from_mnemonic()
-        return Account(address=sender, private_key=pk)
+        return Account(address=address, private_key=pk)
     except click.ClickException as ex:
-        alias_data = get_alias(sender)
+        alias_data = get_alias(address)
 
         if not alias_data:
-            raise click.ClickException(f"Alias `{sender}` alias does not exist.") from ex
+            raise click.ClickException(f"Alias `{address}` alias does not exist.") from ex
         if not alias_data.private_key:
-            raise click.ClickException(f"Alias `{sender}` does not have a private key.") from ex
+            raise click.ClickException(f"Alias `{address}` does not have a private key.") from ex
 
         return Account(address=alias_data.address, private_key=alias_data.private_key)
+
+
+def _get_address_with_private_key(address: str) -> str:
+    try:
+        _validate_address(address)
+        return address
+    except click.ClickException as ex:
+        alias_data = get_alias(address)
+
+        if not alias_data:
+            raise click.ClickException(f"Alias `{address}` alias does not exist.") from ex
+
+        return alias_data.address
 
 
 @click.command(name="transfer")
 @click.option("--sender", "-s", type=click.STRING, help="Address or alias of the sender account", required=True)
 @click.option(
-    "--receiver", "-r", type=click.STRING, help="Address to an account that will receive the asset(s)", required=True
+    "--receiver",
+    "-r",
+    type=click.STRING,
+    help="Address or alias to an account that will receive the asset(s)",
+    required=True,
 )
 @click.option("--asset", "--id", "asset_id", type=click.INT, help="ASA asset id to transfer", default=0, required=False)
 @click.option("--amount", "-a", type=click.INT, help="Amount to transfer", required=True)
@@ -151,13 +168,14 @@ def transfer(  # noqa: PLR0913
     sender = (sender or "").strip('"')
     receiver = (receiver or "").strip('"')
 
-    sender_account = _get_sender_account(sender)
+    sender_account = _get_account_with_private_key(sender)
+    receiver_account = _get_address_with_private_key(receiver)
 
     # Get algod client
     algod_client = _get_algod_client(network)
 
     # Validate inputs
-    _validate_inputs(sender_account, receiver, asset_id, amount, algod_client)
+    _validate_inputs(sender_account, receiver_account, asset_id, amount, algod_client)
 
     # Convert amount to whole units if specified
     if whole_units:
@@ -168,14 +186,15 @@ def transfer(  # noqa: PLR0913
     try:
         if asset_id == 0:
             txn_response = transfer_algos(
-                algod_client, TransferParameters(to_address=receiver, from_account=sender_account, micro_algos=amount)
+                algod_client,
+                TransferParameters(to_address=receiver_account, from_account=sender_account, micro_algos=amount),
             )
         else:
             txn_response = transfer_asset(
                 algod_client,
                 TransferAssetParameters(
                     from_account=sender_account,
-                    to_address=receiver,
+                    to_address=receiver_account,
                     amount=amount,
                     asset_id=asset_id,
                 ),
