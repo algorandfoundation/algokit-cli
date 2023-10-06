@@ -36,13 +36,13 @@ def _get_private_key_from_mnemonic() -> str:
 
 
 def _get_algod_client(network: str) -> algosdk.v2client.algod.AlgodClient:
-    network_mapping = {
-        "localnet": get_algod_client(get_default_localnet_config("algod")),
-        "testnet": get_algod_client(get_algonode_config("testnet", "algod", "")),
-        "mainnet": get_algod_client(get_algonode_config("mainnet", "algod", "")),
+    config_mapping = {
+        "localnet": get_default_localnet_config("algod"),
+        "testnet": get_algonode_config("testnet", "algod", ""),
+        "mainnet": get_algonode_config("mainnet", "algod", ""),
     }
     try:
-        return network_mapping[network]
+        return get_algod_client(config_mapping[network])
     except KeyError as err:
         raise click.ClickException("Invalid network") from err
 
@@ -79,6 +79,11 @@ def _validate_asset_balance(sender_account_info: dict, receiver_account_info: di
         raise click.ClickException("Receiver is not opted into the asset")
 
 
+def _validate_algo_balance(sender_account_info: dict, amount: int) -> None:
+    if sender_account_info.get("amount", 0) < amount:
+        raise click.ClickException("Insufficient Algos balance in sender account")
+
+
 def _validate_balance(
     sender: Account, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
 ) -> None:
@@ -89,8 +94,7 @@ def _validate_balance(
         raise click.ClickException("Invalid account info response")
 
     if asset_id == 0:
-        if isinstance(sender_account_info, dict) and sender_account_info.get("amount", 0) < amount:
-            raise click.ClickException("Insufficient Algos balance in sender account")
+        _validate_algo_balance(sender_account_info, amount)
     else:
         _validate_asset_balance(sender_account_info, receiver_account_info, asset_id, amount)
 
