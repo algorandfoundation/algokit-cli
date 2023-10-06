@@ -99,37 +99,36 @@
     - [stop](#stop)
   - [task](#task)
     - [transfer](#transfer)
-    - [Options](#options-13)
+    - [Options](#options-17)
     - [-s, --sender ](#-s---sender-)
-    - [-r, --receiver ](#-r---receiver-)
+    - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
-    - [-a, --amount ](#-a---amount-)
-    - [--whole-units](#--whole-units)
-    - [Arguments](#arguments-5)
-    - [NETWORK](#network-1)
+    - [-a, --amount ](#-a---amount--1)
+    - [--whole-units](#--whole-units-2)
+    - [-n, --network ](#-n---network-)
     - [vanity-address](#vanity-address)
-    - [Options](#options-14)
+    - [Options](#options-18)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--1)
+    - [-o, --output ](#-o---output--2)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-15)
+    - [Options](#options-19)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-6)
     - [ALIAS_NAME](#alias_name)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-7)
     - [ALIAS](#alias)
-    - [Options](#options-16)
+    - [Options](#options-20)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
-    - [Options](#options-17)
+    - [Options](#options-21)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -675,7 +674,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 ### transfer
 
 ```shell
-algokit task transfer [OPTIONS] [[localnet|testnet|mainnet]]
+algokit task transfer [OPTIONS]
 ```
 
 ### Options
@@ -686,7 +685,7 @@ algokit task transfer [OPTIONS] [[localnet|testnet|mainnet]]
 
 
 ### -r, --receiver <receiver>
-**Required** Address to an account that will receive the asset(s)
+**Required** Address or alias to an account that will receive the asset(s)
 
 
 ### --asset, --id <asset_id>
@@ -700,11 +699,15 @@ ASA asset id to transfer
 ### --whole-units
 Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos). Disabled by default.
 
-### Arguments
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
 
 
-### NETWORK
-Optional argument
+* **Options**
+
+    localnet | testnet | mainnet
+
 
 ### vanity-address
 
@@ -741,15 +744,15 @@ How the output will be presented.
 
 
 ### -a, --alias <alias>
-Alias for the address. Required if output is “alias”.
+Alias for the address. Required if output is "alias".
 
 
 ### --file-path <output_file_path>
-File path where to dump the output. Required if output is “file”.
+File path where to dump the output. Required if output is "file".
 
 
 ### -f, --force
-Allow overwriting an aliases without confirmation, if output option is ‘alias’.
+Allow overwriting an aliases without confirmation, if output option is 'alias'.
 
 ### Arguments
 
