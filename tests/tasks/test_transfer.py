@@ -43,6 +43,7 @@ def test_transfer_invalid_sender_account() -> None:
     verify(result.output)
 
 
+@pytest.mark.usefixtures("mock_keyring")
 def test_transfer_invalid_receiver_account() -> None:
     # Arrange
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -126,6 +127,30 @@ def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
     # Act
     result = invoke(
         f"task transfer -s {dummy_sender_address} -r {dummy_receiver_address} -a 1 --id 1234",
+        input=_get_mnemonic_from_private_key(dummy_sender_pk),
+    )
+
+    # Assert
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
+    # Arrange
+    mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
+    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    dummy_sender_pk, dummy_sender_address = _generate_account()
+    _generate_account()[1]
+
+    dummy_receiver_alias = "dummy_receiver_alias"
+    mock_keyring[dummy_receiver_alias] = json.dumps(
+        {"alias": dummy_receiver_alias, "address": dummy_sender_address, "private_key": None}
+    )
+    mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([dummy_receiver_alias])
+
+    # Act
+    result = invoke(
+        f"task transfer -s {dummy_sender_address} -r {dummy_receiver_alias} -a 1 --id 1234",
         input=_get_mnemonic_from_private_key(dummy_sender_pk),
     )
 

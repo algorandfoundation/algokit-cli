@@ -53,10 +53,10 @@ def _get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algo
 
     asset_info = algod_client.asset_info(asset_id)
 
-    if not isinstance(asset_info, dict):
+    if not isinstance(asset_info, dict) or "params" not in asset_info or "decimals" not in asset_info["params"]:
         raise click.ClickException("Invalid asset info response")
 
-    return asset_info.get("decimals", 0)
+    return int(asset_info["params"]["decimals"])
 
 
 def _validate_address(address: str) -> None:
@@ -103,30 +103,34 @@ def _validate_inputs(
 
 
 def _get_account_with_private_key(address: str) -> Account:
+    parsed_address = address.strip('"')
+
     try:
-        _validate_address(address)
+        _validate_address(parsed_address)
         pk = _get_private_key_from_mnemonic()
-        return Account(address=address, private_key=pk)
+        return Account(address=parsed_address, private_key=pk)
     except click.ClickException as ex:
-        alias_data = get_alias(address)
+        alias_data = get_alias(parsed_address)
 
         if not alias_data:
-            raise click.ClickException(f"Alias `{address}` alias does not exist.") from ex
+            raise click.ClickException(f"Alias `{parsed_address}` alias does not exist.") from ex
         if not alias_data.private_key:
-            raise click.ClickException(f"Alias `{address}` does not have a private key.") from ex
+            raise click.ClickException(f"Alias `{parsed_address}` does not have a private key.") from ex
 
         return Account(address=alias_data.address, private_key=alias_data.private_key)
 
 
-def _get_address_with_private_key(address: str) -> str:
+def _get_address(address: str) -> str:
+    parsed_address = address.strip('"')
+
     try:
-        _validate_address(address)
-        return address
+        _validate_address(parsed_address)
+        return parsed_address
     except click.ClickException as ex:
-        alias_data = get_alias(address)
+        alias_data = get_alias(parsed_address)
 
         if not alias_data:
-            raise click.ClickException(f"Alias `{address}` alias does not exist.") from ex
+            raise click.ClickException(f"Alias `{parsed_address}` alias does not exist.") from ex
 
         return alias_data.address
 
@@ -154,7 +158,14 @@ def _get_address_with_private_key(address: str) -> str:
     default=False,
     required=False,
 )
-@click.argument("network", type=click.Choice(["localnet", "testnet", "mainnet"]), default="localnet", required=False)
+@click.option(
+    "-n",
+    "--network",
+    type=click.Choice(["localnet", "testnet", "mainnet"]),
+    default="localnet",
+    required=False,
+    help="Network to use. Refers to `localnet` by default.",
+)
 def transfer(  # noqa: PLR0913
     *,
     sender: str,
@@ -164,22 +175,19 @@ def transfer(  # noqa: PLR0913
     whole_units: bool,
     network: str,
 ) -> None:
-    # Trim special characters from sender and receiver addresses
-    sender = (sender or "").strip('"')
-    receiver = (receiver or "").strip('"')
-
+    # Load addresses and accounts from mnemonics or aliases
     sender_account = _get_account_with_private_key(sender)
-    receiver_account = _get_address_with_private_key(receiver)
+    receiver_address = _get_address(receiver)
 
     # Get algod client
     algod_client = _get_algod_client(network)
 
-    # Validate inputs
-    _validate_inputs(sender_account, receiver_account, asset_id, amount, algod_client)
-
     # Convert amount to whole units if specified
     if whole_units:
         amount = amount * (10 ** _get_asset_decimals(asset_id, algod_client))
+
+    # Validate inputs
+    _validate_inputs(sender_account, receiver_address, asset_id, amount, algod_client)
 
     # Transfer algos or assets depending on asset_id
     txn_response: PaymentTxn | AssetTransferTxn | None = None
@@ -187,14 +195,14 @@ def transfer(  # noqa: PLR0913
         if asset_id == 0:
             txn_response = transfer_algos(
                 algod_client,
-                TransferParameters(to_address=receiver_account, from_account=sender_account, micro_algos=amount),
+                TransferParameters(to_address=receiver_address, from_account=sender_account, micro_algos=amount),
             )
         else:
             txn_response = transfer_asset(
                 algod_client,
                 TransferAssetParameters(
                     from_account=sender_account,
-                    to_address=receiver_account,
+                    to_address=receiver_address,
                     amount=amount,
                     asset_id=asset_id,
                 ),
@@ -210,4 +218,5 @@ def transfer(  # noqa: PLR0913
         )
 
     except Exception as err:
+        logger.debug(err, exc_info=True)
         raise click.ClickException("Failed to perform transfer") from err

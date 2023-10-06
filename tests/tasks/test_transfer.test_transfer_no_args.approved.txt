@@ -1,4 +1,4 @@
-Usage: algokit task transfer [OPTIONS] [[localnet|testnet|mainnet]]
+Usage: algokit task transfer [OPTIONS]
 Try 'algokit task transfer -h' for help.
 
 Error: Missing option '--sender' / '-s'.
