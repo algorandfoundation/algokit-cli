@@ -98,17 +98,25 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
+    - [transfer](#transfer)
+    - [Options](#options-17)
+    - [-s, --sender ](#-s---sender-)
+    - [-r, --receiver ](#-r---receiver--1)
+    - [--asset, --id ](#--asset---id-)
+    - [-a, --amount ](#-a---amount--1)
+    - [--whole-units](#--whole-units-2)
+    - [-n, --network ](#-n---network-)
     - [vanity-address](#vanity-address)
-    - [Options](#options-13)
+    - [Options](#options-18)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--1)
+    - [-o, --output ](#-o---output--2)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
     - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-14)
+    - [Options](#options-19)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -116,11 +124,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias)
-    - [Options](#options-15)
+    - [Options](#options-20)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
-    - [Options](#options-16)
+    - [Options](#options-21)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -663,6 +671,46 @@ Collection of useful tasks to help you develop on Algorand.
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
 
+### transfer
+
+Transfer algos or assets from one account to another.
+
+```shell
+algokit task transfer [OPTIONS]
+```
+
+### Options
+
+
+### -s, --sender <sender>
+**Required** Address or alias of the sender account
+
+
+### -r, --receiver <receiver>
+**Required** Address or alias to an account that will receive the asset(s)
+
+
+### --asset, --id <asset_id>
+ASA asset id to transfer
+
+
+### -a, --amount <amount>
+**Required** Amount to transfer
+
+
+### --whole-units
+Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos). Disabled by default.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
 ### vanity-address
 
 Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
@@ -698,15 +746,15 @@ How the output will be presented.
 
 
 ### -a, --alias <alias>
-Alias for the address. Required if output is “alias”.
+Alias for the address. Required if output is "alias".
 
 
 ### --file-path <output_file_path>
-File path where to dump the output. Required if output is “file”.
+File path where to dump the output. Required if output is "file".
 
 
 ### -f, --force
-Allow overwriting an aliases without confirmation, if output option is ‘alias’.
+Allow overwriting an aliases without confirmation, if output option is 'alias'.
 
 ### Arguments
 

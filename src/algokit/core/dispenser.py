@@ -11,7 +11,10 @@ from typing import Any, ClassVar
 import httpx
 import jwt
 import keyring
-from auth0.authentication.token_verifier import AsymmetricSignatureVerifier, TokenVerifier
+from auth0.authentication.token_verifier import (
+    AsymmetricSignatureVerifier,
+    TokenVerifier,
+)
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 logger = logging.getLogger(__name__)
