@@ -673,6 +673,8 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### transfer
 
+Transfer algos or assets from one account to another.
+
 ```shell
 algokit task transfer [OPTIONS]
 ```

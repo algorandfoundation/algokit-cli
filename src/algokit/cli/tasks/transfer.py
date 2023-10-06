@@ -139,7 +139,7 @@ def _get_address(address: str) -> str:
         return alias_data.address
 
 
-@click.command(name="transfer")
+@click.command(name="transfer", help="""Transfer algos or assets from one account to another.""")
 @click.option("--sender", "-s", type=click.STRING, help="Address or alias of the sender account", required=True)
 @click.option(
     "--receiver",

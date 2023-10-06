@@ -10,6 +10,8 @@ Available commands and possible usage as follows:
 $ ~ algokit task transfer
 Usage: algokit task transfer [OPTIONS]
 
+Transfer algos or assets from one account to another.
+
 Options:
   -s, --sender TEXT               Address or alias of the sender account  [required]
   -r, --receiver TEXT             Address or alias to an account that will receive the asset(s)  [required]
