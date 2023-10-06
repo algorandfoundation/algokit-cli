@@ -36,26 +36,44 @@
     - [-P, --path ](#-p---path-)
     - [Arguments](#arguments-1)
     - [ENVIRONMENT_NAME](#environment_name)
-  - [doctor](#doctor)
+  - [dispenser](#dispenser)
+    - [fund](#fund)
     - [Options](#options-7)
+    - [-r, --receiver ](#-r---receiver-)
+    - [-a, --amount ](#-a---amount-)
+    - [--whole-units](#--whole-units)
+    - [limit](#limit)
+    - [Options](#options-8)
+    - [--whole-units](#--whole-units-1)
+    - [login](#login)
+    - [Options](#options-9)
+    - [--ci](#--ci)
+    - [-o, --output ](#-o---output-)
+    - [-f, --file ](#-f---file-)
+    - [logout](#logout)
+    - [refund](#refund)
+    - [Options](#options-10)
+    - [-t, --txID ](#-t---txid-)
+  - [doctor](#doctor)
+    - [Options](#options-11)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
     - [Arguments](#arguments-2)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-8)
-    - [-o, --output ](#-o---output-)
+    - [Options](#options-12)
+    - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
     - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-9)
+    - [Options](#options-13)
     - [--console](#--console)
     - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-10)
+    - [Options](#options-14)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -70,11 +88,11 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-11)
+    - [Options](#options-15)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-12)
+    - [Options](#options-16)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
@@ -203,7 +221,7 @@ algokit completions [OPTIONS] COMMAND [ARGS]...
 ### install
 
 Install shell completions, this command will attempt to update the interactive profile script
-for the current shell to support algokit completions. To specify a specific shell use –shell.
+for the current shell to support algokit completions. To specify a specific shell use --shell.
 
 ```shell
 algokit completions install [OPTIONS]
@@ -225,7 +243,7 @@ Specify shell to install algokit completions for.
 
 Uninstall shell completions, this command will attempt to update the interactive profile script
 for the current shell to remove any algokit completions that have been added.
-To specify a specific shell use –shell.
+To specify a specific shell use --shell.
 
 ```shell
 algokit completions uninstall [OPTIONS]
@@ -257,7 +275,7 @@ Controls whether AlgoKit checks and prompts for new versions.
 Set to [disable] to prevent AlgoKit performing this check permanently, or [enable] to resume checking.
 If no argument is provided then outputs current setting.
 
-Also see –skip-version-check which can be used to disable check for a single command.
+Also see --skip-version-check which can be used to disable check for a single command.
 
 ```shell
 algokit config version-prompt [OPTIONS] [[enable|disable]]
@@ -297,9 +315,103 @@ Specify the project directory. If not provided, current working directory will b
 ### ENVIRONMENT_NAME
 Optional argument
 
+## dispenser
+
+Interact with the AlgoKit TestNet Dispenser.
+
+```shell
+algokit dispenser [OPTIONS] COMMAND [ARGS]...
+```
+
+### fund
+
+Fund your wallet address with TestNet ALGOs.
+
+```shell
+algokit dispenser fund [OPTIONS]
+```
+
+### Options
+
+
+### -r, --receiver <receiver>
+**Required** Receiver address to fund with TestNet ALGOs.
+
+
+### -a, --amount <amount>
+**Required** Amount to fund. Defaults to microAlgos.
+
+
+### --whole-units
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
+
+### limit
+
+Get information about current fund limit on your account. Resets daily.
+
+```shell
+algokit dispenser limit [OPTIONS]
+```
+
+### Options
+
+
+### --whole-units
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
+
+### login
+
+Login to your Dispenser API account.
+
+```shell
+algokit dispenser login [OPTIONS]
+```
+
+### Options
+
+
+### --ci
+Generate an access token for CI. Issued for 30 days.
+
+
+### -o, --output <output_mode>
+Choose the output method for the access token. Defaults to stdout. Only applicable when --ci flag is set.
+
+
+* **Options**
+
+    stdout | file
+
+
+
+### -f, --file <output_filename>
+Output filename where you want to store the generated access token.Defaults to algokit_ci_token.txt. Only applicable when --ci flag is set and --output mode is file.
+
+### logout
+
+Logout of your Dispenser API account.
+
+```shell
+algokit dispenser logout [OPTIONS]
+```
+
+### refund
+
+Refund ALGOs back to the dispenser wallet address.
+
+```shell
+algokit dispenser refund [OPTIONS]
+```
+
+### Options
+
+
+### -t, --txID <tx_id>
+**Required** Transaction ID of your refund operation.
+
 ## doctor
 
-Diagnose potential environment issues that may affect AlgoKit
+Diagnose potential environment issues that may affect AlgoKit.
 
 Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
 potential issues.
@@ -341,7 +453,7 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 Create a typed ApplicationClient from an ARC-32 application.json
 
 Supply the path to an application specification file or a directory to recursively search
-for “application.json” files
+for "application.json" files
 
 ```shell
 algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
@@ -422,7 +534,7 @@ Name of an official template to use. To see a list of descriptions, run this com
 
 * **Options**
 
-    beaker | react | fullstack | playground
+    beaker | tealscript | react | fullstack | playground
 
 
 
@@ -431,7 +543,7 @@ URL to a git repo with a custom project template.
 
 
 ### --template-url-ref <URL>
-Specific tag, branch or commit to use on git repo specified with –template-url. Defaults to latest.
+Specific tag, branch or commit to use on git repo specified with --template-url. Defaults to latest.
 
 
 ### --UNSAFE-SECURITY-accept-template-url
@@ -447,7 +559,7 @@ Automatically choose default answers without asking when creating this template.
 
 
 ### --bootstrap, --no-bootstrap
-Whether to run algokit bootstrap to install and configure the new project’s dependencies locally.
+Whether to run algokit bootstrap to install and configure the new project's dependencies locally.
 
 
 ### --ide, --no-ide
@@ -517,7 +629,7 @@ algokit localnet reset [OPTIONS]
 
 
 ### --update, --no-update
-Enable or disable updating to the latest available LocalNet version, default: don’t update
+Enable or disable updating to the latest available LocalNet version, default: don't update
 
 ### start
 

@@ -16,3 +16,4 @@ author = "Algorand Foundation"
 extensions = ["sphinx_click"]
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+smartquotes = False
