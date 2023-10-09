@@ -1,1 +1,1 @@
-Error: Invalid address. Please provide a valid Algorand address.
+Error: `invalid_address` is an invalid account address

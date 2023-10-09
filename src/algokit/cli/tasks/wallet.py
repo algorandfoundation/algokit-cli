@@ -2,8 +2,9 @@ import json
 import re
 
 import click
-from algosdk import account, encoding, mnemonic
+from algosdk import account
 
+from algokit.cli.tasks.utils import get_private_key_from_mnemonic, validate_address
 from algokit.core.tasks.wallet import (
     WALLET_ALIASING_MAX_LIMIT,
     WalletAliasingLimitError,
@@ -21,19 +22,6 @@ def _validate_alias_name(alias_name: str) -> None:
             "Invalid alias name. It should have at most 20 characters consisting of numbers, "
             "letters, dashes, or underscores."
         )
-
-
-def _validate_address(address: str) -> None:
-    if not encoding.is_valid_address(address):  # type: ignore[no-untyped-call]
-        raise click.ClickException("Invalid address. Please provide a valid Algorand address.")
-
-
-def _get_private_key_from_mnemonic() -> str:
-    mnemonic_phrase = click.prompt("Enter the mnemonic phrase (25 words separated by whitespace)", hide_input=True)
-    try:
-        return str(mnemonic.to_private_key(mnemonic_phrase))  # type: ignore[no-untyped-call]
-    except ValueError as err:
-        raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
 
 
 @click.group()
@@ -56,9 +44,9 @@ def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> No
     """Add an address or account to be stored against a named alias (at most 50 aliases)."""
 
     _validate_alias_name(alias_name)
-    _validate_address(address)
+    validate_address(address)
 
-    private_key = _get_private_key_from_mnemonic() if use_mnemonic else None
+    private_key = get_private_key_from_mnemonic() if use_mnemonic else None
 
     if use_mnemonic:
         derived_address = account.address_from_private_key(private_key)  # type: ignore[no-untyped-call]
