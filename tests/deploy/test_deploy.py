@@ -1,9 +1,14 @@
+import json
 import sys
 from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.core.conf import ALGOKIT_CONFIG
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
+from algosdk.account import generate_account
+from algosdk.mnemonic import from_private_key
+from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
@@ -414,3 +419,51 @@ command = "command_a"
 
     assert result.exit_code == 1
     verify(result.output)
+
+
+@pytest.mark.parametrize(
+    ("alias", "env_var_name"),
+    [
+        ("deployer", "DEPLOYER_MNEMONIC"),
+        ("dispenser", "DISPENSER_MNEMONIC"),
+    ],
+)
+def test_deploy_dispenser_alias(
+    alias: str,
+    env_var_name: str,
+    tmp_path_factory: TempPathFactory,
+    proc_mock: ProcMock,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_keyring: dict[str, str],
+    which_mock: WhichMock,
+) -> None:
+    env_config = f"""
+{env_var_name}=GENERIC_ENV_A
+    """.strip()
+
+    monkeypatch.setenv(env_var_name, "GENERIC_ENV_A")
+
+    config_with_deploy_name = f"""
+[deploy]
+command = "command_a"
+environment_secrets = [
+    "{env_var_name}"
+]
+    """.strip()
+
+    dummy_account_pk, dummy_account_addr = generate_account()  # type: ignore[no-untyped-call]
+    mock_keyring[alias] = json.dumps({"alias": alias, "address": dummy_account_addr, "private_key": dummy_account_pk})
+    mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias])
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_deploy_name, encoding="utf-8")
+    (cwd / ".env").write_text(env_config, encoding="utf-8")
+    which_mock.add("command_a")
+    result = invoke(["deploy", f"--{alias}", alias], cwd=cwd)
+
+    assert proc_mock.called[0].env
+    passed_env_vars = proc_mock.called[0].env
+
+    assert passed_env_vars[env_var_name] == from_private_key(dummy_account_pk)  # type: ignore[no-untyped-call]
+
+    verify(result.output, options=NamerFactory.with_parameters(alias))
