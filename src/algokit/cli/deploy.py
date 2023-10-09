@@ -19,6 +19,22 @@ def _ensure_aliases(
     deployer_alias: str | None = None,
     dispenser_alias: str | None = None,
 ) -> None:
+    """
+    Ensures that the required aliases for the deployer and dispenser are provided and valid and
+    injects their mnemonics into env vars config.
+
+    Args:
+        config_env (dict[str, str]): A dictionary containing the environment variables.
+        deployer_alias (str | None, optional): The alias for the deployer. Defaults to None.
+        dispenser_alias (str | None, optional): The alias for the dispenser. Defaults to None.
+
+    Raises:
+        click.ClickException: If the alias or private key is missing.
+
+    Returns:
+        None
+    """
+
     for key, alias in [("DEPLOYER_MNEMONIC", deployer_alias), ("DISPENSER_MNEMONIC", dispenser_alias)]:
         if not alias:
             continue
@@ -38,6 +54,22 @@ def _ensure_environment_secrets(
     *,
     skip_mnemonics_prompts: bool,
 ) -> None:
+    """
+    Ensures that the required environment variables are present in the `config_env` dictionary.
+    If any of the environment variables are missing, it prompts the user to enter the missing variable.
+
+    Args:
+        config_env (dict[str, str]): A dictionary containing the current environment variables.
+        environment_secrets (list[str]): A list of strings representing the required environment variables.
+        skip_mnemonics_prompts (bool): A boolean indicating whether to skip prompting the user for missing variables.
+
+    Raises:
+        click.ClickException: If a required environment variable is missing and `skip_mnemonics_prompts` is True.
+
+    Returns:
+        None. The function modifies the `config_env` dictionary in-place.
+    """
+
     for key in environment_secrets:
         if not config_env.get(key):
             if skip_mnemonics_prompts:
@@ -86,14 +118,20 @@ class CommandParamType(click.types.StringParamType):
     "deployer_alias",
     type=click.STRING,
     required=False,
-    help="Alias of the deployer account. Otherwise, will load the deployer as env variable from .algokit.toml file.",
+    help=(
+        "(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic "
+        "if specified in .algokit.toml file."
+    ),
 )
 @click.option(
     "--dispenser",
     "dispenser_alias",
     type=click.STRING,
     required=False,
-    help="Alias of the dispenser account. Otherwise, will load the dispenser as env variable from .algokit.toml file.",
+    help=(
+        "(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic "
+        "if specified in .algokit.toml file."
+    ),
 )
 def deploy_command(  # noqa: PLR0913
     *,
