@@ -43,15 +43,15 @@ def wallet() -> None:
 
 @wallet.command("add")
 @click.argument("alias_name", type=click.STRING)
-@click.option("--address", "-a", type=click.STRING, required=True, help="The address of the account")
+@click.option("--address", "-a", type=click.STRING, required=True, help="The address of the account.")
 @click.option(
     "--mnemonic",
     "-m",
     "use_mnemonic",
     is_flag=True,
-    help="If specified then prompt the user for a mnemonic phrase interactively using masked input",
+    help="If specified then prompt the user for a mnemonic phrase interactively using masked input.",
 )
-@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias")
+@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias.")
 def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> None:
     """Add an address or account to be stored against a named alias (at most 50 aliases)."""
 
@@ -128,7 +128,7 @@ def list_all() -> None:
 
 @wallet.command("remove")
 @click.argument("alias", type=click.STRING)
-@click.option("--force", "-f", is_flag=True, help="Allow removing an alias without confirmation")
+@click.option("--force", "-f", is_flag=True, help="Allow removing an alias without confirmation.")
 def remove(*, alias: str, force: bool) -> None:
     """Remove an address or account stored against a named alias."""
 
@@ -153,7 +153,7 @@ def remove(*, alias: str, force: bool) -> None:
 
 
 @wallet.command("reset")
-@click.option("--force", "-f", is_flag=True, help="Allow removing all aliases without confirmation")
+@click.option("--force", "-f", is_flag=True, help="Allow removing all aliases without confirmation.")
 def reset(*, force: bool) -> None:
     """Remove all aliases."""
 
