@@ -1,63 +1,121 @@
+import base64
 import json
+import logging
 from pathlib import Path
 from typing import cast
 
 import click
 from algosdk import encoding
-from algosdk.transaction import Transaction, retrieve_from_file, write_to_file
+from algosdk.transaction import SignedTransaction, Transaction, retrieve_from_file, write_to_file
 
+from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.cli.tasks.utils import get_account_with_private_key
 
-
-def get_transaction(file: Path | None, transaction: str | None) -> Transaction:
-    if file:
-        txns: list[Transaction] = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
-        if len(txns) > 1:
-            raise click.ClickException("Only one transaction per file is supported.")
-        return txns[0]
-    elif transaction:
-        return cast(Transaction, encoding.msgpack_decode(transaction))  # type: ignore[no-untyped-call]
-    else:
-        raise click.ClickException("Provide either a file to sign or a transaction to sign, not both or none.")
+logger = logging.getLogger(__name__)
 
 
-def confirm_transaction(txn: Transaction) -> bool:
-    click.echo(json.dumps(txn.__dict__, indent=2))
-    response = click.prompt("Do you want to sign the above transaction?", type=click.Choice(["y", "n"]), default="n")
+def _format_transaction_for_stdout(txn: Transaction) -> dict[str, int | str | bytes | None]:
+    raw_txn = txn.__dict__.copy()
+
+    # Group isn't decoded via dictify by default, hence the need to decode it manually for stdout confirmation message.
+    if raw_txn.get("group"):
+        raw_txn["group"] = base64.b64encode(raw_txn["group"]).decode()
+
+    return raw_txn
+
+
+def _validate_for_signed_txns(txns: list[Transaction]) -> None:
+    signed_txns = [txn for txn in txns if isinstance(txn, SignedTransaction)]
+
+    if signed_txns:
+        txn_ids = ", ".join([txn.get_txid() for txn in signed_txns])  # type: ignore[no-untyped-call]
+        message = f"Supplied transactions {txn_ids} are already signed!"
+        raise click.ClickException(message)
+
+
+def get_transactions(file: Path | None, transaction: str | None) -> list[Transaction]:
+    try:
+        if file:
+            txns: list[Transaction] = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
+            return txns
+        else:
+            return [cast(Transaction, encoding.msgpack_decode(transaction))]  # type: ignore[no-untyped-call]
+    except Exception as ex:
+        logger.debug(ex, exc_info=True)
+        raise click.ClickException(
+            "Failed to decode transaction! If you are intending to sign multiple transactions use --file instead."
+        ) from ex
+
+
+def confirm_transaction(txns: list[Transaction]) -> bool:
+    click.echo(
+        json.dumps(
+            [
+                {
+                    "txn_id": txn.get_txid(),  # type: ignore[no-untyped-call]
+                    "content": _format_transaction_for_stdout(txn),
+                }
+                for txn in txns
+            ],
+            indent=2,
+        ),
+    )
+    response = click.prompt(
+        "Would you like to proceed with signing the above?", type=click.Choice(["y", "n"]), default="n"
+    )
     return bool(response == "y")
 
 
-def sign_and_output_transaction(txn: Transaction, private_key: str, output: Path | None) -> None:
-    signed_txn = txn.sign(private_key)  # type: ignore[no-untyped-call]
+def sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
+    signed_txns = [txn.sign(private_key) for txn in txns]  # type: ignore[no-untyped-call]
 
     if output:
-        write_to_file([signed_txn], str(output))  # type: ignore[no-untyped-call]
+        write_to_file(signed_txns, str(output))  # type: ignore[no-untyped-call]
         click.echo(f"Signed transaction written to {output}")
     else:
-        click.echo(encoding.msgpack_encode({"txn": signed_txn.dictify()}))  # type: ignore[no-untyped-call]
+        encoded_signed_txns = [
+            {"txn_id": txn.get_txid(), "content": encoding.msgpack_encode(txn)}  # type: ignore[no-untyped-call]
+            for txn in signed_txns
+        ]
+        click.echo(json.dumps(encoded_signed_txns, indent=2))
 
 
-@click.command(name="sign", help="Sign an Algorand transaction.")
-@click.option("--account", "-a", type=str, required=True, help="The account alias.")
+@click.command(name="sign", help="Sign goal clerk compatible Algorand transaction(s).")
+@click.option("--account", "-a", type=str, required=True, help="Address or alias of the signer account.")
 @click.option(
     "--file",
     "-f",
     type=Path,
-    help="The file to sign.",
-    required=False,
+    help="Single or multiple message pack encoded transactions from binary file to sign.",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["transaction"],
 )
-@click.option("--transaction", "-t", type=str, help="The transaction to sign.", required=False)
-@click.option("--output", "-o", type=Path, help="The output file.", required=False)
+@click.option(
+    "--transaction",
+    "-t",
+    type=str,
+    help="Single base64 encoded transaction object to sign.",
+    cls=MutuallyExclusiveOption,
+    not_required_if=["file"],
+)
+@click.option("--output", "-o", type=Path, help="The output file path to store signed transaction(s).", required=False)
 @click.option("--force", is_flag=True, help="Force signing without confirmation.", required=False)
 def sign(*, account: str, file: Path | None, transaction: str | None, output: Path | None, force: bool) -> None:
+    if not file and not transaction:
+        raise click.ClickException(
+            "Please provide a file path via `--file` or a base64 encoded unsigned transaction via `--transaction`."
+        )
+
     signer_account = get_account_with_private_key(account)
 
-    if bool(file) == bool(transaction):
-        raise click.ClickException("Provide either a file to sign or a transaction to sign, not both or none.")
+    txns = get_transactions(file, transaction)
 
-    txn: Transaction = get_transaction(file, transaction)
+    if not txns:
+        raise click.ClickException("No valid transactions found!")
 
-    if not force and not confirm_transaction(txn):
+    _validate_for_signed_txns(txns)
+
+    if not force and not confirm_transaction(txns):
         return
 
-    sign_and_output_transaction(txn, signer_account.private_key, output)
+    sign_and_output_transaction(txns, signer_account.private_key, output)
