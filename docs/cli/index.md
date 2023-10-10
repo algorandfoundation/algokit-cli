@@ -680,7 +680,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### sign
 
-Sign an Algorand transaction.
+Sign goal clerk compatible Algorand transaction(s).
 
 ```shell
 algokit task sign [OPTIONS]
@@ -690,19 +690,19 @@ algokit task sign [OPTIONS]
 
 
 ### -a, --account <account>
-**Required** The account alias.
+**Required** Address or alias of the signer account.
 
 
 ### -f, --file <file>
-The file to sign.
+Single or multiple message pack encoded transactions from binary file to sign. Option is mutually exclusive with transaction.
 
 
 ### -t, --transaction <transaction>
-The transaction to sign.
+Single base64 encoded transaction object to sign. Option is mutually exclusive with file.
 
 
 ### -o, --output <output>
-The output file.
+The output file path to store signed transaction(s).
 
 
 ### --force
