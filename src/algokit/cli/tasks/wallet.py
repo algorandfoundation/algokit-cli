@@ -39,7 +39,7 @@ def wallet() -> None:
     is_flag=True,
     help="If specified then prompt the user for a mnemonic phrase interactively using masked input.",
 )
-@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias.")
+@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias.", type=click.BOOL)
 def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> None:
     """Add an address or account to be stored against a named alias (at most 50 aliases)."""
 

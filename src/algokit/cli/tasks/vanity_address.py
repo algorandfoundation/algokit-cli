@@ -15,7 +15,7 @@ def _validate_inputs(
     keyword: str,
     output: str,
     alias: str | None,
-    output_file: str | None,
+    output_file: Path | None,
 ) -> None:
     if not re.match("^[A-Z2-7]+$", keyword):
         raise click.ClickException("Invalid KEYWORD. Allowed: uppercase letters A-Z and numbers 2-7.")
@@ -75,14 +75,19 @@ def _store_vanity_to_alias(*, alias: str, vanity_account: VanityAccount, force: 
     help="How the output will be presented.",
 )
 @click.option(
-    "--alias", "-a", required=False, default=None, help='Alias for the address. Required if output is "alias".'
+    "--alias",
+    "-a",
+    required=False,
+    default=None,
+    help='Alias for the address. Required if output is "alias".',
+    type=click.STRING,
 )
 @click.option(
     "--file-path",
     "output_file_path",
     required=False,
     default=None,
-    type=click.Path(),
+    type=click.Path(dir_okay=False, file_okay=True, resolve_path=True, path_type=Path),
     help='File path where to dump the output. Required if output is "file".',
 )
 @click.option(
@@ -91,6 +96,7 @@ def _store_vanity_to_alias(*, alias: str, vanity_account: VanityAccount, force: 
     is_flag=True,
     required=False,
     default=False,
+    type=click.BOOL,
     help="Allow overwriting an aliases without confirmation, if output option is 'alias'.",
 )
 def vanity_address(  # noqa: PLR0913
@@ -99,7 +105,7 @@ def vanity_address(  # noqa: PLR0913
     match: MatchType,
     output: str,
     alias: str | None,
-    output_file_path: str | None,
+    output_file_path: Path | None,
     force: bool,
 ) -> None:
     match = MatchType(match)  # Force cast since click does not yet support enums as types
@@ -122,7 +128,6 @@ def vanity_address(  # noqa: PLR0913
     elif output == "alias" and alias:
         _store_vanity_to_alias(alias=alias, vanity_account=vanity_account, force=force)
     elif output == "file" and output_file_path is not None:
-        output_path = Path(output_file_path)
-        with output_path.open("w") as f:
+        with output_file_path.open("w") as f:
             json.dump(vanity_account.__dict__, f, indent=4)
-            click.echo(f"Output written to {output_path.absolute()}")
+            click.echo(f"Output written to {output_file_path.absolute()}")

@@ -34,6 +34,8 @@
     - [-C, --command ](#-c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
     - [-P, --path ](#-p---path-)
+    - [--deployer ](#--deployer-)
+    - [--dispenser ](#--dispenser-)
     - [Arguments](#arguments-1)
     - [ENVIRONMENT_NAME](#environment_name)
   - [dispenser](#dispenser)
@@ -323,6 +325,14 @@ Enable/disable interactive prompts. If the CI environment variable is set, defau
 
 ### -P, --path <path>
 Specify the project directory. If not provided, current working directory will be used.
+
+
+### --deployer <deployer_alias>
+(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic if specified in .algokit.toml file.
+
+
+### --dispenser <dispenser_alias>
+(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic if specified in .algokit.toml file.
 
 ### Arguments
 

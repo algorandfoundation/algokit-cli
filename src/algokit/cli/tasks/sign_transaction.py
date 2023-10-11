@@ -81,11 +81,11 @@ def sign_and_output_transaction(txns: list[Transaction], private_key: str, outpu
 
 
 @click.command(name="sign", help="Sign goal clerk compatible Algorand transaction(s).")
-@click.option("--account", "-a", type=str, required=True, help="Address or alias of the signer account.")
+@click.option("--account", "-a", type=click.STRING, required=True, help="Address or alias of the signer account.")
 @click.option(
     "--file",
     "-f",
-    type=Path,
+    type=click.Path(exists=True, dir_okay=False, file_okay=True, resolve_path=True, path_type=Path),
     help="Single or multiple message pack encoded transactions from binary file to sign.",
     cls=MutuallyExclusiveOption,
     not_required_if=["transaction"],
@@ -93,13 +93,19 @@ def sign_and_output_transaction(txns: list[Transaction], private_key: str, outpu
 @click.option(
     "--transaction",
     "-t",
-    type=str,
+    type=click.STRING,
     help="Single base64 encoded transaction object to sign.",
     cls=MutuallyExclusiveOption,
     not_required_if=["file"],
 )
-@click.option("--output", "-o", type=Path, help="The output file path to store signed transaction(s).", required=False)
-@click.option("--force", is_flag=True, help="Force signing without confirmation.", required=False)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(resolve_path=True, dir_okay=False, file_okay=True, path_type=Path),
+    help="The output file path to store signed transaction(s).",
+    required=False,
+)
+@click.option("--force", is_flag=True, help="Force signing without confirmation.", required=False, type=click.BOOL)
 def sign(*, account: str, file: Path | None, transaction: str | None, output: Path | None, force: bool) -> None:
     if not file and not transaction:
         raise click.ClickException(
