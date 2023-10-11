@@ -1,0 +1,2 @@
+Transaction group successfully sent with txid: dummy_tx_id
+Check transaction group status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id/

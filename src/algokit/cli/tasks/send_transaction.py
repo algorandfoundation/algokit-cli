@@ -111,7 +111,7 @@ def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
         click.echo(f"Transaction group successfully sent with txid: {txid}")
         click.echo(f"Check transaction group status at: {get_transaction_explorer_url(txid, network)}")
     else:
-        for index, txn in enumerate(txns):
+        for index, txn in enumerate(txns, start=1):
             click.echo(f"\nSending transaction {index}/{len(txns)}")
             txid = algod_client.send_transaction(txn)
             click.echo(f"Transaction successfully sent with txid: {txid}")
@@ -123,7 +123,7 @@ def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
     "--file",
     "-f",
     type=click.Path(exists=True, dir_okay=False, file_okay=True, resolve_path=True, path_type=Path),
-    help="Single or multiple message pack encoded transactions from binary file to sign.",
+    help="Single or multiple message pack encoded signed transactions from binary file to send.",
     cls=MutuallyExclusiveOption,
     not_required_if=["transaction"],
     required=False,
@@ -137,15 +137,19 @@ def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
     not_required_if=["file"],
     required=False,
 )
-@click.argument(
-    "network",
+@click.option(
+    "-n",
+    "--network",
     type=click.Choice(["localnet", "testnet", "mainnet"]),
-    required=True,
+    default="localnet",
+    required=False,
+    help="Network to use. Refers to `localnet` by default.",
 )
 def send(*, file: Path | None, transaction: str | None, network: str) -> None:
     if not file and not transaction and not stdin_has_content():
         raise click.ClickException(
-            "Please provide a file path via `--file` or a base64 encoded signed transaction via `--transaction`.",
+            "Please provide a file path via `--file` or a base64 encoded signed transaction via `--transaction`. "
+            "Alternatively, you can also pipe the output of `algokit task sign` to this command."
         )
 
     txns = _get_signed_transactions(file, transaction)
