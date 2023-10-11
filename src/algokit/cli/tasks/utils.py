@@ -227,6 +227,9 @@ def get_address(address: str) -> str:
         validate_address(parsed_address)
         return parsed_address
     except click.ClickException as ex:
+        if len(parsed_address) == algosdk.constants.address_len:
+            raise click.ClickException(f"`{parsed_address}` is an invalid account address") from ex
+
         alias_data = get_alias(parsed_address)
 
         if not alias_data:

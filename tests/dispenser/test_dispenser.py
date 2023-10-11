@@ -1,4 +1,4 @@
-import typing
+import json
 from pathlib import Path
 
 import click
@@ -15,6 +15,7 @@ from algokit.core.dispenser import (
     APIErrorCode,
     AuthConfig,
 )
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from approvaltests.namer import NamerFactory
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -26,35 +27,6 @@ from tests.utils.click_invoker import invoke
 @pytest.fixture(autouse=True)
 def _mock_api_base_url(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.dispenser.ApiConfig.BASE_URL", "https://snapshottest.dispenser.com")
-
-
-@pytest.fixture()
-def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None], None, None]:
-    credentials: dict[str, str | None] = {
-        DISPENSER_KEYRING_ID_TOKEN_KEY: None,
-        DISPENSER_KEYRING_ACCESS_TOKEN_KEY: None,
-        DISPENSER_KEYRING_REFRESH_TOKEN_KEY: None,
-        DISPENSER_KEYRING_USER_ID_KEY: None,
-    }
-
-    def _get_password(namespace: str, key: str) -> str | None:  # noqa: ARG001
-        return credentials[key]
-
-    def _set_password(namespace: str, key: str, password: str) -> None:  # noqa: ARG001
-        credentials[key] = password
-
-    def _delete_password(namespace: str, key: str) -> None:  # noqa: ARG001
-        credentials[key] = None
-
-    mocker.patch("keyring.get_password", side_effect=_get_password)
-    mocker.patch("keyring.set_password", side_effect=_set_password)
-    mocker.patch("keyring.delete_password", side_effect=_delete_password)
-
-    yield credentials
-
-    # Teardown step: reset the credentials
-    for key in credentials:
-        credentials[key] = None
 
 
 def _set_mock_keyring_credentials(
@@ -160,10 +132,7 @@ class TestLogoutCommand:
 
         # Assert
         assert result.exit_code == 0
-        assert mock_keyring[DISPENSER_KEYRING_ID_TOKEN_KEY] is None
-        assert mock_keyring[DISPENSER_KEYRING_ACCESS_TOKEN_KEY] is None
-        assert mock_keyring[DISPENSER_KEYRING_REFRESH_TOKEN_KEY] is None
-        assert mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] is None
+        assert not mock_keyring
         verify(result.output)
 
     def test_logout_command_revoke_exception(
@@ -385,7 +354,7 @@ class TestFundCommand:
         mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
         algo_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
         amount = 1 if use_whole_units else int(1e6)
-        receiver = "A" * 58
+        receiver = "TZXGUW6DZ27OBB4QSGZKTYFEABCO3R7XWAXECEV73DTFLVOBNNJNAHZJJY"
         httpx_mock.add_response(
             url=f"{ApiConfig.BASE_URL}/fund/{algo_asset.asset_id}",
             method="POST",
@@ -432,7 +401,7 @@ class TestFundCommand:
         )
 
         # Act
-        result = invoke("dispenser fund -r abc -a 123")
+        result = invoke("dispenser fund -r TZXGUW6DZ27OBB4QSGZKTYFEABCO3R7XWAXECEV73DTFLVOBNNJNAHZJJY -a 123")
 
         # Assert
         assert result.exit_code == 0
@@ -450,6 +419,61 @@ class TestFundCommand:
 
         # Assert
         assert result.exit_code == 0
+        verify(result.output)
+
+    def test_fund_command_from_alias_successful(
+        self,
+        mocker: MockerFixture,
+        mock_keyring: dict[str, str | None],
+        httpx_mock: HTTPXMock,
+    ) -> None:
+        # Arrange
+        alias_name = "test_alias"
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
+        mock_keyring[alias_name] = json.dumps(
+            {
+                "alias": alias_name,
+                "address": "TZXGUW6DZ27OBB4QSGZKTYFEABCO3R7XWAXECEV73DTFLVOBNNJNAHZJJY",
+                "private_key": None,
+            }
+        )
+        mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
+        mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
+        httpx_mock.add_response(
+            url=f"{ApiConfig.BASE_URL}/fund/{DISPENSER_ASSETS[DispenserAssetName.ALGO].asset_id}",
+            method="POST",
+            json={"amount": int(1e6), "txID": "dummy_tx_id"},
+        )
+
+        # Act
+        result = invoke("dispenser fund -r test_alias -a 123")
+
+        # Assert
+        assert result.exit_code == 0
+        verify(result.output)
+
+    def test_fund_command_address_invalid(self, mocker: MockerFixture, mock_keyring: dict[str, str | None]) -> None:
+        # Arrange
+        mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
+
+        # Act
+        result = invoke("dispenser fund -r TZXGUW6DZ27OBB4QSGZKTYFEABCO3R7XWAXECEV73DTF3VOBNNJNAHZJJY -a 123")
+
+        # Assert
+        assert result.exit_code == 1
+        verify(result.output)
+
+    def test_fund_command_alias_invalid(self, mocker: MockerFixture, mock_keyring: dict[str, str | None]) -> None:
+        # Arrange
+        mocker.patch("algokit.cli.dispenser.is_authenticated", return_value=True)
+        _set_mock_keyring_credentials(mock_keyring, "id_token", "access_token", "refresh_token", "user_id")
+
+        # Act
+        result = invoke("dispenser fund -r abc -a 123")
+
+        # Assert
+        assert result.exit_code == 1
         verify(result.output)
 
 
