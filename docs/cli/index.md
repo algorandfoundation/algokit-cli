@@ -360,7 +360,7 @@ algokit dispenser fund [OPTIONS]
 
 
 ### -r, --receiver <receiver>
-**Required** Receiver address to fund with TestNet ALGOs.
+**Required** Address or alias of the receiver to fund with TestNet ALGOs.
 
 
 ### -a, --amount <amount>
