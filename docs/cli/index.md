@@ -100,8 +100,15 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [transfer](#transfer)
+    - [sign](#sign)
     - [Options](#options-17)
+    - [-a, --account ](#-a---account-)
+    - [-f, --file ](#-f---file--1)
+    - [-t, --transaction ](#-t---transaction-)
+    - [-o, --output ](#-o---output--2)
+    - [--force](#--force-1)
+    - [transfer](#transfer)
+    - [Options](#options-18)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -109,16 +116,16 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network-)
     - [vanity-address](#vanity-address)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--2)
+    - [-o, --output ](#-o---output--3)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
     - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -126,11 +133,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -681,6 +688,36 @@ Collection of useful tasks to help you develop on Algorand.
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
 
+### sign
+
+Sign goal clerk compatible Algorand transaction(s).
+
+```shell
+algokit task sign [OPTIONS]
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### -f, --file <file>
+Single or multiple message pack encoded transactions from binary file to sign. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Single base64 encoded transaction object to sign. Option is mutually exclusive with file.
+
+
+### -o, --output <output>
+The output file path to store signed transaction(s).
+
+
+### --force
+Force signing without confirmation.
+
 ### transfer
 
 Transfer algos or assets from one account to another.
@@ -693,19 +730,19 @@ algokit task transfer [OPTIONS]
 
 
 ### -s, --sender <sender>
-**Required** Address or alias of the sender account
+**Required** Address or alias of the sender account.
 
 
 ### -r, --receiver <receiver>
-**Required** Address or alias to an account that will receive the asset(s)
+**Required** Address or alias to an account that will receive the asset(s).
 
 
 ### --asset, --id <asset_id>
-ASA asset id to transfer
+ASA asset id to transfer.
 
 
 ### -a, --amount <amount>
-**Required** Amount to transfer
+**Required** Amount to transfer.
 
 
 ### --whole-units
@@ -792,15 +829,15 @@ algokit task wallet add [OPTIONS] ALIAS_NAME
 
 
 ### -a, --address <address>
-**Required** The address of the account
+**Required** The address of the account.
 
 
 ### -m, --mnemonic
-If specified then prompt the user for a mnemonic phrase interactively using masked input
+If specified then prompt the user for a mnemonic phrase interactively using masked input.
 
 
 ### -f, --force
-Allow overwriting an existing alias
+Allow overwriting an existing alias.
 
 ### Arguments
 
@@ -842,7 +879,7 @@ algokit task wallet remove [OPTIONS] ALIAS
 
 
 ### -f, --force
-Allow removing an alias without confirmation
+Allow removing an alias without confirmation.
 
 ### Arguments
 
@@ -862,4 +899,4 @@ algokit task wallet reset [OPTIONS]
 
 
 ### -f, --force
-Allow removing all aliases without confirmation
+Allow removing all aliases without confirmation.

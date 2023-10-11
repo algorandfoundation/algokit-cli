@@ -78,7 +78,8 @@ def test_transfer_no_amount() -> None:
 def test_transfer_algo_from_address_successful(mocker: MockerFixture) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     dummy_receiver_address = _generate_account()[1]
 
@@ -96,7 +97,8 @@ def test_transfer_algo_from_address_successful(mocker: MockerFixture) -> None:
 def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     dummy_receiver_address = _generate_account()[1]
 
@@ -120,7 +122,8 @@ def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring
 def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     dummy_receiver_address = _generate_account()[1]
 
@@ -138,7 +141,8 @@ def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
 def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     _generate_account()[1]
 
@@ -162,7 +166,8 @@ def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, 
 def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     dummy_receiver_address = _generate_account()[1]
 
@@ -186,7 +191,8 @@ def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyrin
 def test_transfer_failed(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
     mocker.patch("algokit.cli.tasks.transfer.transfer_algos", side_effect=Exception("dummy error"))
-    mocker.patch("algokit.cli.tasks.transfer._validate_inputs")
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
     dummy_receiver_address = _generate_account()[1]
 

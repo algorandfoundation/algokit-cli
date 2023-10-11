@@ -1,1 +1,1 @@
-Error: One of --language or --output is required to determine the client langauge to generate
+Error: One of --language or --output is required to determine the client language to generate

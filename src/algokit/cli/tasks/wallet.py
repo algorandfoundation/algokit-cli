@@ -2,8 +2,9 @@ import json
 import re
 
 import click
-from algosdk import account, encoding, mnemonic
+from algosdk import account
 
+from algokit.cli.tasks.utils import get_private_key_from_mnemonic, validate_address
 from algokit.core.tasks.wallet import (
     WALLET_ALIASING_MAX_LIMIT,
     WalletAliasingLimitError,
@@ -23,19 +24,6 @@ def _validate_alias_name(alias_name: str) -> None:
         )
 
 
-def _validate_address(address: str) -> None:
-    if not encoding.is_valid_address(address):  # type: ignore[no-untyped-call]
-        raise click.ClickException("Invalid address. Please provide a valid Algorand address.")
-
-
-def _get_private_key_from_mnemonic() -> str:
-    mnemonic_phrase = click.prompt("Enter the mnemonic phrase (25 words separated by whitespace)", hide_input=True)
-    try:
-        return str(mnemonic.to_private_key(mnemonic_phrase))  # type: ignore[no-untyped-call]
-    except ValueError as err:
-        raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
-
-
 @click.group()
 def wallet() -> None:
     """Create short aliases for your addresses and accounts on AlgoKit CLI."""
@@ -43,22 +31,22 @@ def wallet() -> None:
 
 @wallet.command("add")
 @click.argument("alias_name", type=click.STRING)
-@click.option("--address", "-a", type=click.STRING, required=True, help="The address of the account")
+@click.option("--address", "-a", type=click.STRING, required=True, help="The address of the account.")
 @click.option(
     "--mnemonic",
     "-m",
     "use_mnemonic",
     is_flag=True,
-    help="If specified then prompt the user for a mnemonic phrase interactively using masked input",
+    help="If specified then prompt the user for a mnemonic phrase interactively using masked input.",
 )
-@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias")
+@click.option("--force", "-f", is_flag=True, help="Allow overwriting an existing alias.")
 def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> None:
     """Add an address or account to be stored against a named alias (at most 50 aliases)."""
 
     _validate_alias_name(alias_name)
-    _validate_address(address)
+    validate_address(address)
 
-    private_key = _get_private_key_from_mnemonic() if use_mnemonic else None
+    private_key = get_private_key_from_mnemonic() if use_mnemonic else None
 
     if use_mnemonic:
         derived_address = account.address_from_private_key(private_key)  # type: ignore[no-untyped-call]
@@ -128,7 +116,7 @@ def list_all() -> None:
 
 @wallet.command("remove")
 @click.argument("alias", type=click.STRING)
-@click.option("--force", "-f", is_flag=True, help="Allow removing an alias without confirmation")
+@click.option("--force", "-f", is_flag=True, help="Allow removing an alias without confirmation.")
 def remove(*, alias: str, force: bool) -> None:
     """Remove an address or account stored against a named alias."""
 
@@ -153,7 +141,7 @@ def remove(*, alias: str, force: bool) -> None:
 
 
 @wallet.command("reset")
-@click.option("--force", "-f", is_flag=True, help="Allow removing all aliases without confirmation")
+@click.option("--force", "-f", is_flag=True, help="Allow removing all aliases without confirmation.")
 def reset(*, force: bool) -> None:
     """Remove all aliases."""
 
