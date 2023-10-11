@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import click
 from algosdk import encoding
@@ -14,14 +14,11 @@ from algokit.cli.tasks.utils import get_account_with_private_key
 logger = logging.getLogger(__name__)
 
 
-def _format_transaction_for_stdout(txn: Transaction) -> dict[str, int | str | bytes | None]:
-    raw_txn = txn.__dict__.copy()
-
-    # Group isn't decoded via dictify by default, hence the need to decode it manually for stdout confirmation message.
-    if raw_txn.get("group"):
-        raw_txn["group"] = base64.b64encode(raw_txn["group"]).decode()
-
-    return raw_txn
+class TransactionBytesEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:  # noqa: ANN401
+        if isinstance(obj, bytes | bytearray):
+            return base64.b64encode(obj).decode()
+        return super().default(obj)
 
 
 def _validate_for_signed_txns(txns: list[Transaction]) -> None:
@@ -53,10 +50,11 @@ def _confirm_transaction(txns: list[Transaction]) -> bool:
             [
                 {
                     "txn_id": txn.get_txid(),  # type: ignore[no-untyped-call]
-                    "content": _format_transaction_for_stdout(txn),
+                    "content": txn.dictify(),  # type: ignore[no-untyped-call]
                 }
                 for txn in txns
             ],
+            cls=TransactionBytesEncoder,
             indent=2,
         ),
     )
