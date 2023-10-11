@@ -33,7 +33,7 @@ def _validate_for_signed_txns(txns: list[Transaction]) -> None:
         raise click.ClickException(message)
 
 
-def get_transactions(file: Path | None, transaction: str | None) -> list[Transaction]:
+def _get_transactions(file: Path | None, transaction: str | None) -> list[Transaction]:
     try:
         if file:
             txns: list[Transaction] = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
@@ -43,11 +43,11 @@ def get_transactions(file: Path | None, transaction: str | None) -> list[Transac
     except Exception as ex:
         logger.debug(ex, exc_info=True)
         raise click.ClickException(
-            "Failed to decode transaction! If you are intending to sign multiple transactions use --file instead."
+            "Failed to decode transaction! If you are intending to sign multiple transactions use `--file` instead."
         ) from ex
 
 
-def confirm_transaction(txns: list[Transaction]) -> bool:
+def _confirm_transaction(txns: list[Transaction]) -> bool:
     click.echo(
         json.dumps(
             [
@@ -66,7 +66,7 @@ def confirm_transaction(txns: list[Transaction]) -> bool:
     return bool(response == "y")
 
 
-def sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
+def _sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
     signed_txns = [txn.sign(private_key) for txn in txns]  # type: ignore[no-untyped-call]
 
     if output:
@@ -114,14 +114,14 @@ def sign(*, account: str, file: Path | None, transaction: str | None, output: Pa
 
     signer_account = get_account_with_private_key(account)
 
-    txns = get_transactions(file, transaction)
+    txns = _get_transactions(file, transaction)
 
     if not txns:
         raise click.ClickException("No valid transactions found!")
 
     _validate_for_signed_txns(txns)
 
-    if not force and not confirm_transaction(txns):
+    if not force and not _confirm_transaction(txns):
         return
 
-    sign_and_output_transaction(txns, signer_account.private_key, output)
+    _sign_and_output_transaction(txns, signer_account.private_key, output)
