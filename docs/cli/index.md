@@ -100,20 +100,25 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [send](#send)
+    - [nfd-lookup](#nfd-lookup)
     - [Options](#options-17)
+    - [-o, --output ](#-o---output--2)
+    - [Arguments](#arguments-5)
+    - [VALUE](#value)
+    - [send](#send)
+    - [Options](#options-18)
     - [-f, --file ](#-f---file--1)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network-)
     - [sign](#sign)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [-a, --account ](#-a---account-)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction--1)
-    - [-o, --output ](#-o---output--2)
+    - [-o, --output ](#-o---output--3)
     - [--force](#--force-1)
     - [transfer](#transfer)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -121,28 +126,28 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--1)
     - [vanity-address](#vanity-address)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--3)
+    - [-o, --output ](#-o---output--4)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-5)
+    - [Arguments](#arguments-6)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-6)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
-    - [ALIAS](#alias)
-    - [Options](#options-22)
-    - [-f, --force](#-f---force-2)
+    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-8)
-    - [ALIAS](#alias-1)
+    - [ALIAS](#alias)
     - [Options](#options-23)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-9)
+    - [ALIAS](#alias-1)
+    - [Options](#options-24)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -692,6 +697,32 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### nfd-lookup
+
+Perform a lookup via NFD domain or address, returning the associated address or domain respectively.
+
+```shell
+algokit task nfd-lookup [OPTIONS] VALUE
+```
+
+### Options
+
+
+### -o, --output <output>
+Output format for NFD API response. Defaults to address|domain resolved.
+
+
+* **Options**
+
+    full | tiny | address
+
+
+### Arguments
+
+
+### VALUE
+Required argument
 
 ### send
 

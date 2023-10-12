@@ -1,0 +1,2 @@
+DEBUG: HTTP Request: GET https://api.nf.domains/nfd/dummy.algo?view=brief&poll=false "HTTP/1.1 200 OK"
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
