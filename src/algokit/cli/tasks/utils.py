@@ -241,12 +241,12 @@ def get_address(address: str) -> str:
         return alias_data.address
 
 
-def get_transaction_explorer_url(txn_id: str, network: str) -> str:
+def get_transaction_explorer_url(transaction_id: str, network: str) -> str:
     """
     Returns a URL for exploring a transaction on the specified network.
 
     Args:
-        txn_id (str): The ID of the transaction.
+        transaction_id (str): The ID of the transaction.
         network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
 
     Returns:
@@ -256,11 +256,11 @@ def get_transaction_explorer_url(txn_id: str, network: str) -> str:
         ValueError: If the network is invalid.
     """
     if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/{txn_id}/"
+        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/{transaction_id}/"
     elif network == "testnet":
-        return f"https://testnet.algoexplorer.io/tx/{txn_id}"
+        return f"https://testnet.algoexplorer.io/tx/{transaction_id}"
     elif network == "mainnet":
-        return f"https://algoexplorer.io/tx/{txn_id}"
+        return f"https://algoexplorer.io/tx/{transaction_id}"
     else:
         raise ValueError(f"Invalid network: {network}")
 

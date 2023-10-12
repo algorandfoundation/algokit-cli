@@ -16,16 +16,16 @@ logger = logging.getLogger(__name__)
 
 def _is_sign_task_output_txn(item: dict) -> bool:
     """
-    Checks if a given item is a dictionary and contains the keys "txn_id" and "content".
+    Checks if a given item is a dictionary and contains the keys "transaction_id" and "content".
 
     Args:
         item (dict): A dictionary object to be checked.
 
     Returns:
-        bool: True if the input item is a dictionary with the keys "txn_id" and "content", False otherwise.
+        bool: True if the input item is a dictionary with the keys "transaction_id" and "content", False otherwise.
     """
 
-    return isinstance(item, dict) and all(key in item for key in ["txn_id", "content"])
+    return isinstance(item, dict) and all(key in item for key in ["transaction_id", "content"])
 
 
 def _load_from_stdin() -> list[SignedTransaction]:

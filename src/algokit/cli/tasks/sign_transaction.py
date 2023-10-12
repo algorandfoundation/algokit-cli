@@ -25,8 +25,8 @@ def _validate_for_signed_txns(txns: list[Transaction]) -> None:
     signed_txns = [txn for txn in txns if isinstance(txn, SignedTransaction)]
 
     if signed_txns:
-        txn_ids = ", ".join([txn.get_txid() for txn in signed_txns])  # type: ignore[no-untyped-call]
-        message = f"Supplied transactions {txn_ids} are already signed!"
+        transaction_ids = ", ".join([txn.get_txid() for txn in signed_txns])  # type: ignore[no-untyped-call]
+        message = f"Supplied transactions {transaction_ids} are already signed!"
         raise click.ClickException(message)
 
 
@@ -49,7 +49,7 @@ def _confirm_transaction(txns: list[Transaction]) -> bool:
         json.dumps(
             [
                 {
-                    "txn_id": txn.get_txid(),  # type: ignore[no-untyped-call]
+                    "transaction_id": txn.get_txid(),  # type: ignore[no-untyped-call]
                     "content": txn.dictify(),  # type: ignore[no-untyped-call]
                 }
                 for txn in txns
@@ -72,7 +72,7 @@ def _sign_and_output_transaction(txns: list[Transaction], private_key: str, outp
         click.echo(f"Signed transaction written to {output}")
     else:
         encoded_signed_txns = [
-            {"txn_id": txn.get_txid(), "content": encoding.msgpack_encode(txn)}  # type: ignore[no-untyped-call]
+            {"transaction_id": txn.get_txid(), "content": encoding.msgpack_encode(txn)}  # type: ignore[no-untyped-call]
             for txn in signed_txns
         ]
         click.echo(json.dumps(encoded_signed_txns, indent=2))

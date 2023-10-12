@@ -2,7 +2,7 @@ import json
 
 import click
 import pytest
-from algosdk import encoding, mnemonic, transaction
+from algosdk import encoding, transaction
 from pytest_mock import MockerFixture
 
 from tests.tasks.conftest import DUMMY_ACCOUNT, DUMMY_SUGGESTED_PARAMS
@@ -38,10 +38,6 @@ def _generate_dummy_signed_txn_group() -> list[transaction.SignedTransaction]:
         signed_txns.append(txn.sign(DUMMY_ACCOUNT.private_key))  # type: ignore[no-untyped-call]
 
     return signed_txns
-
-
-def _get_mnemonic_from_private_key(private_key: str) -> str:
-    return str(mnemonic.from_private_key(private_key))  # type: ignore[no-untyped-call]
 
 
 def test_send_atomic_txn_group_successful(tmp_path_factory: pytest.TempPathFactory, mocker: MockerFixture) -> None:
@@ -108,7 +104,7 @@ def test_send_from_piped_input_successful(
     tmp_path_factory.mktemp("cwd")
 
     ## Below simulates stdout from algokit sign transaction
-    txns = [{"content": _generate_dummy_signed_txn(amount=i, encode=True), "txn_id": str(i)} for i in range(20)]
+    txns = [{"content": _generate_dummy_signed_txn(amount=i, encode=True), "transaction_id": str(i)} for i in range(20)]
 
     algod_mock = mocker.MagicMock()
     algod_mock.send_transaction.side_effect = [f"dummy_tx_id_{i}" for i in range(20)]

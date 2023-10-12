@@ -61,7 +61,7 @@ When `--output` option is not specified, the signed transaction(s) will be outpu
 
 ```
 [
-  {txn_id: "TRANSACTION_ID", content: "BASE64_ENCODED_SIGNED_TRANSACTION"},
+  {transaction_id: "TRANSACTION_ID", content: "BASE64_ENCODED_SIGNED_TRANSACTION"},
 ]
 ```
 
