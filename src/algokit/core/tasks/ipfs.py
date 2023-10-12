@@ -1,11 +1,18 @@
+import logging
 from collections.abc import Generator
 from pathlib import Path
 
 import httpx
 import keyring
 
+logger = logging.getLogger(__name__)
+
 ALGOKIT_WEB3_STORAGE_NAMESPACE = "algokit_web3_storage"
 ALGOKIT_WEB3_STORAGE_TOKEN_KEY = "algokit_web3_storage_access_token"
+
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
+MAX_CHUNK_SIZE = 1024 * 1024  # 1MB
+DEFAULT_TIMEOUT = 10
 
 
 class Web3StorageError(Exception):
@@ -103,7 +110,9 @@ def upload_to_web3_storage(
 
     with file_path.open("rb") as file:
         file_content = file.read()
-        timeout = file_path.stat().st_size / (1024 * 1024)  # timeout in seconds for each MB of the file
+        num_chunks = file_path.stat().st_size // MAX_CHUNK_SIZE | 1
+        timeout = DEFAULT_TIMEOUT * num_chunks
+        logger.debug(f"Timeout set to {timeout} seconds based on {num_chunks} chunks.")
 
     headers = {
         "Authorization": f"Bearer {api_key}",

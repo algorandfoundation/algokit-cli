@@ -5,6 +5,8 @@ from pathlib import Path
 import click
 
 from algokit.core.tasks.ipfs import (
+    MAX_CHUNK_SIZE,
+    MAX_FILE_SIZE,
     Web3StorageBadRequestError,
     Web3StorageForbiddenError,
     Web3StorageHttpError,
@@ -78,22 +80,22 @@ def upload(file_path: Path, name: str | None) -> None:
         with file_path.open("rb") as file:
             total = file_path.stat().st_size
 
-            if total > 100 * 1024 * 1024:
+            if total > MAX_FILE_SIZE:
                 raise click.ClickException("File size exceeds 100MB limit!")
 
             with click.progressbar(length=total, label="Uploading file") as bar:  # type: ignore[var-annotated]
 
                 def read_file_in_chunks() -> Generator[bytes, None, None]:
-                    while data := file.read(1024):
+                    while data := file.read(MAX_CHUNK_SIZE):
                         yield data
                         bar.update(len(data))
 
                 cid = upload_to_web3_storage(file_path, web3_storage_api_key, name, read_file_in_chunks())
-                logger.info(f"File uploaded successfully!\nCID: {cid}")
+                logger.info(f"\nFile uploaded successfully!\nCID: {cid}")
     except click.ClickException as ex:
         raise ex
     except OSError as ex:
-        logger.debug(ex, exc_info=True)
+        logger.debug(ex)
         raise click.ClickException("Failed to open file!") from ex
     except (
         Web3StorageBadRequestError,
@@ -102,8 +104,8 @@ def upload(file_path: Path, name: str | None) -> None:
         Web3StorageInternalServerError,
         Web3StorageHttpError,
     ) as ex:
-        logger.debug(ex, exc_info=True)
-        raise click.ClickException(str(ex)) from ex
+        logger.debug(ex)
+        raise click.ClickException(repr(ex)) from ex
     except Exception as ex:
-        logger.debug(ex, exc_info=True)
+        logger.debug(ex)
         raise click.ClickException("Failed to upload file!") from ex
