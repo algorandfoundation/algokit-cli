@@ -2,7 +2,7 @@ import base64
 import json
 import logging
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import click
 from algosdk import encoding
@@ -14,26 +14,23 @@ from algokit.cli.tasks.utils import get_account_with_private_key
 logger = logging.getLogger(__name__)
 
 
-def _format_transaction_for_stdout(txn: Transaction) -> dict[str, int | str | bytes | None]:
-    raw_txn = txn.__dict__.copy()
-
-    # Group isn't decoded via dictify by default, hence the need to decode it manually for stdout confirmation message.
-    if raw_txn.get("group"):
-        raw_txn["group"] = base64.b64encode(raw_txn["group"]).decode()
-
-    return raw_txn
+class TransactionBytesEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:  # noqa: ANN401
+        if isinstance(obj, bytes | bytearray):
+            return base64.b64encode(obj).decode()
+        return super().default(obj)
 
 
 def _validate_for_signed_txns(txns: list[Transaction]) -> None:
     signed_txns = [txn for txn in txns if isinstance(txn, SignedTransaction)]
 
     if signed_txns:
-        txn_ids = ", ".join([txn.get_txid() for txn in signed_txns])  # type: ignore[no-untyped-call]
-        message = f"Supplied transactions {txn_ids} are already signed!"
+        transaction_ids = ", ".join([txn.get_txid() for txn in signed_txns])  # type: ignore[no-untyped-call]
+        message = f"Supplied transactions {transaction_ids} are already signed!"
         raise click.ClickException(message)
 
 
-def get_transactions(file: Path | None, transaction: str | None) -> list[Transaction]:
+def _get_transactions(file: Path | None, transaction: str | None) -> list[Transaction]:
     try:
         if file:
             txns: list[Transaction] = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
@@ -43,20 +40,21 @@ def get_transactions(file: Path | None, transaction: str | None) -> list[Transac
     except Exception as ex:
         logger.debug(ex, exc_info=True)
         raise click.ClickException(
-            "Failed to decode transaction! If you are intending to sign multiple transactions use --file instead."
+            "Failed to decode transaction! If you are intending to sign multiple transactions use `--file` instead."
         ) from ex
 
 
-def confirm_transaction(txns: list[Transaction]) -> bool:
+def _confirm_transaction(txns: list[Transaction]) -> bool:
     click.echo(
         json.dumps(
             [
                 {
-                    "txn_id": txn.get_txid(),  # type: ignore[no-untyped-call]
-                    "content": _format_transaction_for_stdout(txn),
+                    "transaction_id": txn.get_txid(),  # type: ignore[no-untyped-call]
+                    "content": txn.dictify(),  # type: ignore[no-untyped-call]
                 }
                 for txn in txns
             ],
+            cls=TransactionBytesEncoder,
             indent=2,
         ),
     )
@@ -66,7 +64,7 @@ def confirm_transaction(txns: list[Transaction]) -> bool:
     return bool(response == "y")
 
 
-def sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
+def _sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
     signed_txns = [txn.sign(private_key) for txn in txns]  # type: ignore[no-untyped-call]
 
     if output:
@@ -74,7 +72,7 @@ def sign_and_output_transaction(txns: list[Transaction], private_key: str, outpu
         click.echo(f"Signed transaction written to {output}")
     else:
         encoded_signed_txns = [
-            {"txn_id": txn.get_txid(), "content": encoding.msgpack_encode(txn)}  # type: ignore[no-untyped-call]
+            {"transaction_id": txn.get_txid(), "content": encoding.msgpack_encode(txn)}  # type: ignore[no-untyped-call]
             for txn in signed_txns
         ]
         click.echo(json.dumps(encoded_signed_txns, indent=2))
@@ -114,14 +112,14 @@ def sign(*, account: str, file: Path | None, transaction: str | None, output: Pa
 
     signer_account = get_account_with_private_key(account)
 
-    txns = get_transactions(file, transaction)
+    txns = _get_transactions(file, transaction)
 
     if not txns:
         raise click.ClickException("No valid transactions found!")
 
     _validate_for_signed_txns(txns)
 
-    if not force and not confirm_transaction(txns):
+    if not force and not _confirm_transaction(txns):
         return
 
-    sign_and_output_transaction(txns, signer_account.private_key, output)
+    _sign_and_output_transaction(txns, signer_account.private_key, output)

@@ -100,23 +100,28 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [sign](#sign)
+    - [send](#send)
     - [Options](#options-17)
-    - [-a, --account ](#-a---account-)
     - [-f, --file ](#-f---file--1)
     - [-t, --transaction ](#-t---transaction-)
+    - [-n, --network ](#-n---network-)
+    - [sign](#sign)
+    - [Options](#options-18)
+    - [-a, --account ](#-a---account-)
+    - [-f, --file ](#-f---file--2)
+    - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--2)
     - [--force](#--force-1)
     - [transfer](#transfer)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
     - [-a, --amount ](#-a---amount--1)
     - [--whole-units](#--whole-units-2)
-    - [-n, --network ](#-n---network-)
+    - [-n, --network ](#-n---network--1)
     - [vanity-address](#vanity-address)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--3)
     - [-a, --alias ](#-a---alias-)
@@ -125,7 +130,7 @@
     - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -133,11 +138,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -687,6 +692,34 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### send
+
+Send a signed transaction to the given network.
+
+```shell
+algokit task send [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file>
+Single or multiple message pack encoded signed transactions from binary file to send. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Base64 encoded signed transaction to send. Option is mutually exclusive with file.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
 
 ### sign
 

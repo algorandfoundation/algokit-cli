@@ -1,4 +1,7 @@
 import logging
+import os
+import stat
+import sys
 
 import algosdk
 import algosdk.encoding
@@ -236,3 +239,39 @@ def get_address(address: str) -> str:
             raise click.ClickException(f"Alias `{parsed_address}` alias does not exist.") from ex
 
         return alias_data.address
+
+
+def get_transaction_explorer_url(transaction_id: str, network: str) -> str:
+    """
+    Returns a URL for exploring a transaction on the specified network.
+
+    Args:
+        transaction_id (str): The ID of the transaction.
+        network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
+
+    Returns:
+        str: The URL for exploring the transaction on the specified network.
+
+    Raises:
+        ValueError: If the network is invalid.
+    """
+    if network == "localnet":
+        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/{transaction_id}/"
+    elif network == "testnet":
+        return f"https://testnet.algoexplorer.io/tx/{transaction_id}"
+    elif network == "mainnet":
+        return f"https://algoexplorer.io/tx/{transaction_id}"
+    else:
+        raise ValueError(f"Invalid network: {network}")
+
+
+def stdin_has_content() -> bool:
+    """
+    Checks if there is content in the standard input.
+
+    Returns:
+        bool: True if there is content in the standard input, False otherwise.
+    """
+
+    mode = os.fstat(sys.stdin.fileno()).st_mode
+    return stat.S_ISFIFO(mode) or stat.S_ISREG(mode)

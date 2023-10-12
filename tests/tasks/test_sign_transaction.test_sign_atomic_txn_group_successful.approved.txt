@@ -1,51 +1,41 @@
 [
   {
-    "txn_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
+    "transaction_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
     "content": {
-      "sender": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
-      "fee": 0,
-      "first_valid_round": 33652328,
-      "last_valid_round": 33653328,
-      "note": null,
-      "genesis_id": "testnet-v1.0",
-      "genesis_hash": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-      "group": "Vyhyt7HcQWkkBxcIR4zP+GkJLUAmN2H2D5Hx03fAVvo=",
-      "lease": null,
-      "type": "pay",
-      "rekey_to": null,
-      "receiver": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
       "amt": 1,
-      "close_remainder_to": null
+      "fv": 33652328,
+      "gen": "testnet-v1.0",
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "grp": "Vyhyt7HcQWkkBxcIR4zP+GkJLUAmN2H2D5Hx03fAVvo=",
+      "lv": 33653328,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay"
     }
   },
   {
-    "txn_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
+    "transaction_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
     "content": {
-      "sender": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
-      "fee": 0,
-      "first_valid_round": 33652328,
-      "last_valid_round": 33653328,
-      "note": null,
-      "genesis_id": "testnet-v1.0",
-      "genesis_hash": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-      "group": "Vyhyt7HcQWkkBxcIR4zP+GkJLUAmN2H2D5Hx03fAVvo=",
-      "lease": null,
-      "type": "pay",
-      "rekey_to": null,
-      "receiver": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
       "amt": 1,
-      "close_remainder_to": null
+      "fv": 33652328,
+      "gen": "testnet-v1.0",
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "grp": "Vyhyt7HcQWkkBxcIR4zP+GkJLUAmN2H2D5Hx03fAVvo=",
+      "lv": 33653328,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay"
     }
   }
 ]
 Would you like to proceed with signing the above? (y, n) [n]: y
 [
   {
-    "txn_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
+    "transaction_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
     "content": "gqNzaWfEQMSdIjL5dbUk+/lVCi0AWs84ikMH0gEErgYxuNHpY/dYkKIvY9XlhiszYNMhk2XlkvTCkrrWGOWmblX3Af43tg+jdHhuiaNhbXQBomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKjZ3JwxCBXKHK3sdxBaSQHFwhHjM/4aQktQCY3YfYPkfHTd8BW+qJsds4CAYJQo3JjdsQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKjc25kxCBluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAqR0eXBlo3BheQ=="
   },
   {
-    "txn_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
+    "transaction_id": "RUU4DMAYJ5TLIEZ3ZT3PWTDPUOHCGOFY26JAXMOQXE52J2W6D7UA",
     "content": "gqNzaWfEQMSdIjL5dbUk+/lVCi0AWs84ikMH0gEErgYxuNHpY/dYkKIvY9XlhiszYNMhk2XlkvTCkrrWGOWmblX3Af43tg+jdHhuiaNhbXQBomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKjZ3JwxCBXKHK3sdxBaSQHFwhHjM/4aQktQCY3YfYPkfHTd8BW+qJsds4CAYJQo3JjdsQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKjc25kxCBluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAqR0eXBlo3BheQ=="
   }
 ]
