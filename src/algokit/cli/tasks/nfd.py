@@ -1,4 +1,3 @@
-import json
 import logging
 
 import click
@@ -46,8 +45,8 @@ def nfd_lookup(
 
     try:
         if is_nfd(value):
-            click.echo(json.dumps(nfd_lookup_by_domain(value, NFDMatchType(output)), indent=2))
+            click.echo(nfd_lookup_by_domain(value, NFDMatchType(output)))
         elif is_algorand_address(value):
-            click.echo(json.dumps(nfd_lookup_by_address(value, NFDMatchType(output)), indent=2))
+            click.echo(nfd_lookup_by_address(value, NFDMatchType(output)))
     except Exception as err:
         raise click.ClickException(str(err)) from err
