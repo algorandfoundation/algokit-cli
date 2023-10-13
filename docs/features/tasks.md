@@ -11,5 +11,5 @@ AlgoKit Tasks are a collection of handy tasks that can be used to perform variou
 - [Signing transactions](./tasks/sign.md) - Sign goal clerk compatible Algorand transactions.
 - [Sending transactions](./tasks/send.md) - Send signed goal clerk compatible Algorand transactions.
 - NFD lookups - Coming soon!
-- IPFS uploads - Coming soon!
+- [IPFS uploads](./tasks/ipfs.md) - Upload files to IPFS.
 - ARC19 asset minting - Coming soon!

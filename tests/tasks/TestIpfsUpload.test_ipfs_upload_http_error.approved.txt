@@ -1,0 +1,5 @@
+Uploading file
+DEBUG: Timeout set to 10 seconds based on 1 chunks.
+DEBUG: HTTP Request: POST https://api.web3.storage/upload "HTTP/1.1 500 Internal Server Error"
+DEBUG: Web3 Storage error: 500. {"ok": false, "cid": "test"}
+Error: Web3StorageInternalServerError('Web3 Storage error: 500')

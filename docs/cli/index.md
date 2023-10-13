@@ -100,20 +100,24 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [send](#send)
+    - [ipfs](#ipfs)
     - [Options](#options-17)
     - [-f, --file ](#-f---file--1)
+    - [-n, --name ](#-n---name--1)
+    - [send](#send)
+    - [Options](#options-18)
+    - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network-)
     - [sign](#sign)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [-a, --account ](#-a---account-)
-    - [-f, --file ](#-f---file--2)
+    - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--2)
     - [--force](#--force-1)
     - [transfer](#transfer)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -121,7 +125,7 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--1)
     - [vanity-address](#vanity-address)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--3)
     - [-a, --alias ](#-a---alias-)
@@ -130,7 +134,7 @@
     - [Arguments](#arguments-5)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -138,11 +142,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-7)
     - [ALIAS](#alias)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias-1)
-    - [Options](#options-23)
+    - [Options](#options-24)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -692,6 +696,48 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### ipfs
+
+Upload files to IPFS using Web3 Storage provider.
+
+```shell
+algokit task ipfs [OPTIONS] COMMAND [ARGS]...
+```
+
+#### login
+
+Login to web3 storage ipfs provider.
+
+```shell
+algokit task ipfs login [OPTIONS]
+```
+
+#### logout
+
+Logout of web3 storage ipfs provider.
+
+```shell
+algokit task ipfs logout [OPTIONS]
+```
+
+#### upload
+
+Upload a file to web3 storage ipfs provider. Please note, max file size is 100MB.
+
+```shell
+algokit task ipfs upload [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file_path>
+**Required** Path to the file to upload.
+
+
+### -n, --name <name>
+Human readable name for this upload, for use in file listings.
 
 ### send
 
