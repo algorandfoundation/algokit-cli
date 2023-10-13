@@ -65,7 +65,7 @@ def nfd_lookup_by_address(address: str, view: NFDMatchType) -> str:
     content = _process_get_request(url)
     if isinstance(content, dict):
         if view.value == NFDMatchType.ADDRESS.value:
-            return content[address]["name"]
+            return str(content[address]["name"])
         else:
             return json.dumps(content, indent=2)
 
@@ -94,7 +94,7 @@ def nfd_lookup_by_domain(domain: str, view: NFDMatchType) -> str:
     content = _process_get_request(url)
     if isinstance(content, dict):
         if view == NFDMatchType.ADDRESS:
-            return content["owner"]
+            return str(content["owner"])
         else:
             return json.dumps(content, indent=2)
 
