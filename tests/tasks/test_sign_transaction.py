@@ -53,9 +53,8 @@ def test_sign_from_stdin_with_alias_successful(mock_keyring: dict[str, str]) -> 
     dummy_txn = _generate_dummy_txn(DUMMY_ACCOUNT.address)
 
     # Act
-    result = invoke(
-        f"task sign -a {alias_name} --transaction {encoding.msgpack_encode({'txn': dummy_txn.dictify()})}", input="y"  # type: ignore[no-untyped-call]  # noqa: E501
-    )
+    txn = encoding.msgpack_encode({"txn": dummy_txn.dictify()})  # type: ignore[no-untyped-call]
+    result = invoke(f"task sign -a {alias_name} --transaction {txn}", input="y")
 
     # Assert
     assert result.exit_code == 0
@@ -67,8 +66,9 @@ def test_sign_from_stdin_with_address_successful() -> None:
     dummy_txn = _generate_dummy_txn(DUMMY_ACCOUNT.address)
 
     # Act
+    txn = encoding.msgpack_encode({"txn": dummy_txn.dictify()})  # type: ignore[no-untyped-call]
     result = invoke(
-        f"task sign -a {DUMMY_ACCOUNT.address} --transaction {encoding.msgpack_encode({'txn': dummy_txn.dictify()})}",  # type: ignore[no-untyped-call]  # noqa: E501
+        f"task sign -a {DUMMY_ACCOUNT.address} --transaction {txn}",
         input=f"{_get_mnemonic_from_private_key(DUMMY_ACCOUNT.private_key)}\ny",
     )
 

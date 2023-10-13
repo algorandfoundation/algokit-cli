@@ -100,6 +100,8 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
+    - [ipfs](#ipfs)
+    - [Options](#options-17)
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-17)
     - [-o, --output ](#-o---output--2)
@@ -108,12 +110,16 @@
     - [send](#send)
     - [Options](#options-18)
     - [-f, --file ](#-f---file--1)
+    - [-n, --name ](#-n---name--1)
+    - [send](#send)
+    - [Options](#options-18)
+    - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network-)
     - [sign](#sign)
     - [Options](#options-19)
     - [-a, --account ](#-a---account-)
-    - [-f, --file ](#-f---file--2)
+    - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--3)
     - [--force](#--force-1)
@@ -697,6 +703,48 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### ipfs
+
+Upload files to IPFS using Web3 Storage provider.
+
+```shell
+algokit task ipfs [OPTIONS] COMMAND [ARGS]...
+```
+
+#### login
+
+Login to web3 storage ipfs provider.
+
+```shell
+algokit task ipfs login [OPTIONS]
+```
+
+#### logout
+
+Logout of web3 storage ipfs provider.
+
+```shell
+algokit task ipfs logout [OPTIONS]
+```
+
+#### upload
+
+Upload a file to web3 storage ipfs provider. Please note, max file size is 100MB.
+
+```shell
+algokit task ipfs upload [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file_path>
+**Required** Path to the file to upload.
+
+
+### -n, --name <name>
+Human readable name for this upload, for use in file listings.
 
 ### nfd-lookup
 
