@@ -3,6 +3,7 @@ import logging
 import click
 
 from algokit.cli.tasks.ipfs import ipfs_group
+from algokit.cli.tasks.nfd import nfd_lookup
 from algokit.cli.tasks.send_transaction import send
 from algokit.cli.tasks.sign_transaction import sign
 from algokit.cli.tasks.transfer import transfer
@@ -23,3 +24,4 @@ task_group.add_command(transfer)
 task_group.add_command(sign)
 task_group.add_command(send)
 task_group.add_command(ipfs_group)
+task_group.add_command(nfd_lookup)
