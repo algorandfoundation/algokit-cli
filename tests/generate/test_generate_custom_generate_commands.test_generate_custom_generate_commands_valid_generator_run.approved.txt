@@ -1,0 +1,2 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Running generator in {current_working_directory}/smart_contract

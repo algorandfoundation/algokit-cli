@@ -1,0 +1,3 @@
+DEBUG: Using CI access token over keyring credentials
+DEBUG: HTTP Request: POST https://snapshottest.dispenser.com/refund "HTTP/1.1 200 OK"
+Successfully processed refund transaction

@@ -49,17 +49,25 @@ class BlessedTemplateSource(TemplateSource):
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
     return {
-        "beaker_starter": BlessedTemplateSource(
-            url="gh:algorand-devrel/starter-algokit-beaker-template",
-            description="Official starter template for Beaker applications.",
-        ),
-        "beaker_production": BlessedTemplateSource(
+        "beaker": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for production Beaker applications.",
+            description="Official template for starter or production Beaker applications.",
+        ),
+        "tealscript": BlessedTemplateSource(
+            url="gh:algorand-devrel/tealscript-algokit-template",
+            description="Official starter template for TEALScript applications.",
+        ),
+        "react": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-react-frontend-template",
+            description="Official template for React frontend applications (smart contracts not included).",
+        ),
+        "fullstack": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-fullstack-template",
+            description="Official template for starter or production fullstack applications (React + Beaker).",
         ),
         "playground": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
-            description="A number of small example applications and demos.",
+            description="Official template showcasing a number of small example applications and demos.",
         ),
     }
 
@@ -154,7 +162,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
-def init_command(
+def init_command(  # noqa: PLR0913
     *,
     directory_name: str | None,
     template_name: str | None,
@@ -246,15 +254,29 @@ def init_command(
         # and print it out so the user can (depending on terminal) click it to open in browser
         logger.info(f"Your selected template comes from:\n➡️  {expanded_template_url.removesuffix('.git')}")
 
+    # Check if a README file exists
     readme_path = next(project_path.glob("README*"), None)
+
+    # Check if a .workspace file exists
+    workspace_file = next(project_path.glob("*.code-workspace"), None)
+
     if open_ide and (project_path / ".vscode").is_dir() and (code_cmd := shutil.which("code")):
+        target_path = str(project_path)
+
         logger.info(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-        code_cmd_and_args = [code_cmd, str(project_path)]
+
+        if workspace_file:
+            logger.info(f"Detected VSCode workspace file. Opening workspace: {workspace_file}")
+            target_path = str(workspace_file)
+
+        code_cmd_and_args = [code_cmd, target_path]
+
         if readme_path:
             code_cmd_and_args.append(str(readme_path))
+
         proc.run(code_cmd_and_args)
     elif readme_path:
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
@@ -273,7 +295,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # but if something goes wrong, we don't want to block
         try:
             project_minimum_algokit_version_check(project_path)
-            bootstrap_any_including_subdirs(project_path)
+            bootstrap_any_including_subdirs(project_path, ci_mode=False)
         except Exception as e:
             logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(

@@ -18,7 +18,9 @@ Commands:
                project root directory.
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
-  doctor       Diagnose potential environment issues that may affect AlgoKit
+  deploy       Deploy smart contracts from AlgoKit compliant repository.
+  dispenser    Interact with the AlgoKit TestNet Dispenser.
+  doctor       Diagnose potential environment issues that may affect AlgoKit.
   explore      Explore the specified network in the browser using Dappflow.
   generate     Generate code for an Algorand project.
   goal         Run the Algorand goal CLI against the AlgoKit LocalNet.

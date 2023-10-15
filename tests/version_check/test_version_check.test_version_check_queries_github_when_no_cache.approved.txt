@@ -2,4 +2,5 @@ DEBUG: {app_state}/last-version-check inaccessible
 DEBUG: HTTP Request: GET https://api.github.com/repos/algorandfoundation/algokit-cli/releases/latest "HTTP/1.1 200 OK"
 DEBUG: Latest version tag: v{new_version}
 You are using AlgoKit version {current_version}, however version {new_version} is available.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.

@@ -92,7 +92,7 @@ Please inspect the template repository, and pay particular attention to the valu
 ? Continue anyway? Yes
 ```
 
-If you want to create a community template, you can use the [beaker template](https://github.com/algorandfoundation/algokit-beaker-default-template) and [Copier documentation](https://copier.readthedocs.io/en/stable/) as a starting point.
+If you want to create a community template, you can use the [AlgoKit guidelines on template building](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md#creating-algokit-templates) and [Copier documentation](https://copier.readthedocs.io/en/stable/) as a starting point.
 
 ## Template Answers
 

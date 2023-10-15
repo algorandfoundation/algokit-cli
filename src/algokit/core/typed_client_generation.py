@@ -13,7 +13,7 @@ from algokit.core import proc
 
 logger = logging.getLogger(__name__)
 
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@^2.2.1"
+TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@^2.2.2"
 
 
 def _snake_case(s: str) -> str:
@@ -27,8 +27,8 @@ class ClientGenerator(abc.ABC):
     language: ClassVar[str]
     extension: ClassVar[str]
 
-    _by_language: dict[str, type["ClientGenerator"]] = {}
-    _by_extension: dict[str, type["ClientGenerator"]] = {}
+    _by_language: ClassVar[dict[str, type["ClientGenerator"]]] = {}
+    _by_extension: ClassVar[dict[str, type["ClientGenerator"]]] = {}
 
     def __init_subclass__(cls, language: str, extension: str) -> None:
         cls.language = language

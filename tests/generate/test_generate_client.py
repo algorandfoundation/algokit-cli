@@ -103,9 +103,11 @@ def test_generate_client_typescript(
         _normalize_output(result.output),
         options=NamerFactory.with_parameters(*options.split()),
     )
-    assert proc_mock.called == [
-        f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
-    ]
+    assert len(proc_mock.called) == 1
+    assert (
+        proc_mock.called[0].command
+        == f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+    )
 
 
 def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:

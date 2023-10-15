@@ -1,0 +1,5 @@
+DEBUG: HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/device/code "HTTP/1.1 200 OK"
+Navigate to: https://example.com/device
+Confirm code: user_code
+DEBUG: HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/token "HTTP/1.1 200 OK"
+Login successful

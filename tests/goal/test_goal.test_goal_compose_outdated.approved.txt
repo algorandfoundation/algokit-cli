@@ -1,0 +1,4 @@
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+Error: Sandbox definition is out of date; please run `algokit localnet reset` first!

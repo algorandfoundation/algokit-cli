@@ -2,6 +2,79 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.0 (2023-10-04)
+
+### Feature
+
+* Algokit `dispenser` ([#309](https://github.com/algorandfoundation/algokit-cli/issues/309)) ([`6b7a514`](https://github.com/algorandfoundation/algokit-cli/commit/6b7a51421d42d90192c866ff7ce7307a4b180b9c))
+
+### Documentation
+
+* Explicit reference on how to obtain the dispenser address ([#321](https://github.com/algorandfoundation/algokit-cli/issues/321)) ([`d7db09c`](https://github.com/algorandfoundation/algokit-cli/commit/d7db09c50e41ec8840f908f6a3db223622562269))
+
+## v1.4.2 (2023-09-29)
+
+### Documentation
+
+* Adding tealscript template ([#318](https://github.com/algorandfoundation/algokit-cli/issues/318)) ([`a855530`](https://github.com/algorandfoundation/algokit-cli/commit/a855530923a308e3826d4203b851cfbc49420bed))
+* Fixed links to tutorials ([`8207043`](https://github.com/algorandfoundation/algokit-cli/commit/820704305d7bb66d3f5e7c6627e53594a74f9e45))
+
+## v1.4.1 (2023-08-21)
+
+### Fix
+
+* Localnet displays a warning when image is out of date ([#308](https://github.com/algorandfoundation/algokit-cli/issues/308)) ([`be5a5df`](https://github.com/algorandfoundation/algokit-cli/commit/be5a5df0883b378a0dd889b9996ff68850df5698))
+* Adding fixes to allow working with local filesystem files when interacting with algokit goal commands ([#304](https://github.com/algorandfoundation/algokit-cli/issues/304)) ([`caca2b5`](https://github.com/algorandfoundation/algokit-cli/commit/caca2b59b07817648ae7d8f208fe02f895cee92e))
+
+## v1.4.0 (2023-08-14)
+
+### Feature
+
+* Advanced algokit generate command ([#306](https://github.com/algorandfoundation/algokit-cli/issues/306)) ([`0381862`](https://github.com/algorandfoundation/algokit-cli/commit/038186239c6787b0e80d49ea6a0e5e4135ce4240))
+
+## v1.3.0 (2023-08-01)
+
+### Feature
+
+* Add new "deploy" command to execute user/template defined logic to deploy smart contracts to an Algorand network ([#295](https://github.com/algorandfoundation/algokit-cli/issues/295)) ([`6673f80`](https://github.com/algorandfoundation/algokit-cli/commit/6673f8062989172674471056baf1e8a7f34753b7))
+
+### Fix
+
+* Pip-audit dependencies ([#307](https://github.com/algorandfoundation/algokit-cli/issues/307)) ([`142dba3`](https://github.com/algorandfoundation/algokit-cli/commit/142dba3651731003936c32ff9a6144c58289c829))
+* Handle deploy commands on windows that are actually `.cmd` files or similar ([#303](https://github.com/algorandfoundation/algokit-cli/issues/303)) ([`17791c7`](https://github.com/algorandfoundation/algokit-cli/commit/17791c7ca7f5aabe510b1dcaa1d09b9ed403233b))
+
+### Documentation
+
+* Advanced algokit generate command ADR ([#305](https://github.com/algorandfoundation/algokit-cli/issues/305)) ([`cb0ac17`](https://github.com/algorandfoundation/algokit-cli/commit/cb0ac17e9afda66e74ae2c63d0729c3b34f2a4b7))
+* Adding algokit template documentation ([#300](https://github.com/algorandfoundation/algokit-cli/issues/300)) ([`6e19743`](https://github.com/algorandfoundation/algokit-cli/commit/6e19743bacf3856f91e2610cff58676a17e99deb))
+
+## v1.2.0 (2023-07-04)
+
+### Feature
+
+* Detecting whether opening folder contains *.code-workspace file ([#294](https://github.com/algorandfoundation/algokit-cli/issues/294)) ([`e902d55`](https://github.com/algorandfoundation/algokit-cli/commit/e902d55a6077d60eb3c5b3fa809e1ba80b61b37e))
+* Adding react and fullstack templates ([#291](https://github.com/algorandfoundation/algokit-cli/issues/291)) ([`5af81f1`](https://github.com/algorandfoundation/algokit-cli/commit/5af81f100b16ce1281980ff3067df648fb5c9b4f))
+
+### Fix
+
+* Hotfixing a bug that is caused by pydantic v2 being installed as a copier dependency ([#297](https://github.com/algorandfoundation/algokit-cli/issues/297)) ([`31b580b`](https://github.com/algorandfoundation/algokit-cli/commit/31b580b2364e123fd81fdab14da93b704ea4bdda))
+* Update algokit-client-generators ([#293](https://github.com/algorandfoundation/algokit-cli/issues/293)) ([`cf0f46f`](https://github.com/algorandfoundation/algokit-cli/commit/cf0f46ffba9c3a33e75bad56195589bed3c5dc3a))
+
+### Documentation
+
+* Switching to more reliable visitors badge provider ([`51dce8b`](https://github.com/algorandfoundation/algokit-cli/commit/51dce8be83f0b72765ddffc9ea67886235d83fbb))
+* Fixing underline caused by whitespace in html tags on readme ([`f824596`](https://github.com/algorandfoundation/algokit-cli/commit/f824596d845fce31fe6d32fd9dc14fa0086746ca))
+
+## v1.1.6 (2023-06-21)
+
+### Fix
+
+* Increase timeout when doing algod health check ([#290](https://github.com/algorandfoundation/algokit-cli/issues/290)) ([`2b39970`](https://github.com/algorandfoundation/algokit-cli/commit/2b39970c53d358050639fbcb02ab6e99c1808d98))
+
+### Documentation
+
+* Adding readme assets ([`e300fa9`](https://github.com/algorandfoundation/algokit-cli/commit/e300fa929850b1f3677cb3545b8f284e8f3a7ef9))
+
 ## v1.1.5 (2023-06-15)
 
 ### Fix

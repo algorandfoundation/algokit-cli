@@ -3,7 +3,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from types import TracebackType
-from typing import Any
+from typing import Any, ClassVar
 
 import click
 from click.globals import resolve_color_default
@@ -27,7 +27,7 @@ class ClickHandler(logging.Handler):
     but they're kind of intertwined for our use case of actually displaying things to the user.
     """
 
-    styles: dict[str, dict[str, Any]] = {
+    styles: ClassVar[dict[str, dict[str, Any]]] = {
         "critical": {"fg": "red", "bold": True},
         "error": {"fg": "red"},
         "warning": {"fg": "yellow"},

@@ -8,6 +8,7 @@ For details on how to use individual features see the following
 
 - [Bootstrap](./features/bootstrap.md) - Bootstrap AlgoKit project dependencies
 - [Completions](./features/completions.md) - Install shell completions for AlgoKit
+- [Deploy](./features/deploy.md) - Deploy your smart contracts effortlessly to various networks
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
 - [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
 - [Generate](./features/generate.md) - Generate code for an Algorand project
@@ -31,7 +32,7 @@ See also the [AlgoKit CLI Reference](./cli/index.md), which details every comman
 The following tutorials guide you through various scenarios:
 
 - [AlgoKit quick start](./tutorials/intro.md)
-- [Production-ready smart contracts](./tutorials/smart-contracts.md)
+- [Creating AlgoKit templates](./tutorials/algokit-template.md)
 
 ## Guiding Principles
 

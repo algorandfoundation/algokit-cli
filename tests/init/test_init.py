@@ -68,7 +68,7 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def _override_bootstrap(mocker: MockerFixture) -> None:
-    def bootstrap_mock(p: Path) -> None:
+    def bootstrap_mock(p: Path, *, ci_mode: bool) -> None:  # noqa: ARG001
         click.echo(f"Executed `algokit bootstrap all` in {p}")
 
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
@@ -547,7 +547,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
             Path("myapp") / "smart_contracts",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
     verify(
         get_combined_verify_output(
             result.output, additional_name=".env.template", additional_output=env_template_file_contents
@@ -598,10 +598,10 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
             Path("myapp"),
             Path("myapp") / "README.md",
             Path("myapp") / "smart_contracts",
-            Path("myapp") / "smart_contracts" / ".env.template",
+            Path("myapp") / ".env.template",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / "smart_contracts" / ".env.template").read_text()
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
 
     verify(
         get_combined_verify_output(
