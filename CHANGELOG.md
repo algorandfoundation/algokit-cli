@@ -2,6 +2,23 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.0 (2023-10-04)
+
+### Feature
+
+* Algokit `dispenser` ([#309](https://github.com/algorandfoundation/algokit-cli/issues/309)) ([`6b7a514`](https://github.com/algorandfoundation/algokit-cli/commit/6b7a51421d42d90192c866ff7ce7307a4b180b9c))
+
+### Documentation
+
+* Explicit reference on how to obtain the dispenser address ([#321](https://github.com/algorandfoundation/algokit-cli/issues/321)) ([`d7db09c`](https://github.com/algorandfoundation/algokit-cli/commit/d7db09c50e41ec8840f908f6a3db223622562269))
+
+## v1.4.2 (2023-09-29)
+
+### Documentation
+
+* Adding tealscript template ([#318](https://github.com/algorandfoundation/algokit-cli/issues/318)) ([`a855530`](https://github.com/algorandfoundation/algokit-cli/commit/a855530923a308e3826d4203b851cfbc49420bed))
+* Fixed links to tutorials ([`8207043`](https://github.com/algorandfoundation/algokit-cli/commit/820704305d7bb66d3f5e7c6627e53594a74f9e45))
+
 ## v1.4.1 (2023-08-21)
 
 ### Fix

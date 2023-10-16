@@ -34,28 +34,48 @@
     - [-C, --command ](#-c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
     - [-P, --path ](#-p---path-)
+    - [--deployer ](#--deployer-)
+    - [--dispenser ](#--dispenser-)
     - [Arguments](#arguments-1)
     - [ENVIRONMENT_NAME](#environment_name)
-  - [doctor](#doctor)
+  - [dispenser](#dispenser)
+    - [fund](#fund)
     - [Options](#options-7)
+    - [-r, --receiver ](#-r---receiver-)
+    - [-a, --amount ](#-a---amount-)
+    - [--whole-units](#--whole-units)
+    - [limit](#limit)
+    - [Options](#options-8)
+    - [--whole-units](#--whole-units-1)
+    - [login](#login)
+    - [Options](#options-9)
+    - [--ci](#--ci)
+    - [-o, --output ](#-o---output-)
+    - [-f, --file ](#-f---file-)
+    - [logout](#logout)
+    - [refund](#refund)
+    - [Options](#options-10)
+    - [-t, --txID ](#-t---txid-)
+  - [doctor](#doctor)
+    - [Options](#options-11)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
     - [Arguments](#arguments-2)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-8)
-    - [-o, --output ](#-o---output-)
+    - [Options](#options-12)
+    - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
     - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-9)
+    - [Options](#options-13)
     - [--console](#--console)
     - [Arguments](#arguments-4)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-10)
+    - [Options](#options-14)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -70,15 +90,69 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-11)
+    - [Options](#options-15)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-12)
+    - [Options](#options-16)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [status](#status)
     - [stop](#stop)
+  - [task](#task)
+    - [ipfs](#ipfs)
+    - [Options](#options-17)
+    - [-f, --file ](#-f---file--1)
+    - [-n, --name ](#-n---name--1)
+    - [nfd-lookup](#nfd-lookup)
+    - [Options](#options-18)
+    - [-o, --output ](#-o---output--2)
+    - [Arguments](#arguments-5)
+    - [VALUE](#value)
+    - [send](#send)
+    - [Options](#options-19)
+    - [-f, --file ](#-f---file--2)
+    - [-t, --transaction ](#-t---transaction-)
+    - [-n, --network ](#-n---network-)
+    - [sign](#sign)
+    - [Options](#options-20)
+    - [-a, --account ](#-a---account-)
+    - [-f, --file ](#-f---file--3)
+    - [-t, --transaction ](#-t---transaction--1)
+    - [-o, --output ](#-o---output--3)
+    - [--force](#--force-1)
+    - [transfer](#transfer)
+    - [Options](#options-21)
+    - [-s, --sender ](#-s---sender-)
+    - [-r, --receiver ](#-r---receiver--1)
+    - [--asset, --id ](#--asset---id-)
+    - [-a, --amount ](#-a---amount--1)
+    - [--whole-units](#--whole-units-2)
+    - [-n, --network ](#-n---network--1)
+    - [vanity-address](#vanity-address)
+    - [Options](#options-22)
+    - [-m, --match ](#-m---match-)
+    - [-o, --output ](#-o---output--4)
+    - [-a, --alias ](#-a---alias-)
+    - [--file-path ](#--file-path-)
+    - [-f, --force](#-f---force)
+    - [Arguments](#arguments-6)
+    - [KEYWORD](#keyword)
+    - [wallet](#wallet)
+    - [Options](#options-23)
+    - [-a, --address ](#-a---address-)
+    - [-m, --mnemonic](#-m---mnemonic)
+    - [-f, --force](#-f---force-1)
+    - [Arguments](#arguments-7)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-8)
+    - [ALIAS](#alias)
+    - [Options](#options-24)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-9)
+    - [ALIAS](#alias-1)
+    - [Options](#options-25)
+    - [-f, --force](#-f---force-3)
 
 # algokit
 
@@ -178,7 +252,7 @@ algokit completions [OPTIONS] COMMAND [ARGS]...
 ### install
 
 Install shell completions, this command will attempt to update the interactive profile script
-for the current shell to support algokit completions. To specify a specific shell use –shell.
+for the current shell to support algokit completions. To specify a specific shell use --shell.
 
 ```shell
 algokit completions install [OPTIONS]
@@ -200,7 +274,7 @@ Specify shell to install algokit completions for.
 
 Uninstall shell completions, this command will attempt to update the interactive profile script
 for the current shell to remove any algokit completions that have been added.
-To specify a specific shell use –shell.
+To specify a specific shell use --shell.
 
 ```shell
 algokit completions uninstall [OPTIONS]
@@ -232,7 +306,7 @@ Controls whether AlgoKit checks and prompts for new versions.
 Set to [disable] to prevent AlgoKit performing this check permanently, or [enable] to resume checking.
 If no argument is provided then outputs current setting.
 
-Also see –skip-version-check which can be used to disable check for a single command.
+Also see --skip-version-check which can be used to disable check for a single command.
 
 ```shell
 algokit config version-prompt [OPTIONS] [[enable|disable]]
@@ -266,15 +340,117 @@ Enable/disable interactive prompts. If the CI environment variable is set, defau
 ### -P, --path <path>
 Specify the project directory. If not provided, current working directory will be used.
 
+
+### --deployer <deployer_alias>
+(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic if specified in .algokit.toml file.
+
+
+### --dispenser <dispenser_alias>
+(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic if specified in .algokit.toml file.
+
 ### Arguments
 
 
 ### ENVIRONMENT_NAME
 Optional argument
 
+## dispenser
+
+Interact with the AlgoKit TestNet Dispenser.
+
+```shell
+algokit dispenser [OPTIONS] COMMAND [ARGS]...
+```
+
+### fund
+
+Fund your wallet address with TestNet ALGOs.
+
+```shell
+algokit dispenser fund [OPTIONS]
+```
+
+### Options
+
+
+### -r, --receiver <receiver>
+**Required** Address or alias of the receiver to fund with TestNet ALGOs.
+
+
+### -a, --amount <amount>
+**Required** Amount to fund. Defaults to microAlgos.
+
+
+### --whole-units
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
+
+### limit
+
+Get information about current fund limit on your account. Resets daily.
+
+```shell
+algokit dispenser limit [OPTIONS]
+```
+
+### Options
+
+
+### --whole-units
+Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
+
+### login
+
+Login to your Dispenser API account.
+
+```shell
+algokit dispenser login [OPTIONS]
+```
+
+### Options
+
+
+### --ci
+Generate an access token for CI. Issued for 30 days.
+
+
+### -o, --output <output_mode>
+Choose the output method for the access token. Defaults to stdout. Only applicable when --ci flag is set.
+
+
+* **Options**
+
+    stdout | file
+
+
+
+### -f, --file <output_filename>
+Output filename where you want to store the generated access token.Defaults to algokit_ci_token.txt. Only applicable when --ci flag is set and --output mode is file.
+
+### logout
+
+Logout of your Dispenser API account.
+
+```shell
+algokit dispenser logout [OPTIONS]
+```
+
+### refund
+
+Refund ALGOs back to the dispenser wallet address.
+
+```shell
+algokit dispenser refund [OPTIONS]
+```
+
+### Options
+
+
+### -t, --txID <tx_id>
+**Required** Transaction ID of your refund operation.
+
 ## doctor
 
-Diagnose potential environment issues that may affect AlgoKit
+Diagnose potential environment issues that may affect AlgoKit.
 
 Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
 potential issues.
@@ -316,7 +492,7 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 Create a typed ApplicationClient from an ARC-32 application.json
 
 Supply the path to an application specification file or a directory to recursively search
-for “application.json” files
+for "application.json" files
 
 ```shell
 algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
@@ -397,7 +573,7 @@ Name of an official template to use. To see a list of descriptions, run this com
 
 * **Options**
 
-    beaker | react | fullstack | playground
+    beaker | tealscript | react | fullstack | playground
 
 
 
@@ -406,7 +582,7 @@ URL to a git repo with a custom project template.
 
 
 ### --template-url-ref <URL>
-Specific tag, branch or commit to use on git repo specified with –template-url. Defaults to latest.
+Specific tag, branch or commit to use on git repo specified with --template-url. Defaults to latest.
 
 
 ### --UNSAFE-SECURITY-accept-template-url
@@ -422,7 +598,7 @@ Automatically choose default answers without asking when creating this template.
 
 
 ### --bootstrap, --no-bootstrap
-Whether to run algokit bootstrap to install and configure the new project’s dependencies locally.
+Whether to run algokit bootstrap to install and configure the new project's dependencies locally.
 
 
 ### --ide, --no-ide
@@ -492,7 +668,7 @@ algokit localnet reset [OPTIONS]
 
 
 ### --update, --no-update
-Enable or disable updating to the latest available LocalNet version, default: don’t update
+Enable or disable updating to the latest available LocalNet version, default: don't update
 
 ### start
 
@@ -517,3 +693,320 @@ Stop the AlgoKit LocalNet.
 ```shell
 algokit localnet stop [OPTIONS]
 ```
+
+## task
+
+Collection of useful tasks to help you develop on Algorand.
+
+```shell
+algokit task [OPTIONS] COMMAND [ARGS]...
+```
+
+### ipfs
+
+Upload files to IPFS using Web3 Storage provider.
+
+```shell
+algokit task ipfs [OPTIONS] COMMAND [ARGS]...
+```
+
+#### login
+
+Login to web3 storage ipfs provider.
+
+```shell
+algokit task ipfs login [OPTIONS]
+```
+
+#### logout
+
+Logout of web3 storage ipfs provider.
+
+```shell
+algokit task ipfs logout [OPTIONS]
+```
+
+#### upload
+
+Upload a file to web3 storage ipfs provider. Please note, max file size is 100MB.
+
+```shell
+algokit task ipfs upload [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file_path>
+**Required** Path to the file to upload.
+
+
+### -n, --name <name>
+Human readable name for this upload, for use in file listings.
+
+### nfd-lookup
+
+Perform a lookup via NFD domain or address, returning the associated address or domain respectively.
+
+```shell
+algokit task nfd-lookup [OPTIONS] VALUE
+```
+
+### Options
+
+
+### -o, --output <output>
+Output format for NFD API response. Defaults to address|domain resolved.
+
+
+* **Options**
+
+    full | tiny | address
+
+
+### Arguments
+
+
+### VALUE
+Required argument
+
+### send
+
+Send a signed transaction to the given network.
+
+```shell
+algokit task send [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file>
+Single or multiple message pack encoded signed transactions from binary file to send. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Base64 encoded signed transaction to send. Option is mutually exclusive with file.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### sign
+
+Sign goal clerk compatible Algorand transaction(s).
+
+```shell
+algokit task sign [OPTIONS]
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### -f, --file <file>
+Single or multiple message pack encoded transactions from binary file to sign. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Single base64 encoded transaction object to sign. Option is mutually exclusive with file.
+
+
+### -o, --output <output>
+The output file path to store signed transaction(s).
+
+
+### --force
+Force signing without confirmation.
+
+### transfer
+
+Transfer algos or assets from one account to another.
+
+```shell
+algokit task transfer [OPTIONS]
+```
+
+### Options
+
+
+### -s, --sender <sender>
+**Required** Address or alias of the sender account.
+
+
+### -r, --receiver <receiver>
+**Required** Address or alias to an account that will receive the asset(s).
+
+
+### --asset, --id <asset_id>
+ASA asset id to transfer.
+
+
+### -a, --amount <amount>
+**Required** Amount to transfer.
+
+
+### --whole-units
+Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos). Disabled by default.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### vanity-address
+
+Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
+Keeping your KEYWORD under 5 characters will usually result in faster generation.
+Note: The longer the KEYWORD, the longer it may take to generate a matching address.
+Please be patient if you choose a long keyword.
+
+```shell
+algokit task vanity-address [OPTIONS] KEYWORD
+```
+
+### Options
+
+
+### -m, --match <match>
+Location where the keyword will be included. Default is start.
+
+
+* **Options**
+
+    start | anywhere | end
+
+
+
+### -o, --output <output>
+How the output will be presented.
+
+
+* **Options**
+
+    stdout | alias | file
+
+
+
+### -a, --alias <alias>
+Alias for the address. Required if output is "alias".
+
+
+### --file-path <output_file_path>
+File path where to dump the output. Required if output is "file".
+
+
+### -f, --force
+Allow overwriting an aliases without confirmation, if output option is 'alias'.
+
+### Arguments
+
+
+### KEYWORD
+Required argument
+
+### wallet
+
+Create short aliases for your addresses and accounts on AlgoKit CLI.
+
+```shell
+algokit task wallet [OPTIONS] COMMAND [ARGS]...
+```
+
+#### add
+
+Add an address or account to be stored against a named alias (at most 50 aliases).
+
+```shell
+algokit task wallet add [OPTIONS] ALIAS_NAME
+```
+
+### Options
+
+
+### -a, --address <address>
+**Required** The address of the account.
+
+
+### -m, --mnemonic
+If specified then prompt the user for a mnemonic phrase interactively using masked input.
+
+
+### -f, --force
+Allow overwriting an existing alias.
+
+### Arguments
+
+
+### ALIAS_NAME
+Required argument
+
+#### get
+
+Get an address or account stored against a named alias.
+
+```shell
+algokit task wallet get [OPTIONS] ALIAS
+```
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### list
+
+List all addresses and accounts stored against a named alias.
+
+```shell
+algokit task wallet list [OPTIONS]
+```
+
+#### remove
+
+Remove an address or account stored against a named alias.
+
+```shell
+algokit task wallet remove [OPTIONS] ALIAS
+```
+
+### Options
+
+
+### -f, --force
+Allow removing an alias without confirmation.
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### reset
+
+Remove all aliases.
+
+```shell
+algokit task wallet reset [OPTIONS]
+```
+
+### Options
+
+
+### -f, --force
+Allow removing all aliases without confirmation.

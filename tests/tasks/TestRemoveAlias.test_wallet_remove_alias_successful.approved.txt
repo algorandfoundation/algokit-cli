@@ -1,0 +1,2 @@
+🚨 This is a destructive action that will remove the `test_alias` alias. Are you sure? (y, n) [n]: y
+Alias `test_alias` removed successfully.

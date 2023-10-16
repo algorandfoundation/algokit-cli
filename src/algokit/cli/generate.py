@@ -119,7 +119,7 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
             ) from ex
     else:
         raise click.ClickException(
-            "One of --language or --output is required to determine the client langauge to generate"
+            "One of --language or --output is required to determine the client language to generate"
         )
 
     if not app_spec_path_or_dir.is_dir():
