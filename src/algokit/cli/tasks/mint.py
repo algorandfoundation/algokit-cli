@@ -11,13 +11,16 @@ from algokit.cli.tasks.utils import (
     load_algod_client,
 )
 from algokit.core.tasks.ipfs import get_web3_storage_api_key
-from algokit.core.tasks.mint.mint import MetadataStandard, mint_token
+from algokit.core.tasks.mint.mint import mint_token
 from algokit.core.tasks.mint.models import TokenMetadata
 
 logger = logging.getLogger(__name__)
 
+MAX_UNIT_NAME_BYTE_LENGTH = 8
+MAX_ASSET_NAME_BYTE_LENGTH = 32
 
-def _validate_inputs(total: int, decimals: int) -> None:
+
+def _validate_supply(total: int, decimals: int) -> None:
     # Validate total and decimals
     if not (total == 1 or (total % 10 == 0 and total != 0)):
         raise click.ClickException("Total must be 1 or a power of 10 larger than 1 (10, 100, 1000, ...).")
@@ -28,64 +31,85 @@ def _validate_inputs(total: int, decimals: int) -> None:
         )
 
 
+def _validate_unit_name(context: click.Context, param: click.Parameter, value: str) -> str:
+    if len(value.encode("utf-8")) <= MAX_UNIT_NAME_BYTE_LENGTH:
+        return value
+    else:
+        raise click.BadParameter(
+            f"Unit name must be {MAX_UNIT_NAME_BYTE_LENGTH} bytes or less.", ctx=context, param=param
+        )
+
+
+def _validate_asset_name(context: click.Context, param: click.Parameter, value: str) -> str:
+    if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
+        return value
+    else:
+        raise click.BadParameter(
+            f"Unit name must be {MAX_UNIT_NAME_BYTE_LENGTH} bytes or less.", ctx=context, param=param
+        )
+
+
 @click.command(
     name="mint",
     help="Mint a new fungible or non-fungible assets on Algorand.",
 )
 @click.option(
     "--creator",
-    "-r",
     required=True,
-    prompt="Please enter the address or alias of the asset creator",
+    prompt="Provide the address or alias of the asset creator",
     help="Address or alias of the asset creator.",
     type=click.STRING,
 )
 @click.option(
-    "--asset-name",
+    "-n",
+    "--name",
+    "asset_name",
     type=click.STRING,
     required=True,
-    prompt="Please enter the asset name",
+    callback=_validate_asset_name,
+    prompt="Provide the asset name",
     help="Asset name.",
 )
 @click.option(
-    "--unit-name",
+    "-u",
+    "--unit",
+    "unit_name",
     type=click.STRING,
     required=True,
-    prompt="Please enter the unit name",
+    callback=_validate_unit_name,
+    prompt="Provide the unit name",
     help="Unit name of the asset.",
 )
 @click.option(
+    "-t",
     "--total",
     type=click.INT,
-    required=True,
-    prompt=(
-        "Please enter the total supply. Set 1 for a pure NFT, or a power of 10 "
-        "larger than 1 (10, 100, 1000, ...) for a fractional NFT."
-    ),
-    help=(
-        "Total supply of the asset. Set 1 for a pure NFT, or a power of 10 "
-        "larger than 1 (10, 100, 1000, ...) for a fractional NFT."
-    ),
+    required=False,
+    default=1,
+    prompt="Provide the total supply",
+    help="Total supply of the asset. Defaults to 1.",
 )
 @click.option(
+    "-d",
     "--decimals",
     type=click.INT,
     required=False,
-    prompt="""Please enter the number of decimals. Set 0 for a pure NFT,
-        or equal to the logarithm in base 10 of total supply for a fractional NFT.""",
-    help="""Number of decimals. Set 0 for a pure NFT, ",
-        "or equal to the logarithm in base 10 of total supply for a fractional NFT.""",
+    default=0,
+    prompt="Provide the number of decimals",
+    help="Number of decimals. Defaults to 0.",
 )
 @click.option(
-    "--image-path",
+    "-i",
+    "--image",
     "image_path",
     type=click.Path(exists=True, dir_okay=False, file_okay=True, resolve_path=True, path_type=Path),
-    prompt="Please enter the path to the ARC19 compliant asset metadata file to be uploaded to IPFS",
-    help="Path to the ARC19 compliant asset metadata file to be uploaded to IPFS.",
+    prompt="Provide the path to the asset image file",
+    help="Path to the asset image file to be uploaded to IPFS.",
     required=True,
 )
 @click.option(
-    "--token-metadata-path",
+    "-m",
+    "--metadata",
     "token_metadata_path",
     type=click.Path(exists=True, dir_okay=False, file_okay=True, resolve_path=True, path_type=Path),
     help="""Path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not provided,
@@ -95,24 +119,32 @@ def _validate_inputs(total: int, decimals: int) -> None:
     required=False,
 )
 @click.option(
-    "--arc",
-    "metadata_standard",
-    type=click.Choice([standard.value for standard in MetadataStandard]),
-    prompt="Please enter the ARC standard to use (arc19 or arc3)",
-    default=MetadataStandard.ARC19.value,
-    required=False,
-    help="ARC standard to use. Refers to `arc19` by default.",
+    "--mutable/--immutable",
+    type=click.BOOL,
+    prompt="Would you like to make the asset mutable?",
+    default=False,
+    help="Whether the asset should be mutable or immutable. Refers to `ARC19` by default.",
+)
+@click.option(
+    "--nft/--ft",
+    "non_fungible",
+    type=click.BOOL,
+    prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
+    default=False,
+    help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+    definitions of pure or fractional NFTs as per ARC3 standard.""",
 )
 @click.option(
     "-n",
     "--network",
     type=click.Choice(["localnet", "testnet", "mainnet"]),
-    prompt="Please enter the network to use",
+    prompt="Provide the network to use",
     default="localnet",
     required=False,
     help="Network to use. Refers to `localnet` by default.",
 )
 def mint(  # noqa: PLR0913
+    *,
     creator: str,
     asset_name: str,
     unit_name: str,
@@ -120,10 +152,12 @@ def mint(  # noqa: PLR0913
     decimals: int,
     image_path: Path,
     token_metadata_path: Path | None,
-    metadata_standard: str,
+    mutable: bool,
+    non_fungible: bool,
     network: str,
 ) -> None:
-    _validate_inputs(total, decimals)
+    if non_fungible:
+        _validate_supply(total, decimals)
 
     creator_account = get_account_with_private_key(creator)
 
@@ -138,13 +172,6 @@ def mint(  # noqa: PLR0913
         token_metadata.name = asset_name
         token_metadata.decimals = decimals
 
-    is_mutable = (
-        True
-        if metadata_standard
-        == MetadataStandard.ARC19.value  # The whole point of ARC19 is mutability, so we don't need to ask the user
-        else click.confirm("Would you like to set `manager` field on your ARC3 asset configuration metadata?")
-    )
-
     asset_id, txn_id = mint_token(
         client=client,
         api_key=web3_storage_api_key,
@@ -153,11 +180,10 @@ def mint(  # noqa: PLR0913
         image_path=image_path,
         unit_name=unit_name,
         asset_name=asset_name,
-        metadata_standard=metadata_standard,
-        is_mutable=is_mutable,
+        mutable=mutable,
         total=total,
     )
 
-    click.echo("Successfully minted asset!")
+    click.echo("\nSuccessfully minted the asset!")
     click.echo(f"Browse your asset at: {get_asset_explorer_url(asset_id, network)}")
     click.echo(f"Check transaction status at: {get_transaction_explorer_url(txn_id, network)}")

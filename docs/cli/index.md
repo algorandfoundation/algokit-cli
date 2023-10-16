@@ -106,14 +106,15 @@
     - [-n, --name ](#-n---name--1)
     - [mint](#mint)
     - [Options](#options-18)
-    - [-r, --creator ](#-r---creator-)
-    - [--asset-name ](#--asset-name-)
-    - [--unit-name ](#--unit-name-)
-    - [--total ](#--total-)
-    - [--decimals ](#--decimals-)
-    - [--image-path ](#--image-path-)
-    - [--token-metadata-path ](#--token-metadata-path-)
-    - [--arc ](#--arc-)
+    - [--creator ](#--creator-)
+    - [-n, --name ](#-n---name--2)
+    - [-u, --unit ](#-u---unit-)
+    - [-t, --total ](#-t---total-)
+    - [-d, --decimals ](#-d---decimals-)
+    - [-i, --image ](#-i---image-)
+    - [-m, --metadata ](#-m---metadata-)
+    - [--mutable, --immutable](#--mutable---immutable)
+    - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-19)
@@ -766,45 +767,43 @@ algokit task mint [OPTIONS]
 ### Options
 
 
-### -r, --creator <creator>
+### --creator <creator>
 **Required** Address or alias of the asset creator.
 
 
-### --asset-name <asset_name>
+### -n, --name <asset_name>
 **Required** Asset name.
 
 
-### --unit-name <unit_name>
+### -u, --unit <unit_name>
 **Required** Unit name of the asset.
 
 
-### --total <total>
-**Required** Total supply of the asset. Set 1 for a pure NFT, or a power of 10 larger than 1 (10, 100, 1000, ...) for a fractional NFT.
+### -t, --total <total>
+Total supply of the asset. Defaults to 1.
 
 
-### --decimals <decimals>
-Number of decimals. Set 0 for a pure NFT, ",
-"or equal to the logarithm in base 10 of total supply for a fractional NFT.
+### -d, --decimals <decimals>
+Number of decimals. Defaults to 0.
 
 
-### --image-path <image_path>
-**Required** Path to the ARC19 compliant asset metadata file to be uploaded to IPFS.
+### -i, --image <image_path>
+**Required** Path to the asset image file to be uploaded to IPFS.
 
 
-### --token-metadata-path <token_metadata_path>
+### -m, --metadata <token_metadata_path>
 Path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not provided,
 a default metadata object will be generated automatically based on asset-name, decimals and image.
 For more details refer to [https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema).
 
 
-### --arc <metadata_standard>
-ARC standard to use. Refers to arc19 by default.
+### --mutable, --immutable
+Whether the asset should be mutable or immutable. Refers to ARC19 by default.
 
 
-* **Options**
-
-    arc19 | arc3
-
+### --nft, --ft
+Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+definitions of pure or fractional NFTs as per ARC3 standard.
 
 
 ### -n, --network <network>

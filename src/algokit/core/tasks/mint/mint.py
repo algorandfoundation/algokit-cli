@@ -6,7 +6,6 @@ import mimetypes
 import pathlib
 import re
 from dataclasses import asdict
-from enum import Enum
 
 from algokit_utils import Account
 from algosdk import encoding, transaction
@@ -18,11 +17,6 @@ from algokit.core.tasks.ipfs import upload_to_web3_storage
 from algokit.core.tasks.mint.models import AssetConfigTxnParams, TokenMetadata
 
 logger = logging.getLogger(__name__)
-
-
-class MetadataStandard(Enum):
-    ARC19 = "arc19"
-    ARC3 = "arc3"
 
 
 def _reserve_address_from_cid(cid: str) -> str:
@@ -101,14 +95,10 @@ def mint_token(  # noqa: PLR0913
     unit_name: str,
     total: int,
     token_metadata: TokenMetadata,
-    metadata_standard: str,
-    is_mutable: bool,
+    mutable: bool,
     image_path: pathlib.Path | None = None,
     decimals: int | None = 0,
 ) -> tuple[int, str]:
-    if metadata_standard not in [MetadataStandard.ARC19.value, MetadataStandard.ARC3.value]:
-        raise ValueError("Invalid metadata standard provided!")
-
     if not token_metadata.name or token_metadata.name != asset_name:
         raise ValueError("Token name in metadata JSON must match CLI argument providing token name!")
 
@@ -132,13 +122,11 @@ def mint_token(  # noqa: PLR0913
     asset_config_params = AssetConfigTxnParams(
         sender=creator_account.address,
         sp=client.suggested_params(),
-        reserve=_reserve_address_from_cid(metadata_cid),
+        reserve=_reserve_address_from_cid(metadata_cid) if mutable else "",
         unit_name=unit_name,
         asset_name=asset_name,
-        url=_create_url_from_cid(metadata_cid) + "#arc3"
-        if metadata_standard == MetadataStandard.ARC19.value
-        else "ipfs://" + metadata_cid + "#arc3",
-        manager=creator_account.address if is_mutable else "",
+        url=_create_url_from_cid(metadata_cid) + "#arc3" if mutable else "ipfs://" + metadata_cid + "#arc3",
+        manager=creator_account.address if mutable else "",
         total=total,
         decimals=decimals,
     )
@@ -146,7 +134,7 @@ def mint_token(  # noqa: PLR0913
     asset_config_txn = _create_asset_txn(
         asset_config_params=asset_config_params,
         token_metadata=token_metadata,
-        use_metadata_hash=metadata_standard == MetadataStandard.ARC3.value,
+        use_metadata_hash=not mutable,
     )
     signed_asset_config_txn = asset_config_txn.sign(creator_account.private_key)  # type: ignore[no-untyped-call]
     asset_config_txn_id = client.send_transaction(signed_asset_config_txn)
