@@ -24,7 +24,7 @@ keyring = "^24.2.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
 algokit-utils = "^1.4.0"
-py-multiformats-cid = "^0.4.4"
+multiformats = "^0.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

@@ -286,18 +286,22 @@ files = [
 ]
 
 [[package]]
-name = "base58"
-version = "2.1.1"
-description = "Base58 and Base58Check implementation."
+name = "bases"
+version = "0.2.1"
+description = "Python library for general Base-N encodings."
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 files = [
-    {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
-    {file = "base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c"},
+    {file = "bases-0.2.1-py3-none-any.whl", hash = "sha256:d030b5e349773ad2a067bfaaf3a9794b70d23a1f923033c15c2e0ce869854f6d"},
+    {file = "bases-0.2.1.tar.gz", hash = "sha256:b0999e14725b59bff38974b00e918629e0e29f3d80a40e022c6f0f8d5cdff9d4"},
 ]
 
+[package.dependencies]
+typing-extensions = "*"
+typing-validation = "*"
+
 [package.extras]
-tests = ["PyHamcrest (>=2.0.2)", "mypy", "pytest (>=4.6)", "pytest-benchmark", "pytest-cov", "pytest-flake8"]
+dev = ["base58", "mypy", "pylint", "pytest", "pytest-cov"]
 
 [[package]]
 name = "beautifulsoup4"
@@ -1379,16 +1383,6 @@ files = [
 ]
 
 [[package]]
-name = "morphys"
-version = "1.0"
-description = "Smart conversions between unicode and bytes types for common cases"
-optional = false
-python-versions = "*"
-files = [
-    {file = "morphys-1.0-py2.py3-none-any.whl", hash = "sha256:76d6dbaa4d65f597e59d332c81da786d83e4669387b9b2a750cfec74e7beec20"},
-]
-
-[[package]]
 name = "mrjob"
 version = "0.7.4"
 description = "Python MapReduce framework"
@@ -1574,6 +1568,44 @@ files = [
     {file = "multidict-6.0.4-cp39-cp39-win_amd64.whl", hash = "sha256:33029f5734336aa0d4c0384525da0387ef89148dc7191aae00ca5fb23d7aafc2"},
     {file = "multidict-6.0.4.tar.gz", hash = "sha256:3666906492efb76453c0e7b97f2cf459b0682e7402c0489a95484965dbc1da49"},
 ]
+
+[[package]]
+name = "multiformats"
+version = "0.2.1"
+description = "Python implementation of multiformats protocols."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "multiformats-0.2.1-py3-none-any.whl", hash = "sha256:0655fad05cff4cb9eaae3a0f61c4cf8189857fef5a5d0ade6aa25d6b8439e204"},
+    {file = "multiformats-0.2.1.tar.gz", hash = "sha256:4aee6eb5289c3cd00315e3f2b97e36b60db6af9bcec91d65f32d7155942dbef9"},
+]
+
+[package.dependencies]
+bases = "*"
+multiformats-config = "*"
+typing-extensions = "*"
+typing-validation = "*"
+
+[package.extras]
+dev = ["blake3", "mmh3", "mypy", "pycryptodomex", "pylint", "pysha3", "pyskein", "pytest", "pytest-cov"]
+full = ["blake3", "mmh3", "pycryptodomex", "pysha3", "pyskein"]
+
+[[package]]
+name = "multiformats-config"
+version = "0.2.0.post4"
+description = "Pre-loading configuration module for the 'multiformats' package."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "multiformats-config-0.2.0.post4.tar.gz", hash = "sha256:3b5d0be63211681edbcf887abe149fc17b43a79d0c009fb44232af9addf7a309"},
+    {file = "multiformats_config-0.2.0.post4-py3-none-any.whl", hash = "sha256:221a630732f7bb2cd6cb708b94a85da683e29618e4a2055eea1bf4f980feefce"},
+]
+
+[package.dependencies]
+multiformats = "*"
+
+[package.extras]
+dev = ["mypy", "pylint", "pytest", "pytest-cov"]
 
 [[package]]
 name = "mypy"
@@ -1907,72 +1939,6 @@ pycryptodomex = ">=3.6.0,<4"
 pynacl = ">=1.4.0,<2"
 
 [[package]]
-name = "py-multibase"
-version = "1.0.3"
-description = "Multibase implementation for Python"
-optional = false
-python-versions = "*"
-files = [
-    {file = "py-multibase-1.0.3.tar.gz", hash = "sha256:d28a20efcbb61eec28f55827a0bf329c7cea80fffd933aecaea6ae8431267fe4"},
-    {file = "py_multibase-1.0.3-py2.py3-none-any.whl", hash = "sha256:2677c1fafcc0ae15ddb9c7f444c5becc2530b3889124fd4fa2959ddfefb8c15b"},
-]
-
-[package.dependencies]
-morphys = ">=1.0,<2.0"
-python-baseconv = ">=1.2.0,<2.0"
-six = ">=1.10.0,<2.0"
-
-[[package]]
-name = "py-multicodec"
-version = "0.2.1"
-description = "Multicodec implementation in Python"
-optional = false
-python-versions = "*"
-files = [
-    {file = "py-multicodec-0.2.1.tar.gz", hash = "sha256:83021ffe8c0e272d19b5b86bc5b39efa67c8e9f4735ce6cafdbc1ace767ec647"},
-    {file = "py_multicodec-0.2.1-py2.py3-none-any.whl", hash = "sha256:55b6bb53088a63e56c434cb11b29795e8805652bac43d50a8f2a9bcf5ca84e1f"},
-]
-
-[package.dependencies]
-morphys = ">=1.0,<2.0"
-six = ">=1.10.0,<2.0"
-varint = ">=1.0.2,<2.0.0"
-
-[[package]]
-name = "py-multiformats-cid"
-version = "0.4.4"
-description = "Self-describing content-addressed identifiers for distributed systems"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "py_multiformats_cid-0.4.4-py2.py3-none-any.whl", hash = "sha256:83f6c3109ed56664799c7367703a68d1724b1e9bd79b45c8935c77660560d1dd"},
-]
-
-[package.dependencies]
-base58 = "*"
-morphys = "*"
-py-multibase = "*"
-py-multicodec = "*"
-py-multihash = "*"
-
-[[package]]
-name = "py-multihash"
-version = "2.0.1"
-description = "Multihash implementation in Python"
-optional = false
-python-versions = "*"
-files = [
-    {file = "py-multihash-2.0.1.tar.gz", hash = "sha256:b97511a87b7091f8b37a3d74ccb4a898e133529e7c5e431f9a27f78248a75e60"},
-    {file = "py_multihash-2.0.1-py2.py3-none-any.whl", hash = "sha256:c388728b3456d35cd6668b42a3d9ba32dd640493c8e93b992979668dcf2c0676"},
-]
-
-[package.dependencies]
-base58 = ">=1.0.2,<3.0"
-morphys = ">=1.0,<2.0"
-six = ">=1.10.0,<2.0"
-varint = ">=1.0.2,<2.0"
-
-[[package]]
 name = "py-serializable"
 version = "0.11.1"
 description = "Library for serializing and deserializing Python Objects to and from JSON and XML."
@@ -2283,16 +2249,6 @@ pytest = ">=5.0"
 
 [package.extras]
 dev = ["pre-commit", "pytest-asyncio", "tox"]
-
-[[package]]
-name = "python-baseconv"
-version = "1.2.2"
-description = "Convert numbers from base 10 integers to base X strings and back again."
-optional = false
-python-versions = "*"
-files = [
-    {file = "python-baseconv-1.2.2.tar.gz", hash = "sha256:0539f8bd0464013b05ad62e0a1673f0ac9086c76b43ebf9f833053527cd9931b"},
-]
 
 [[package]]
 name = "python-dotenv"
@@ -2969,6 +2925,20 @@ files = [
 ]
 
 [[package]]
+name = "typing-validation"
+version = "1.0.0.post2"
+description = "A simple library for runtime type-checking."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "typing-validation-1.0.0.post2.tar.gz", hash = "sha256:6a30dec74373f9dca29db6f79ef65eb765a6934c09d87639cf422288933b2aa4"},
+    {file = "typing_validation-1.0.0.post2-py3-none-any.whl", hash = "sha256:c9f5cb42435ee59fcf5a1a69dc88ccd5dc6f904436e61b5b8c276906a1c9e454"},
+]
+
+[package.extras]
+dev = ["mypy", "pylint", "pytest", "pytest-cov", "rich"]
+
+[[package]]
 name = "unify"
 version = "0.5"
 description = "Modifies strings to all use the same (single/double) quote where possible."
@@ -3007,16 +2977,6 @@ brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
 secure = ["certifi", "cryptography (>=1.9)", "idna (>=2.0.0)", "pyopenssl (>=17.1.0)", "urllib3-secure-extra"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
-
-[[package]]
-name = "varint"
-version = "1.0.2"
-description = "Simple python varint implementation"
-optional = false
-python-versions = "*"
-files = [
-    {file = "varint-1.0.2.tar.gz", hash = "sha256:a6ecc02377ac5ee9d65a6a8ad45c9ff1dac8ccee19400a5950fb51d594214ca5"},
-]
 
 [[package]]
 name = "virtualenv"
@@ -3279,4 +3239,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8207b46ff00ada0de6e381c2812cb460a71ebbfc0d13cd347f58c437d260de40"
+content-hash = "b3d75225130ce524a83c4879371c02fcf109dca5ffa6b227e91f8a90cf1dc560"

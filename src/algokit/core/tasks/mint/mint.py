@@ -8,12 +8,11 @@ import re
 from dataclasses import asdict
 from enum import Enum
 
-import multihash  # type: ignore[import]
 from algokit_utils import Account
 from algosdk import encoding, transaction
 from algosdk.transaction import wait_for_confirmation
 from algosdk.v2client import algod
-from multiformats_cid.cid import make_cid
+from multiformats import CID
 
 from algokit.core.tasks.ipfs import upload_to_web3_storage
 from algokit.core.tasks.mint.models import AssetConfigTxnParams, TokenMetadata
@@ -27,19 +26,21 @@ class MetadataStandard(Enum):
 
 
 def _reserve_address_from_cid(cid: str) -> str:
-    decoded_cid = multihash.decode(make_cid(cid).multihash)
-    reserve_address = str(encoding.encode_address(decoded_cid.digest))  # type: ignore[no-untyped-call]
+    # Workaround to fix `multiformats` package issue, remove first two bytes before using `encode_address`.
+    # Initial fix using `py-multiformats-cid` and `multihash.decode` was dropped due to PEP 517 incompatibility.
+    digest = CID.decode(cid).digest[2:]
+    reserve_address = str(encoding.encode_address(digest))  # type: ignore[no-untyped-call]
     assert encoding.is_valid_address(reserve_address)  # type: ignore[no-untyped-call]
     return reserve_address
 
 
 def _create_url_from_cid(cid: str) -> str:
-    cid_object = make_cid(cid)
+    cid_object = CID.decode(cid)
     version = cid_object.version
-    codec = cid_object.codec
-    decoded_multihash = multihash.decode(cid_object.multihash).name
+    codec = cid_object.codec.name
+    hash_function_name = cid_object.hashfun.name
 
-    url = f"template-ipfs://{{ipfscid:{version}:{codec}:reserve:{decoded_multihash}}}"
+    url = f"template-ipfs://{{ipfscid:{version}:{codec}:reserve:{hash_function_name}}}"
     valid = re.compile(
         r"template-ipfs://{ipfscid:(?P<version>[01]):(?P<codec>[a-z0-9\-]+):(?P<field>[a-z0-9\-]+):(?P<hash>[a-z0-9\-]+)}"
     )
