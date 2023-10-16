@@ -1,11 +1,9 @@
-import base64
-import hashlib
 import json
 import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from algosdk import transaction
+MIN_BG_COLOR_LENGTH = 6  # Based on ARC-0003 spec, must be a 6 character hex without a pre-pended #
 
 
 @dataclass
@@ -28,10 +26,10 @@ class Localization:
 
 @dataclass
 class TokenMetadata:
-    name: str
-    description: str
-    properties: Properties
-    decimals: int = 0
+    name: str | None = None
+    description: str | None = None
+    properties: Properties | None = None
+    decimals: int | None = None
     image: str | None = None
     image_integrity: str | None = None
     image_mimetype: str | None = None
@@ -45,13 +43,13 @@ class TokenMetadata:
     localization: Localization | None = None
     extra_metadata: str | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.image_mimetype and not self.image_mimetype.startswith("image/"):
             raise ValueError("image_mimetype must start with 'image/'")
         if self.external_url_mimetype and self.external_url_mimetype != "text/html":
             raise ValueError("external_url_mimetype must be 'text/html'")
         if self.background_color and (
-            len(self.background_color) != 6
+            len(self.background_color) != MIN_BG_COLOR_LENGTH
             or not all(char.isdigit() or char.islower() for char in self.background_color)
         ):
             raise ValueError("background_color must be a six-character hexadecimal without a pre-pended #.")
@@ -71,10 +69,13 @@ class TokenMetadata:
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
         except json.JSONDecodeError as err:
-            raise ValueError(f"Failed to decode JSON from file {file_path}: {e}") from err
+            raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
     @classmethod
-    def from_json_file(cls: type["TokenMetadata"], file_path: Path) -> "TokenMetadata":
+    def from_json_file(cls: type["TokenMetadata"], file_path: Path | None) -> "TokenMetadata":
+        if not file_path:
+            return cls()
+
         try:
             with file_path.open() as file:
                 data = json.load(file)
@@ -82,63 +83,25 @@ class TokenMetadata:
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
         except json.JSONDecodeError as err:
-            raise ValueError(f"Failed to decode JSON from file {file_path}: {e}") from err
+            raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
 
-def create_asset_txn(
-    *,
-    token_metadata: TokenMetadata,
-    sender: str,
-    sp: object,
-    unit_name: str,
-    asset_name: str,
-    url: str,
-    manager: str,
-    reserve: str,
-    freeze: str = "",
-    clawback: str = "",
-    note: str = "",
-    total: int = 1,
-    default_frozen: bool = False,
-    lease: str = "",
-    rekey_to: str = "",
-    metadata_hash: bool = True,
-) -> transaction.AssetConfigTxn:
-    metadata = json.loads(token_metadata.to_json())
-
-    if metadata_hash:
-        h = hashlib.new("sha512_256")
-        h.update(b"arc0003/amj")
-        h.update(metadata.encode("utf-8"))
-        json_metadata_hash = h.digest()
-
-        h = hashlib.new("sha512_256")
-        h.update(b"arc0003/am")
-
-        h.update(json_metadata_hash)
-        if "extra_metadata" in metadata:
-            h.update(base64.b64decode(metadata["extra_metadata"]))
-        am = h.digest()
-    else:
-        am = ""
-
-    transaction_dict = {
-        "sender": sender,
-        "sp": sp,
-        "total": total,
-        "default_frozen": default_frozen,
-        "manager": manager,
-        "reserve": reserve,
-        "freeze": freeze,
-        "clawback": clawback,
-        "unit_name": unit_name,
-        "asset_name": asset_name,
-        "url": url,
-        "metadata_hash": am,
-        "note": note,
-        "lease": lease,
-        "strict_empty_address_check": False,
-        "rekey_to": rekey_to,
-    }
-
-    return transaction.AssetConfigTxn(**transaction_dict)
+@dataclass
+class AssetConfigTxnParams:
+    sender: str
+    sp: object
+    unit_name: str
+    asset_name: str
+    url: str
+    manager: str
+    reserve: str
+    total: int
+    freeze: str | None = ""
+    clawback: str | None = ""
+    note: str | None = ""
+    decimals: int | None = 0
+    default_frozen: bool = False
+    lease: str | None = ""
+    rekey_to: str | None = ""
+    metadata_hash: bytes | None = None
+    strict_empty_address_check: bool = False

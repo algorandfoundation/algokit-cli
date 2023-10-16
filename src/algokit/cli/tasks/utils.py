@@ -265,6 +265,30 @@ def get_transaction_explorer_url(transaction_id: str, network: str) -> str:
         raise ValueError(f"Invalid network: {network}")
 
 
+def get_asset_explorer_url(asset_id: int, network: str) -> str:
+    """
+    Returns a URL for exploring a asset on the specified network.
+
+    Args:
+        asset_id (int): The ID of the asset.
+        network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
+
+    Returns:
+        str: The URL for exploring the asset on the specified network.
+
+    Raises:
+        ValueError: If the network is invalid.
+    """
+    if network == "localnet":
+        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/asset/{asset_id}/"
+    elif network == "testnet":
+        return f"https://testnet.explorer.perawallet.app/assets/{asset_id}"
+    elif network == "mainnet":
+        return f"https://explorer.perawallet.app/assets/{asset_id}"
+    else:
+        raise ValueError(f"Invalid network: {network}")
+
+
 def stdin_has_content() -> bool:
     """
     Checks if there is content in the standard input.
