@@ -104,7 +104,7 @@ def test_vanity_address_on_termination(mocker: MockerFixture) -> None:
     mock_pool.side_effect = KeyboardInterrupt()
     # Mocking functions within the thread is tricky hence the use of side_effect on the range is used to simulate
     # the KeyboardInterrupt
-    mocker.patch("algokit.core.tasks.vanity_address.range", side_effect=[range(2), KeyboardInterrupt()])
+    mocker.patch("algokit.core.tasks.vanity_address.generate_vanity_address", side_effect=[KeyboardInterrupt()])
 
     result = invoke("task vanity-address AAAAAA")
 
