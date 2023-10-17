@@ -95,7 +95,7 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
 
 @click.command(
     name="mint",
-    help="Mint a new fungible or non-fungible assets on Algorand.",
+    help="Mint new fungible or non-fungible assets on Algorand.",
 )
 @click.option(
     "--creator",

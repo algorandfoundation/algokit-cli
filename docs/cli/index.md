@@ -758,7 +758,7 @@ Human readable name for this upload, for use in file listings.
 
 ### mint
 
-Mint a new fungible or non-fungible assets on Algorand.
+Mint new fungible or non-fungible assets on Algorand.
 
 ```shell
 algokit task mint [OPTIONS]

@@ -155,7 +155,7 @@ def mint_token(  # noqa: PLR0913
     decimals: int | None = 0,
 ) -> tuple[int, str]:
     """
-    Mint a new token on the Algorand blockchain.
+    Mint new token on the Algorand blockchain.
 
     Args:
         client (algod.AlgodClient): An instance of the `algod.AlgodClient` class representing the Algorand node.
