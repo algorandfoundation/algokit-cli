@@ -7,4 +7,4 @@ Stopping AlgoKit LocalNet now...
 DEBUG: Running 'docker compose stop' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
-Sandbox Stopped; execute `algokit localnet start` to start it again.
+LocalNet Stopped; execute `algokit localnet start` to start it again.
