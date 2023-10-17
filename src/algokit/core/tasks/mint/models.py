@@ -3,6 +3,8 @@ import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from algosdk.transaction import SuggestedParams
+
 MIN_BG_COLOR_LENGTH = 6  # Based on ARC-0003 spec, must be a 6 character hex without a pre-pended #
 
 
@@ -89,7 +91,7 @@ class TokenMetadata:
 @dataclass
 class AssetConfigTxnParams:
     sender: str
-    sp: object
+    sp: SuggestedParams
     unit_name: str
     asset_name: str
     url: str
@@ -105,3 +107,8 @@ class AssetConfigTxnParams:
     rekey_to: str | None = ""
     metadata_hash: bytes | None = None
     strict_empty_address_check: bool = False
+
+    def to_json(self, indent: int | None = 4) -> str:
+        # Filter out None values before converting to JSON
+        data_dict = {k: v for k, v in asdict(self).items() if v is not None and k != "sp"}
+        return json.dumps(data_dict, indent=indent)

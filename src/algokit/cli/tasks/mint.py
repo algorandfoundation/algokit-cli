@@ -3,14 +3,24 @@ import math
 from pathlib import Path
 
 import click
+from algosdk.error import AlgodHTTPError
+from algosdk.util import algos_to_microalgos
 
 from algokit.cli.tasks.utils import (
     get_account_with_private_key,
     get_asset_explorer_url,
     get_transaction_explorer_url,
     load_algod_client,
+    validate_balance,
 )
-from algokit.core.tasks.ipfs import get_web3_storage_api_key
+from algokit.core.tasks.ipfs import (
+    Web3StorageBadRequestError,
+    Web3StorageForbiddenError,
+    Web3StorageHttpError,
+    Web3StorageInternalServerError,
+    Web3StorageUnauthorizedError,
+    get_web3_storage_api_key,
+)
 from algokit.core.tasks.mint.mint import mint_token
 from algokit.core.tasks.mint.models import TokenMetadata
 
@@ -18,10 +28,20 @@ logger = logging.getLogger(__name__)
 
 MAX_UNIT_NAME_BYTE_LENGTH = 8
 MAX_ASSET_NAME_BYTE_LENGTH = 32
+ASSET_MINTING_MBR = 0.2  # Algos, 0.1 for base account, 0.1 for asset creation
 
 
 def _validate_supply(total: int, decimals: int) -> None:
-    # Validate total and decimals
+    """
+    Validate the total supply and decimal places of a token.
+
+    Args:
+        total (int): The total supply of the token.
+        decimals (int): The number of decimal places for the token.
+
+    Raises:
+        click.ClickException: If the validation fails.
+    """
     if not (total == 1 or (total % 10 == 0 and total != 0)):
         raise click.ClickException("Total must be 1 or a power of 10 larger than 1 (10, 100, 1000, ...).")
     if not ((total == 1 and decimals == 0) or (total != 1 and decimals == int(math.log10(total)))):
@@ -32,6 +52,18 @@ def _validate_supply(total: int, decimals: int) -> None:
 
 
 def _validate_unit_name(context: click.Context, param: click.Parameter, value: str) -> str:
+    """
+    Validate the unit name by checking if its byte length is less than or equal to a predefined maximum value.
+
+    Args:
+        context (click.Context): The click context.
+        param (click.Parameter): The click parameter.
+        value (str): The value of the parameter.
+
+    Returns:
+        str: The value of the parameter if it passes the validation.
+    """
+
     if len(value.encode("utf-8")) <= MAX_UNIT_NAME_BYTE_LENGTH:
         return value
     else:
@@ -41,6 +73,18 @@ def _validate_unit_name(context: click.Context, param: click.Parameter, value: s
 
 
 def _validate_asset_name(context: click.Context, param: click.Parameter, value: str) -> str:
+    """
+    Validate the asset name by checking if its byte length is less than or equal to a predefined maximum value.
+
+    Args:
+        context (click.Context): The click context.
+        param (click.Parameter): The click parameter.
+        value (str): The value of the parameter.
+
+    Returns:
+        str: The value of the parameter if it passes the validation.
+    """
+
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
         return value
     else:
@@ -166,24 +210,41 @@ def mint(  # noqa: PLR0913
         raise click.ClickException("You are not logged in! Please login using `algokit ipfs login`.")
 
     client = load_algod_client(network)
+    validate_balance(
+        client, creator_account, 0, algos_to_microalgos(ASSET_MINTING_MBR)  # type: ignore[no-untyped-call]
+    )
 
     token_metadata = TokenMetadata.from_json_file(token_metadata_path)
     if not token_metadata_path:
         token_metadata.name = asset_name
         token_metadata.decimals = decimals
+    try:
+        asset_id, txn_id = mint_token(
+            client=client,
+            api_key=web3_storage_api_key,
+            creator_account=creator_account,
+            token_metadata=token_metadata,
+            image_path=image_path,
+            unit_name=unit_name,
+            asset_name=asset_name,
+            mutable=mutable,
+            total=total,
+        )
 
-    asset_id, txn_id = mint_token(
-        client=client,
-        api_key=web3_storage_api_key,
-        creator_account=creator_account,
-        token_metadata=token_metadata,
-        image_path=image_path,
-        unit_name=unit_name,
-        asset_name=asset_name,
-        mutable=mutable,
-        total=total,
-    )
-
-    click.echo("\nSuccessfully minted the asset!")
-    click.echo(f"Browse your asset at: {get_asset_explorer_url(asset_id, network)}")
-    click.echo(f"Check transaction status at: {get_transaction_explorer_url(txn_id, network)}")
+        click.echo("\nSuccessfully minted the asset!")
+        click.echo(f"Browse your asset at: {get_asset_explorer_url(asset_id, network)}")
+        click.echo(f"Check transaction status at: {get_transaction_explorer_url(txn_id, network)}")
+    except (
+        Web3StorageBadRequestError,
+        Web3StorageUnauthorizedError,
+        Web3StorageForbiddenError,
+        Web3StorageInternalServerError,
+        Web3StorageHttpError,
+    ) as ex:
+        logger.debug(ex)
+        raise click.ClickException(repr(ex)) from ex
+    except AlgodHTTPError as ex:
+        raise click.ClickException(str(ex)) from ex
+    except Exception as ex:
+        logger.debug(ex, exc_info=True)
+        raise click.ClickException("Failed to mint the asset!") from ex

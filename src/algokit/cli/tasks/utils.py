@@ -12,30 +12,34 @@ from algokit_utils import (
     get_algonode_config,
     get_default_localnet_config,
 )
+from algosdk.util import microalgos_to_algos
 
 from algokit.core.tasks.wallet import get_alias
 
 logger = logging.getLogger(__name__)
 
 
-def _validate_asset_balance(sender_account_info: dict, receiver_account_info: dict, asset_id: int, amount: int) -> None:
-    sender_asset_record = next(
-        (asset for asset in sender_account_info.get("assets", []) if asset["asset-id"] == asset_id), None
-    )
-    receiver_asset_record = next(
-        (asset for asset in receiver_account_info.get("assets", []) if asset["asset-id"] == asset_id), None
-    )
-    if not sender_asset_record:
-        raise click.ClickException("Sender is not opted into the asset")
-    if sender_asset_record["amount"] < amount:
-        raise click.ClickException("Insufficient asset balance in sender account")
-    if not receiver_asset_record:
-        raise click.ClickException("Receiver is not opted into the asset")
+def _validate_asset_balance(account_info: dict, asset_id: int, decimals: int, amount: int = 0) -> None:
+    asset_record = next((asset for asset in account_info.get("assets", []) if asset["asset-id"] == asset_id), None)
+
+    if not asset_record:
+        raise click.ClickException("Account is not opted into the asset")
+
+    if amount > 0 and asset_record["amount"] < amount:
+        required = amount / 10**decimals
+        available = asset_record["amount"] / 10**decimals
+        raise click.ClickException(
+            f"Insufficient asset balance in account, required: {required}, available: {available}"
+        )
 
 
-def _validate_algo_balance(sender_account_info: dict, amount: int) -> None:
-    if sender_account_info.get("amount", 0) < amount:
-        raise click.ClickException("Insufficient Algos balance in sender account")
+def _validate_algo_balance(account_info: dict, amount: int) -> None:
+    if account_info.get("amount", 0) < amount:
+        required = microalgos_to_algos(amount)  # type: ignore[no-untyped-call]
+        available = microalgos_to_algos(account_info.get("amount", 0))  # type: ignore[no-untyped-call]
+        raise click.ClickException(
+            f"Insufficient Algos balance in account, required: {required} Algos, available: {available} Algos"
+        )
 
 
 def get_private_key_from_mnemonic() -> str:
@@ -127,33 +131,32 @@ def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algod
 
 
 def validate_balance(
-    sender: Account, receiver: str, asset_id: int, amount: int, algod_client: algosdk.v2client.algod.AlgodClient
+    algod_client: algosdk.v2client.algod.AlgodClient, account: Account | str, asset_id: int, amount: int = 0
 ) -> None:
     """
-    Validates the balance of a sender's account before transferring assets or Algos to a receiver's account.
+    Validates the balance of an account before an operation.
 
     Args:
-        sender (Account): The sender's account object.
-        receiver (str): The receiver's account address.
-        asset_id (int): The ID of the asset to be transferred (0 for Algos).
-        amount (int): The amount of Algos or asset to be transferred.
         algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
         interacting with the Algorand blockchain.
+        account (Account | str): The account object.
+        asset_id (int): The ID of the asset to be checked (0 for Algos).
+        amount (int): The amount of Algos or asset for the operation. Defaults to 0 implying opt-in check only.
 
     Raises:
         click.ClickException: If any validation check fails.
     """
+    address = account.address if isinstance(account, Account) else account
+    account_info = algod_client.account_info(address)
 
-    sender_account_info = algod_client.account_info(sender.address)
-    receiver_account_info = algod_client.account_info(receiver)
-
-    if not isinstance(sender_account_info, dict) or not isinstance(receiver_account_info, dict):
+    if not isinstance(account_info, dict):
         raise click.ClickException("Invalid account info response")
 
     if asset_id == 0:
-        _validate_algo_balance(sender_account_info, amount)
+        _validate_algo_balance(account_info, amount)
     else:
-        _validate_asset_balance(sender_account_info, receiver_account_info, asset_id, amount)
+        decimals = get_asset_decimals(asset_id, algod_client)
+        _validate_asset_balance(account_info, asset_id, decimals, amount)
 
 
 def validate_address(address: str) -> None:
