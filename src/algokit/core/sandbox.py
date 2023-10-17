@@ -86,14 +86,14 @@ class ComposeSandbox:
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
         self._run_compose_command("stop", bad_return_code_error_message="Failed to stop LocalNet")
-        logger.info("Sandbox Stopped; execute `algokit localnet start` to start it again.")
+        logger.info("LocalNet Stopped; execute `algokit localnet start` to start it again.")
 
     def down(self) -> None:
         logger.info("Deleting any existing LocalNet...")
         self._run_compose_command("down", stdout_log_level=logging.DEBUG)
 
     def pull(self) -> None:
-        logger.info("Looking for latest Sandbox images from DockerHub...")
+        logger.info("Fetching any container updates from DockerHub...")
         self._run_compose_command("pull --ignore-pull-failures --quiet")
 
     def logs(self, *, follow: bool = False, no_color: bool = False, tail: str | None = None) -> None:
