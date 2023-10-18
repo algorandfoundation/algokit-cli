@@ -1,0 +1,4 @@
+Usage: algokit task opt-in [OPTIONS] ASSET_IDS ACCOUNT
+Try 'algokit task opt-in -h' for help.
+
+Error: Invalid value for '-n' / '--network': 'invalid-network' is not one of 'localnet', 'testnet', 'mainnet'.

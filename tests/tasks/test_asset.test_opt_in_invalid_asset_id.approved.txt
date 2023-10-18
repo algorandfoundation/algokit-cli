@@ -1,0 +1,3 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: asset does not exist
+Error: Failed to perform opt-in
