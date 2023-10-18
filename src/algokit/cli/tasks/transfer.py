@@ -83,7 +83,8 @@ def transfer(  # noqa: PLR0913
 
     # Validate inputs
     validate_address(receiver_address)
-    validate_balance(sender_account, receiver_address, asset_id, amount, algod_client)
+    validate_balance(algod_client, sender_account, asset_id, amount)
+    validate_balance(algod_client, receiver_address, asset_id)
 
     # Transfer algos or assets depending on asset_id
     txn_response: PaymentTxn | AssetTransferTxn | None = None

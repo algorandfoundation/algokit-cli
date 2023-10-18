@@ -1,0 +1,25 @@
+Uploading image to Web3 Storage...
+Image uploaded to Web3 Storage: ipfs://bafkreifax6dswcxk4us2am3jxhd3swxew32oreaxzol7dnnqzhieepqg2y
+Uploading metadata to Web3 Storage...
+Metadata uploaded to Web3 Storage: bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe
+DEBUG: Asset config params: {
+    "sender": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
+    "unit_name": "tst",
+    "asset_name": "test",
+    "url": "template-ipfs://{ipfscid:1:raw:reserve:sha2-256}#arc3",
+    "manager": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
+    "reserve": "WNQLRZXLXINUJI6X5EOBU5K5FJ6VOERJ4SVGZTMZGLHA25KSLVY55WGVYQ",
+    "total": 1,
+    "freeze": "",
+    "clawback": "",
+    "note": "",
+    "decimals": 0,
+    "default_frozen": false,
+    "lease": "",
+    "rekey_to": "",
+    "strict_empty_address_check": false
+}
+
+Successfully minted the asset!
+Browse your asset at: https://testnet.explorer.perawallet.app/assets/123
+Check transaction status at: https://testnet.algoexplorer.io/tx/dummy_tx_id

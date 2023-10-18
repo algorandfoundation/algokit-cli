@@ -104,33 +104,45 @@
     - [Options](#options-17)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--1)
-    - [nfd-lookup](#nfd-lookup)
+    - [mint](#mint)
     - [Options](#options-18)
+    - [--creator ](#--creator-)
+    - [-n, --name ](#-n---name--2)
+    - [-u, --unit ](#-u---unit-)
+    - [-t, --total ](#-t---total-)
+    - [-d, --decimals ](#-d---decimals-)
+    - [-i, --image ](#-i---image-)
+    - [-m, --metadata ](#-m---metadata-)
+    - [--mutable, --immutable](#--mutable---immutable)
+    - [--nft, --ft](#--nft---ft)
+    - [-n, --network ](#-n---network-)
+    - [nfd-lookup](#nfd-lookup)
+    - [Options](#options-19)
     - [-o, --output ](#-o---output--2)
     - [Arguments](#arguments-5)
     - [VALUE](#value)
     - [send](#send)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
-    - [-n, --network ](#-n---network-)
+    - [-n, --network ](#-n---network--1)
     - [sign](#sign)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-a, --account ](#-a---account-)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--3)
     - [--force](#--force-1)
     - [transfer](#transfer)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
     - [-a, --amount ](#-a---amount--1)
     - [--whole-units](#--whole-units-2)
-    - [-n, --network ](#-n---network--1)
+    - [-n, --network ](#-n---network--2)
     - [vanity-address](#vanity-address)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--4)
     - [-a, --alias ](#-a---alias-)
@@ -139,7 +151,7 @@
     - [Arguments](#arguments-6)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-23)
+    - [Options](#options-24)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -147,11 +159,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-8)
     - [ALIAS](#alias)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-9)
     - [ALIAS](#alias-1)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -743,6 +755,65 @@ algokit task ipfs upload [OPTIONS]
 
 ### -n, --name <name>
 Human readable name for this upload, for use in file listings.
+
+### mint
+
+Mint new fungible or non-fungible assets on Algorand.
+
+```shell
+algokit task mint [OPTIONS]
+```
+
+### Options
+
+
+### --creator <creator>
+**Required** Address or alias of the asset creator.
+
+
+### -n, --name <asset_name>
+**Required** Asset name.
+
+
+### -u, --unit <unit_name>
+**Required** Unit name of the asset.
+
+
+### -t, --total <total>
+Total supply of the asset. Defaults to 1.
+
+
+### -d, --decimals <decimals>
+Number of decimals. Defaults to 0.
+
+
+### -i, --image <image_path>
+**Required** Path to the asset image file to be uploaded to IPFS.
+
+
+### -m, --metadata <token_metadata_path>
+Path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not provided,
+a default metadata object will be generated automatically based on asset-name, decimals and image.
+For more details refer to [https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema).
+
+
+### --mutable, --immutable
+Whether the asset should be mutable or immutable. Refers to ARC19 by default.
+
+
+### --nft, --ft
+Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+definitions of pure or fractional NFTs as per ARC3 standard.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
 
 ### nfd-lookup
 

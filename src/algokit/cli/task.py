@@ -4,6 +4,7 @@ import click
 
 from algokit.cli.tasks.assets import opt_in_command, opt_out_command
 from algokit.cli.tasks.ipfs import ipfs_group
+from algokit.cli.tasks.mint import mint
 from algokit.cli.tasks.nfd import nfd_lookup
 from algokit.cli.tasks.send_transaction import send
 from algokit.cli.tasks.sign_transaction import sign
@@ -26,5 +27,6 @@ task_group.add_command(sign)
 task_group.add_command(send)
 task_group.add_command(ipfs_group)
 task_group.add_command(nfd_lookup)
-task_group.add_command(opt_in_command)
 task_group.add_command(opt_out_command)
+task_group.add_command(opt_in_command)
+task_group.add_command(mint)

@@ -1,0 +1,2 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+Error: You are not logged in! Please login using `algokit ipfs login`.
