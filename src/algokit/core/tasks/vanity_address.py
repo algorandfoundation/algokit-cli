@@ -55,7 +55,7 @@ def _log_progress(count: Value, start_time: float) -> None:  # type: ignore[vali
                 )
                 logger.info(f"Still searching for a match. {message}")
                 last_log_time = timer()
-            time.sleep(PROGRESS_REFRESH_INTERVAL_SECONDS - 1)
+            time.sleep(PROGRESS_REFRESH_INTERVAL_SECONDS)
     except KeyboardInterrupt:
         return
 
