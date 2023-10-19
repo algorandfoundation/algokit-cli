@@ -84,8 +84,8 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 ## Prerequisites
 
 The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
-> **Note**
-Due to compatibility issues, we advise using Python versions up to 3.11 for now.
+> **IMPORTANT**  
+> Due to some dependency compatibility issues with Python 3.12, we advise using Python versions up to 3.11 for now.
 
 AlgoKit also has some runtime dependencies that also need to be available for particular commands.
 
