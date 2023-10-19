@@ -116,7 +116,21 @@ class ComposeSandbox:
         )
         if run_results.exit_code != 0:
             return []
-        data = json.loads(run_results.output)
+
+        data = []
+
+        # docker compose version >= 2.21.0 outputs a blank line when nothing is running
+        # json.loads with a blank line will throw an error
+        if len(run_results.output.strip()) > 0:
+            # docker compose version < 2.21.0 outputs a JSON array, so it will have no newlines
+            if run_results.output.strip().find("\n") == -1:
+                data = json.loads(run_results.output)
+            # docker compose version >= 2.21.0 outputs seperate JSON objects, each on a new line
+            else:
+                for line in run_results.output.split("\n"):
+                    if len(line) > 0:
+                        data.append(json.loads(line))
+
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
