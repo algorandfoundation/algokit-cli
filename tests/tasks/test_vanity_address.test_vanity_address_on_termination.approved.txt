@@ -1,3 +1,0 @@
-
-Aborting vanity address generation...
-Aborted!
