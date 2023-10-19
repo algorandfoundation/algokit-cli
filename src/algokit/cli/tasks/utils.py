@@ -302,3 +302,21 @@ def stdin_has_content() -> bool:
 
     mode = os.fstat(sys.stdin.fileno()).st_mode
     return stat.S_ISFIFO(mode) or stat.S_ISREG(mode)
+
+
+def validate_account_balance_to_opt_in(
+    algod_client: algosdk.v2client.algod.AlgodClient, account: Account, num_assets: int
+) -> None:
+    address = account.address if isinstance(account, Account) else account
+    account_info = algod_client.account_info(address)
+
+    if not isinstance(account_info, dict):
+        raise click.ClickException("Invalid account info response")
+
+    required_algos = num_assets * microalgos_to_algos(0.1)  # type: ignore[no-untyped-call]
+    available_algos = microalgos_to_algos(account_info.get("amount", 0))  # type: ignore[no-untyped-call]
+    if available_algos < required_algos:
+        raise click.ClickException(
+            f"Insufficient Algos balance in account to opt in, required: {available_algos} Algos, available:"
+            f" {available_algos} Algos"
+        )
