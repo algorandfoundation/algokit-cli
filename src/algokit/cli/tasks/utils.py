@@ -307,6 +307,20 @@ def stdin_has_content() -> bool:
 def validate_account_balance_to_opt_in(
     algod_client: algosdk.v2client.algod.AlgodClient, account: Account, num_assets: int
 ) -> None:
+    """
+    Validates the balance of an account before opt in operation.
+    Each asset requires 0.1 Algos to opt in.
+
+    Args:
+        algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
+        interacting with the Algorand blockchain.
+        account (Account | str): The account object.
+        num_assets (int): The number of the assets for opt in (0 for Algos).
+
+    Raises:
+        click.ClickException: If there is an insufficient fund in the account or account is not valid.
+    """
+
     address = account.address if isinstance(account, Account) else account
     account_info = algod_client.account_info(address)
 
