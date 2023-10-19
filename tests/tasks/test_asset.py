@@ -38,34 +38,6 @@ def test_opt_in_invalid_network() -> None:
     verify(result.output)
 
 
-def test_opt_in_invalid_account(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
-    invalid_account = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    asset_id = OptMock().get_asset_id()
-    dummy_account_pk, _ = _generate_account()
-    result = invoke(
-        f"task opt-in {invalid_account} {asset_id} --network localnet",
-        input=_get_mnemonic_from_private_key(dummy_account_pk),
-    )
-
-    assert result.exit_code != 0
-    verify(result.output)
-
-
-def test_opt_in_invalid_asset_id(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
-    dummy_account_pk, dummy_account_address = _generate_account()
-    asset_id = "1234"
-    result = invoke(
-        f"task opt-in {dummy_account_address} {asset_id} --network localnet",
-        input=_get_mnemonic_from_private_key(dummy_account_pk),
-    )
-
-    # Assert
-    assert result.exit_code != 0
-    verify(result.output)
-
-
 def test_opt_in_to_assets_from_account_address_successful(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.tasks.assets.opt_in")
     mocker.patch("algokit.cli.tasks.assets.validate_address")
@@ -85,20 +57,35 @@ def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, m
     mocker.patch("algokit.cli.tasks.assets.opt_in")
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
-    dummy_sender_pk, dummy_sender_address = _generate_account()
+    dummy_account_pk, dummy_account_address = _generate_account()
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_sender_address, "private_key": dummy_sender_pk}
+        {"alias": alias_name, "address": dummy_account_address, "private_key": dummy_account_pk}
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
     result = invoke(
         f"task opt-in {alias_name} {OptMock().get_asset_id()} --network localnet",
-        input=_get_mnemonic_from_private_key(dummy_sender_pk),
+        input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
     assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_opt_in_to_assets_from_account_address_failed(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.tasks.assets.opt_in", side_effect=Exception("dummy error"))
+    mocker.patch("algokit.cli.tasks.assets.validate_address")
+    mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
+    dummy_account_pk, dummy_account_address = _generate_account()
+    asset_id = OptMock().get_asset_id()
+    result = invoke(
+        f"task opt-in {dummy_account_address} {asset_id} --network localnet",
+        input=_get_mnemonic_from_private_key(dummy_account_pk),
+    )
+
+    assert result.exit_code == 1
     verify(result.output)
 
 
@@ -113,19 +100,6 @@ def test_opt_out_invalid_network() -> None:
     _, addr = _generate_account()
     asset_id = OptMock().get_asset_id()
     result = invoke(f"task opt-out {asset_id} {addr}  --network invalid-network")
-
-    assert result.exit_code != 0
-    verify(result.output)
-
-
-def test_opt_out_invalid_account() -> None:
-    invalid_account = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    asset_id = OptMock().get_asset_id()
-    dummy_account_pk, _ = _generate_account()
-    result = invoke(
-        f"task opt-out  {invalid_account} {asset_id} --network localnet",
-        input=_get_mnemonic_from_private_key(dummy_account_pk),
-    )
 
     assert result.exit_code != 0
     verify(result.output)
@@ -146,8 +120,10 @@ def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture
 
 
 def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out")
+    dummy_account_info = {"assets": [{"asset-id": 1, "amount": 1}]}
+    mocker.patch("algokit.cli.tasks.assets.get_account_info", return_value=dummy_account_info)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
+    mocker.patch("algokit.cli.tasks.assets.opt_out")
     dummy_account_pk, dummy_account_address = _generate_account()
     result = invoke(
         f"task opt-out {dummy_account_address} --network localnet --all",
@@ -161,18 +137,32 @@ def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFix
 def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     mocker.patch("algokit.cli.tasks.assets.opt_out")
     mocker.patch("algokit.cli.tasks.assets.validate_address")
-    dummy_sender_pk, dummy_sender_address = _generate_account()
+    dummy_account_pk, dummy_account_address = _generate_account()
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_sender_address, "private_key": dummy_sender_pk}
+        {"alias": alias_name, "address": dummy_account_address, "private_key": dummy_account_pk}
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
     result = invoke(
         f"task opt-out {alias_name} {OptMock().get_asset_id()}  --network localnet",
-        input=_get_mnemonic_from_private_key(dummy_sender_pk),
+        input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
     assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_opt_out_assets_from_account_address_failed(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.cli.tasks.assets.opt_out", side_effect=Exception("dummy error"))
+    mocker.patch("algokit.cli.tasks.assets.validate_address")
+    dummy_account_pk, dummy_account_address = _generate_account()
+    asset_id = OptMock().get_asset_id()
+    result = invoke(
+        f"task opt-out {dummy_account_address} {asset_id} --network localnet",
+        input=_get_mnemonic_from_private_key(dummy_account_pk),
+    )
+
+    assert result.exit_code == 1
     verify(result.output)

@@ -5,6 +5,7 @@ from algokit_utils import opt_in, opt_out
 from algosdk import error
 
 from algokit.cli.tasks.utils import (
+    get_account_info,
     get_account_with_private_key,
     load_algod_client,
     validate_account_balance_to_opt_in,
@@ -80,8 +81,8 @@ def opt_out_command(asset_ids: str, account: str, network: str, all_assets: bool
     asset_ids_list = []
     try:
         if all_assets:
-            account_info = algod_client.account_info(opt_out_account.address)
-            for asset in account_info.get("assets", []):  # type: ignore  # noqa: PGH003
+            account_info = get_account_info(algod_client, opt_out_account.address)
+            for asset in account_info.get("assets", []):
                 if asset["amount"] == 0:
                     asset_ids_list.append(int(asset["asset-id"]))
         else:
@@ -93,7 +94,8 @@ def opt_out_command(asset_ids: str, account: str, network: str, all_assets: bool
 
     except error.AlgodHTTPError as err:
         raise click.ClickException(str(err)) from err
-
+    except ConnectionRefusedError as err:
+        raise click.ClickException(str(err)) from err
     except Exception as err:
         logger.debug(err, exc_info=True)
         raise click.ClickException("Failed to perform opt-out.") from err

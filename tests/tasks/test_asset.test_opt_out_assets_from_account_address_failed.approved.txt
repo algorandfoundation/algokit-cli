@@ -1,0 +1,3 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: dummy error
+Error: Failed to perform opt-out.

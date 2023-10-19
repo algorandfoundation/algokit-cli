@@ -334,3 +334,9 @@ def validate_account_balance_to_opt_in(
             f"Insufficient Algos balance in account to opt in, required: {available_algos} Algos, available:"
             f" {available_algos} Algos"
         )
+
+
+def get_account_info(algod_client: algosdk.v2client.algod.AlgodClient, account_address: str) -> dict:
+    account_info = algod_client.account_info(account_address)
+    assert isinstance(account_info, dict)
+    return account_info
