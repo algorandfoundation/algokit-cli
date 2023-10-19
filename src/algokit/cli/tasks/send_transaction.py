@@ -9,7 +9,12 @@ from algosdk import encoding, error
 from algosdk.transaction import SignedTransaction, retrieve_from_file
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
-from algokit.cli.tasks.utils import get_transaction_explorer_url, load_algod_client, stdin_has_content
+from algokit.cli.tasks.utils import (
+    ExplorerEntityType,
+    get_explorer_url,
+    load_algod_client,
+    stdin_has_content,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -109,13 +114,17 @@ def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
     if any(txn.transaction.group for txn in txns):
         txid = algod_client.send_transactions(txns)
         click.echo(f"Transaction group successfully sent with txid: {txid}")
-        click.echo(f"Check transaction group status at: {get_transaction_explorer_url(txid, network)}")
+        click.echo(
+            f"Check transaction group status at: {get_explorer_url(txid, network, ExplorerEntityType.TRANSACTION)}"
+        )
     else:
         for index, txn in enumerate(txns, start=1):
             click.echo(f"\nSending transaction {index}/{len(txns)}")
             txid = algod_client.send_transaction(txn)
             click.echo(f"Transaction successfully sent with txid: {txid}")
-            click.echo(f"Check transaction status at: {get_transaction_explorer_url(txid, network)}")
+            click.echo(
+                f"Check transaction status at: {get_explorer_url(txid, network, ExplorerEntityType.TRANSACTION)}"
+            )
 
 
 @click.command(name="send", help="Send a signed transaction to the given network.")

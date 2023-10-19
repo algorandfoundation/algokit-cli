@@ -121,49 +121,62 @@
     - [-o, --output ](#-o---output--2)
     - [Arguments](#arguments-5)
     - [VALUE](#value)
-    - [send](#send)
+    - [opt-in](#opt-in)
     - [Options](#options-20)
+    - [-a, --account ](#-a---account-)
+    - [-n, --network ](#-n---network--1)
+    - [Arguments](#arguments-6)
+    - [ASSET_IDS](#asset_ids)
+    - [opt-out](#opt-out)
+    - [Options](#options-21)
+    - [-a, --account ](#-a---account--1)
+    - [--all](#--all)
+    - [-n, --network ](#-n---network--2)
+    - [Arguments](#arguments-7)
+    - [ASSET_IDS](#asset_ids-1)
+    - [send](#send)
+    - [Options](#options-22)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
-    - [-n, --network ](#-n---network--1)
+    - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-21)
-    - [-a, --account ](#-a---account-)
+    - [Options](#options-23)
+    - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--3)
     - [--force](#--force-1)
     - [transfer](#transfer)
-    - [Options](#options-22)
+    - [Options](#options-24)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
     - [-a, --amount ](#-a---amount--1)
     - [--whole-units](#--whole-units-2)
-    - [-n, --network ](#-n---network--2)
+    - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-23)
+    - [Options](#options-25)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--4)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-8)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-24)
+    - [Options](#options-26)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-7)
-    - [ALIAS_NAME](#alias_name)
-    - [Arguments](#arguments-8)
-    - [ALIAS](#alias)
-    - [Options](#options-25)
-    - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-9)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-10)
+    - [ALIAS](#alias)
+    - [Options](#options-27)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-11)
     - [ALIAS](#alias-1)
-    - [Options](#options-26)
+    - [Options](#options-28)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -840,6 +853,70 @@ Output format for NFD API response. Defaults to address|domain resolved.
 
 ### VALUE
 Required argument
+
+### opt-in
+
+Opt-in to an asset(s). This is required before you can receive an asset. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
+
+```shell
+algokit task opt-in [OPTIONS] ASSET_IDS...
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### Arguments
+
+
+### ASSET_IDS
+Required argument(s)
+
+### opt-out
+
+opt-out of an asset(s). You can only opt out of an asset with a zero balance. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
+
+```shell
+algokit task opt-out [OPTIONS] [ASSET_IDS]...
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### --all
+Opt-out of all assets with zero balance.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### Arguments
+
+
+### ASSET_IDS
+Optional argument(s)
 
 ### send
 

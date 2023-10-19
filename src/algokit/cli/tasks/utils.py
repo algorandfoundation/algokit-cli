@@ -2,6 +2,7 @@ import logging
 import os
 import stat
 import sys
+from enum import Enum
 
 import algosdk
 import algosdk.encoding
@@ -12,7 +13,7 @@ from algokit_utils import (
     get_algonode_config,
     get_default_localnet_config,
 )
-from algosdk.util import microalgos_to_algos
+from algosdk.util import algos_to_microalgos, microalgos_to_algos
 
 from algokit.core.tasks.wallet import get_alias
 
@@ -244,52 +245,52 @@ def get_address(address: str) -> str:
         return alias_data.address
 
 
-def get_transaction_explorer_url(transaction_id: str, network: str) -> str:
+class ExplorerEntityType(Enum):
+    TRANSACTION = "transaction"
+    ASSET = "asset"
+    ADDRESS = "account"
+
+
+def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerEntityType) -> str:
     """
-    Returns a URL for exploring a transaction on the specified network.
+    Returns a URL for exploring a specified type (transaction, asset, address) on the specified network.
 
     Args:
-        transaction_id (str): The ID of the transaction.
+        identifier (str | int): The ID of the transaction, asset, or address to explore.
         network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
+        entity_type (ExplorerEntityType): The type to explore (e.g., ExplorerEntityType.TRANSACTION,
+        ExplorerEntityType.ASSET, ExplorerEntityType.ADDRESS).
 
     Returns:
-        str: The URL for exploring the transaction on the specified network.
+        str: The URL for exploring the specified type on the specified network.
 
     Raises:
-        ValueError: If the network is invalid.
+        ValueError: If the network or explorer type is invalid.
     """
+
+    base_urls: dict[str, dict[str, str]] = {
+        "testnet": {
+            ExplorerEntityType.TRANSACTION.value: "https://testnet.algoexplorer.io/tx/",
+            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/assets/",
+            ExplorerEntityType.ADDRESS.value: "https://testnet.algoexplorer.io/address/",
+        },
+        "mainnet": {
+            ExplorerEntityType.TRANSACTION.value: "https://algoexplorer.io/tx/",
+            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/assets/",
+            ExplorerEntityType.ADDRESS.value: "https://algoexplorer.io/address/",
+        },
+    }
+
     if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/{transaction_id}/"
-    elif network == "testnet":
-        return f"https://testnet.algoexplorer.io/tx/{transaction_id}"
-    elif network == "mainnet":
-        return f"https://algoexplorer.io/tx/{transaction_id}"
-    else:
+        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/{entity_type.value}/{identifier}/"
+
+    if network not in base_urls:
         raise ValueError(f"Invalid network: {network}")
 
+    if entity_type.value not in base_urls[network]:
+        raise ValueError(f"Invalid explorer type: {entity_type}")
 
-def get_asset_explorer_url(asset_id: int, network: str) -> str:
-    """
-    Returns a URL for exploring a asset on the specified network.
-
-    Args:
-        asset_id (int): The ID of the asset.
-        network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
-
-    Returns:
-        str: The URL for exploring the asset on the specified network.
-
-    Raises:
-        ValueError: If the network is invalid.
-    """
-    if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/asset/{asset_id}/"
-    elif network == "testnet":
-        return f"https://testnet.explorer.perawallet.app/assets/{asset_id}"
-    elif network == "mainnet":
-        return f"https://explorer.perawallet.app/assets/{asset_id}"
-    else:
-        raise ValueError(f"Invalid network: {network}")
+    return base_urls[network][entity_type.value] + str(identifier)
 
 
 def stdin_has_content() -> bool:
@@ -302,3 +303,43 @@ def stdin_has_content() -> bool:
 
     mode = os.fstat(sys.stdin.fileno()).st_mode
     return stat.S_ISFIFO(mode) or stat.S_ISREG(mode)
+
+
+def validate_account_balance_to_opt_in(
+    algod_client: algosdk.v2client.algod.AlgodClient, account: Account, num_assets: int
+) -> None:
+    """
+    Validates the balance of an account before opt in operation.
+    Each asset requires 0.1 Algos to opt in.
+
+    Args:
+        algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
+        interacting with the Algorand blockchain.
+        account (Account | str): The account object.
+        num_assets (int): The number of the assets for opt in (0 for Algos).
+
+    Raises:
+        click.ClickException: If there is an insufficient fund in the account or account is not valid.
+    """
+
+    address = account.address if isinstance(account, Account) else account
+    account_info = algod_client.account_info(address)
+
+    if not isinstance(account_info, dict):
+        raise click.ClickException("Invalid account info response")
+
+    required_microalgos = num_assets * algos_to_microalgos(0.1)  # type: ignore[no-untyped-call]
+    available_microalgos = account_info.get("amount", 0)
+    if available_microalgos < required_microalgos:
+        required_algo = microalgos_to_algos(required_microalgos)  # type: ignore[no-untyped-call]
+        available_algos = microalgos_to_algos(available_microalgos)  # type: ignore[no-untyped-call]
+        raise click.ClickException(
+            f"Insufficient Algos balance in account to opt in, required: {required_algo} Algos, available:"
+            f" {available_algos} Algos"
+        )
+
+
+def get_account_info(algod_client: algosdk.v2client.algod.AlgodClient, account_address: str) -> dict:
+    account_info = algod_client.account_info(account_address)
+    assert isinstance(account_info, dict)
+    return account_info
