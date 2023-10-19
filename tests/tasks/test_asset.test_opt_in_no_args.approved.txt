@@ -1,4 +1,4 @@
-Usage: algokit task opt-in [OPTIONS] ACCOUNT ASSET_IDS
+Usage: algokit task opt-in [OPTIONS] ASSET_IDS...
 Try 'algokit task opt-in -h' for help.
 
-Error: Missing argument 'ACCOUNT'.
+Error: Missing argument 'ASSET_IDS...'.

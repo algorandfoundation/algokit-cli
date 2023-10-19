@@ -7,9 +7,9 @@ from algosdk.error import AlgodHTTPError
 from algosdk.util import algos_to_microalgos
 
 from algokit.cli.tasks.utils import (
+    ExplorerEntityType,
     get_account_with_private_key,
-    get_asset_explorer_url,
-    get_transaction_explorer_url,
+    get_explorer_url,
     load_algod_client,
     validate_balance,
 )
@@ -232,8 +232,8 @@ def mint(  # noqa: PLR0913
         )
 
         click.echo("\nSuccessfully minted the asset!")
-        click.echo(f"Browse your asset at: {get_asset_explorer_url(asset_id, network)}")
-        click.echo(f"Check transaction status at: {get_transaction_explorer_url(txn_id, network)}")
+        click.echo(f"Browse your asset at: {get_explorer_url(asset_id, network, ExplorerEntityType.ASSET)}")
+        click.echo(f"Check transaction status at: {get_explorer_url(txn_id, network, ExplorerEntityType.TRANSACTION)}")
     except (
         Web3StorageBadRequestError,
         Web3StorageUnauthorizedError,

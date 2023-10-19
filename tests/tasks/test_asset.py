@@ -8,11 +8,6 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
-class OptMock:
-    def get_asset_id(self) -> int:
-        return 1234
-
-
 def _generate_account() -> tuple[str, str]:
     pk, addr = account.generate_account()  # type: ignore[no-untyped-call]
     return pk, addr
@@ -31,7 +26,7 @@ def test_opt_in_no_args() -> None:
 
 def test_opt_in_invalid_network() -> None:
     _, addr = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(f"task opt-in {addr} {asset_id}  --network invalid-network")
 
     assert result.exit_code != 0
@@ -39,13 +34,13 @@ def test_opt_in_invalid_network() -> None:
 
 
 def test_opt_in_to_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_in")
+    mocker.patch("algokit.cli.tasks.assets.opt_in", return_value={123: "dummy_txn_id"})
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(
-        f"task opt-in {dummy_account_address} {asset_id} --network localnet",
+        f"task opt-in -a {dummy_account_address} {asset_id} --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -54,7 +49,7 @@ def test_opt_in_to_assets_from_account_address_successful(mocker: MockerFixture)
 
 
 def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_in")
+    mocker.patch("algokit.cli.tasks.assets.opt_in", return_value={123: "dummy_txn_id"})
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
@@ -66,7 +61,7 @@ def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, m
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
     result = invoke(
-        f"task opt-in {alias_name} {OptMock().get_asset_id()} --network localnet",
+        f"task opt-in -a {alias_name} {123} --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -79,9 +74,9 @@ def test_opt_in_to_assets_from_account_address_failed(mocker: MockerFixture) -> 
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(
-        f"task opt-in {dummy_account_address} {asset_id} --network localnet",
+        f"task opt-in -a {dummy_account_address} {asset_id} --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -98,7 +93,7 @@ def test_opt_out_no_args() -> None:
 
 def test_opt_out_invalid_network() -> None:
     _, addr = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(f"task opt-out {asset_id} {addr}  --network invalid-network")
 
     assert result.exit_code != 0
@@ -106,12 +101,12 @@ def test_opt_out_invalid_network() -> None:
 
 
 def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out")
+    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(
-        f"task opt-out {dummy_account_address} {asset_id} --network localnet",
+        f"task opt-out -a {dummy_account_address} {asset_id} --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -120,13 +115,13 @@ def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture
 
 
 def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    dummy_account_info = {"assets": [{"asset-id": 1, "amount": 1}]}
+    dummy_account_info = {"assets": [{"asset-id": 1, "amount": 0}]}
     mocker.patch("algokit.cli.tasks.assets.get_account_info", return_value=dummy_account_info)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
-    mocker.patch("algokit.cli.tasks.assets.opt_out")
+    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
     dummy_account_pk, dummy_account_address = _generate_account()
     result = invoke(
-        f"task opt-out {dummy_account_address} --network localnet --all",
+        f"task opt-out -a {dummy_account_address} --network localnet --all",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -135,7 +130,7 @@ def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFix
 
 
 def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out")
+    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
 
@@ -146,7 +141,7 @@ def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, 
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
     result = invoke(
-        f"task opt-out {alias_name} {OptMock().get_asset_id()}  --network localnet",
+        f"task opt-out -a {alias_name} 123 --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 
@@ -158,9 +153,9 @@ def test_opt_out_assets_from_account_address_failed(mocker: MockerFixture) -> No
     mocker.patch("algokit.cli.tasks.assets.opt_out", side_effect=Exception("dummy error"))
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
-    asset_id = OptMock().get_asset_id()
+    asset_id = 123
     result = invoke(
-        f"task opt-out {dummy_account_address} {asset_id} --network localnet",
+        f"task opt-out -a {dummy_account_address} {asset_id} --network localnet",
         input=_get_mnemonic_from_private_key(dummy_account_pk),
     )
 

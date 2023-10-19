@@ -1,3 +1,4 @@
 Enter the mnemonic phrase (25 words separated by whitespace): 
+Performing opt-in. This may take a few seconds...
 DEBUG: dummy error
 Error: Failed to perform opt-in

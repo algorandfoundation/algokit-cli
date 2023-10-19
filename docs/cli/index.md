@@ -123,16 +123,16 @@
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-20)
+    - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
     - [Arguments](#arguments-6)
-    - [ACCOUNT](#account)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
     - [Options](#options-21)
+    - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
     - [Arguments](#arguments-7)
-    - [ACCOUNT](#account-1)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
     - [Options](#options-22)
@@ -141,7 +141,7 @@
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
     - [Options](#options-23)
-    - [-a, --account ](#-a---account-)
+    - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--3)
@@ -856,13 +856,17 @@ Required argument
 
 ### opt-in
 
-Opt-in to an asset using <ID> <ACCOUNT>. This is required before you can receive an asset. Use -n to specify localnet, testnet, or mainnet.
+Opt-in to an asset(s). This is required before you can receive an asset. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
 
 ```shell
-algokit task opt-in [OPTIONS] ACCOUNT ASSET_IDS
+algokit task opt-in [OPTIONS] ASSET_IDS...
 ```
 
 ### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
 
 
 ### -n, --network <network>
@@ -877,22 +881,22 @@ Network to use. Refers to localnet by default.
 ### Arguments
 
 
-### ACCOUNT
-Required argument
-
-
 ### ASSET_IDS
-Required argument
+Required argument(s)
 
 ### opt-out
 
-opt-out of an asset using <ID> <ACCOUNT>. You can only opt out of an asset with a zero balance. Use -n to specify localnet, testnet, or mainnet.
+opt-out of an asset(s). You can only opt out of an asset with a zero balance. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
 
 ```shell
-algokit task opt-out [OPTIONS] ACCOUNT [ASSET_IDS]
+algokit task opt-out [OPTIONS] [ASSET_IDS]...
 ```
 
 ### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
 
 
 ### --all
@@ -911,12 +915,8 @@ Network to use. Refers to localnet by default.
 ### Arguments
 
 
-### ACCOUNT
-Required argument
-
-
 ### ASSET_IDS
-Optional argument
+Optional argument(s)
 
 ### send
 
