@@ -1,11 +1,12 @@
 import logging
+import multiprocessing
 import signal
 import time
 import types
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from multiprocessing import Process, Queue, Value, cpu_count
+from multiprocessing import Process, Queue, cpu_count
 from timeit import default_timer as timer
 from typing import Any
 
@@ -39,17 +40,31 @@ class VanityAccount:
     private_key: str
 
 
-def _log_progress(count: Value, start_time: float) -> None:  # type: ignore[valid-type]
+class Counter:
+    def __init__(self, initial_value: int = 0):
+        self.val = multiprocessing.RawValue("i", initial_value)
+        self.lock = multiprocessing.Lock()
+
+    def increment(self, value: int = 1) -> None:
+        with self.lock:
+            self.val.value += value
+
+    @property
+    def value(self) -> int:
+        return int(self.val.value)
+
+
+def _log_progress(counter: Counter, start_time: float) -> None:
     """Logs progress of address matching at regular intervals."""
     last_log_time = start_time
 
     try:
         while True:
-            total_count = count.value  # type: ignore[attr-defined]
+            total_count = counter.value
             if timer() - last_log_time >= PROGRESS_REFRESH_INTERVAL_SECONDS:
                 elapsed_time = timer() - start_time
                 message = (
-                    f"Iterated over {total_count} addresses in {elapsed_time:.2f} seconds."
+                    f"Iterated over ~{total_count} addresses in {elapsed_time:.2f} seconds."
                     if total_count > 0
                     else f"Elapsed time: {elapsed_time:.2f} seconds."
                 )
@@ -60,9 +75,7 @@ def _log_progress(count: Value, start_time: float) -> None:  # type: ignore[vali
         return
 
 
-def _search_for_matching_address(
-    keyword: str, match: MatchType, count: Value, queue: Queue  # type: ignore[valid-type]
-) -> None:
+def _search_for_matching_address(keyword: str, match: MatchType, counter: Counter, queue: Queue) -> None:
     """
     Searches for a matching address based on the specified keyword and matching criteria.
 
@@ -77,10 +90,15 @@ def _search_for_matching_address(
     """
 
     try:
+        local_count = 0
+        batch_size = 100
+
         while True:
             private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
-
-            count.value += 1  # type: ignore[attr-defined]
+            local_count += 1
+            if local_count % batch_size == 0:
+                counter.increment(local_count)
+                local_count = 0
 
             if MATCH_FUNCTIONS[match](address, keyword):
                 generated_mnemonic = from_private_key(private_key)  # type: ignore[no-untyped-call]
@@ -115,16 +133,16 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
     num_processes = cpu_count()
     logger.info(f"Using {num_processes} processes to search for a matching address...")
     queue: Queue = Queue()
-    count = Value("i", 0)
+    counter = Counter()
 
     start_time: float = timer()
     for _ in range(num_processes):
-        process = Process(target=_search_for_matching_address, args=(keyword, match, count, queue))
+        process = Process(target=_search_for_matching_address, args=(keyword, match, counter, queue))
         jobs.append(process)
         process.start()
 
     # Start the logger process
-    logger_process = Process(target=_log_progress, args=(count, start_time))
+    logger_process = Process(target=_log_progress, args=(counter, start_time))
     jobs.append(logger_process)
     logger_process.start()
 
