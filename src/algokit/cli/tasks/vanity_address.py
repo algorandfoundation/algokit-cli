@@ -108,6 +108,11 @@ def vanity_address(  # noqa: PLR0913
     output_file_path: Path | None,
     force: bool,
 ) -> None:
+    if output_file_path and output != "file":
+        raise click.ClickException("File path can only be set when the output is set to 'file'.")
+    if alias and output != "alias":
+        raise click.ClickException("Alias can only be set when the output is set to 'alias'.")
+
     match = MatchType(match)  # Force cast since click does not yet support enums as types
     _validate_inputs(keyword, output, alias, output_file_path)
 

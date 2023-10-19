@@ -1,15 +1,17 @@
 import logging
+import multiprocessing
+import signal
 import time
+import types
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from multiprocessing import Manager, Pool, cpu_count
-from multiprocessing.managers import DictProxy
-from multiprocessing.synchronize import Event as EventClass
+from multiprocessing import Process, Queue, cpu_count
 from timeit import default_timer as timer
+from typing import Any
 
 import algosdk
-from algosdk import mnemonic
+from algosdk.mnemonic import from_private_key, to_private_key
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +40,27 @@ class VanityAccount:
     private_key: str
 
 
-def _log_progress(shared_data: DictProxy, stop_event: EventClass, start_time: float) -> None:
+class Counter:
+    def __init__(self, initial_value: int = 0):
+        self.val = multiprocessing.RawValue("i", initial_value)
+        self.lock = multiprocessing.Lock()
+
+    def increment(self, value: int = 1) -> None:
+        with self.lock:
+            self.val.value += value
+
+    @property
+    def value(self) -> int:
+        return int(self.val.value)
+
+
+def _log_progress(counter: Counter, start_time: float) -> None:
     """Logs progress of address matching at regular intervals."""
     last_log_time = start_time
 
     try:
-        while not stop_event.is_set():
-            total_count = sum(count.value for count in shared_data["counts"])
+        while True:
+            total_count = counter.value
             if timer() - last_log_time >= PROGRESS_REFRESH_INTERVAL_SECONDS:
                 elapsed_time = timer() - start_time
                 message = (
@@ -54,14 +70,12 @@ def _log_progress(shared_data: DictProxy, stop_event: EventClass, start_time: fl
                 )
                 logger.info(f"Still searching for a match. {message}")
                 last_log_time = timer()
-            time.sleep(1)
+            time.sleep(PROGRESS_REFRESH_INTERVAL_SECONDS)
     except KeyboardInterrupt:
-        stop_event.set()
+        return
 
 
-def _search_for_matching_address(
-    worker_id: int, keyword: str, match: MatchType, stop_event: EventClass, shared_data: DictProxy
-) -> None:
+def _search_for_matching_address(keyword: str, match: MatchType, counter: Counter, queue: Queue) -> None:
     """
     Searches for a matching address based on the specified keyword and matching criteria.
 
@@ -75,26 +89,23 @@ def _search_for_matching_address(
         shared_data (DictProxy): A multiprocessing dictionary to share data between processes.
     """
 
-    local_count = 0
-    batch_size = 1000 * (cpu_count() - 1)
-
     try:
-        while not stop_event.is_set():
+        local_count = 0
+        batch_size = 100
+
+        while True:
             private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
-
             local_count += 1
-
             if local_count % batch_size == 0:
-                shared_data["counts"][worker_id].value += local_count
+                counter.increment(local_count)
                 local_count = 0
 
             if MATCH_FUNCTIONS[match](address, keyword):
-                stop_event.set()
-                generated_mnemonic = mnemonic.from_private_key(private_key)  # type: ignore[no-untyped-call]
-                shared_data.update({"mnemonic": generated_mnemonic, "address": address})
+                generated_mnemonic = from_private_key(private_key)  # type: ignore[no-untyped-call]
+                queue.put((address, generated_mnemonic))
                 return
     except KeyboardInterrupt:
-        stop_event.set()
+        return
 
 
 def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
@@ -111,37 +122,41 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
         VanityAccount: An object containing the generated mnemonic and address
         that match the specified keyword and matching criteria.
     """
+    jobs: list[Process] = []
 
-    manager = Manager()
+    def signal_handler(sig: int, frame: types.FrameType | None) -> Any | None:
+        logger.debug(f"KeyboardInterrupt captured for {sig} and frame {frame}. Terminating processes...")
+        for p in jobs:
+            p.terminate()
+        raise KeyboardInterrupt
+
     num_processes = cpu_count()
-    shared_data = manager.dict()
-    shared_data["counts"] = [manager.Value("i", 0) for _ in range(num_processes - 1)]
-    stop_event = manager.Event()
+    logger.info(f"Using {num_processes} processes to search for a matching address...")
+    queue: Queue = Queue()
+    counter = Counter()
 
     start_time: float = timer()
-    pool = Pool(processes=num_processes)
-    try:
-        for worker_id in range(num_processes - 1):
-            pool.apply_async(_search_for_matching_address, (worker_id, keyword, match, stop_event, shared_data))
+    for _ in range(num_processes):
+        process = Process(target=_search_for_matching_address, args=(keyword, match, counter, queue))
+        jobs.append(process)
+        process.start()
 
-        # Start the logger process
-        pool.apply_async(_log_progress, (shared_data, stop_event, start_time))
+    # Start the logger process
+    logger_process = Process(target=_log_progress, args=(counter, start_time))
+    jobs.append(logger_process)
+    logger_process.start()
 
-        pool.close()
-        pool.join()
-    except KeyboardInterrupt as ex:
-        stop_event.set()
-        pool.terminate()
-        pool.join()
-        raise ex
+    signal.signal(signal.SIGINT, signal_handler)  # capture ctrl-c so we can report attempts and running time
 
-    logger.debug(f"Vanity address generation time: {timer() - start_time:.2f} seconds")
+    address, mnemonic = queue.get()  # this will return once one of the spawned processes finds a match
 
-    if "mnemonic" not in shared_data or "address" not in shared_data:
-        raise Exception("No matching account was found")
+    logger.info(f"Vanity address generation time: {timer() - start_time:.2f} seconds")
+
+    for p in jobs:
+        p.terminate()
 
     return VanityAccount(
-        mnemonic=shared_data["mnemonic"],
-        address=shared_data["address"],
-        private_key=mnemonic.to_private_key(shared_data["mnemonic"]),  # type: ignore[no-untyped-call]
+        mnemonic=mnemonic,
+        address=address,
+        private_key=to_private_key(mnemonic),  # type: ignore[no-untyped-call]
     )
