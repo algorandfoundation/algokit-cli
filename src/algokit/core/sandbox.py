@@ -120,7 +120,7 @@ class ComposeSandbox:
         data = []
 
         # `docker compose ps --format json` on version < 2.21.0 outputs a JSON arary
-        if run_results.output and run_results.output[0] == "[":
+        if run_results.output.startswith("["):
             data = json.loads(run_results.output)
         # `docker compose ps --format json` on version >= 2.21.0 outputs seperate JSON objects, each on a new line
         else:
