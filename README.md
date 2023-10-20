@@ -85,6 +85,9 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
 
+> **IMPORTANT**  
+> Due to [`aiohttp`](https://github.com/aio-libs/aiohttp/issues/7675) dependency compatibility issues with Python 3.12, we advise using Python versions up to 3.11 for now. This is a temporary measure until stable release of `aiohttp` with 3.12 support is available.
+
 AlgoKit also has some runtime dependencies that also need to be available for particular commands.
 
 > **Note**

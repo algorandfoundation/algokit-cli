@@ -63,12 +63,12 @@ def start_localnet() -> None:
     sandbox.check_docker_compose_for_new_image_versions()
 
     if compose_file_status is ComposeFileStatus.MISSING:
-        logger.debug("Sandbox compose file does not exist yet; writing it out for the first time")
+        logger.debug("LocalNet compose file does not exist yet; writing it out for the first time")
         sandbox.write_compose_file()
     elif compose_file_status is ComposeFileStatus.UP_TO_DATE:
-        logger.debug("Sandbox compose file does not require updating")
+        logger.debug("LocalNet compose file does not require updating")
     else:
-        logger.warning("Sandbox definition is out of date; please run algokit localnet reset")
+        logger.warning("LocalNet definition is out of date; please run algokit localnet reset")
     sandbox.up()
 
 
@@ -78,7 +78,7 @@ def stop_localnet() -> None:
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug(
-            "Sandbox compose file does not exist yet; run `algokit localnet start` to start the AlgoKit LocalNet"
+            "LocalNet compose file does not exist yet; run `algokit localnet start` to start the AlgoKit LocalNet"
         )
     else:
         sandbox.stop()
@@ -99,7 +99,7 @@ def reset_localnet(*, update: bool) -> None:
     else:
         sandbox.down()
         if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
-            logger.info("Sandbox definition is out of date; updating it to latest")
+            logger.info("LocalNet definition is out of date; updating it to latest")
             sandbox.write_compose_file()
         if update:
             sandbox.pull()
