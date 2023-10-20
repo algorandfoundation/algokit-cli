@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.5.2 (2023-10-20)
+
+### Fix
+
+* Docker compose ps parsing for version >= 2.21 ([#336](https://github.com/algorandfoundation/algokit-cli/issues/336)) ([`06ba5e9`](https://github.com/algorandfoundation/algokit-cli/commit/06ba5e908a879a45ab793ffbc6c9436eeeb5b370))
+
+### Documentation
+
+* Updating docs for the issue on python 3.12 ([#332](https://github.com/algorandfoundation/algokit-cli/issues/332)) ([`288b561`](https://github.com/algorandfoundation/algokit-cli/commit/288b5617f284b5135f272cdb4c1c160c2aa6fc33))
+
 ## v1.5.1 (2023-10-17)
 
 
