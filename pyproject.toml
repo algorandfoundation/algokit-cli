@@ -23,7 +23,7 @@ mslex = "^1.1.0"
 keyring = "^24.2.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
-algokit-utils = "v2.1.0-beta.1"
+algokit-utils = "v2.1.0"
 multiformats = "^0.2.1"
 
 [tool.poetry.group.dev.dependencies]
