@@ -38,7 +38,15 @@ logger = logging.getLogger(__name__)
     help="Address or alias to an account that will receive the asset(s).",
     required=True,
 )
-@click.option("--asset", "--id", "asset_id", type=click.INT, help="Asset ID to transfer.", default=0, required=False)
+@click.option(
+    "--asset",
+    "--id",
+    "asset_id",
+    type=click.INT,
+    help="Asset ID to transfer. Defaults to 0 (Algo).",
+    default=0,
+    required=False,
+)
 @click.option("--amount", "-a", type=click.INT, help="Amount to transfer.", required=True)
 @click.option(
     "--whole-units",

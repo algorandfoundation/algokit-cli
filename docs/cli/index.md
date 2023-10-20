@@ -996,7 +996,7 @@ algokit task transfer [OPTIONS]
 
 
 ### --asset, --id <asset_id>
-Asset ID to transfer.
+Asset ID to transfer. Defaults to 0 (Algo).
 
 
 ### -a, --amount <amount>
