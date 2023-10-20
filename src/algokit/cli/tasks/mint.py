@@ -6,10 +6,10 @@ import click
 from algosdk.error import AlgodHTTPError
 from algosdk.util import algos_to_microalgos
 
+from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
+from algokit.cli.common.utils import get_explorer_url
 from algokit.cli.tasks.utils import (
-    ExplorerEntityType,
     get_account_with_private_key,
-    get_explorer_url,
     load_algod_client,
     validate_balance,
 )
@@ -181,11 +181,11 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
 @click.option(
     "-n",
     "--network",
-    type=click.Choice(["localnet", "testnet", "mainnet"]),
+    type=click.Choice(AlgorandNetwork.to_list()),
     prompt="Provide the network to use",
-    default="localnet",
+    default=AlgorandNetwork.LOCALNET,
     required=False,
-    help="Network to use. Refers to `localnet` by default.",
+    help=f"Network to use. Refers to `{AlgorandNetwork.LOCALNET}` by default.",
 )
 def mint(  # noqa: PLR0913
     *,
@@ -198,7 +198,7 @@ def mint(  # noqa: PLR0913
     token_metadata_path: Path | None,
     mutable: bool,
     non_fungible: bool,
-    network: str,
+    network: AlgorandNetwork,
 ) -> None:
     if non_fungible:
         _validate_supply(total, decimals)

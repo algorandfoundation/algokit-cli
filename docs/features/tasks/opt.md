@@ -65,3 +65,7 @@ $ algokit task opt-out --account {YOUR_ACCOUNT} --all
 ```
 
 > Please note, the account must have sufficient balance to cover the transaction fees.
+
+## Further Reading
+
+For in-depth details, visit the [opt-in](../../cli/index.md#opt-in) and [opt-out](../../cli/index#opt-out) sections in the AlgoKit CLI reference documentation.

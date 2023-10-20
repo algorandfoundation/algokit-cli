@@ -8,10 +8,9 @@ import click
 from algosdk import encoding, error
 from algosdk.transaction import SignedTransaction, retrieve_from_file
 
-from algokit.cli.common.utils import MutuallyExclusiveOption
+from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
+from algokit.cli.common.utils import MutuallyExclusiveOption, get_explorer_url
 from algokit.cli.tasks.utils import (
-    ExplorerEntityType,
-    get_explorer_url,
     load_algod_client,
     stdin_has_content,
 )
@@ -98,12 +97,12 @@ def _get_signed_transactions(file: Path | None = None, transaction: str | None =
         ) from ex
 
 
-def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
+def _send_transactions(network: AlgorandNetwork, txns: list[SignedTransaction]) -> None:
     """
     Sends a list of signed transactions to the Algorand blockchain network using the AlgodClient.
 
     Args:
-        network (str): The network to which the transactions will be sent.
+        network (AlgorandNetwork): The network to which the transactions will be sent.
         txns (list[SignedTransaction]): A list of signed transactions to be sent.
 
     Returns:
@@ -149,12 +148,12 @@ def _send_transactions(network: str, txns: list[SignedTransaction]) -> None:
 @click.option(
     "-n",
     "--network",
-    type=click.Choice(["localnet", "testnet", "mainnet"]),
-    default="localnet",
+    type=click.Choice(AlgorandNetwork.to_list()),
+    default=AlgorandNetwork.LOCALNET,
     required=False,
-    help="Network to use. Refers to `localnet` by default.",
+    help=f"Network to use. Refers to `{AlgorandNetwork.LOCALNET}` by default.",
 )
-def send(*, file: Path | None, transaction: str | None, network: str) -> None:
+def send(*, file: Path | None, transaction: str | None, network: AlgorandNetwork) -> None:
     if not file and not transaction and not stdin_has_content():
         raise click.ClickException(
             "Please provide a file path via `--file` or a base64 encoded signed transaction via `--transaction`. "

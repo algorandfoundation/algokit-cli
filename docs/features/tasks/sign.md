@@ -88,3 +88,7 @@ Buffer.from(algosdk.encodeObj({ txn: txn.get_obj_for_encoding() })).toString(
   "base64"
 ); // Resulting string can be passed directy to algokit task sign with --transaction flag
 ```
+
+## Further Reading
+
+For in-depth details, visit the [sign section](../../cli/index.md#sign) in the AlgoKit CLI reference documentation.

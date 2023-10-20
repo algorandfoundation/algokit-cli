@@ -54,3 +54,7 @@ If the transaction is successfully sent, the transaction ID (txid) will be outpu
 ## Goal Compatibility
 
 Please note, at the moment this feature only supports [`goal clerk`](https://developer.algorand.org/docs/clis/goal/clerk/clerk/) compatible transaction objects.
+
+## Further Reading
+
+For in-depth details, visit the [send section](../../cli/index.md#send) in the AlgoKit CLI reference documentation.

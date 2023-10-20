@@ -5,11 +5,11 @@ from algokit_utils import opt_in, opt_out
 from algosdk import error
 from algosdk.v2client.algod import AlgodClient
 
+from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
+from algokit.cli.common.utils import get_explorer_url
 from algokit.cli.tasks.utils import (
-    ExplorerEntityType,
     get_account_info,
     get_account_with_private_key,
-    get_explorer_url,
     load_algod_client,
     validate_account_balance_to_opt_in,
     validate_address,
@@ -44,12 +44,12 @@ def _get_zero_balanced_assets(
 @click.option(
     "-n",
     "--network",
-    type=click.Choice(["localnet", "testnet", "mainnet"]),
-    default="localnet",
+    type=click.Choice(AlgorandNetwork.to_list()),
+    default=AlgorandNetwork.LOCALNET,
     required=False,
-    help="Network to use. Refers to `localnet` by default.",
+    help=f"Network to use. Refers to `{AlgorandNetwork.LOCALNET}` by default.",
 )
-def opt_in_command(asset_ids: tuple[int], account: str, network: str) -> None:
+def opt_in_command(asset_ids: tuple[int], account: str, network: AlgorandNetwork) -> None:
     asset_ids_list = list(asset_ids)
 
     opt_in_account = get_account_with_private_key(account)
@@ -95,12 +95,12 @@ def opt_in_command(asset_ids: tuple[int], account: str, network: str) -> None:
 @click.option(
     "-n",
     "--network",
-    type=click.Choice(["localnet", "testnet", "mainnet"]),
-    default="localnet",
+    type=click.Choice(AlgorandNetwork.to_list()),
+    default=AlgorandNetwork.LOCALNET,
     required=False,
-    help="Network to use. Refers to `localnet` by default.",
+    help=f"Network to use. Refers to `{AlgorandNetwork.LOCALNET}` by default.",
 )
-def opt_out_command(asset_ids: tuple[int], account: str, network: str, all_assets: bool) -> None:  # noqa: FBT001
+def opt_out_command(*, asset_ids: tuple[int], account: str, network: AlgorandNetwork, all_assets: bool) -> None:
     if not (all_assets or asset_ids):
         raise click.UsageError("asset_ids or --all must be specified")
     opt_out_account = get_account_with_private_key(account)

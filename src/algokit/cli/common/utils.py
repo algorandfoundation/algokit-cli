@@ -5,6 +5,8 @@ import typing as t
 
 import click
 
+from algokit.cli.common.constants import ExplorerEntityType
+
 
 class MutuallyExclusiveOption(click.Option):
     """
@@ -79,3 +81,45 @@ class MutuallyExclusiveOption(click.Option):
                     )
                 self.prompt = None
         return super().handle_parse_result(ctx, opts, args)
+
+
+def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerEntityType) -> str:
+    """
+    Returns a URL for exploring a specified type (transaction, asset, address) on the specified network.
+
+    Args:
+        identifier (str | int): The ID of the transaction, asset, or address to explore.
+        network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
+        entity_type (ExplorerEntityType): The type to explore (e.g., ExplorerEntityType.TRANSACTION,
+        ExplorerEntityType.ASSET, ExplorerEntityType.ADDRESS).
+
+    Returns:
+        str: The URL for exploring the specified type on the specified network.
+
+    Raises:
+        ValueError: If the network or explorer type is invalid.
+    """
+
+    base_urls: dict[str, dict[str, str]] = {
+        "testnet": {
+            ExplorerEntityType.TRANSACTION.value: "https://testnet.algoexplorer.io/tx/",
+            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/assets/",
+            ExplorerEntityType.ADDRESS.value: "https://testnet.algoexplorer.io/address/",
+        },
+        "mainnet": {
+            ExplorerEntityType.TRANSACTION.value: "https://algoexplorer.io/tx/",
+            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/assets/",
+            ExplorerEntityType.ADDRESS.value: "https://algoexplorer.io/address/",
+        },
+    }
+
+    if network == "localnet":
+        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/{entity_type.value}/{identifier}/"
+
+    if network not in base_urls:
+        raise ValueError(f"Invalid network: {network}")
+
+    if entity_type.value not in base_urls[network]:
+        raise ValueError(f"Invalid explorer type: {entity_type}")
+
+    return base_urls[network][entity_type.value] + str(identifier)

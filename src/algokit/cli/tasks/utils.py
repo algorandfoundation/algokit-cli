@@ -1,8 +1,9 @@
+# AlgoKit Tasks related utility functions
+
 import logging
 import os
 import stat
 import sys
-from enum import Enum
 
 import algosdk
 import algosdk.encoding
@@ -15,6 +16,7 @@ from algokit_utils import (
 )
 from algosdk.util import algos_to_microalgos, microalgos_to_algos
 
+from algokit.cli.common.constants import AlgorandNetwork
 from algokit.core.tasks.wallet import get_alias
 
 logger = logging.getLogger(__name__)
@@ -74,7 +76,7 @@ def get_private_key_from_mnemonic() -> str:
         raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
 
 
-def load_algod_client(network: str) -> algosdk.v2client.algod.AlgodClient:
+def load_algod_client(network: AlgorandNetwork) -> algosdk.v2client.algod.AlgodClient:
     """
     Returns an instance of the `algosdk.v2client.algod.AlgodClient` class for the specified network.
 
@@ -89,9 +91,9 @@ def load_algod_client(network: str) -> algosdk.v2client.algod.AlgodClient:
     """
 
     config_mapping = {
-        "localnet": get_default_localnet_config("algod"),
-        "testnet": get_algonode_config("testnet", "algod", ""),
-        "mainnet": get_algonode_config("mainnet", "algod", ""),
+        AlgorandNetwork.LOCALNET: get_default_localnet_config("algod"),
+        AlgorandNetwork.TESTNET: get_algonode_config("testnet", "algod", ""),
+        AlgorandNetwork.MAINNET: get_algonode_config("mainnet", "algod", ""),
     }
     try:
         return get_algod_client(config_mapping[network])
@@ -243,54 +245,6 @@ def get_address(address: str) -> str:
             raise click.ClickException(f"Alias `{parsed_address}` alias does not exist.") from ex
 
         return alias_data.address
-
-
-class ExplorerEntityType(Enum):
-    TRANSACTION = "transaction"
-    ASSET = "asset"
-    ADDRESS = "account"
-
-
-def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerEntityType) -> str:
-    """
-    Returns a URL for exploring a specified type (transaction, asset, address) on the specified network.
-
-    Args:
-        identifier (str | int): The ID of the transaction, asset, or address to explore.
-        network (str): The name of the network (e.g., "localnet", "testnet", "mainnet").
-        entity_type (ExplorerEntityType): The type to explore (e.g., ExplorerEntityType.TRANSACTION,
-        ExplorerEntityType.ASSET, ExplorerEntityType.ADDRESS).
-
-    Returns:
-        str: The URL for exploring the specified type on the specified network.
-
-    Raises:
-        ValueError: If the network or explorer type is invalid.
-    """
-
-    base_urls: dict[str, dict[str, str]] = {
-        "testnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://testnet.algoexplorer.io/tx/",
-            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://testnet.algoexplorer.io/address/",
-        },
-        "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://algoexplorer.io/tx/",
-            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://algoexplorer.io/address/",
-        },
-    }
-
-    if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/{entity_type.value}/{identifier}/"
-
-    if network not in base_urls:
-        raise ValueError(f"Invalid network: {network}")
-
-    if entity_type.value not in base_urls[network]:
-        raise ValueError(f"Invalid explorer type: {entity_type}")
-
-    return base_urls[network][entity_type.value] + str(identifier)
 
 
 def stdin_has_content() -> bool:

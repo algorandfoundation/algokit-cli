@@ -87,3 +87,7 @@ To retrieve the stored mnemonic, you will need to manually navigate to your oper
 - On Linux, it can use Secret Service API, KWallet, or an in-memory store depending on your setup.
 
 > Remember, AlgoKit is designed to keep your sensitive information secure however your storage is only as secure as the device on which it is stored. Always ensure to maintain good security practices on your device, especially when dealing with mnemonics that are to be used on MainNet.
+
+## Further Reading
+
+For in-depth details, visit the [wallet section](../../cli/index.md#wallet) in the AlgoKit CLI reference documentation.

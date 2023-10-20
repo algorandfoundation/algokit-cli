@@ -60,3 +60,7 @@ This will remove your Web3 Storage API token from the keyring.
 ## File Size Limit
 
 Please note, the maximum file size that can be uploaded is 100MB. If you try to upload a file larger than this, you will receive an error.
+
+## Further Reading
+
+For in-depth details, visit the [ipfs section](../../cli/index.md#ipfs) in the AlgoKit CLI reference documentation.

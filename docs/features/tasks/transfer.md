@@ -48,3 +48,7 @@ $ ~ algokit task transfer -s {SENDER_ALIAS OR SENDER_ADDRESS} -r {RECEIVER_ALIAS
 By default:
 
 - the `amount` is smallest divisible unit of supplied `ASSET_ID`. To use whole units, use the `--whole-units` flag.
+
+## Further Reading
+
+For in-depth details, visit the [transfer section](../../cli/index.md#transfer) in the AlgoKit CLI reference documentation.

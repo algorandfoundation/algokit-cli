@@ -11,6 +11,7 @@ from algokit_utils import (
     transfer as transfer_algos,
 )
 
+from algokit.cli.common.constants import AlgorandNetwork
 from algokit.cli.tasks.utils import (
     get_account_with_private_key,
     get_address,
@@ -56,10 +57,10 @@ logger = logging.getLogger(__name__)
 @click.option(
     "-n",
     "--network",
-    type=click.Choice(["localnet", "testnet", "mainnet"]),
-    default="localnet",
+    type=click.Choice([choice.value for choice in AlgorandNetwork]),
+    default=AlgorandNetwork.LOCALNET,
     required=False,
-    help="Network to use. Refers to `localnet` by default.",
+    help=f"Network to use. Refers to `{AlgorandNetwork.LOCALNET}` by default.",
 )
 def transfer(  # noqa: PLR0913
     *,
@@ -68,7 +69,7 @@ def transfer(  # noqa: PLR0913
     asset_id: int,
     amount: int,
     whole_units: bool,
-    network: str,
+    network: AlgorandNetwork,
 ) -> None:
     # Load addresses and accounts from mnemonics or aliases
     sender_account = get_account_with_private_key(sender)

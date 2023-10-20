@@ -64,3 +64,7 @@ If the minting process is successful, the asset ID and transaction ID will be ou
 For non interactive mode, refer to usage section above for available options.
 
 > Please note, creator account must have at least 0.2 Algos available to cover minimum balance requirements.
+
+## Further Reading
+
+For in-depth details, visit the [mint section](../../cli/index.md#mint) in the AlgoKit CLI reference documentation.
