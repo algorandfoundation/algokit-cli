@@ -116,7 +116,14 @@ class ComposeSandbox:
         )
         if run_results.exit_code != 0:
             return []
-        data = json.loads(run_results.output)
+
+        # `docker compose ps --format json` on version < 2.21.0 outputs a JSON arary
+        if run_results.output.startswith("["):
+            data = json.loads(run_results.output)
+        # `docker compose ps --format json` on version >= 2.21.0 outputs seperate JSON objects, each on a new line
+        else:
+            data = [json.loads(line) for line in run_results.output.splitlines() if line]
+
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
