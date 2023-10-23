@@ -135,30 +135,31 @@ files = [
 
 [[package]]
 name = "algokit-client-generator"
-version = "1.0.2"
+version = "1.0.3"
 description = "Algorand typed client Generator"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "algokit_client_generator-1.0.2-py3-none-any.whl", hash = "sha256:0347ede8decf840dccade5628b118d17618e9cafb4bb342447261074e840479c"},
+    {file = "algokit_client_generator-1.0.3-py3-none-any.whl", hash = "sha256:2f36faa73e57c51332155d806406030a4237fe21e9b33d69653b2ddcf0e3ec9e"},
 ]
 
 [package.dependencies]
-algokit-utils = ">=1.2.0,<2.0.0"
+algokit-utils = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "algokit-utils"
-version = "1.3.1"
+version = "2.1.0"
 description = "Utilities for Algorand development for use by AlgoKit"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "algokit_utils-1.3.1-py3-none-any.whl", hash = "sha256:9a369a3db1c18c5122fce1ec33496db3c4ab0566905f92a486806350eb95a1cb"},
+    {file = "algokit_utils-2.1.0-py3-none-any.whl", hash = "sha256:cd455d392daa908ee496417b010fcb59ff4284e79055fc5f0d4491c2e783284d"},
 ]
 
 [package.dependencies]
 deprecated = ">=1.2.14,<2.0.0"
-py-algorand-sdk = ">=2.2.0,<3.0.0"
+httpx = ">=0.23.1,<0.24.0"
+py-algorand-sdk = ">=2.4.0,<3.0.0"
 
 [[package]]
 name = "allpairspy"
@@ -1868,13 +1869,13 @@ wcwidth = "*"
 
 [[package]]
 name = "py-algorand-sdk"
-version = "2.3.0"
+version = "2.5.0"
 description = "Algorand SDK in Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "py-algorand-sdk-2.3.0.tar.gz", hash = "sha256:6ccd9777007b3462f44fface7a7d040b6e21e03cede9319b0242d5498499889d"},
-    {file = "py_algorand_sdk-2.3.0-py3-none-any.whl", hash = "sha256:a4e0e55a488daed6262c78b5358eb90bfd465758ee345e816bb603460341d816"},
+    {file = "py-algorand-sdk-2.5.0.tar.gz", hash = "sha256:014b475595aedb82d9ac056d835f65f5ba44f6373aafef9ea4cfe515c648bcef"},
+    {file = "py_algorand_sdk-2.5.0-py3-none-any.whl", hash = "sha256:d1cb2a191edcda1e6febd2f4d830a5d441b243dfc47f9e2008630b52b2d61561"},
 ]
 
 [package.dependencies]
@@ -3169,4 +3170,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d05e936d452c8ac13c3abcdc1f70baf0cfcda8c278e28b28e6105419f56bed1f"
+content-hash = "045ecbf12ab12cb183f9bbcf5294079b6814881d5233bebc4dd623a589a71519"
