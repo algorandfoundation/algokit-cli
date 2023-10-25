@@ -1,0 +1,57 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+[
+  {
+    "transaction_id": "YGSOMX5QSASQALR5V4MH47L4GEHFJZVGSUETJAWUFM2I6PJAQL4Q",
+    "content": {
+      "amt": 1,
+      "fv": 33652328,
+      "gen": "testnet-v1.0",
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "lv": 33653328,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay"
+    }
+  },
+  {
+    "transaction_id": "MLS7IUJQVK7GABTCOLTG5QE7NWITX74D6YC3QZLN6Y5SZF23WZBQ",
+    "content": {
+      "amt": 2,
+      "fv": 33652328,
+      "gen": "testnet-v1.0",
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "lv": 33653328,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay"
+    }
+  },
+  {
+    "transaction_id": "NEI3KU7ALQ6PFOSTYEN3LSJX2CUDEESDH2NH2XUJGYHNR3UVB3OQ",
+    "content": {
+      "amt": 3,
+      "fv": 33652328,
+      "gen": "testnet-v1.0",
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "lv": 33653328,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay"
+    }
+  }
+]
+Would you like to proceed with signing the above? (y, n) [n]: y
+[
+  {
+    "transaction_id": "YGSOMX5QSASQALR5V4MH47L4GEHFJZVGSUETJAWUFM2I6PJAQL4Q",
+    "content": "gqNzaWfEQHHuPbhkAADyq8eKU/NiDCuJ+cnW9MrHT3iAAEPm+okmoio/rmgctA7QUpqqd4eF5aYlUcgz9EbU+uUXS1rFOg2jdHhuiKNhbXQBomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+  },
+  {
+    "transaction_id": "MLS7IUJQVK7GABTCOLTG5QE7NWITX74D6YC3QZLN6Y5SZF23WZBQ",
+    "content": "gqNzaWfEQMDbNg81bX8hvW+MHye1pJhtDxWvk/3Oec8lC8QZ5i0pn7LNnXTEniYzhECzjwxL11ENlTh6w66M2jl1f4YeZwijdHhuiKNhbXQComZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+  },
+  {
+    "transaction_id": "NEI3KU7ALQ6PFOSTYEN3LSJX2CUDEESDH2NH2XUJGYHNR3UVB3OQ",
+    "content": "gqNzaWfEQJPaDlnXKBkMacMv6SNJmDlRf2dBzVBZwhOelc/Q+uriONVXzP0pqmZqqCua/fo3DxH9tbKyCDcSYVmn9MsaLgqjdHhuiKNhbXQDomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+  }
+]

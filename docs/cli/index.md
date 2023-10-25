@@ -34,6 +34,8 @@
     - [-C, --command ](#-c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
     - [-P, --path ](#-p---path-)
+    - [--deployer ](#--deployer-)
+    - [--dispenser ](#--dispenser-)
     - [Arguments](#arguments-1)
     - [ENVIRONMENT_NAME](#environment_name)
   - [dispenser](#dispenser)
@@ -97,6 +99,85 @@
     - [start](#start)
     - [status](#status)
     - [stop](#stop)
+  - [task](#task)
+    - [ipfs](#ipfs)
+    - [Options](#options-17)
+    - [-f, --file ](#-f---file--1)
+    - [-n, --name ](#-n---name--1)
+    - [mint](#mint)
+    - [Options](#options-18)
+    - [--creator ](#--creator-)
+    - [-n, --name ](#-n---name--2)
+    - [-u, --unit ](#-u---unit-)
+    - [-t, --total ](#-t---total-)
+    - [-d, --decimals ](#-d---decimals-)
+    - [-i, --image ](#-i---image-)
+    - [-m, --metadata ](#-m---metadata-)
+    - [--mutable, --immutable](#--mutable---immutable)
+    - [--nft, --ft](#--nft---ft)
+    - [-n, --network ](#-n---network-)
+    - [nfd-lookup](#nfd-lookup)
+    - [Options](#options-19)
+    - [-o, --output ](#-o---output--2)
+    - [Arguments](#arguments-5)
+    - [VALUE](#value)
+    - [opt-in](#opt-in)
+    - [Options](#options-20)
+    - [-a, --account ](#-a---account-)
+    - [-n, --network ](#-n---network--1)
+    - [Arguments](#arguments-6)
+    - [ASSET_IDS](#asset_ids)
+    - [opt-out](#opt-out)
+    - [Options](#options-21)
+    - [-a, --account ](#-a---account--1)
+    - [--all](#--all)
+    - [-n, --network ](#-n---network--2)
+    - [Arguments](#arguments-7)
+    - [ASSET_IDS](#asset_ids-1)
+    - [send](#send)
+    - [Options](#options-22)
+    - [-f, --file ](#-f---file--2)
+    - [-t, --transaction ](#-t---transaction-)
+    - [-n, --network ](#-n---network--3)
+    - [sign](#sign)
+    - [Options](#options-23)
+    - [-a, --account ](#-a---account--2)
+    - [-f, --file ](#-f---file--3)
+    - [-t, --transaction ](#-t---transaction--1)
+    - [-o, --output ](#-o---output--3)
+    - [--force](#--force-1)
+    - [transfer](#transfer)
+    - [Options](#options-24)
+    - [-s, --sender ](#-s---sender-)
+    - [-r, --receiver ](#-r---receiver--1)
+    - [--asset, --id ](#--asset---id-)
+    - [-a, --amount ](#-a---amount--1)
+    - [--whole-units](#--whole-units-2)
+    - [-n, --network ](#-n---network--4)
+    - [vanity-address](#vanity-address)
+    - [Options](#options-25)
+    - [-m, --match ](#-m---match-)
+    - [-o, --output ](#-o---output--4)
+    - [-a, --alias ](#-a---alias-)
+    - [--file-path ](#--file-path-)
+    - [-f, --force](#-f---force)
+    - [Arguments](#arguments-8)
+    - [KEYWORD](#keyword)
+    - [wallet](#wallet)
+    - [Options](#options-26)
+    - [-a, --address ](#-a---address-)
+    - [-m, --mnemonic](#-m---mnemonic)
+    - [-f, --force](#-f---force-1)
+    - [Arguments](#arguments-9)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-10)
+    - [ALIAS](#alias)
+    - [Options](#options-27)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-11)
+    - [ALIAS](#alias-1)
+    - [Options](#options-28)
+    - [-f, --force](#-f---force-3)
 
 # algokit
 
@@ -284,6 +365,14 @@ Enable/disable interactive prompts. If the CI environment variable is set, defau
 ### -P, --path <path>
 Specify the project directory. If not provided, current working directory will be used.
 
+
+### --deployer <deployer_alias>
+(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic if specified in .algokit.toml file.
+
+
+### --dispenser <dispenser_alias>
+(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic if specified in .algokit.toml file.
+
 ### Arguments
 
 
@@ -310,7 +399,7 @@ algokit dispenser fund [OPTIONS]
 
 
 ### -r, --receiver <receiver>
-**Required** Receiver address to fund with TestNet ALGOs.
+**Required** Address or alias of the receiver to fund with TestNet ALGOs.
 
 
 ### -a, --amount <amount>
@@ -629,3 +718,443 @@ Stop the AlgoKit LocalNet.
 ```shell
 algokit localnet stop [OPTIONS]
 ```
+
+## task
+
+Collection of useful tasks to help you develop on Algorand.
+
+```shell
+algokit task [OPTIONS] COMMAND [ARGS]...
+```
+
+### ipfs
+
+Upload files to IPFS using Web3 Storage provider.
+
+```shell
+algokit task ipfs [OPTIONS] COMMAND [ARGS]...
+```
+
+#### login
+
+Login to web3 storage ipfs provider.
+
+```shell
+algokit task ipfs login [OPTIONS]
+```
+
+#### logout
+
+Logout of web3 storage ipfs provider.
+
+```shell
+algokit task ipfs logout [OPTIONS]
+```
+
+#### upload
+
+Upload a file to web3 storage ipfs provider. Please note, max file size is 100MB.
+
+```shell
+algokit task ipfs upload [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file_path>
+**Required** Path to the file to upload.
+
+
+### -n, --name <name>
+Human readable name for this upload, for use in file listings.
+
+### mint
+
+Mint new fungible or non-fungible assets on Algorand.
+
+```shell
+algokit task mint [OPTIONS]
+```
+
+### Options
+
+
+### --creator <creator>
+**Required** Address or alias of the asset creator.
+
+
+### -n, --name <asset_name>
+**Required** Asset name.
+
+
+### -u, --unit <unit_name>
+**Required** Unit name of the asset.
+
+
+### -t, --total <total>
+Total supply of the asset. Defaults to 1.
+
+
+### -d, --decimals <decimals>
+Number of decimals. Defaults to 0.
+
+
+### -i, --image <image_path>
+**Required** Path to the asset image file to be uploaded to IPFS.
+
+
+### -m, --metadata <token_metadata_path>
+Path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not provided,
+a default metadata object will be generated automatically based on asset-name, decimals and image.
+For more details refer to [https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema).
+
+
+### --mutable, --immutable
+Whether the asset should be mutable or immutable. Refers to ARC19 by default.
+
+
+### --nft, --ft
+Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+definitions of pure or fractional NFTs as per ARC3 standard.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### nfd-lookup
+
+Perform a lookup via NFD domain or address, returning the associated address or domain respectively.
+
+```shell
+algokit task nfd-lookup [OPTIONS] VALUE
+```
+
+### Options
+
+
+### -o, --output <output>
+Output format for NFD API response. Defaults to address|domain resolved.
+
+
+* **Options**
+
+    full | tiny | address
+
+
+### Arguments
+
+
+### VALUE
+Required argument
+
+### opt-in
+
+Opt-in to an asset(s). This is required before you can receive an asset. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
+
+```shell
+algokit task opt-in [OPTIONS] ASSET_IDS...
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### Arguments
+
+
+### ASSET_IDS
+Required argument(s)
+
+### opt-out
+
+opt-out of an asset(s). You can only opt out of an asset with a zero balance. Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
+
+```shell
+algokit task opt-out [OPTIONS] [ASSET_IDS]...
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### --all
+Opt-out of all assets with zero balance.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### Arguments
+
+
+### ASSET_IDS
+Optional argument(s)
+
+### send
+
+Send a signed transaction to the given network.
+
+```shell
+algokit task send [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <file>
+Single or multiple message pack encoded signed transactions from binary file to send. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Base64 encoded signed transaction to send. Option is mutually exclusive with file.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### sign
+
+Sign goal clerk compatible Algorand transaction(s).
+
+```shell
+algokit task sign [OPTIONS]
+```
+
+### Options
+
+
+### -a, --account <account>
+**Required** Address or alias of the signer account.
+
+
+### -f, --file <file>
+Single or multiple message pack encoded transactions from binary file to sign. Option is mutually exclusive with transaction.
+
+
+### -t, --transaction <transaction>
+Single base64 encoded transaction object to sign. Option is mutually exclusive with file.
+
+
+### -o, --output <output>
+The output file path to store signed transaction(s).
+
+
+### --force
+Force signing without confirmation.
+
+### transfer
+
+Transfer algos or assets from one account to another.
+
+```shell
+algokit task transfer [OPTIONS]
+```
+
+### Options
+
+
+### -s, --sender <sender>
+**Required** Address or alias of the sender account.
+
+
+### -r, --receiver <receiver>
+**Required** Address or alias to an account that will receive the asset(s).
+
+
+### --asset, --id <asset_id>
+Asset ID to transfer. Defaults to 0 (Algo).
+
+
+### -a, --amount <amount>
+**Required** Amount to transfer.
+
+
+### --whole-units
+Use whole units (Algos | ASAs) instead of smallest divisible units (for example, microAlgos). Disabled by default.
+
+
+### -n, --network <network>
+Network to use. Refers to localnet by default.
+
+
+* **Options**
+
+    localnet | testnet | mainnet
+
+
+### vanity-address
+
+Generate a vanity Algorand address. Your KEYWORD can only include letters A - Z and numbers 2 - 7.
+Keeping your KEYWORD under 5 characters will usually result in faster generation.
+Note: The longer the KEYWORD, the longer it may take to generate a matching address.
+Please be patient if you choose a long keyword.
+
+```shell
+algokit task vanity-address [OPTIONS] KEYWORD
+```
+
+### Options
+
+
+### -m, --match <match>
+Location where the keyword will be included. Default is start.
+
+
+* **Options**
+
+    start | anywhere | end
+
+
+
+### -o, --output <output>
+How the output will be presented.
+
+
+* **Options**
+
+    stdout | alias | file
+
+
+
+### -a, --alias <alias>
+Alias for the address. Required if output is "alias".
+
+
+### --file-path <output_file_path>
+File path where to dump the output. Required if output is "file".
+
+
+### -f, --force
+Allow overwriting an aliases without confirmation, if output option is 'alias'.
+
+### Arguments
+
+
+### KEYWORD
+Required argument
+
+### wallet
+
+Create short aliases for your addresses and accounts on AlgoKit CLI.
+
+```shell
+algokit task wallet [OPTIONS] COMMAND [ARGS]...
+```
+
+#### add
+
+Add an address or account to be stored against a named alias (at most 50 aliases).
+
+```shell
+algokit task wallet add [OPTIONS] ALIAS_NAME
+```
+
+### Options
+
+
+### -a, --address <address>
+**Required** The address of the account.
+
+
+### -m, --mnemonic
+If specified then prompt the user for a mnemonic phrase interactively using masked input.
+
+
+### -f, --force
+Allow overwriting an existing alias.
+
+### Arguments
+
+
+### ALIAS_NAME
+Required argument
+
+#### get
+
+Get an address or account stored against a named alias.
+
+```shell
+algokit task wallet get [OPTIONS] ALIAS
+```
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### list
+
+List all addresses and accounts stored against a named alias.
+
+```shell
+algokit task wallet list [OPTIONS]
+```
+
+#### remove
+
+Remove an address or account stored against a named alias.
+
+```shell
+algokit task wallet remove [OPTIONS] ALIAS
+```
+
+### Options
+
+
+### -f, --force
+Allow removing an alias without confirmation.
+
+### Arguments
+
+
+### ALIAS
+Required argument
+
+#### reset
+
+Remove all aliases.
+
+```shell
+algokit task wallet reset [OPTIONS]
+```
+
+### Options
+
+
+### -f, --force
+Allow removing all aliases without confirmation.

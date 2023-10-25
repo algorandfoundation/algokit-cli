@@ -1,0 +1,3 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: Token name in metadata JSON must match CLI argument providing token name!
+Error: Failed to mint the asset!

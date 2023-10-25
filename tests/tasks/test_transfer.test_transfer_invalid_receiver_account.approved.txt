@@ -1,0 +1,3 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: `invalid-address` does not exist
+Error: Alias `invalid-address` alias does not exist.

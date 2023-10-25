@@ -1,0 +1,12 @@
+[
+  {
+    "alias": "test_alias_1",
+    "address": "test_address_1",
+    "has_private_key": false
+  },
+  {
+    "alias": "test_alias_2",
+    "address": "test_address_2",
+    "has_private_key": true
+  }
+]

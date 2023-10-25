@@ -58,7 +58,10 @@ class ShellCompletion:
         self.profile_line = f". {home_based_source_path}\n"
 
     def install(self) -> None:
-        self._save_source()
+        try:
+            self._save_source()
+        except click.exceptions.Exit:
+            raise
         if self._insert_profile_line():
             logger.info(f"AlgoKit completions installed for {self.shell} 🎉")
         else:
