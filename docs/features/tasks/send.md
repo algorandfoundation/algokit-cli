@@ -43,7 +43,7 @@ This will send the transactions to the default `localnet` network. If you want t
 $ algokit task send --transaction {YOUR_BASE64_ENCODED_SIGNED_TRANSACTION} --network testnet
 ```
 
-You can also pipe the `stdout` of `algokit sign` command:
+You can also pipe in the `stdout` of `algokit sign` command:
 
 ```bash
 $ algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --file {PATH_TO_BINARY_FILE_CONTAINING_TRANSACTIONS} --force | algokit task send --network {network_name}

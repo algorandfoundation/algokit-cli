@@ -82,7 +82,7 @@ When you use AlgoKit to store a mnemonic, it is never printed or exposed directl
 
 To retrieve the stored mnemonic, you will need to manually navigate to your operating system's password manager. The keyring library supports a variety of password managers across different operating systems. Here are some examples:
 
-- On macOS, the keyring library uses the Keychain Access app.
+- On macOS, it uses the Keychain Access app.
 - On Windows, it uses the Credential Manager.
 - On Linux, it can use Secret Service API, KWallet, or an in-memory store depending on your setup.
 
