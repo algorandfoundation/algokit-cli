@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.0 (2023-10-26)
+
+### Feature
+
+* Algokit tasks - 1.6.0 release ([#334](https://github.com/algorandfoundation/algokit-cli/issues/334)) ([`e35f4f8`](https://github.com/algorandfoundation/algokit-cli/commit/e35f4f836f5433449a6685d1aeca01b8fd416fe2))
+
+### Fix
+
+* Pinning aiohttp beta to hotfix 3.12 support ([#338](https://github.com/algorandfoundation/algokit-cli/issues/338)) ([`96fc7e6`](https://github.com/algorandfoundation/algokit-cli/commit/96fc7e668c3a5b4fb9f00216ee6278b8ded1cf87))
+
 ## v1.5.3 (2023-10-23)
 
 
