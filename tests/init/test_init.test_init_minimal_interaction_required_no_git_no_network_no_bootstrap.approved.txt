@@ -4,7 +4,7 @@ Please inspect the template repository, and pay particular attention to the valu
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 DEBUG: project path = {current_working_directory}/myapp
 Starting template copy and render...
-No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
+No git tags found in template; using HEAD as ref
 Template render complete!
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐

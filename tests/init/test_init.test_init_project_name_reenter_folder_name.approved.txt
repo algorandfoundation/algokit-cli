@@ -7,8 +7,8 @@ WARNING: Re-using existing directory, this is not recommended because if project
 ? Name of project / directory to create the project in: 
 DEBUG: project path = {current_working_directory}/FAKE_PROJECT_2
 Starting template copy and render...
-No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
+No git tags found in template; using HEAD as ref
 Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/FAKE_PROJECT_2/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
