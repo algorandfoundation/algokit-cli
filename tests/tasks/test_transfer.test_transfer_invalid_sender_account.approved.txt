@@ -1,0 +1,2 @@
+DEBUG: `invalid-address` does not exist
+Error: Alias `invalid-address` alias does not exist.

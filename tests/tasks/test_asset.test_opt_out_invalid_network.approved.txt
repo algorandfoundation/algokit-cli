@@ -1,0 +1,4 @@
+Usage: algokit task opt-out [OPTIONS] [ASSET_IDS]...
+Try 'algokit task opt-out -h' for help.
+
+Error: Invalid value for '-n' / '--network': 'invalid-network' is not one of 'localnet', 'testnet', 'mainnet'.

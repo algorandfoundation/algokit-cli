@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "1.5.3"
+version = "1.6.0"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -23,6 +23,11 @@ mslex = "^1.1.0"
 keyring = "^24.2.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
+algokit-utils = "v2.1.0"
+multiformats = "^0.2.1"
+# Temporary workaround for https://github.com/aio-libs/aiohttp/issues/7675
+# aihttp is used by auth0 but we don't rely on abstractions using it directly so we can pin it for the time being
+aiohttp = "3.9.0beta0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

@@ -1,0 +1,2 @@
+DEBUG: dummy error
+Error: Failed to perform transfer

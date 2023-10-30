@@ -1,0 +1,3 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+DEBUG: Invalid base64-encoded string: number of data characters (5) cannot be 1 more than a multiple of 4
+Error: Failed to decode transaction! If you are intending to sign multiple transactions use `--file` instead.
