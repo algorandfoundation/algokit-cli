@@ -220,7 +220,7 @@ def init_command(  # noqa: PLR0913
     #       to their repo to include py.typed file
     from copier.main import Worker  # type: ignore[import]
 
-    from algokit.core.init import populate_default_answers  # type: ignore[import]
+    from algokit.core.init import populate_default_answers
 
     with Worker(
         src_path=template.url,
