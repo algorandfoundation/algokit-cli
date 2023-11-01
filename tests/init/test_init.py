@@ -488,7 +488,7 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     ref = "abcdef123456"
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
-        "init --name myapp --no-git --no-bootstrap --defaults "
+        "init --name myapp --no-git --no-bootstrap "
         "--template-url gh:algorandfoundation/algokit-beaker-default-template "
         f"--template-url-ref {ref} "
         "--UNSAFE-SECURITY-accept-template-url",
