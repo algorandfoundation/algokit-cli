@@ -56,7 +56,7 @@ AlgoKit supports using a [local version of the Algorand blockchain](../features/
 algokit localnet start
 ```
 
-This should start an instance of the LocalNet within docker. If you open the Docker Desktop application you should something similar to the following:
+This should start an instance of the LocalNet within docker. If you open the Docker Desktop application you should see something similar to the following:
 
 ![Docker Desktop LocalNet Instance](../imgs/localnet.png)
 
