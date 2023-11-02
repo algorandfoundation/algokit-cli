@@ -1,6 +1,7 @@
 import logging
 import re
 import shutil
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NoReturn
@@ -207,7 +208,7 @@ def init_command(  # noqa: PLR0913
     # if the template is a trusted Algorand template that has _tasks defined in copier.yml (e.g: fullstack template)
     # we need to set the unsafe_security_accept_template_url to true for copier worker to trust the template
     if not unsafe_security_accept_template_url:
-        unsafe_security_accept_template_url = _safe_template(template.url)
+        unsafe_security_accept_template_url = _is_algorand_foundation_repo(template.url)
 
     logger.debug(f"template source = {template}")
 
@@ -408,8 +409,20 @@ def _get_template(
     return template
 
 
-def _safe_template(url: str) -> bool:
-    return url.startswith(("gh:algorandfoundation/", "https://github.com/algorandfoundation/"))
+def _is_algorand_foundation_repo(url: str) -> bool:
+    url = url.replace("gh:", "https://github.com/").replace("gl:", "https://gitlab.com/")
+    http_ssh_match = re.match(r"(https?|git)://([^/]+)/([^/]+)", url)
+    if http_ssh_match:
+        domain, path = http_ssh_match.group(2), http_ssh_match.group(3)
+        return domain in {"github.com", "gitlab.com"} and path.startswith("algorandfoundation")
+
+    if url.startswith(("/", "~", "\\"):
+        try:
+            remote_url = subprocess.check_output(["git", "-C", url, "remote", "get-url", "origin"], text=True).strip()
+            return _is_algorand_foundation_repo(remote_url)
+        except subprocess.CalledProcessError:
+            return False
+    return False
 
 
 class GitRepoValidator(questionary.Validator):
