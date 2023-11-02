@@ -204,6 +204,11 @@ def init_command(  # noqa: PLR0913
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+    # if the template is a trusted Algorand template that has _tasks defined in copier.yml (e.g: fullstack template)
+    # we need to set the unsafe_security_accept_template_url to true for copier worker to trust the template
+    if not unsafe_security_accept_template_url:
+        unsafe_security_accept_template_url = _safe_template(template.url)
+
     logger.debug(f"template source = {template}")
 
     project_path = _get_project_path(directory_name)
@@ -401,6 +406,10 @@ def _get_template(
             _fail_and_bail()
         template = TemplateSource(url=url, commit=commit)
     return template
+
+
+def _safe_template(url: str) -> bool:
+    return url.startswith(("gh:algorandfoundation/", "https://github.com/algorandfoundation/"))
 
 
 class GitRepoValidator(questionary.Validator):
