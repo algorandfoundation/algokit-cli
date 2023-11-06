@@ -204,6 +204,7 @@ def init_command(  # noqa: PLR0913
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+    logger.debug(f"template source = {template}")
 
     project_path = _get_project_path(directory_name)
     logger.debug(f"project path = {project_path}")

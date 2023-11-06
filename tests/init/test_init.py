@@ -560,7 +560,7 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --template beaker_with_version --UNSAFE-SECURITY-accept-template-url"
+        "init --name myapp --no-git --template beaker_with_version"
         " --defaults -a run_poetry_install False -a author_name None -a author_email None ",
         cwd=cwd,
     )
