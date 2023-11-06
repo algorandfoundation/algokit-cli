@@ -499,6 +499,80 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     assert mock_copier_worker_cls.call_args.kwargs["vcs_ref"] == ref
 
 
+def test_init_blessed_template_url_get_community_warning(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    mock_questionary_input.send_text("N")  # community warning
+    result = invoke(
+        "init --name myapp --no-git "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "-a author_name None -a author_email None ",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_with_any_template_url_get_community_warning(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    mock_questionary_input.send_text("Y")
+    result = invoke(
+        "init --name myapp --no-git --no-bootstrap "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "-a author_name None -a author_email None ",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "smart_contracts",
+        }
+    )
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
+    verify(
+        get_combined_verify_output(
+            result.output, additional_name=".env.template", additional_output=env_template_file_contents
+        ),
+        scrubber=make_output_scrubber(),
+    )
+
+
+def test_init_with_any_template_url_get_community_warning_with_unsafe_tag(tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    result = invoke(
+        "init --name myapp --no-git --no-bootstrap "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "-a author_name None -a author_email None --UNSAFE-SECURITY-accept-template-url",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
+    assert paths.issuperset(
+        {
+            Path("myapp"),
+            Path("myapp") / "README.md",
+            Path("myapp") / "smart_contracts",
+        }
+    )
+    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
+    verify(
+        get_combined_verify_output(
+            result.output, additional_name=".env.template", additional_output=env_template_file_contents
+        ),
+        scrubber=make_output_scrubber(),
+    )
+
+
 def test_init_no_community_template(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
