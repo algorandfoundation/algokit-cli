@@ -125,7 +125,14 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
     if not app_spec_path_or_dir.is_dir():
         app_specs = [app_spec_path_or_dir]
     else:
-        app_specs = sorted(app_spec_path_or_dir.rglob("application.json"))
+        patterns = ["application.json", "*.arc32.json"]
+
+        app_specs = []
+        for pattern in patterns:
+            app_specs.extend(app_spec_path_or_dir.rglob(pattern))
+        
+        app_specs = list(set(app_specs))
+        app_specs.sort()
         if not app_specs:
             raise click.ClickException("No app specs found")
     for app_spec in app_specs:
