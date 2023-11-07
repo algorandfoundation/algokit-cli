@@ -130,7 +130,7 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
         app_specs = []
         for pattern in patterns:
             app_specs.extend(app_spec_path_or_dir.rglob(pattern))
-        
+
         app_specs = list(set(app_specs))
         app_specs.sort()
         if not app_specs:
