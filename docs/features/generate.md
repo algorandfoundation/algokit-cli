@@ -4,8 +4,7 @@ The `algokit generate` [command](../cli/index.md#generate) is used to generate c
 
 ## 1. Typed clients
 
-The `algokit generate client` [command](../cli/index.md#client) can be used to generate a typed client from an [ARC-0032](https://arc.algorand.foundation/ARCs/arc-0032) application specification with
-both Python and TypeScript available as target languages.
+The `algokit generate client` [command](../cli/index.md#client) can be used to generate a typed client from an [ARC-0032](https://arc.algorand.foundation/ARCs/arc-0032) application specification with both Python and TypeScript available as target languages.
 
 ### Prerequisites
 
@@ -17,6 +16,10 @@ Each generated client will also have a dependency on `algokit-utils` libraries f
 - Python clients require: `algokit-utils@^1.2`
 - TypeScript clients require: `@algorandfoundation/algokit-utils@^2.0`
 
+### Input file / directory
+
+You can either specify a path to a ARC-0032 JSON file, or to a directory that is recursively scanned for `application.json` or `*.arc32.json` file(s).
+
 ### Output tokens
 
 The output path is interpreted as relative to the current working directory, however an absolute path may also be specified e.g.
@@ -25,7 +28,7 @@ The output path is interpreted as relative to the current working directory, how
 There are two tokens available for use with the `-o`, `--output` [option](../cli/index.md#-o---output-):
 
 - `{contract_name}`: This will resolve to a name based on the ARC-0032 contract name, formatted appropriately for the target language.
-- `{app_spec_dir}`: This will resolve to the parent directory of an `application.json` which can be useful to output a client relative to its source application.json.
+- `{app_spec_dir}`: This will resolve to the parent directory of the `application.json` or `*.arc32.json` file which can be useful to output a client relative to its source file.
 
 ### Usage
 
@@ -59,24 +62,24 @@ response = app_client.hello(name="World")
 
 ```typescript
 // A similar working example can be seen in the beaker_production template, when using TypeScript deployment
-import { HelloWorldAppClient } from './artifacts/HelloWorldApp/client'
+import { HelloWorldAppClient } from "./artifacts/HelloWorldApp/client";
 
 const appClient = new HelloWorldAppClient(
   {
-    resolveBy: 'creatorAndName',
+    resolveBy: "creatorAndName",
     findExistingUsing: indexer,
     sender: deployer,
     creatorAddress: deployer.addr,
   },
-  algod,
-)
+  algod
+);
 const app = await appClient.deploy({
   allowDelete: isLocal,
   allowUpdate: isLocal,
-  onSchemaBreak: isLocal ? 'replace' : 'fail',
-  onUpdate: isLocal ? 'update' : 'fail',
-})
-const response = await appClient.hello({ name: 'world' })
+  onSchemaBreak: isLocal ? "replace" : "fail",
+  onUpdate: isLocal ? "update" : "fail",
+});
+const response = await appClient.hello({ name: "world" });
 ```
 
 ### Examples
