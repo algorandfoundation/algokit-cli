@@ -1,0 +1,2 @@
+Generating Python client code for application specified in {current_working_directory}/app.arc32.json and writing to client.py
+Output typed client for HelloWorldApp to client.py

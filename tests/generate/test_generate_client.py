@@ -13,7 +13,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
-DirWithAppSpecFactory = Callable[[Path], Path]
+DirWithAppSpecFactory = Callable[[Path, str], Path]
 
 
 def _normalize_output(output: str) -> str:
@@ -29,9 +29,9 @@ def cwd(tmp_path_factory: TempPathFactory) -> Path:
 def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
     app_spec_example_path = Path(__file__).parent / "application.json"
 
-    def factory(app_spec_dir: Path) -> Path:
+    def factory(app_spec_dir: Path, app_spec_file_name: str) -> Path:
         app_spec_dir.mkdir(exist_ok=True, parents=True)
-        app_spec_path = app_spec_dir / "application.json"
+        app_spec_path = app_spec_dir / app_spec_file_name
         shutil.copy(app_spec_example_path, app_spec_path)
         return app_spec_path
 
@@ -40,7 +40,12 @@ def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
 
 @pytest.fixture()
 def application_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
-    return dir_with_app_spec_factory(cwd)
+    return dir_with_app_spec_factory(cwd, "application.json")
+
+
+@pytest.fixture()
+def arc32_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
+    return dir_with_app_spec_factory(cwd, "app.arc32.json")
 
 
 @pytest.fixture(autouse=True)
@@ -80,6 +85,21 @@ def test_generate_client_python(application_json: Path, options: str, expected_o
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
     assert (application_json.parent / expected_output_path).exists()
     assert (application_json.parent / expected_output_path).read_text()
+
+
+@pytest.mark.parametrize(
+    ("options", "expected_output_path"),
+    [
+        ("-o client.py", "client.py"),
+    ],
+)
+def test_generate_client_python_arc32_filename(arc32_json: Path, options: str, expected_output_path: Path) -> None:
+    result = invoke(f"generate client {options} {arc32_json.name}", cwd=arc32_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
+    assert (arc32_json.parent / expected_output_path).exists()
+    assert (arc32_json.parent / expected_output_path).read_text()
 
 
 @pytest.mark.parametrize(
@@ -133,7 +153,7 @@ def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWith
         cwd / "dir2" / "sub_dir",
     ]
     for dir_path in dir_paths:
-        dir_with_app_spec_factory(dir_path)
+        dir_with_app_spec_factory(dir_path, "application.json")
 
     result = invoke("generate client -o {app_spec_dir}/output.py .", cwd=cwd)
     assert result.exit_code == 0
