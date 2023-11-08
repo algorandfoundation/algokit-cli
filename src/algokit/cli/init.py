@@ -228,6 +228,7 @@ def init_command(  # noqa: PLR0913
         data=answers_dict,
         quiet=True,
         vcs_ref=template.commit,
+        unsafe=True,
     ) as copier_worker:
         if use_defaults:
             populate_default_answers(copier_worker)

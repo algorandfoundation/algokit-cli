@@ -8,7 +8,6 @@ def populate_default_answers(worker: Worker) -> None:
     Used as a work-around for the behaviour of Worker(default=True, ...) which in >=7.1 raises an error instead of
     prompting if no default is provided"""
     answers = AnswersMap(
-        default=worker.template.default_answers,
         user_defaults=worker.user_defaults,
         init=worker.data,
         last=worker.subproject.last_answers,
