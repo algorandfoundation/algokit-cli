@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.1 (2023-11-08)
+
+### Documentation
+
+* Typo resolved ([#341](https://github.com/algorandfoundation/algokit-cli/issues/341)) ([`e71ff96`](https://github.com/algorandfoundation/algokit-cli/commit/e71ff964a9879a30689be049d3af3ec3002c3198))
+* Fixing typo in docs ([#339](https://github.com/algorandfoundation/algokit-cli/issues/339)) ([`e8eba42`](https://github.com/algorandfoundation/algokit-cli/commit/e8eba421b32767ae9d57d8bbe75f86c268f5cbf7))
+
 ## v1.6.0 (2023-10-26)
 
 ### Feature
