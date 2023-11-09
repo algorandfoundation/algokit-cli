@@ -356,7 +356,7 @@ def test_goal_postprocess_of_command_args(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
     assert result.exit_code == 0
 
-    # check if the output files is no longer in the goal_mount_path
+    # check if the output files are no longer in the goal_mount_path
     assert not (mocked_goal_mount_path / "approval.compiled").exists()
 
     # check if the input/output file is in the cwd
@@ -367,6 +367,49 @@ def test_goal_postprocess_of_command_args(
     assert (mocked_goal_mount_path / "approval.group").exists()
     assert (mocked_goal_mount_path / "approval.group.sig").exists()
     assert (mocked_goal_mount_path / "approval.group.sig.out").exists()
+
+
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose")
+@pytest.mark.parametrize("_setup_input_files", [[{"name": "group.gtxn", "content": ""}]], indirect=True)
+def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_files(
+    proc_mock: ProcMock,
+    cwd: Path,
+    mocked_goal_mount_path: Path,
+) -> None:
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_algod",
+        "goal",
+        "clerk",
+        "split",
+    ]
+
+    def dump_files(cwd: Path) -> None:
+        (cwd / "group-0.txn").touch()
+        (cwd / "group-1.txn").touch()
+
+    proc_mock.set_output(
+        expected_arguments,
+        output=["Wrote transaction"],
+        side_effect=dump_files,
+        side_effect_args={"cwd": mocked_goal_mount_path},
+    )
+
+    result = invoke("goal clerk split -i group.gtxn -o group.txn", cwd=cwd)
+    assert result.exit_code == 0
+
+    # check if the output files are no longer in the goal_mount_path
+    assert not (mocked_goal_mount_path / "group-0.txn").exists()
+    assert not (mocked_goal_mount_path / "group-1.txn").exists()
+
+    # check if the input/output file is in the cwd
+    assert (cwd / "group.gtxn").exists()
+    assert (cwd / "group-0.txn").exists()
+    assert (cwd / "group-1.txn").exists()
 
 
 @pytest.mark.usefixtures("proc_mock")
