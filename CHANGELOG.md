@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.2 (2023-11-10)
+
+### Fix
+
+* Support detect ~/test.txt as valid goal paths ([#347](https://github.com/algorandfoundation/algokit-cli/issues/347)) ([`8ac5ec5`](https://github.com/algorandfoundation/algokit-cli/commit/8ac5ec5843cf243fb051e504d821b719c37cbe38))
+* Support the multiple file outputs of goal clerk split ([#346](https://github.com/algorandfoundation/algokit-cli/issues/346)) ([`fd9cd54`](https://github.com/algorandfoundation/algokit-cli/commit/fd9cd54137ca40595220fe916799eb682971387b))
+
 ## v1.6.1 (2023-11-08)
 
 ### Documentation
