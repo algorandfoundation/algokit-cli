@@ -28,7 +28,7 @@ class NetworkConfiguration(NetworkConfigurationRequired, total=False):
 
 
 GITPOD_URL = os.environ.get("GITPOD_WORKSPACE_URL")
-CODESPAE_NAME = os.environ.get("CODESPACE_NAME")
+CODESPACE_NAME = os.environ.get("CODESPACE_NAME")
 
 if GITPOD_URL:
     algod_url = GITPOD_URL.replace("https://", "https://4001-")
@@ -37,10 +37,10 @@ if GITPOD_URL:
     algod_port = 443
     indexer_port = 443
     kmd_port = 443
-elif CODESPAE_NAME:
-    algod_url = f"https://{CODESPAE_NAME}-4001.app.github.dev"
-    indexer_url = f"https://{CODESPAE_NAME}-8980.app.github.dev"
-    kmd_url = f"https://{CODESPAE_NAME}-4002.app.github.dev"
+elif CODESPACE_NAME:
+    algod_url = f"https://{CODESPACE_NAME}-4001.app.github.dev"
+    indexer_url = f"https://{CODESPACE_NAME}-8980.app.github.dev"
+    kmd_url = f"https://{CODESPACE_NAME}-4002.app.github.dev"
     algod_port = 443
     indexer_port = 443
     kmd_port = 443
