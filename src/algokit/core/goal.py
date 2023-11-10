@@ -16,9 +16,12 @@ def get_volume_mount_path_local() -> Path:
     return get_app_config_dir().joinpath("sandbox", "goal_mount")
 
 
+filename_pattern = re.compile(r"^[\w-]+\.\w+$")
+
+
 def is_path_or_filename(argument: str) -> bool:
-    filename_pattern = re.compile(r"^[\w-]+\.\w+$")
-    return filename_pattern.match(argument) is not None or len(PurePath(argument).parts) > 1
+    path = PurePath(argument)
+    return len(path.parts) > 1 or (len(path.parts) == 1 and filename_pattern.match(path.parts[0]) is not None)
 
 
 def delete_files_from_volume_mount(filename: str, volume_mount_path_docker: Path) -> None:
