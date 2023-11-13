@@ -1,0 +1,71 @@
+version: '3'
+name: "algokit_sandbox"
+
+services:
+  algod:
+    container_name: algokit_algod
+    image: "algorand/algod:master"
+    ports:
+      - 4001:8080
+      - 4002:7833
+      - 9392:9392
+    environment:
+      START_KMD: 1
+      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
+    volumes:
+      - type: bind
+        source: ./algod_config.json
+        target: /etc/algorand/config.json
+      - ./goal_mount:/root/goal_mount
+
+  algod-follower:
+    image: algorand/algod:latest
+    restart: unless-stopped
+    # follower node is internal
+    ports:
+      - 5190:8080 # exposed for testing.
+    environment:
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      PROFILE: conduit
+      GENESIS_ADDRESS: algod:8080
+      PEER_ADDRESS: algod:10000
+    depends_on:
+      - algod
+
+  conduit:
+    container_name: algokit_conduit
+    image: "algorand/conduit:1.5.0"
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ~/.config/algokit/sandbox/conduit.yml
+        target: /etc/algorand/conduit.yml
+    depends_on:
+      - indexer-db
+      - algod-follower
+
+  indexer-db:
+    container_name: algokit_postgres
+    image: postgres:13-alpine
+    ports:
+      - 5443:5432
+    user: postgres
+    environment:
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: conduitdb
+
+  indexer:
+    image: algorand/indexer:3.3.0
+    ports:
+      - "8980:8980"
+    restart: unless-stopped
+    command: daemon
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+    depends_on:
+      - conduit
