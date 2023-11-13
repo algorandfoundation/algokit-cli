@@ -301,8 +301,8 @@ services:
       - {kmd_port}:7833
       - {tealdbg_port}:9392
     environment:
-      DEV_MODE: 1
       START_KMD: 1
+      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       GOSSIP_PORT: 10000
@@ -319,7 +319,6 @@ services:
     ports:
       - 5190:8080 # exposed for testing.
     environment:
-      DEV_MODE: 1
       TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       PROFILE: conduit
@@ -327,10 +326,10 @@ services:
       PEER_ADDRESS: algod:10000
     depends_on:
       - algod
-      
+
   conduit:
     container_name: {name}_conduit
-    image: "algorand/conduit:1.2.0"
+    image: "algorand/conduit:1.5.0"
     restart: unless-stopped
     volumes:
       - type: bind
@@ -339,7 +338,7 @@ services:
     depends_on:
       - indexer-db
       - algod-follower
-      
+
   indexer-db:
     container_name: {name}_postgres
     image: postgres:13-alpine
@@ -352,7 +351,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    image: algorand/indexer:3.0.0
+    image: algorand/indexer:3.3.0
     ports:
       - "8980:8980"
     restart: unless-stopped
@@ -360,7 +359,7 @@ services:
     environment:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
     depends_on:
-      - indexer-db
+      - conduit
 """
 
 
