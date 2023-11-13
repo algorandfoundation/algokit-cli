@@ -12,7 +12,6 @@ from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
 
-
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
 
 
@@ -28,12 +27,17 @@ class ComposeSandbox:
         if not self.directory.exists():
             logger.debug("Sandbox directory does not exist yet; creating it")
             self.directory.mkdir()
+        self._conduit_yaml = get_conduit_yaml()
         self._latest_yaml = get_docker_compose_yml()
         self._latest_config_json = get_config_json()
 
     @property
     def compose_file_path(self) -> Path:
         return self.directory / "docker-compose.yml"
+
+    @property
+    def conduit_file_path(self) -> Path:
+        return self.directory / "conduit.yml"
 
     @property
     def algod_config_file_path(self) -> Path:
@@ -56,6 +60,7 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
 
     def write_compose_file(self) -> None:
+        self.conduit_file_path.write_text(self._conduit_yaml)
         self.compose_file_path.write_text(self._latest_yaml)
         self.algod_config_file_path.write_text(self._latest_config_json)
 
@@ -216,12 +221,73 @@ def get_config_json() -> str:
     )
 
 
+def get_conduit_yaml() -> str:
+    return """# Log verbosity: PANIC, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+log-level: INFO
+
+# If no log file is provided logs are written to stdout.
+#log-file:
+
+# Number of retries to perform after a pipeline plugin error.
+retry-count: 10
+
+# Time duration to wait between retry attempts.
+retry-delay: "1s"
+
+# Optional filepath to use for pidfile.
+#pid-filepath: /path/to/pidfile
+
+# Whether or not to print the conduit banner on startup.
+hide-banner: false
+
+# When enabled prometheus metrics are available on '/metrics'
+metrics:
+  mode: OFF
+  addr: ":9999"
+  prefix: "conduit"
+
+# The importer is typically an algod follower node.
+importer:
+  name: algod
+  config:
+    # The mode of operation, either "archival" or "follower".
+    # * archival mode allows you to start processing on any round but does not
+    # contain the ledger state delta objects required for the postgres writer.
+    # * follower mode allows you to use a lightweight non-archival node as the
+    # data source. In addition, it will provide ledger state delta objects to
+    # the processors and exporter.
+    mode: "follower"
+
+    # Algod API address.
+    netaddr: "http://algod-follower:8080"
+
+    # Algod API token.
+    token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+# Zero or more processors may be defined to manipulate what data
+# reaches the exporter.
+processors:
+
+# An exporter is defined to do something with the data.
+exporter:
+  name: postgresql
+  config:
+    # Pgsql connection string
+    # See https://github.com/jackc/pgconn for more details
+    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb"
+
+    # Maximum connection number for connection pool
+    # This means the total number of active queries that can be running
+    # concurrently can never be more than this
+    max-conn: 20
+"""
+
+
 def get_docker_compose_yml(
     name: str = "algokit",
     algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
     return f"""version: '3'
 name: "{name}_sandbox"
@@ -229,7 +295,7 @@ name: "{name}_sandbox"
 services:
   algod:
     container_name: {name}_algod
-    image: {ALGORAND_IMAGE}
+    image: "algorand/algod:master"
     ports:
       - {algod_port}:8080
       - {kmd_port}:7833
@@ -238,31 +304,42 @@ services:
       DEV_MODE: 1
       START_KMD: 1
       TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
     volumes:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
       - ./goal_mount:/root/goal_mount
 
-  indexer:
-    container_name: {name}_indexer
-    image: {INDEXER_IMAGE}
-    ports:
-      - {indexer_port}:8980
+  algod-follower:
+    image: {ALGORAND_IMAGE}
     restart: unless-stopped
+    # follower node is internal
+    ports:
+      - 5190:8080 # exposed for testing.
     environment:
-      ALGOD_HOST: algod
-      ALGOD_PORT: 8080
-      POSTGRES_HOST: indexer-db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: algorand
-      POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+      DEV_MODE: 1
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      PROFILE: conduit
+      GENESIS_ADDRESS: algod:8080
+      PEER_ADDRESS: algod:10000
+    depends_on:
+      - algod
+      
+  conduit:
+    container_name: {name}_conduit
+    image: "algorand/conduit:1.2.0"
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ~/.config/algokit/sandbox/conduit.yml
+        target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
-      - algod
-
+      - algod-follower
+      
   indexer-db:
     container_name: {name}_postgres
     image: postgres:13-alpine
@@ -272,7 +349,18 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+      POSTGRES_DB: conduitdb
+
+  indexer:
+    image: algorand/indexer:3.0.0
+    ports:
+      - "8980:8980"
+    restart: unless-stopped
+    command: daemon
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+    depends_on:
+      - indexer-db
 """
 
 
