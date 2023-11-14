@@ -30,6 +30,7 @@ class ComposeSandbox:
         self._conduit_yaml = get_conduit_yaml()
         self._latest_yaml = get_docker_compose_yml()
         self._latest_config_json = get_config_json()
+        self._latest_algod_network_template = get_algod_network_template()
 
     @property
     def compose_file_path(self) -> Path:
@@ -43,10 +44,15 @@ class ComposeSandbox:
     def algod_config_file_path(self) -> Path:
         return self.directory / "algod_config.json"
 
+    @property
+    def algod_network_template_file_path(self) -> Path:
+        return self.directory / "algod_network_template.json"
+
     def compose_file_status(self) -> ComposeFileStatus:
         try:
             compose_content = self.compose_file_path.read_text()
             config_content = self.algod_config_file_path.read_text()
+            algod_network_template_content = self.algod_network_template_file_path.read_text()
         except FileNotFoundError:
             # treat as out of date if compose file exists but algod config doesn't
             # so that existing setups aren't suddenly reset
@@ -54,7 +60,11 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
-            if compose_content == self._latest_yaml and config_content == self._latest_config_json:
+            if (
+                compose_content == self._latest_yaml
+                and config_content == self._latest_config_json
+                and algod_network_template_content == self._latest_algod_network_template
+            ):
                 return ComposeFileStatus.UP_TO_DATE
             else:
                 return ComposeFileStatus.OUT_OF_DATE
@@ -63,6 +73,7 @@ class ComposeSandbox:
         self.conduit_file_path.write_text(self._conduit_yaml)
         self.compose_file_path.write_text(self._latest_yaml)
         self.algod_config_file_path.write_text(self._latest_config_json)
+        self.algod_network_template_file_path.write_text(self._latest_algod_network_template)
 
     def _run_compose_command(
         self,
@@ -189,8 +200,9 @@ DEFAULT_INDEXER_PORT = 8980
 DEFAULT_WAIT_FOR_ALGOD = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
-INDEXER_IMAGE = "makerxau/algorand-indexer-dev:latest"
+INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
+CONDUIT_IMAGE = "algorand/conduit:latest"
 
 
 def _wait_for_algod() -> bool:
@@ -219,6 +231,62 @@ def get_config_json() -> str:
         '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
         ' "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}'
     )
+
+
+def get_algod_network_template() -> str:
+    return """{
+    "Genesis": {
+      "ConsensusProtocol": "future",
+      "NetworkName": "followermodenet",
+      "FirstPartKeyRound": 0,
+      "LastPartKeyRound":  NUM_ROUNDS,
+      "Wallets": [
+        {
+          "Name": "Wallet1",
+          "Stake": 40,
+          "Online": true
+        },
+        {
+          "Name": "Wallet2",
+          "Stake": 40,
+          "Online": true
+        },
+        {
+          "Name": "Wallet3",
+          "Stake": 20,
+          "Online": true
+        }
+      ],
+      "DevMode": true
+    },
+    "Nodes": [
+      {
+        "Name": "data",
+        "IsRelay": true,
+        "Wallets": [
+          {
+            "Name": "Wallet1",
+            "ParticipationOnly": false
+          },
+          {
+            "Name": "Wallet2",
+            "ParticipationOnly": false
+          },
+          {
+            "Name": "Wallet3",
+            "ParticipationOnly": false
+          }
+        ]
+      },
+      {
+        "Name": "follower",
+        "IsRelay": false,
+        "ConfigJSONOverride":
+        "{\\"EnableFollowMode\\":true,\\"EndpointAddress\\":\\"0.0.0.0:8081\\",\\"MaxAcctLookback\\":64,\\"CatchupParallelBlocks\\":64,\\"CatchupBlockValidateMode\\":3}"
+      }
+    ]
+  }
+"""
 
 
 def get_conduit_yaml() -> str:
@@ -259,7 +327,7 @@ importer:
     mode: "follower"
 
     # Algod API address.
-    netaddr: "http://algod-follower:8080"
+    netaddr: "http://algod:8081"
 
     # Algod API token.
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -295,7 +363,7 @@ name: "{name}_sandbox"
 services:
   algod:
     container_name: {name}_algod
-    image: "algorand/algod:master"
+    image: {ALGORAND_IMAGE}
     ports:
       - {algod_port}:8080
       - {kmd_port}:7833
@@ -310,26 +378,14 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
       - ./goal_mount:/root/goal_mount
-
-  algod-follower:
-    image: {ALGORAND_IMAGE}
-    restart: unless-stopped
-    # follower node is internal
-    ports:
-      - 5190:8080 # exposed for testing.
-    environment:
-      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      PROFILE: conduit
-      GENESIS_ADDRESS: algod:8080
-      PEER_ADDRESS: algod:10000
-    depends_on:
-      - algod
 
   conduit:
     container_name: {name}_conduit
-    image: "algorand/conduit:1.5.0"
+    image: {CONDUIT_IMAGE}
     restart: unless-stopped
     volumes:
       - type: bind
@@ -337,7 +393,7 @@ services:
         target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
-      - algod-follower
+      - algod
 
   indexer-db:
     container_name: {name}_postgres
@@ -351,7 +407,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    image: algorand/indexer:3.3.0
+    image: {INDEXER_IMAGE}
     ports:
       - "8980:8980"
     restart: unless-stopped
@@ -360,7 +416,7 @@ services:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
     depends_on:
       - conduit
-"""
+"""  # noqa: E501
 
 
 def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
