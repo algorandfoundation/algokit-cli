@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.6.3 (2023-11-14)
+
+### Fix
+
+* Correctly convert list of tuple to dictionary ([#353](https://github.com/algorandfoundation/algokit-cli/issues/353)) ([`ad71719`](https://github.com/algorandfoundation/algokit-cli/commit/ad717190f5822964d726555b7d7f8e1f5453cdfa))
+
 ## v1.6.2 (2023-11-10)
 
 ### Fix
