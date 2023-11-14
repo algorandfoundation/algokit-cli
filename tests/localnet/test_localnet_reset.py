@@ -1,5 +1,5 @@
 import pytest
-from algokit.core.sandbox import get_config_json, get_docker_compose_yml
+from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml
 
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
@@ -49,6 +49,7 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
     result = invoke("localnet reset")
 
@@ -61,6 +62,7 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_with_pull(a
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
     result = invoke("localnet reset --update")
 

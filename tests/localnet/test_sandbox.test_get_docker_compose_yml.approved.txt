@@ -4,7 +4,7 @@ name: "algokit_sandbox"
 services:
   algod:
     container_name: algokit_algod
-    image: "algorand/algod:master"
+    image: algorand/algod:latest
     ports:
       - 4001:8080
       - 4002:7833
@@ -19,26 +19,14 @@ services:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
       - ./goal_mount:/root/goal_mount
-
-  algod-follower:
-    image: algorand/algod:latest
-    restart: unless-stopped
-    # follower node is internal
-    ports:
-      - 5190:8080 # exposed for testing.
-    environment:
-      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      PROFILE: conduit
-      GENESIS_ADDRESS: algod:8080
-      PEER_ADDRESS: algod:10000
-    depends_on:
-      - algod
 
   conduit:
     container_name: algokit_conduit
-    image: "algorand/conduit:1.5.0"
+    image: algorand/conduit:latest
     restart: unless-stopped
     volumes:
       - type: bind
@@ -46,7 +34,7 @@ services:
         target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
-      - algod-follower
+      - algod
 
   indexer-db:
     container_name: algokit_postgres
@@ -60,7 +48,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    image: algorand/indexer:3.3.0
+    image: algorand/indexer:latest
     ports:
       - "8980:8980"
     restart: unless-stopped

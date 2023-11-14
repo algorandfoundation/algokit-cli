@@ -35,7 +35,7 @@ importer:
     mode: "follower"
 
     # Algod API address.
-    netaddr: "http://algod-follower:8080"
+    netaddr: "http://algod:8081"
 
     # Algod API token.
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
