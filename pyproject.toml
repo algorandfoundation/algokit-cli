@@ -17,7 +17,6 @@ shellingham = "^1.5.0.post1"
 algokit-client-generator = "^1.0.3"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
-# workaround for issue with copier dependency spec allowing major upgrade to pydantic v2
 pydantic = "^2.4.0"
 mslex = "^1.1.0"
 keyring = "^24.2.0"
