@@ -3,7 +3,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     // Don't want to use isort because it conflicts with Ruff - see run on save below
-    "source.organizeImports": false
+    "source.organizeImports": false,
+    "source.fixAll": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.exclude": {
@@ -32,33 +33,34 @@
     }
   },
   "python.analysis.extraPaths": ["${workspaceFolder}/src"],
-  "python.formatting.provider": "black",
   "[python]": {
     // https://dev.to/eegli/quick-guide-to-python-formatting-in-vs-code-2040
-    "editor.defaultFormatter": null
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.analysis.typeCheckingMode": "basic",
-  "python.linting.enabled": true,
-  "python.linting.lintOnSave": true,
-  "ruff.importStrategy": "fromEnvironment",
-  "python.linting.pylintEnabled": false,
-  "python.linting.mypyEnabled": false,
+  "ruff.lint.run": "onSave",
+  "ruff.lint.args": ["--config=pyproject.toml"], // not sure yet
+  "ruff.importStrategy": "fromEnvironment", // needed
+  "ruff.fixAll": true, //lint and fix all files in workspace   // not needed
+  "ruff.organizeImports": false, //organize imports on save   // not needed
+
   "mypy.configFile": "pyproject.toml",
   // set to empty array to use config from project
   "mypy.targets": [],
   "mypy.runUsingActiveInterpreter": true,
-  "python.linting.banditEnabled": false,
-  "python.linting.prospectorEnabled": false,
-  "python.linting.pydocstyleEnabled": false,
-  "python.linting.pycodestyleEnabled": false,
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "emeraldwalk.runonsave": {
     "commands": [
+      // Run Ruff formatter on save of Python file
+      // {
+      //   "match": "\\.py$",
+      //   "cmd": "${workspaceFolder}/.venv/bin/ruff format ${file}"
+      // },
       // Run Ruff linter on save of Python file
       {
         "match": "\\.py$",
-        "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix"
+        "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix" // not sure it is really needed -- see without extension
       }
     ]
   },
