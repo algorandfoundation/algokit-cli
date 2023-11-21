@@ -47,7 +47,7 @@ commands_sequence = args_file.read_text().splitlines()
 os.chdir(vcs_root / "src")
 for command in commands_sequence or [""]:
     click.echo(click.style(f"> algokit -v {command}", bold=True), err=True)
-    run_result = subprocess.run([sys.executable, "-m", "algokit", "-v", *command.split()])
+    run_result = subprocess.run([sys.executable, "-m", "algokit", "-v", *command.split()], check=True)
     if run_result.returncode != 0:
         click.echo(
             click.style(
