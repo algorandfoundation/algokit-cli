@@ -1,7 +1,7 @@
 import logging
-import os
 import re
 from datetime import timedelta
+from pathlib import Path
 from time import time
 
 import click
@@ -44,7 +44,7 @@ def get_latest_version_or_cached() -> str | None:
     version_check_path = get_app_state_dir() / "last-version-check"
 
     try:
-        last_checked = os.path.getmtime(version_check_path)
+        last_checked = Path.stat(version_check_path).st_mtime
         version = version_check_path.read_text(encoding="utf-8")
     except OSError:
         logger.debug(f"{version_check_path} inaccessible")

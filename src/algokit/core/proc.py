@@ -86,7 +86,7 @@ def run_interactive(
     command_str = " ".join(command)
     logger.debug(f"Running '{command_str}' in '{cwd or Path.cwd()}'")
 
-    result = subprocess_run(command, cwd=cwd, env=env)
+    result = subprocess_run(command, cwd=cwd, env=env, check=True)
 
     if result.returncode == 0:
         logger.debug(f"'{command_str}' completed successfully", extra=EXTRA_EXCLUDE_FROM_CONSOLE)

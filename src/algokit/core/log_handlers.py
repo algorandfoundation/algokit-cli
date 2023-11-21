@@ -78,7 +78,7 @@ class ManualExclusionFilter(logging.Filter):
         super().__init__()
         self.exclude_value = exclude_value
 
-    def filter(self, record: logging.LogRecord) -> bool:  # noqa: A003
+    def filter(self, record: logging.LogRecord) -> bool:
         return getattr(record, EXCLUDE_FROM_KEY, None) != self.exclude_value
 
 

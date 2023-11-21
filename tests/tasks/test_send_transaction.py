@@ -24,9 +24,7 @@ def _generate_dummy_signed_txn(*, amount: int = 1, encode: bool = False) -> tran
 
 def _generate_dummy_signed_txn_group() -> list[transaction.SignedTransaction]:
     txns = [
-        transaction.PaymentTxn(
-            DUMMY_ACCOUNT.address, DUMMY_SUGGESTED_PARAMS, DUMMY_ACCOUNT.address, amt=i
-        )  # type: ignore[no-untyped-call]
+        transaction.PaymentTxn(DUMMY_ACCOUNT.address, DUMMY_SUGGESTED_PARAMS, DUMMY_ACCOUNT.address, amt=i)  # type: ignore[no-untyped-call]
         for i in range(3)
     ]
     txns[0].fee = 3000

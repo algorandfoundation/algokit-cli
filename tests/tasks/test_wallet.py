@@ -96,7 +96,7 @@ class TestAddAlias:
     def test_wallet_add_alias_limit_error(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         dummy_aliases = []
-        for i in range(0, 50):
+        for i in range(50):
             alias_name = f"test_alias_{i}"
             dummy_aliases.append(alias_name)
             address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
