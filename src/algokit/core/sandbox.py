@@ -238,6 +238,7 @@ def get_algod_network_template() -> str:
     "Genesis": {
       "ConsensusProtocol": "future",
       "NetworkName": "followermodenet",
+      "RewardsPoolBalance": 0,
       "FirstPartKeyRound": 0,
       "LastPartKeyRound":  NUM_ROUNDS,
       "Wallets": [
