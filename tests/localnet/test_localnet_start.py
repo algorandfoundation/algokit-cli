@@ -53,7 +53,7 @@ def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
 def test_localnet_start(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
@@ -107,7 +107,7 @@ def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> N
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
 def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
@@ -119,7 +119,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
 def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
@@ -141,7 +141,7 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
     )
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
 def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
@@ -200,7 +200,7 @@ def test_localnet_start_with_old_docker_compose_version(proc_mock: ProcMock) -> 
     verify(result.output)
 
 
-@pytest.mark.usefixtures("health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("_health_success", "_localnet_up_to_date")
 def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.5-dev123"})])
 
@@ -210,7 +210,7 @@ def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: Ap
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("_health_success", "_localnet_up_to_date")
 def test_localnet_start_with_gitpod_docker_compose_version(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose version --format json", [json.dumps({"version": "v2.10.0-gitpod.0"})])
 
@@ -220,7 +220,7 @@ def test_localnet_start_with_gitpod_docker_compose_version(app_dir_mock: AppDirs
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_out_of_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_out_of_date")
 def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
@@ -228,7 +228,7 @@ def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "health_success", "_localnet_img_check_cmd_error")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_img_check_cmd_error")
 def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
