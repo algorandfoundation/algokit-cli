@@ -34,10 +34,10 @@ jobs:
           # --ignore-vuln "GHSA-hcpj-qp55-gfph" # GitPython vulnerability, dev only dependency
           poetry run pip-audit --ignore-vuln "GHSA-wfm5-v35h-vwf4" --ignore-vuln "GHSA-cwvm-v4w8-q58c" --ignore-vuln "PYSEC-2022-43059"
 
-      - name: Check formatting with Black
+      - name: Check formatting with Ruff
         run: |
           # stop the build if there are files that don't meet formatting requirements
-          poetry run black --check .
+          poetry run ruff format --check .
 
       - name: Check linting with Ruff
         run: |
