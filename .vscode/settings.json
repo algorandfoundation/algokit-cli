@@ -34,7 +34,6 @@
   },
   "python.analysis.extraPaths": ["${workspaceFolder}/src"],
   "[python]": {
-    // https://dev.to/eegli/quick-guide-to-python-formatting-in-vs-code-2040
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.analysis.typeCheckingMode": "basic",
@@ -61,7 +60,7 @@
     "commands": [
       {
         "match": "\\.py$",
-        "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix" // not sure it is really needed -- see without extension
+        "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix"
       }
     ]
   },
