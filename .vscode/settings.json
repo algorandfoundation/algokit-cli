@@ -38,11 +38,18 @@
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.analysis.typeCheckingMode": "basic",
+  "ruff.enable": true,
   "ruff.lint.run": "onSave",
-  "ruff.lint.args": ["--config=pyproject.toml"], // not sure yet
-  "ruff.importStrategy": "fromEnvironment", // needed
-  "ruff.fixAll": true, //lint and fix all files in workspace   // not needed
-  "ruff.organizeImports": false, //organize imports on save   // not needed
+  "ruff.lint.args": ["--config=pyproject.toml"],
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.fixAll": true, //lint and fix all files in workspace
+  "ruff.organizeImports": true, //organize imports on save
+  "ruff.codeAction.disableRuleComment": {
+    "enable": true
+  },
+  "ruff.codeAction.fixViolation": {
+    "enable": true
+  },
 
   "mypy.configFile": "pyproject.toml",
   // set to empty array to use config from project
@@ -52,12 +59,6 @@
   "python.testing.pytestEnabled": true,
   "emeraldwalk.runonsave": {
     "commands": [
-      // Run Ruff formatter on save of Python file
-      // {
-      //   "match": "\\.py$",
-      //   "cmd": "${workspaceFolder}/.venv/bin/ruff format ${file}"
-      // },
-      // Run Ruff linter on save of Python file
       {
         "match": "\\.py$",
         "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix" // not sure it is really needed -- see without extension
