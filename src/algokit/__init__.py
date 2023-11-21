@@ -5,7 +5,7 @@ import sys
 if sys.version_info < (3, 11, 0):
     print(  # noqa: T201
         f"Unsupported CPython version: {platform.python_version()} detected.\n"
-        "The minimum version of Python supported is CPython 3.10.\n"
+        "The minimum version of Python supported is CPython 3.11.\n"
         "If you need help installing then this is a good starting point: \n"
         "https://www.python.org/about/gettingstarted/",
         file=sys.stderr,
