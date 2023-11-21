@@ -112,12 +112,15 @@ select = [
 ignore = [
   "ANN101", # no type for self
   "ANN102", # no type for cls
-  "SIM108", # allow if-else in place of ternary
-  "RET505", # allow else after return
-  "Q001", # bad quotes
+  "E111", # indentation is not a multiple of four
+  "E117", # over-indented
+  "Q000", # bad quotes inline string
+  "Q001", # bad quotes multiline string
   "Q002", # bad quotes docstring
   "Q003", # avoidable escaped quotes
-
+  "RET505", # allow else after return
+  "SIM108", # allow if-else in place of ternary
+  "W191", # indentation contains tabs
 ]
 # Exclude a variety of commonly ignored directories.
 exclude = [
