@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.1 (2023-11-22)
+
+### Fix
+
+* Hotfixing conduit path for localnet windows compatibility ([#360](https://github.com/algorandfoundation/algokit-cli/issues/360)) ([`897e335`](https://github.com/algorandfoundation/algokit-cli/commit/897e33554252083ed2b0d8a18a49969ef82a097b))
+
 ## v1.7.0 (2023-11-22)
 
 ### Feature
