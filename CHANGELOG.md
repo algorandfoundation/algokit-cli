@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.0 (2023-11-22)
+
+### Feature
+
+* Migrating localnet to latest indexer v3.x images ([#351](https://github.com/algorandfoundation/algokit-cli/issues/351)) ([`04ef300`](https://github.com/algorandfoundation/algokit-cli/commit/04ef3008366028118358e342c0e83e08f3c095ba))
+
 ## v1.6.3 (2023-11-14)
 
 ### Fix
