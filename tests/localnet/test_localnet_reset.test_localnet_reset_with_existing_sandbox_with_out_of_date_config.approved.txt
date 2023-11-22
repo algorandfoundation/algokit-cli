@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
     volumes:
       - type: bind
-        source: ~/.config/algokit/sandbox/conduit.yml
+        source: ./conduit.yml
         target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
