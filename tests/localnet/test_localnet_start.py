@@ -6,6 +6,7 @@ from algokit.core.sandbox import (
     ALGOD_HEALTH_URL,
     ALGORAND_IMAGE,
     INDEXER_IMAGE,
+    get_algod_network_template,
     get_config_json,
     get_docker_compose_yml,
 )
@@ -32,7 +33,7 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     )
 
     httpx_mock.add_response(
-        url="https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest",
+        url="https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest",
         json={
             "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
         },
@@ -112,6 +113,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
     result = invoke("localnet start")
 
