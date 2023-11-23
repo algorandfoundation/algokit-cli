@@ -4,8 +4,8 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Sandbox directory does not exist yet; creating it
-DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
-DEBUG: Error checking indexer status: No response can be found for GET request on https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest amongst:
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
+DEBUG: Error checking indexer status: No response can be found for GET request on https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest amongst:
 Match all requests on http://localhost:4001/v2/status
 DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: Error checking indexer status: No response can be found for GET request on https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest amongst:

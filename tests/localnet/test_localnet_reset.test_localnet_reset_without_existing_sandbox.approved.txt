@@ -28,30 +28,28 @@ services:
       - 4002:7833
       - 9392:9392
     environment:
-      DEV_MODE: 1
       START_KMD: 1
-      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
     volumes:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
       - ./goal_mount:/root/goal_mount
 
-  indexer:
-    container_name: algokit_indexer
-    image: makerxau/algorand-indexer-dev:latest
-    ports:
-      - 8980:8980
+  conduit:
+    container_name: algokit_conduit
+    image: algorand/conduit:latest
     restart: unless-stopped
-    environment:
-      ALGOD_HOST: algod
-      ALGOD_PORT: 8080
-      POSTGRES_HOST: indexer-db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: algorand
-      POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+    volumes:
+      - type: bind
+        source: ./conduit.yml
+        target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
       - algod
@@ -65,4 +63,15 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+      POSTGRES_DB: conduitdb
+
+  indexer:
+    image: algorand/indexer:latest
+    ports:
+      - "8980:8980"
+    restart: unless-stopped
+    command: daemon --enable-all-parameters
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+    depends_on:
+      - conduit

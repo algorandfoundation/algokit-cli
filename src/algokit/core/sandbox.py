@@ -12,7 +12,6 @@ from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
 
-
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
 
 
@@ -28,21 +27,32 @@ class ComposeSandbox:
         if not self.directory.exists():
             logger.debug("Sandbox directory does not exist yet; creating it")
             self.directory.mkdir()
+        self._conduit_yaml = get_conduit_yaml()
         self._latest_yaml = get_docker_compose_yml()
         self._latest_config_json = get_config_json()
+        self._latest_algod_network_template = get_algod_network_template()
 
     @property
     def compose_file_path(self) -> Path:
         return self.directory / "docker-compose.yml"
 
     @property
+    def conduit_file_path(self) -> Path:
+        return self.directory / "conduit.yml"
+
+    @property
     def algod_config_file_path(self) -> Path:
         return self.directory / "algod_config.json"
+
+    @property
+    def algod_network_template_file_path(self) -> Path:
+        return self.directory / "algod_network_template.json"
 
     def compose_file_status(self) -> ComposeFileStatus:
         try:
             compose_content = self.compose_file_path.read_text()
             config_content = self.algod_config_file_path.read_text()
+            algod_network_template_content = self.algod_network_template_file_path.read_text()
         except FileNotFoundError:
             # treat as out of date if compose file exists but algod config doesn't
             # so that existing setups aren't suddenly reset
@@ -50,14 +60,20 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
-            if compose_content == self._latest_yaml and config_content == self._latest_config_json:
+            if (
+                compose_content == self._latest_yaml
+                and config_content == self._latest_config_json
+                and algod_network_template_content == self._latest_algod_network_template
+            ):
                 return ComposeFileStatus.UP_TO_DATE
             else:
                 return ComposeFileStatus.OUT_OF_DATE
 
     def write_compose_file(self) -> None:
+        self.conduit_file_path.write_text(self._conduit_yaml)
         self.compose_file_path.write_text(self._latest_yaml)
         self.algod_config_file_path.write_text(self._latest_config_json)
+        self.algod_network_template_file_path.write_text(self._latest_algod_network_template)
 
     def _run_compose_command(
         self,
@@ -184,8 +200,9 @@ DEFAULT_INDEXER_PORT = 8980
 DEFAULT_WAIT_FOR_ALGOD = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
-INDEXER_IMAGE = "makerxau/algorand-indexer-dev:latest"
+INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
+CONDUIT_IMAGE = "algorand/conduit:latest"
 
 
 def _wait_for_algod() -> bool:
@@ -212,8 +229,127 @@ def _wait_for_algod() -> bool:
 def get_config_json() -> str:
     return (
         '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
-        ' "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}"'
+        ' "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}'
     )
+
+
+def get_algod_network_template() -> str:
+    return """{
+    "Genesis": {
+      "ConsensusProtocol": "future",
+      "NetworkName": "followermodenet",
+      "RewardsPoolBalance": 0,
+      "FirstPartKeyRound": 0,
+      "LastPartKeyRound":  NUM_ROUNDS,
+      "Wallets": [
+        {
+          "Name": "Wallet1",
+          "Stake": 40,
+          "Online": true
+        },
+        {
+          "Name": "Wallet2",
+          "Stake": 40,
+          "Online": true
+        },
+        {
+          "Name": "Wallet3",
+          "Stake": 20,
+          "Online": true
+        }
+      ],
+      "DevMode": true
+    },
+    "Nodes": [
+      {
+        "Name": "data",
+        "IsRelay": true,
+        "Wallets": [
+          {
+            "Name": "Wallet1",
+            "ParticipationOnly": false
+          },
+          {
+            "Name": "Wallet2",
+            "ParticipationOnly": false
+          },
+          {
+            "Name": "Wallet3",
+            "ParticipationOnly": false
+          }
+        ]
+      },
+      {
+        "Name": "follower",
+        "IsRelay": false,
+        "ConfigJSONOverride":
+        "{\\"EnableFollowMode\\":true,\\"EndpointAddress\\":\\"0.0.0.0:8081\\",\\"MaxAcctLookback\\":64,\\"CatchupParallelBlocks\\":64,\\"CatchupBlockValidateMode\\":3}"
+      }
+    ]
+  }
+"""
+
+
+def get_conduit_yaml() -> str:
+    return """# Log verbosity: PANIC, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+log-level: INFO
+
+# If no log file is provided logs are written to stdout.
+#log-file:
+
+# Number of retries to perform after a pipeline plugin error.
+retry-count: 10
+
+# Time duration to wait between retry attempts.
+retry-delay: "1s"
+
+# Optional filepath to use for pidfile.
+#pid-filepath: /path/to/pidfile
+
+# Whether or not to print the conduit banner on startup.
+hide-banner: false
+
+# When enabled prometheus metrics are available on '/metrics'
+metrics:
+  mode: OFF
+  addr: ":9999"
+  prefix: "conduit"
+
+# The importer is typically an algod follower node.
+importer:
+  name: algod
+  config:
+    # The mode of operation, either "archival" or "follower".
+    # * archival mode allows you to start processing on any round but does not
+    # contain the ledger state delta objects required for the postgres writer.
+    # * follower mode allows you to use a lightweight non-archival node as the
+    # data source. In addition, it will provide ledger state delta objects to
+    # the processors and exporter.
+    mode: "follower"
+
+    # Algod API address.
+    netaddr: "http://algod:8081"
+
+    # Algod API token.
+    token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+# Zero or more processors may be defined to manipulate what data
+# reaches the exporter.
+processors:
+
+# An exporter is defined to do something with the data.
+exporter:
+  name: postgresql
+  config:
+    # Pgsql connection string
+    # See https://github.com/jackc/pgconn for more details
+    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb"
+
+    # Maximum connection number for connection pool
+    # This means the total number of active queries that can be running
+    # concurrently can never be more than this
+    max-conn: 20
+"""
 
 
 def get_docker_compose_yml(
@@ -221,7 +357,6 @@ def get_docker_compose_yml(
     algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    indexer_port: int = DEFAULT_INDEXER_PORT,
 ) -> str:
     return f"""version: '3'
 name: "{name}_sandbox"
@@ -235,30 +370,28 @@ services:
       - {kmd_port}:7833
       - {tealdbg_port}:9392
     environment:
-      DEV_MODE: 1
       START_KMD: 1
-      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
     volumes:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
       - ./goal_mount:/root/goal_mount
 
-  indexer:
-    container_name: {name}_indexer
-    image: {INDEXER_IMAGE}
-    ports:
-      - {indexer_port}:8980
+  conduit:
+    container_name: {name}_conduit
+    image: {CONDUIT_IMAGE}
     restart: unless-stopped
-    environment:
-      ALGOD_HOST: algod
-      ALGOD_PORT: 8080
-      POSTGRES_HOST: indexer-db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: algorand
-      POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+    volumes:
+      - type: bind
+        source: ./conduit.yml
+        target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
       - algod
@@ -272,8 +405,19 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
-"""
+      POSTGRES_DB: conduitdb
+
+  indexer:
+    image: {INDEXER_IMAGE}
+    ports:
+      - "8980:8980"
+    restart: unless-stopped
+    command: daemon --enable-all-parameters
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+    depends_on:
+      - conduit
+"""  # noqa: E501
 
 
 def fetch_algod_status_data(service_info: dict[str, Any]) -> dict[str, Any]:

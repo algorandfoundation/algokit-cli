@@ -25,14 +25,12 @@ jobs:
       - name: Audit with pip-audit
         run: |
           # audit non dev dependencies, no exclusions
-          # This is a temporary fix for PYSEC-2022-43059 as the vulnerability is withdrawn. See https://github.com/pypa/advisory-database/pull/169
-          poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt --ignore-vuln "PYSEC-2022-43059"
+          poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt
 
           # audit all dependencies, with exclusions.
           # If a vulnerability is found in a dev dependency without an available fix,
           # it can be temporarily ignored by adding --ignore-vuln e.g.
-          # --ignore-vuln "GHSA-hcpj-qp55-gfph" # GitPython vulnerability, dev only dependency
-          poetry run pip-audit --ignore-vuln "GHSA-wfm5-v35h-vwf4" --ignore-vuln "GHSA-cwvm-v4w8-q58c" --ignore-vuln "PYSEC-2022-43059"
+          poetry run pip-audit
 
       - name: Check formatting with Ruff
         run: |

@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.1 (2023-11-22)
+
+### Fix
+
+* Hotfixing conduit path for localnet windows compatibility ([#360](https://github.com/algorandfoundation/algokit-cli/issues/360)) ([`897e335`](https://github.com/algorandfoundation/algokit-cli/commit/897e33554252083ed2b0d8a18a49969ef82a097b))
+
+## v1.7.0 (2023-11-22)
+
+### Feature
+
+* Migrating localnet to latest indexer v3.x images ([#351](https://github.com/algorandfoundation/algokit-cli/issues/351)) ([`04ef300`](https://github.com/algorandfoundation/algokit-cli/commit/04ef3008366028118358e342c0e83e08f3c095ba))
+
 ## v1.6.3 (2023-11-14)
 
 ### Fix
