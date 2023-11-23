@@ -29,8 +29,7 @@ aiohttp = "3.9.0beta0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
-black = {extras = ["d"], version = "^23.1.0"}
-ruff = "^0.0.275"
+ruff = "^0.1.6"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -114,8 +113,18 @@ select = [
 ignore = [
   "ANN101", # no type for self
   "ANN102", # no type for cls
-  "SIM108", # allow if-else in place of ternary
   "RET505", # allow else after return
+  "SIM108", # allow if-else in place of ternary
+  # To avoid conflict with ruff formatter. More details on https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+  "E111", # indentation is not a multiple of four
+  "E117", # over-indented
+  "ISC001", # single line implicit string concatenation
+  "ISC002", # multi line implicit string concatenation
+  "Q000", # bad quotes inline string
+  "Q001", # bad quotes multiline string
+  "Q002", # bad quotes docstring
+  "Q003", # avoidable escaped quotes
+  "W191", # indentation contains tabs
 ]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -143,9 +152,6 @@ target-version = "py310"
 [tool.ruff.flake8-annotations]
 allow-star-arg-any = true
 suppress-none-returning = true
-
-[tool.black]
-line-length = 120
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]

@@ -81,7 +81,10 @@ class CommandParamType(click.types.StringParamType):
     name = "command"
 
     def convert(
-        self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None  # noqa: ANN401
+        self,
+        value: t.Any,  # noqa: ANN401
+        param: click.Parameter | None,
+        ctx: click.Context | None,
     ) -> list[str]:
         str_value = super().convert(value=value, param=param, ctx=ctx)
         try:

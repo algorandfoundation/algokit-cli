@@ -3,7 +3,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     // Don't want to use isort because it conflicts with Ruff - see run on save below
-    "source.organizeImports": false
+    "source.organizeImports": true,
+    "source.fixAll": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.exclude": {
@@ -32,30 +33,31 @@
     }
   },
   "python.analysis.extraPaths": ["${workspaceFolder}/src"],
-  "python.formatting.provider": "black",
   "[python]": {
-    // https://dev.to/eegli/quick-guide-to-python-formatting-in-vs-code-2040
-    "editor.defaultFormatter": null
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.analysis.typeCheckingMode": "basic",
-  "python.linting.enabled": true,
-  "python.linting.lintOnSave": true,
+  "ruff.enable": true,
+  "ruff.lint.run": "onSave",
+  "ruff.lint.args": ["--config=pyproject.toml"],
   "ruff.importStrategy": "fromEnvironment",
-  "python.linting.pylintEnabled": false,
-  "python.linting.mypyEnabled": false,
+  "ruff.fixAll": true, //lint and fix all files in workspace
+  "ruff.organizeImports": true, //organize imports on save
+  "ruff.codeAction.disableRuleComment": {
+    "enable": true
+  },
+  "ruff.codeAction.fixViolation": {
+    "enable": true
+  },
+
   "mypy.configFile": "pyproject.toml",
   // set to empty array to use config from project
   "mypy.targets": [],
   "mypy.runUsingActiveInterpreter": true,
-  "python.linting.banditEnabled": false,
-  "python.linting.prospectorEnabled": false,
-  "python.linting.pydocstyleEnabled": false,
-  "python.linting.pycodestyleEnabled": false,
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "emeraldwalk.runonsave": {
     "commands": [
-      // Run Ruff linter on save of Python file
       {
         "match": "\\.py$",
         "cmd": "${workspaceFolder}/.venv/bin/ruff ${file} --fix"

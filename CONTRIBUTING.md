@@ -16,7 +16,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 2. Install pre-requisites:
 
    - Manually:
-     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`. It is also recommended to use `3.10` for development so dependencies on higher versions are not introduced, and to avoid debugging issues with `3.11`(see https://github.com/fabioz/PyDev.Debugger/issues/234 and https://github.com/microsoft/debugpy/issues/939)
+     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`. It is also recommended to use `3.10` for development so dependencies on higher versions are not introduced, and to avoid debugging issues with `3.11`(see <https://github.com/fabioz/PyDev.Debugger/issues/234> and <https://github.com/microsoft/debugpy/issues/939>)
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
      - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via automated script:
@@ -66,11 +66,13 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
    - In each of the above cases, an `args.in` file will be created in the source root.
      Each line will be executed in order, with the arguments passed to the cli.
      For example, you could have:
+
      ```
      version
      --help
      version --help
      ```
+
      Not a terribly useful sequence of commands, but hopefully this helps illustrate the usage.
 
 ### Subsequently

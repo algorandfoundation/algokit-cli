@@ -3,12 +3,12 @@ import multiprocessing
 import signal
 import time
 import types
+import typing
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from multiprocessing import Process, Queue, cpu_count
 from timeit import default_timer as timer
-from typing import Any
 
 import algosdk
 from algosdk.mnemonic import from_private_key, to_private_key
@@ -124,7 +124,7 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
     """
     jobs: list[Process] = []
 
-    def signal_handler(sig: int, frame: types.FrameType | None) -> Any | None:
+    def signal_handler(sig: int, frame: types.FrameType | None) -> typing.NoReturn:
         logger.debug(f"KeyboardInterrupt captured for {sig} and frame {frame}. Terminating processes...")
         for p in jobs:
             p.terminate()

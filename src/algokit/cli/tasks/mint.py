@@ -211,7 +211,10 @@ def mint(  # noqa: PLR0913
 
     client = load_algod_client(network)
     validate_balance(
-        client, creator_account, 0, algos_to_microalgos(ASSET_MINTING_MBR)  # type: ignore[no-untyped-call]
+        client,
+        creator_account,
+        0,
+        algos_to_microalgos(ASSET_MINTING_MBR),  # type: ignore[no-untyped-call]
     )
 
     token_metadata = TokenMetadata.from_json_file(token_metadata_path)
