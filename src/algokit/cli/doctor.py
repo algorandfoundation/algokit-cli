@@ -49,14 +49,14 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         "docker": check_dependency(
             ["docker", "--version"],
             missing_help=[
-                "Docker required to `run algokit sandbox` command; install via https://docs.docker.com/get-docker/"
+                "Docker required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/"
             ],
         ),
         "docker compose": check_dependency(
             DOCKER_COMPOSE_VERSION_COMMAND,
             minimum_version=DOCKER_COMPOSE_MINIMUM_VERSION,
             minimum_version_help=[
-                f"Docker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to run `algokit sandbox command`;",
+                f"Docker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to run `algokit localnet` command;",
                 "install via https://docs.docker.com/compose/install/",
             ],
         ),
