@@ -6,8 +6,6 @@
     "charliermarsh.ruff",
     "tamasfe.even-better-toml",
     "editorconfig.editorconfig",
-    "emeraldwalk.runonsave",
-    "matangover.mypy",
-    "runarsf.platform-settings"
+    "matangover.mypy"
   ]
 }
