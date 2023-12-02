@@ -16,28 +16,12 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 2. Install pre-requisites:
 
    - Manually:
-     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`. It is also recommended to use `3.10` for development so dependencies on higher versions are not introduced, and to avoid debugging issues with `3.11`(see <https://github.com/fabioz/PyDev.Debugger/issues/234> and <https://github.com/microsoft/debugpy/issues/939>)
+     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`, but `3.11` is recommended.)
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
      - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
-   - Via automated script:
+   - Via AlgoKit CLI:
 
-     - For your convenience, we provide an opinionated way to _quickly_ get the prerequisites up and running via pyenv and Poetry, which is handy if you are less familiar with Python or feeling lazy.
-     - These scripts are idempotent and re-entrant so safe to run again and again if they come across a problem on your system that needs to get resolved to run them to completion.
-     - To execute them:
-
-       - Bash (e.g. Linux (Debian, Ubuntu) or Mac OSX): `./scripts/setup.sh`
-       - Windows
-
-         1. Ensure you have [Powershell Core (7+)](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2) e.g. via `winget install --id Microsoft.Powershell --source winget` or `choco install pwsh -y`
-         2. `./scripts/setup.ps1` (or if you want to confirm each step `./scripts/setup.ps1 -Confirm`)
-
-     - These scripts will:
-
-       - Install Python 3.10 if not present (via `pyenv`, after installing pyenv if it's not present)
-       - Install Poetry (via `pyenv`)
-       - Install Python dependencies and setup Python venv (to `./.venv/`) (via `poetry install`)
-       - (On Windows, if you execute the script as admin) Set up `.venv/bin` as a symlink to `.venv/Scripts` to provide a consistent path to reference the Python interpreter (optional, makes for a slightly smoother getting started experience in VS Code)
-       -
+     - [Install AlgoKit CLI](./README.md#install) and run `algokit bootstrap poetry` in the root directory
 
 3. Install pre-commit hooks (optional but recommended):
 
