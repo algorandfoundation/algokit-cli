@@ -51,8 +51,8 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                             {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
                             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}
-                        ]
+                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
+                        ],
                     },
                     {
                         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
@@ -66,7 +66,7 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": []
+                        "Publishers": [],
                     },
                     {
                         "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
@@ -82,7 +82,7 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
-                        ]
+                        ],
                     },
                     {
                         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -98,8 +98,8 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
-                        ]
-                    }
+                        ],
+                    },
                 ]
             )
         ],
@@ -149,8 +149,8 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                             {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
                             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}
-                        ]
+                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
+                        ],
                     },
                     {
                         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
@@ -164,7 +164,7 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": []
+                        "Publishers": [],
                     },
                     {
                         "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
@@ -180,7 +180,7 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
-                        ]
+                        ],
                     },
                     {
                         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -196,8 +196,8 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
-                        ]
-                    }
+                        ],
+                    },
                 ]
             )
         ],
@@ -246,8 +246,8 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
                             {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
                             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}
-                        ]
+                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
+                        ],
                     },
                     {
                         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
@@ -261,7 +261,7 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
                         "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": []
+                        "Publishers": [],
                     },
                     {
                         "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
@@ -277,7 +277,7 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
-                        ]
+                        ],
                     },
                     {
                         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -293,8 +293,8 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
-                        ]
-                    }
+                        ],
+                    },
                 ]
             )
         ],
@@ -335,8 +335,8 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
                             {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
                             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}
-                        ]
+                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
+                        ],
                     },
                     {
                         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
@@ -350,7 +350,7 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
                         "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": []
+                        "Publishers": [],
                     },
                     {
                         "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
@@ -366,7 +366,7 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
-                        ]
+                        ],
                     },
                     {
                         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -382,8 +382,8 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
-                        ]
-                    }
+                        ],
+                    },
                 ]
             )
         ],
@@ -432,8 +432,8 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
                             {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
                             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}
-                        ]
+                            {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
+                        ],
                     },
                     {
                         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
@@ -447,7 +447,7 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
                         "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": []
+                        "Publishers": [],
                     },
                     {
                         "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
@@ -463,7 +463,7 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
-                        ]
+                        ],
                     },
                     {
                         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -479,8 +479,8 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
                         "ExitCode": 0,
                         "Publishers": [
                             {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
-                        ]
-                    }
+                        ],
+                    },
                 ]
             )
         ],
