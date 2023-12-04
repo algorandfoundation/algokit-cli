@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.2 (2023-12-04)
+
+### Fix
+
+* Removing outdated reference to `algokit sandbox` command ([#362](https://github.com/algorandfoundation/algokit-cli/issues/362)) ([`e6cd395`](https://github.com/algorandfoundation/algokit-cli/commit/e6cd395bf600485be6edbe4e68c9ba4885598000))
+* Fixing Localnet status ([#365](https://github.com/algorandfoundation/algokit-cli/issues/365)) ([`8277572`](https://github.com/algorandfoundation/algokit-cli/commit/8277572db58d14bfcbda5e8bda18673d536b84a0))
+* Update vulnerable package dependency versions ([#361](https://github.com/algorandfoundation/algokit-cli/issues/361)) ([`450e02d`](https://github.com/algorandfoundation/algokit-cli/commit/450e02ddba02c98d9c8fe8a6baedaf84ef7e9460))
+
 ## v1.7.1 (2023-11-22)
 
 ### Fix
