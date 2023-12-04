@@ -109,7 +109,7 @@ def reset_localnet(*, update: bool) -> None:
     sandbox.up()
 
 
-SERVICE_NAMES = ("algod", "indexer", "indexer-db")
+SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer")
 
 
 @localnet_group.command("status", short_help="Check the status of the AlgoKit LocalNet.")
