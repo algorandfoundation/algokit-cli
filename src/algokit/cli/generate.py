@@ -52,6 +52,14 @@ def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command
 
             answers_dict = dict(answers)
 
+            if not click.confirm(
+                "You are about to run a generator. Please make sure it's from a "
+                "trusted source (for example, official AlgoKit Templates). Do you want to proceed?",
+                default=False,
+            ):
+                logger.warning("Generator execution cancelled.")
+                return None
+
             return run_generator(answers_dict, path)
 
         commands_table[generator.name] = command
