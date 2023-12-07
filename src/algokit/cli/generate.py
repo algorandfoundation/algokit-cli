@@ -43,7 +43,21 @@ def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command
             type=click.Path(exists=True),
             default=generator.path,
         )
-        def command(answers: list[tuple[str, str]], path: Path) -> None:
+        @click.option(
+            "--force",
+            "-f",
+            is_flag=True,
+            required=False,
+            default=False,
+            type=click.BOOL,
+            help="Executes generator without confirmation. Use with trusted sources only.",
+        )
+        def command(
+            *,
+            answers: list[tuple[str, str]],
+            path: Path,
+            force: bool,
+        ) -> None:
             if not shutil.which("git"):
                 raise click.ClickException(
                     "Git not found; please install git and add to path.\n"
@@ -52,7 +66,7 @@ def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command
 
             answers_dict = dict(answers)
 
-            if not click.confirm(
+            if not force and not click.confirm(
                 "You are about to run a generator. Please make sure it's from a "
                 "trusted source (for example, official AlgoKit Templates). Do you want to proceed?",
                 default=False,
