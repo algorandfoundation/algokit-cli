@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.3 (2023-12-08)
+
+### Fix
+
+* Adding confirmation prompt prior to execution of algokit generators ([#366](https://github.com/algorandfoundation/algokit-cli/issues/366)) ([`eeb5bae`](https://github.com/algorandfoundation/algokit-cli/commit/eeb5bae18c4ffb2384f92627d19a4308a46bfdf0))
+
 ## v1.7.2 (2023-12-04)
 
 ### Fix
