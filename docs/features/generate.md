@@ -168,3 +168,7 @@ $ algokit generate smart-contract
 
 $ algokit generate smart-contract -a contract_name "MyCoolContract"
 ```
+
+#### Third Party Generators
+
+It is important to understand that by default, AlgoKit will always prompt you before executing a generator to ensure it's from a trusted source. If you are confident about the source of the generator, you can use the `--force` or `-f` option to execute the generator without this confirmation prompt. Be cautious while using this option and ensure the generator is from a trusted source. At the moment, a trusted source for a generator is defined as _a generator that is included in the official AlgoKit templates (e.g. `smart-contract` generator in `algokit-beaker-default-template`)_
