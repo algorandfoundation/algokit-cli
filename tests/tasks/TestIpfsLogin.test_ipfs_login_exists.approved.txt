@@ -1,1 +1,2 @@
+DEBUG: Old Web3 Storage API key is already deleted.
 WARNING: You are already logged in!

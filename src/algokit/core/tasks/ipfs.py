@@ -1,4 +1,3 @@
-import json
 import logging
 from collections.abc import Generator
 from pathlib import Path
@@ -55,15 +54,17 @@ def get_pinata_jwt() -> str | None:
     Returns:
         str | None: The retrieved password from the keyring, or None if no password is found.
     """
-
-    old_api_key = keyring.get_credential("algokit_web3_storage", "algokit_web3_storage_access_token")
-    if old_api_key:
-        logger.warning(
-            "You are using the old Web3 Storage API key. Please login again using `algokit ipfs login` with Pinata "
-            "ipfs provider. Follow the instructions on https://docs.pinata.cloud/docs/getting-started "
-            "to create an account and obtain a JWT."
-        )
-        keyring.delete_password("algokit_web3_storage", "algokit_web3_storage_access_token")
+    try:
+        old_api_key = keyring.get_password("algokit_web3_storage", "algokit_web3_storage_access_token")
+        if old_api_key:
+            logger.warning(
+                "You are using the old Web3 Storage API key. Please login again using `algokit ipfs login` with Pinata "
+                "ipfs provider. Follow the instructions on https://docs.pinata.cloud/docs/getting-started "
+                "to create an account and obtain a JWT."
+            )
+            keyring.delete_password("algokit_web3_storage", "algokit_web3_storage_access_token")
+    except KeyError as ex:
+        logger.debug("Old Web3 Storage API key is already deleted.", exc_info=ex)
     return keyring.get_password(ALGOKIT_PINATA_NAMESPACE, ALGOKIT_PINATA_TOKEN_KEY)
 
 
@@ -120,18 +121,19 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None, content
         num_chunks = file_path.stat().st_size // MAX_CHUNK_SIZE | 1
         timeout = DEFAULT_TIMEOUT * num_chunks
         logger.debug(f"Timeout set to {timeout} seconds based on {num_chunks} chunks.")
+
     headers = {
         "accept": "application/json",
         "Authorization": f"Bearer {jwt}",
     }
-    pinata_options = {"cidVersion": "1"}
-    data = {"pinataOptions": json.dumps(pinata_options)}
-    files = {"file": (name or file_path.name, file_content)}
+
+    # pinata_options = {"cidVersion": "1"}
+    # data = {"pinataOptions": json.dumps(pinata_options)}
+    # files = {"file": (name or file_path.name, file_content)}
     try:
         response = httpx.post(
             url="https://api.pinata.cloud/pinning/pinFileToIPFS",
-            files=files,
-            data=data,
+            content=content or file_content,
             headers=headers,
             timeout=DEFAULT_TIMEOUT,
         )

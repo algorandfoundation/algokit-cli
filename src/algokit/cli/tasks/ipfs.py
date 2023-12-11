@@ -89,8 +89,8 @@ def upload(file_path: Path, name: str | None) -> None:
                         yield data
                         bar.update(len(data))
 
-            cid = upload_to_pinata(file_path, pinata_jwt, name)
-            logger.info(f"\nFile uploaded successfully!\nCID: {cid}")
+                cid = upload_to_pinata(file_path, pinata_jwt, name, read_file_in_chunks())
+                logger.info(f"\nFile uploaded successfully!\nCID: {cid}")
     except click.ClickException as ex:
         raise ex
     except OSError as ex:
