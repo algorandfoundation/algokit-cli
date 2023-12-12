@@ -25,7 +25,7 @@ Options:
 
 ## Prerequisites
 
-Before you can use this feature, you need to ensure that you have signed up for a Piñata account and have a JWT. You can sign up for a Piñata account by reading [quickstart](https://web3.storage/docs/intro/#quickstart).
+Before you can use this feature, you need to ensure that you have signed up for a Piñata account and have a JWT. You can sign up for a Piñata account by reading [quickstart](https://docs.pinata.cloud/docs/getting-started).
 
 ## Login
 

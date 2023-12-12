@@ -1,11 +1,10 @@
 import logging
-from collections.abc import Generator
 from pathlib import Path
 
 import click
+from yaspin import yaspin  # type: ignore  # noqa: PGH003
 
 from algokit.core.tasks.ipfs import (
-    MAX_CHUNK_SIZE,
     MAX_FILE_SIZE,
     PinataBadRequestError,
     PinataForbiddenError,
@@ -76,21 +75,15 @@ def upload(file_path: Path, name: str | None) -> None:
         raise click.ClickException("You are not logged in! Please login using `algokit ipfs login`.")
 
     try:
-        with file_path.open("rb") as file:
-            total = file_path.stat().st_size
+        total = file_path.stat().st_size
+        if total > MAX_FILE_SIZE:
+            raise click.ClickException("File size exceeds 100MB limit!")
 
-            if total > MAX_FILE_SIZE:
-                raise click.ClickException("File size exceeds 100MB limit!")
+        with yaspin(text="Uploading\n", color="yellow") as spinner:
+            cid = upload_to_pinata(file_path, pinata_jwt, name)
+            spinner.ok("✅ ")
+            logger.info(f"File uploaded successfully!\nCID: {cid}")
 
-            with click.progressbar(length=total, label="Uploading file") as bar:  # type: ignore[var-annotated]
-
-                def read_file_in_chunks() -> Generator[bytes, None, None]:
-                    while data := file.read(MAX_CHUNK_SIZE):
-                        yield data
-                        bar.update(len(data))
-
-                cid = upload_to_pinata(file_path, pinata_jwt, name, read_file_in_chunks())
-                logger.info(f"\nFile uploaded successfully!\nCID: {cid}")
     except click.ClickException as ex:
         raise ex
     except OSError as ex:

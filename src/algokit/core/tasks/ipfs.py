@@ -1,5 +1,5 @@
+import json
 import logging
-from collections.abc import Generator
 from pathlib import Path
 
 import httpx
@@ -84,7 +84,7 @@ def set_pinata_jwt(jwt: str | None) -> None:
         keyring.delete_password(ALGOKIT_PINATA_NAMESPACE, ALGOKIT_PINATA_TOKEN_KEY)
 
 
-def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None, content: Generator | None = None) -> str:
+def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None) -> str:
     """
     Uploads a file to the Piñata API.
 
@@ -93,7 +93,6 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None, content
         jwt (str): The JWT for accessing the Piñata API.
         name (str | None, optional): The name to be assigned to the uploaded file. If not provided,
         the name of the file at `file_path` will be used. Defaults to None.
-        content (Generator | None, optional): A generator that yields the content of the file.
         If not provided, the content will be read from the file at `file_path`. Defaults to None.
 
     Returns:
@@ -113,7 +112,7 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None, content
         name = "file.txt"
 
         cid = upload_to_pinata(file_path, jwt, name)
-        print(cid)  # e.g. "bafybeih6z7z2z3z4z5z6z7z8z9z0"
+        print(cid) # e.g. "bafybeih6z7z2z3z4z5z6z7z8z9z0"
     """
 
     with file_path.open("rb") as file:
@@ -127,13 +126,14 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None, content
         "Authorization": f"Bearer {jwt}",
     }
 
-    # pinata_options = {"cidVersion": "1"}
-    # data = {"pinataOptions": json.dumps(pinata_options)}
-    # files = {"file": (name or file_path.name, file_content)}
+    pinata_options = {"cidVersion": "1"}
+    data = {"pinataOptions": json.dumps(pinata_options)}
+    files = {"file": (name or file_path.name, file_content)}
     try:
         response = httpx.post(
             url="https://api.pinata.cloud/pinning/pinFileToIPFS",
-            content=content or file_content,
+            data=data,
+            files=files,
             headers=headers,
             timeout=DEFAULT_TIMEOUT,
         )
