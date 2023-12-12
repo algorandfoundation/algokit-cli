@@ -45,7 +45,7 @@ class TestIpfsUpload:
         cwd = tmp_path_factory.mktemp("cwd")
         (cwd / "dummy.txt").write_text("dummy text to upload")
 
-        httpx_mock.add_response(status_code=200, json={"ok": True, "cid": "test"})
+        httpx_mock.add_response(status_code=200, json={"ok": True, "IpfsHash": "test"})
         result = invoke("task ipfs upload --file dummy.txt", cwd=cwd)
 
         # Assert

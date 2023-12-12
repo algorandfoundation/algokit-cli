@@ -1,6 +1,11 @@
 DEBUG: Old Web3 Storage API key is already deleted.
-Uploading file
+
+
+
+⠋ Uploading
 DEBUG: Timeout set to 10 seconds based on 1 chunks.
 DEBUG: HTTP Request: POST https://api.pinata.cloud/pinning/pinFileToIPFS "HTTP/1.1 500 Internal Server Error"
+
+             
 DEBUG: Pinata error: 500. {"ok": false, "cid": "test"}
 Error: PinataInternalServerError('Pinata error: 500')

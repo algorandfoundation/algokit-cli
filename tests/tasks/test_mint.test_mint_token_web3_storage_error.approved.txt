@@ -1,6 +1,0 @@
-Enter the mnemonic phrase (25 words separated by whitespace): 
-Uploading image to Web3 Storage...
-DEBUG: Timeout set to 10 seconds based on 1 chunks.
-DEBUG: HTTP Request: POST https://api.web3.storage/upload "HTTP/1.1 403 Forbidden"
-DEBUG: Web3 Storage error: 403. {"ok": false}
-Error: Web3StorageForbiddenError('Web3 Storage error: 403')
