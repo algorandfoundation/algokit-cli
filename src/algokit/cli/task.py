@@ -2,6 +2,7 @@ import logging
 
 import click
 
+from algokit.cli.tasks.analyze import analyze
 from algokit.cli.tasks.assets import opt_in_command, opt_out_command
 from algokit.cli.tasks.ipfs import ipfs_group
 from algokit.cli.tasks.mint import mint
@@ -30,3 +31,4 @@ task_group.add_command(nfd_lookup)
 task_group.add_command(opt_out_command)
 task_group.add_command(opt_in_command)
 task_group.add_command(mint)
+task_group.add_command(analyze)
