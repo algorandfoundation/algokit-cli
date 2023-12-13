@@ -41,7 +41,7 @@ def test_mint_token_successful(
     (cwd / "image.png").touch()
 
     mocker.patch(
-        "algokit.core.tasks.mint.mint.upload_to_web3_storage",
+        "algokit.core.tasks.mint.mint.upload_to_pinata",
         side_effect=[
             "bafkreifax6dswcxk4us2am3jxhd3swxew32oreaxzol7dnnqzhieepqg2y",
             "bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe",
@@ -49,7 +49,7 @@ def test_mint_token_successful(
     )
     mocker.patch("algokit.core.tasks.mint.mint.wait_for_confirmation", return_value={"asset-index": 123})
     mocker.patch(
-        "algokit.cli.tasks.mint.get_web3_storage_api_key",
+        "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value="dummy_key",
     )
     mocker.patch(
@@ -102,7 +102,7 @@ def test_mint_token_pure_fractional_nft_ft_validation(
     assert nft_result.exit_code == 1
 
 
-def test_mint_token_web3_storage_error(
+def test_mint_token_pinata_error(
     mocker: MockerFixture,
     httpx_mock: HTTPXMock,
     tmp_path_factory: pytest.TempPathFactory,
@@ -116,7 +116,7 @@ def test_mint_token_web3_storage_error(
     httpx_mock.add_response(status_code=403, json={"ok": False})
 
     mocker.patch(
-        "algokit.cli.tasks.mint.get_web3_storage_api_key",
+        "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value="dummy_key",
     )
     mocker.patch(
@@ -138,7 +138,7 @@ def test_mint_token_web3_storage_error(
     verify(result.output)
 
 
-def test_mint_token_no_web3_token_error(
+def test_mint_token_no_pinata_jwt_error(
     mocker: MockerFixture,
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
@@ -150,7 +150,7 @@ def test_mint_token_no_web3_token_error(
     (cwd / "image.png").touch()
 
     mocker.patch(
-        "algokit.cli.tasks.mint.get_web3_storage_api_key",
+        "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value=None,
     )
     # Act
@@ -196,7 +196,7 @@ def test_mint_token_acfg_token_metadata_mismatch(
     )
 
     mocker.patch(
-        "algokit.cli.tasks.mint.get_web3_storage_api_key",
+        "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value="dummy_key",
     )
     mocker.patch(
