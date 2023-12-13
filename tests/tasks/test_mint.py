@@ -138,7 +138,7 @@ def test_mint_token_pinata_error(
     verify(result.output)
 
 
-def test_mint_token_no_web3_token_error(
+def test_mint_token_no_pinata_jwt_error(
     mocker: MockerFixture,
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
