@@ -1,4 +1,3 @@
-DEBUG: Old Web3 Storage API key is already deleted.
 Follow the instructions on https://docs.pinata.cloud/docs/getting-started to create an account and obtain a JWT.
 Enter pinata JWT: 
 Repeat for confirmation: 

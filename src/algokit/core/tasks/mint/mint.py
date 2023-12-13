@@ -159,7 +159,7 @@ def mint_token(  # noqa: PLR0913
 
     Args:
         client (algod.AlgodClient): An instance of the `algod.AlgodClient` class representing the Algorand node.
-        jwt (str): A string representing the JWT for accessing the Algorand network.
+        jwt (str): The JWT for accessing the Piñata API.
         creator_account (Account): An instance of the `Account` class representing the account that
         will create the token.
         asset_name (str): A string representing the name of the token.

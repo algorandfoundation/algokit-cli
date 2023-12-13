@@ -11,8 +11,7 @@ ALGOKIT_PINATA_NAMESPACE = "algokit_pinata"
 ALGOKIT_PINATA_TOKEN_KEY = "algokit_pinata_access_token"
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
-MAX_CHUNK_SIZE = 1024 * 1024  # 1MB
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 90
 
 
 class PinataError(Exception):
@@ -63,14 +62,14 @@ def get_pinata_jwt() -> str | None:
                 "to create an account and obtain a JWT."
             )
             keyring.delete_password("algokit_web3_storage", "algokit_web3_storage_access_token")
-    except KeyError as ex:
-        logger.debug("Old Web3 Storage API key is already deleted.", exc_info=ex)
+    except Exception:
+        pass
     return keyring.get_password(ALGOKIT_PINATA_NAMESPACE, ALGOKIT_PINATA_TOKEN_KEY)
 
 
 def set_pinata_jwt(jwt: str | None) -> None:
     """
-    Sets or deletes a password in the keyring library based on the provided KWT.
+    Sets or deletes a password in the keyring library based on the provided JWT.
 
     Args:
         jwt (str | None): The JWT to be set in the keyring library. If None, the password will be deleted.
@@ -117,9 +116,6 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None) -> str:
 
     with file_path.open("rb") as file:
         file_content = file.read()
-        num_chunks = file_path.stat().st_size // MAX_CHUNK_SIZE | 1
-        timeout = DEFAULT_TIMEOUT * num_chunks
-        logger.debug(f"Timeout set to {timeout} seconds based on {num_chunks} chunks.")
 
     headers = {
         "accept": "application/json",
@@ -137,11 +133,12 @@ def upload_to_pinata(file_path: Path, jwt: str, name: str | None = None) -> str:
             headers=headers,
             timeout=DEFAULT_TIMEOUT,
         )
+
         response.raise_for_status()
-        ipfs_hash = response.json().get("IpfsHash")
-        if not isinstance(ipfs_hash, str):
+        cid = response.json().get("IpfsHash")
+        if not isinstance(cid, str):
             raise ValueError("IpfsHash is not a string.")
-        return ipfs_hash
+        return cid
     except httpx.HTTPStatusError as ex:
         if ex.response.status_code == httpx.codes.BAD_REQUEST:
             raise PinataBadRequestError(ex.response) from ex

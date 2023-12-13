@@ -79,7 +79,7 @@ def upload(file_path: Path, name: str | None) -> None:
         if total > MAX_FILE_SIZE:
             raise click.ClickException("File size exceeds 100MB limit!")
 
-        with yaspin(text="Uploading\n", color="yellow") as spinner:
+        with yaspin(text="Uploading", color="yellow") as spinner:
             cid = upload_to_pinata(file_path, pinata_jwt, name)
             spinner.ok("✅ ")
             logger.info(f"File uploaded successfully!\nCID: {cid}")
