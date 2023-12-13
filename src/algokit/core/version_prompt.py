@@ -1,6 +1,9 @@
 import logging
+import platform
 import re
+import subprocess
 from datetime import timedelta
+from pathlib import Path
 from time import time
 
 import click
@@ -15,6 +18,31 @@ VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 DISABLE_CHECK_MARKER = "disable-version-prompt"
 
 
+def get_installation_method() -> str | None:
+    os_type = platform.system().lower()
+    if os_type == "darwin" and Path("/opt/homebrew/Caskroom/algokit").exists():
+        return "brew"
+    return "pipx"
+
+
+def prompt_for_update() -> bool:
+    return click.confirm("Do you want to update AlgoKit?", default=True)
+
+
+def execute_pipx_upgrade() -> None:
+    try:
+        subprocess.run(["pipx", "upgrade", "algokit"], check=True)
+        logger.info("AlgoKit successfully updated")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to update AlgoKit using pipx: {e}")
+
+
+def create_decision_file() -> None:
+    decision_file = get_app_state_dir() / "user_declined_update_version"
+    decision_file.touch()
+    decision_file.write_text("1.0.0", encoding="utf-8")
+
+
 def do_version_prompt() -> None:
     if _skip_version_prompt():
         logger.debug("Version prompt disabled")
@@ -26,8 +54,23 @@ def do_version_prompt() -> None:
         logger.debug("Could not determine latest version")
         return
 
+    if not Path(get_app_state_dir() / "user_declined_update_version").exists():
+        create_decision_file()
     if _get_version_sequence(current_version) < _get_version_sequence(latest_version):
-        logger.info(f"You are using AlgoKit version {current_version}, however version {latest_version} is available.")
+        logger.info(f" 🚨You are using AlgoKit version {current_version}, however version {latest_version} is available.")
+        installation_method = get_installation_method()
+        if installation_method == "pipx":
+            decision_file = get_app_state_dir() / "user_declined_update_version"
+            try:
+                if decision_file.read_text(encoding="utf-8") < latest_version:
+                    if prompt_for_update():
+                        execute_pipx_upgrade()
+                    else:
+                        decision_file.write_text(latest_version, encoding="utf-8")
+                else:
+                    logger.debug("User has previously declined the update. Skipping version update.")
+            except OSError:
+                logger.info(f"{decision_file} inaccessible")
     else:
         logger.debug("Current version is up to date")
 
