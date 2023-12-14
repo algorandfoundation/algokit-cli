@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.8.0 (2023-12-14)
+
+### Feature
+
+* Update generators to support generating typed clients with simulate functionality ([#368](https://github.com/algorandfoundation/algokit-cli/issues/368)) ([`90c876b`](https://github.com/algorandfoundation/algokit-cli/commit/90c876b819f4f9bba040e8630584cedc13678f5a))
+* Use Pinata ipfs instead of web3.storage ([#367](https://github.com/algorandfoundation/algokit-cli/issues/367)) ([`fc7ee5d`](https://github.com/algorandfoundation/algokit-cli/commit/fc7ee5d36c09b91251c46ab2be670015ac106164))
+
+### Fix
+
+* Replacing Yaspin with Simplified Spinners for Windows Systems ([#369](https://github.com/algorandfoundation/algokit-cli/issues/369)) ([`e12311e`](https://github.com/algorandfoundation/algokit-cli/commit/e12311e3be087e78aed092dd9b2670f8183afea3))
+
 ## v1.7.3 (2023-12-08)
 
 ### Fix
