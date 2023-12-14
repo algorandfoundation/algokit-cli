@@ -57,8 +57,8 @@ def get_pinata_jwt() -> str | None:
         old_api_key = keyring.get_password("algokit_web3_storage", "algokit_web3_storage_access_token")
         if old_api_key:
             logger.warning(
-                "You are using the old Web3 Storage API key. Please login again using `algokit ipfs login` with Pinata "
-                "ipfs provider. Follow the instructions on https://docs.pinata.cloud/docs/getting-started "
+                "You are using the old Web3 Storage API key. Please login again using `algokit task ipfs login` with "
+                "Pinata ipfs provider. Follow the instructions on https://docs.pinata.cloud/docs/getting-started"
                 "to create an account and obtain a JWT."
             )
             keyring.delete_password("algokit_web3_storage", "algokit_web3_storage_access_token")

@@ -4,9 +4,9 @@ import socket
 import sys
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
-import cursor
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 
 CLEAR_LINE = "\033[K"
 
@@ -37,13 +37,6 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
         return False
 
 
-def decode_utf_8_text(text: str) -> bytes | str:
-    try:
-        return codecs.decode(text, "utf-8")
-    except Exception:
-        return text
-
-
 def animate(name: str, style: str, stop_event: threading.Event) -> None:
     spinners = {
         "dots": {"interval": 100, "frames": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]},
@@ -52,20 +45,25 @@ def animate(name: str, style: str, stop_event: threading.Event) -> None:
     frames = spinners[style]["frames"]
     interval = spinners[style]["interval"]
     while not stop_event.is_set():
-        for frame in frames:
+        for frame in frames:  # type: ignore  # noqa: PGH003
             if stop_event.is_set():
                 break
-            the_frame = decode_utf_8_text(frame)
-            output = f"\r{the_frame} {name}"
+            try:
+                text = codecs.decode(frame, "utf-8")
+            except Exception:
+                text = frame
+            output = f"\r{text} {name}"
             sys.stdout.write(output)
             sys.stdout.write(CLEAR_LINE)
             sys.stdout.flush()
-            time.sleep(0.001 * interval)
+            time.sleep(0.001 * interval)  # type: ignore  # noqa: PGH003
 
-    sys.stdout.write("\rLoading complete!\n")
+    sys.stdout.write("\r ")
 
 
-def run_with_animation(target_function, animation_text="Loading", spinner_style="dots", *args, **kwargs):
+def run_with_animation(
+    target_function: Callable, animation_text: str = "Loading", spinner_style: str = "dots", *args: Any, **kwargs: Any
+) -> Any:  # noqa: ANN401
     with ThreadPoolExecutor(max_workers=2) as executor:
         stop_event = threading.Event()
         animation_future = executor.submit(animate, animation_text, spinner_style, stop_event)

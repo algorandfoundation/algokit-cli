@@ -207,7 +207,7 @@ def mint(  # noqa: PLR0913
 
     pinata_jwt = get_pinata_jwt()
     if not pinata_jwt:
-        raise click.ClickException("You are not logged in! Please login using `algokit ipfs login`.")
+        raise click.ClickException("You are not logged in! Please login using `algokit task ipfs login`.")
 
     client = load_algod_client(network)
     validate_balance(
