@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 import click
-from yaspin import yaspin  # type: ignore  # noqa: PGH003
 
 from algokit.core.tasks.ipfs import (
     MAX_FILE_SIZE,
@@ -15,6 +14,7 @@ from algokit.core.tasks.ipfs import (
     set_pinata_jwt,
     upload_to_pinata,
 )
+from algokit.core.utils import animate, run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -79,10 +79,9 @@ def upload(file_path: Path, name: str | None) -> None:
         if total > MAX_FILE_SIZE:
             raise click.ClickException("File size exceeds 100MB limit!")
 
-        with yaspin(text="Uploading", color="yellow") as spinner:
-            cid = upload_to_pinata(file_path, pinata_jwt, name)
-            spinner.ok("✅ ")
-            logger.info(f"File uploaded successfully!\nCID: {cid}")
+        cid = run_with_animation(target_function=upload_to_pinata, animation_text="Uploading", spinner_style="dots",
+                                 file_path=file_path, jwt=pinata_jwt, name=name)
+        logger.info(f"File uploaded successfully!\nCID: {cid}")
 
     except click.ClickException as ex:
         raise ex
