@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 import click
-from yaspin import yaspin  # type: ignore  # noqa: PGH003
 
 from algokit.core.tasks.ipfs import (
     MAX_FILE_SIZE,
@@ -15,6 +14,7 @@ from algokit.core.tasks.ipfs import (
     set_pinata_jwt,
     upload_to_pinata,
 )
+from algokit.core.utils import run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -72,17 +72,21 @@ def logout_command() -> None:
 def upload(file_path: Path, name: str | None) -> None:
     pinata_jwt = get_pinata_jwt()
     if not pinata_jwt:
-        raise click.ClickException("You are not logged in! Please login using `algokit ipfs login`.")
+        raise click.ClickException("You are not logged in! Please login using `algokit task ipfs login`.")
 
     try:
         total = file_path.stat().st_size
         if total > MAX_FILE_SIZE:
             raise click.ClickException("File size exceeds 100MB limit!")
 
-        with yaspin(text="Uploading", color="yellow") as spinner:
-            cid = upload_to_pinata(file_path, pinata_jwt, name)
-            spinner.ok("✅ ")
-            logger.info(f"File uploaded successfully!\nCID: {cid}")
+        def upload() -> str:
+            return upload_to_pinata(file_path, pinata_jwt, name)
+
+        cid = run_with_animation(
+            target_function=upload,
+            animation_text="Uploading",
+        )
+        logger.info(f"File uploaded successfully!\n CID: {cid}")
 
     except click.ClickException as ex:
         raise ex
