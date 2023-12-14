@@ -1,6 +1,6 @@
 # AlgoKit Task Mint
 
-The AlgoKit Mint feature allows you to mint new fungible or non-fungible assets on the Algorand blockchain. This feature supports the creation of assets, validation of asset parameters, and uploading of asset metadata and image to IPFS using the Web3 Storage provider. Immutable assets are compliant with [ARC3](https://arc.algorand.foundation/ARCs/arc-0003), while mutable are based using [ARC19](https://arc.algorand.foundation/ARCs/arc-0019) standard.
+The AlgoKit Mint feature allows you to mint new fungible or non-fungible assets on the Algorand blockchain. This feature supports the creation of assets, validation of asset parameters, and uploading of asset metadata and image to IPFS using the Piñata provider. Immutable assets are compliant with [ARC3](https://arc.algorand.foundation/ARCs/arc-0003), while mutable are based using [ARC19](https://arc.algorand.foundation/ARCs/arc-0019) standard.
 
 ## Usage
 
@@ -51,7 +51,7 @@ To mint a new asset in interactive mode, you can use the mint command as follows
 $ algokit task mint
 ```
 
-This will interactively prompt you for the required information, upload the asset image and metadata to IPFS using the Web3 Storage provider and mint a new asset on the Algorand blockchain. The [asset's metadata](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema) will be generated automatically based on the provided asset name, decimals, and image.
+This will interactively prompt you for the required information, upload the asset image and metadata to IPFS using the Piñata provider and mint a new asset on the Algorand blockchain. The [asset's metadata](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema) will be generated automatically based on the provided asset name, decimals, and image.
 
 If you want to provide a custom metadata file, you can use the --metadata flag:
 

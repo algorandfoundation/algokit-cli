@@ -13,7 +13,7 @@ from algosdk.transaction import wait_for_confirmation
 from algosdk.v2client import algod
 from multiformats import CID
 
-from algokit.core.tasks.ipfs import upload_to_web3_storage
+from algokit.core.tasks.ipfs import upload_to_pinata
 from algokit.core.tasks.mint.models import AssetConfigTxnParams, TokenMetadata
 
 logger = logging.getLogger(__name__)
@@ -144,7 +144,7 @@ def _create_asset_txn(
 def mint_token(  # noqa: PLR0913
     *,
     client: algod.AlgodClient,
-    api_key: str,
+    jwt: str,
     creator_account: Account,
     asset_name: str,
     unit_name: str,
@@ -159,7 +159,7 @@ def mint_token(  # noqa: PLR0913
 
     Args:
         client (algod.AlgodClient): An instance of the `algod.AlgodClient` class representing the Algorand node.
-        api_key (str): A string representing the API key for accessing the Algorand network.
+        jwt (str): The JWT for accessing the Piñata API.
         creator_account (Account): An instance of the `Account` class representing the account that
         will create the token.
         asset_name (str): A string representing the name of the token.
@@ -189,16 +189,16 @@ def mint_token(  # noqa: PLR0913
     if image_path:
         token_metadata.image_integrity = _file_integrity(image_path)
         token_metadata.image_mimetype = _file_mimetype(image_path)
-        logger.info("Uploading image to Web3 Storage...")
-        token_metadata.image = "ipfs://" + upload_to_web3_storage(image_path, api_key=api_key)
-        logger.info(f"Image uploaded to Web3 Storage: {token_metadata.image}")
+        logger.info("Uploading image to pinata...")
+        token_metadata.image = "ipfs://" + upload_to_pinata(image_path, jwt=jwt)
+        logger.info(f"Image uploaded to pinata: {token_metadata.image}")
 
-    logger.info("Uploading metadata to Web3 Storage...")
-    metadata_cid = upload_to_web3_storage(
+    logger.info("Uploading metadata to pinata...")
+    metadata_cid = upload_to_pinata(
         token_metadata.to_file_path(),
-        api_key=api_key,
+        jwt=jwt,
     )
-    logger.info(f"Metadata uploaded to Web3 Storage: {metadata_cid}")
+    logger.info(f"Metadata uploaded to pinata: {metadata_cid}")
 
     asset_config_params = AssetConfigTxnParams(
         sender=creator_account.address,

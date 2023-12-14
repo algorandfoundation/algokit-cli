@@ -14,12 +14,12 @@ from algokit.cli.tasks.utils import (
     validate_balance,
 )
 from algokit.core.tasks.ipfs import (
-    Web3StorageBadRequestError,
-    Web3StorageForbiddenError,
-    Web3StorageHttpError,
-    Web3StorageInternalServerError,
-    Web3StorageUnauthorizedError,
-    get_web3_storage_api_key,
+    PinataBadRequestError,
+    PinataForbiddenError,
+    PinataHttpError,
+    PinataInternalServerError,
+    PinataUnauthorizedError,
+    get_pinata_jwt,
 )
 from algokit.core.tasks.mint.mint import mint_token
 from algokit.core.tasks.mint.models import TokenMetadata
@@ -205,9 +205,9 @@ def mint(  # noqa: PLR0913
 
     creator_account = get_account_with_private_key(creator)
 
-    web3_storage_api_key = get_web3_storage_api_key()
-    if not web3_storage_api_key:
-        raise click.ClickException("You are not logged in! Please login using `algokit ipfs login`.")
+    pinata_jwt = get_pinata_jwt()
+    if not pinata_jwt:
+        raise click.ClickException("You are not logged in! Please login using `algokit task ipfs login`.")
 
     client = load_algod_client(network)
     validate_balance(
@@ -224,7 +224,7 @@ def mint(  # noqa: PLR0913
     try:
         asset_id, txn_id = mint_token(
             client=client,
-            api_key=web3_storage_api_key,
+            jwt=pinata_jwt,
             creator_account=creator_account,
             token_metadata=token_metadata,
             image_path=image_path,
@@ -238,11 +238,11 @@ def mint(  # noqa: PLR0913
         click.echo(f"Browse your asset at: {get_explorer_url(asset_id, network, ExplorerEntityType.ASSET)}")
         click.echo(f"Check transaction status at: {get_explorer_url(txn_id, network, ExplorerEntityType.TRANSACTION)}")
     except (
-        Web3StorageBadRequestError,
-        Web3StorageUnauthorizedError,
-        Web3StorageForbiddenError,
-        Web3StorageInternalServerError,
-        Web3StorageHttpError,
+        PinataBadRequestError,
+        PinataUnauthorizedError,
+        PinataForbiddenError,
+        PinataInternalServerError,
+        PinataHttpError,
     ) as ex:
         logger.debug(ex)
         raise click.ClickException(repr(ex)) from ex

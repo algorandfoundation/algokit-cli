@@ -729,7 +729,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### ipfs
 
-Upload files to IPFS using Web3 Storage provider.
+Upload files to IPFS using Pinata provider.
 
 ```shell
 algokit task ipfs [OPTIONS] COMMAND [ARGS]...
@@ -737,7 +737,7 @@ algokit task ipfs [OPTIONS] COMMAND [ARGS]...
 
 #### login
 
-Login to web3 storage ipfs provider.
+Login to Pinata ipfs provider. You will be prompted for your JWT.
 
 ```shell
 algokit task ipfs login [OPTIONS]
@@ -745,7 +745,7 @@ algokit task ipfs login [OPTIONS]
 
 #### logout
 
-Logout of web3 storage ipfs provider.
+Logout of Pinata ipfs provider.
 
 ```shell
 algokit task ipfs logout [OPTIONS]
@@ -753,7 +753,7 @@ algokit task ipfs logout [OPTIONS]
 
 #### upload
 
-Upload a file to web3 storage ipfs provider. Please note, max file size is 100MB.
+Upload a file to Pinata ipfs provider. Please note, max file size is 100MB.
 
 ```shell
 algokit task ipfs upload [OPTIONS]
