@@ -79,13 +79,12 @@ def upload(file_path: Path, name: str | None) -> None:
         if total > MAX_FILE_SIZE:
             raise click.ClickException("File size exceeds 100MB limit!")
 
+        def upload() -> str:
+            return upload_to_pinata(file_path, pinata_jwt, name)
+
         cid = run_with_animation(
-            target_function=upload_to_pinata,
+            target_function=upload,
             animation_text="Uploading",
-            spinner_style="dots",
-            file_path=file_path,
-            jwt=pinata_jwt,
-            name=name,
         )
         logger.info(f"File uploaded successfully!\n CID: {cid}")
 

@@ -37,15 +37,14 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
         return False
 
 
-def animate(name: str, style: str, stop_event: threading.Event) -> None:
-    spinners = {
-        "dots": {"interval": 100, "frames": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]},
-        "simpleDotsScrolling": {"interval": 200, "frames": [".  ", ".. ", "...", " ..", "  .", "   "]},
+def animate(name: str, stop_event: threading.Event) -> None:
+    spinner = {
+        "interval": 100,
+        "frames": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
     }
-    frames = spinners[style]["frames"]
-    interval = spinners[style]["interval"]
+
     while not stop_event.is_set():
-        for frame in frames:  # type: ignore  # noqa: PGH003
+        for frame in spinner["frames"]:  # type: ignore  # noqa: PGH003
             if stop_event.is_set():
                 break
             try:
@@ -56,18 +55,16 @@ def animate(name: str, style: str, stop_event: threading.Event) -> None:
             sys.stdout.write(output)
             sys.stdout.write(CLEAR_LINE)
             sys.stdout.flush()
-            time.sleep(0.001 * interval)  # type: ignore  # noqa: PGH003
+            time.sleep(0.001 * spinner["interval"])  # type: ignore  # noqa: PGH003
 
     sys.stdout.write("\r ")
 
 
-def run_with_animation(
-    target_function: Callable, animation_text: str = "Loading", spinner_style: str = "dots", *args: Any, **kwargs: Any
-) -> Any:  # noqa: ANN401
+def run_with_animation(target_function: Callable[[], Any], animation_text: str = "Loading") -> Any:  # noqa: ANN401
     with ThreadPoolExecutor(max_workers=2) as executor:
         stop_event = threading.Event()
-        animation_future = executor.submit(animate, animation_text, spinner_style, stop_event)
-        function_future = executor.submit(target_function, *args, **kwargs)
+        animation_future = executor.submit(animate, animation_text, stop_event)
+        function_future = executor.submit(target_function)
 
         try:
             result = function_future.result()
