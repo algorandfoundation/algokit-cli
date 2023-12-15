@@ -57,6 +57,10 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
         ),
+        "puya": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-puya-template",
+            description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
+        ),
         "react": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
