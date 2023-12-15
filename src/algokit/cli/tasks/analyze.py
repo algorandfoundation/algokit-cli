@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from pathlib import Path
 
 import click
@@ -9,6 +10,7 @@ from algokit.core.tasks.analyze import (
     TEALER_ARTIFACTS_ROOT,
     TEALER_DOT_FILES_ROOT,
     TEALER_REPORTS_ROOT,
+    TEALER_SNAPSHOTS_ROOT,
     generate_filename,
     generate_table_rows,
     generate_tealer_command,
@@ -27,10 +29,11 @@ def prepare_artifact_folders(output_dir: Path | None) -> None:
     TEALER_REPORTS_ROOT.mkdir(parents=True, exist_ok=True)
     TEALER_ARTIFACTS_ROOT.mkdir(parents=True, exist_ok=True)
     TEALER_DOT_FILES_ROOT.mkdir(parents=True, exist_ok=True)
+    TEALER_SNAPSHOTS_ROOT.mkdir(parents=True, exist_ok=True)
 
 
-def display_analysis_summary(analysis_results: dict):
-    impact_frequency = {}
+def display_analysis_summary(analysis_results: dict) -> None:
+    impact_frequency: dict = {}
     for file_path, result_rows in analysis_results.items():
         click.echo(f"\nFile: {file_path}\n")
         for result in result_rows:
@@ -47,6 +50,11 @@ def display_analysis_summary(analysis_results: dict):
         click.echo(f"{impact}: {frequency}")
 
     click.echo(f"Finished analyzing {len(analysis_results)} files.")
+
+
+def has_template_vars(path: Path) -> bool:
+    content = path.read_text()
+    return bool(re.search(r"\bTMPL_\w*\b", content))
 
 
 @click.command(
@@ -110,12 +118,6 @@ def display_analysis_summary(analysis_results: dict):
     type=click.STRING,
     help="Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.",
 )
-@click.option(
-    "--diff",
-    "show_diff",
-    is_flag=True,
-    help="Show the diff between the current and baseline reports.",
-)
 def analyze(  # noqa: PLR0913
     *,
     files: list[Path],
@@ -125,7 +127,6 @@ def analyze(  # noqa: PLR0913
     baseline: bool,
     output_path: Path | None,
     detectors_to_exclude: list[str],
-    show_diff: bool,
 ) -> None:
     """
     Analyze the TEAL programs for common vulnerabilities.
@@ -139,7 +140,6 @@ def analyze(  # noqa: PLR0913
         identified between the current and baseline reports.
         output_path (Path | None): The directory path where to store the results of the static analysis.
         detectors_to_exclude (list[str]): The vulnerabilities to exclude from the analysis.
-        show_diff (bool): Whether to show the diff between the current and baseline reports.
     """
 
     prepare_artifact_folders(output_path)
@@ -159,25 +159,28 @@ def analyze(  # noqa: PLR0913
         pattern = "**/*.teal" if recursive else "*.teal"
         input_files.extend(sorted(directory.glob(pattern)))
 
-    duplicate_files = {}
+    duplicate_files: dict = {}
     reports = {}
     for cur_file in input_files:
         file = cur_file.resolve()
+
+        if has_template_vars(file):
+            click.secho(
+                f"Skipping {file} due to template variables. Substitute them before scanning.", err=True, fg="yellow"
+            )
+            continue
+
         filename = generate_filename(file, duplicate_files)
 
-        report_output_root = output_path or TEALER_REPORTS_ROOT
+        report_output_root = TEALER_SNAPSHOTS_ROOT if baseline else output_path or TEALER_REPORTS_ROOT
         report_output_path = report_output_root / filename
 
         command = generate_tealer_command(cur_file, report_output_path, detectors_to_exclude)
-
         old_report = load_tealer_report(str(report_output_path)) if report_output_path.exists() and baseline else None
-
         result = run_tealer(command)
 
         if baseline and old_report:
-            handle_baseline_diff(
-                cur_file=cur_file, report_output_path=report_output_path, old_report=old_report, show_diff=show_diff
-            )
+            handle_baseline_diff(cur_file=cur_file, report_output_path=report_output_path, old_report=old_report)
 
         reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
 
@@ -193,4 +196,4 @@ def analyze(  # noqa: PLR0913
     if table_rows:
         display_analysis_summary(table_rows)
     else:
-        click.echo("No issues identified.")
+        click.secho("\nNo issues identified.", fg="green")

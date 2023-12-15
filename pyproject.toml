@@ -176,6 +176,10 @@ implicit_reexport = false
 module = "approvaltests.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "jsondiff.*"
+ignore_missing_imports = true
+
 [tool.semantic_release]
 version_toml = "pyproject.toml:tool.poetry.version"
 remove_dist = false

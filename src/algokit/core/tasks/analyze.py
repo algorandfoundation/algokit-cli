@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 TEALER_REPORTS_ROOT = Path.cwd() / Path(".algokit/static-analysis")
 TEALER_ARTIFACTS_ROOT = TEALER_REPORTS_ROOT / "artifacts"
+TEALER_SNAPSHOTS_ROOT = TEALER_REPORTS_ROOT / "snapshots"
 TEALER_DOT_FILES_ROOT = TEALER_REPORTS_ROOT / "tealer"
 
 
@@ -91,22 +92,17 @@ def run_tealer(command: list[str]) -> RunResult:
     )
 
 
-def handle_baseline_diff(
-    *, cur_file: Path, report_output_path: Path, old_report: TealerAnalysisReport, show_diff: bool
-):
+def handle_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: TealerAnalysisReport) -> None:
     new_report = load_tealer_report(str(report_output_path))
     baseline_diff = diff(old_report.model_dump(), new_report.model_dump())
     if baseline_diff:
         logger.info(f"Diff detected in {cur_file}! Please check the content of " f"{report_output_path}.")
-        if show_diff:
-            logger.error(baseline_diff)
-            logger.error("Diff detected in the report.")
-        else:
-            logger.info("To output the diff use --diff option.")
+        logger.error(baseline_diff)
+        logger.error("Diff detected in the report.")
 
 
-def generate_table_rows(reports: dict) -> dict:
-    table_rows = {}
+def generate_table_rows(reports: dict) -> dict[Path, list[list[str]]]:
+    table_rows: dict[Path, list[list[str]]] = {}
     for report_path, _ in reports.items():
         report = load_tealer_report(report_path)
         file_path = Path(report_path).relative_to(Path.cwd())
