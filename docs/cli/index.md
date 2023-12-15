@@ -100,12 +100,21 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [ipfs](#ipfs)
+    - [analyze](#analyze)
     - [Options](#options-17)
     - [-f, --file ](#-f---file--1)
+    - [-d, --directory ](#-d---directory-)
+    - [--recursive](#--recursive)
+    - [--force](#--force-1)
+    - [--baseline](#--baseline)
+    - [-o, --output ](#-o---output--2)
+    - [--exclude ](#--exclude-)
+    - [ipfs](#ipfs)
+    - [Options](#options-18)
+    - [-f, --file ](#-f---file--2)
     - [-n, --name ](#-n---name--1)
     - [mint](#mint)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [--creator ](#--creator-)
     - [-n, --name ](#-n---name--2)
     - [-u, --unit ](#-u---unit-)
@@ -117,37 +126,37 @@
     - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-19)
-    - [-o, --output ](#-o---output--2)
+    - [Options](#options-20)
+    - [-o, --output ](#-o---output--3)
     - [Arguments](#arguments-5)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
     - [Arguments](#arguments-6)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
     - [Arguments](#arguments-7)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-22)
-    - [-f, --file ](#-f---file--2)
+    - [Options](#options-23)
+    - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-23)
-    - [-a, --account ](#-a---account--2)
-    - [-f, --file ](#-f---file--3)
-    - [-t, --transaction ](#-t---transaction--1)
-    - [-o, --output ](#-o---output--3)
-    - [--force](#--force-1)
-    - [transfer](#transfer)
     - [Options](#options-24)
+    - [-a, --account ](#-a---account--2)
+    - [-f, --file ](#-f---file--4)
+    - [-t, --transaction ](#-t---transaction--1)
+    - [-o, --output ](#-o---output--4)
+    - [--force](#--force-2)
+    - [transfer](#transfer)
+    - [Options](#options-25)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -155,16 +164,16 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--4)
+    - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
     - [Arguments](#arguments-8)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -172,11 +181,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-10)
     - [ALIAS](#alias)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-11)
     - [ALIAS](#alias-1)
-    - [Options](#options-28)
+    - [Options](#options-29)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -726,6 +735,44 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### analyze
+
+Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration.
+
+```shell
+algokit task analyze [OPTIONS]
+```
+
+### Options
+
+
+### -f, --file <files>
+Path to the TEAL file to analyze. Supports multiple files in a single run. Option is mutually exclusive with directory, recursive.
+
+
+### -d, --directory <directory>
+Path to a directory containing the TEAL files. Recursively search for all TEAL files within. Option is mutually exclusive with file.
+
+
+### --recursive
+Recursively search for all TEAL files within the provided directory. Option is mutually exclusive with file.
+
+
+### --force
+Force verification without the disclaimer confirmation prompt.
+
+
+### --baseline
+Exit with a non-zero code if any diffs are identified between the current and baseline reports. By default baseline reports are stored in the .algokit/static-analysis/artifacts folder. Alternatively, you can specify a custom path using the --output option to compare against.
+
+
+### -o, --output <output_path>
+Directory path where to store the results of the static analysis.
+
+
+### --exclude <detectors_to_exclude>
+Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.
 
 ### ipfs
 
