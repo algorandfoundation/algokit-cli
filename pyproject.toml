@@ -173,11 +173,7 @@ disallow_any_generics = false
 implicit_reexport = false
 
 [[tool.mypy.overrides]]
-module = "approvaltests.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "jsondiff.*"
+module = ["approvaltests.*", "jsondiff.*"]
 ignore_missing_imports = true
 
 [tool.semantic_release]

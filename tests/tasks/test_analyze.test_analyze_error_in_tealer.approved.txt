@@ -1,0 +1,27 @@
+Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
+DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/cwd0_dummy.json detect --contracts dummy/path/dummy.teal' in '{current_working_directory}'
+DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
+DEBUG: poetry: 
+DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
+DEBUG: poetry: Reading contract from file: "dummy/path/dummy.teal"
+DEBUG: poetry: Traceback (most recent call last):
+DEBUG: poetry: File "{current_working_directory}/.venv/bin/tealer", line 8, in <module>
+DEBUG: poetry: sys.exit(main())
+DEBUG: poetry: ^^^^^^
+DEBUG: poetry: File "{current_working_directory}/.venv/lib/python3.11/site-packages/tealer/__main__.py", line 558, in main
+DEBUG: poetry: tealer = init_tealer_from_single_contract(contract_source, contract_name)
+DEBUG: poetry: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+DEBUG: poetry: File "{current_working_directory}/.venv/lib/python3.11/site-packages/tealer/utils/command_line/common.py", line 334, in init_tealer_from_single_contract
+DEBUG: poetry: teal = parse_teal(contract_src, contract_name)
+DEBUG: poetry: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+DEBUG: poetry: File "{current_working_directory}/.venv/lib/python3.11/site-packages/tealer/teal/parse_teal.py", line 488, in parse_teal
+DEBUG: poetry: fourth_pass(all_bbs)
+DEBUG: poetry: File "{current_working_directory}/.venv/lib/python3.11/site-packages/tealer/teal/parse_teal.py", line 299, in fourth_pass
+DEBUG: poetry: ins = bb.exit_instr
+DEBUG: poetry: ^^^^^^^^^^^^^
+DEBUG: poetry: File "{current_working_directory}/.venv/lib/python3.11/site-packages/tealer/teal/basic_blocks.py", line 79, in exit_instr
+DEBUG: poetry: return self._instructions[-1]
+DEBUG: poetry: ~~~~~~~~~~~~~~~~~~^^^^
+DEBUG: poetry: IndexError: list index out of range
+An error occurred while analyzing dummy/path/dummy.teal. Please make sure the files supplied are valid TEAL code before trying again.
+Aborted!

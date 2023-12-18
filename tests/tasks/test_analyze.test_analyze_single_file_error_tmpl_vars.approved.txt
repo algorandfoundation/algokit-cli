@@ -1,0 +1,4 @@
+Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
+Warning: skipping dummy/path/dummy.teal due to template variables. Substitute them before scanning.
+
+No issues identified.

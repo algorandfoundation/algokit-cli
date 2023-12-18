@@ -1,0 +1,36 @@
+Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
+DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/cwd0_dummy.json detect --contracts dummy/path/dummy.teal' in '{current_working_directory}'
+DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
+DEBUG: poetry: 
+DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
+DEBUG: poetry: Reading contract from file: "dummy/path/dummy.teal"
+DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/cwd0_dummy.json
+
+File: .algokit/static-analysis/cwd0_dummy.json
+
+Detector: is-deletable
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
+Execution Paths (#Lines):
+2-8->26-30->31-34->35-38->40-45->76-86->46-47
+
+Detector: missing-fee-check
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+Detector: rekey-to
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+
+Total issues:
+High: 3
+Finished analyzing 1 files.

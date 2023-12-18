@@ -11,10 +11,10 @@ from algokit.core.tasks.analyze import (
     TEALER_DOT_FILES_ROOT,
     TEALER_REPORTS_ROOT,
     TEALER_SNAPSHOTS_ROOT,
-    generate_filename,
+    generate_report_filename,
     generate_table_rows,
     generate_tealer_command,
-    handle_baseline_diff,
+    has_baseline_diff,
     load_tealer_report,
     run_tealer,
 )
@@ -23,6 +23,12 @@ logger = logging.getLogger(__name__)
 
 
 def prepare_artifact_folders(output_dir: Path | None) -> None:
+    """
+    Create necessary artifact folders if they do not exist.
+
+    Args:
+        output_dir (Path | None): The output directory path.
+    """
     if output_dir:
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -33,6 +39,12 @@ def prepare_artifact_folders(output_dir: Path | None) -> None:
 
 
 def display_analysis_summary(analysis_results: dict) -> None:
+    """
+    Display the summary of the analysis results.
+
+    Args:
+        analysis_results (dict): Dictionary containing analysis results.
+    """
     impact_frequency: dict = {}
     for file_path, result_rows in analysis_results.items():
         click.echo(f"\nFile: {file_path}\n")
@@ -53,33 +65,53 @@ def display_analysis_summary(analysis_results: dict) -> None:
 
 
 def has_template_vars(path: Path) -> bool:
+    """
+    Check if the file contains template variables.
+
+    Args:
+        path (Path): The file path to check.
+
+    Returns:
+        bool: True if template variables are found, False otherwise.
+    """
     content = path.read_text()
     return bool(re.search(r"\bTMPL_\w*\b", content))
+
+
+def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
+    """
+    Get input files based on the input paths and recursive flag.
+
+    Args:
+        input_paths (tuple[Path]): Tuple of input paths.
+        recursive (bool): Flag to indicate recursive search.
+
+    Returns:
+        list[Path]: List of input files.
+    """
+
+    input_files = []
+    for input_path in input_paths:
+        if input_path.is_dir():
+            pattern = "**/*.teal" if recursive else "*.teal"
+            input_files.extend(sorted(input_path.glob(pattern)))
+        else:
+            input_files.append(input_path)
+    return sorted(set(input_files))
 
 
 @click.command(
     name="analyze",
     help="Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration.",
 )
-@click.option(
-    "--file",
-    "-f",
-    "files",
-    multiple=True,
-    cls=MutuallyExclusiveOption,
-    not_required_if=["directory", "recursive"],
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
-    help="Path to the TEAL file to analyze. Supports multiple files in a single run.",
+@click.argument(
+    "input_paths",
+    nargs=-1,
+    type=click.Path(exists=True, dir_okay=True, file_okay=True, path_type=Path),
+    required=True,
 )
 @click.option(
-    "--directory",
-    "-d",
-    cls=MutuallyExclusiveOption,
-    not_required_if=["file"],
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    help="Path to a directory containing the TEAL files. Recursively search for all TEAL files within.",
-)
-@click.option(
+    "-r",
     "--recursive",
     is_flag=True,
     cls=MutuallyExclusiveOption,
@@ -92,6 +124,7 @@ def has_template_vars(path: Path) -> bool:
     help="Force verification without the disclaimer confirmation prompt.",
 )
 @click.option(
+    "-b",
     "--baseline",
     is_flag=True,
     help=(
@@ -111,6 +144,7 @@ def has_template_vars(path: Path) -> bool:
     help="Directory path where to store the results of the static analysis.",
 )
 @click.option(
+    "-e",
     "--exclude",
     "detectors_to_exclude",
     multiple=True,
@@ -120,8 +154,7 @@ def has_template_vars(path: Path) -> bool:
 )
 def analyze(  # noqa: PLR0913
     *,
-    files: list[Path],
-    directory: Path | None,
+    input_paths: tuple[Path],
     recursive: bool,
     force: bool,
     baseline: bool,
@@ -130,22 +163,11 @@ def analyze(  # noqa: PLR0913
 ) -> None:
     """
     Analyze the TEAL programs for common vulnerabilities.
-
-    Args:
-        files (list[Path]): The files to analyze.
-        directory (Path | None): The directory containing the TEAL files.
-        recursive (bool): Whether to recursively search for all TEAL files within the provided directory.
-        force (bool): Whether to force verification without the disclaimer confirmation prompt.
-        baseline (bool): Whether to exit with a non-zero code if any diffs are
-        identified between the current and baseline reports.
-        output_path (Path | None): The directory path where to store the results of the static analysis.
-        detectors_to_exclude (list[str]): The vulnerabilities to exclude from the analysis.
     """
 
     prepare_artifact_folders(output_path)
-
-    input_files = sorted(set(files))
     detectors_to_exclude = sorted(set(detectors_to_exclude))
+    input_files = get_input_files(input_paths=input_paths, recursive=recursive)
 
     if not force:
         click.confirm(
@@ -155,10 +177,6 @@ def analyze(  # noqa: PLR0913
             abort=True,
         )
 
-    if directory:
-        pattern = "**/*.teal" if recursive else "*.teal"
-        input_files.extend(sorted(directory.glob(pattern)))
-
     duplicate_files: dict = {}
     reports = {}
     for cur_file in input_files:
@@ -166,34 +184,44 @@ def analyze(  # noqa: PLR0913
 
         if has_template_vars(file):
             click.secho(
-                f"Skipping {file} due to template variables. Substitute them before scanning.", err=True, fg="yellow"
+                f"Warning: skipping {file} due to template variables. Substitute them before scanning.",
+                err=True,
+                fg="yellow",
             )
             continue
 
-        filename = generate_filename(file, duplicate_files)
+        filename = generate_report_filename(file, duplicate_files)
 
+        # If baseline is enabled, store the report in the snapshots folder otherwise store it in the reports folder
+        # If a custom output path is provided, store the report in the specified path
         report_output_root = TEALER_SNAPSHOTS_ROOT if baseline else output_path or TEALER_REPORTS_ROOT
         report_output_path = report_output_root / filename
 
         command = generate_tealer_command(cur_file, report_output_path, detectors_to_exclude)
         old_report = load_tealer_report(str(report_output_path)) if report_output_path.exists() and baseline else None
         result = run_tealer(command)
-
-        if baseline and old_report:
-            handle_baseline_diff(cur_file=cur_file, report_output_path=report_output_path, old_report=old_report)
-
-        reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
-
         if result.exit_code != 0:
-            click.echo(
-                f"An error occurred while analyzing {cur_file}. Please check the logs for more information.",
+            click.secho(
+                f"An error occurred while analyzing {cur_file}. "
+                "Please make sure the files supplied are valid TEAL code before trying again.",
                 err=True,
+                fg="red",
             )
             raise click.Abort("Error while running tealer")
 
+        if baseline and old_report:
+            has_diff = has_baseline_diff(
+                cur_file=cur_file, report_output_path=report_output_path, old_report=old_report
+            )
+            if has_diff:
+                raise click.exceptions.Exit(1)
+
+        reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
+
     table_rows = generate_table_rows(reports)
 
-    if table_rows:
+    if table_rows and not baseline:
         display_analysis_summary(table_rows)
-    else:
-        click.secho("\nNo issues identified.", fg="green")
+        raise click.exceptions.Exit(1)
+
+    click.secho("\nNo issues identified.", fg="green")

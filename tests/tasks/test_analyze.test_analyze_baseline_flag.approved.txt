@@ -1,0 +1,8 @@
+Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
+DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/snapshots/cwd0_dummy.json detect --contracts dummy/path/dummy.teal' in '{current_working_directory}'
+DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
+DEBUG: poetry: 
+DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
+DEBUG: poetry: Reading contract from file: "dummy/path/dummy.teal"
+DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/snapshots/cwd0_dummy.json
+ERROR: Diff detected in dummy/path/dummy.teal! Please check the content of {current_working_directory}/.algokit/static-analysis/snapshots/cwd0_dummy.json.
