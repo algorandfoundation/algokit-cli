@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.8.1 (2023-12-19)
+
+### Fix
+
+* Update multiformats version as it needs to be in sync with multiformats-config ([#372](https://github.com/algorandfoundation/algokit-cli/issues/372)) ([`67a5966`](https://github.com/algorandfoundation/algokit-cli/commit/67a59662c67d7f1d2e5eedeb1e8d62289e0ad5ac))
+
 ## v1.8.0 (2023-12-14)
 
 ### Feature
