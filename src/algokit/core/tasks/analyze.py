@@ -11,7 +11,7 @@ from algokit.core.proc import RunResult, run
 
 logger = logging.getLogger(__name__)
 
-TEALER_REPORTS_ROOT = Path.cwd() / Path(".algokit/static-analysis")
+TEALER_REPORTS_ROOT = Path.cwd() / ".algokit/static-analysis"
 TEALER_ARTIFACTS_ROOT = TEALER_REPORTS_ROOT / "artifacts"
 TEALER_SNAPSHOTS_ROOT = TEALER_REPORTS_ROOT / "snapshots"
 TEALER_DOT_FILES_ROOT = TEALER_REPORTS_ROOT / "tealer"
@@ -47,15 +47,12 @@ def _extract_lines(block: list[list[str]]) -> str:
     return "->".join([_extract_line(b) for b in block])
 
 
-def generate_report_filename(file: Path, duplicate_files: dict) -> str:
-    filename = f"{file.parent.stem}_{file.stem}"
-    if filename in duplicate_files:
-        duplicate_files[filename] += 1
-        filename = f"{filename}_{duplicate_files[filename]}.json"
-    else:
-        duplicate_files[filename] = 0
-        filename = f"{filename}.json"
-    return filename
+def generate_report_filename(file: Path) -> str:
+    duplicate_files: dict[str, int] = {}
+    base_filename = f"{file.parent.stem}_{file.stem}"
+    duplicate_count = duplicate_files.get(base_filename, 0)
+    duplicate_files[base_filename] = duplicate_count + 1
+    return f"{base_filename}_{duplicate_count}.json" if duplicate_count else f"{base_filename}.json"
 
 
 def load_tealer_report(file_path: str) -> TealerAnalysisReport:
@@ -87,8 +84,10 @@ def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_
     """
 
     command = [
-        "poetry",
+        "pipx",
         "run",
+        "--spec",
+        "git+https://github.com/algorandfoundation/tealer.git@py3.12",
         "tealer",
         "--json",
         str(report_output_path),
@@ -136,7 +135,7 @@ def has_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: T
     """
 
     new_report = load_tealer_report(str(report_output_path))
-    baseline_diff = diff(old_report.model_dump(), new_report.model_dump())
+    baseline_diff = diff(old_report.model_dump(by_alias=True), new_report.model_dump(by_alias=True))
     if baseline_diff:
         logger.error(f"Diff detected in {cur_file}! Please check the content of " f"{report_output_path}.")
 

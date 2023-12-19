@@ -1,7 +1,25 @@
-from pytest import TempPathFactory
+from collections.abc import Generator
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+
+
+def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy") -> str:
+    for target in targets:
+        output = output.replace(target, replacement)
+    return output
+
+
+@pytest.fixture()
+def mock_tealer_artifacts_path(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]:
+    cwd = tmp_path_factory.mktemp("cwd")
+    with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_content.teal"):
+        yield cwd
+
 
 # Default algokit beaker hello world contract
 # transpiled to TEAL
@@ -128,18 +146,21 @@ retsub
 """
 
 
-def test_analyze_single_file(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_single_file(
+    tmp_path_factory: pytest.TempPathFactory,
+    mock_tealer_artifacts_path: Path,
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_file}", input="y\n")
+    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
-    result.output = result.output.replace(str(teal_file), "dummy/path/dummy.teal")
+    _format_snapshot(result.output, [str(cwd), str(mock_tealer_artifacts_path)])
     verify(result.output)
 
 
-def test_analyze_multiple_files(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_multiple_files(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_folder = cwd / "dummy_contracts"
     teal_folder.mkdir()
@@ -154,7 +175,7 @@ def test_analyze_multiple_files(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_analyze_multiple_files_recursive(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_multiple_files_recursive(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_root_folder = cwd / "dummy_contracts"
     teal_folder = teal_root_folder / "subfolder"
@@ -172,7 +193,7 @@ def test_analyze_multiple_files_recursive(tmp_path_factory: TempPathFactory) -> 
     verify(result.output)
 
 
-def test_exclude_vulnerabilities(tmp_path_factory: TempPathFactory) -> None:
+def test_exclude_vulnerabilities(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(TEAL_FILE_CONTENT)
@@ -186,7 +207,7 @@ def test_exclude_vulnerabilities(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_analyze_skipping_tmpl_vars(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_skipping_tmpl_vars(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(
@@ -199,7 +220,7 @@ def test_analyze_skipping_tmpl_vars(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_analyze_abort_disclaimer(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_abort_disclaimer(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
@@ -209,7 +230,7 @@ def test_analyze_abort_disclaimer(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_analyze_error_in_tealer(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_error_in_tealer(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
@@ -220,15 +241,16 @@ def test_analyze_error_in_tealer(tmp_path_factory: TempPathFactory) -> None:
     verify(result.output)
 
 
-def test_analyze_baseline_flag(tmp_path_factory: TempPathFactory) -> None:
+def test_analyze_baseline_flag(tmp_path_factory: pytest.TempPathFactory, mock_tealer_artifacts_path: Path) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(TEAL_FILE_CONTENT)
     result = invoke(f"task analyze {teal_file} --baseline", input="y\n")
-    assert result.exit_code == 0
+    assert result.exit_code == 1
 
     teal_file.write_text("\n#pragma version 8\nint 1\nreturn\n")
     result = invoke(f"task analyze {teal_file} --baseline", input="y\n")
     assert result.exit_code == 1
-    result.output = result.output.replace(str(teal_file), "dummy/path/dummy.teal")
+    result.output = result.output.replace(str(cwd), "dummy/path/dummy.teal")
+    result.output = result.output.replace(str(mock_tealer_artifacts_path), "dummy/path/dummy.teal")
     verify(result.output)

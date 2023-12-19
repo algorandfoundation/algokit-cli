@@ -177,7 +177,6 @@ def analyze(  # noqa: PLR0913
             abort=True,
         )
 
-    duplicate_files: dict = {}
     reports = {}
     for cur_file in input_files:
         file = cur_file.resolve()
@@ -190,7 +189,7 @@ def analyze(  # noqa: PLR0913
             )
             continue
 
-        filename = generate_report_filename(file, duplicate_files)
+        filename = generate_report_filename(file)
 
         # If baseline is enabled, store the report in the snapshots folder otherwise store it in the reports folder
         # If a custom output path is provided, store the report in the specified path

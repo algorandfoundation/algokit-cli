@@ -1,9 +1,9 @@
 Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/cwd0_dummy.json detect --contracts dummy/path/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
+DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/dummycwd_dummy.json detect --contracts /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-53/dummycwd/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
 DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
 DEBUG: poetry: 
 DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy/path/dummy.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/cwd0_dummy.json
+DEBUG: poetry: Reading contract from file: "/private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-53/dummycwd/dummy.teal"
+DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/dummycwd_dummy.json
 
 No issues identified.

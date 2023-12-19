@@ -25,7 +25,6 @@ algokit-utils = "v2.1.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 aiohttp = "3.9.1"
-tealer = {git = "https://github.com/algorandfoundation/tealer.git"}
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
