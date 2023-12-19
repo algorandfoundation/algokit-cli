@@ -287,18 +287,18 @@ files = [
 
 [[package]]
 name = "bases"
-version = "0.2.1"
+version = "0.3.0"
 description = "Python library for general Base-N encodings."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "bases-0.2.1-py3-none-any.whl", hash = "sha256:d030b5e349773ad2a067bfaaf3a9794b70d23a1f923033c15c2e0ce869854f6d"},
-    {file = "bases-0.2.1.tar.gz", hash = "sha256:b0999e14725b59bff38974b00e918629e0e29f3d80a40e022c6f0f8d5cdff9d4"},
+    {file = "bases-0.3.0-py3-none-any.whl", hash = "sha256:a2fef3366f3e522ff473d2e95c21523fe8e44251038d5c6150c01481585ebf5b"},
+    {file = "bases-0.3.0.tar.gz", hash = "sha256:70f04a4a45d63245787f9e89095ca11042685b6b64b542ad916575ba3ccd1570"},
 ]
 
 [package.dependencies]
-typing-extensions = "*"
-typing-validation = "*"
+typing-extensions = ">=4.6.0"
+typing-validation = ">=1.1.0"
 
 [package.extras]
 dev = ["base58", "mypy", "pylint", "pytest", "pytest-cov"]
@@ -1561,34 +1561,34 @@ files = [
 
 [[package]]
 name = "multiformats"
-version = "0.2.1"
+version = "0.3.1"
 description = "Python implementation of multiformats protocols."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "multiformats-0.2.1-py3-none-any.whl", hash = "sha256:0655fad05cff4cb9eaae3a0f61c4cf8189857fef5a5d0ade6aa25d6b8439e204"},
-    {file = "multiformats-0.2.1.tar.gz", hash = "sha256:4aee6eb5289c3cd00315e3f2b97e36b60db6af9bcec91d65f32d7155942dbef9"},
+    {file = "multiformats-0.3.1-py3-none-any.whl", hash = "sha256:e194bae88004cb41ca8df83cd330d97e0a566c46db99e915831761cbf0a319a4"},
+    {file = "multiformats-0.3.1.tar.gz", hash = "sha256:6b011e780d8283395c3062e16def6a61636ee265a3a8c94cc83d7a80293e70e5"},
 ]
 
 [package.dependencies]
-bases = "*"
-multiformats-config = "*"
-typing-extensions = "*"
-typing-validation = "*"
+bases = ">=0.3.0"
+multiformats-config = ">=0.3.0"
+typing-extensions = ">=4.6.0"
+typing-validation = ">=1.1.0"
 
 [package.extras]
-dev = ["blake3", "mmh3", "mypy", "pycryptodomex", "pylint", "pysha3", "pyskein", "pytest", "pytest-cov"]
-full = ["blake3", "mmh3", "pycryptodomex", "pysha3", "pyskein"]
+dev = ["blake3", "mmh3", "mypy", "pycryptodomex", "pylint", "pyskein", "pytest", "pytest-cov", "rich"]
+full = ["blake3", "mmh3", "pycryptodomex", "pyskein", "rich"]
 
 [[package]]
 name = "multiformats-config"
-version = "0.2.0.post4"
+version = "0.3.1"
 description = "Pre-loading configuration module for the 'multiformats' package."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "multiformats-config-0.2.0.post4.tar.gz", hash = "sha256:3b5d0be63211681edbcf887abe149fc17b43a79d0c009fb44232af9addf7a309"},
-    {file = "multiformats_config-0.2.0.post4-py3-none-any.whl", hash = "sha256:221a630732f7bb2cd6cb708b94a85da683e29618e4a2055eea1bf4f980feefce"},
+    {file = "multiformats-config-0.3.1.tar.gz", hash = "sha256:7eaa80ef5d9c5ee9b86612d21f93a087c4a655cbcb68960457e61adbc62b47a7"},
+    {file = "multiformats_config-0.3.1-py3-none-any.whl", hash = "sha256:dec4c9d42ed0d9305889b67440f72e8e8d74b82b80abd7219667764b5b0a8e1d"},
 ]
 
 [package.dependencies]
@@ -2943,20 +2943,6 @@ unify = "*"
 yapf = "*"
 
 [[package]]
-name = "termcolor"
-version = "2.4.0"
-description = "ANSI color formatting for output in terminal"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
-    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
-]
-
-[package.extras]
-tests = ["pytest", "pytest-cov"]
-
-[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -3045,14 +3031,17 @@ files = [
 
 [[package]]
 name = "typing-validation"
-version = "1.0.0.post2"
+version = "1.1.0"
 description = "A simple library for runtime type-checking."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing-validation-1.0.0.post2.tar.gz", hash = "sha256:6a30dec74373f9dca29db6f79ef65eb765a6934c09d87639cf422288933b2aa4"},
-    {file = "typing_validation-1.0.0.post2-py3-none-any.whl", hash = "sha256:c9f5cb42435ee59fcf5a1a69dc88ccd5dc6f904436e61b5b8c276906a1c9e454"},
+    {file = "typing-validation-1.1.0.tar.gz", hash = "sha256:dbfa1b797e1e6d32cbe3015141d7a60b40404b043db5ae5de889761c6f85d03b"},
+    {file = "typing_validation-1.1.0-py3-none-any.whl", hash = "sha256:a2bf0ed7cc91faf17c7530170ebf1a59363e560846de48c5938821e67877bb74"},
 ]
+
+[package.dependencies]
+typing-extensions = {version = ">=4.6.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 dev = ["mypy", "pylint", "pytest", "pytest-cov", "rich"]
@@ -3341,20 +3330,6 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [[package]]
-name = "yaspin"
-version = "3.0.1"
-description = "Yet Another Terminal Spinner"
-optional = false
-python-versions = ">=3.9,<4.0"
-files = [
-    {file = "yaspin-3.0.1-py3-none-any.whl", hash = "sha256:c4b5d2ca23ae664b87a5cd53401c5107cef12668a71d9ee5ea5536045f364121"},
-    {file = "yaspin-3.0.1.tar.gz", hash = "sha256:9c04aa69cce9be83e1ea3134a6712e749e6c0c9cd02599023713e6befd7bf369"},
-]
-
-[package.dependencies]
-termcolor = ">=2.3,<3.0"
-
-[[package]]
 name = "zipp"
 version = "3.16.2"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -3372,4 +3347,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "75c0e53fef40f8ad7c6b7a631648cd0beaab63d74a74c8eeb02c5e613cdff92e"
+content-hash = "f00e7cdf46cda3bf89f7ee10dc2918fb3a95f7451e7ec25692d50f43117d5c8e"
