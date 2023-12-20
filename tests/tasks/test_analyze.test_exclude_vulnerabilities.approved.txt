@@ -1,9 +1,6 @@
-Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/dummycwd_dummy.json detect --contracts /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-53/dummycwd/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "/private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-53/dummycwd/dummy.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/dummycwd_dummy.json
+This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: y
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_content.teal detect --contracts {current_working_directory}/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
 
-No issues identified.
+No issues found.

@@ -1,256 +1,201 @@
+import re
 from collections.abc import Generator
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
+from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
 def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy") -> str:
+    from algokit.core.utils import get_base_python_path
+
+    python_base_path = get_base_python_path()
+    if python_base_path is None:
+        pytest.fail("Python base detection failed, this should work (even in CI)")
+
+    output = output.replace(python_base_path, "python_base_path")
+
     for target in targets:
         output = output.replace(target, replacement)
-    return output
+
+    # If output contains more than one new line trim them to have at most one whitespace in between
+
+    output = re.sub(r"^(pipx:|DEBBUG: pipx:).*", "", output, flags=re.MULTILINE)
+    return re.sub(r"\n\s*\n", "\n\n", output)
 
 
-@pytest.fixture()
-def mock_tealer_artifacts_path(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]:
+@pytest.fixture(autouse=True)
+def _disable_animation(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.animate", return_value=None)
+
+
+@pytest.fixture(autouse=True)
+def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]:
     cwd = tmp_path_factory.mktemp("cwd")
-    with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_content.teal"):
+
+    with patch("algokit.core.tasks.analyze.TEALER_REPORTS_ROOT", return_value=cwd), patch(
+        "algokit.core.tasks.analyze.TEALER_SNAPSHOTS_ROOT", return_value=cwd
+    ), patch("algokit.core.tasks.analyze.TEALER_DOT_FILES_ROOT", return_value=cwd):
         yield cwd
 
 
-# Default algokit beaker hello world contract
-# transpiled to TEAL
-TEAL_FILE_CONTENT = """
-#pragma version 8
-intcblock 0 1
-bytecblock 0x
-txn NumAppArgs
-intc_0 // 0
-==
-bnz main_l4
-txna ApplicationArgs 0
-pushbytes 0x02bece11 // "hello(string)string"
-==
-bnz main_l3
-err
-main_l3:
-txn OnCompletion
-intc_0 // NoOp
-==
-txn ApplicationID
-intc_0 // 0
-!=
-&&
-assert
-callsub hellocaster_3
-intc_1 // 1
-return
-main_l4:
-txn OnCompletion
-intc_0 // NoOp
-==
-bnz main_l10
-txn OnCompletion
-pushint 4 // UpdateApplication
-==
-bnz main_l9
-txn OnCompletion
-pushint 5 // DeleteApplication
-==
-bnz main_l8
-err
-main_l8:
-txn ApplicationID
-intc_0 // 0
-!=
-assert
-callsub delete_1
-intc_1 // 1
-return
-main_l9:
-txn ApplicationID
-intc_0 // 0
-!=
-assert
-callsub update_0
-intc_1 // 1
-return
-main_l10:
-txn ApplicationID
-intc_0 // 0
-==
-assert
-intc_1 // 1
-return
-
-// update
-update_0:
-proto 0 0
-txn Sender
-global CreatorAddress
-==
-// unauthorized
-assert
-intc_0 // 0
-return
-
-// delete
-delete_1:
-proto 0 0
-txn Sender
-global CreatorAddress
-==
-// unauthorized
-assert
-intc_0 // 0
-// Check app is deletable
-assert
-retsub
-
-// hello
-hello_2:
-proto 1 1
-bytec_0 // ""
-pushbytes 0x48656c6c6f2c20 // "Hello, "
-frame_dig -1
-extract 2 0
-concat
-frame_bury 0
-frame_dig 0
-len
-itob
-extract 6 0
-frame_dig 0
-concat
-frame_bury 0
-retsub
-
-// hello_caster
-hellocaster_3:
-proto 0 0
-bytec_0 // ""
-dup
-txna ApplicationArgs 1
-frame_bury 1
-frame_dig 1
-callsub hello_2
-frame_bury 0
-pushbytes 0x151f7c75 // 0x151f7c75
-frame_dig 0
-concat
-log
-retsub
-"""
+@pytest.fixture()
+def generate_report_filename_mock() -> Generator[MagicMock, None, None]:
+    with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_content.teal") as mock:
+        yield mock
 
 
+@pytest.mark.usefixtures("generate_report_filename_mock")
 def test_analyze_single_file(
-    tmp_path_factory: pytest.TempPathFactory,
-    mock_tealer_artifacts_path: Path,
+    cwd: Path,
 ) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
     teal_file = cwd / "dummy.teal"
-    teal_file.write_text(TEAL_FILE_CONTENT)
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
     result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
-    _format_snapshot(result.output, [str(cwd), str(mock_tealer_artifacts_path)])
+    result.output = _format_snapshot(
+        result.output,
+        [
+            str(cwd),
+        ],
+    )
     verify(result.output)
 
 
-def test_analyze_multiple_files(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_analyze_multiple_files(
+    cwd: Path,
+    generate_report_filename_mock: MagicMock,
+) -> None:
+    generate_report_filename_mock.side_effect = [f"dummy_{i}.teal" for i in range(5)]
     teal_folder = cwd / "dummy_contracts"
     teal_folder.mkdir()
     for i in range(5):
         teal_file = teal_folder / f"dummy_{i}.teal"
-        teal_file.write_text(TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_folder}", input="y\n")
+        teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
+    result = invoke(f"task analyze {teal_folder} --output {cwd}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
     for i in range(5):
         result.output = result.output.replace(str(teal_folder / f"dummy_{i}.teal"), f"dummy_contracts/dummy_{i}.teal")
+    result.output = _format_snapshot(
+        result.output,
+        [
+            str(cwd),
+        ],
+    )
     verify(result.output)
 
 
-def test_analyze_multiple_files_recursive(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_analyze_multiple_files_recursive(
+    cwd: Path,
+    generate_report_filename_mock: MagicMock,
+) -> None:
     teal_root_folder = cwd / "dummy_contracts"
-    teal_folder = teal_root_folder / "subfolder"
-    teal_folder.mkdir(parents=True)
+    generate_report_filename_mock.side_effect = [teal_root_folder / f"subfolder_{i}/dummy.teal" for i in range(5)]
+
     for i in range(5):
-        teal_file = teal_folder / f"dummy_{i}.teal"
-        teal_file.write_text(TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_folder} --recursive", input="y\n")
+        teal_folder = teal_root_folder / f"subfolder_{i}"
+        teal_folder.mkdir(parents=True)
+        teal_file = teal_folder / "dummy.teal"
+        teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
+    result = invoke(f"task analyze {teal_root_folder} --recursive --output {cwd}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
     for i in range(5):
         result.output = result.output.replace(
-            str(teal_folder / f"dummy_{i}.teal"), f"dummy_contracts/subfolder/dummy_{i}.teal"
+            str(teal_root_folder / f"subfolder_{i}/dummy.teal"), f"dummy_contracts/subfolder_{i}/dummy.teal"
         )
+    result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
 
 
-def test_exclude_vulnerabilities(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+@pytest.mark.usefixtures("generate_report_filename_mock")
+def test_exclude_vulnerabilities(
+    cwd: Path,
+) -> None:
     teal_file = cwd / "dummy.teal"
-    teal_file.write_text(TEAL_FILE_CONTENT)
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
     result = invoke(
-        f"task analyze {teal_file} --exclude is-deletable --exclude rekey-to --exclude missing-fee-check",
+        f"task analyze {teal_file} --exclude is-deletable "
+        f"--exclude rekey-to --exclude missing-fee-check --output {cwd}",
         input="y\n",
+        cwd=cwd,
     )
 
     assert result.exit_code == 0
-    result.output = result.output.replace(str(teal_file), "dummy/path/dummy.teal")
+    result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
 
 
-def test_analyze_skipping_tmpl_vars(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_analyze_skipping_tmpl_vars(
+    cwd: Path,
+) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(
-        TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
+        DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
     )
-    result = invoke(f"task analyze {teal_file}", input="y\n")
+    result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 0
-    result.output = result.output.replace(str(teal_file), "dummy/path/dummy.teal")
+    result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
 
 
-def test_analyze_abort_disclaimer(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_analyze_abort_disclaimer(
+    cwd: Path,
+) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
-    result = invoke(f"task analyze {teal_file}", input="n\n")
+    result = invoke(f"task analyze {teal_file} --output {cwd}", input="n\n", cwd=cwd)
 
     assert result.exit_code == 1
     verify(result.output)
 
 
-def test_analyze_error_in_tealer(tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+def test_analyze_error_in_tealer(
+    cwd: Path,
+) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
-    result = invoke(f"task analyze {teal_file}", input="y\n")
+    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
-    result.output = result.output.replace(str(teal_file), "dummy/path/dummy.teal")
+    result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
 
 
-def test_analyze_baseline_flag(tmp_path_factory: pytest.TempPathFactory, mock_tealer_artifacts_path: Path) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
+@pytest.mark.usefixtures("generate_report_filename_mock")
+def test_analyze_diff_flag(
+    cwd: Path,
+) -> None:
     teal_file = cwd / "dummy.teal"
-    teal_file.write_text(TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_file} --baseline", input="y\n")
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
+    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
     assert result.exit_code == 1
 
     teal_file.write_text("\n#pragma version 8\nint 1\nreturn\n")
-    result = invoke(f"task analyze {teal_file} --baseline", input="y\n")
+    result = invoke(f"task analyze {teal_file} --diff --output {cwd}", input="y\n", cwd=cwd)
     assert result.exit_code == 1
-    result.output = result.output.replace(str(cwd), "dummy/path/dummy.teal")
-    result.output = result.output.replace(str(mock_tealer_artifacts_path), "dummy/path/dummy.teal")
+    result.output = _format_snapshot(result.output, [str(cwd)])
+    verify(result.output)
+
+
+def test_analyze_error_no_pipx(
+    cwd: Path,
+    mocker: MockerFixture,
+) -> None:
+    mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
+
+    teal_file = cwd / "dummy.teal"
+    teal_file.touch()
+    result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
+
+    assert result.exit_code == 1
+    result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)

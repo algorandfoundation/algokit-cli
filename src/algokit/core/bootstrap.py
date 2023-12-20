@@ -1,16 +1,14 @@
 import logging
 import os
 import platform
-import sys
-from collections.abc import Iterator
 from pathlib import Path
-from shutil import which
 
 import click
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
+from algokit.core.utils import find_valid_pipx_command
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 logger = logging.getLogger(__name__)
@@ -127,7 +125,11 @@ def bootstrap_poetry(project_dir: Path) -> None:
                 "Unable to install poetry via pipx; please install poetry "
                 "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
             )
-        pipx_command = _find_valid_pipx_command()
+        pipx_command = find_valid_pipx_command(
+            "Unable to find pipx install so that poetry can be installed; "
+            "please install pipx via https://pypa.github.io/pipx/ "
+            "and then try `algokit bootstrap poetry` again."
+        )
         proc.run(
             [*pipx_command, "install", "poetry"],
             bad_return_code_error_message=(
@@ -167,74 +169,6 @@ def bootstrap_npm(project_dir: Path) -> None:
             raise click.ClickException(
                 f"Failed to run `{' '.join(cmd)}` for {package_json_path}. Is npm installed and available on PATH?"
             ) from e
-
-
-def _find_valid_pipx_command() -> list[str]:
-    for pipx_command in _get_candidate_pipx_commands():
-        try:
-            pipx_version_result = proc.run([*pipx_command, "--version"])
-        except OSError:
-            pass  # in case of path/permission issues, go to next candidate
-        else:
-            if pipx_version_result.exit_code == 0:
-                return pipx_command
-    # If pipx isn't found in global path or python -m pipx then bail out
-    #   this is an exceptional circumstance since pipx should always be present with algokit
-    #   since it's installed with brew / choco as a dependency, and otherwise is used to install algokit
-    raise click.ClickException(
-        "Unable to find pipx install so that poetry can be installed; "
-        "please install pipx via https://pypa.github.io/pipx/ "
-        "and then try `algokit bootstrap poetry` again."
-    )
-
-
-def _get_candidate_pipx_commands() -> Iterator[list[str]]:
-    # first try is pipx via PATH
-    yield ["pipx"]
-    # otherwise try getting an interpreter with pipx installed as a module,
-    # this won't work if pipx is installed in its own venv but worth a shot
-    for python_path in _get_python_paths():
-        yield [python_path, "-m", "pipx"]
-
-
-def _get_python_paths() -> Iterator[str]:
-    for python_name in ("python3", "python"):
-        if python_path := which(python_name):
-            yield python_path
-    python_base_path = _get_base_python_path()
-    if python_base_path is not None:
-        yield python_base_path
-
-
-def _get_base_python_path() -> str | None:
-    this_python: str | None = sys.executable
-    if not this_python:
-        # Not: can be empty or None... yikes! unlikely though
-        # https://docs.python.org/3.10/library/sys.html#sys.executable
-        return None
-    # not in venv... not recommended to install algokit this way, but okay
-    if sys.prefix == sys.base_prefix:
-        return this_python
-    this_python_path = Path(this_python)
-    # try resolving symlink, this should be default on *nix
-    try:
-        if this_python_path.is_symlink():
-            return str(this_python_path.resolve())
-    except (OSError, RuntimeError):
-        pass
-    # otherwise, try getting an internal value which should be set when running in a .venv
-    # this will be the value of `home = <path>` in pyvenv.cfg if it exists
-    if base_home := getattr(sys, "_home", None):
-        base_home_path = Path(base_home)
-        is_windows = platform.system() == "Windows"
-        for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
-            candidate_path = base_home_path / name
-            if is_windows:
-                candidate_path = candidate_path.with_suffix(".exe")
-            if candidate_path.is_file():
-                return str(candidate_path)
-    # give up, we tried...
-    return this_python
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:

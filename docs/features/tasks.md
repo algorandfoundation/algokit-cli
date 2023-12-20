@@ -13,3 +13,4 @@ AlgoKit Tasks are a collection of handy tasks that can be used to perform variou
 - [NFD lookups](./tasks/nfd.md) - Perform a lookup via NFD domain or address, returning the associated address or domain respectively using the AlgoKit CLI.
 - [IPFS uploads](./tasks/ipfs.md) - Upload files to IPFS.
 - [Asset minting](./tasks/mint.md) - Mint new fungible or non-fungible assets on Algorand.
+- [Analyze TEAL code](./tasks/analyze.md) - Analyze TEAL code using [`tealer`](https://github.com/crytic/tealer) integration for errors and warnings.

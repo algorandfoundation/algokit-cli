@@ -8,11 +8,11 @@ from jsondiff import diff
 from pydantic import BaseModel, Field
 
 from algokit.core.proc import RunResult, run
+from algokit.core.utils import find_valid_pipx_command
 
 logger = logging.getLogger(__name__)
 
 TEALER_REPORTS_ROOT = Path.cwd() / ".algokit/static-analysis"
-TEALER_ARTIFACTS_ROOT = TEALER_REPORTS_ROOT / "artifacts"
 TEALER_SNAPSHOTS_ROOT = TEALER_REPORTS_ROOT / "snapshots"
 TEALER_DOT_FILES_ROOT = TEALER_REPORTS_ROOT / "tealer"
 
@@ -47,9 +47,8 @@ def _extract_lines(block: list[list[str]]) -> str:
     return "->".join([_extract_line(b) for b in block])
 
 
-def generate_report_filename(file: Path) -> str:
-    duplicate_files: dict[str, int] = {}
-    base_filename = f"{file.parent.stem}_{file.stem}"
+def generate_report_filename(file: Path, duplicate_files: dict[str, int]) -> str:
+    base_filename = file.stem
     duplicate_count = duplicate_files.get(base_filename, 0)
     duplicate_files[base_filename] = duplicate_count + 1
     return f"{base_filename}_{duplicate_count}.json" if duplicate_count else f"{base_filename}.json"
@@ -70,6 +69,21 @@ def load_tealer_report(file_path: str) -> TealerAnalysisReport:
     return TealerAnalysisReport(**data)
 
 
+def prepare_artifacts_folders(output_dir: Path | None) -> None:
+    """
+    Create necessary artifacts folders if they do not exist.
+
+    Args:
+        output_dir (Path | None): The output directory path.
+    """
+    if output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+    TEALER_REPORTS_ROOT.mkdir(parents=True, exist_ok=True)
+    TEALER_SNAPSHOTS_ROOT.mkdir(parents=True, exist_ok=True)
+    TEALER_DOT_FILES_ROOT.mkdir(parents=True, exist_ok=True)
+
+
 def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_to_exclude: list[str]) -> list[str]:
     """
     Generate the tealer command for analyzing TEAL programs.
@@ -83,8 +97,14 @@ def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_
         list[str]: The generated tealer command.
     """
 
+    pipx_command = find_valid_pipx_command(
+        "Unable to find pipx install so that `tealer` static analyzer can be installed; "
+        "please install pipx via https://pypa.github.io/pipx/ "
+        "and then try `algokit task analyze ...` again."
+    )
+
     command = [
-        "pipx",
+        *pipx_command,
         "run",
         "--spec",
         "git+https://github.com/algorandfoundation/tealer.git@py3.12",
@@ -144,12 +164,13 @@ def has_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: T
     return False
 
 
-def generate_table_rows(reports: dict) -> dict[Path, list[list[str]]]:
+def generate_table_rows(reports: dict, detectors_to_exclude: list[str]) -> dict[Path, list[list[str]]]:
     """
     Generate table rows from the reports dictionary.
 
     Args:
         reports (dict): A dictionary containing the reports.
+        detectors_to_exclude (list[str]): List of detectors to be excluded.
 
     Returns:
         dict[Path, list[list[str]]]: A dictionary containing the table rows.
@@ -161,11 +182,12 @@ def generate_table_rows(reports: dict) -> dict[Path, list[list[str]]]:
     # Iterate through each report in the reports dictionary.
     for report_path, _ in reports.items():
         report = load_tealer_report(report_path)
+
         relative_path = Path(report_path).relative_to(Path.cwd())
 
         # Process each item in the report's result.
         for item in report.result:
-            if item.count == 0:
+            if item.count == 0 or item.check in detectors_to_exclude:
                 continue
 
             check_type = item.check

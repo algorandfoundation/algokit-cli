@@ -102,16 +102,16 @@
   - [task](#task)
     - [analyze](#analyze)
     - [Options](#options-17)
-    - [-f, --file ](#-f---file--1)
-    - [-d, --directory ](#-d---directory-)
-    - [--recursive](#--recursive)
+    - [-r, --recursive](#-r---recursive)
     - [--force](#--force-1)
-    - [--baseline](#--baseline)
+    - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
-    - [--exclude ](#--exclude-)
+    - [-e, --exclude ](#-e---exclude-)
+    - [Arguments](#arguments-5)
+    - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
     - [Options](#options-18)
-    - [-f, --file ](#-f---file--2)
+    - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--1)
     - [mint](#mint)
     - [Options](#options-19)
@@ -128,30 +128,30 @@
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-20)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-5)
+    - [Arguments](#arguments-6)
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-21)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-7)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
     - [Options](#options-22)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-8)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
     - [Options](#options-23)
-    - [-f, --file ](#-f---file--3)
+    - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
     - [Options](#options-24)
     - [-a, --account ](#-a---account--2)
-    - [-f, --file ](#-f---file--4)
+    - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
     - [--force](#--force-2)
@@ -170,20 +170,20 @@
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-9)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-27)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-9)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-10)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-11)
     - [ALIAS](#alias)
     - [Options](#options-28)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-11)
+    - [Arguments](#arguments-12)
     - [ALIAS](#alias-1)
     - [Options](#options-29)
     - [-f, --force](#-f---force-3)
@@ -738,24 +738,16 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### analyze
 
-Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration.
+Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
 
 ```shell
-algokit task analyze [OPTIONS]
+algokit task analyze [OPTIONS] INPUT_PATHS...
 ```
 
 ### Options
 
 
-### -f, --file <files>
-Path to the TEAL file to analyze. Supports multiple files in a single run. Option is mutually exclusive with directory, recursive.
-
-
-### -d, --directory <directory>
-Path to a directory containing the TEAL files. Recursively search for all TEAL files within. Option is mutually exclusive with file.
-
-
-### --recursive
+### -r, --recursive
 Recursively search for all TEAL files within the provided directory. Option is mutually exclusive with file.
 
 
@@ -763,7 +755,7 @@ Recursively search for all TEAL files within the provided directory. Option is m
 Force verification without the disclaimer confirmation prompt.
 
 
-### --baseline
+### --diff
 Exit with a non-zero code if any diffs are identified between the current and baseline reports. By default baseline reports are stored in the .algokit/static-analysis/artifacts folder. Alternatively, you can specify a custom path using the --output option to compare against.
 
 
@@ -771,8 +763,14 @@ Exit with a non-zero code if any diffs are identified between the current and ba
 Directory path where to store the results of the static analysis.
 
 
-### --exclude <detectors_to_exclude>
+### -e, --exclude <detectors_to_exclude>
 Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.
+
+### Arguments
+
+
+### INPUT_PATHS
+Required argument(s)
 
 ### ipfs
 

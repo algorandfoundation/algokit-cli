@@ -1,36 +1,25 @@
-Standard disclaimer: This tool provides suggestions for improving your TEAL programs, but it does not guarantee their correctness or security. Do you understand? [y/N]: y
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/subfolder_dummy_0.json detect --contracts dummy_contracts/subfolder/dummy_0.teal' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy_contracts/subfolder/dummy_0.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/subfolder_dummy_0.json
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/subfolder_dummy_1.json detect --contracts dummy_contracts/subfolder/dummy_1.teal' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy_contracts/subfolder/dummy_1.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/subfolder_dummy_1.json
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/subfolder_dummy_2.json detect --contracts dummy_contracts/subfolder/dummy_2.teal' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy_contracts/subfolder/dummy_2.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/subfolder_dummy_2.json
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/subfolder_dummy_3.json detect --contracts dummy_contracts/subfolder/dummy_3.teal' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy_contracts/subfolder/dummy_3.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/subfolder_dummy_3.json
-DEBUG: Running 'poetry run tealer --json {current_working_directory}/.algokit/static-analysis/subfolder_dummy_4.json detect --contracts dummy_contracts/subfolder/dummy_4.teal' in '{current_working_directory}'
-DEBUG: poetry: Configuration file exists at /Users/aorumbayev/Library/Preferences/pypoetry, reusing this directory.
-DEBUG: poetry: 
-DEBUG: poetry: Consider moving TOML configuration files to /Users/aorumbayev/Library/Application Support/pypoetry, as support for the legacy directory will be removed in an upcoming release.
-DEBUG: poetry: Reading contract from file: "dummy_contracts/subfolder/dummy_4.teal"
-DEBUG: poetry: json output is written to {current_working_directory}/.algokit/static-analysis/subfolder_dummy_4.json
+This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: y
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_contracts/subfolder_0/dummy.teal detect --contracts {current_working_directory}/dummy_contracts/subfolder_0/dummy.teal' in '{current_working_directory}'
 
-File: .algokit/static-analysis/subfolder_dummy_0.json
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_contracts/subfolder_1/dummy.teal detect --contracts {current_working_directory}/dummy_contracts/subfolder_1/dummy.teal' in '{current_working_directory}'
+
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_contracts/subfolder_2/dummy.teal detect --contracts {current_working_directory}/dummy_contracts/subfolder_2/dummy.teal' in '{current_working_directory}'
+
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_contracts/subfolder_3/dummy.teal detect --contracts {current_working_directory}/dummy_contracts/subfolder_3/dummy.teal' in '{current_working_directory}'
+
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: pipx: 1.3.3
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_contracts/subfolder_4/dummy.teal detect --contracts {current_working_directory}/dummy_contracts/subfolder_4/dummy.teal' in '{current_working_directory}'
+
+File: dummy_contracts/subfolder_0/dummy.teal
 
 Detector: is-deletable
 Impact: High
@@ -54,33 +43,7 @@ Execution Paths (#Lines):
 2-8->26-30->31-34->35-38->40-45->76-86->46-47,
 2-8->26-30->56-62
 
-
-File: .algokit/static-analysis/subfolder_dummy_1.json
-
-Detector: is-deletable
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
-Execution Paths (#Lines):
-2-8->26-30->31-34->35-38->40-45->76-86->46-47
-
-Detector: missing-fee-check
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
-Execution Paths (#Lines):
-2-8->9-12->14-23->107-114->89-104->115-120->24-25,
-2-8->26-30->31-34->35-38->40-45->76-86->46-47,
-2-8->26-30->56-62
-
-Detector: rekey-to
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
-Execution Paths (#Lines):
-2-8->9-12->14-23->107-114->89-104->115-120->24-25,
-2-8->26-30->31-34->35-38->40-45->76-86->46-47,
-2-8->26-30->56-62
-
-
-File: .algokit/static-analysis/subfolder_dummy_2.json
+File: dummy_contracts/subfolder_1/dummy.teal
 
 Detector: is-deletable
 Impact: High
@@ -104,33 +67,7 @@ Execution Paths (#Lines):
 2-8->26-30->31-34->35-38->40-45->76-86->46-47,
 2-8->26-30->56-62
 
-
-File: .algokit/static-analysis/subfolder_dummy_3.json
-
-Detector: is-deletable
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
-Execution Paths (#Lines):
-2-8->26-30->31-34->35-38->40-45->76-86->46-47
-
-Detector: missing-fee-check
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
-Execution Paths (#Lines):
-2-8->9-12->14-23->107-114->89-104->115-120->24-25,
-2-8->26-30->31-34->35-38->40-45->76-86->46-47,
-2-8->26-30->56-62
-
-Detector: rekey-to
-Impact: High
-Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
-Execution Paths (#Lines):
-2-8->9-12->14-23->107-114->89-104->115-120->24-25,
-2-8->26-30->31-34->35-38->40-45->76-86->46-47,
-2-8->26-30->56-62
-
-
-File: .algokit/static-analysis/subfolder_dummy_4.json
+File: dummy_contracts/subfolder_2/dummy.teal
 
 Detector: is-deletable
 Impact: High
@@ -154,6 +91,53 @@ Execution Paths (#Lines):
 2-8->26-30->31-34->35-38->40-45->76-86->46-47,
 2-8->26-30->56-62
 
+File: dummy_contracts/subfolder_3/dummy.teal
+
+Detector: is-deletable
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
+Execution Paths (#Lines):
+2-8->26-30->31-34->35-38->40-45->76-86->46-47
+
+Detector: missing-fee-check
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+Detector: rekey-to
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+File: dummy_contracts/subfolder_4/dummy.teal
+
+Detector: is-deletable
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
+Execution Paths (#Lines):
+2-8->26-30->31-34->35-38->40-45->76-86->46-47
+
+Detector: missing-fee-check
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+Detector: rekey-to
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
 
 Total issues:
 High: 15

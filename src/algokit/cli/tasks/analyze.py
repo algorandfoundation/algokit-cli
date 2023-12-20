@@ -7,35 +7,18 @@ import click
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core.tasks.analyze import (
-    TEALER_ARTIFACTS_ROOT,
-    TEALER_DOT_FILES_ROOT,
-    TEALER_REPORTS_ROOT,
     TEALER_SNAPSHOTS_ROOT,
     generate_report_filename,
     generate_table_rows,
     generate_tealer_command,
     has_baseline_diff,
     load_tealer_report,
+    prepare_artifacts_folders,
     run_tealer,
 )
+from algokit.core.utils import run_with_animation
 
 logger = logging.getLogger(__name__)
-
-
-def prepare_artifact_folders(output_dir: Path | None) -> None:
-    """
-    Create necessary artifact folders if they do not exist.
-
-    Args:
-        output_dir (Path | None): The output directory path.
-    """
-    if output_dir:
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-    TEALER_REPORTS_ROOT.mkdir(parents=True, exist_ok=True)
-    TEALER_ARTIFACTS_ROOT.mkdir(parents=True, exist_ok=True)
-    TEALER_DOT_FILES_ROOT.mkdir(parents=True, exist_ok=True)
-    TEALER_SNAPSHOTS_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def display_analysis_summary(analysis_results: dict) -> None:
@@ -59,9 +42,7 @@ def display_analysis_summary(analysis_results: dict) -> None:
     # print summary by impact label
     click.echo("\nTotal issues:")
     for impact, frequency in impact_frequency.items():
-        click.echo(f"{impact}: {frequency}")
-
-    click.echo(f"Finished analyzing {len(analysis_results)} files.")
+        click.secho(f"{impact}: {frequency}", fg="yellow")
 
 
 def has_template_vars(path: Path) -> bool:
@@ -102,7 +83,12 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
 
 @click.command(
     name="analyze",
-    help="Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration.",
+    help=(
+        "Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration. "
+        "This task uses a third party tool to suggest improvements for your TEAL programs, "
+        "but remember to always test your smart contracts code and follow modern software engineering practices. "
+        "For full list of available detectors, please refer to https://github.com/crytic/tealer?tab=readme-ov-file#detectors"
+    ),
 )
 @click.argument(
     "input_paths",
@@ -124,8 +110,8 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     help="Force verification without the disclaimer confirmation prompt.",
 )
 @click.option(
-    "-b",
-    "--baseline",
+    "--diff",
+    "diff_only",
     is_flag=True,
     help=(
         "Exit with a non-zero code if any diffs are identified between the current "
@@ -157,7 +143,7 @@ def analyze(  # noqa: PLR0913
     input_paths: tuple[Path],
     recursive: bool,
     force: bool,
-    baseline: bool,
+    diff_only: bool,
     output_path: Path | None,
     detectors_to_exclude: list[str],
 ) -> None:
@@ -165,20 +151,27 @@ def analyze(  # noqa: PLR0913
     Analyze the TEAL programs for common vulnerabilities.
     """
 
-    prepare_artifact_folders(output_path)
     detectors_to_exclude = sorted(set(detectors_to_exclude))
     input_files = get_input_files(input_paths=input_paths, recursive=recursive)
 
     if not force:
         click.confirm(
-            "Standard disclaimer: This tool provides suggestions for improving "
-            "your TEAL programs, but it does not guarantee their correctness "
-            "or security. Do you understand?",
+            click.style(
+                "This task uses `tealer` to suggest improvements for your TEAL programs, "
+                "but remember to always test your smart contracts code and follow modern "
+                "software engineering practices. Do you understand?",
+                fg="yellow",
+            ),
+            default=True,
             abort=True,
         )
 
     reports = {}
-    for cur_file in input_files:
+    duplicate_files: dict[str, int] = {}
+    prepare_artifacts_folders(output_path)
+    total_files = len(input_files)
+    for index in range(total_files):
+        cur_file = input_files[index]
         file = cur_file.resolve()
 
         if has_template_vars(file):
@@ -189,38 +182,44 @@ def analyze(  # noqa: PLR0913
             )
             continue
 
-        filename = generate_report_filename(file)
+        filename = generate_report_filename(file, duplicate_files)
 
-        # If baseline is enabled, store the report in the snapshots folder otherwise store it in the reports folder
+        # If diff_only is enabled, store the report in the snapshots folder otherwise store it in the reports folder
         # If a custom output path is provided, store the report in the specified path
-        report_output_root = TEALER_SNAPSHOTS_ROOT if baseline else output_path or TEALER_REPORTS_ROOT
+        report_output_root = output_path or TEALER_SNAPSHOTS_ROOT
         report_output_path = report_output_root / filename
 
         command = generate_tealer_command(cur_file, report_output_path, detectors_to_exclude)
-        old_report = load_tealer_report(str(report_output_path)) if report_output_path.exists() and baseline else None
-        result = run_tealer(command)
-        if result.exit_code != 0:
+        old_report = load_tealer_report(str(report_output_path)) if report_output_path.exists() and diff_only else None
+        try:
+            run_with_animation(run_tealer, f"Analyzing {index + 1} out of {total_files} files", command)
+
+            if diff_only and old_report:
+                has_diff = has_baseline_diff(
+                    cur_file=cur_file, report_output_path=report_output_path, old_report=old_report
+                )
+                if has_diff:
+                    report_output_path.write_text(json.dumps(old_report.model_dump(by_alias=True), indent=2))
+                    raise click.exceptions.Exit(1)
+
+            reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
+        except Exception as e:
+            if isinstance(e, click.exceptions.Exit):
+                raise e
+
             click.secho(
                 f"An error occurred while analyzing {cur_file}. "
                 "Please make sure the files supplied are valid TEAL code before trying again.",
                 err=True,
                 fg="red",
             )
-            raise click.Abort("Error while running tealer")
+            raise click.Abort("Error while running tealer") from e
 
-        if baseline and old_report:
-            has_diff = has_baseline_diff(
-                cur_file=cur_file, report_output_path=report_output_path, old_report=old_report
-            )
-            if has_diff:
-                raise click.exceptions.Exit(1)
+    table_rows = generate_table_rows(reports, detectors_to_exclude=detectors_to_exclude)
 
-        reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
-
-    table_rows = generate_table_rows(reports)
-
-    if table_rows and not baseline:
+    if table_rows and not diff_only:
         display_analysis_summary(table_rows)
+        click.echo(f"Finished analyzing {total_files} files.")
         raise click.exceptions.Exit(1)
 
-    click.secho("\nNo issues identified.", fg="green")
+    click.secho(f"\nNo {'differences against the base report' if diff_only else 'issues'} found.", fg="green")
