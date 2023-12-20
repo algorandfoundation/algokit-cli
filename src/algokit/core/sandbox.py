@@ -22,10 +22,10 @@ class ComposeFileStatus(enum.Enum):
 
 
 class ComposeSandbox:
-    def __init__(self) -> None:
-        self.directory = get_app_config_dir() / "sandbox"
+    def __init__(self, dir_name: str) -> None:
+        self.directory = get_app_config_dir() / dir_name
         if not self.directory.exists():
-            logger.debug("Sandbox directory does not exist yet; creating it")
+            logger.debug(f"The {dir_name} directory does not exist yet; creating it")
             self.directory.mkdir()
         self._conduit_yaml = get_conduit_yaml()
         self._latest_yaml = get_docker_compose_yml()
@@ -102,7 +102,10 @@ class ComposeSandbox:
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
         self._run_compose_command("stop", bad_return_code_error_message="Failed to stop LocalNet")
-        logger.info("LocalNet Stopped; execute `algokit localnet start` to start it again.")
+        logger.info(
+            f"LocalNet Stopped; execute `algokit localnet start"
+            f"{' --name ' + self.directory.name if self.directory.name != 'sandbox' else ''}` to start it again."
+        )
 
     def down(self) -> None:
         logger.info("Deleting any existing LocalNet...")
@@ -191,6 +194,18 @@ class ComposeSandbox:
             logger.warning(
                 "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
+
+    def save_current_directory(self) -> None:
+        current_dir_file = get_app_config_dir() / "localnet_directory.txt"
+        current_dir_file.write_text(str(self.directory))
+
+
+def get_sandbox_directory() -> Path:
+    current_dir_file = get_app_config_dir() / "localnet_directory.txt"
+    if Path(current_dir_file).exists():
+        return Path(current_dir_file.read_text().strip())
+    else:
+        return get_app_config_dir() / "sandbox"
 
 
 DEFAULT_ALGOD_SERVER = "http://localhost"

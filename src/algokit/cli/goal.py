@@ -47,7 +47,7 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
 
-    sandbox = ComposeSandbox()
+    sandbox = ComposeSandbox(dir_name="sandbox")
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
         raise click.ClickException("LocalNet definition is out of date; please run `algokit localnet reset` first!")
