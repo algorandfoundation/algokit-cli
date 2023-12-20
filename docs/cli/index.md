@@ -760,7 +760,7 @@ Exit with a non-zero code if differences are found between current and last repo
 
 
 ### -o, --output <output_path>
-Directory path where to store the results of the static analysis.
+Directory path where to store the results of the static analysis. Defaults to .algokit/static-analysis/snapshots.
 
 
 ### -e, --exclude <detectors_to_exclude>

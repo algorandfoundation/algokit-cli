@@ -131,7 +131,10 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     required=False,
     default=None,
     type=click.Path(dir_okay=True, file_okay=False, resolve_path=True, path_type=Path),
-    help="Directory path where to store the results of the static analysis.",
+    help=(
+        "Directory path where to store the results of the static analysis. "
+        "Defaults to .algokit/static-analysis/snapshots."
+    ),
 )
 @click.option(
     "-e",
