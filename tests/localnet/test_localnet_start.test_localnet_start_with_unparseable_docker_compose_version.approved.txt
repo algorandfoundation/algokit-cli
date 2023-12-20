@@ -6,7 +6,7 @@ Please ensure a minimum of compose v2.5.0 is used
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"

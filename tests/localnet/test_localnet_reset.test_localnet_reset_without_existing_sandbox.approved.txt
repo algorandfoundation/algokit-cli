@@ -3,7 +3,7 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Existing LocalNet not found; creating from scratch...
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'

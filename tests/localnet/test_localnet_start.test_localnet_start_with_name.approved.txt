@@ -3,16 +3,18 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: The sandbox directory does not exist yet; creating it
-DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
+DEBUG: The sandbox_test directory does not exist yet; creating it
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
 DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
+A Localnet compose and config files has been created in {app_config}/sandbox_test directory. 
+You can configure your localnet by editing those files and then run `algokit localnet start --name test`
 Starting AlgoKit LocalNet now...
-DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox_test'
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
@@ -20,7 +22,7 @@ DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
 DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 ----
-{app_config}/sandbox/docker-compose.yml:
+{app_config}/sandbox_test/docker-compose.yml:
 ----
 version: '3'
 name: "algokit_sandbox"

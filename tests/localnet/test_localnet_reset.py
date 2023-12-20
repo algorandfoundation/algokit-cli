@@ -57,6 +57,20 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
+def test_localnet_reset_with_existing_named_sandbox_with_up_to_date_config(app_dir_mock: AppDirs) -> None:
+    (app_dir_mock.app_config_dir / "sandbox_test").mkdir()
+    (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").write_text(" changed text")
+    (app_dir_mock.app_config_dir / "sandbox_test" / "algod_config.json").write_text(" changed text")
+    (app_dir_mock.app_config_dir / "sandbox_test" / "algod_network_template.json").write_text(" changed text")
+    (app_dir_mock.app_config_dir / "localnet_directory.txt").write_text("test/path/to/localnet/named/sandbox_test")
+
+    result = invoke("localnet reset", input="y")
+
+    assert result.exit_code == 0
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
 @pytest.mark.usefixtures("proc_mock", "_health_success")
 def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_with_pull(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()

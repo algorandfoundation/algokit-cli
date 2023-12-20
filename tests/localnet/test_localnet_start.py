@@ -68,6 +68,20 @@ def test_localnet_start(app_dir_mock: AppDirs) -> None:
     )
 
 
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
+def test_localnet_start_with_name(app_dir_mock: AppDirs) -> None:
+    result = invoke("localnet start --name test")
+
+    assert result.exit_code == 0
+    verify(
+        get_combined_verify_output(
+            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            "{app_config}/sandbox_test/docker-compose.yml",
+            (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").read_text(),
+        )
+    )
+
+
 @pytest.mark.usefixtures("proc_mock", "_localnet_up_to_date")
 def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_exception(httpx.RemoteProtocolError("No response"), url=ALGOD_HEALTH_URL)

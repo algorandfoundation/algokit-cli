@@ -3,5 +3,5 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Sandbox directory does not exist yet; creating it
+DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: LocalNet compose file does not exist yet; run `algokit localnet start` to start the AlgoKit LocalNet

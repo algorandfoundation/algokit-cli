@@ -18,6 +18,19 @@ def test_localnet_stop(app_dir_mock: AppDirs) -> None:
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("proc_mock")
+def test_localnet_stop_with_name(app_dir_mock: AppDirs) -> None:
+    (app_dir_mock.app_config_dir / "sandbox_test").mkdir()
+    (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").write_text("existing")
+    (app_dir_mock.app_config_dir / "sandbox_test" / "algod_config.json").write_text("existing")
+    (app_dir_mock.app_config_dir / "localnet_directory.txt").write_text("test/path/to/localnet/named/sandbox_test")
+
+    result = invoke("localnet stop")
+
+    assert result.exit_code == 0
+    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
 def test_localnet_stop_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")

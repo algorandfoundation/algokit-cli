@@ -3,7 +3,8 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: The sandbox directory does not exist yet; creating it
-DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
+Stopping AlgoKit LocalNet now...
+DEBUG: Running 'docker compose stop' in '{app_config}/sandbox_test'
+docker: STDOUT
+docker: STDERR
+LocalNet Stopped; execute `algokit localnet start --name sandbox_test` to start it again.
