@@ -164,9 +164,9 @@ def has_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: T
     return False
 
 
-def generate_table_rows(reports: dict, detectors_to_exclude: list[str]) -> dict[Path, list[list[str]]]:
+def generate_summaries(reports: dict, detectors_to_exclude: list[str]) -> dict[Path, list[list[str]]]:
     """
-    Generate table rows from the reports dictionary.
+    Generate the summaries for STDOUT from the tealer reports.
 
     Args:
         reports (dict): A dictionary containing the reports.

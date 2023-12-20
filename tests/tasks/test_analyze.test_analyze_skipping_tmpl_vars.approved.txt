@@ -1,4 +1,2 @@
-This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: y
-Warning: skipping {current_working_directory}/dummy.teal due to template variables. Substitute them before scanning.
-
-No issues found.
+Warning: This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: y
+Warning: Skipping {current_working_directory}/dummy.teal due to template variables. Substitute them before scanning.

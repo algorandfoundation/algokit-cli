@@ -5,11 +5,10 @@ from pathlib import Path
 
 import click
 
-from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core.tasks.analyze import (
     TEALER_SNAPSHOTS_ROOT,
     generate_report_filename,
-    generate_table_rows,
+    generate_summaries,
     generate_tealer_command,
     has_baseline_diff,
     load_tealer_report,
@@ -77,6 +76,11 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
             pattern = "**/*.teal" if recursive else "*.teal"
             input_files.extend(sorted(input_path.glob(pattern)))
         else:
+            if recursive:
+                click.secho(
+                    f"Warning: Ignoring recursive flag for {input_path} as it is not a directory.\n",
+                    fg="yellow",
+                )
             input_files.append(input_path)
     return sorted(set(input_files))
 
@@ -84,7 +88,7 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
 @click.command(
     name="analyze",
     help=(
-        "Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration. "
+        "Analyze TEAL programs for common vulnerabilities using Tealer. "
         "This task uses a third party tool to suggest improvements for your TEAL programs, "
         "but remember to always test your smart contracts code and follow modern software engineering practices. "
         "For full list of available detectors, please refer to https://github.com/crytic/tealer?tab=readme-ov-file#detectors"
@@ -100,8 +104,6 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     "-r",
     "--recursive",
     is_flag=True,
-    cls=MutuallyExclusiveOption,
-    not_required_if=["file"],
     help="Recursively search for all TEAL files within the provided directory.",
 )
 @click.option(
@@ -114,10 +116,12 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     "diff_only",
     is_flag=True,
     help=(
-        "Exit with a non-zero code if any diffs are identified between the current "
-        "and baseline reports. By default baseline reports are stored in the "
-        ".algokit/static-analysis/artifacts folder. Alternatively, you can specify a "
-        "custom path using the --output option to compare against."
+        "Exit with a non-zero code if differences are found between current "
+        "and last reports. Reports are generated each run, but with this flag "
+        "execution fails if the current report doesn't match "
+        "the last report. Reports are stored in the "
+        ".algokit/static-analysis/snapshots folder by default. Use --output for a "
+        "custom path."
     ),
 )
 @click.option(
@@ -148,7 +152,7 @@ def analyze(  # noqa: PLR0913
     detectors_to_exclude: list[str],
 ) -> None:
     """
-    Analyze the TEAL programs for common vulnerabilities.
+    Analyze TEAL programs for common vulnerabilities using Tealer.
     """
 
     detectors_to_exclude = sorted(set(detectors_to_exclude))
@@ -157,7 +161,7 @@ def analyze(  # noqa: PLR0913
     if not force:
         click.confirm(
             click.style(
-                "This task uses `tealer` to suggest improvements for your TEAL programs, "
+                "Warning: This task uses `tealer` to suggest improvements for your TEAL programs, "
                 "but remember to always test your smart contracts code and follow modern "
                 "software engineering practices. Do you understand?",
                 fg="yellow",
@@ -176,7 +180,7 @@ def analyze(  # noqa: PLR0913
 
         if has_template_vars(file):
             click.secho(
-                f"Warning: skipping {file} due to template variables. Substitute them before scanning.",
+                f"Warning: Skipping {file} due to template variables. Substitute them before scanning.",
                 err=True,
                 fg="yellow",
             )
@@ -215,11 +219,9 @@ def analyze(  # noqa: PLR0913
             )
             raise click.Abort("Error while running tealer") from e
 
-    table_rows = generate_table_rows(reports, detectors_to_exclude=detectors_to_exclude)
+    summaries = generate_summaries(reports, detectors_to_exclude=detectors_to_exclude)
 
-    if table_rows and not diff_only:
-        display_analysis_summary(table_rows)
+    if summaries and not diff_only:
+        display_analysis_summary(summaries)
         click.echo(f"Finished analyzing {total_files} files.")
         raise click.exceptions.Exit(1)
-
-    click.secho(f"\nNo {'differences against the base report' if diff_only else 'issues'} found.", fg="green")

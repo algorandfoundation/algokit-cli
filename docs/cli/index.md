@@ -738,7 +738,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### analyze
 
-Analyze TEAL programs for common vulnerabilities with AlgoKit Tealer integration. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
+Analyze TEAL programs for common vulnerabilities using Tealer. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
 
 ```shell
 algokit task analyze [OPTIONS] INPUT_PATHS...
@@ -748,7 +748,7 @@ algokit task analyze [OPTIONS] INPUT_PATHS...
 
 
 ### -r, --recursive
-Recursively search for all TEAL files within the provided directory. Option is mutually exclusive with file.
+Recursively search for all TEAL files within the provided directory.
 
 
 ### --force
@@ -756,7 +756,7 @@ Force verification without the disclaimer confirmation prompt.
 
 
 ### --diff
-Exit with a non-zero code if any diffs are identified between the current and baseline reports. By default baseline reports are stored in the .algokit/static-analysis/artifacts folder. Alternatively, you can specify a custom path using the --output option to compare against.
+Exit with a non-zero code if differences are found between current and last reports. Reports are generated each run, but with this flag execution fails if the current report doesn't match the last report. Reports are stored in the .algokit/static-analysis/snapshots folder by default. Use --output for a custom path.
 
 
 ### -o, --output <output_path>

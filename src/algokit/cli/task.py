@@ -16,7 +16,19 @@ from algokit.cli.tasks.wallet import wallet
 logger = logging.getLogger(__name__)
 
 
-@click.group(name="task")
+class AliasedGroup(click.Group):
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+
+        if cmd_name == "analyse":
+            return click.Group.get_command(self, ctx, "analyze")
+
+        return None
+
+
+@click.group(name="task", cls=AliasedGroup)
 def task_group() -> None:
     """Collection of useful tasks to help you develop on Algorand."""
 

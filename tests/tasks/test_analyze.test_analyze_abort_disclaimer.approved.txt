@@ -1,2 +1,2 @@
-This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: n
+Warning: This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: n
 Aborted!
