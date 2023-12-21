@@ -119,11 +119,16 @@ def test_analyze_multiple_files_recursive(
 
     assert result.exit_code == 1
     for i in range(5):
+        target_substring = str(teal_root_folder / f"subfolder_{i}" / "dummy.teal").split("dummy_contracts")[1]
+
         result.output = result.output.replace(
-            str(teal_root_folder / f"subfolder_{i}/dummy.teal"), f"dummy_contracts/subfolder_{i}/dummy.teal"
+            target_substring.replace("\\", r"\\"),
+            f"_{i}_dummy.teal",
         )
     result.output = _format_snapshot(
-        result.output, [str(cwd), *[f"dummy_contracts/subfolder_{i}/dummy.teal" for i in range(5)]], "dummy_file.teal"
+        result.output,
+        [str(cwd)],
+        "dummy_file.teal",
     )
     verify(result.output)
 
