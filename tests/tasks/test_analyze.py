@@ -122,7 +122,9 @@ def test_analyze_multiple_files_recursive(
         result.output = result.output.replace(
             str(teal_root_folder / f"subfolder_{i}/dummy.teal"), f"dummy_contracts/subfolder_{i}/dummy.teal"
         )
-    result.output = _format_snapshot(result.output, [str(cwd)])
+    result.output = _format_snapshot(
+        result.output, [str(cwd), *[f"dummy_contracts/subfolder_{i}/dummy.teal" for i in range(5)]], "dummy_file.teal"
+    )
     verify(result.output)
 
 
