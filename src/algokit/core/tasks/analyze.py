@@ -107,7 +107,7 @@ def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_
         *pipx_command,
         "run",
         "--spec",
-        "git+https://github.com/algorandfoundation/tealer.git@py3.12",
+        "git+https://github.com/algorandfoundation/tealer.git@main",
         "tealer",
         "--json",
         str(report_output_path),

@@ -25,7 +25,7 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
 
     # If output contains more than one new line trim them to have at most one whitespace in between
 
-    output = re.sub(r"^(pipx:|DEBBUG: pipx:).*", "", output, flags=re.MULTILINE)
+    output = re.sub(r"^(pipx:|DEBUG: pipx:).*", "", output, flags=re.MULTILINE)
     return re.sub(r"\n\s*\n", "\n\n", output)
 
 
@@ -46,7 +46,7 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]
 
 @pytest.fixture()
 def generate_report_filename_mock() -> Generator[MagicMock, None, None]:
-    with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_content.teal") as mock:
+    with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_report.json") as mock:
         yield mock
 
 
@@ -180,6 +180,18 @@ def test_analyze_diff_flag(
     assert result.exit_code == 1
 
     teal_file.write_text("\n#pragma version 8\nint 1\nreturn\n")
+    result = invoke(f"task analyze {teal_file} --diff --output {cwd}", input="y\n", cwd=cwd)
+    assert result.exit_code == 1
+    result.output = _format_snapshot(result.output, [str(cwd)])
+    verify(result.output)
+
+
+@pytest.mark.usefixtures("generate_report_filename_mock")
+def test_analyze_diff_flag_missing_old_report(
+    cwd: Path,
+) -> None:
+    teal_file = cwd / "dummy.teal"
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
     result = invoke(f"task analyze {teal_file} --diff --output {cwd}", input="y\n", cwd=cwd)
     assert result.exit_code == 1
     result.output = _format_snapshot(result.output, [str(cwd)])

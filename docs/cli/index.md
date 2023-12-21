@@ -738,7 +738,7 @@ algokit task [OPTIONS] COMMAND [ARGS]...
 
 ### analyze
 
-Analyze TEAL programs for common vulnerabilities using Tealer. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the [guidelines for smart contract development](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/guidelines/). This should not be used as a substitute for an actual audit. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
+Analyze TEAL programs for common vulnerabilities using Tealer. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the guidelines for smart contract development. This should not be used as a substitute for an actual audit. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
 
 ```shell
 algokit task analyze [OPTIONS] INPUT_PATHS...

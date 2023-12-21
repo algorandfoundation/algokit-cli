@@ -147,7 +147,7 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     type=click.STRING,
     help="Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.",
 )
-def analyze(  # noqa: PLR0913
+def analyze(  # noqa: PLR0913, C901
     *,
     input_paths: tuple[Path],
     recursive: bool,
@@ -201,6 +201,15 @@ def analyze(  # noqa: PLR0913
 
         command = generate_tealer_command(cur_file, report_output_path, detectors_to_exclude)
         old_report = load_tealer_report(str(report_output_path)) if report_output_path.exists() and diff_only else None
+        if not old_report and diff_only:
+            click.secho(
+                f"Unable to provide the diff since {file} report is missing. "
+                "Please run the task without the --diff flag first.",
+                err=True,
+                fg="red",
+            )
+            raise click.exceptions.Exit(1)
+
         try:
             run_with_animation(run_tealer, f"Analyzing {index + 1} out of {total_files} files", command)
 
@@ -209,11 +218,13 @@ def analyze(  # noqa: PLR0913
                     cur_file=cur_file, report_output_path=report_output_path, old_report=old_report
                 )
                 if has_diff:
-                    report_output_path.write_text(json.dumps(old_report.model_dump(by_alias=True), indent=2))
                     raise click.exceptions.Exit(1)
 
             reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
         except Exception as e:
+            if diff_only and old_report:
+                report_output_path.write_text(json.dumps(old_report.model_dump(by_alias=True), indent=2))
+
             if isinstance(e, click.exceptions.Exit):
                 raise e
 

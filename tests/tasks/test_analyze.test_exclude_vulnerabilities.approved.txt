@@ -1,5 +1,5 @@
 Warning: This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code and follow modern software engineering practices. Do you understand? [Y/n]: y
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
-DEBUG: pipx: 1.3.3
-Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@py3.12 tealer --json {current_working_directory}/dummy_content.teal detect --contracts {current_working_directory}/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
+
+Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@main tealer --json {current_working_directory}/dummy_report.json detect --contracts {current_working_directory}/dummy.teal --exclude is-deletable, missing-fee-check, rekey-to' in '{current_working_directory}'
 
