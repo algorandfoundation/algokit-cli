@@ -30,6 +30,10 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
     return re.sub(r"\n\s*\n", "\n\n", output)
 
 
+def _normalize_path(path: Path) -> str:
+    return str(path.absolute()).replace("\\", r"\\")
+
+
 @pytest.fixture(autouse=True)
 def _disable_animation(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.utils.animate", return_value=None)
@@ -57,7 +61,7 @@ def test_analyze_single_file(
 ) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
     result.output = _format_snapshot(
@@ -79,7 +83,9 @@ def test_analyze_multiple_files(
     for i in range(5):
         teal_file = teal_folder / f"dummy_{i}.teal"
         teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_folder} --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(
+        f"task analyze {_normalize_path(teal_folder)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd
+    )
 
     assert result.exit_code == 1
     for i in range(5):
@@ -105,7 +111,11 @@ def test_analyze_multiple_files_recursive(
         teal_folder.mkdir(parents=True)
         teal_file = teal_folder / "dummy.teal"
         teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_root_folder} --recursive --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(
+        f"task analyze {_normalize_path(teal_root_folder)} --recursive --output {_normalize_path(cwd)}",
+        input="y\n",
+        cwd=cwd,
+    )
 
     assert result.exit_code == 1
     for i in range(5):
@@ -123,8 +133,8 @@ def test_exclude_vulnerabilities(
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
     result = invoke(
-        f"task analyze {teal_file} --exclude is-deletable "
-        f"--exclude rekey-to --exclude missing-fee-check --output {cwd}",
+        f"task analyze {_normalize_path(teal_file)} --exclude is-deletable "
+        f"--exclude rekey-to --exclude missing-fee-check --output {_normalize_path(cwd)}",
         input="y\n",
         cwd=cwd,
     )
@@ -141,7 +151,7 @@ def test_analyze_skipping_tmpl_vars(
     teal_file.write_text(
         DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
     )
-    result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 0
     result.output = _format_snapshot(result.output, [str(cwd)])
@@ -166,7 +176,7 @@ def test_analyze_abort_disclaimer(
 ) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
-    result = invoke(f"task analyze {teal_file} --output {cwd}", input="n\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="n\n", cwd=cwd)
 
     assert result.exit_code == 1
     verify(result.output)
@@ -177,7 +187,7 @@ def test_analyze_error_in_tealer(
 ) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
-    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
     result.output = _format_snapshot(result.output, [str(cwd)])
@@ -190,11 +200,13 @@ def test_analyze_diff_flag(
 ) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_file} --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd)
     assert result.exit_code == 1
 
     teal_file.write_text("\n#pragma version 8\nint 1\nreturn\n")
-    result = invoke(f"task analyze {teal_file} --diff --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(
+        f"task analyze {_normalize_path(teal_file)} --diff --output {_normalize_path(cwd)}", input="y\n", cwd=cwd
+    )
     assert result.exit_code == 1
     result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
@@ -206,7 +218,9 @@ def test_analyze_diff_flag_missing_old_report(
 ) -> None:
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(DUMMY_TEAL_FILE_CONTENT)
-    result = invoke(f"task analyze {teal_file} --diff --output {cwd}", input="y\n", cwd=cwd)
+    result = invoke(
+        f"task analyze {_normalize_path(teal_file)} --diff --output {_normalize_path(cwd)}", input="y\n", cwd=cwd
+    )
     assert result.exit_code == 1
     result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
@@ -220,7 +234,7 @@ def test_analyze_error_no_pipx(
 
     teal_file = cwd / "dummy.teal"
     teal_file.touch()
-    result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
+    result = invoke(f"task analyze {_normalize_path(teal_file)}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 1
     result.output = _format_snapshot(result.output, [str(cwd)])
