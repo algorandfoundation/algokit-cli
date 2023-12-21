@@ -159,8 +159,8 @@ def has_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: T
     if baseline_diff:
         new_report_path = report_output_path.with_suffix(".received.json")
         logger.error(
-            f"Diff detected in {cur_file}! Please check the content of the latest report"
-            f"{report_output_path} against the snapshot report at {new_report_path}."
+            f"Diff detected in {cur_file}! Please check the content of the snapshot report"
+            f"{report_output_path} against the latest received report at {new_report_path}."
         )
 
         return True
