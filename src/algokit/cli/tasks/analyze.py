@@ -55,7 +55,7 @@ def has_template_vars(path: Path) -> bool:
         bool: True if template variables are found, False otherwise.
     """
     content = path.read_text()
-    return bool(re.search(r"\bTMPL_\w*\b", content))
+    return bool(re.search(r"^(?!.*//.*TMPL_).*TMPL_.*", content, flags=re.MULTILINE))
 
 
 def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:

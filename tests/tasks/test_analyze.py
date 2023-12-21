@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from algokit.cli.tasks.analyze import has_template_vars
 from pytest_mock import MockerFixture
 
 from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
@@ -139,6 +140,20 @@ def test_analyze_skipping_tmpl_vars(
     teal_file = cwd / "dummy.teal"
     teal_file.write_text(
         DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
+    )
+    assert has_template_vars(teal_file)
+
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint 4 // TMPL_VAR"))
+    assert not has_template_vars(teal_file)
+
+
+@pytest.mark.usefixtures("generate_report_filename_mock")
+def test_analyze_commented_tmpl_vars(
+    cwd: Path,
+) -> None:
+    teal_file = cwd / "dummy.teal"
+    teal_file.write_text(
+        DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint 4 // TMPL_COMMENTED")
     )
     result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
 
