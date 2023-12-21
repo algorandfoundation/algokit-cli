@@ -158,6 +158,7 @@ def has_baseline_diff(*, cur_file: Path, report_output_path: Path, old_report: T
     baseline_diff = diff(old_report.model_dump(by_alias=True), new_report.model_dump(by_alias=True))
     if baseline_diff:
         new_report_path = report_output_path.with_suffix(".received.json")
+        new_report_path.write_text(json.dumps(new_report.model_dump(by_alias=True), indent=2))
         logger.error(
             f"Diff detected in {cur_file}! Please check the content of the snapshot report"
             f"{report_output_path} against the latest received report at {new_report_path}."
