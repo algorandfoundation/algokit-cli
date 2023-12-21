@@ -141,25 +141,24 @@ def test_analyze_skipping_tmpl_vars(
     teal_file.write_text(
         DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
     )
-    assert has_template_vars(teal_file)
-
-    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint 4 // TMPL_VAR"))
-    assert not has_template_vars(teal_file)
-
-
-@pytest.mark.usefixtures("generate_report_filename_mock")
-def test_analyze_commented_tmpl_vars(
-    cwd: Path,
-) -> None:
-    teal_file = cwd / "dummy.teal"
-    teal_file.write_text(
-        DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint 4 // TMPL_COMMENTED")
-    )
     result = invoke(f"task analyze {teal_file}", input="y\n", cwd=cwd)
 
     assert result.exit_code == 0
     result.output = _format_snapshot(result.output, [str(cwd)])
     verify(result.output)
+
+
+def test_analyze_commented_tmpl_vars(
+    cwd: Path,
+) -> None:
+    teal_file = cwd / "dummy.teal"
+    teal_file.write_text(
+        DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint TMPL_VAR // UpdateApplication")
+    )
+    assert has_template_vars(teal_file)
+
+    teal_file.write_text(DUMMY_TEAL_FILE_CONTENT.replace("pushint 4 // UpdateApplication", "pushint 4 // TMPL_VAR"))
+    assert not has_template_vars(teal_file)
 
 
 def test_analyze_abort_disclaimer(

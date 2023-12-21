@@ -169,8 +169,7 @@ def analyze(  # noqa: PLR0913, C901
                 "Warning: This task uses `tealer` to suggest improvements for your TEAL programs, "
                 "but remember to always test your smart contracts code, follow modern software engineering practices "
                 "and use the guidelines for smart contract development. "
-                "This should not be used as a substitute for an actual audit. Do you understand?"
-                "software engineering practices. Do you understand?",
+                "This should not be used as a substitute for an actual audit. Do you understand?",
                 fg="yellow",
             ),
             default=True,
