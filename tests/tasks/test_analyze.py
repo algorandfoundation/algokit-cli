@@ -4,9 +4,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from algokit.cli.tasks.analyze import has_template_vars
 from pytest_mock import MockerFixture
 
-from algokit.cli.tasks.analyze import has_template_vars
 from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
