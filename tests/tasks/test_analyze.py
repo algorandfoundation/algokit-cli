@@ -41,7 +41,7 @@ def _disable_animation(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]:
-    cwd = tmp_path_factory.mktemp("cwd")
+    cwd = tmp_path_factory.mktemp("cwd", numbered=True)
 
     with patch("algokit.core.tasks.analyze.TEALER_REPORTS_ROOT", return_value=cwd), patch(
         "algokit.core.tasks.analyze.TEALER_SNAPSHOTS_ROOT", return_value=cwd
