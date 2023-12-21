@@ -4,9 +4,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from algokit.cli.tasks.analyze import has_template_vars
 from pytest_mock import MockerFixture
 
+from algokit.cli.tasks.analyze import has_template_vars
 from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -119,12 +119,7 @@ def test_analyze_multiple_files_recursive(
 
     assert result.exit_code == 1
     for i in range(5):
-        target_substring = str(teal_root_folder / f"subfolder_{i}" / "dummy.teal").split("dummy_contracts")[1]
-
-        result.output = result.output.replace(
-            target_substring.replace("\\", r"\\"),
-            f"_{i}_dummy.teal",
-        )
+        result.output = re.sub(r"^File: .*", f"File:  {i}_dummy.teal", result.output, flags=re.MULTILINE)
     result.output = _format_snapshot(
         result.output,
         [str(cwd)],
