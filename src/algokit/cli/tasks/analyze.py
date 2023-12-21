@@ -90,7 +90,9 @@ def get_input_files(*, input_paths: tuple[Path], recursive: bool) -> list[Path]:
     help=(
         "Analyze TEAL programs for common vulnerabilities using Tealer. "
         "This task uses a third party tool to suggest improvements for your TEAL programs, "
-        "but remember to always test your smart contracts code and follow modern software engineering practices. "
+        "but remember to always test your smart contracts code, follow modern software engineering practices "
+        "and use the guidelines for smart contract development. "
+        "This should not be used as a substitute for an actual audit. "
         "For full list of available detectors, please refer to https://github.com/crytic/tealer?tab=readme-ov-file#detectors"
     ),
 )
@@ -165,7 +167,9 @@ def analyze(  # noqa: PLR0913
         click.confirm(
             click.style(
                 "Warning: This task uses `tealer` to suggest improvements for your TEAL programs, "
-                "but remember to always test your smart contracts code and follow modern "
+                "but remember to always test your smart contracts code, follow modern software engineering practices "
+                "and use the guidelines for smart contract development. "
+                "This should not be used as a substitute for an actual audit. Do you understand?"
                 "software engineering practices. Do you understand?",
                 fg="yellow",
             ),
@@ -191,7 +195,6 @@ def analyze(  # noqa: PLR0913
 
         filename = generate_report_filename(file, duplicate_files)
 
-        # If diff_only is enabled, store the report in the snapshots folder otherwise store it in the reports folder
         # If a custom output path is provided, store the report in the specified path
         report_output_root = output_path or TEALER_SNAPSHOTS_ROOT
         report_output_path = report_output_root / filename
