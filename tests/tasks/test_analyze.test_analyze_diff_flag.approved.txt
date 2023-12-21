@@ -3,4 +3,4 @@ DEBUG: Running 'pipx --version' in '{current_working_directory}'
 
 Running 'pipx run --spec git+https://github.com/algorandfoundation/tealer.git@main tealer --json {current_working_directory}/dummy_report.json detect --contracts {current_working_directory}/dummy.teal' in '{current_working_directory}'
 
-ERROR: Diff detected in {current_working_directory}/dummy.teal! Please check the content of the latest report{current_working_directory}/dummy_report.json against the snapshot report at {current_working_directory}/dummy_report.old.json.
+ERROR: Diff detected in {current_working_directory}/dummy.teal! Please check the content of the latest report{current_working_directory}/dummy_report.json against the snapshot report at {current_working_directory}/dummy_report.received.json.
