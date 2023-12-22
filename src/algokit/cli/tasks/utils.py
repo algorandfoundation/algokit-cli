@@ -117,7 +117,7 @@ def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algod
 
     Example:
         asset_id = 123
-        algod_client = algosdk.v2client.algod.AlgodClient("https://api.algoexplorer.io", "API_KEY")
+        algod_client = algosdk.v2client.algod.AlgodClient("https://mainnet-api.algonode.cloud", "API_KEY")
         decimals = get_asset_decimals(asset_id, algod_client)
         print(decimals)
     """

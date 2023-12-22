@@ -17,7 +17,7 @@ class StringEnum(str, Enum):
 
 class ExplorerEntityType(StringEnum):
     """
-    Used to indicate type of entity when used with `generate_explorer_url` function.
+    Used to indicate type of entity when used with `get_explorer_url` function.
     """
 
     TRANSACTION = "transaction"

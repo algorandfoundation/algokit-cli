@@ -22,4 +22,4 @@ DEBUG: Asset config params: {
 
 Successfully minted the asset!
 Browse your asset at: https://explorer.perawallet.app/assets/123
-Check transaction status at: https://algoexplorer.io/tx/dummy_tx_id
+Check transaction status at: https://allo.info/tx/dummy_tx_id

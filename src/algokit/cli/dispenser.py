@@ -5,6 +5,8 @@ from pathlib import Path
 
 import click
 
+from algokit.cli.common.constants import ExplorerEntityType
+from algokit.cli.common.utils import get_explorer_url
 from algokit.cli.tasks.utils import get_address
 from algokit.core.dispenser import (
     DISPENSER_ACCESS_TOKEN_KEY,
@@ -193,7 +195,10 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
         )
         asset_description = default_asset.description if whole_units else f"μ{default_asset.description}"
         logger.info(
-            f'Successfully funded {processed_amount} {asset_description}. Browse transaction at https://testnet.algoexplorer.io/tx/{response_body["txID"]}'
+            f"Successfully funded {processed_amount} {asset_description}. Browse transaction at "
+            f"{get_explorer_url(identifier=response_body["txID"],
+                                network="testnet",
+                                entity_type=ExplorerEntityType.TRANSACTION)}"
         )
 
 
