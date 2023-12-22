@@ -22,13 +22,14 @@ class ComposeFileStatus(enum.Enum):
 
 
 class ComposeSandbox:
-    def __init__(self, dir_name: str) -> None:
-        self.directory = get_app_config_dir() / dir_name
+    def __init__(self, name: str = "sandbox") -> None:
+        self.name = (f"sandbox_{name}" if name != "sandbox" else name)
+        self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
-            logger.debug(f"The {dir_name} directory does not exist yet; creating it")
+            logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
         self._conduit_yaml = get_conduit_yaml()
-        self._latest_yaml = get_docker_compose_yml()
+        self._latest_yaml = get_docker_compose_yml(convention_name=name)
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
 
@@ -146,6 +147,45 @@ class ComposeSandbox:
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
+    def ls(self) -> str | None:
+        run_results = self._run_compose_command(
+            "ls --format json --filter name=algokit_sandbox* ",
+            bad_return_code_error_message="Failed to list running LocalNet"
+        )
+        if run_results.exit_code != 0:
+            return None
+        return run_results.output
+
+    def get_status(self) -> str | None:
+        try:
+            data = json.loads(self.ls())
+            for item in data:
+                return item.get("Status")
+            return None
+        except Exception as err:
+            logger.debug(f"Error checking indexer status: {err}", exc_info=True)
+            return None
+
+    def get_config_directory_name(self) -> str | None:
+        try:
+            data = json.loads(self.ls())
+            for item in data:
+                first_config_file = item.get("ConfigFiles").split(',')[0]
+                # todo: windows issue
+                return first_config_file.split('/')[-2]
+            return None
+        except Exception as err:
+            logger.debug(f"Error checking config file: {err}", exc_info=True)
+            return None
+
+    def get_running_localnet_name(self) -> list[str]:
+        try:
+            data = json.loads(self.ls())
+            return [item.get("Name") for item in data]
+        except Exception as err:
+            logger.debug(f"Error on checking running localnet: {err}", exc_info=True)
+            return []
+
     def _get_local_image_version(self, image_name: str) -> str | None:
         """
         Get the local version of a Docker image
@@ -194,10 +234,6 @@ class ComposeSandbox:
             logger.warning(
                 "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
-
-    def save_current_directory(self) -> None:
-        current_dir_file = get_app_config_dir() / "localnet_directory.txt"
-        current_dir_file.write_text(str(self.directory))
 
 
 def get_sandbox_directory() -> Path:
@@ -372,13 +408,14 @@ def get_docker_compose_yml(
     algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
+    convention_name: str = "",
 ) -> str:
     return f"""version: '3'
-name: "{name}_sandbox"
+name: "{name}_{convention_name}"
 
 services:
   algod:
-    container_name: {name}_algod
+    container_name: {name}_algod_{convention_name}
     image: {ALGORAND_IMAGE}
     ports:
       - {algod_port}:8080
@@ -400,7 +437,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: {name}_conduit
+    container_name: {name}_conduit_{convention_name}
     image: {CONDUIT_IMAGE}
     restart: unless-stopped
     volumes:
@@ -412,7 +449,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: {name}_postgres
+    container_name: {name}_postgres_{convention_name}
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -423,6 +460,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
+    container_name: {name}_indexer_{convention_name}
     image: {INDEXER_IMAGE}
     ports:
       - "8980:8980"
