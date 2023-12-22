@@ -194,12 +194,10 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
             response_body["amount"] / (10**default_asset.decimals) if whole_units else response_body["amount"]
         )
         asset_description = default_asset.description if whole_units else f"μ{default_asset.description}"
-        logger.info(
-            f"Successfully funded {processed_amount} {asset_description}. Browse transaction at "
-            f"{get_explorer_url(identifier=response_body["txID"],
-                                network="testnet",
-                                entity_type=ExplorerEntityType.TRANSACTION)}"
+        txn_url = get_explorer_url(
+            identifier=response_body["txID"], network="testnet", entity_type=ExplorerEntityType.TRANSACTION
         )
+        logger.info(f"Successfully funded {processed_amount} {asset_description}. Browse transaction at {txn_url}")
 
 
 @dispenser_group.command("refund", help="Refund ALGOs back to the dispenser wallet address.")

@@ -116,12 +116,12 @@ def transfer(  # noqa: PLR0913
         if not txn_response:
             raise click.ClickException("Failed to perform transfer")
 
-        click.echo(
-            f"Successfully performed transfer. See details at "
-            f"{get_explorer_url(identifier=txn_response.get_txid(),  # type: ignore[no-untyped-call]
-                                network=network,
-                                entity_type=ExplorerEntityType.TRANSACTION)}"
+        txn_url = get_explorer_url(
+            identifier=txn_response.get_txid(),  # type: ignore[no-untyped-call]
+            network=network,
+            entity_type=ExplorerEntityType.TRANSACTION,
         )
+        click.echo(f"Successfully performed transfer. See details at {txn_url}")
 
     except Exception as err:
         logger.debug(err, exc_info=True)
