@@ -3,6 +3,8 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
 DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Existing LocalNet not found; creating from scratch...
 Starting AlgoKit LocalNet now...
@@ -21,7 +23,7 @@ name: "algokit_sandbox"
 
 services:
   algod:
-    container_name: algokit_algod
+    container_name: algokit_algod_sandbox
     image: algorand/algod:latest
     ports:
       - 4001:8080
@@ -43,7 +45,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: algokit_conduit
+    container_name: algokit_conduit_sandbox
     image: algorand/conduit:latest
     restart: unless-stopped
     volumes:
@@ -55,7 +57,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: algokit_postgres
+    container_name: algokit_postgres_sandbox
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -66,6 +68,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
+    container_name: algokit_indexer_sandbox
     image: algorand/indexer:latest
     ports:
       - "8980:8980"

@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from algokit.core.sandbox import ALGOD_HEALTH_URL, ALGORAND_IMAGE, INDEXER_IMAGE
 from pytest_httpx import HTTPXMock
@@ -42,4 +44,18 @@ def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
         json={
             "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         },
+    )
+
+
+@pytest.fixture()
+def _list_running_localnet(proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        "docker compose ls --format json --filter name=algokit_*",
+        [
+            json.dumps(
+                [
+                    {"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": f"test/sandbox/docker-compose.yml"}
+                ]
+            )
+        ]
     )

@@ -6,5 +6,9 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox_test/docker-compose.yml"}]
+DEBUG: The sandbox_test directory does not exist yet; creating it
+A named LocalNet is running, goal command will be executed under the named LocalNet
 Opening Bash console on the algod node; execute `exit` to return to original console
 DEBUG: Running 'docker exec -it -w /root algokit_algod bash' in '{current_working_directory}'

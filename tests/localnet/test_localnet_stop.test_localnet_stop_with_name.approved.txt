@@ -3,8 +3,10 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox_test/docker-compose.yml"}]
 Stopping AlgoKit LocalNet now...
 DEBUG: Running 'docker compose stop' in '{app_config}/sandbox_test'
 docker: STDOUT
 docker: STDERR
-LocalNet Stopped; execute `algokit localnet start --name sandbox_test` to start it again.
+LocalNet Stopped; execute `algokit localnet start` to start it again.
