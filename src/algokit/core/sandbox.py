@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import json
 import logging
@@ -13,6 +15,7 @@ from algokit.core.proc import RunResult, run, run_interactive
 logger = logging.getLogger(__name__)
 
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
+DEFAULT_NAME = "sandbox"
 
 
 class ComposeFileStatus(enum.Enum):
@@ -22,8 +25,8 @@ class ComposeFileStatus(enum.Enum):
 
 
 class ComposeSandbox:
-    def __init__(self, name: str = "sandbox") -> None:
-        self.name = (f"sandbox_{name}" if name != "sandbox" else name)
+    def __init__(self, name: str = DEFAULT_NAME) -> None:
+        self.name = f"{DEFAULT_NAME}_{name}" if name != DEFAULT_NAME else name
         self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
@@ -48,6 +51,31 @@ class ComposeSandbox:
     @property
     def algod_network_template_file_path(self) -> Path:
         return self.directory / "algod_network_template.json"
+
+    @classmethod
+    def from_environment(cls) -> ComposeSandbox | None:
+        run_results = run(
+            ["docker", "compose", "ls", "--format", "json", "--filter", "name=algokit_*"],
+            bad_return_code_error_message="Failed to list running LocalNet",
+        )
+        if run_results.exit_code != 0:
+            return None
+        try:
+            data = json.loads(run_results.output)
+            for item in data:
+                first_config_file = item.get("ConfigFiles").split(",")[0]
+                path_components = Path(first_config_file).parts
+                convention_name = path_components[-2]
+                strip_name = (
+                    convention_name.replace(f"{DEFAULT_NAME}_", "")
+                    if convention_name.startswith(f"{DEFAULT_NAME}_")
+                    else convention_name
+                )
+                return cls(strip_name)
+            return None
+        except Exception as err:
+            logger.info(f"Error checking config file: {err}", exc_info=True)
+            return None
 
     def compose_file_status(self) -> ComposeFileStatus:
         try:
@@ -103,10 +131,7 @@ class ComposeSandbox:
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
         self._run_compose_command("stop", bad_return_code_error_message="Failed to stop LocalNet")
-        logger.info(
-            f"LocalNet Stopped; execute `algokit localnet start"
-            f"{' --name ' + self.directory.name if self.directory.name != 'sandbox' else ''}` to start it again."
-        )
+        logger.info("LocalNet Stopped; execute `algokit localnet start` to start it again.")
 
     def down(self) -> None:
         logger.info("Deleting any existing LocalNet...")
@@ -146,45 +171,6 @@ class ComposeSandbox:
 
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
-
-    def ls(self) -> str | None:
-        run_results = self._run_compose_command(
-            "ls --format json --filter name=algokit_sandbox* ",
-            bad_return_code_error_message="Failed to list running LocalNet"
-        )
-        if run_results.exit_code != 0:
-            return None
-        return run_results.output
-
-    def get_status(self) -> str | None:
-        try:
-            data = json.loads(self.ls())
-            for item in data:
-                return item.get("Status")
-            return None
-        except Exception as err:
-            logger.debug(f"Error checking indexer status: {err}", exc_info=True)
-            return None
-
-    def get_config_directory_name(self) -> str | None:
-        try:
-            data = json.loads(self.ls())
-            for item in data:
-                first_config_file = item.get("ConfigFiles").split(',')[0]
-                # todo: windows issue
-                return first_config_file.split('/')[-2]
-            return None
-        except Exception as err:
-            logger.debug(f"Error checking config file: {err}", exc_info=True)
-            return None
-
-    def get_running_localnet_name(self) -> list[str]:
-        try:
-            data = json.loads(self.ls())
-            return [item.get("Name") for item in data]
-        except Exception as err:
-            logger.debug(f"Error on checking running localnet: {err}", exc_info=True)
-            return []
 
     def _get_local_image_version(self, image_name: str) -> str | None:
         """
@@ -234,14 +220,6 @@ class ComposeSandbox:
             logger.warning(
                 "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
-
-
-def get_sandbox_directory() -> Path:
-    current_dir_file = get_app_config_dir() / "localnet_directory.txt"
-    if Path(current_dir_file).exists():
-        return Path(current_dir_file.read_text().strip())
-    else:
-        return get_app_config_dir() / "sandbox"
 
 
 DEFAULT_ALGOD_SERVER = "http://localhost"
