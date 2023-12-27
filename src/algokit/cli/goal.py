@@ -9,7 +9,7 @@ from algokit.core.goal import (
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
+from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, DEFAULT_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +47,13 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
 
-    sandbox = ComposeSandbox()
+    sandbox = ComposeSandbox.from_environment()
+    if sandbox is None:
+        sandbox = ComposeSandbox()
+    if sandbox.name != DEFAULT_NAME:
+        logger.info("A named LocalNet is running, goal command will be executed under the named LocalNet")
     compose_file_status = sandbox.compose_file_status()
-    if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
+    if compose_file_status is not ComposeFileStatus.UP_TO_DATE and sandbox.name == DEFAULT_NAME:
         raise click.ClickException("LocalNet definition is out of date; please run `algokit localnet reset` first!")
 
     if console:

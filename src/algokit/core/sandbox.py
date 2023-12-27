@@ -63,15 +63,14 @@ class ComposeSandbox:
         try:
             data = json.loads(run_results.output)
             for item in data:
-                first_config_file = item.get("ConfigFiles").split(",")[0]
-                path_components = Path(first_config_file).parts
-                convention_name = path_components[-2]
-                strip_name = (
-                    convention_name.replace(f"{DEFAULT_NAME}_", "")
-                    if convention_name.startswith(f"{DEFAULT_NAME}_")
-                    else convention_name
+                config_file = item.get("ConfigFiles").split(",")[0]
+                full_name = Path(config_file).parent.name
+                name = (
+                    full_name.replace(f"{DEFAULT_NAME}_", "")
+                    if full_name.startswith(f"{DEFAULT_NAME}_")
+                    else full_name
                 )
-                return cls(strip_name)
+                return cls(name)
             return None
         except Exception as err:
             logger.info(f"Error checking config file: {err}", exc_info=True)
