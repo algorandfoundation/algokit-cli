@@ -66,9 +66,7 @@ class ComposeSandbox:
                 config_file = item.get("ConfigFiles").split(",")[0]
                 full_name = Path(config_file).parent.name
                 name = (
-                    full_name.replace(f"{DEFAULT_NAME}_", "")
-                    if full_name.startswith(f"{DEFAULT_NAME}_")
-                    else full_name
+                    full_name.replace(f"{DEFAULT_NAME}_", "") if full_name.startswith(f"{DEFAULT_NAME}_") else full_name
                 )
                 return cls(name)
             return None

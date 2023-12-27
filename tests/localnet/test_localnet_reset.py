@@ -49,7 +49,9 @@ def test_localnet_reset_with_existing_sandbox_with_out_of_date_config(app_dir_mo
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_list_running_localnet")
 def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
-    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml(convention_name="sandbox"))
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(
+        get_docker_compose_yml(convention_name="sandbox")
+    )
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
@@ -60,22 +62,25 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success")
-def test_localnet_reset_with_named_sandbox_config(
-    app_dir_mock: AppDirs, proc_mock: ProcMock
-) -> None:
+def test_localnet_reset_with_named_sandbox_config(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output(
         "docker compose ls --format json --filter name=algokit_*",
         [
             json.dumps(
                 [
-                    {"Name": "algokit_sandbox", "Status": "running",
-                     "ConfigFiles": "test/sandbox_test/docker-compose.yml"}
+                    {
+                        "Name": "algokit_sandbox",
+                        "Status": "running",
+                        "ConfigFiles": "test/sandbox_test/docker-compose.yml",
+                    }
                 ]
             )
-        ]
+        ],
     )
     (app_dir_mock.app_config_dir / "test").mkdir()
-    (app_dir_mock.app_config_dir / "test" / "docker-compose.yml").write_text(get_docker_compose_yml(convention_name="test"))
+    (app_dir_mock.app_config_dir / "test" / "docker-compose.yml").write_text(
+        get_docker_compose_yml(convention_name="test")
+    )
     (app_dir_mock.app_config_dir / "test" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "test" / "algod_network_template.json").write_text(get_algod_network_template())
 
@@ -89,7 +94,8 @@ def test_localnet_reset_with_named_sandbox_config(
 def test_localnet_reset_with_existing_sandbox_with_up_to_date_config_with_pull(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(
-        get_docker_compose_yml(convention_name="sandbox"))
+        get_docker_compose_yml(convention_name="sandbox")
+    )
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 

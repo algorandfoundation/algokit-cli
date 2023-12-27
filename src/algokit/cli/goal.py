@@ -9,7 +9,7 @@ from algokit.core.goal import (
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox, DEFAULT_NAME
+from algokit.core.sandbox import DEFAULT_NAME, ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 

@@ -75,11 +75,14 @@ def test_localnet_start_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) ->
         [
             json.dumps(
                 [
-                    {"Name": "algokit_sandbox", "Status": "running",
-                     "ConfigFiles": "test/sandbox_test/docker-compose.yml"}
+                    {
+                        "Name": "algokit_sandbox",
+                        "Status": "running",
+                        "ConfigFiles": "test/sandbox_test/docker-compose.yml",
+                    }
                 ]
             )
-        ]
+        ],
     )
     result = invoke("localnet start --name test")
 
@@ -136,7 +139,9 @@ def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> N
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_list_running_localnet")
 def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
-    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml(convention_name="sandbox"))
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(
+        get_docker_compose_yml(convention_name="sandbox")
+    )
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 

@@ -29,11 +29,14 @@ def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
         [
             json.dumps(
                 [
-                    {"Name": "algokit_sandbox", "Status": "running",
-                     "ConfigFiles": "test/sandbox_test/docker-compose.yml"}
+                    {
+                        "Name": "algokit_sandbox",
+                        "Status": "running",
+                        "ConfigFiles": "test/sandbox_test/docker-compose.yml",
+                    }
                 ]
             )
-        ]
+        ],
     )
     result = invoke("localnet stop")
 

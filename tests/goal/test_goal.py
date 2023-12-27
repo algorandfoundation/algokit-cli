@@ -34,7 +34,9 @@ def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture()
 def _setup_latest_dummy_compose(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
-    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml(convention_name="sandbox"))
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(
+        get_docker_compose_yml(convention_name="sandbox")
+    )
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
@@ -54,14 +56,7 @@ def _setup_input_files(cwd: Path, request: pytest.FixtureRequest) -> None:
 
 @pytest.fixture()
 def _list_running_localnet(proc_mock: ProcMock) -> None:
-    proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_*",
-        [
-            json.dumps(
-                []
-            )
-        ]
-    )
+    proc_mock.set_output("docker compose ls --format json --filter name=algokit_*", [json.dumps([])])
 
 
 def dump_file(cwd: Path) -> None:
@@ -176,8 +171,9 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path",
-                         "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_list_running_localnet"
+)
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "transactions.txt"}]], indirect=True)
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
@@ -241,8 +237,9 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose",
-                         "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet"
+)
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
 )
@@ -280,8 +277,9 @@ def test_goal_simple_args_with_input_output_files(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose",
-                         "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet"
+)
 @pytest.mark.parametrize(
     "_setup_input_files",
     [

@@ -53,9 +53,7 @@ def _list_running_localnet(proc_mock: ProcMock) -> None:
         "docker compose ls --format json --filter name=algokit_*",
         [
             json.dumps(
-                [
-                    {"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": f"test/sandbox/docker-compose.yml"}
-                ]
+                [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
             )
-        ]
+        ],
     )

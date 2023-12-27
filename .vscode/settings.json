@@ -2,9 +2,8 @@
   // General - see also /.editorconfig
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    // Don't want to use isort because it conflicts with Ruff - see run on save below
-    "source.organizeImports": true,
-    "source.fixAll": true
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "files.exclude": {
