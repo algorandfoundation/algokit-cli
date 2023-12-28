@@ -98,18 +98,18 @@
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
     - [Options](#options-17)
-    - [--name ](#--name-)
+    - [-n, --name ](#-n---name--1)
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
     - [ipfs](#ipfs)
     - [Options](#options-18)
     - [-f, --file ](#-f---file--1)
-    - [-n, --name ](#-n---name--1)
+    - [-n, --name ](#-n---name--2)
     - [mint](#mint)
     - [Options](#options-19)
     - [--creator ](#--creator-)
-    - [-n, --name ](#-n---name--2)
+    - [-n, --name ](#-n---name--3)
     - [-u, --unit ](#-u---unit-)
     - [-t, --total ](#-t---total-)
     - [-d, --decimals ](#-d---decimals-)
@@ -708,8 +708,8 @@ algokit localnet start [OPTIONS]
 ### Options
 
 
-### --name <name>
-a name for your localnet
+### -n, --name <name>
+A name for your localnet
 
 ### status
 

@@ -56,6 +56,23 @@ Once the LocalNet has started, the following endpoints will be available:
 - tealdbg port:
   - address: http://localhost:9392
 
+### Creating / starting a Named LocalNet
+
+To initialize your AlgoKit LocalNet instance with a custom name,
+execute the command `algokit localnet start --name {YourLocalnetName}`.
+This command sets up a Docker Compose deployment tailored to your specified name,
+creating a dedicated directory for all related files.
+You have the flexibility to modify various settings,
+including toggling the development mode (dev-mode) in the configuration files to either true or false,
+according to your requirements.
+
+Once you've made your desired adjustments,
+apply these modifications to your named LocalNet by running `algokit localnet reset`.
+
+The rest of LocalNet commands will work on your named LocalNet instance.
+
+If you wish to switch back to the default LocalNet instance, simply run `algokit localnet start`.
+
 ### Stopping and Resetting the LocalNet
 
 To stop the LocalNet you can execute `algokit localnet stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit localnet start`.
