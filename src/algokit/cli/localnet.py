@@ -64,8 +64,8 @@ def localnet_group() -> None:
     "-n",
     default=None,
     help="Specify a unique name for your LocalNet instance. Providing a name helps in changing and managing "
-         "multiple LocalNet instances. If no name is given, a default name is assigned. Use this option to create "
-         "distinct environments for your needs.",
+    "multiple LocalNet instances. If no name is given, a default name is assigned. Use this option to create "
+    "distinct environments for your needs.",
 )
 def start_localnet(name: str | None) -> None:
     sandbox = ComposeSandbox.from_environment()
