@@ -3,7 +3,7 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
 DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'

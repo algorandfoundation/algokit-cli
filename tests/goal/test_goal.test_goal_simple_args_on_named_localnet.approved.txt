@@ -1,0 +1,10 @@
+DEBUG: Running 'docker version' in '{current_working_directory}'
+DEBUG: docker: STDOUT
+DEBUG: docker: STDERR
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_test", "Status": "running", "ConfigFiles": "to/test/docker-compose.yml"}]
+DEBUG: The sandbox_test directory does not exist yet; creating it
+A named LocalNet is running, goal command will be executed under the named LocalNet
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod_test goal account list' in '{current_working_directory}'
+ STDOUT
+ STDERR

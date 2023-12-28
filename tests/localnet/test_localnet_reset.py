@@ -64,7 +64,7 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
 @pytest.mark.usefixtures("proc_mock", "_health_success")
 def test_localnet_reset_with_named_sandbox_config(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_*",
+        "docker compose ls --format json --filter name=algokit_sandbox*",
         [
             json.dumps(
                 [

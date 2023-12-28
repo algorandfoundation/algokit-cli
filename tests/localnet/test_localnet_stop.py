@@ -25,7 +25,7 @@ def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").write_text("existing")
     (app_dir_mock.app_config_dir / "sandbox_test" / "algod_config.json").write_text("existing")
     proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_*",
+        "docker compose ls --format json --filter name=algokit_sandbox*",
         [
             json.dumps(
                 [

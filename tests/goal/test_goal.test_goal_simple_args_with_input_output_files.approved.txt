@@ -1,7 +1,7 @@
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
-DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal clerk compile /root/goal_mount/approval.teal -o /root/goal_mount/approval.compiled' in '{current_working_directory}'
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod_sandbox goal clerk compile /root/goal_mount/approval.teal -o /root/goal_mount/approval.compiled' in '{current_working_directory}'
  File compiled

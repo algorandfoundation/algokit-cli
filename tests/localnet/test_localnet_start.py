@@ -71,7 +71,7 @@ def test_localnet_start(app_dir_mock: AppDirs) -> None:
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
 def test_localnet_start_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_*",
+        "docker compose ls --format json --filter name=algokit_sandbox*",
         [
             json.dumps(
                 [

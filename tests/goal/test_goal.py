@@ -27,7 +27,7 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
 def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     mocked_goal_mount = cwd / "goal_mount"
     mocked_goal_mount.mkdir()
-    monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda: cwd / "goal_mount")
+    monkeypatch.setattr("algokit.cli.goal.get_volume_mount_path_local", lambda directory_name: cwd / "goal_mount")  # noqa: ARG005
     return mocked_goal_mount
 
 
@@ -56,7 +56,7 @@ def _setup_input_files(cwd: Path, request: pytest.FixtureRequest) -> None:
 
 @pytest.fixture()
 def _list_running_localnet(proc_mock: ProcMock) -> None:
-    proc_mock.set_output("docker compose ls --format json --filter name=algokit_*", [json.dumps([])])
+    proc_mock.set_output("docker compose ls --format json --filter name=algokit_sandbox*", [json.dumps([])])
 
 
 def dump_file(cwd: Path) -> None:
@@ -112,7 +112,7 @@ def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker:
 
     proc_mock.set_output(
         ["docker", "compose", "ps", "algod", "--format", "json"],
-        output=[json.dumps([{"Name": "algokit_algod", "State": "running"}])],
+        output=[json.dumps([{"Name": "algokit_algod_sandbox", "State": "running"}])],
     )
 
     result = invoke("goal --console")
@@ -185,7 +185,7 @@ def test_goal_simple_args_with_input_file(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "clerk",
         "group",
@@ -211,7 +211,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "account",
         "dump",
@@ -253,7 +253,7 @@ def test_goal_simple_args_with_input_output_files(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "clerk",
         "compile",
@@ -300,7 +300,7 @@ def test_goal_simple_args_with_multiple_input_output_files(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "clerk",
         "compile",
@@ -355,7 +355,7 @@ def test_goal_postprocess_of_command_args(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "clerk",
         "compile",
@@ -396,7 +396,7 @@ def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_file
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod",
+        "algokit_algod_sandbox",
         "goal",
         "clerk",
         "split",
@@ -440,3 +440,16 @@ def test_goal_compose_outdated(
     assert result.exit_code == 1
 
     verify(_normalize_output(result.output))
+
+
+@pytest.mark.usefixtures("_setup_latest_dummy_compose", "mocked_goal_mount_path")
+def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        "docker compose ls --format json --filter name=algokit_sandbox*",
+        [json.dumps([{"Name": "algokit_test", "Status": "running", "ConfigFiles": "to/test/docker-compose.yml"}])],
+    )
+
+    result = invoke("goal account list")
+
+    assert result.exit_code == 0
+    verify(result.output)

@@ -29,7 +29,7 @@ def test_goal_console(
         ["docker", "exec"], 0, "STDOUT+STDERR"
     )
     proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_*",
+        "docker compose ls --format json --filter name=algokit_sandbox*",
         [
             json.dumps(
                 [

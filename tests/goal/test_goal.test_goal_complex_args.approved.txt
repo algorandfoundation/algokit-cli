@@ -1,8 +1,8 @@
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker compose ls --format json --filter name=algokit_*' in '{current_working_directory}'
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
-DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY' in '{current_working_directory}'
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod_sandbox goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY' in '{current_working_directory}'
  STDOUT
  STDERR
