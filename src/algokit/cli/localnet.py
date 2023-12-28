@@ -84,7 +84,7 @@ def start_localnet(name: str | None) -> None:
         sandbox.write_compose_file()
         if name is not None:
             logger.info(
-                f"The LocalNet configuration has been created in {sandbox.directory}. \n"
+                f"The named LocalNet configuration has been created in {sandbox.directory}. \n"
                 f"You can edit the configuration by changing those files. "
                 f"Running `algokit localnet reset` will ensure the configuration is applied"
             )

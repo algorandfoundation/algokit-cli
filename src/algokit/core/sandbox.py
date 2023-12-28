@@ -266,7 +266,7 @@ def get_algod_network_template() -> str:
       "NetworkName": "followermodenet",
       "RewardsPoolBalance": 0,
       "FirstPartKeyRound": 0,
-      "LastPartKeyRound":  NUM_ROUNDS,
+      "LastPartKeyRound": NUM_ROUNDS,
       "Wallets": [
         {
           "Name": "Wallet1",

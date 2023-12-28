@@ -13,7 +13,7 @@ DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (spl
 DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
-The LocalNet configuration has been created in {app_config}/sandbox_test. 
+The named LocalNet configuration has been created in {app_config}/sandbox_test. 
 You can edit the configuration by changing those files. Running `algokit localnet reset` will ensure the configuration is applied
 A named LocalNet is running, update checks are disabled. If you wish to synchronize with the latest version, run `algokit localnet reset --update`
 Starting AlgoKit LocalNet now...
@@ -74,7 +74,7 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: conduitdb
+      POSTGRES_DB: indexerdb
 
   indexer:
     container_name: "algokit_sandbox_test_indexer"
@@ -84,6 +84,6 @@ services:
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
-      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit

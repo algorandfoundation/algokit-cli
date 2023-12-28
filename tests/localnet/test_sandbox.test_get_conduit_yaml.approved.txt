@@ -50,7 +50,7 @@ exporter:
   config:
     # Pgsql connection string
     # See https://github.com/jackc/pgconn for more details
-    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb"
+    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb"
 
     # Maximum connection number for connection pool
     # This means the total number of active queries that can be running
