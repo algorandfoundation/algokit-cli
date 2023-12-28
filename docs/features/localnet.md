@@ -58,15 +58,12 @@ Once the LocalNet has started, the following endpoints will be available:
 
 ### Creating / Starting a Named LocalNet
 
-AlgoKit manages the default LocalNet environment and automatically keeps the configuration updated with any upstream changes.
-As a result configuration changes are reset automatically by AlgoKit, so that developers always have access to a known good LocalNet configuration.
-This is great for the majority of scenarios, however sometimes developers need the control to make specific configuration changes for specific scenarios.
-This is where named LocalNet instances are useful, which can be created by running `algokit localnet start --name {name}`.
-This command will set up and run a named LocalNet environment (based off the default), however AlgoKit will not manage the configuration or updates any further.
-From here developers are able to modify their named environment however they like, including for example setting `DevMode: false` in `algod_network_template.json`.
+AlgoKit manages the default LocalNet environment and automatically keeps the configuration updated with any upstream changes. As a result, configuration changes are reset automatically by AlgoKit, so that developers always have access to a known good LocalNet configuration. This works well for the majority of scenarios, however sometimes developers need the control to make specific configuration changes for specific scenarios.
 
-Once you have a named LocalNet running, the AlgoKit LocalNet commands will target your named LocalNet instance.
-If at any point you'd like to switch back to the default LocalNet instance, simply run `algokit localnet start`.
+When you want more control, named LocalNet instances can be used by running `algokit localnet start --name {name}`. This command will set up and run a named LocalNet environment (based off the default), however AlgoKit will not update the environment or configuration automatically. From here developers are able to modify their named environment in any way they like, for example setting `DevMode: false` in `algod_network_template.json`.
+
+Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
+If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
 
 ### Stopping and Resetting the LocalNet
 

@@ -65,7 +65,7 @@ def localnet_group() -> None:
     default=None,
     help="Specify a name for a custom LocalNet instance. "
     "AlgoKit will not manage the configuration of named LocalNet instances, "
-    "allowing developers to configure the LocalNet instance in any way they wish.",
+    "allowing developers to configure it in any way they need.",
 )
 def start_localnet(name: str | None) -> None:
     sandbox = ComposeSandbox.from_environment()
@@ -85,8 +85,8 @@ def start_localnet(name: str | None) -> None:
         if name is not None:
             logger.info(
                 f"The LocalNet configuration has been created in {sandbox.directory}. \n"
-                f"You can edit the configuration by changing those files. Running "
-                f"`algokit localnet reset` will ensure the configuration is applied"
+                f"You can edit the configuration by changing those files. "
+                f"Running `algokit localnet reset` will ensure the configuration is applied"
             )
     elif compose_file_status is ComposeFileStatus.UP_TO_DATE:
         logger.debug("LocalNet compose file does not require updating")
@@ -138,14 +138,14 @@ def reset_localnet(*, update: bool) -> None:
         if click.confirm(
             f"A named LocalNet is running, are you sure you want to reset the LocalNet configuration "
             f"in {sandbox.directory}?\nThis will stop the running LocalNet and overwrite any changes "
-            "you've made to the configuration.",
+            "you've made to the configuration",
             default=True,
         ):
             sandbox.down()
             sandbox.write_compose_file()
             sandbox.pull()
         else:
-            raise click.ClickException("LocalNet configuration has not been reset.")
+            raise click.ClickException("LocalNet configuration has not been reset")
     else:
         sandbox.down()
     sandbox.up()
