@@ -32,7 +32,7 @@ class ComposeSandbox:
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
         self._conduit_yaml = get_conduit_yaml()
-        self._latest_yaml = get_docker_compose_yml(convention_name=name)
+        self._latest_yaml = get_docker_compose_yml(convention_name=self.name)
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
 
@@ -55,7 +55,7 @@ class ComposeSandbox:
     @classmethod
     def from_environment(cls) -> ComposeSandbox | None:
         run_results = run(
-            ["docker", "compose", "ls", "--format", "json", "--filter", "name=algokit_*"],
+            ["docker", "compose", "ls", "--format", "json", "--filter", "name=algokit_sandbox*"],
             bad_return_code_error_message="Failed to list running LocalNet",
         )
         if run_results.exit_code != 0:

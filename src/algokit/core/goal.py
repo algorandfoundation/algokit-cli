@@ -12,8 +12,8 @@ def get_volume_mount_path_docker() -> Path:
     return Path("/root/goal_mount/")
 
 
-def get_volume_mount_path_local() -> Path:
-    return get_app_config_dir().joinpath("sandbox", "goal_mount")
+def get_volume_mount_path_local(directory_name: str) -> Path:
+    return get_app_config_dir().joinpath(directory_name, "goal_mount")
 
 
 filename_pattern = re.compile(r"^[\w-]+\.\w+$")

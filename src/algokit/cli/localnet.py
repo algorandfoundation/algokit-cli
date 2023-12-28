@@ -61,8 +61,11 @@ def localnet_group() -> None:
 @click.option(
     "name",
     "--name",
+    "-n",
     default=None,
-    help="a name for your localnet",
+    help="Specify a unique name for your LocalNet instance. Providing a name helps in changing and managing "
+         "multiple LocalNet instances. If no name is given, a default name is assigned. Use this option to create "
+         "distinct environments for your needs.",
 )
 def start_localnet(name: str | None) -> None:
     sandbox = ComposeSandbox.from_environment()
@@ -83,7 +86,7 @@ def start_localnet(name: str | None) -> None:
             logger.info(
                 f"The LocalNet configuration has been created in {sandbox.directory}. \n"
                 f"You can edit the configuration by changing those files and then re-run "
-                f"`algokit localnet start --name {name}`"
+                f"`algokit localnet reset`"
             )
     elif compose_file_status is ComposeFileStatus.UP_TO_DATE:
         logger.debug("LocalNet compose file does not require updating")
@@ -122,9 +125,9 @@ def reset_localnet(*, update: bool) -> None:
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Existing LocalNet not found; creating from scratch...")
         sandbox.write_compose_file()
-    else:
-        sandbox.down()
+    else:  # noqa: PLR5501
         if sandbox.name == DEFAULT_NAME:
+            sandbox.down()
             if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
                 logger.info("LocalNet definition is out of date; updating it to latest")
                 sandbox.write_compose_file()
@@ -132,15 +135,20 @@ def reset_localnet(*, update: bool) -> None:
                 sandbox.pull()
             else:
                 sandbox.check_docker_compose_for_new_image_versions()
-        elif sandbox.name != DEFAULT_NAME:
-            if update and click.confirm(
+        elif update:
+            if click.confirm(
                 f"A named LocalNet is running, are you sure you want to reset the LocalNet configuration "
                 f"in {sandbox.directory}?\nThis will stop the running LocalNet and overwrite any changes "
                 "you've made to the configuration.",
                 default=True,
             ):
+                sandbox.down()
                 sandbox.write_compose_file()
                 sandbox.pull()
+            else:
+                raise click.ClickException("LocalNet configuration has not been reset.")
+        else:
+            sandbox.down()
     sandbox.up()
 
 
