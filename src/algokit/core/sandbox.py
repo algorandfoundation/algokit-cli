@@ -369,7 +369,7 @@ exporter:
   config:
     # Pgsql connection string
     # See https://github.com/jackc/pgconn for more details
-    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb"
+    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb"
 
     # Maximum connection number for connection pool
     # This means the total number of active queries that can be running
@@ -431,7 +431,7 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: conduitdb
+      POSTGRES_DB: indexerdb
 
   indexer:
     container_name: "{name}_indexer"
@@ -441,7 +441,7 @@ services:
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
-      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
 """  # noqa: E501
