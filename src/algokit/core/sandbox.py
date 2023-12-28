@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import json
 import logging
@@ -13,6 +15,7 @@ from algokit.core.proc import RunResult, run, run_interactive
 logger = logging.getLogger(__name__)
 
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
+DEFAULT_NAME = "sandbox"
 
 
 class ComposeFileStatus(enum.Enum):
@@ -22,13 +25,14 @@ class ComposeFileStatus(enum.Enum):
 
 
 class ComposeSandbox:
-    def __init__(self) -> None:
-        self.directory = get_app_config_dir() / "sandbox"
+    def __init__(self, name: str = DEFAULT_NAME) -> None:
+        self.name = DEFAULT_NAME if name == DEFAULT_NAME else f"{DEFAULT_NAME}_{name}"
+        self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
-            logger.debug("Sandbox directory does not exist yet; creating it")
+            logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
         self._conduit_yaml = get_conduit_yaml()
-        self._latest_yaml = get_docker_compose_yml()
+        self._latest_yaml = get_docker_compose_yml(name=f"algokit_{self.name}")
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
 
@@ -47,6 +51,28 @@ class ComposeSandbox:
     @property
     def algod_network_template_file_path(self) -> Path:
         return self.directory / "algod_network_template.json"
+
+    @classmethod
+    def from_environment(cls) -> ComposeSandbox | None:
+        run_results = run(
+            ["docker", "compose", "ls", "--format", "json", "--filter", "name=algokit_sandbox*"],
+            bad_return_code_error_message="Failed to list running LocalNet",
+        )
+        if run_results.exit_code != 0:
+            return None
+        try:
+            data = json.loads(run_results.output)
+            for item in data:
+                config_file = item.get("ConfigFiles").split(",")[0]
+                full_name = Path(config_file).parent.name
+                name = (
+                    full_name.replace(f"{DEFAULT_NAME}_", "") if full_name.startswith(f"{DEFAULT_NAME}_") else full_name
+                )
+                return cls(name)
+            return None
+        except Exception as err:
+            logger.info(f"Error checking config file: {err}", exc_info=True)
+            return None
 
     def compose_file_status(self) -> ComposeFileStatus:
         try:
@@ -240,7 +266,7 @@ def get_algod_network_template() -> str:
       "NetworkName": "followermodenet",
       "RewardsPoolBalance": 0,
       "FirstPartKeyRound": 0,
-      "LastPartKeyRound":  NUM_ROUNDS,
+      "LastPartKeyRound": NUM_ROUNDS,
       "Wallets": [
         {
           "Name": "Wallet1",
@@ -343,7 +369,7 @@ exporter:
   config:
     # Pgsql connection string
     # See https://github.com/jackc/pgconn for more details
-    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb"
+    connection-string: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb"
 
     # Maximum connection number for connection pool
     # This means the total number of active queries that can be running
@@ -353,17 +379,17 @@ exporter:
 
 
 def get_docker_compose_yml(
-    name: str = "algokit",
+    name: str = "algokit_sandbox",
     algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
 ) -> str:
-    return f"""version: '3'
-name: "{name}_sandbox"
+    return f"""version: "3"
+name: "{name}"
 
 services:
   algod:
-    container_name: {name}_algod
+    container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
       - {algod_port}:8080
@@ -385,7 +411,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: {name}_conduit
+    container_name: "{name}_conduit"
     image: {CONDUIT_IMAGE}
     restart: unless-stopped
     volumes:
@@ -397,7 +423,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: {name}_postgres
+    container_name: "{name}_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -405,16 +431,17 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: conduitdb
+      POSTGRES_DB: indexerdb
 
   indexer:
+    container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
     ports:
       - "8980:8980"
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
-      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
 """  # noqa: E501

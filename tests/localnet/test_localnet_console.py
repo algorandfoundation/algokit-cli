@@ -1,3 +1,4 @@
+import json
 from subprocess import CompletedProcess
 
 import pytest
@@ -7,12 +8,12 @@ from pytest_mock import MockerFixture
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
-@pytest.mark.usefixtures(
-    "proc_mock",
-)
-def test_goal_console(mocker: MockerFixture, tmp_path_factory: pytest.TempPathFactory, app_dir_mock: AppDirs) -> None:
+def test_goal_console(
+    mocker: MockerFixture, tmp_path_factory: pytest.TempPathFactory, app_dir_mock: AppDirs, proc_mock: ProcMock
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     mocked_goal_mount = cwd / "goal_mount"
@@ -26,6 +27,20 @@ def test_goal_console(mocker: MockerFixture, tmp_path_factory: pytest.TempPathFa
 
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
+    )
+    proc_mock.set_output(
+        "docker compose ls --format json --filter name=algokit_sandbox*",
+        [
+            json.dumps(
+                [
+                    {
+                        "Name": "algokit_sandbox",
+                        "Status": "running",
+                        "ConfigFiles": "test/sandbox_test/docker-compose.yml",
+                    }
+                ]
+            )
+        ],
     )
 
     result = invoke("localnet console")
