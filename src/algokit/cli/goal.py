@@ -48,11 +48,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
     sandbox = ComposeSandbox.from_environment()
     if sandbox is None:
         sandbox = ComposeSandbox()
-    if sandbox.name == DEFAULT_NAME:
-        name = DEFAULT_NAME
-    else:
-        name = sandbox.name[len(DEFAULT_NAME) + 1 :]
-        logger.info("A named LocalNet is running, goal command will be executed under the named LocalNet")
+
+    if sandbox.name != DEFAULT_NAME:
+        logger.info("A named LocalNet is running, goal command will be executed against the named LocalNet")
 
     volume_mount_path_local = get_volume_mount_path_local(directory_name=sandbox.name)
     volume_mount_path_docker = get_volume_mount_path_docker()
@@ -65,9 +63,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         if goal_args:
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
-        result = proc.run_interactive(f"docker exec -it -w /root algokit_algod_{name} bash".split())
+        result = proc.run_interactive(f"docker exec -it -w /root algokit_{sandbox.name}_algod bash".split())
     else:
-        cmd = f"docker exec --interactive --workdir /root algokit_algod_{name} goal".split()
+        cmd = f"docker exec --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()
         input_files, output_files, goal_args = preprocess_command_args(
             goal_args, volume_mount_path_local, volume_mount_path_docker
         )

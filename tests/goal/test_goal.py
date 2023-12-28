@@ -34,9 +34,7 @@ def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture()
 def _setup_latest_dummy_compose(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
-    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(
-        get_docker_compose_yml(convention_name="sandbox")
-    )
+    (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
 
@@ -55,7 +53,7 @@ def _setup_input_files(cwd: Path, request: pytest.FixtureRequest) -> None:
 
 
 @pytest.fixture()
-def _list_running_localnet(proc_mock: ProcMock) -> None:
+def _mock_proc_with_running_localnet(proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose ls --format json --filter name=algokit_sandbox*", [json.dumps([])])
 
 
@@ -84,7 +82,9 @@ def test_goal_help() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+)
 def test_goal_no_args() -> None:
     result = invoke("goal")
 
@@ -92,7 +92,7 @@ def test_goal_no_args() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 def test_goal_console(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
@@ -104,7 +104,7 @@ def test_goal_console(mocker: MockerFixture) -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 1, "STDOUT+STDERR"
@@ -112,7 +112,7 @@ def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker:
 
     proc_mock.set_output(
         ["docker", "compose", "ps", "algod", "--format", "json"],
-        output=[json.dumps([{"Name": "algokit_algod_sandbox", "State": "running"}])],
+        output=[json.dumps([{"Name": "algokit_sandbox_algod", "State": "running"}])],
     )
 
     result = invoke("goal --console")
@@ -121,7 +121,7 @@ def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker:
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 def test_goal_console_failed_algod_not_created(
     app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture
 ) -> None:
@@ -137,7 +137,9 @@ def test_goal_console_failed_algod_not_created(
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+)
 def test_goal_simple_args() -> None:
     result = invoke("goal account list")
 
@@ -145,7 +147,9 @@ def test_goal_simple_args() -> None:
     verify(result.output)
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+)
 def test_goal_complex_args() -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
@@ -172,7 +176,7 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
 
 
 @pytest.mark.usefixtures(
-    "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_list_running_localnet"
+    "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
 )
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "transactions.txt"}]], indirect=True)
 def test_goal_simple_args_with_input_file(
@@ -185,7 +189,7 @@ def test_goal_simple_args_with_input_file(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "clerk",
         "group",
@@ -203,7 +207,7 @@ def test_goal_simple_args_with_input_file(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> None:
     expected_arguments = [
         "docker",
@@ -211,7 +215,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "account",
         "dump",
@@ -238,7 +242,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
 
 
 @pytest.mark.usefixtures(
-    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet"
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
 )
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
@@ -253,7 +257,7 @@ def test_goal_simple_args_with_input_output_files(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "clerk",
         "compile",
@@ -278,7 +282,7 @@ def test_goal_simple_args_with_input_output_files(
 
 
 @pytest.mark.usefixtures(
-    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet"
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
 )
 @pytest.mark.parametrize(
     "_setup_input_files",
@@ -300,7 +304,7 @@ def test_goal_simple_args_with_multiple_input_output_files(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "clerk",
         "compile",
@@ -324,7 +328,9 @@ def test_goal_simple_args_with_multiple_input_output_files(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures(
+    "proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
+)
 def test_goal_simple_args_without_file_error(
     cwd: Path,
 ) -> None:
@@ -335,7 +341,7 @@ def test_goal_simple_args_without_file_error(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
 )
@@ -355,7 +361,7 @@ def test_goal_postprocess_of_command_args(
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "clerk",
         "compile",
@@ -383,7 +389,7 @@ def test_goal_postprocess_of_command_args(
     assert (mocked_goal_mount_path / "approval.group.sig.out").exists()
 
 
-@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_list_running_localnet")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "group.gtxn", "content": ""}]], indirect=True)
 def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_files(
     proc_mock: ProcMock,
@@ -396,7 +402,7 @@ def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_file
         "--interactive",
         "--workdir",
         "/root",
-        "algokit_algod_sandbox",
+        "algokit_sandbox_algod",
         "goal",
         "clerk",
         "split",
@@ -426,7 +432,7 @@ def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_file
     assert (cwd / "group-1.txn").exists()
 
 
-@pytest.mark.usefixtures("proc_mock", "_list_running_localnet")
+@pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet")
 def test_goal_compose_outdated(
     cwd: Path,
     app_dir_mock: AppDirs,

@@ -16,7 +16,7 @@ def test_get_conduit_yaml() -> None:
 
 
 def test_get_docker_compose_yml() -> None:
-    docker_compose_yml = get_docker_compose_yml(convention_name="sandbox")
+    docker_compose_yml = get_docker_compose_yml()
     verify(docker_compose_yml)
 
 

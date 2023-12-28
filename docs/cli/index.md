@@ -709,7 +709,7 @@ algokit localnet start [OPTIONS]
 
 
 ### -n, --name <name>
-Specify a unique name for your LocalNet instance. Providing a name helps in changing and managing multiple LocalNet instances. If no name is given, a default name is assigned. Use this option to create distinct environments for your needs.
+Specify a name for a custom LocalNet instance. AlgoKit will not manage the configuration of named LocalNet instances, allowing developers to configure the LocalNet instance in any way they wish.
 
 ### status
 

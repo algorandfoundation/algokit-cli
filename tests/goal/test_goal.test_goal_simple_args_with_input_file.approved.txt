@@ -3,5 +3,5 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
-DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod_sandbox goal clerk group /root/goal_mount/transactions.txt' in '{current_working_directory}'
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_sandbox_algod goal clerk group /root/goal_mount/transactions.txt' in '{current_working_directory}'
  File compiled

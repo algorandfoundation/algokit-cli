@@ -48,7 +48,7 @@ def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 
 @pytest.fixture()
-def _list_running_localnet(proc_mock: ProcMock) -> None:
+def _mock_proc_with_running_localnet(proc_mock: ProcMock) -> None:
     proc_mock.set_output(
         "docker compose ls --format json --filter name=algokit_sandbox*",
         [

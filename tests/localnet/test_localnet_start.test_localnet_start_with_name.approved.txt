@@ -4,7 +4,7 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
-DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox_test/docker-compose.yml"}]
+DEBUG: docker: [{"Name": "algokit_sandbox_test", "Status": "running", "ConfigFiles": "sandbox_test/docker-compose.yml"}]
 DEBUG: The sandbox_test directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
@@ -14,8 +14,8 @@ DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 The LocalNet configuration has been created in {app_config}/sandbox_test. 
-You can edit the configuration by changing those files and then re-run `algokit localnet reset`
-A named LocalNet is running, update checks are disabled. If you wish to synchronize with the latest version, run 'algokit localnet reset --update'.
+You can edit the configuration by changing those files. Running `algokit localnet reset` will ensure the configuration is applied
+A named LocalNet is running, update checks are disabled. If you wish to synchronize with the latest version, run `algokit localnet reset --update`
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox_test'
 docker: STDOUT
@@ -27,12 +27,12 @@ Started; execute `algokit explore` to explore LocalNet in a web user interface.
 ----
 {app_config}/sandbox_test/docker-compose.yml:
 ----
-version: '3'
+version: "3"
 name: "algokit_sandbox_test"
 
 services:
   algod:
-    container_name: algokit_algod_sandbox_test
+    container_name: "algokit_sandbox_test_algod"
     image: algorand/algod:latest
     ports:
       - 4001:8080
@@ -54,7 +54,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: algokit_conduit_sandbox_test
+    container_name: "algokit_sandbox_test_conduit"
     image: algorand/conduit:latest
     restart: unless-stopped
     volumes:
@@ -66,7 +66,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: algokit_postgres_sandbox_test
+    container_name: "algokit_sandbox_test_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -77,7 +77,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    container_name: algokit_indexer_sandbox_test
+    container_name: "algokit_sandbox_test_indexer"
     image: algorand/indexer:latest
     ports:
       - "8980:8980"

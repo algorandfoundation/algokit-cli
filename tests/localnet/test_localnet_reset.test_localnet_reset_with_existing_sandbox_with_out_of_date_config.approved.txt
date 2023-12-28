@@ -26,12 +26,12 @@ DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 
 {app_config}/sandbox/docker-compose.yml
-version: '3'
+version: "3"
 name: "algokit_sandbox"
 
 services:
   algod:
-    container_name: algokit_algod_sandbox
+    container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
       - 4001:8080
@@ -53,7 +53,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: algokit_conduit_sandbox
+    container_name: "algokit_sandbox_conduit"
     image: algorand/conduit:latest
     restart: unless-stopped
     volumes:
@@ -65,7 +65,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: algokit_postgres_sandbox
+    container_name: "algokit_sandbox_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -76,7 +76,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    container_name: algokit_indexer_sandbox
+    container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
     ports:
       - "8980:8980"

@@ -4,7 +4,7 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
 Opening Bash console on the algod node; execute `exit` to return to original console
-DEBUG: Running 'docker exec -it -w /root algokit_algod_sandbox bash' in '{current_working_directory}'
+DEBUG: Running 'docker exec -it -w /root algokit_sandbox_algod bash' in '{current_working_directory}'
 DEBUG: Running 'docker compose ps algod --format json' in '{app_config}/sandbox'
 DEBUG: docker: []
 WARNING: algod container does not appear to be running, ensure localnet is started by executing `algokit localnet start`

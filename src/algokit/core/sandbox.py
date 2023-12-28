@@ -26,13 +26,13 @@ class ComposeFileStatus(enum.Enum):
 
 class ComposeSandbox:
     def __init__(self, name: str = DEFAULT_NAME) -> None:
-        self.name = f"{DEFAULT_NAME}_{name}" if name != DEFAULT_NAME else name
+        self.name = DEFAULT_NAME if name == DEFAULT_NAME else f"{DEFAULT_NAME}_{name}"
         self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
         self._conduit_yaml = get_conduit_yaml()
-        self._latest_yaml = get_docker_compose_yml(convention_name=self.name)
+        self._latest_yaml = get_docker_compose_yml(name=f"algokit_{self.name}")
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
 
@@ -379,18 +379,17 @@ exporter:
 
 
 def get_docker_compose_yml(
-    name: str = "algokit",
+    name: str = "algokit_sandbox",
     algod_port: int = DEFAULT_ALGOD_PORT,
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
-    convention_name: str = "",
 ) -> str:
-    return f"""version: '3'
-name: "{name}_{convention_name}"
+    return f"""version: "3"
+name: "{name}"
 
 services:
   algod:
-    container_name: {name}_algod_{convention_name}
+    container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
       - {algod_port}:8080
@@ -412,7 +411,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: {name}_conduit_{convention_name}
+    container_name: "{name}_conduit"
     image: {CONDUIT_IMAGE}
     restart: unless-stopped
     volumes:
@@ -424,7 +423,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: {name}_postgres_{convention_name}
+    container_name: "{name}_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -435,7 +434,7 @@ services:
       POSTGRES_DB: conduitdb
 
   indexer:
-    container_name: {name}_indexer_{convention_name}
+    container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
     ports:
       - "8980:8980"
