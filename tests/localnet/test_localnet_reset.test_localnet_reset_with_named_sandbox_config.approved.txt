@@ -5,7 +5,7 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox_test", "Status": "running", "ConfigFiles": "sandbox_test/docker-compose.yml"}]
-Deleting any existing LocalNet...
+Cleaning up the running AlgoKit LocalNet...
 DEBUG: Running 'docker compose down' in '{app_config}/sandbox_test'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
