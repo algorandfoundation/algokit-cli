@@ -22,4 +22,4 @@ DEBUG: Asset config params: {
 
 Successfully minted the asset!
 Browse your asset at: https://testnet.explorer.perawallet.app/assets/123
-Check transaction status at: https://testnet.allo.info/tx/dummy_tx_id
+Check transaction status at: https://app.dappflow.org/setnetwork?name=algonode_testnet&redirect=explorer/transaction/dummy_tx_id
