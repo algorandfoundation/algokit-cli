@@ -3,7 +3,9 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-Deleting any existing LocalNet...
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
+Cleaning up the running AlgoKit LocalNet...
 DEBUG: Running 'docker compose down' in '{app_config}/sandbox'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
@@ -24,12 +26,12 @@ DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 
 {app_config}/sandbox/docker-compose.yml
-version: '3'
+version: "3"
 name: "algokit_sandbox"
 
 services:
   algod:
-    container_name: algokit_algod
+    container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
       - 4001:8080
@@ -51,7 +53,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
-    container_name: algokit_conduit
+    container_name: "algokit_sandbox_conduit"
     image: algorand/conduit:latest
     restart: unless-stopped
     volumes:
@@ -63,7 +65,7 @@ services:
       - algod
 
   indexer-db:
-    container_name: algokit_postgres
+    container_name: "algokit_sandbox_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -71,16 +73,17 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: conduitdb
+      POSTGRES_DB: indexerdb
 
   indexer:
+    container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
     ports:
       - "8980:8980"
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
-      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=conduitdb sslmode=disable"
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
 

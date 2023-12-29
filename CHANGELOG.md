@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.9.0 (2023-12-29)
+
+### Feature
+
+* Add support for a customisable named localnet ([#373](https://github.com/algorandfoundation/algokit-cli/issues/373)) ([`41c4946`](https://github.com/algorandfoundation/algokit-cli/commit/41c4946fce6894a9f6548bf4a2cbdd499dec4cb4))
+
 ## v1.8.2 (2023-12-20)
 
 
