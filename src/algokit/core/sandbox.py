@@ -131,7 +131,7 @@ class ComposeSandbox:
         logger.info("LocalNet Stopped; execute `algokit localnet start` to start it again.")
 
     def down(self) -> None:
-        logger.info("Deleting any existing LocalNet...")
+        logger.info("Cleaning up the running AlgoKit LocalNet...")
         self._run_compose_command("down", stdout_log_level=logging.DEBUG)
 
     def pull(self) -> None:
