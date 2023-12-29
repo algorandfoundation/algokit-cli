@@ -102,14 +102,14 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
 
     base_urls: dict[str, dict[str, str]] = {
         "testnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://testnet.algoexplorer.io/tx/",
+            ExplorerEntityType.TRANSACTION.value: "https://testnet.allo.info/tx/",
             ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://testnet.algoexplorer.io/address/",
+            ExplorerEntityType.ADDRESS.value: "https://testnet.allo.info/account/",
         },
         "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://algoexplorer.io/tx/",
+            ExplorerEntityType.TRANSACTION.value: "https://allo.info/tx/",
             ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://algoexplorer.io/address/",
+            ExplorerEntityType.ADDRESS.value: "https://allo.info/account/",
         },
     }
 

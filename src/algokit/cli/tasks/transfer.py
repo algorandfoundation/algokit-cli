@@ -11,7 +11,8 @@ from algokit_utils import (
     transfer as transfer_algos,
 )
 
-from algokit.cli.common.constants import AlgorandNetwork
+from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
+from algokit.cli.common.utils import get_explorer_url
 from algokit.cli.tasks.utils import (
     get_account_with_private_key,
     get_address,
@@ -115,11 +116,12 @@ def transfer(  # noqa: PLR0913
         if not txn_response:
             raise click.ClickException("Failed to perform transfer")
 
-        click.echo(
-            f"Successfully performed transfer. "
-            "See details at "
-            f"https://testnet.algoexplorer.io/tx/{txn_response.get_txid()}"  # type: ignore[no-untyped-call]
+        txn_url = get_explorer_url(
+            identifier=txn_response.get_txid(),  # type: ignore[no-untyped-call]
+            network=network,
+            entity_type=ExplorerEntityType.TRANSACTION,
         )
+        click.echo(f"Successfully performed transfer. See details at {txn_url}")
 
     except Exception as err:
         logger.debug(err, exc_info=True)

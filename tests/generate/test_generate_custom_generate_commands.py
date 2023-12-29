@@ -121,7 +121,7 @@ path = "{smart_contract_path}"
 
 
 def test_generate_custom_generate_commands_valid_generator_no_description(
-    cwd_with_custom_folder: tuple[Path, str]
+    cwd_with_custom_folder: tuple[Path, str],
 ) -> None:
     cwd, smart_contract_path = cwd_with_custom_folder
     (cwd / ALGOKIT_CONFIG).write_text(
