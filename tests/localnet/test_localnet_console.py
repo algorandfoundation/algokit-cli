@@ -5,6 +5,7 @@ import pytest
 from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml
 from pytest_mock import MockerFixture
 
+from tests.goal.test_goal import _normalize_output
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -42,8 +43,12 @@ def test_goal_console(
             )
         ],
     )
+    proc_mock.set_output(
+        cmd=["docker", "compose", "ps", "algod", "--format", "json"],
+        output=[json.dumps([{"Name": "algokit_sandbox_algod", "State": "running"}])],
+    )
 
     result = invoke("localnet console")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))

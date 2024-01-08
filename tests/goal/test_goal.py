@@ -57,6 +57,14 @@ def _mock_proc_with_running_localnet(proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose ls --format json --filter name=algokit_sandbox*", [json.dumps([])])
 
 
+@pytest.fixture()
+def _mock_proc_with_algod_running_state(proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        cmd=["docker", "compose", "ps", "algod", "--format", "json"],
+        output=[json.dumps([{"Name": "algokit_sandbox_algod", "State": "running"}])],
+    )
+
+
 def dump_file(cwd: Path) -> None:
     (cwd / "approval.compiled").write_text(
         """
@@ -83,17 +91,26 @@ def test_goal_help() -> None:
 
 
 @pytest.mark.usefixtures(
-    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+    "proc_mock",
+    "_setup_latest_dummy_compose",
+    "mocked_goal_mount_path",
+    "_mock_proc_with_running_localnet",
+    "_mock_proc_with_algod_running_state",
 )
-def test_goal_no_args() -> None:
+def test_goal_no_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("proc_mock", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
-def test_goal_console(mocker: MockerFixture) -> None:
+@pytest.mark.usefixtures(
+    "proc_mock",
+    "_setup_latest_dummy_compose",
+    "_mock_proc_with_running_localnet",
+    "_mock_proc_with_algod_running_state",
+)
+def test_goal_console(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
     )
@@ -101,18 +118,15 @@ def test_goal_console(mocker: MockerFixture) -> None:
     result = invoke("goal --console")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
-def test_goal_console_failed(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture) -> None:
+@pytest.mark.usefixtures(
+    "proc_mock","_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
+)
+def test_goal_console_failed(app_dir_mock: AppDirs, mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 1, "STDOUT+STDERR"
-    )
-
-    proc_mock.set_output(
-        ["docker", "compose", "ps", "algod", "--format", "json"],
-        output=[json.dumps([{"Name": "algokit_sandbox_algod", "State": "running"}])],
     )
 
     result = invoke("goal --console")
@@ -138,23 +152,23 @@ def test_goal_console_failed_algod_not_created(
 
 
 @pytest.mark.usefixtures(
-    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
-def test_goal_simple_args() -> None:
+def test_goal_simple_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures(
-    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+    "proc_mock", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
-def test_goal_complex_args() -> None:
+def test_goal_complex_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 def test_goal_start_without_docker(proc_mock: ProcMock) -> None:
@@ -176,12 +190,13 @@ def test_goal_start_without_docker_engine_running(proc_mock: ProcMock) -> None:
 
 
 @pytest.mark.usefixtures(
-    "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet"
+    "_setup_input_files", "_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "transactions.txt"}]], indirect=True)
 def test_goal_simple_args_with_input_file(
     proc_mock: ProcMock,
     cwd: Path,
+    app_dir_mock: AppDirs,
 ) -> None:
     expected_arguments = [
         "docker",
@@ -199,16 +214,16 @@ def test_goal_simple_args_with_input_file(
     result = invoke("goal clerk group transactions.txt", cwd=cwd)
 
     # Check if the path in command has changed in preprocess step
-    assert _normalize_output(proc_mock.called[2].command[9]) == "/root/goal_mount/transactions.txt"
+    assert _normalize_output(proc_mock.called[3].command[9]) == "/root/goal_mount/transactions.txt"
 
     # Check for the result status
     assert result.exit_code == 0
 
-    verify(_normalize_output(result.output))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
-def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> None:
+@pytest.mark.usefixtures("mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state")
+def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path, app_dir_mock: AppDirs) -> None:
     expected_arguments = [
         "docker",
         "exec",
@@ -230,7 +245,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     result = invoke("goal account dump -o balance_record.json")
 
     # Check if the path in command has changed in preprocess step
-    assert _normalize_output(proc_mock.called[2].command[10]) == "/root/goal_mount/balance_record.json"
+    assert _normalize_output(proc_mock.called[3].command[10]) == "/root/goal_mount/balance_record.json"
 
     # Check for the result status
     assert result.exit_code == 0
@@ -238,11 +253,11 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
     # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "balance_record.json").exists()
 
-    verify(_normalize_output(result.output))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures(
-    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
@@ -250,6 +265,7 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path) -> No
 def test_goal_simple_args_with_input_output_files(
     proc_mock: ProcMock,
     cwd: Path,
+    app_dir_mock: AppDirs,
 ) -> None:
     expected_arguments = [
         "docker",
@@ -270,19 +286,19 @@ def test_goal_simple_args_with_input_output_files(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
     # Check if the paths in command have changed in preprocess step
-    assert _normalize_output(proc_mock.called[2].command[9]) == "/root/goal_mount/approval.teal"
-    assert _normalize_output(proc_mock.called[2].command[11]) == "/root/goal_mount/approval.compiled"
+    assert _normalize_output(proc_mock.called[3].command[9]) == "/root/goal_mount/approval.teal"
+    assert _normalize_output(proc_mock.called[3].command[11]) == "/root/goal_mount/approval.compiled"
 
     # Check for the result status
     assert result.exit_code == 0
 
     # Check if the output file is created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
-    verify(_normalize_output(result.output))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures(
-    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
+    "mocked_goal_mount_path", "_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
 @pytest.mark.parametrize(
     "_setup_input_files",
@@ -297,6 +313,7 @@ def test_goal_simple_args_with_input_output_files(
 def test_goal_simple_args_with_multiple_input_output_files(
     proc_mock: ProcMock,
     cwd: Path,
+    app_dir_mock: AppDirs,
 ) -> None:
     expected_arguments = [
         "docker",
@@ -316,32 +333,33 @@ def test_goal_simple_args_with_multiple_input_output_files(
     result = invoke("goal clerk compile approval1.teal approval2.teal -o approval.compiled", cwd=cwd)
 
     # Check if the paths in command have changed in preprocess step
-    assert _normalize_output(proc_mock.called[2].command[9]) == "/root/goal_mount/approval1.teal"
-    assert _normalize_output(proc_mock.called[2].command[10]) == "/root/goal_mount/approval2.teal"
-    assert _normalize_output(proc_mock.called[2].command[12]) == "/root/goal_mount/approval.compiled"
+    assert _normalize_output(proc_mock.called[3].command[9]) == "/root/goal_mount/approval1.teal"
+    assert _normalize_output(proc_mock.called[3].command[10]) == "/root/goal_mount/approval2.teal"
+    assert _normalize_output(proc_mock.called[3].command[12]) == "/root/goal_mount/approval.compiled"
 
     # Check for the result
     assert result.exit_code == 0
 
     # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
-    verify(_normalize_output(result.output))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
 @pytest.mark.usefixtures(
-    "proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet"
+    "proc_mock", "mocked_goal_mount_path", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state"
 )
 def test_goal_simple_args_without_file_error(
     cwd: Path,
+    app_dir_mock: AppDirs,
 ) -> None:
     assert not (cwd / "approval.teal").exists()
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(_normalize_output(result.output))
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
-@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state")
 @pytest.mark.parametrize(
     "_setup_input_files", [[{"name": "approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
 )
@@ -389,7 +407,7 @@ def test_goal_postprocess_of_command_args(
     assert (mocked_goal_mount_path / "approval.group.sig.out").exists()
 
 
-@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_setup_input_files", "_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_mock_proc_with_algod_running_state")
 @pytest.mark.parametrize("_setup_input_files", [[{"name": "group.gtxn", "content": ""}]], indirect=True)
 def test_goal_postprocess_of_single_output_arg_resulting_in_multiple_output_files(
     proc_mock: ProcMock,
@@ -448,8 +466,8 @@ def test_goal_compose_outdated(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "mocked_goal_mount_path")
-def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock) -> None:
+@pytest.mark.usefixtures("_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_algod_running_state")
+def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
     proc_mock.set_output(
         "docker compose ls --format json --filter name=algokit_sandbox*",
         [json.dumps([{"Name": "algokit_test", "Status": "running", "ConfigFiles": "to/test/docker-compose.yml"}])],
@@ -458,4 +476,4 @@ def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock) -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))

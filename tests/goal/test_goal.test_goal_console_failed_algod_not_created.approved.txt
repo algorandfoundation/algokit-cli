@@ -3,8 +3,16 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
-Opening Bash console on the algod node; execute `exit` to return to original console
-DEBUG: Running 'docker exec -it -w /root algokit_sandbox_algod bash' in '{current_working_directory}'
 DEBUG: Running 'docker compose ps algod --format json' in '{app_config}/sandbox'
 DEBUG: docker: []
-WARNING: algod container does not appear to be running, ensure localnet is started by executing `algokit localnet start`
+AlgoKit LocalNet isn't running
+Starting AlgoKit LocalNet now...
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
+docker: STDOUT
+docker: STDERR
+DEBUG: AlgoKit LocalNet started, waiting for health check
+DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
+DEBUG: AlgoKit LocalNet health check successful, algod is ready
+Started; execute `algokit explore` to explore LocalNet in a web user interface.
+Opening Bash console on the algod node; execute `exit` to return to original console
+DEBUG: Running 'docker exec -it -w /root algokit_sandbox_algod bash' in '{current_working_directory}'
