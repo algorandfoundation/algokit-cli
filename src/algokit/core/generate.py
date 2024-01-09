@@ -44,6 +44,7 @@ def run_generator(answers: dict, path: Path) -> None:
         dst_path=cwd,
         data=answers,
         quiet=True,
+        unsafe=True,
     ) as copier_worker:
         logger.debug(f"Running generator in {copier_worker.src_path}")
         copier_worker.run_copy()

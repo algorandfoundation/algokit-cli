@@ -1,0 +1,5 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+Uploading image to pinata...
+DEBUG: HTTP Request: POST https://api.pinata.cloud/pinning/pinFileToIPFS "HTTP/1.1 403 Forbidden"
+DEBUG: Pinata error: 403. {"ok": false}
+Error: PinataForbiddenError('Pinata error: 403')

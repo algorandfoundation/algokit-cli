@@ -26,7 +26,7 @@ We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit Lo
 
 ## Functionality
 
-### Creating / starting the LocalNet
+### Creating / Starting the LocalNet
 
 To create / start your AlgoKit LocalNet instance you can run `algokit localnet start`. This will:
 
@@ -46,15 +46,24 @@ Once they have downloaded, it won't try and re-download images unless you perfor
 Once the LocalNet has started, the following endpoints will be available:
 
 - [algod](https://developer.algorand.org/docs/rest-apis/algod/v2/):
-  - address: http://localhost:4001
+  - address: <http://localhost:4001>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 - [kmd](https://developer.algorand.org/docs/rest-apis/kmd/):
-  - address: http://localhost:4002
+  - address: <http://localhost:4002>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 - [indexer](https://developer.algorand.org/docs/rest-apis/indexer/):
-  - address: http://localhost:8980
+  - address: <http://localhost:8980>
 - tealdbg port:
-  - address: http://localhost:9392
+  - address: <http://localhost:9392>
+
+### Creating / Starting a Named LocalNet
+
+AlgoKit manages the default LocalNet environment and automatically keeps the configuration updated with any upstream changes. As a result, configuration changes are reset automatically by AlgoKit, so that developers always have access to a known good LocalNet configuration. This works well for the majority of scenarios, however sometimes developers need the control to make specific configuration changes for specific scenarios.
+
+When you want more control, named LocalNet instances can be used by running `algokit localnet start --name {name}`. This command will set up and run a named LocalNet environment (based off the default), however AlgoKit will not update the environment or configuration automatically. From here developers are able to modify their named environment in any way they like, for example setting `DevMode: false` in `algod_network_template.json`.
+
+Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
+If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
 
 ### Stopping and Resetting the LocalNet
 
@@ -95,7 +104,7 @@ Needing to do this manual step every time you spin up a new development environm
 
 AlgoKit Utils provides methods to help you do this:
 
-* TypeScript - [`ensureFunded`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#ensurefunded) and [`getDispenserAccount`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#dispenser)
-* Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
+- TypeScript - [`ensureFunded`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#ensurefunded) and [`getDispenserAccount`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#dispenser)
+- Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
 
 For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#localnet).

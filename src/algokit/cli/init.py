@@ -57,6 +57,10 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
         ),
+        "puya": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-puya-template",
+            description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
+        ),
         "react": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
@@ -228,6 +232,7 @@ def init_command(  # noqa: PLR0913
         data=answers_dict,
         quiet=True,
         vcs_ref=template.commit,
+        unsafe=True,
     ) as copier_worker:
         if use_defaults:
             populate_default_answers(copier_worker)

@@ -1,0 +1,2 @@
+DEBUG: Failed to get alias keys from keyring
+You don't have any aliases stored yet. Create one using `algokit task wallet add`.

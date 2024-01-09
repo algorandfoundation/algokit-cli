@@ -10,6 +10,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -35,27 +36,49 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
             json.dumps(
                 [
                     {
-                        "ID": "90ce27e631e4d0b048322abd01a9e68e4c899b936ad4e4e3106ad5d9f774a189",
+                        "ID": "e900c9dfe5e4676ca7fb3ac38cbee366ca5429ae447222282b64c059f5727a47",
                         "Name": "algokit_algod",
-                        "Command": "start.sh",
+                        "Image": "algorand/algod:latest",
+                        "Command": "/node/run/run.sh",
                         "Project": "algokit_sandbox",
                         "Service": "algod",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
                     },
                     {
-                        "ID": "d3a74173d552ac388643ee65c9c6aa4c1864cb1442d0423d62bd95c468ac4b97",
-                        "Name": "algokit_indexer",
-                        "Command": "/tmp/start.sh",
+                        "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
+                        "Name": "algokit_conduit",
+                        "Image": "algorand/conduit:latest",
+                        "Command": "docker-entrypoint.sh",
+                        "Project": "algokit_sandbox",
+                        "Service": "conduit",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [],
+                    },
+                    {
+                        "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
+                        "Name": "algokit_sandbox-indexer-1",
+                        "Image": "algorand/indexer:latest",
+                        "Command": "docker-entrypoint.sh daemon --enable-all-parameters",
                         "Project": "algokit_sandbox",
                         "Service": "indexer",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
@@ -63,15 +86,20 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         ],
                     },
                     {
-                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
                         "Name": "algokit_postgres",
+                        "Image": "postgres:13-alpine",
                         "Command": "docker-entrypoint.sh postgres",
                         "Project": "algokit_sandbox",
                         "Service": "indexer-db",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
+                        ],
                     },
                 ]
             )
@@ -83,6 +111,7 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -106,27 +135,49 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
             json.dumps(
                 [
                     {
-                        "ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973",
+                        "ID": "e900c9dfe5e4676ca7fb3ac38cbee366ca5429ae447222282b64c059f5727a47",
                         "Name": "algokit_algod",
-                        "Command": "start.sh",
+                        "Image": "algorand/algod:latest",
+                        "Command": "/node/run/run.sh",
                         "Project": "algokit_sandbox",
                         "Service": "algod",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
                     },
                     {
-                        "ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7",
-                        "Name": "algokit_indexer",
-                        "Command": "/tmp/start.sh",
+                        "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
+                        "Name": "algokit_conduit",
+                        "Image": "algorand/conduit:latest",
+                        "Command": "docker-entrypoint.sh",
+                        "Project": "algokit_sandbox",
+                        "Service": "conduit",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [],
+                    },
+                    {
+                        "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
+                        "Name": "algokit_sandbox-indexer-1",
+                        "Image": "algorand/indexer:latest",
+                        "Command": "docker-entrypoint.sh daemon --enable-all-parameters",
                         "Project": "algokit_sandbox",
                         "Service": "indexer",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
@@ -134,15 +185,20 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
                         ],
                     },
                     {
-                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
                         "Name": "algokit_postgres",
+                        "Image": "postgres:13-alpine",
                         "Command": "docker-entrypoint.sh postgres",
                         "Project": "algokit_sandbox",
                         "Service": "indexer-db",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
+                        ],
                     },
                 ]
             )
@@ -154,6 +210,7 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -176,43 +233,70 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
             json.dumps(
                 [
                     {
-                        "ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973",
+                        "ID": "e900c9dfe5e4676ca7fb3ac38cbee366ca5429ae447222282b64c059f5727a47",
                         "Name": "algokit_algod",
-                        "Command": "start.sh",
+                        "Image": "algorand/algod:latest",
+                        "Command": "/node/run/run.sh",
                         "Project": "algokit_sandbox",
                         "Service": "algod",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
                     },
                     {
-                        "ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7",
-                        "Name": "algokit_indexer",
-                        "Command": "/tmp/start.sh",
+                        "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
+                        "Name": "algokit_conduit",
+                        "Image": "algorand/conduit:latest",
+                        "Command": "docker-entrypoint.sh",
+                        "Project": "algokit_sandbox",
+                        "Service": "conduit",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [],
+                    },
+                    {
+                        "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
+                        "Name": "algokit_sandbox-indexer-1",
+                        "Image": "algorand/indexer:latest",
+                        "Command": "docker-entrypoint.sh daemon --enable-all-parameters",
                         "Project": "algokit_sandbox",
                         "Service": "indexer",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 1234, "PublishedPort": 1234, "Protocol": "tcp"}
+                            {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
                         ],
                     },
                     {
-                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
                         "Name": "algokit_postgres",
+                        "Image": "postgres:13-alpine",
                         "Command": "docker-entrypoint.sh postgres",
                         "Project": "algokit_sandbox",
                         "Service": "indexer-db",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
+                        ],
                     },
                 ]
             )
@@ -224,6 +308,7 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -238,27 +323,49 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
             json.dumps(
                 [
                     {
-                        "ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973",
+                        "ID": "e900c9dfe5e4676ca7fb3ac38cbee366ca5429ae447222282b64c059f5727a47",
                         "Name": "algokit_algod",
-                        "Command": "start.sh",
+                        "Image": "algorand/algod:latest",
+                        "Command": "/node/run/run.sh",
                         "Project": "algokit_sandbox",
                         "Service": "algod",
-                        "State": "stopped",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
                     },
                     {
-                        "ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7",
-                        "Name": "algokit_indexer",
-                        "Command": "/tmp/start.sh",
+                        "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
+                        "Name": "algokit_conduit",
+                        "Image": "algorand/conduit:latest",
+                        "Command": "docker-entrypoint.sh",
+                        "Project": "algokit_sandbox",
+                        "Service": "conduit",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [],
+                    },
+                    {
+                        "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
+                        "Name": "algokit_sandbox-indexer-1",
+                        "Image": "algorand/indexer:latest",
+                        "Command": "docker-entrypoint.sh daemon --enable-all-parameters",
                         "Project": "algokit_sandbox",
                         "Service": "indexer",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
@@ -266,15 +373,20 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
                         ],
                     },
                     {
-                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
                         "Name": "algokit_postgres",
+                        "Image": "postgres:13-alpine",
                         "Command": "docker-entrypoint.sh postgres",
                         "Project": "algokit_sandbox",
                         "Service": "indexer-db",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
+                        ],
                     },
                 ]
             )
@@ -286,6 +398,7 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -308,41 +421,70 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
             json.dumps(
                 [
                     {
-                        "ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973",
+                        "ID": "e900c9dfe5e4676ca7fb3ac38cbee366ca5429ae447222282b64c059f5727a47",
                         "Name": "algokit_algod",
-                        "Command": "start.sh",
+                        "Image": "algorand/algod:latest",
+                        "Command": "/node/run/run.sh",
                         "Project": "algokit_sandbox",
                         "Service": "algod",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [
-                            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-                            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+                            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
+                            {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
                             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
                         ],
                     },
                     {
-                        "ID": "a242581a65f7e49d376bff9fd8d2288cdd85a28a264657d73db84dbeef6155b7",
-                        "Name": "algokit_indexer",
-                        "Command": "/tmp/start.sh",
+                        "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
+                        "Name": "algokit_conduit",
+                        "Image": "algorand/conduit:latest",
+                        "Command": "docker-entrypoint.sh",
                         "Project": "algokit_sandbox",
-                        "Service": "indexer",
+                        "Service": "conduit",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
                         "Publishers": [],
                     },
                     {
-                        "ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026",
+                        "ID": "fa5b36dddbd112eb8b52ccd4de7db47c55ad49124b0483896a23f6727335cb3d",
+                        "Name": "algokit_sandbox-indexer-1",
+                        "Image": "algorand/indexer:latest",
+                        "Command": "docker-entrypoint.sh daemon --enable-all-parameters",
+                        "Project": "algokit_sandbox",
+                        "Service": "indexer",
+                        "Created": 1701664778,
+                        "State": "running",
+                        "Status": "",
+                        "Health": "",
+                        "ExitCode": 0,
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}
+                        ],
+                    },
+                    {
+                        "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
                         "Name": "algokit_postgres",
+                        "Image": "postgres:13-alpine",
                         "Command": "docker-entrypoint.sh postgres",
                         "Project": "algokit_sandbox",
                         "Service": "indexer-db",
+                        "Created": 1701664778,
                         "State": "running",
+                        "Status": "",
                         "Health": "",
                         "ExitCode": 0,
-                        "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}],
+                        "Publishers": [
+                            {"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}
+                        ],
                     },
                 ]
             )
@@ -354,6 +496,7 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -400,6 +543,7 @@ def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcM
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -411,7 +555,7 @@ def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock")
+@pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet")
 def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet status")
 

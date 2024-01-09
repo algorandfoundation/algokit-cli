@@ -43,14 +43,38 @@ def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command
             type=click.Path(exists=True),
             default=generator.path,
         )
-        def command(answers: dict, path: Path) -> None:
+        @click.option(
+            "--force",
+            "-f",
+            is_flag=True,
+            required=False,
+            default=False,
+            type=click.BOOL,
+            help="Executes generator without confirmation. Use with trusted sources only.",
+        )
+        def command(
+            *,
+            answers: list[tuple[str, str]],
+            path: Path,
+            force: bool,
+        ) -> None:
             if not shutil.which("git"):
                 raise click.ClickException(
                     "Git not found; please install git and add to path.\n"
                     "See https://github.com/git-guides/install-git for more information."
                 )
 
-            return run_generator(answers, path)
+            answers_dict = dict(answers)
+
+            if not force and not click.confirm(
+                "You are about to run a generator. Please make sure it's from a "
+                "trusted source (for example, official AlgoKit Templates). Do you want to proceed?",
+                default=False,
+            ):
+                logger.warning("Generator execution cancelled.")
+                return None
+
+            return run_generator(answers_dict, path)
 
         commands_table[generator.name] = command
 
@@ -119,13 +143,20 @@ def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path,
             ) from ex
     else:
         raise click.ClickException(
-            "One of --language or --output is required to determine the client langauge to generate"
+            "One of --language or --output is required to determine the client language to generate"
         )
 
     if not app_spec_path_or_dir.is_dir():
         app_specs = [app_spec_path_or_dir]
     else:
-        app_specs = sorted(app_spec_path_or_dir.rglob("application.json"))
+        patterns = ["application.json", "*.arc32.json"]
+
+        app_specs = []
+        for pattern in patterns:
+            app_specs.extend(app_spec_path_or_dir.rglob(pattern))
+
+        app_specs = list(set(app_specs))
+        app_specs.sort()
         if not app_specs:
             raise click.ClickException("No app specs found")
     for app_spec in app_specs:

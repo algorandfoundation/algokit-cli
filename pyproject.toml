@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "1.5.0"
+version = "1.9.2"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -10,25 +10,26 @@ readme = "README.md"
 python = "^3.10"
 click = "^8.1.3"
 httpx = "^0.23.1"
-copier = "^7.1.0"
+copier = "^9.0.0"
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.0.post1"
-algokit-client-generator = "^1.0.2"
+algokit-client-generator = "^1.1.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
-# workaround for issue with copier dependency spec allowing major upgrade to pydantic v2
-pydantic = "^1.10.2"
 mslex = "^1.1.0"
-keyring = "^24.2.0"
+keyring = "24.3.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
+algokit-utils = "v2.1.0"
+multiformats = "0.3.1"
+multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
+aiohttp = "3.9.1"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^5.12.0", python = "<3.12"}
 pytest = "^7.2.0"
-black = {extras = ["d"], version = "^23.1.0"}
-ruff = "^0.0.275"
+ruff = "^0.1.6"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -42,6 +43,7 @@ sphinx-click = "^4.4.0"
 sphinxnotes-markdown-builder = "^0.5.6"
 poethepoet = "^0.17.1"
 gfm-toc = "^0.0.7"
+pytest-xdist = "^3.4.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -112,8 +114,18 @@ select = [
 ignore = [
   "ANN101", # no type for self
   "ANN102", # no type for cls
-  "SIM108", # allow if-else in place of ternary
   "RET505", # allow else after return
+  "SIM108", # allow if-else in place of ternary
+  # To avoid conflict with ruff formatter. More details on https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+  "E111", # indentation is not a multiple of four
+  "E117", # over-indented
+  "ISC001", # single line implicit string concatenation
+  "ISC002", # multi line implicit string concatenation
+  "Q000", # bad quotes inline string
+  "Q001", # bad quotes multiline string
+  "Q002", # bad quotes docstring
+  "Q003", # avoidable escaped quotes
+  "W191", # indentation contains tabs
 ]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -141,9 +153,6 @@ target-version = "py310"
 [tool.ruff.flake8-annotations]
 allow-star-arg-any = true
 suppress-none-returning = true
-
-[tool.black]
-line-length = 120
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "tests"]

@@ -30,13 +30,12 @@ jobs:
           # audit all dependencies, with exclusions.
           # If a vulnerability is found in a dev dependency without an available fix,
           # it can be temporarily ignored by adding --ignore-vuln e.g.
-          # --ignore-vuln "GHSA-hcpj-qp55-gfph" # GitPython vulnerability, dev only dependency
-          poetry run pip-audit --ignore-vuln "GHSA-wfm5-v35h-vwf4" --ignore-vuln "GHSA-cwvm-v4w8-q58c"
+          poetry run pip-audit
 
-      - name: Check formatting with Black
+      - name: Check formatting with Ruff
         run: |
           # stop the build if there are files that don't meet formatting requirements
-          poetry run black --check .
+          poetry run ruff format --check .
 
       - name: Check linting with Ruff
         run: |

@@ -6,6 +6,7 @@ from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
 from algokit.core.sandbox import (
+    DEFAULT_NAME,
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
     ComposeFileStatus,
@@ -57,31 +58,57 @@ def localnet_group() -> None:
 
 
 @localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
-def start_localnet() -> None:
-    sandbox = ComposeSandbox()
+@click.option(
+    "name",
+    "--name",
+    "-n",
+    default=None,
+    help="Specify a name for a custom LocalNet instance. "
+    "AlgoKit will not manage the configuration of named LocalNet instances, "
+    "allowing developers to configure it in any way they need.",
+)
+def start_localnet(name: str | None) -> None:
+    sandbox = ComposeSandbox.from_environment()
+    full_name = f"{DEFAULT_NAME}_{name}" if name is not None else DEFAULT_NAME
+    if sandbox is not None and full_name != sandbox.name:
+        logger.debug("LocalNet is already running.")
+        if click.confirm("This will stop any running AlgoKit LocalNet instance. Are you sure?", default=True):
+            sandbox.stop()
+        else:
+            raise click.ClickException("LocalNet is already running. Please stop it first")
+    sandbox = ComposeSandbox() if name is None else ComposeSandbox(name)
     compose_file_status = sandbox.compose_file_status()
     sandbox.check_docker_compose_for_new_image_versions()
-
     if compose_file_status is ComposeFileStatus.MISSING:
-        logger.debug("Sandbox compose file does not exist yet; writing it out for the first time")
+        logger.debug("LocalNet compose file does not exist yet; writing it out for the first time")
         sandbox.write_compose_file()
+        if name is not None:
+            logger.info(
+                f"The named LocalNet configuration has been created in {sandbox.directory}. \n"
+                f"You can edit the configuration by changing those files. "
+                f"Running `algokit localnet reset` will ensure the configuration is applied"
+            )
     elif compose_file_status is ComposeFileStatus.UP_TO_DATE:
-        logger.debug("Sandbox compose file does not require updating")
-    else:
-        logger.warning("Sandbox definition is out of date; please run algokit localnet reset")
+        logger.debug("LocalNet compose file does not require updating")
+    elif compose_file_status is ComposeFileStatus.OUT_OF_DATE and name is None:
+        logger.warning("LocalNet definition is out of date; please run `algokit localnet reset`")
+    if name is not None:
+        logger.info(
+            "A named LocalNet is running, update checks are disabled. If you wish to synchronize with the latest "
+            "version, run `algokit localnet reset --update`"
+        )
     sandbox.up()
 
 
 @localnet_group.command("stop", short_help="Stop the AlgoKit LocalNet.")
 def stop_localnet() -> None:
-    sandbox = ComposeSandbox()
-    compose_file_status = sandbox.compose_file_status()
-    if compose_file_status is ComposeFileStatus.MISSING:
-        logger.debug(
-            "Sandbox compose file does not exist yet; run `algokit localnet start` to start the AlgoKit LocalNet"
-        )
+    sandbox = ComposeSandbox.from_environment()
+    if sandbox is not None:
+        compose_file_status = sandbox.compose_file_status()
+        if compose_file_status is not ComposeFileStatus.MISSING:
+            sandbox.stop()
     else:
-        sandbox.stop()
+        logger.debug("LocalNet is not running; run `algokit localnet start` to start the AlgoKit LocalNet")
 
 
 @localnet_group.command("reset", short_help="Reset the AlgoKit LocalNet.")
@@ -91,30 +118,47 @@ def stop_localnet() -> None:
     help="Enable or disable updating to the latest available LocalNet version, default: don't update",
 )
 def reset_localnet(*, update: bool) -> None:
-    sandbox = ComposeSandbox()
+    sandbox = ComposeSandbox.from_environment()
+    if sandbox is None:
+        sandbox = ComposeSandbox()
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Existing LocalNet not found; creating from scratch...")
         sandbox.write_compose_file()
-    else:
+    elif sandbox.name == DEFAULT_NAME:
         sandbox.down()
         if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
-            logger.info("Sandbox definition is out of date; updating it to latest")
+            logger.info("LocalNet definition is out of date; updating it to latest")
             sandbox.write_compose_file()
         if update:
             sandbox.pull()
         else:
             sandbox.check_docker_compose_for_new_image_versions()
-
+    elif update:
+        if click.confirm(
+            f"A named LocalNet is running, are you sure you want to reset the LocalNet configuration "
+            f"in {sandbox.directory}?\nThis will stop the running LocalNet and overwrite any changes "
+            "you've made to the configuration",
+            default=True,
+        ):
+            sandbox.down()
+            sandbox.write_compose_file()
+            sandbox.pull()
+        else:
+            raise click.ClickException("LocalNet configuration has not been reset")
+    else:
+        sandbox.down()
     sandbox.up()
 
 
-SERVICE_NAMES = ("algod", "indexer", "indexer-db")
+SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer")
 
 
 @localnet_group.command("status", short_help="Check the status of the AlgoKit LocalNet.")
 def localnet_status() -> None:
-    sandbox = ComposeSandbox()
+    sandbox = ComposeSandbox.from_environment()
+    if sandbox is None:
+        sandbox = ComposeSandbox()
     ps = sandbox.ps()
     ps_by_name = {stats["Service"]: stats for stats in ps}
     # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),

@@ -2,6 +2,121 @@
 
 <!--next-version-placeholder-->
 
+## v1.9.2 (2024-01-09)
+
+### Fix
+
+* Run localnet on goal command ([#380](https://github.com/algorandfoundation/algokit-cli/issues/380)) ([`5a06ddc`](https://github.com/algorandfoundation/algokit-cli/commit/5a06ddce965716ea4fb47a1d8a19b8cb65d17b77))
+
+### Documentation
+
+* Update the list of AlgoKit CLI high-level features in the docs ([`8e3b827`](https://github.com/algorandfoundation/algokit-cli/commit/8e3b8273d65a1fbcd7e3bf600b96c82500eef538))
+
+## v1.9.1 (2023-12-29)
+
+
+
+## v1.9.0 (2023-12-29)
+
+### Feature
+
+* Add support for a customisable named localnet ([#373](https://github.com/algorandfoundation/algokit-cli/issues/373)) ([`41c4946`](https://github.com/algorandfoundation/algokit-cli/commit/41c4946fce6894a9f6548bf4a2cbdd499dec4cb4))
+
+## v1.8.2 (2023-12-20)
+
+
+
+## v1.8.1 (2023-12-19)
+
+### Fix
+
+* Update multiformats version as it needs to be in sync with multiformats-config ([#372](https://github.com/algorandfoundation/algokit-cli/issues/372)) ([`67a5966`](https://github.com/algorandfoundation/algokit-cli/commit/67a59662c67d7f1d2e5eedeb1e8d62289e0ad5ac))
+
+## v1.8.0 (2023-12-14)
+
+### Feature
+
+* Update generators to support generating typed clients with simulate functionality ([#368](https://github.com/algorandfoundation/algokit-cli/issues/368)) ([`90c876b`](https://github.com/algorandfoundation/algokit-cli/commit/90c876b819f4f9bba040e8630584cedc13678f5a))
+* Use Pinata ipfs instead of web3.storage ([#367](https://github.com/algorandfoundation/algokit-cli/issues/367)) ([`fc7ee5d`](https://github.com/algorandfoundation/algokit-cli/commit/fc7ee5d36c09b91251c46ab2be670015ac106164))
+
+### Fix
+
+* Replacing Yaspin with Simplified Spinners for Windows Systems ([#369](https://github.com/algorandfoundation/algokit-cli/issues/369)) ([`e12311e`](https://github.com/algorandfoundation/algokit-cli/commit/e12311e3be087e78aed092dd9b2670f8183afea3))
+
+## v1.7.3 (2023-12-08)
+
+### Fix
+
+* Adding confirmation prompt prior to execution of algokit generators ([#366](https://github.com/algorandfoundation/algokit-cli/issues/366)) ([`eeb5bae`](https://github.com/algorandfoundation/algokit-cli/commit/eeb5bae18c4ffb2384f92627d19a4308a46bfdf0))
+
+## v1.7.2 (2023-12-04)
+
+### Fix
+
+* Removing outdated reference to `algokit sandbox` command ([#362](https://github.com/algorandfoundation/algokit-cli/issues/362)) ([`e6cd395`](https://github.com/algorandfoundation/algokit-cli/commit/e6cd395bf600485be6edbe4e68c9ba4885598000))
+* Fixing Localnet status ([#365](https://github.com/algorandfoundation/algokit-cli/issues/365)) ([`8277572`](https://github.com/algorandfoundation/algokit-cli/commit/8277572db58d14bfcbda5e8bda18673d536b84a0))
+* Update vulnerable package dependency versions ([#361](https://github.com/algorandfoundation/algokit-cli/issues/361)) ([`450e02d`](https://github.com/algorandfoundation/algokit-cli/commit/450e02ddba02c98d9c8fe8a6baedaf84ef7e9460))
+
+## v1.7.1 (2023-11-22)
+
+### Fix
+
+* Hotfixing conduit path for localnet windows compatibility ([#360](https://github.com/algorandfoundation/algokit-cli/issues/360)) ([`897e335`](https://github.com/algorandfoundation/algokit-cli/commit/897e33554252083ed2b0d8a18a49969ef82a097b))
+
+## v1.7.0 (2023-11-22)
+
+### Feature
+
+* Migrating localnet to latest indexer v3.x images ([#351](https://github.com/algorandfoundation/algokit-cli/issues/351)) ([`04ef300`](https://github.com/algorandfoundation/algokit-cli/commit/04ef3008366028118358e342c0e83e08f3c095ba))
+
+## v1.6.3 (2023-11-14)
+
+### Fix
+
+* Correctly convert list of tuple to dictionary ([#353](https://github.com/algorandfoundation/algokit-cli/issues/353)) ([`ad71719`](https://github.com/algorandfoundation/algokit-cli/commit/ad717190f5822964d726555b7d7f8e1f5453cdfa))
+
+## v1.6.2 (2023-11-10)
+
+### Fix
+
+* Support detect ~/test.txt as valid goal paths ([#347](https://github.com/algorandfoundation/algokit-cli/issues/347)) ([`8ac5ec5`](https://github.com/algorandfoundation/algokit-cli/commit/8ac5ec5843cf243fb051e504d821b719c37cbe38))
+* Support the multiple file outputs of goal clerk split ([#346](https://github.com/algorandfoundation/algokit-cli/issues/346)) ([`fd9cd54`](https://github.com/algorandfoundation/algokit-cli/commit/fd9cd54137ca40595220fe916799eb682971387b))
+
+## v1.6.1 (2023-11-08)
+
+### Documentation
+
+* Typo resolved ([#341](https://github.com/algorandfoundation/algokit-cli/issues/341)) ([`e71ff96`](https://github.com/algorandfoundation/algokit-cli/commit/e71ff964a9879a30689be049d3af3ec3002c3198))
+* Fixing typo in docs ([#339](https://github.com/algorandfoundation/algokit-cli/issues/339)) ([`e8eba42`](https://github.com/algorandfoundation/algokit-cli/commit/e8eba421b32767ae9d57d8bbe75f86c268f5cbf7))
+
+## v1.6.0 (2023-10-26)
+
+### Feature
+
+* Algokit tasks - 1.6.0 release ([#334](https://github.com/algorandfoundation/algokit-cli/issues/334)) ([`e35f4f8`](https://github.com/algorandfoundation/algokit-cli/commit/e35f4f836f5433449a6685d1aeca01b8fd416fe2))
+
+### Fix
+
+* Pinning aiohttp beta to hotfix 3.12 support ([#338](https://github.com/algorandfoundation/algokit-cli/issues/338)) ([`96fc7e6`](https://github.com/algorandfoundation/algokit-cli/commit/96fc7e668c3a5b4fb9f00216ee6278b8ded1cf87))
+
+## v1.5.3 (2023-10-23)
+
+
+
+## v1.5.2 (2023-10-20)
+
+### Fix
+
+* Docker compose ps parsing for version >= 2.21 ([#336](https://github.com/algorandfoundation/algokit-cli/issues/336)) ([`06ba5e9`](https://github.com/algorandfoundation/algokit-cli/commit/06ba5e908a879a45ab793ffbc6c9436eeeb5b370))
+
+### Documentation
+
+* Updating docs for the issue on python 3.12 ([#332](https://github.com/algorandfoundation/algokit-cli/issues/332)) ([`288b561`](https://github.com/algorandfoundation/algokit-cli/commit/288b5617f284b5135f272cdb4c1c160c2aa6fc33))
+
+## v1.5.1 (2023-10-17)
+
+
+
 ## v1.5.0 (2023-10-04)
 
 ### Feature

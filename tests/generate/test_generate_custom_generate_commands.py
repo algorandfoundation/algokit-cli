@@ -113,7 +113,7 @@ path = "{smart_contract_path}"
     mock_copier_worker_cls = mocker.patch("copier.main.Worker")
     mock_copier_worker_cls.return_value.__enter__.return_value.src_path = str(cwd / "smart_contract")
 
-    result = invoke("generate smart-contract", cwd=cwd)
+    result = invoke("generate smart-contract", cwd=cwd, input="y\n")
 
     assert result.exit_code == 0
     assert mock_copier_worker_cls.call_args.kwargs["src_path"] == str(cwd / "smart_contract")
@@ -121,7 +121,7 @@ path = "{smart_contract_path}"
 
 
 def test_generate_custom_generate_commands_valid_generator_no_description(
-    cwd_with_custom_folder: tuple[Path, str]
+    cwd_with_custom_folder: tuple[Path, str],
 ) -> None:
     cwd, smart_contract_path = cwd_with_custom_folder
     (cwd / ALGOKIT_CONFIG).write_text(

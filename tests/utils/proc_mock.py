@@ -13,7 +13,7 @@ class PopenMock:
     def __enter__(self) -> "PopenMock":
         return self
 
-    def __exit__(self, *args: Any) -> None:
+    def __exit__(self, *args: object) -> None:
         # TODO: we should change the structure of this mocking a bit,
         #       and check that I/O cleanup was called
         pass

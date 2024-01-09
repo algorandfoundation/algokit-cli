@@ -4,10 +4,8 @@
     "ms-python.python",
     "ms-python.vscode-pylance",
     "charliermarsh.ruff",
-    "bungcip.better-toml",
+    "tamasfe.even-better-toml",
     "editorconfig.editorconfig",
-    "emeraldwalk.runonsave",
-    "matangover.mypy",
-    "runarsf.platform-settings"
+    "matangover.mypy"
   ]
 }

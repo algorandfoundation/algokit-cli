@@ -15,6 +15,8 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 - `--command, -C TEXT`: Specifies a custom deploy command. If this option is not provided, the deploy command will be loaded from the `.algokit.toml` file.
 - `--interactive / --non-interactive, --ci`: Enables or disables the interactive prompt for mnemonics. When the CI environment variable is set, it defaults to non-interactive.
 - `--path, -P DIRECTORY`: Specifies the project directory. If not provided, the current working directory will be used.
+- `--deployer`: Specifies the deployer alias. If not provided and if the deployer is specified in `.algokit.toml` file its mnemonic will be prompted.
+- `--dispenser`: Specifies the dispenser alias. If not provided and if the dispenser is specified in `.algokit.toml` file its mnemonic will be prompted.
 - `-h, --help`: Show this message and exit.
 
 ## Environment files

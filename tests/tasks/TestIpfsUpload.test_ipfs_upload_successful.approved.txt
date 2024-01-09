@@ -1,0 +1,5 @@
+
+⠋ Uploading[KHTTP Request: POST https://api.pinata.cloud/pinning/pinFileToIPFS "HTTP/1.1 200 OK"
+
+ File uploaded successfully!
+ CID: test

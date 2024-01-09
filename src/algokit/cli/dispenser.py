@@ -5,6 +5,9 @@ from pathlib import Path
 
 import click
 
+from algokit.cli.common.constants import ExplorerEntityType
+from algokit.cli.common.utils import get_explorer_url
+from algokit.cli.tasks.utils import get_address
 from algokit.core.dispenser import (
     DISPENSER_ACCESS_TOKEN_KEY,
     DispenserApiAudiences,
@@ -147,19 +150,30 @@ def login_command(*, ci: bool, output_mode: str, output_filename: str) -> None:
 
 
 @dispenser_group.command("fund", help="Fund your wallet address with TestNet ALGOs.")
-@click.option("--receiver", "-r", required=True, help="Receiver address to fund with TestNet ALGOs.")
-@click.option("--amount", "-a", required=True, help="Amount to fund. Defaults to microAlgos.", default=1000000)
+@click.option(
+    "--receiver",
+    "-r",
+    required=True,
+    help="Address or alias of the receiver to fund with TestNet ALGOs.",
+    type=click.STRING,
+)
+@click.option(
+    "--amount", "-a", required=True, help="Amount to fund. Defaults to microAlgos.", default=1000000, type=click.INT
+)
 @click.option(
     "--whole-units",
     "whole_units",
     is_flag=True,
     help="Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.",
     default=False,
+    type=click.BOOL,
 )
 def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
     if not is_authenticated():
         logger.error(NOT_AUTHENTICATED_MESSAGE)
         return
+
+    receiver_address = get_address(receiver)
 
     default_asset = DISPENSER_ASSETS[DispenserAssetName.ALGO]
     if whole_units:
@@ -169,7 +183,7 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
     try:
         response = process_dispenser_request(
             url_suffix=f"fund/{DISPENSER_ASSETS[DispenserAssetName.ALGO].asset_id}",
-            data={"receiver": receiver, "amount": amount, "assetID": default_asset.asset_id},
+            data={"receiver": receiver_address, "amount": amount, "assetID": default_asset.asset_id},
             method="POST",
         )
     except Exception as e:
@@ -180,9 +194,10 @@ def fund_command(*, receiver: str, amount: int, whole_units: bool) -> None:
             response_body["amount"] / (10**default_asset.decimals) if whole_units else response_body["amount"]
         )
         asset_description = default_asset.description if whole_units else f"μ{default_asset.description}"
-        logger.info(
-            f'Successfully funded {processed_amount} {asset_description}. Browse transaction at https://testnet.algoexplorer.io/tx/{response_body["txID"]}'
+        txn_url = get_explorer_url(
+            identifier=response_body["txID"], network="testnet", entity_type=ExplorerEntityType.TRANSACTION
         )
+        logger.info(f"Successfully funded {processed_amount} {asset_description}. Browse transaction at {txn_url}")
 
 
 @dispenser_group.command("refund", help="Refund ALGOs back to the dispenser wallet address.")

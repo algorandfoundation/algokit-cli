@@ -3,14 +3,16 @@ DEBUG: docker: {"version": "v2.5.0"}
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Sandbox directory does not exist yet; creating it
-DEBUG: Running 'docker image inspect makerxau/algorand-indexer-dev:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
+DEBUG: The sandbox directory does not exist yet; creating it
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/makerxau/algorand-indexer-dev/tags/latest "HTTP/1.1 200 OK"
+DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
 DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
 DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Sandbox compose file does not exist yet; writing it out for the first time
+DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
@@ -21,48 +23,46 @@ WARNING: AlgoKit LocalNet failed to return a successful health check
 ----
 {app_config}/sandbox/docker-compose.yml:
 ----
-version: '3'
+version: "3"
 name: "algokit_sandbox"
 
 services:
   algod:
-    container_name: algokit_algod
+    container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
       - 4001:8080
       - 4002:7833
       - 9392:9392
     environment:
-      DEV_MODE: 1
       START_KMD: 1
-      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
       KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
     volumes:
       - type: bind
         source: ./algod_config.json
         target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
       - ./goal_mount:/root/goal_mount
 
-  indexer:
-    container_name: algokit_indexer
-    image: makerxau/algorand-indexer-dev:latest
-    ports:
-      - 8980:8980
+  conduit:
+    container_name: "algokit_sandbox_conduit"
+    image: algorand/conduit:latest
     restart: unless-stopped
-    environment:
-      ALGOD_HOST: algod
-      ALGOD_PORT: 8080
-      POSTGRES_HOST: indexer-db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: algorand
-      POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+    volumes:
+      - type: bind
+        source: ./conduit.yml
+        target: /etc/algorand/conduit.yml
     depends_on:
       - indexer-db
       - algod
 
   indexer-db:
-    container_name: algokit_postgres
+    container_name: "algokit_sandbox_postgres"
     image: postgres:13-alpine
     ports:
       - 5443:5432
@@ -70,4 +70,16 @@ services:
     environment:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
-      POSTGRES_DB: indexer_db
+      POSTGRES_DB: indexerdb
+
+  indexer:
+    container_name: "algokit_sandbox_indexer"
+    image: algorand/indexer:latest
+    ports:
+      - "8980:8980"
+    restart: unless-stopped
+    command: daemon --enable-all-parameters
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
+    depends_on:
+      - conduit

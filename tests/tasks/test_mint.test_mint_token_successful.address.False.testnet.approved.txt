@@ -1,0 +1,26 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+Uploading image to pinata...
+Image uploaded to pinata: ipfs://bafkreifax6dswcxk4us2am3jxhd3swxew32oreaxzol7dnnqzhieepqg2y
+Uploading metadata to pinata...
+Metadata uploaded to pinata: bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe
+DEBUG: Asset config params: {
+    "sender": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
+    "unit_name": "tst",
+    "asset_name": "test",
+    "url": "ipfs://bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe#arc3",
+    "manager": "",
+    "reserve": "",
+    "total": 1,
+    "freeze": "",
+    "clawback": "",
+    "note": "",
+    "decimals": 0,
+    "default_frozen": false,
+    "lease": "",
+    "rekey_to": "",
+    "strict_empty_address_check": false
+}
+
+Successfully minted the asset!
+Browse your asset at: https://testnet.explorer.perawallet.app/assets/123
+Check transaction status at: https://app.dappflow.org/setnetwork?name=algonode_testnet&redirect=explorer/transaction/dummy_tx_id

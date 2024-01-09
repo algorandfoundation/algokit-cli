@@ -1,0 +1,1 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 

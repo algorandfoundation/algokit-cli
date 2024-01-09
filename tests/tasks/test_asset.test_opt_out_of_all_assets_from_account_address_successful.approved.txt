@@ -1,0 +1,4 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+Performing opt-out. This may take a few seconds...
+Successfully performed opt-out.
+Check opt-in status for asset 123 at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_txn_id/

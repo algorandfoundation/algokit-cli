@@ -57,7 +57,7 @@ $ algokit dispenser fund [OPTIONS]
 This command funds your wallet address with TestNet ALGOs.
 Options
 
-- `--receiver`, -r: Receiver address to fund with TestNet ALGOs. This option is required.
+- `--receiver`, -r: Receiver [alias](./tasks/wallet.md#add) or address to fund with TestNet ALGOs. This option is required.
 - `--amount`, -a: Amount to fund. Defaults to microAlgos. This option is required.
 - `--whole-units`: Use whole units (Algos) instead of smallest divisible units (microAlgos). Disabled by default.
 

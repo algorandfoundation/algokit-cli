@@ -4,17 +4,72 @@ import typing as t
 from pathlib import Path
 
 import click
+from algosdk.mnemonic import from_private_key
 
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG
 from algokit.core.deploy import load_deploy_config, load_env_files, parse_command, resolve_command
+from algokit.core.tasks.wallet import get_alias
 
 logger = logging.getLogger(__name__)
 
 
-def _ensure_environment_secrets(
-    config_env: dict[str, str], environment_secrets: list[str], *, skip_mnemonics_prompts: bool
+def _ensure_aliases(
+    config_env: dict[str, str],
+    deployer_alias: str | None = None,
+    dispenser_alias: str | None = None,
 ) -> None:
+    """
+    Ensures that the required aliases for the deployer and dispenser are provided and valid and
+    injects their mnemonics into env vars config.
+
+    Args:
+        config_env (dict[str, str]): A dictionary containing the environment variables.
+        deployer_alias (str | None, optional): The alias for the deployer. Defaults to None.
+        dispenser_alias (str | None, optional): The alias for the dispenser. Defaults to None.
+
+    Raises:
+        click.ClickException: If the alias or private key is missing.
+
+    Returns:
+        None
+    """
+
+    for key, alias in [("DEPLOYER_MNEMONIC", deployer_alias), ("DISPENSER_MNEMONIC", dispenser_alias)]:
+        if not alias:
+            continue
+
+        alias_data = get_alias(alias)
+        if not alias_data:
+            raise click.ClickException(f"Error: missing {alias} alias")
+        if not alias_data.private_key:
+            raise click.ClickException(f"Error: missing private key for {alias} alias")
+        config_env[key] = from_private_key(alias_data.private_key)  # type: ignore[no-untyped-call]
+        logger.debug(f"Loaded {alias} alias mnemonic as {key} environment variable")
+
+
+def _ensure_environment_secrets(
+    config_env: dict[str, str],
+    environment_secrets: list[str],
+    *,
+    skip_mnemonics_prompts: bool,
+) -> None:
+    """
+    Ensures that the required environment variables are present in the `config_env` dictionary.
+    If any of the environment variables are missing, it prompts the user to enter the missing variable.
+
+    Args:
+        config_env (dict[str, str]): A dictionary containing the current environment variables.
+        environment_secrets (list[str]): A list of strings representing the required environment variables.
+        skip_mnemonics_prompts (bool): A boolean indicating whether to skip prompting the user for missing variables.
+
+    Raises:
+        click.ClickException: If a required environment variable is missing and `skip_mnemonics_prompts` is True.
+
+    Returns:
+        None. The function modifies the `config_env` dictionary in-place.
+    """
+
     for key in environment_secrets:
         if not config_env.get(key):
             if skip_mnemonics_prompts:
@@ -26,7 +81,10 @@ class CommandParamType(click.types.StringParamType):
     name = "command"
 
     def convert(
-        self, value: t.Any, param: click.Parameter | None, ctx: click.Context | None  # noqa: ANN401
+        self,
+        value: t.Any,  # noqa: ANN401
+        param: click.Parameter | None,
+        ctx: click.Context | None,
     ) -> list[str]:
         str_value = super().convert(value=value, param=param, ctx=ctx)
         try:
@@ -58,12 +116,34 @@ class CommandParamType(click.types.StringParamType):
     default=".",
     help="Specify the project directory. If not provided, current working directory will be used.",
 )
-def deploy_command(
+@click.option(
+    "--deployer",
+    "deployer_alias",
+    type=click.STRING,
+    required=False,
+    help=(
+        "(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic "
+        "if specified in .algokit.toml file."
+    ),
+)
+@click.option(
+    "--dispenser",
+    "dispenser_alias",
+    type=click.STRING,
+    required=False,
+    help=(
+        "(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic "
+        "if specified in .algokit.toml file."
+    ),
+)
+def deploy_command(  # noqa: PLR0913
     *,
     environment_name: str | None,
     command: list[str] | None,
     interactive: bool,
     path: Path,
+    deployer_alias: str | None,
+    dispenser_alias: str | None,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
     logger.debug(f"Deploying from project directory: {path}")
@@ -87,8 +167,14 @@ def deploy_command(
     config_dotenv = load_env_files(environment_name, path)
     # environment variables take precedence over those in .env* files
     config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
+    _ensure_aliases(config_env, deployer_alias=deployer_alias, dispenser_alias=dispenser_alias)
+
     if config.environment_secrets:
-        _ensure_environment_secrets(config_env, config.environment_secrets, skip_mnemonics_prompts=not interactive)
+        _ensure_environment_secrets(
+            config_env,
+            config.environment_secrets,
+            skip_mnemonics_prompts=not interactive,
+        )
     logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
     try:
         result = proc.run(resolved_command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
