@@ -33,13 +33,13 @@ jobs:
       #     set -o pipefail
       #     poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
 
-      - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
-        if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
-        continue-on-error: true # forks fail to add a comment, so continue any way
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-coverage-path: ./pytest-coverage.txt
-          junitxml-path: ./pytest-junit.xml
+      # - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
+      #   if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
+      #   continue-on-error: true # forks fail to add a comment, so continue any way
+      #   uses: MishaKav/pytest-coverage-comment@main
+      #   with:
+      #     pytest-coverage-path: ./pytest-coverage.txt
+      #     junitxml-path: ./pytest-junit.xml
 
       - name: Build Executable
         run: poetry run poe build
