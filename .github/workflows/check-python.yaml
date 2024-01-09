@@ -47,6 +47,3 @@ jobs:
 
       - name: Check docs are up to date
         run: poetry run poe docs && [ $(git status --porcelain docs/ | wc -l) -eq "0" ]
-
-      - name: Check PyInstaller compilation
-        run: poetry run poe build

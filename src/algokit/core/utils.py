@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 CLEAR_LINE = "\033[K"
+SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 
 def extract_version_triple(version_str: str) -> str:
@@ -40,7 +41,7 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 def animate(name: str, stop_event: threading.Event) -> None:
     spinner = {
         "interval": 100,
-        "frames": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+        "frames": SPINNER_FRAMES,
     }
 
     while not stop_event.is_set():

@@ -2,6 +2,7 @@ import re
 from typing import Any
 
 import approvaltests
+from algokit.core.utils import CLEAR_LINE, SPINNER_FRAMES
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 
 __all__ = [
@@ -29,7 +30,11 @@ class TokenScrubber(Scrubber):  # type: ignore[misc]
         result = data
         for token, search in self._tokens.items():
             result = result.replace(search, "{" + token + "}")
-        return result
+        # Normalize SPINNER_FRAMES
+        for frame in SPINNER_FRAMES:
+            result = result.replace(frame, "")
+        # Normalize CLEAR_LINE
+        return result.replace(CLEAR_LINE, " ")
 
 
 def verify(

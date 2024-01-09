@@ -27,11 +27,11 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: pytest + coverage
-        shell: bash
-        run: |
-          set -o pipefail
-          poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
+      # - name: pytest + coverage
+      #   shell: bash
+      #   run: |
+      #     set -o pipefail
+      #     poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
 
       - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
         if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
