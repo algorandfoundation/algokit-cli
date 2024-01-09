@@ -63,7 +63,7 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         case [{"State": "running"}]:
             pass
         case _:
-            logger.info("AlgoKit LocalNet isn't running")
+            logger.info("LocalNet isn't running")
             sandbox.up()
 
     if console:
