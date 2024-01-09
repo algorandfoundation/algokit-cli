@@ -3,7 +3,8 @@ from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
-from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml
+from algokit.core.sandbox import ALGOD_HEALTH_URL, get_algod_network_template, get_config_json, get_docker_compose_yml
+from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
 from tests.utils.app_dir_mock import AppDirs
@@ -16,6 +17,11 @@ DUMMY_CONTRACT_TEAL = """\n#pragma version 8\nint 1\nreturn\n"""
 
 def _normalize_output(output: str) -> str:
     return output.replace("\\", "/")
+
+
+@pytest.fixture()
+def _health_success(httpx_mock: HTTPXMock) -> None:
+    httpx_mock.add_response(url=ALGOD_HEALTH_URL)
 
 
 @pytest.fixture()
@@ -121,6 +127,20 @@ def test_goal_console(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
+@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_health_success")
+def test_goal_console_algod_not_created(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture) -> None:
+    proc_mock.set_output(["docker", "compose", "ps", "algod", "--format", "json"], output=[json.dumps([])])
+
+    mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
+        ["docker", "exec"], 0, "STDOUT+STDERR"
+    )
+
+    result = invoke("goal --console")
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+
+
 @pytest.mark.usefixtures(
     "proc_mock",
     "_setup_latest_dummy_compose",
@@ -135,20 +155,6 @@ def test_goal_console_failed(app_dir_mock: AppDirs, mocker: MockerFixture) -> No
     result = invoke("goal --console")
 
     assert result.exit_code == 1
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
-
-
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
-def test_goal_console_algod_not_created(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture) -> None:
-    mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
-        ["docker", "exec"], 0, "STDOUT+STDERR"
-    )
-
-    proc_mock.set_output(["docker", "compose", "ps", "algod", "--format", "json"], output=[json.dumps([])])
-
-    result = invoke("goal --console")
-
-    assert result.exit_code == 0
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
