@@ -5,7 +5,7 @@ DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' 
 DEBUG: docker: []
 DEBUG: Running 'docker compose ps algod --format json' in '{app_config}/sandbox'
 DEBUG: docker: []
-AlgoKit LocalNet isn't running
+LocalNet isn't running
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT

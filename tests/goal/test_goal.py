@@ -139,18 +139,16 @@ def test_goal_console_failed(app_dir_mock: AppDirs, mocker: MockerFixture) -> No
 
 
 @pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet")
-def test_goal_console_failed_algod_not_created(
-    app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture
-) -> None:
+def test_goal_console_algod_not_created(app_dir_mock: AppDirs, proc_mock: ProcMock, mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
-        ["docker", "exec"], 1, "bad args to goal"
+        ["docker", "exec"], 0, "STDOUT+STDERR"
     )
 
     proc_mock.set_output(["docker", "compose", "ps", "algod", "--format", "json"], output=[json.dumps([])])
 
     result = invoke("goal --console")
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
 
 
