@@ -58,6 +58,13 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is not ComposeFileStatus.UP_TO_DATE and sandbox.name == DEFAULT_NAME:
         raise click.ClickException("LocalNet definition is out of date; please run `algokit localnet reset` first!")
+    ps_result = sandbox.ps("algod")
+    match ps_result:
+        case [{"State": "running"}]:
+            pass
+        case _:
+            logger.info("LocalNet isn't running")
+            sandbox.up()
 
     if console:
         if goal_args:
@@ -79,13 +86,4 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         post_process(input_files, output_files, volume_mount_path_local)
 
     if result.exit_code != 0:
-        ps_result = sandbox.ps("algod")
-        match ps_result:
-            case [{"State": "running"}]:
-                pass  # container is running, failure must have been with command
-            case _:
-                logger.warning(
-                    "algod container does not appear to be running, "
-                    "ensure localnet is started by executing `algokit localnet start`"
-                )
-        raise click.exceptions.Exit(result.exit_code)  # pass on the exit code
+        raise click.exceptions.Exit(result.exit_code)

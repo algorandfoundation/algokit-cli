@@ -3,4 +3,6 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: []
+DEBUG: Running 'docker compose ps algod --format json' in '{app_config}/sandbox'
+DEBUG: docker: [{"Name": "algokit_sandbox_algod", "State": "running"}]
 ERROR: approval.teal does not exist.
