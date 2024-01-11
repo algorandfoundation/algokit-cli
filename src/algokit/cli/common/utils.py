@@ -107,9 +107,9 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
             ExplorerEntityType.ADDRESS.value: "https://testnet.explorer.perawallet.app/address/",
         },
         "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://allo.info/tx/",
+            ExplorerEntityType.TRANSACTION.value: "https://explorer.perawallet.app/tx/",
             ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/asset/",
-            ExplorerEntityType.ADDRESS.value: "https://allo.info/account/",
+            ExplorerEntityType.ADDRESS.value: "https://explorer.perawallet.app/tx/address/",
         },
     }
 
