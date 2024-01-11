@@ -102,14 +102,14 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
 
     base_urls: dict[str, dict[str, str]] = {
         "testnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://app.dappflow.org/setnetwork?name=algonode_testnet&redirect=explorer/transaction/",
-            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://testnet.explorer.perawallet.app/accounts/",
+            ExplorerEntityType.TRANSACTION.value: "https://testnet.explorer.perawallet.app/tx/",
+            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/asset/",
+            ExplorerEntityType.ADDRESS.value: "https://testnet.explorer.perawallet.app/address/",
         },
         "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://allo.info/tx/",
-            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/assets/",
-            ExplorerEntityType.ADDRESS.value: "https://allo.info/account/",
+            ExplorerEntityType.TRANSACTION.value: "https://explorer.perawallet.app/tx/",
+            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/asset/",
+            ExplorerEntityType.ADDRESS.value: "https://explorer.perawallet.app/tx/address/",
         },
     }
 
