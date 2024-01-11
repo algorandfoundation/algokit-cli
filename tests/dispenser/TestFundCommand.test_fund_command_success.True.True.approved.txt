@@ -1,4 +1,4 @@
 DEBUG: Converted algos to microAlgos: 1000000
 DEBUG: Using CI access token over keyring credentials
 DEBUG: HTTP Request: POST https://snapshottest.dispenser.com/fund/0 "HTTP/1.1 200 OK"
-Successfully funded 1.0 Algo. Browse transaction at https://app.dappflow.org/setnetwork?name=algonode_testnet&redirect=explorer/transaction/dummy_tx_id
+Successfully funded 1.0 Algo. Browse transaction at https://testnet.explorer.perawallet.app/tx/dummy_tx_id
