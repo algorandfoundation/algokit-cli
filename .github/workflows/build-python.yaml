@@ -5,9 +5,8 @@ on: [workflow_call]
 jobs:
   build-python:
     strategy:
+      fail-fast: false
       matrix:
-        #os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        # Mac and Windows chew through build minutes - waiting until repo is public to enable
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python: ["3.11", "3.12"]
     runs-on: ${{ matrix.os }}
@@ -47,10 +46,14 @@ jobs:
 
       - name: Build Executable
         run: |
-          if ( "${{ matrix.os }}" == "macos-latest" ); then
-            poetry run poe build --target-architecture universal2
+          if ( "${{ matrix.os }}" == "windows-latest" ); then
+            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv\Lib\site-packages\multiformats_config\multicodec-table.json;multiformats_config\" --add-data ".venv\Lib\site-packages\multiformats_config\multibase-table.json;multiformats_config/" 
+
+          elif ( "${{ matrix.os }}" == "macos-latest" ); then
+            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/" --target-architecture universal2
+
           else
-            poetry run poe build
+            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/"
           fi
 
       - name: Test Executable
