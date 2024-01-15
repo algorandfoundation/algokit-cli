@@ -46,15 +46,15 @@ jobs:
 
       - name: Build Executable
         run: |
-          if ( "${{ matrix.os }}" == "windows-latest" ); then
+          if ( "${{ matrix.os }}" -eq "windows-latest" ) {
             poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv\Lib\site-packages\multiformats_config\multicodec-table.json;multiformats_config\" --add-data ".venv\Lib\site-packages\multiformats_config\multibase-table.json;multiformats_config/" 
-
-          elif ( "${{ matrix.os }}" == "macos-latest" ); then
+          }
+          elif  ( "${{ matrix.os }}" == "macos-latest" ) {
             poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/" --target-architecture universal2
-
-          else
+          }
+          else {
             poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/"
-          fi
+          }
 
       - name: Test Executable
         run: |
