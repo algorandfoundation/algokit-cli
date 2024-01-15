@@ -62,11 +62,7 @@ jobs:
       - name: Test Executable
         run: |
           ls -l dist
-          elif ( "${{ matrix.os }}" == "windows-latest" ); then
-            ./dist/algokit.exe --help
-          else
-            ./dist/algokit --help
-          fi
+          ./dist/algokit --help
 
       - name: Publish Executable
         uses: actions/upload-artifact@v2
