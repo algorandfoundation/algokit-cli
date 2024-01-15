@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          if ( "${{ matrix.os }}" -eq "windows-latest" ) {
+          if ( "${{ matrix.os }}" == "windows-latest" ) {
             poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv\Lib\site-packages\multiformats_config\multicodec-table.json;multiformats_config\" --add-data ".venv\Lib\site-packages\multiformats_config\multibase-table.json;multiformats_config/" 
           }
           elif  ( "${{ matrix.os }}" == "macos-latest" ) {
