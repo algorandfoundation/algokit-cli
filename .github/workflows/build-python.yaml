@@ -46,7 +46,12 @@ jobs:
         run: poetry add setuptools
 
       - name: Build Executable
-        run: poetry run poe build
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            poetry run poe build --target-architecture universal2
+          else
+            poetry run poe build
+          fi
 
       - name: Publish Executable
         uses: actions/upload-artifact@v2
