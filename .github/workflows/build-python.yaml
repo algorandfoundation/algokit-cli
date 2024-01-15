@@ -56,7 +56,7 @@ jobs:
       - name: Test Executable
         run: |
           if ( "${{ matrix.os }}" == "macos-latest" ); then
-            ./dist/algokit-cli-macos-latest-py${{ matrix.python }}
+            ./dist/algokit-cli-macos-latest-py${{ matrix.python }} --help
           elif ( "${{ matrix.os }}" == "windows-latest" ); then
             ./dist/algokit-cli-windows-latest-py${{ matrix.python }}.exe
           else
