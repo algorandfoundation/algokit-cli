@@ -46,24 +46,21 @@ jobs:
 
       - name: Build Executable
         run: |
-          if ( "${{ matrix.os }}" == "windows-latest" ) {
-            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv\Lib\site-packages\multiformats_config\multicodec-table.json;multiformats_config\" --add-data ".venv\Lib\site-packages\multiformats_config\multibase-table.json;multiformats_config/" 
-          }
-          elif  ( "${{ matrix.os }}" == "macos-latest" ) {
-            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/" --target-architecture universal2
-          }
-          else {
-            poetry run pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multicodec-table.json:multiformats_config/" --add-data ".venv/lib/python${{ matrix.python }}/site-packages/multiformats_config/multibase-table.json:multiformats_config/"
-          }
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            poetry run poe package --paths .venv/Lib/site-packages/
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            poetry run poe package --paths .venv/lib/python{{ matrix.python }}/site-packages/ --target-architecture universal2
+          else
+            poetry run poe package --paths .venv/lib/python{{ matrix.python }}/site-packages/ 
+          fi
 
       - name: Test Executable
         run: |
-          if ( "${{ matrix.os }}" == "macos-latest" ); then
-            ./dist/algokit-cli-macos-latest-py${{ matrix.python }}/algokit --help
+          ls -l dist
           elif ( "${{ matrix.os }}" == "windows-latest" ); then
-            ./dist/algokit-cli-windows-latest-py${{ matrix.python }}/algokit.exe --help
+            ./dist/algokit.exe --help
           else
-            ./dist/algokit-cli-ubuntu-latest-py${{ matrix.python }}/algokit --help
+            ./dist/algokit --help
           fi
 
       - name: Publish Executable
