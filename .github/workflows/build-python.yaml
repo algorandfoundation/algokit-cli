@@ -47,10 +47,20 @@ jobs:
 
       - name: Build Executable
         run: |
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          if ( "${{ matrix.os }}" == "macos-latest" ); then
             poetry run poe build --target-architecture universal2
           else
             poetry run poe build
+          fi
+
+      - name: Test Executable
+        run: |
+          if ( "${{ matrix.os }}" == "macos-latest" ); then
+            ./dist/algokit-cli-macos-latest-py${{ matrix.python }}
+          elif ( "${{ matrix.os }}" == "windows-latest" ); then
+            ./dist/algokit-cli-windows-latest-py${{ matrix.python }}.exe
+          else
+            ./dist/algokit-cli-ubuntu-latest-py${{ matrix.python }}
           fi
 
       - name: Publish Executable
