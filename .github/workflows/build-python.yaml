@@ -44,15 +44,20 @@ jobs:
         if: matrix.python == '3.12' && matrix.os == 'windows-latest'
         run: poetry add setuptools
 
-      - name: Build Executable
+      - name: Build Executable (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            poetry run poe package --paths .venv/Lib/site-packages/
-          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            poetry run poe package --paths .venv/lib/python{{ matrix.python }}/site-packages/ --target-architecture universal2
-          else
-            poetry run poe package --paths .venv/lib/python{{ matrix.python }}/site-packages/ 
-          fi
+          poetry run poe package --paths .venv/Lib/site-packages/
+
+      - name: Build Executable (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/
+
+      - name: Build Executable (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/ --target-architecture universal2
 
       - name: Test Executable
         run: |
