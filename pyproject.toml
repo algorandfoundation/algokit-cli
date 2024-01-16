@@ -27,7 +27,6 @@ multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 aiohttp = "3.9.1"
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = {version = "^5.12.0"}
 pytest = "^7.2.0"
 ruff = "^0.1.6"
 pip-audit = "^2.4.7"
