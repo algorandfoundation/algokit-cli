@@ -56,7 +56,7 @@ jobs:
       - name: Build Exacutable unofficial
         uses: jimkring/python-script-to-exe@v0.2.0
         with:
-            script-name: algokit_cli
+            script-name: algokit-cli
             onefile: true
 
       - name: Test Executable
