@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python: ["3.11", "3.12"]
+        python: ["3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -47,17 +47,17 @@ jobs:
       - name: Build Executable (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          poetry run poe package --paths .venv/Lib/site-packages/
+          poetry run poe package
 
       - name: Build Executable (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/
+          poetry run poe package
 
       - name: Build Executable (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/ --target-architecture universal2
+          poetry run poe package --target-architecture universal2
 
       - name: Test Executable
         run: |
