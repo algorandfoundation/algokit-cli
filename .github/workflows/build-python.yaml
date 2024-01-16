@@ -45,13 +45,19 @@ jobs:
 #        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
 #        run: poetry add setuptools
 
-      - name: Build Exacutable
-        uses: Nuitka/Nuitka-Action@main
+#      - name: Build Exacutable
+#        uses: Nuitka/Nuitka-Action@main
+#        with:
+#          nuitka-version: main
+#          script-name: src/algokit/__main__.py
+#          onefile: true
+#          standalone: true
+
+      - name: Build Exacutable unofficial
+        uses: jimkring/python-script-to-exe@v0.2.0
         with:
-          nuitka-version: main
-          script-name: src/algokit/__main__.py
-          onefile: true
-          standalone: true
+            script-name: algokit_cli
+            onefile: true
 
       - name: Test Executable
         run: |
