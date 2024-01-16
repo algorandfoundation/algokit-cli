@@ -51,11 +51,12 @@ jobs:
           nuitka-version: main
           script-name: src/algokit/__main__.py
           onefile: true
+          standalone: true
 
       - name: Test Executable
         run: |
           ls -l build
-          ./build/algokit --help
+          ./build/__main__ algokit --help
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
