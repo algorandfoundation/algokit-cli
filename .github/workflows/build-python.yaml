@@ -62,8 +62,9 @@ jobs:
         with:
           name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
           path: |
-            build/algokit_cli.exe
-            build/algokit_cli.bin
+            build/*.exe
+            build/*.bin
+
 
 #
 #      - name: Publish Executable
