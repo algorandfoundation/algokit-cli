@@ -21,8 +21,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-          architecture: ${{ matrix.architecture }}
           cache: "poetry"
+          cache-dependency-path: |
+            .venv/Lib/${{ matrix.python }}/site-packages/
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -66,11 +67,3 @@ jobs:
           path: |
             build/*.exe
             build/*.bin
-
-
-#
-#      - name: Publish Executable
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
-#          path: dist
