@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python: ["3.11", "3.12"]
+        python: ["3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -41,9 +41,9 @@ jobs:
       #     pytest-coverage-path: ./pytest-coverage.txt
       #     junitxml-path: ./pytest-junit.xml
 
-      - name: Install setuptools (3.12 only)
-        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
-        run: poetry add setuptools
+#      - name: Install setuptools (3.12 only)
+#        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
+#        run: poetry add setuptools
 
       - name: Build Exacutable
         uses: Nuitka/Nuitka-Action@main
@@ -51,6 +51,11 @@ jobs:
           nuitka-version: main
           script-name: src/algokit/__main__.py
           onefile: true
+
+      - name: Test Executable
+        run: |
+          ls -l build
+          ./build/algokit --help
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
@@ -60,10 +65,6 @@ jobs:
             build/algokit_cli.exe
             build/algokit_cli.bin
 
-#      - name: Test Executable
-#        run: |
-#          ls -l dist
-#          ./dist/algokit --help
 #
 #      - name: Publish Executable
 #        uses: actions/upload-artifact@v2
