@@ -48,21 +48,24 @@ jobs:
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
-          script-name: src/algokit
+          script-name: src/algokit/__main__.py
           onefile: true
-          standalone: true
-          follow-imports: true
+          include-package: |
+            - "algokit"
+            - "jinja2_ansible_filters"
+          output-dir: dist
+          output-file: "algokit"
+          include-data-dir: "misc/multiformats_config=./multiformats_config/"
 
       - name: Test Executable
         run: |
-          ls -l build
-          ls -l build/algokit.dist
-          build/algokit.dist/algokit --help
+          ls -l dist
+          dist/algokit --help
+          dist/algokit doctor
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
           path: |
-            build/*.exe
-            build/*.bin
+            dist/
