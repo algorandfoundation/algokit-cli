@@ -89,6 +89,17 @@ Uncommon used packages that need to be checked: copier, questionary, pyclip, she
 - Not very flexible with configuring the executable file
 - Doesn’t support some complex packages and modules
 
+#### Nuitka
+
+##### Pros
+- Nuitka translates Python code into C++ and then compiles it, which can result in performance improvements.
+- Cross-Platform: Supports multiple platforms including Windows, macOS, and Linux.
+
+##### Cons
+- Compilation Time: The process of converting Python to C++ and then compiling can be time-consuming.
+- Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C++ code.
+- Limited Support: Nuitka does not support Python 3.12.
+
 ### Packaging
 
 #### Windows (winget)
@@ -101,7 +112,7 @@ Package the application as a Snap for Linux. Snaps work across different Linux d
 
 #### Github Action
 
-A Github action for publishing snaps
+A [Github action](https://github.com/snapcore/action-publish) for publishing snaps
 
 ### Note
 
