@@ -22,8 +22,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           cache: "poetry"
-          cache-dependency-path: |
-            .venv/Lib/${{ matrix.python }}/site-packages/
 
       - name: Install dependencies
         run: poetry install --no-interaction
