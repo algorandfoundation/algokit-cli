@@ -56,6 +56,9 @@ jobs:
       - name: Test Executable
         run: |
           ls -l build
+          ls -l build/__main__.dist
+          ls -l build/__main__.build
+          ls -l build/__main__.onefile-build
           build/__main__.dist/algokit --help
 
       - name: Upload artifact
