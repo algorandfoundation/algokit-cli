@@ -44,7 +44,7 @@ jobs:
         if: matrix.python == '3.12' && matrix.os == 'windows-latest'
         run: pip install -U setuptools
 
-      - name: Build Exacutable
+      - name: Build Executable
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
@@ -59,7 +59,7 @@ jobs:
         run: |
           ls -l dist
           dist/algokit --help
-        
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
