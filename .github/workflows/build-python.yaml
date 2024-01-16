@@ -49,15 +49,10 @@ jobs:
         run: |
           poetry run poe package
 
-      - name: Build Executable (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Build Executable (Unix)
+        if: matrix.os != 'windows-latest'
         run: |
           poetry run poe package
-
-      - name: Build Executable (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          poetry run poe package --target-architecture universal2
 
       - name: Test Executable
         run: |
