@@ -31,6 +31,8 @@ graph TD
 
 > Note that PyPi the diagram above represents the existing distribution model for AlgoKit CLI prone to environment-specific bugs.
 
+The scope of this ADR only concerns the packaging for the CLI. The distribution via `snap`, `winget` and etc will be handled separately/in-parallel after decision and implementation of this ADR is in place.
+
 ## Requirements
 
 - The native binaries should be easy to maintain and understand from a CI/CD deployment perspective.
@@ -127,6 +129,8 @@ cx_Freeze is a set of scripts and modules for freezing Python scripts into execu
 PyOxidizer is a utility for producing binaries that embed Python. However, it is no longer actively maintained, which makes it a less desirable option for our needs.
 
 ## Preferred option
+
+Based on observations so far we are leaning towards a combination of Option 1 and 3. Where we would use PyInstaller to build native binaries for Windows, Mac and Linux and use cibuildwheel to build native wheels for different platforms and python versions with frozen dependencies which can aid a bit with issues around pipx not respecting the lockfiles.
 
 ## Selected option
 
