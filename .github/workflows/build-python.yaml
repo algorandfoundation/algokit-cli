@@ -40,9 +40,9 @@ jobs:
       #     pytest-coverage-path: ./pytest-coverage.txt
       #     junitxml-path: ./pytest-junit.xml
 
-#      - name: Install setuptools (3.12 only)
-#        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
-#        run: poetry add setuptools
+      - name: Install setuptools (3.12 only)
+        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
+        run: poetry add setuptools
 
       - name: Build Exacutable
         uses: Nuitka/Nuitka-Action@main
@@ -51,6 +51,8 @@ jobs:
           script-name: src/algokit
           onefile: true
           standalone: true
+#          package_dir: .venv/Lib/${{ matrix.python }}/site-packages/
+          enable-plugin: click
 
       - name: Test Executable
         run: |
