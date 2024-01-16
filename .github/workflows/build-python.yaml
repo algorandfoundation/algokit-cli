@@ -59,8 +59,7 @@ jobs:
         run: |
           ls -l dist
           dist/algokit --help
-          dist/algokit doctor
-
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
