@@ -50,7 +50,7 @@ jobs:
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
-          script-name: algokit_cli
+          script-name: algokit-cli
           onefile: true
 
       - name: Upload artifact
