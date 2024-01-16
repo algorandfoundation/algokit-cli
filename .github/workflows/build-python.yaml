@@ -50,9 +50,7 @@ jobs:
           nuitka-version: main
           script-name: src/algokit/__main__.py
           onefile: true
-          include-package: |
-            - "algokit"
-            - "jinja2_ansible_filters"
+          include-package: "algokit,jinja2_ansible_filters"
           output-dir: dist
           output-file: "algokit"
           include-data-dir: "misc/multiformats_config=./multiformats_config/"
