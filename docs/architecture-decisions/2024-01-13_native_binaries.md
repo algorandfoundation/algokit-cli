@@ -29,7 +29,7 @@ graph TD
     L -->|pipx| M[Python Users]
 ```
 
-> Note that PyPi the diagram above represents the existing distribution model for AlgoKit CLI prone to environment-specific bugs.
+> Note that PyPi in the diagram above represents the existing distribution model for AlgoKit CLI prone to environment-specific bugs.
 
 The scope of this ADR only concerns the packaging for the CLI. The distribution via `snap`, `winget` and etc will be handled separately/in-parallel after decision and implementation of this ADR is in place.
 
@@ -38,7 +38,7 @@ The scope of this ADR only concerns the packaging for the CLI. The distribution 
 - The native binaries should be easy to maintain and understand from a CI/CD deployment perspective.
 - The solution should support a wide variety of Linux distributions, macOS (both Apple Silicon and Intel architectures), and Windows.
 - The solution should integrate seamlessly with existing installation options, including Homebrew, or provide an easier alternative.
-- The solution should be designed with future scalability in mind, allowing for the addition of support for other operating systems as needed.
+- The solution should be designed with future scalability in mind, allowing for the addition of support for other variations of architectures or else as needed.
 - The solution should not significantly increase the complexity of the build process.
 - The solution should provide clear error messages and debugging information to assist in troubleshooting any issues that may arise.
 
@@ -61,7 +61,7 @@ The scope of this ADR only concerns the packaging for the CLI. The distribution 
 - Larger executable files compared to cx_Freeze
 - Occasionally requires manual configuration for more complex packages
 - Not as customizable as cx_Freeze
-- Load time is long = 5-10 sec
+- Load time is long = 5-10 sec but only when bundled in one-file. When distributed in unpacked state it is sub 1-2 seconds.
 - Requires complex build packaging matrix to support multiple platforms and architectures
 
 #### PoC
@@ -77,14 +77,14 @@ Testing the PoC against compiled executables revealed the following issues that 
 
 **Pros**
 
-- Nuitka translates Python code into C++ and then compiles it, which can result in performance improvements.
+- Nuitka translates Python code into C and then compiles it, which can result in performance improvements.
 - Cross-Platform: Supports multiple platforms including Windows, macOS, and Linux.
 - Official github action simplifies the process of building executables for different platforms.
 
 **Cons**
 
-- Compilation Time: The process of converting Python to C++ and then compiling can be time-consuming. Up to ~30 minutes on github with 3 parallel jobs.
-- Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C++ code. Sub 70MB.
+- Compilation Time: The process of converting Python to C and then compiling can be time-consuming. Up to ~30 minutes on github with 3 parallel jobs.
+- Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C code. Sub 70MB.
 - Limited Support: Nuitka does not support Python 3.12.
 - Cross compilation options but still requires something like ManyLinux docker image for building and capturing oldest versions of linux distros to maximize compatibility
 
