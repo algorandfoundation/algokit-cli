@@ -9,6 +9,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python: ["3.11", "3.12"]
+        architecture: ["x64", "x86"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -21,6 +22,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+          architecture: ${{ matrix.architecture }}
           cache: "poetry"
 
       - name: Install dependencies
@@ -44,28 +46,28 @@ jobs:
         if: matrix.python == '3.12' && matrix.os == 'windows-latest'
         run: poetry add setuptools
 
-      - name: Build Executable (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          poetry run poe package --paths .venv/Lib/site-packages/
+      - name: Build Exacutable
+        uses: Nuitka/Nuitka-Action@main
+        with:
+          nuitka-version: main
+          script-name: algokit_cli
+          onefile: true
 
-      - name: Build Executable (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/
-
-      - name: Build Executable (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          poetry run poe package --paths .venv/lib/python${{ matrix.python }}/site-packages/ --target-architecture universal2
-
-      - name: Test Executable
-        run: |
-          ls -l dist
-          ./dist/algokit --help
-
-      - name: Publish Executable
-        uses: actions/upload-artifact@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
           name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
-          path: dist
+          path: |
+            build/algokit_cli.exe
+            build/algokit_cli.bin
+
+#      - name: Test Executable
+#        run: |
+#          ls -l dist
+#          ./dist/algokit --help
+#
+#      - name: Publish Executable
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
+#          path: dist
