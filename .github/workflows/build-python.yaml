@@ -65,4 +65,4 @@ jobs:
         with:
           name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
           path: |
-            dist/
+            dist/algokit
