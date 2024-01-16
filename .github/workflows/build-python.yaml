@@ -51,6 +51,7 @@ jobs:
           script-name: src/algokit
           onefile: true
           standalone: true
+          follow-imports: true
 
       - name: Test Executable
         run: |
