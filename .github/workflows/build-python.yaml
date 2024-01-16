@@ -51,8 +51,7 @@ jobs:
           script-name: src/algokit
           onefile: true
           standalone: true
-#          package_dir: .venv/Lib/${{ matrix.python }}/site-packages/
-          enable-plugin: click
+          include-plugin-directory: .venv/Lib/${{ matrix.python }}/site-packages/
 
       - name: Test Executable
         run: |
