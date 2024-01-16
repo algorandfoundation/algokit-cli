@@ -24,7 +24,7 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry export --without=dev > requirements.txt && pip install -U -r requirements.txt
 
       # - name: pytest + coverage
       #   shell: bash
@@ -42,7 +42,7 @@ jobs:
 
       - name: Install setuptools (3.12 only)
         if: matrix.python == '3.12' && matrix.os == 'windows-latest'
-        run: poetry add setuptools
+        run: pip install -U setuptools
 
       - name: Build Exacutable
         uses: Nuitka/Nuitka-Action@main
