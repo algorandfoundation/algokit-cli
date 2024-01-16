@@ -51,7 +51,6 @@ jobs:
           script-name: src/algokit
           onefile: true
           standalone: true
-          include-plugin-directory: site-packages
 
       - name: Test Executable
         run: |
