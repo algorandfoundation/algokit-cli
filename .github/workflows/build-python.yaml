@@ -9,7 +9,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python: ["3.11", "3.12"]
-        architecture: ["x64", "x86"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
