@@ -62,6 +62,7 @@ The scope of this ADR only concerns the packaging for the CLI. The distribution 
 - Occasionally requires manual configuration for more complex packages
 - Requires complex build packaging matrix to support multiple platforms and architectures
 - Requires minor tweaks in algokit cli to account for the fact that features relying on `sys.executable` will point to algokit cli executable instead of python interpreter. This is a minor change and can be done in a backwards compatible way however still a con to consider.
+- Requires minor tweaks in algokit cli to introduce `multiprocessing.freeze_support()` to avoid issues with `vanity-address` task when executing via binary.
 
 #### PoC
 
@@ -82,6 +83,7 @@ The PoC is available [here](https://github.com/algorandfoundation/algokit-cli/pu
 - Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C code (see benchmarking results below).
 - Does not support Python 3.12.
 - Requires minor tweaks in algokit cli to account for the fact that features relying on `sys.executable` will point to algokit cli executable instead of python interpreter. This is a minor change and can be done in a backwards compatible way however still a con to consider.
+- Requires minor tweaks in algokit cli to introduce `multiprocessing.freeze_support()` to avoid issues with `vanity-address` task when executing via binary.
 
 #### PoC
 
@@ -176,4 +178,5 @@ To be decided.
 - [ ] Finalize the decision on the preferred option.
 - [ ] Expand PoC and polish the github action to build native binaries for Windows, Mac and Linux for x86, x86-64 and ARM architectures.
 - [ ] Expand PoC and polish the github action to build wheels for different platforms and python versions with frozen dependencies.
+- [ ] Implement portability snapshot tests, expanding existing algokit cli snapshot tests by running against real executable covering main functionality to test and ensure that the native binaries are portable and behave the same way as pip installed algokit cli.
 - [ ] Prepare packaged artifacts for consumption and distribution via `snap`, `winget` and etc.
