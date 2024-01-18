@@ -9,7 +9,7 @@
 
 ## Context
 
-The primary motivation for this decision is to streamline the installation process of AlgoKit CLI and reduce the friction associated with installing it on various operating systems. Currently, users often encounter minor environment-specific bugs during installation, which can be a significant deterrent. By providing native binaries, we aim to speed up the installation time and eliminate these bugs, thereby improving the overall user experience.
+The primary motivation for this decision is to streamline the installation process of AlgoKit CLI and reduce the friction associated with installing it on various operating systems. Currently, users often encounter minor environment-specific bugs during installation, which can be a significant deterrent. By providing native binaries, we aim to speed up the installation time and eliminate these bugs by **removing requirements to install python by the user**, thereby improving the overall user experience.
 
 The north star for this decision is to provide a distribution model that can be described as:
 
