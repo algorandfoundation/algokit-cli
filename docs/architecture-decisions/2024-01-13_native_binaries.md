@@ -1,4 +1,4 @@
-# AlgoKit CLI Enhancements
+# AlgoKit CLI native binaries
 
 - **Status**: Draft
 - **Owner:** Altynbek Orumbayev (MakerX), Negar Abbasi (MakerX)
