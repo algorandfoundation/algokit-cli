@@ -15,9 +15,9 @@ The north star for this decision is to provide a distribution model that can be 
 
 ```mermaid
 graph TD
-    A[GitHub Runners] -->|Windows| B[PyInstaller]
-    A -->|Mac| C[PyInstaller]
-    A -->|Linux| D[PyInstaller]
+    A[GitHub Runners] -->|Windows| B[Packaging tool]
+    A -->|Mac| C[Packaging tool]
+    A -->|Linux| D[Packaging tool]
     B --> E[Windows Binary]
     C --> F[Mac Binary]
     D --> G[Linux Binary]
@@ -54,24 +54,18 @@ The scope of this ADR only concerns the packaging for the CLI. The distribution 
 - Generates a single file executable
 - Active development and community support
 - Fairly fast build time via ci - ~3-4 minutes
-- Fairly small executable size - sub 20MB
+- Fairly small executable size (see benchmarking results below)
+- Marginally equal executable load time in `onedir` mode compared to `onefile` mode
 
 **Cons**
 
-- Larger executable files compared to cx_Freeze
 - Occasionally requires manual configuration for more complex packages
-- Not as customizable as cx_Freeze
-- Load time is long = 5-10 sec but only when bundled in one-file. When distributed in unpacked state it is sub 1-2 seconds.
 - Requires complex build packaging matrix to support multiple platforms and architectures
+- Requires minor tweaks in algokit cli to account for the fact that features relying on `sys.executable` will point to algokit cli executable instead of python interpreter. This is a minor change and can be done in a backwards compatible way however still a con to consider.
 
 #### PoC
 
 The PoC is available [here](https://github.com/algorandfoundation/algokit-cli/pull/382). It outlines a simple github action with extra setup that compiles algokit cli as a single file executable on latest versions of Windows, Mac and Linux github runners.
-
-Testing the PoC against compiled executables revealed the following issues that would need to be addressed on the CLI side in parallel with actioning on this ADR:
-
-1. algokit task vanity-address - fails to use multiprocessing when bundled in one-file and requires extra setup to use multiprocessing
-2. algokit init fullstack template failing during inject.py execution. This is due to the fact that both cli and python when bundled together are invoked from the same directory and inject.py is not able to find python executable. Requires fixes on the CLI side.
 
 ### Option 2 - Nuitka
 
@@ -79,25 +73,19 @@ Testing the PoC against compiled executables revealed the following issues that 
 
 - Nuitka translates Python code into C and then compiles it, which can result in performance improvements.
 - Cross-Platform: Supports multiple platforms including Windows, macOS, and Linux.
+- More cross compilations options than PyInstaller
 - Official github action simplifies the process of building executables for different platforms.
 
 **Cons**
 
 - Compilation Time: The process of converting Python to C and then compiling can be time-consuming. Up to ~30 minutes on github with 3 parallel jobs.
-- Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C code. Sub 70MB.
-- Limited Support: Nuitka does not support Python 3.12.
-- Cross compilation options but still requires something like ManyLinux docker image for building and capturing oldest versions of linux distros to maximize compatibility
+- Size of Executable: The resulting executables can be larger due to the inclusion of the Python interpreter and the compiled C code (see benchmarking results below).
+- Does not support Python 3.12.
+- Requires minor tweaks in algokit cli to account for the fact that features relying on `sys.executable` will point to algokit cli executable instead of python interpreter. This is a minor change and can be done in a backwards compatible way however still a con to consider.
 
 #### PoC
 
 The PoC is available [here](https://github.com/algorandfoundation/algokit-cli/pull/393). It outlines a simple github action with extra setup that compiles algokit cli as a single file executable on latest versions of Windows, Mac and Linux github runners.
-
-Testing the PoC against compiled executables revealed the following issues that would need to be addressed on the CLI side in parallel with actioning on this ADR:
-
-1. algokit doctor - fails to access python via `sys.executable` and `sys.path` when bundled in one-file
-2. algokit task vanity-address - fails to use multiprocessing when bundled in one-file and requires extra setup to use multiprocessing
-3. boot time is slow when bundled in one-file, ~5 seconds and up to ~10 seconds on Windows. Windows is the slowest to boot up and is adviced to be distributed in unpacked state instead of single executable file.
-4. algokit init fullstack template failing during inject.py execution. This is due to the fact that both cli and python when bundled together are invoked from the same directory and inject.py is not able to find python executable. Requires fixes on the CLI side.
 
 ### Option 3 - Cross platform python wheels with `cibuildwheel`
 
@@ -118,6 +106,51 @@ Testing the PoC against compiled executables revealed the following issues that 
 
 There is no PoC supporting this option given an official github action by `pypa` that is a plug and play solution for building wheels for different platforms and python versions.
 
+### Benchmarking `pyinstaller` vs `nuitka` vs pipx installed `algokit`
+
+#### Methodology
+
+`hyperfine` was used to benchmark 5 different executables:
+
+- Nuitka Onefile - Nuitka compiled executable with `--onefile` flag, which produces a single file executable.
+- Nuitka Onedir - Nuitka compiled executable with `--onedir` flag, which produces a directory with the executable and other dependencies unzipped.
+- PyInstaller Onedir - PyInstaller compiled executable with `--standalone` flag, which produces a directory with the executable and other dependencies unzipped.
+- PyInstaller Onefile - PyInstaller compiled executable with `--onefile` flag, which produces a single file executable.
+- AlgoKit from `pipx` - AlgoKit CLI installed via `pipx` with all dependencies frozen (current latest stable release).
+
+The benchmarking was performed on a MacBook M2 running macOS 14.2.1 and an ARM based Ubuntu 20.04.3 LTS running on a Parallels Desktop on the same machine.
+
+#### Results
+
+| Method              | macOS M2 | Ubuntu 20 ARM Linux VM | Windows 11 ARM |
+| ------------------- | -------- | ---------------------- | -------------- |
+| nuitka_onefile      | 3.634    | 1.465                  | 3.874          |
+| nuitka_onedir       | 0.2515   | 0.6200                 | 0.5136         |
+| pyinstaller_onedir  | 0.3228   | 0.7927                 | 0.6668         |
+| pyinstaller_onefile | 3.031    | 1.466                  | 1.875          |
+| algokit             | 0.3126   | 0.6111                 | 0.7579         |
+
+![Benchmarking Results](./assets/2024-01-13_native_binaries/image_1.png)
+_Figure: Benchmarking results comparing the performance of Nuitka (onefile, onedir modes), PyInstaller (onefile, onedir modes), and pipx installed Algokit CLI on macOS M2, Windows 11 ARM VM, Ubuntu 20 ARM VM._
+
+| Method              | Windows (MB) | Ubuntu (MB) | macOS (MB) |
+| ------------------- | ------------ | ----------- | ---------- |
+| nuitka_onedir       | 92.10        | 106         | 166        |
+| nuitka_onefile      | 22.48        | 23          | 41         |
+| pyinstaller_onedir  | 46.07        | 52          | 113        |
+| pyinstaller_onefile | 26.47        | 25          | 45         |
+
+![Bundle sizes](./assets/2024-01-13_native_binaries/image_2.png)
+_Figure: Bundle sizes of folders with executables build with Nuitka (onefile, onedir modes), PyInstaller (onefile, onedir modes)._
+
+#### Preliminary Observations
+
+- Nuitka's warmed up execution time is **fast**
+- Nuitka produces largest executables in `onedir` mode
+- Nuitka is the slowest to build (no charts for build benchmarks, this is observations based on CI build time from PoC, see links above)
+- PyInstaller produces smallest executables in `onedir` mode
+- PyInstaller is the fastest to build (no charts for build benchmarks, this is observations based on CI build time from PoC, see links above)
+
 ### Honorable Mentions
 
 #### cx_Freeze
@@ -132,8 +165,15 @@ PyOxidizer is a utility for producing binaries that embed Python. However, it is
 
 Based on observations so far we are leaning towards a combination of Option 1 and 3. Where we would use PyInstaller to build native binaries for Windows, Mac and Linux and use cibuildwheel to build native wheels for different platforms and python versions with frozen dependencies which can aid a bit with issues around pipx not respecting the lockfiles.
 
+While `nuitka` in `onedir` mode is even faster than pip installed algokit, it generates larger executables, and is the slowest option in terms of build time. Pyinstaller is only marginally slower than `nuitka` or pip installed algokit in terms of execution time, has mature documentation, and is the fastest option to build (in `onedir` mode) and produces smaller executables than `nuitka`. Given that and the fact that `nuitka` does not support Python 3.12 yet and has a lot of `magical` optimizations hidden under the hood, we are leaning towards PyInstaller as the preferred option for building native binaries given its maturity and straightforwardness despite marginally slower execution time (which is not a big deal given that we are talking of deviations of 5-10 milliseconds).
+
 ## Selected option
 
-{Which option did we select and why (can sometimes be different from the preferred option)}
+To be decided.
 
 ## Next Steps
+
+- [ ] Finalize the decision on the preferred option.
+- [ ] Expand PoC and polish the github action to build native binaries for Windows, Mac and Linux for x86, x86-64 and ARM architectures.
+- [ ] Expand PoC and polish the github action to build wheels for different platforms and python versions with frozen dependencies.
+- [ ] Prepare packaged artifacts for consumption and distribution via `snap`, `winget` and etc.
