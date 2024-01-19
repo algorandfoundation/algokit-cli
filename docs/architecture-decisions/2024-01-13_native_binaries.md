@@ -41,6 +41,7 @@ The scope of this ADR only concerns the packaging for the CLI. The distribution 
 - The solution should be designed with future scalability in mind, allowing for the addition of support for other variations of architectures or else as needed.
 - The solution should not significantly increase the complexity of the build process.
 - The solution should provide clear error messages and debugging information to assist in troubleshooting any issues that may arise.
+- You don't need to install Python on your system to use AlgoKit if you aren't creating a Python project.
 
 ## Options
 
