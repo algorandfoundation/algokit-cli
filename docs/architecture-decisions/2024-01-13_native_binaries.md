@@ -90,25 +90,6 @@ The PoC is available [here](https://github.com/algorandfoundation/algokit-cli/pu
 
 The PoC is available [here](https://github.com/algorandfoundation/algokit-cli/pull/393). It outlines a simple github action with extra setup that compiles algokit cli as a single file executable on latest versions of Windows, Mac and Linux github runners.
 
-### Option 3 - Cross platform python wheels with `cibuildwheel`
-
-**Pros**
-
-- cibuildwheel is a versatile tool that simplifies the process of building wheels for different platforms and Python versions.
-- It supports a wide range of Python versions and platforms, including Windows, macOS, and Linux.
-- It integrates well with CI/CD systems, making it easy to automate the wheel building process.
-- It can handle complex dependencies and package structures.
-- It provides a consistent and reproducible build environment, which can help reduce environment-specific bugs.
-- Minimal configuration is required to get started and aligns with existing distribution methods like PyPi.
-
-**Cons**
-
-- As it doesn't produce standalone executables, the end users still need to have Python installed on their systems.
-- The wheels produced might not be as portable as standalone executables, as they can still be affected by the specific Python environment on the user's machine.
-- It doesn't inherently support distribution methods like Homebrew or Winget, additional work might be needed to integrate with these systems.
-
-There is no PoC supporting this option given an official github action by `pypa` that is a plug and play solution for building wheels for different platforms and python versions.
-
 ### Benchmarking `pyinstaller` vs `nuitka` vs pipx installed `algokit`
 
 #### Methodology
@@ -166,7 +147,7 @@ PyOxidizer is a utility for producing binaries that embed Python. However, it is
 
 ## Preferred option
 
-Based on observations so far we are leaning towards a combination of Option 1 and 3. Where we would use PyInstaller to build native binaries for Windows, Mac and Linux and use cibuildwheel to build native wheels for different platforms and python versions with frozen dependencies which can aid a bit with issues around pipx not respecting the lockfiles.
+Based on observations so far we are leaning towards an Option 1. Where we would use PyInstaller to build native binaries for Windows, Mac and Linux.
 
 While `nuitka` in `onedir` mode is even faster than pip installed algokit, it generates larger executables, and is the slowest option in terms of build time. Pyinstaller is only marginally slower than `nuitka` or pip installed algokit in terms of execution time, has mature documentation, and is the fastest option to build (in `onedir` mode) and produces smaller executables than `nuitka`. Given that and the fact that `nuitka` does not support Python 3.12 yet and has a lot of `magical` optimizations hidden under the hood, we are leaning towards PyInstaller as the preferred option for building native binaries given its maturity and straightforwardness despite marginally slower execution time (which is not a big deal given that we are talking of deviations of 5-10 milliseconds).
 
@@ -178,6 +159,5 @@ To be decided.
 
 - [ ] Finalize the decision on the preferred option.
 - [ ] Expand PoC and polish the github action to build native binaries for Windows, Mac and Linux for x86, x86-64 and ARM architectures.
-- [ ] Expand PoC and polish the github action to build wheels for different platforms and python versions with frozen dependencies.
 - [ ] Implement portability snapshot tests, expanding existing algokit cli snapshot tests by running against real executable covering main functionality to test and ensure that the native binaries are portable and behave the same way as pip installed algokit cli.
 - [ ] Prepare packaged artifacts for consumption and distribution via `snap`, `winget` and etc.
