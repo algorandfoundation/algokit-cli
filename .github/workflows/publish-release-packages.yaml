@@ -103,3 +103,109 @@ jobs:
         uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: push --source https://push.chocolatey.org/
+
+  publish-snap:
+    runs-on: ubuntu-latest
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Install snapcraft
+        run: samuelmeuli/action-snapcraft@v2
+
+      - name: use snapcraft shell
+        run: snapcraft --help
+
+      - name: Download artifact
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
+
+      - name: publishing
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: AlgoKit
+
+
+  publish-winget:
+    runs-on: windows-latest
+    steps:
+      - name: Publish AlgoKit to WinGet
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: Package.Identifier<X>
+          installers-regex: '\.exe$' # Only .exe files
+          token: ${{ secrets.WINGET_TOKEN }}
+
+
+  publish-homebrew:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # First, remove the refs/tags/ from the ref name to get something like v0.1.0 that we need for the brew formula versioning
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+      # Calculate the sha256 hash of the bundle to pass on to homebrew aswell for validation.
+      # We store this information using the ::set-output to allow using it in later steps of the workflow
+      - name: Set SHA
+        id: shasum
+        run: echo ::set-output name=sha::"$(shasum -a 256 ./target/algokit-cli-mac.tar.gz | awk '{printf $1}')"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: true
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/algokit-cli-mac.tar.gz
+          asset_name: algokit-cli-mac.tar.gz
+          asset_content_type: application/gzip
+
+
+      - name: Bump Brew
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.BREW_TOKEN }}
+        run: |
+          brew tap algorandfoundation/tap
+          brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
+          --sha256=${{ steps.shasum.outputs.sha }} \
+          --url="https://github.com/algorandfoundation/algokit-cli/releases/download/${{ steps.get_version.outputs.version }}/algokit-cli-mac.tar.gz" \
+          algorandfoundation/tap/algokit-cli
+
+
+
+
+
+      - name: Download artifact
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
+
+      - name: Update homebrew cask
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
