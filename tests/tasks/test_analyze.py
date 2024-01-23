@@ -31,6 +31,7 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
         r"^(Tealer installed successfully via pipx!).*",
         r"^(DEBUG: Running 'pipx install tealer==0.1.1').*",
         r"^(Tealer not found; attempting to install it...).*",
+        r"^(No such file or directory:).*",
         r"^(DEBUG: Running 'pipx --version' in '{current_working_directory}').*",
     ]
 
