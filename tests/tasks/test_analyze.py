@@ -1,4 +1,5 @@
 import re
+import subprocess
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -25,20 +26,9 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
     for target in targets:
         output = output.replace(target, replacement)
 
-    # Remove tealer logs specific to fresh install, given that these are running against real
-    # tealer and not the mocked version
-    patterns_to_remove = [
-        r"^(pipx:|DEBUG: pipx:|DEBUG: tealer).*",
-        r"^(Tealer installed successfully via pipx!).*",
-        r"^(DEBUG: Running 'pipx install tealer==0.1.1').*",
-        r"^(Tealer not found; attempting to install it...).*",
-        r"^(No such file or directory:).*",
-        r"^(DEBUG: Running 'pipx --version' in '{current_working_directory}').*",
-    ]
+    # If output contains more than one new line trim them to have at most one whitespace in between
 
-    for pattern in patterns_to_remove:
-        output = re.sub(pattern, "", output, flags=re.MULTILINE)
-
+    output = re.sub(r"^(pipx:|DEBUG: pipx:).*", "", output, flags=re.MULTILINE)
     return re.sub(r"\n\s*\n", "\n\n", output)
 
 
@@ -65,6 +55,11 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]
 def generate_report_filename_mock() -> Generator[MagicMock, None, None]:
     with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_report.json") as mock:
         yield mock
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _install_tealer() -> None:
+    subprocess.run(["pipx", "install", "tealer==0.1.1"], check=True)
 
 
 @pytest.mark.usefixtures("generate_report_filename_mock")
@@ -212,6 +207,7 @@ def test_analyze_error_in_tealer(
         verify(result.output)
 
 
+@pytest.mark.usefixtures("generate_report_filename_mock")
 def test_analyze_diff_flag(
     cwd: Path,
 ) -> None:
