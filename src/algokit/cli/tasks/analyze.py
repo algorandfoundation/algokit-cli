@@ -11,6 +11,7 @@ from algokit.core.tasks.analyze import (
     generate_summaries,
     generate_tealer_command,
     has_baseline_diff,
+    install_tealer_if_needed,
     load_tealer_report,
     prepare_artifacts_folders,
     run_tealer,
@@ -159,6 +160,9 @@ def analyze(  # noqa: PLR0913, C901
     """
     Analyze TEAL programs for common vulnerabilities using Tealer.
     """
+
+    # Install tealer if needed
+    install_tealer_if_needed()
 
     detectors_to_exclude = sorted(set(detectors_to_exclude))
     input_files = get_input_files(input_paths=input_paths, recursive=recursive)
