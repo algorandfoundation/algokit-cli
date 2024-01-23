@@ -25,7 +25,8 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
     for target in targets:
         output = output.replace(target, replacement)
 
-    # If output contains more than one new line trim them to have at most one whitespace in between
+    # Remove tealer logs specific to fresh install, given that these are running against real
+    # tealer and not the mocked version
     patterns_to_remove = [
         r"^(pipx:|DEBUG: pipx:|DEBUG: tealer).*",
         r"^(Tealer installed successfully via pipx!).*",
