@@ -1,5 +1,4 @@
 import re
-import subprocess
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -55,11 +54,6 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]
 def generate_report_filename_mock() -> Generator[MagicMock, None, None]:
     with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_report.json") as mock:
         yield mock
-
-
-@pytest.fixture(scope="module", autouse=True)
-def _install_tealer() -> None:
-    subprocess.run(["pipx", "install", "tealer==0.1.1"], check=True)
 
 
 @pytest.mark.usefixtures("generate_report_filename_mock")
