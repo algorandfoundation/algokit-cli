@@ -85,6 +85,33 @@ def prepare_artifacts_folders(output_dir: Path | None) -> None:
     TEALER_DOT_FILES_ROOT.mkdir(parents=True, exist_ok=True)
 
 
+def install_tealer_if_needed() -> None:
+    """
+    Install tealer if it's not already installed.
+    """
+    try:
+        run(
+            ["tealer", "--version"],
+            bad_return_code_error_message="tealer --version failed, please check your tealer install",
+        )
+    except Exception as e:
+        logger.debug(e)
+        logger.info("Tealer not found; attempting to install it...")
+        pipx_command = find_valid_pipx_command(
+            "Unable to find pipx install so that `tealer` static analyzer can be installed; "
+            "please install pipx via https://pypa.github.io/pipx/ "
+            "and then try `algokit task analyze ...` again."
+        )
+        run(
+            [*pipx_command, "install", f"tealer=={TEALER_VERSION}"],
+            bad_return_code_error_message=(
+                "Unable to install tealer via pipx; please install tealer "
+                "manually and try `algokit task analyze ...` again."
+            ),
+        )
+        logger.info("Tealer installed successfully via pipx!")
+
+
 def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_to_exclude: list[str]) -> list[str]:
     """
     Generate the tealer command for analyzing TEAL programs.
@@ -98,17 +125,7 @@ def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_
         list[str]: The generated tealer command.
     """
 
-    pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that `tealer` static analyzer can be installed; "
-        "please install pipx via https://pypa.github.io/pipx/ "
-        "and then try `algokit task analyze ...` again."
-    )
-
     command = [
-        *pipx_command,
-        "run",
-        "--spec",
-        f"tealer=={TEALER_VERSION}",
         "tealer",
         "--json",
         str(report_output_path),

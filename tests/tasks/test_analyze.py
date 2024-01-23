@@ -10,6 +10,7 @@ from pytest_mock import MockerFixture
 from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
 
 
 def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy") -> str:
@@ -186,14 +187,18 @@ def test_analyze_abort_disclaimer(
 
 def test_analyze_error_in_tealer(
     cwd: Path,
+    mocker: MockerFixture,
 ) -> None:
-    teal_file = cwd / "dummy.teal"
-    teal_file.touch()
-    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd)
+    with mocker.patch("algokit.cli.tasks.analyze.run_tealer", side_effect=Exception("dummy")):
+        teal_file = cwd / "dummy.teal"
+        teal_file.touch()
+        result = invoke(
+            f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd
+        )
 
-    assert result.exit_code == 1
-    result.output = _format_snapshot(result.output, [str(cwd)])
-    verify(result.output)
+        assert result.exit_code == 1
+        result.output = _format_snapshot(result.output, [str(cwd)])
+        verify(result.output)
 
 
 @pytest.mark.usefixtures("generate_report_filename_mock")
@@ -228,10 +233,8 @@ def test_analyze_diff_flag_missing_old_report(
     verify(result.output)
 
 
-def test_analyze_error_no_pipx(
-    cwd: Path,
-    mocker: MockerFixture,
-) -> None:
+def test_analyze_error_no_pipx(cwd: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
+    proc_mock.should_fail_on("tealer --version")
     mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
 
     teal_file = cwd / "dummy.teal"
