@@ -9,7 +9,7 @@ from algokit.core.goal import (
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import ComposeFileStatus, ComposeSandbox
+from algokit.core.sandbox import DEFAULT_NAME, ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +34,6 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
 
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
-    volume_mount_path_local = get_volume_mount_path_local()
-    volume_mount_path_docker = get_volume_mount_path_docker()
     goal_args = list(goal_args)
     try:
         proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
@@ -47,18 +45,34 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
             "See https://docs.docker.com/get-docker/ for more information."
         ) from ex
 
-    sandbox = ComposeSandbox()
+    sandbox = ComposeSandbox.from_environment()
+    if sandbox is None:
+        sandbox = ComposeSandbox()
+
+    if sandbox.name != DEFAULT_NAME:
+        logger.info("A named LocalNet is running, goal command will be executed against the named LocalNet")
+
+    volume_mount_path_local = get_volume_mount_path_local(directory_name=sandbox.name)
+    volume_mount_path_docker = get_volume_mount_path_docker()
+
     compose_file_status = sandbox.compose_file_status()
-    if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
+    if compose_file_status is not ComposeFileStatus.UP_TO_DATE and sandbox.name == DEFAULT_NAME:
         raise click.ClickException("LocalNet definition is out of date; please run `algokit localnet reset` first!")
+    ps_result = sandbox.ps("algod")
+    match ps_result:
+        case [{"State": "running"}]:
+            pass
+        case _:
+            logger.info("LocalNet isn't running")
+            sandbox.up()
 
     if console:
         if goal_args:
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
-        result = proc.run_interactive("docker exec -it -w /root algokit_algod bash".split())
+        result = proc.run_interactive(f"docker exec -it -w /root algokit_{sandbox.name}_algod bash".split())
     else:
-        cmd = "docker exec --interactive --workdir /root algokit_algod goal".split()
+        cmd = f"docker exec --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()
         input_files, output_files, goal_args = preprocess_command_args(
             goal_args, volume_mount_path_local, volume_mount_path_docker
         )
@@ -72,13 +86,4 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         post_process(input_files, output_files, volume_mount_path_local)
 
     if result.exit_code != 0:
-        ps_result = sandbox.ps("algod")
-        match ps_result:
-            case [{"State": "running"}]:
-                pass  # container is running, failure must have been with command
-            case _:
-                logger.warning(
-                    "algod container does not appear to be running, "
-                    "ensure localnet is started by executing `algokit localnet start`"
-                )
-        raise click.exceptions.Exit(result.exit_code)  # pass on the exit code
+        raise click.exceptions.Exit(result.exit_code)

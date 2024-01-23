@@ -22,5 +22,5 @@ DEBUG: Asset config params: {
 }
 
 Successfully minted the asset!
-Browse your asset at: https://testnet.explorer.perawallet.app/assets/123
-Check transaction status at: https://testnet.algoexplorer.io/tx/dummy_tx_id
+Browse your asset at: https://testnet.explorer.perawallet.app/asset/123
+Check transaction status at: https://testnet.explorer.perawallet.app/tx/dummy_tx_id

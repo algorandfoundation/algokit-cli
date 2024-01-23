@@ -1,0 +1,2 @@
+Enter the mnemonic phrase (25 words separated by whitespace): 
+Successfully performed transfer. See details at https://explorer.perawallet.app/tx/dummy_txid

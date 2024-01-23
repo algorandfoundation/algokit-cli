@@ -97,6 +97,8 @@
     - [Options](#options-16)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
+    - [Options](#options-17)
+    - [-n, --name ](#-n---name--1)
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
@@ -112,11 +114,11 @@
     - [ipfs](#ipfs)
     - [Options](#options-18)
     - [-f, --file ](#-f---file--1)
-    - [-n, --name ](#-n---name--1)
+    - [-n, --name ](#-n---name--2)
     - [mint](#mint)
     - [Options](#options-19)
     - [--creator ](#--creator-)
-    - [-n, --name ](#-n---name--2)
+    - [-n, --name ](#-n---name--3)
     - [-u, --unit ](#-u---unit-)
     - [-t, --total ](#-t---total-)
     - [-d, --decimals ](#-d---decimals-)
@@ -127,8 +129,8 @@
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-20)
-    - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-6)
+    - [-o, --output ](#-o---output--2)
+    - [Arguments](#arguments-5)
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-21)
@@ -711,6 +713,12 @@ Start the AlgoKit LocalNet.
 ```shell
 algokit localnet start [OPTIONS]
 ```
+
+### Options
+
+
+### -n, --name <name>
+Specify a name for a custom LocalNet instance. AlgoKit will not manage the configuration of named LocalNet instances, allowing developers to configure it in any way they need.
 
 ### status
 

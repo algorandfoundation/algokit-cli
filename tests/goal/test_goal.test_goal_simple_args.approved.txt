@@ -1,6 +1,10 @@
 DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-DEBUG: Running 'docker exec --interactive --workdir /root algokit_algod goal account list' in '{current_working_directory}'
+DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
+DEBUG: docker: []
+DEBUG: Running 'docker compose ps algod --format json' in '{app_config}/sandbox'
+DEBUG: docker: [{"Name": "algokit_sandbox_algod", "State": "running"}]
+DEBUG: Running 'docker exec --interactive --workdir /root algokit_sandbox_algod goal account list' in '{current_working_directory}'
  STDOUT
  STDERR

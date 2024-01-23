@@ -2,6 +2,34 @@
 
 <!--next-version-placeholder-->
 
+## v1.9.3 (2024-01-11)
+
+
+
+## v1.9.2 (2024-01-09)
+
+### Fix
+
+* Run localnet on goal command ([#380](https://github.com/algorandfoundation/algokit-cli/issues/380)) ([`5a06ddc`](https://github.com/algorandfoundation/algokit-cli/commit/5a06ddce965716ea4fb47a1d8a19b8cb65d17b77))
+
+### Documentation
+
+* Update the list of AlgoKit CLI high-level features in the docs ([`8e3b827`](https://github.com/algorandfoundation/algokit-cli/commit/8e3b8273d65a1fbcd7e3bf600b96c82500eef538))
+
+## v1.9.1 (2023-12-29)
+
+
+
+## v1.9.0 (2023-12-29)
+
+### Feature
+
+* Add support for a customisable named localnet ([#373](https://github.com/algorandfoundation/algokit-cli/issues/373)) ([`41c4946`](https://github.com/algorandfoundation/algokit-cli/commit/41c4946fce6894a9f6548bf4a2cbdd499dec4cb4))
+
+## v1.8.2 (2023-12-20)
+
+
+
 ## v1.8.1 (2023-12-19)
 
 ### Fix

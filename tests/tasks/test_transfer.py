@@ -211,3 +211,41 @@ def test_transfer_failed(mocker: MockerFixture, mock_keyring: dict[str, str]) ->
     # Assert
     assert result.exit_code == 1
     verify(result.output)
+
+
+def test_transfer_on_testnet(mocker: MockerFixture) -> None:
+    # Arrange
+    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
+    dummy_sender_pk, dummy_sender_address = _generate_account()
+    dummy_receiver_address = _generate_account()[1]
+
+    # Act
+    result = invoke(
+        f"task transfer -s {dummy_sender_address} -r {dummy_receiver_address} -a 1 -n testnet",
+        input=_get_mnemonic_from_private_key(dummy_sender_pk),
+    )
+
+    # Assert
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_transfer_on_mainnet(mocker: MockerFixture) -> None:
+    # Arrange
+    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    mocker.patch("algokit.cli.tasks.transfer.validate_address")
+    mocker.patch("algokit.cli.tasks.transfer.validate_balance")
+    dummy_sender_pk, dummy_sender_address = _generate_account()
+    dummy_receiver_address = _generate_account()[1]
+
+    # Act
+    result = invoke(
+        f"task transfer -s {dummy_sender_address} -r {dummy_receiver_address} -a 1 -n mainnet",
+        input=_get_mnemonic_from_private_key(dummy_sender_pk),
+    )
+
+    # Assert
+    assert result.exit_code == 0
+    verify(result.output)

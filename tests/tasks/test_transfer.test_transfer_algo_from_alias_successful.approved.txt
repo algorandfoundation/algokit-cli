@@ -1,1 +1,1 @@
-Successfully performed transfer. See details at https://testnet.algoexplorer.io/tx/dummy_txid
+Successfully performed transfer. See details at https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_txid/
