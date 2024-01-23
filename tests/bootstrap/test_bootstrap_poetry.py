@@ -14,9 +14,9 @@ from tests.utils.proc_mock import ProcMock
 
 @pytest.fixture(scope="module")
 def python_base_executable() -> str:
-    from algokit.core.bootstrap import _get_base_python_path
+    from algokit.core.utils import get_base_python_path
 
-    value = _get_base_python_path()
+    value = get_base_python_path()
     if value is None:
         pytest.fail("Python base detection failed, this should work (even in CI)")
     return value
@@ -31,7 +31,7 @@ def system_python_paths(request: FixtureRequest, mocker: MockerFixture) -> Magic
             return f"/bin/{cmd}"
         return None
 
-    mock = mocker.patch("algokit.core.bootstrap.which")
+    mock = mocker.patch("algokit.core.utils.which")
     mock.side_effect = which
     return mock
 
