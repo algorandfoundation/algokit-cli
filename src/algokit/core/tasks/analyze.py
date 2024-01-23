@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 TEALER_REPORTS_ROOT = Path.cwd() / ".algokit/static-analysis"
 TEALER_SNAPSHOTS_ROOT = TEALER_REPORTS_ROOT / "snapshots"
 TEALER_DOT_FILES_ROOT = TEALER_REPORTS_ROOT / "tealer"
+TEALER_VERSION = "0.1.1"
 
 
 class TealerBlock(BaseModel):
@@ -107,7 +108,7 @@ def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_
         *pipx_command,
         "run",
         "--spec",
-        "git+https://github.com/algorandfoundation/tealer.git@main",
+        f"tealer=={TEALER_VERSION}",
         "tealer",
         "--json",
         str(report_output_path),
