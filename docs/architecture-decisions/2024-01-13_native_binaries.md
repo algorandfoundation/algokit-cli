@@ -153,7 +153,7 @@ While `nuitka` in `onedir` mode is even faster than pip installed algokit, it ge
 
 ## Selected option
 
-To be decided.
+Option 1 with pyinstaller as the preferred option.
 
 ## Next Steps
 
