@@ -1,4 +1,4 @@
 DEBUG: Running 'tealer --version' in '{current_working_directory}'
 DEBUG: No such file or directory: tealer
-Tealer not found; attempting to install it...
+
 Error: Unable to find pipx install so that `tealer` static analyzer can be installed; please install pipx via https://pypa.github.io/pipx/ and then try `algokit task analyze ...` again.

@@ -26,8 +26,17 @@ def _format_snapshot(output: str, targets: list[str], replacement: str = "dummy"
         output = output.replace(target, replacement)
 
     # If output contains more than one new line trim them to have at most one whitespace in between
+    patterns_to_remove = [
+        r"^(pipx:|DEBUG: pipx:|DEBUG: tealer).*",
+        r"^(Tealer installed successfully via pipx!).*",
+        r"^(DEBUG: Running 'pipx install tealer==0.1.1').*",
+        r"^(Tealer not found; attempting to install it...).*",
+        r"^(DEBUG: Running 'pipx --version' in '{current_working_directory}').*",
+    ]
 
-    output = re.sub(r"^(pipx:|DEBUG: pipx:).*", "", output, flags=re.MULTILINE)
+    for pattern in patterns_to_remove:
+        output = re.sub(pattern, "", output, flags=re.MULTILINE)
+
     return re.sub(r"\n\s*\n", "\n\n", output)
 
 
@@ -201,7 +210,6 @@ def test_analyze_error_in_tealer(
         verify(result.output)
 
 
-@pytest.mark.usefixtures("generate_report_filename_mock")
 def test_analyze_diff_flag(
     cwd: Path,
 ) -> None:
