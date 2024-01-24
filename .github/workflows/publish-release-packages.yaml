@@ -12,11 +12,16 @@ on:
         default: true
         type: boolean
         description: "Publish to brew repository"
-      do_chocolatey:
+      do_snap:
         required: false
         default: true
         type: boolean
-        description: "Publish to Chocolatey repository"
+        description: "Publish to snap repository"
+      do_winget:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to winget repository"
   workflow_dispatch:
     inputs:
       release:
@@ -28,14 +33,125 @@ on:
         default: true
         type: boolean
         description: "Publish to brew repository"
-      do_chocolatey:
+      do_snap:
         required: false
         default: true
         type: boolean
-        description: "Publish to Chocolatey repository"
+        description: "Publish to snap repository"
+      do_winget:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to winget repository"
 
 jobs:
-  publish-brew:
+  publish-snap:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.do_snap }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # check version
+      - name: Check version
+        env:
+          ARCHITECTURE: ${{ matrix.platform }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
+        run: ./stores/snapcraft/check_version.sh
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
+        if: env.SHOULD_DEPLOY == 'yes'
+
+      - name: publishing
+        uses: snapcore/action-publish@master
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
+        if: env.SHOULD_DEPLOY == 'yes'
+
+
+  publish-winget:
+    runs-on: windows-latest
+    if : ${{ inputs.do_winget }}
+    steps:
+      - name: Publish AlgoKit to WinGet
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          # We must fill the PackageIdentifier
+          identifier: PackageIdentifier.algokit-cli
+          installers-regex: '\.exe$'
+          token: ${{ secrets.WINGET_TOKEN}}
+
+
+  publish-homebrew:
+    runs-on: macos-latest
+    if: ${{ inputs.do_brew }}
+    steps:
+      - uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: algokit-cli
+        env:
+          COMMITTER_TOKEN: ${{ secrets.BREW_TOKEN }}
+
+
+  publish-homebrew-sencondary:
+    runs-on: macos-latest
+    if : ${{ inputs.do_brew }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # First, remove the refs/tags/ from the ref name to get something like v0.1.0 that we need for the brew formula versioning
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+      # Calculate the sha256 hash of the bundle to pass on to homebrew aswell for validation.
+      # We store this information using the ::set-output to allow using it in later steps of the workflow
+      - name: Set SHA
+        id: shasum
+        run: echo ::set-output name=sha::"$(shasum -a 256 ./target/algokit-cli-mac.tar.gz | awk '{printf $1}')"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          pre_release: true
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/algokit-cli-mac.tar.gz
+          asset_name: algokit-cli-mac.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Bump Brew
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.BREW_TOKEN }}
+        run: |
+          brew tap algorandfoundation/tap
+          brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
+          --sha256=${{ steps.shasum.outputs.sha }} \
+          --url="https://github.com/algorandfoundation/algokit-cli/releases/download/${{ steps.get_version.outputs.version }}/algokit-cli-mac.tar.gz" \
+          algorandfoundation/tap/algokit-cli
+
+
+  publish-homebrew-third:
+    needs: build-python
     runs-on: ubuntu-latest
     if: ${{ inputs.do_brew }}
     steps:
@@ -50,7 +166,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Download artifact
-        if: ${{ github.event_name == 'workflow_call' }}
         uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifactName }}
@@ -63,43 +178,3 @@ jobs:
         run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
-
-  publish-chocolatey:
-    runs-on: windows-latest
-    if: ${{ inputs.do_chocolatey }}
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
-      # Download either via release or provided artifact
-      - name: Download release
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: gh release download ${{ inputs.release }} --pattern "*.whl" --dir dist
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Download artifact
-        if: ${{ github.event_name == 'workflow_call' }}
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.artifactName }}
-          path: dist
-
-      - name: Update chocolatey files
-        id: update_chocolatey_files
-        run: scripts/update-chocolatey-package.ps1
-
-      - name: Build package
-        uses: crazy-max/ghaction-chocolatey@v2
-        with:
-          args: pack --version ${{ steps.update_chocolatey_files.outputs.version }} .\scripts\chocolatey\algokit\algokit.nuspec
-
-      - name: Set API key
-        uses: crazy-max/ghaction-chocolatey@v2
-        with:
-          args: apikey --api-key ${{ secrets.CHOCOLATEY_API_KEY }} -source https://push.chocolatey.org/
-
-      - name: Push package
-        uses: crazy-max/ghaction-chocolatey@v2
-        with:
-          args: push --source https://push.chocolatey.org/

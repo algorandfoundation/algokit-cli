@@ -1,0 +1,19 @@
+name: algokit
+version: 1.9.3
+summary: The AlgoKit tool for developers building on the Algorand network.
+description: |
+  AlgoKit gets developers of all levels up and running with a familiar, 
+  fun and productive development environment in minutes. 
+  The goal of AlgoKit is to help developers build and launch 
+  secure, automated production-ready applications rapidly.
+confinement: devmode
+base: core18
+
+parts:
+  algokit:
+    plugin: dump
+    source: https://github.com/algorandfoundation/algokit-cli-$SNAPCRAFT_PROJECT_VERSION-Linux.tar.gz
+
+apps:
+  algokit:
+    command: algokit
