@@ -1,0 +1,59 @@
+name: Build, Test and Publish Pyinstaller Binaries
+
+on:
+  pull_request:
+  workflow_call:
+    inputs:
+      is_production:
+        required: true
+        type: boolean
+
+jobs:
+  build-python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        python: ["3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Install setuptools (3.12 only)
+        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
+        run: poetry add setuptools
+
+      - name: Build Executable (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          poetry run poe package_windows
+
+      - name: Build Executable (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          poetry run poe package_unix
+
+      - name: Test Executable
+        run: |
+          ls -l dist
+          ./dist/algokit --help
+
+      - name: Publish Executable
+        if: ${{ github.event.inputs.is_production }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
+          path: dist
