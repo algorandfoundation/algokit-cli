@@ -31,6 +31,14 @@ jobs:
         run: |
           set -o pipefail
           poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
+        id: pytest
+
+      - name: Upload received snapshots (in case of failure)
+        if: failure() && steps.pytest.outcome == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-artifacts
+          path: tests/**/*.received.txt
 
       - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
         if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
