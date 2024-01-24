@@ -5,10 +5,10 @@ on: [workflow_call]
 jobs:
   build-python:
     strategy:
-      fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python: ["3.12"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        # Mac and Windows chew through build minutes - waiting until repo is public to enable
+        python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -26,41 +26,23 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction && pipx install tealer==0.1.1
 
-      # - name: pytest + coverage
-      #   shell: bash
-      #   run: |
-      #     set -o pipefail
-      #     poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
+      - name: pytest + coverage
+        shell: bash
+        run: |
+          set -o pipefail
+          poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
 
-      # - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
-      #   if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
-      #   continue-on-error: true # forks fail to add a comment, so continue any way
-      #   uses: MishaKav/pytest-coverage-comment@main
-      #   with:
-      #     pytest-coverage-path: ./pytest-coverage.txt
-      #     junitxml-path: ./pytest-junit.xml
+      - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
+        if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
+        continue-on-error: true # forks fail to add a comment, so continue any way
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest-junit.xml
 
-      - name: Install setuptools (3.12 only)
+      - name: Install setuptools (required in 3.12 only)
         if: matrix.python == '3.12' && matrix.os == 'windows-latest'
         run: poetry add setuptools
 
-      - name: Build Executable (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          poetry run poe package_windows
-
-      - name: Build Executable (Unix)
-        if: matrix.os != 'windows-latest'
-        run: |
-          poetry run poe package_unix
-
-      - name: Test Executable
-        run: |
-          ls -l dist
-          ./dist/algokit --help
-
-      - name: Publish Executable
-        uses: actions/upload-artifact@v2
-        with:
-          name: algokit-cli-${{ matrix.os }}-py${{ matrix.python }}
-          path: dist
+      - name: Build Wheel
+        run: poetry build --format wheel
