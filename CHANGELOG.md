@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v1.10.0 (2024-01-24)
+
+### Feature
+
+* Adding algokit analyze - perform static analysis with tealer integration ([#370](https://github.com/algorandfoundation/algokit-cli/issues/370)) ([`3e56a4b`](https://github.com/algorandfoundation/algokit-cli/commit/3e56a4b4e1f59d747cd7eb4e2cfea8b8d9c7c670))
+
+### Fix
+
+* Installation process for tealer (windows compatibility) ([#396](https://github.com/algorandfoundation/algokit-cli/issues/396)) ([`971aff4`](https://github.com/algorandfoundation/algokit-cli/commit/971aff46a6b5502135122bff951ee2d9c15fa80f))
+
+## v1.9.3 (2024-01-11)
+
+
+
 ## v1.9.2 (2024-01-09)
 
 ### Fix

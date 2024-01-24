@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "1.9.2"
+version = "1.10.0"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -25,6 +25,7 @@ algokit-utils = "v2.1.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 aiohttp = "3.9.1"
+jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^5.12.0"}
@@ -176,7 +177,7 @@ disallow_any_generics = false
 implicit_reexport = false
 
 [[tool.mypy.overrides]]
-module = "approvaltests.*"
+module = ["approvaltests.*", "jsondiff.*"]
 ignore_missing_imports = true
 
 [tool.semantic_release]

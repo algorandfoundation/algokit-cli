@@ -1,0 +1,4 @@
+DEBUG: Running 'tealer --version' in '{current_working_directory}'
+DEBUG: tealer: 0.1.1
+Warning: This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the guidelines for smart contract development. This should not be used as a substitute for an actual audit. Do you understand? [Y/n]: y
+Unable to provide the diff since {current_working_directory}/dummy.teal report is missing. Please run the task without the --diff flag first.

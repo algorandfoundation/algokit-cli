@@ -1,0 +1,34 @@
+DEBUG: Running 'tealer --version' in '{current_working_directory}'
+DEBUG: tealer: 0.1.1
+Warning: This task uses `tealer` to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the guidelines for smart contract development. This should not be used as a substitute for an actual audit. Do you understand? [Y/n]: y
+Running 'tealer --json {current_working_directory}/dummy_report.json detect --contracts {current_working_directory}/dummy.teal' in '{current_working_directory}'
+tealer: Reading contract from file: "{current_working_directory}/dummy.teal"
+tealer: json output is written to {current_working_directory}/dummy_report.json
+
+File: dummy_report.json
+
+Detector: is-deletable
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#deletable-application
+Execution Paths (#Lines):
+2-8->26-30->31-34->35-38->40-45->76-86->46-47
+
+Detector: missing-fee-check
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#missing-fee-field-validation
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+Detector: rekey-to
+Impact: High
+Details: https://github.com/crytic/tealer/wiki/Detector-Documentation#rekeyable-logicsig
+Execution Paths (#Lines):
+2-8->9-12->14-23->107-114->89-104->115-120->24-25,
+2-8->26-30->31-34->35-38->40-45->76-86->46-47,
+2-8->26-30->56-62
+
+Total issues:
+High: 3
+Finished analyzing 1 files.

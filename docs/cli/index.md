@@ -102,12 +102,21 @@
     - [status](#status)
     - [stop](#stop)
   - [task](#task)
-    - [ipfs](#ipfs)
+    - [analyze](#analyze)
     - [Options](#options-18)
+    - [-r, --recursive](#-r---recursive)
+    - [--force](#--force-1)
+    - [--diff](#--diff)
+    - [-o, --output ](#-o---output--2)
+    - [-e, --exclude ](#-e---exclude-)
+    - [Arguments](#arguments-5)
+    - [INPUT_PATHS](#input_paths)
+    - [ipfs](#ipfs)
+    - [Options](#options-19)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [--creator ](#--creator-)
     - [-n, --name ](#-n---name--3)
     - [-u, --unit ](#-u---unit-)
@@ -119,37 +128,37 @@
     - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-20)
-    - [-o, --output ](#-o---output--2)
-    - [Arguments](#arguments-5)
+    - [Options](#options-21)
+    - [-o, --output ](#-o---output--3)
+    - [Arguments](#arguments-6)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-7)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-8)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-23)
+    - [Options](#options-24)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
-    - [-o, --output ](#-o---output--3)
-    - [--force](#--force-1)
+    - [-o, --output ](#-o---output--4)
+    - [--force](#--force-2)
     - [transfer](#transfer)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -157,28 +166,28 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [-m, --match ](#-m---match-)
-    - [-o, --output ](#-o---output--4)
+    - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-9)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-9)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-10)
-    - [ALIAS](#alias)
-    - [Options](#options-28)
-    - [-f, --force](#-f---force-2)
+    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-11)
-    - [ALIAS](#alias-1)
+    - [ALIAS](#alias)
     - [Options](#options-29)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-12)
+    - [ALIAS](#alias-1)
+    - [Options](#options-30)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -734,6 +743,42 @@ Collection of useful tasks to help you develop on Algorand.
 ```shell
 algokit task [OPTIONS] COMMAND [ARGS]...
 ```
+
+### analyze
+
+Analyze TEAL programs for common vulnerabilities using Tealer. This task uses a third party tool to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the guidelines for smart contract development. This should not be used as a substitute for an actual audit. For full list of available detectors, please refer to [https://github.com/crytic/tealer?tab=readme-ov-file#detectors](https://github.com/crytic/tealer?tab=readme-ov-file#detectors)
+
+```shell
+algokit task analyze [OPTIONS] INPUT_PATHS...
+```
+
+### Options
+
+
+### -r, --recursive
+Recursively search for all TEAL files within the provided directory.
+
+
+### --force
+Force verification without the disclaimer confirmation prompt.
+
+
+### --diff
+Exit with a non-zero code if differences are found between current and last reports. Reports are generated each run, but with this flag execution fails if the current report doesn't match the last report. Reports are stored in the .algokit/static-analysis/snapshots folder by default. Use --output for a custom path.
+
+
+### -o, --output <output_path>
+Directory path where to store the results of the static analysis. Defaults to .algokit/static-analysis/snapshots.
+
+
+### -e, --exclude <detectors_to_exclude>
+Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.
+
+### Arguments
+
+
+### INPUT_PATHS
+Required argument(s)
 
 ### ipfs
 

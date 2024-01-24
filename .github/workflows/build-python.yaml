@@ -24,7 +24,7 @@ jobs:
           cache: "poetry"
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction && pipx install tealer==0.1.1
 
       # - name: pytest + coverage
       #   shell: bash
