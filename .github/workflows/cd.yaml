@@ -106,7 +106,7 @@ jobs:
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: algokit-cli
           path: dist/algokit*-py3-none-any.whl

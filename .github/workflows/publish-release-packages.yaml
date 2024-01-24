@@ -51,7 +51,7 @@ jobs:
 
       - name: Download artifact
         if: ${{ github.event_name == 'workflow_call' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifactName }}
           path: dist
@@ -80,7 +80,7 @@ jobs:
 
       - name: Download artifact
         if: ${{ github.event_name == 'workflow_call' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifactName }}
           path: dist
