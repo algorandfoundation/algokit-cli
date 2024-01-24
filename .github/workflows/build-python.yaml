@@ -37,11 +37,11 @@ jobs:
         if: failure() && steps.pytest.outcome == 'failure'
         uses: actions/upload-artifact@v2
         with:
-          name: test-artifacts
+          name: test-artifacts-${{ matrix.os }}-python${{ matrix.python }}
           path: tests/**/*.received.txt
 
-      - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
-        if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
+      - name: pytest coverage comment - using Python 3.12 on ubuntu-latest
+        if: matrix.python == '3.12' && matrix.os == 'ubuntu-latest'
         continue-on-error: true # forks fail to add a comment, so continue any way
         uses: MishaKav/pytest-coverage-comment@main
         with:

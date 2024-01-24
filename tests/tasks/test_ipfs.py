@@ -1,11 +1,17 @@
 import pytest
 from algokit.core.tasks.ipfs import ALGOKIT_PINATA_TOKEN_KEY
 from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
 
 from tests.utils.approvals import TokenScrubber, verify
 from tests.utils.click_invoker import invoke
 
 scrubber = TokenScrubber({})
+
+
+@pytest.fixture(autouse=True)
+def _disable_animation(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.animate", return_value=None)
 
 
 class TestIpfsLogin:
