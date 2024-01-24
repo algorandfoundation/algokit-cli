@@ -59,7 +59,7 @@ docs_toc = "gfm-toc docs/cli/index.md -e 3"
 docs_title = {shell = "(echo \"# AlgoKit CLI Reference Documentation\\n\\n\"; cat docs/cli/index.md) > docs/cli/temp.md && mv docs/cli/temp.md docs/cli/index.md"}
 docs = ["docs_generate", "docs_toc", "docs_title"]
 package_unix = "pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config/multibase-table.json:multiformats_config/' --add-data './misc/multiformats_config/multicodec-table.json:multiformats_config/'"
-package_windows = "pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config/multibase-table.json;multiformats_config/' --add-data './misc/multiformats_config/multicodec-table.json;multiformats_config/'"
+package_windows = "pyinstaller --onefile --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config/multibase-table.json;multiformats_config/ --add-data ./misc/multiformats_config/multicodec-table.json;multiformats_config/"
 
 
 [tool.ruff]
