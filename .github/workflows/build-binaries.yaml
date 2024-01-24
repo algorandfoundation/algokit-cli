@@ -33,7 +33,7 @@ jobs:
       - name: Test Executable
         run: |
           ls -l dist
-          ./dist/algokit --help
+          ./dist/algokit/algokit --help
 
       - name: Publish Executable
         if: ${{ github.event.inputs.is_production }}
@@ -70,7 +70,7 @@ jobs:
       - name: Test Executable
         run: |
           ls -l dist
-          ./dist/algokit.exe --help
+          ./dist/algokit/algokit.exe --help
 
       - name: Publish Executable
         if: ${{ github.event.inputs.is_production }}
@@ -104,7 +104,7 @@ jobs:
       - name: Test Executable
         run: |
           ls -l dist
-          ./dist/algokit --help
+          ./dist/algokit/algokit --help
 
       - name: Publish Executable
         if: ${{ github.event.inputs.is_production }}
