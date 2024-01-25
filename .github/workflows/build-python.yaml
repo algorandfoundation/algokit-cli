@@ -12,16 +12,21 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-          cache: "poetry"
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - uses: actions/cache@v4
+        name: Setup poetry cache
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ matrix.os }}-${{ matrix.python }}
 
       - name: Install dependencies
         run: poetry install --no-interaction && pipx install tealer==0.1.1
@@ -35,7 +40,7 @@ jobs:
 
       - name: Upload received snapshots (in case of failure)
         if: failure() && steps.pytest.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-${{ matrix.os }}-python${{ matrix.python }}
           path: tests/**/*.received.txt
@@ -47,10 +52,6 @@ jobs:
         with:
           pytest-coverage-path: ./pytest-coverage.txt
           junitxml-path: ./pytest-junit.xml
-
-      - name: Install setuptools (required in 3.12 only)
-        if: matrix.python == '3.12' && matrix.os == 'windows-latest'
-        run: poetry add setuptools
 
       - name: Build Wheel
         run: poetry build --format wheel

@@ -1,114 +1,132 @@
 name: Build, Test and Publish Pyinstaller Binaries
 
 on:
-  pull_request:
   workflow_call:
     inputs:
-      is_production:
+      upload_binaries:
         required: true
-        type: boolean
+        type: string
+
 jobs:
   build-binaries-ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+      - name: Checkout source code (for release)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries == 'true' }}
+        with:
+          fetch-depth: 0
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Checkout source code (for build)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries != 'true' }}
+        with:
+          fetch-depth: 1
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-          cache: "poetry"
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - uses: actions/cache@v4
+        name: Setup poetry cache
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
 
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Build Executable (Linux)
-        run: |
-          poetry run poe package_unix
-
-      - name: Test Executable
-        run: |
-          ls -l dist
-          ./dist/algokit/algokit --help
-
-      - name: Publish Executable
-        if: ${{ github.event.inputs.is_production }}
-        uses: actions/upload-artifact@v2
+      - name: Build linux binary
+        uses: ./.github/actions/build-binaries
         with:
-          name: algokit-cli-ubuntu-py3.12
-          path: dist
+          python_version: "3.12"
+          package_name: "algokit"
+          upload_binaries: ${{ inputs.upload_binaries }}
+          operating_system: ${{ runner.os }}
+          build_command: "poetry run poe package_unix"
 
   build-binaries-windows:
     runs-on: windows-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+      - name: Checkout source code (for release)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries == 'true' }}
+        with:
+          fetch-depth: 0
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Checkout source code (for build)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries != 'true' }}
+        with:
+          fetch-depth: 1
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-          cache: "poetry"
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - uses: actions/cache@v4
+        name: Setup poetry cache
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
 
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Install setuptools (3.12 only)
-        run: poetry add setuptools
-
-      - name: Build Executable (Windows)
-        run: |
-          poetry run poe package_windows
-
-      - name: Test Executable
-        run: |
-          ls -l dist
-          ./dist/algokit/algokit.exe --help
-
-      - name: Publish Executable
-        if: ${{ github.event.inputs.is_production }}
-        uses: actions/upload-artifact@v2
+      - name: Build windows binary
+        uses: ./.github/actions/build-binaries
         with:
-          name: algokit-cli-windows-py3.12
-          path: dist
+          python_version: "3.12"
+          package_name: "algokit"
+          upload_binaries: ${{ inputs.upload_binaries }}
+          operating_system: ${{ runner.os }}
+          build_command: "poetry run poe package_windows"
 
   build-binaries-macos:
     runs-on: macos-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+      - name: Checkout source code (for release)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries == 'true' }}
+        with:
+          fetch-depth: 0
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Checkout source code (for build)
+        uses: actions/checkout@v4
+        if: ${{ inputs.upload_binaries != 'true' }}
+        with:
+          fetch-depth: 1
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-          cache: "poetry"
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+
+      - uses: actions/cache@v4
+        name: Setup poetry cache
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
 
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Build Executable (Darwin)
-        run: |
-          poetry run poe package_unix
-
-      - name: Test Executable
-        run: |
-          ls -l dist
-          ./dist/algokit/algokit --help
-
-      - name: Publish Executable
-        if: ${{ github.event.inputs.is_production }}
-        uses: actions/upload-artifact@v2
+      - name: Build macos binary
+        uses: ./.github/actions/build-binaries
         with:
-          name: algokit-cli-macos-py3.12
-          path: dist
+          python_version: "3.12"
+          package_name: "algokit"
+          upload_binaries: ${{ inputs.upload_binaries }}
+          operating_system: ${{ runner.os }}
+          build_command: "poetry run poe package_unix"
