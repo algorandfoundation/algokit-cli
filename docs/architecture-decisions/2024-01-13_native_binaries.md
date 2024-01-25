@@ -2,9 +2,9 @@
 
 - **Status**: Draft
 - **Owner:** Altynbek Orumbayev (MakerX), Negar Abbasi (MakerX)
-- **Deciders**: Algorand Foundation, Rob Moore (MakerX), ... to be adjusted
+- **Deciders**: Alessandro (Algorand Foundation), MakerX
 - **Date created**: 2024-01-13
-- **Date decided:** TBD
+- **Date decided:** 2024-01-25
 - **Date updated**: 2024-01-16
 
 ## Context
@@ -29,7 +29,7 @@ graph TD
     L -->|pipx| M[Python Users]
 ```
 
-> Note that PyPi in the diagram above represents the existing distribution model for AlgoKit CLI prone to environment-specific bugs.
+> ⚠️⚠️⚠️ Please note diagram above is a draft and is to be separately discussed in a follow up ADR that will focus on distribution of the binaries.
 
 The scope of this ADR only concerns the packaging for the CLI. The distribution via `snap`, `winget` and etc will be handled separately/in-parallel after decision and implementation of this ADR is in place.
 
@@ -153,11 +153,11 @@ While `nuitka` in `onedir` mode is even faster than pip installed algokit, it ge
 
 ## Selected option
 
-Option 1 with pyinstaller as the preferred option.
+The team has formally pre-discussed this ADR and has agreed to proceed with Option 1 - PyInstaller.
 
 ## Next Steps
 
 - [ ] Finalize the decision on the preferred option.
 - [ ] Expand PoC and polish the github action to build native binaries for Windows, Mac and Linux for x86, x86-64 and ARM architectures.
 - [ ] Implement portability snapshot tests, expanding existing algokit cli snapshot tests by running against real executable covering main functionality to test and ensure that the native binaries are portable and behave the same way as pip installed algokit cli.
-- [ ] Prepare packaged artifacts for consumption and distribution via `snap`, `winget` and etc.
+- [ ] Submit follow up ADR to discuss strategies on how to distribute the binaries in most accessible, user friendly and secure way.
