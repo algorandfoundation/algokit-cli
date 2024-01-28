@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.0 (2024-01-28)
+
+### Feature
+
+* Upgrading to latest version of algokit-client-generator-ts ([#398](https://github.com/algorandfoundation/algokit-cli/issues/398)) ([`1b6773b`](https://github.com/algorandfoundation/algokit-cli/commit/1b6773b1bbfcc5191e0da86af4e445de29ae3058))
+
+### Documentation
+
+* Adr on native binaries ([#395](https://github.com/algorandfoundation/algokit-cli/issues/395)) ([`42f61d1`](https://github.com/algorandfoundation/algokit-cli/commit/42f61d1a5ffdb411947a7581a36df1ed53786a25))
+
 ## v1.10.0 (2024-01-24)
 
 ### Feature
