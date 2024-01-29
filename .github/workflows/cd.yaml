@@ -44,7 +44,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: ./.github/actions/setup-poetry
 
       - uses: actions/cache@v4
         name: Setup poetry cache
@@ -121,6 +121,7 @@ jobs:
     needs: release
     with:
       upload_binaries: "true"
+      python_version: "3.12"
 
   cd-publish-release-packages:
     name: Publish Release Packages

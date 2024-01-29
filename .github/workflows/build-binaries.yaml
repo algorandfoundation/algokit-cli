@@ -6,6 +6,9 @@ on:
       upload_binaries:
         required: true
         type: string
+      python_version:
+        required: true
+        type: string
 
 jobs:
   build-binaries-ubuntu:
@@ -23,19 +26,19 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: ${{ inputs.python_version }}
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: ./.github/actions/setup-poetry
 
       - uses: actions/cache@v4
         name: Setup poetry cache
         with:
           path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ inputs.python_version }}
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -43,7 +46,7 @@ jobs:
       - name: Build linux binary
         uses: ./.github/actions/build-binaries
         with:
-          python_version: "3.12"
+          python_version: ${{ inputs.python_version }}
           package_name: "algokit"
           upload_binaries: ${{ inputs.upload_binaries }}
           operating_system: ${{ runner.os }}
@@ -64,19 +67,19 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: ${{ inputs.python_version }}
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: ./.github/actions/setup-poetry
 
       - uses: actions/cache@v4
         name: Setup poetry cache
         with:
           path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ inputs.python_version }}
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -84,7 +87,7 @@ jobs:
       - name: Build windows binary
         uses: ./.github/actions/build-binaries
         with:
-          python_version: "3.12"
+          python_version: ${{ inputs.python_version }}
           package_name: "algokit"
           upload_binaries: ${{ inputs.upload_binaries }}
           operating_system: ${{ runner.os }}
@@ -105,19 +108,19 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: ${{ inputs.python_version }}
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: ./.github/actions/setup-poetry
 
       - uses: actions/cache@v4
         name: Setup poetry cache
         with:
           path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.12
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ inputs.python_version }}
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -125,7 +128,7 @@ jobs:
       - name: Build macos binary
         uses: ./.github/actions/build-binaries
         with:
-          python_version: "3.12"
+          python_version: ${{ inputs.python_version }}
           package_name: "algokit"
           upload_binaries: ${{ inputs.upload_binaries }}
           operating_system: ${{ runner.os }}

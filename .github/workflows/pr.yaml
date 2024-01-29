@@ -22,3 +22,4 @@ jobs:
     uses: ./.github/workflows/build-binaries.yaml
     with:
       upload_binaries: "false"
+      python_version: "3.12"
