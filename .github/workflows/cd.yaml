@@ -52,6 +52,9 @@ jobs:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-3.10
 
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
       - name: Get branch name
         shell: bash
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
