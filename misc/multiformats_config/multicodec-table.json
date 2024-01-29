@@ -1,0 +1,3775 @@
+[
+    {
+        "name": "identity",
+        "tag": "multihash",
+        "code": "0x00",
+        "status": "permanent",
+        "description": "raw binary"
+    },
+    {
+        "name": "cidv1",
+        "tag": "cid",
+        "code": "0x01",
+        "status": "permanent",
+        "description": "CIDv1"
+    },
+    {
+        "name": "cidv2",
+        "tag": "cid",
+        "code": "0x02",
+        "status": "draft",
+        "description": "CIDv2"
+    },
+    {
+        "name": "cidv3",
+        "tag": "cid",
+        "code": "0x03",
+        "status": "draft",
+        "description": "CIDv3"
+    },
+    {
+        "name": "ip4",
+        "tag": "multiaddr",
+        "code": "0x04",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "tcp",
+        "tag": "multiaddr",
+        "code": "0x06",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha1",
+        "tag": "multihash",
+        "code": "0x11",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha2-256",
+        "tag": "multihash",
+        "code": "0x12",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha2-512",
+        "tag": "multihash",
+        "code": "0x13",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha3-512",
+        "tag": "multihash",
+        "code": "0x14",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha3-384",
+        "tag": "multihash",
+        "code": "0x15",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha3-256",
+        "tag": "multihash",
+        "code": "0x16",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "sha3-224",
+        "tag": "multihash",
+        "code": "0x17",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "shake-128",
+        "tag": "multihash",
+        "code": "0x18",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "shake-256",
+        "tag": "multihash",
+        "code": "0x19",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "keccak-224",
+        "tag": "multihash",
+        "code": "0x1a",
+        "status": "draft",
+        "description": "keccak has variable output length. The number specifies the core length"
+    },
+    {
+        "name": "keccak-256",
+        "tag": "multihash",
+        "code": "0x1b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "keccak-384",
+        "tag": "multihash",
+        "code": "0x1c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "keccak-512",
+        "tag": "multihash",
+        "code": "0x1d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake3",
+        "tag": "multihash",
+        "code": "0x1e",
+        "status": "draft",
+        "description": "BLAKE3 has a default 32 byte output length. The maximum length is (2^64)-1 bytes."
+    },
+    {
+        "name": "sha2-384",
+        "tag": "multihash",
+        "code": "0x20",
+        "status": "permanent",
+        "description": "aka SHA-384; as specified by FIPS 180-4."
+    },
+    {
+        "name": "dccp",
+        "tag": "multiaddr",
+        "code": "0x21",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "murmur3-x64-64",
+        "tag": "hash",
+        "code": "0x22",
+        "status": "permanent",
+        "description": "The first 64-bits of a murmur3-x64-128 - used for UnixFS directory sharding."
+    },
+    {
+        "name": "murmur3-32",
+        "tag": "hash",
+        "code": "0x23",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ip6",
+        "tag": "multiaddr",
+        "code": "0x29",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "ip6zone",
+        "tag": "multiaddr",
+        "code": "0x2a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ipcidr",
+        "tag": "multiaddr",
+        "code": "0x2b",
+        "status": "draft",
+        "description": "CIDR mask for IP addresses"
+    },
+    {
+        "name": "path",
+        "tag": "namespace",
+        "code": "0x2f",
+        "status": "permanent",
+        "description": "Namespace for string paths. Corresponds to `/` in ASCII."
+    },
+    {
+        "name": "multicodec",
+        "tag": "multiformat",
+        "code": "0x30",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "multihash",
+        "tag": "multiformat",
+        "code": "0x31",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "multiaddr",
+        "tag": "multiformat",
+        "code": "0x32",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "multibase",
+        "tag": "multiformat",
+        "code": "0x33",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "varsig",
+        "tag": "multiformat",
+        "code": "0x34",
+        "status": "draft",
+        "description": "Variable signature (varsig) multiformat"
+    },
+    {
+        "name": "dns",
+        "tag": "multiaddr",
+        "code": "0x35",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "dns4",
+        "tag": "multiaddr",
+        "code": "0x36",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "dns6",
+        "tag": "multiaddr",
+        "code": "0x37",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "dnsaddr",
+        "tag": "multiaddr",
+        "code": "0x38",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "protobuf",
+        "tag": "serialization",
+        "code": "0x50",
+        "status": "draft",
+        "description": "Protocol Buffers"
+    },
+    {
+        "name": "cbor",
+        "tag": "ipld",
+        "code": "0x51",
+        "status": "permanent",
+        "description": "CBOR"
+    },
+    {
+        "name": "raw",
+        "tag": "ipld",
+        "code": "0x55",
+        "status": "permanent",
+        "description": "raw binary"
+    },
+    {
+        "name": "dbl-sha2-256",
+        "tag": "multihash",
+        "code": "0x56",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "rlp",
+        "tag": "serialization",
+        "code": "0x60",
+        "status": "draft",
+        "description": "recursive length prefix"
+    },
+    {
+        "name": "bencode",
+        "tag": "serialization",
+        "code": "0x63",
+        "status": "draft",
+        "description": "bencode"
+    },
+    {
+        "name": "dag-pb",
+        "tag": "ipld",
+        "code": "0x70",
+        "status": "permanent",
+        "description": "MerkleDAG protobuf"
+    },
+    {
+        "name": "dag-cbor",
+        "tag": "ipld",
+        "code": "0x71",
+        "status": "permanent",
+        "description": "MerkleDAG cbor"
+    },
+    {
+        "name": "libp2p-key",
+        "tag": "ipld",
+        "code": "0x72",
+        "status": "permanent",
+        "description": "Libp2p Public Key"
+    },
+    {
+        "name": "git-raw",
+        "tag": "ipld",
+        "code": "0x78",
+        "status": "permanent",
+        "description": "Raw Git object"
+    },
+    {
+        "name": "torrent-info",
+        "tag": "ipld",
+        "code": "0x7b",
+        "status": "draft",
+        "description": "Torrent file info field (bencoded)"
+    },
+    {
+        "name": "torrent-file",
+        "tag": "ipld",
+        "code": "0x7c",
+        "status": "draft",
+        "description": "Torrent file (bencoded)"
+    },
+    {
+        "name": "leofcoin-block",
+        "tag": "ipld",
+        "code": "0x81",
+        "status": "draft",
+        "description": "Leofcoin Block"
+    },
+    {
+        "name": "leofcoin-tx",
+        "tag": "ipld",
+        "code": "0x82",
+        "status": "draft",
+        "description": "Leofcoin Transaction"
+    },
+    {
+        "name": "leofcoin-pr",
+        "tag": "ipld",
+        "code": "0x83",
+        "status": "draft",
+        "description": "Leofcoin Peer Reputation"
+    },
+    {
+        "name": "sctp",
+        "tag": "multiaddr",
+        "code": "0x84",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "dag-jose",
+        "tag": "ipld",
+        "code": "0x85",
+        "status": "draft",
+        "description": "MerkleDAG JOSE"
+    },
+    {
+        "name": "dag-cose",
+        "tag": "ipld",
+        "code": "0x86",
+        "status": "draft",
+        "description": "MerkleDAG COSE"
+    },
+    {
+        "name": "lbry",
+        "tag": "namespace",
+        "code": "0x8c",
+        "status": "draft",
+        "description": "LBRY Address"
+    },
+    {
+        "name": "eth-block",
+        "tag": "ipld",
+        "code": "0x90",
+        "status": "permanent",
+        "description": "Ethereum Header (RLP)"
+    },
+    {
+        "name": "eth-block-list",
+        "tag": "ipld",
+        "code": "0x91",
+        "status": "permanent",
+        "description": "Ethereum Header List (RLP)"
+    },
+    {
+        "name": "eth-tx-trie",
+        "tag": "ipld",
+        "code": "0x92",
+        "status": "permanent",
+        "description": "Ethereum Transaction Trie (Eth-Trie)"
+    },
+    {
+        "name": "eth-tx",
+        "tag": "ipld",
+        "code": "0x93",
+        "status": "permanent",
+        "description": "Ethereum Transaction (MarshalBinary)"
+    },
+    {
+        "name": "eth-tx-receipt-trie",
+        "tag": "ipld",
+        "code": "0x94",
+        "status": "permanent",
+        "description": "Ethereum Transaction Receipt Trie (Eth-Trie)"
+    },
+    {
+        "name": "eth-tx-receipt",
+        "tag": "ipld",
+        "code": "0x95",
+        "status": "permanent",
+        "description": "Ethereum Transaction Receipt (MarshalBinary)"
+    },
+    {
+        "name": "eth-state-trie",
+        "tag": "ipld",
+        "code": "0x96",
+        "status": "permanent",
+        "description": "Ethereum State Trie (Eth-Secure-Trie)"
+    },
+    {
+        "name": "eth-account-snapshot",
+        "tag": "ipld",
+        "code": "0x97",
+        "status": "permanent",
+        "description": "Ethereum Account Snapshot (RLP)"
+    },
+    {
+        "name": "eth-storage-trie",
+        "tag": "ipld",
+        "code": "0x98",
+        "status": "permanent",
+        "description": "Ethereum Contract Storage Trie (Eth-Secure-Trie)"
+    },
+    {
+        "name": "eth-receipt-log-trie",
+        "tag": "ipld",
+        "code": "0x99",
+        "status": "draft",
+        "description": "Ethereum Transaction Receipt Log Trie (Eth-Trie)"
+    },
+    {
+        "name": "eth-receipt-log",
+        "tag": "ipld",
+        "code": "0x9a",
+        "status": "draft",
+        "description": "Ethereum Transaction Receipt Log (RLP)"
+    },
+    {
+        "name": "aes-128",
+        "tag": "key",
+        "code": "0xa0",
+        "status": "draft",
+        "description": "128-bit AES symmetric key"
+    },
+    {
+        "name": "aes-192",
+        "tag": "key",
+        "code": "0xa1",
+        "status": "draft",
+        "description": "192-bit AES symmetric key"
+    },
+    {
+        "name": "aes-256",
+        "tag": "key",
+        "code": "0xa2",
+        "status": "draft",
+        "description": "256-bit AES symmetric key"
+    },
+    {
+        "name": "chacha-128",
+        "tag": "key",
+        "code": "0xa3",
+        "status": "draft",
+        "description": "128-bit ChaCha symmetric key"
+    },
+    {
+        "name": "chacha-256",
+        "tag": "key",
+        "code": "0xa4",
+        "status": "draft",
+        "description": "256-bit ChaCha symmetric key"
+    },
+    {
+        "name": "bitcoin-block",
+        "tag": "ipld",
+        "code": "0xb0",
+        "status": "permanent",
+        "description": "Bitcoin Block"
+    },
+    {
+        "name": "bitcoin-tx",
+        "tag": "ipld",
+        "code": "0xb1",
+        "status": "permanent",
+        "description": "Bitcoin Tx"
+    },
+    {
+        "name": "bitcoin-witness-commitment",
+        "tag": "ipld",
+        "code": "0xb2",
+        "status": "permanent",
+        "description": "Bitcoin Witness Commitment"
+    },
+    {
+        "name": "zcash-block",
+        "tag": "ipld",
+        "code": "0xc0",
+        "status": "permanent",
+        "description": "Zcash Block"
+    },
+    {
+        "name": "zcash-tx",
+        "tag": "ipld",
+        "code": "0xc1",
+        "status": "permanent",
+        "description": "Zcash Tx"
+    },
+    {
+        "name": "caip-50",
+        "tag": "multiformat",
+        "code": "0xca",
+        "status": "draft",
+        "description": "CAIP-50 multi-chain account id"
+    },
+    {
+        "name": "streamid",
+        "tag": "namespace",
+        "code": "0xce",
+        "status": "draft",
+        "description": "Ceramic Stream Id"
+    },
+    {
+        "name": "stellar-block",
+        "tag": "ipld",
+        "code": "0xd0",
+        "status": "draft",
+        "description": "Stellar Block"
+    },
+    {
+        "name": "stellar-tx",
+        "tag": "ipld",
+        "code": "0xd1",
+        "status": "draft",
+        "description": "Stellar Tx"
+    },
+    {
+        "name": "md4",
+        "tag": "multihash",
+        "code": "0xd4",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "md5",
+        "tag": "multihash",
+        "code": "0xd5",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "decred-block",
+        "tag": "ipld",
+        "code": "0xe0",
+        "status": "draft",
+        "description": "Decred Block"
+    },
+    {
+        "name": "decred-tx",
+        "tag": "ipld",
+        "code": "0xe1",
+        "status": "draft",
+        "description": "Decred Tx"
+    },
+    {
+        "name": "ipld",
+        "tag": "namespace",
+        "code": "0xe2",
+        "status": "draft",
+        "description": "IPLD path"
+    },
+    {
+        "name": "ipfs",
+        "tag": "namespace",
+        "code": "0xe3",
+        "status": "draft",
+        "description": "IPFS path"
+    },
+    {
+        "name": "swarm",
+        "tag": "namespace",
+        "code": "0xe4",
+        "status": "draft",
+        "description": "Swarm path"
+    },
+    {
+        "name": "ipns",
+        "tag": "namespace",
+        "code": "0xe5",
+        "status": "draft",
+        "description": "IPNS path"
+    },
+    {
+        "name": "zeronet",
+        "tag": "namespace",
+        "code": "0xe6",
+        "status": "draft",
+        "description": "ZeroNet site address"
+    },
+    {
+        "name": "secp256k1-pub",
+        "tag": "key",
+        "code": "0xe7",
+        "status": "draft",
+        "description": "Secp256k1 public key (compressed)"
+    },
+    {
+        "name": "dnslink",
+        "tag": "namespace",
+        "code": "0xe8",
+        "status": "permanent",
+        "description": "DNSLink path"
+    },
+    {
+        "name": "bls12_381-g1-pub",
+        "tag": "key",
+        "code": "0xea",
+        "status": "draft",
+        "description": "BLS12-381 public key in the G1 field"
+    },
+    {
+        "name": "bls12_381-g2-pub",
+        "tag": "key",
+        "code": "0xeb",
+        "status": "draft",
+        "description": "BLS12-381 public key in the G2 field"
+    },
+    {
+        "name": "x25519-pub",
+        "tag": "key",
+        "code": "0xec",
+        "status": "draft",
+        "description": "Curve25519 public key"
+    },
+    {
+        "name": "ed25519-pub",
+        "tag": "key",
+        "code": "0xed",
+        "status": "draft",
+        "description": "Ed25519 public key"
+    },
+    {
+        "name": "bls12_381-g1g2-pub",
+        "tag": "key",
+        "code": "0xee",
+        "status": "draft",
+        "description": "BLS12-381 concatenated public keys in both the G1 and G2 fields"
+    },
+    {
+        "name": "sr25519-pub",
+        "tag": "key",
+        "code": "0xef",
+        "status": "draft",
+        "description": "Sr25519 public key"
+    },
+    {
+        "name": "dash-block",
+        "tag": "ipld",
+        "code": "0xf0",
+        "status": "draft",
+        "description": "Dash Block"
+    },
+    {
+        "name": "dash-tx",
+        "tag": "ipld",
+        "code": "0xf1",
+        "status": "draft",
+        "description": "Dash Tx"
+    },
+    {
+        "name": "swarm-manifest",
+        "tag": "ipld",
+        "code": "0xfa",
+        "status": "draft",
+        "description": "Swarm Manifest"
+    },
+    {
+        "name": "swarm-feed",
+        "tag": "ipld",
+        "code": "0xfb",
+        "status": "draft",
+        "description": "Swarm Feed"
+    },
+    {
+        "name": "beeson",
+        "tag": "ipld",
+        "code": "0xfc",
+        "status": "draft",
+        "description": "Swarm BeeSon"
+    },
+    {
+        "name": "udp",
+        "tag": "multiaddr",
+        "code": "0x0111",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "p2p-webrtc-star",
+        "tag": "multiaddr",
+        "code": "0x0113",
+        "status": "deprecated",
+        "description": "Use webrtc or webrtc-direct instead"
+    },
+    {
+        "name": "p2p-webrtc-direct",
+        "tag": "multiaddr",
+        "code": "0x0114",
+        "status": "deprecated",
+        "description": "Use webrtc or webrtc-direct instead"
+    },
+    {
+        "name": "p2p-stardust",
+        "tag": "multiaddr",
+        "code": "0x0115",
+        "status": "deprecated",
+        "description": ""
+    },
+    {
+        "name": "webrtc-direct",
+        "tag": "multiaddr",
+        "code": "0x0118",
+        "status": "draft",
+        "description": "ICE-lite webrtc transport with SDP munging during connection establishment and without use of a STUN server"
+    },
+    {
+        "name": "webrtc",
+        "tag": "multiaddr",
+        "code": "0x0119",
+        "status": "draft",
+        "description": "webrtc transport where connection establishment is according to w3c spec"
+    },
+    {
+        "name": "p2p-circuit",
+        "tag": "multiaddr",
+        "code": "0x0122",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "dag-json",
+        "tag": "ipld",
+        "code": "0x0129",
+        "status": "permanent",
+        "description": "MerkleDAG json"
+    },
+    {
+        "name": "udt",
+        "tag": "multiaddr",
+        "code": "0x012d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "utp",
+        "tag": "multiaddr",
+        "code": "0x012e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "crc32",
+        "tag": "hash",
+        "code": "0x0132",
+        "status": "draft",
+        "description": "CRC-32 non-cryptographic hash algorithm (IEEE 802.3)"
+    },
+    {
+        "name": "crc64-ecma",
+        "tag": "hash",
+        "code": "0x0164",
+        "status": "draft",
+        "description": "CRC-64 non-cryptographic hash algorithm (ECMA-182 - Annex B)"
+    },
+    {
+        "name": "unix",
+        "tag": "multiaddr",
+        "code": "0x0190",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "thread",
+        "tag": "multiaddr",
+        "code": "0x0196",
+        "status": "draft",
+        "description": "Textile Thread"
+    },
+    {
+        "name": "p2p",
+        "tag": "multiaddr",
+        "code": "0x01a5",
+        "status": "permanent",
+        "description": "libp2p"
+    },
+    {
+        "name": "https",
+        "tag": "multiaddr",
+        "code": "0x01bb",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "onion",
+        "tag": "multiaddr",
+        "code": "0x01bc",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "onion3",
+        "tag": "multiaddr",
+        "code": "0x01bd",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "garlic64",
+        "tag": "multiaddr",
+        "code": "0x01be",
+        "status": "draft",
+        "description": "I2P base64 (raw public key)"
+    },
+    {
+        "name": "garlic32",
+        "tag": "multiaddr",
+        "code": "0x01bf",
+        "status": "draft",
+        "description": "I2P base32 (hashed public key or encoded public key/checksum+optional secret)"
+    },
+    {
+        "name": "tls",
+        "tag": "multiaddr",
+        "code": "0x01c0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "sni",
+        "tag": "multiaddr",
+        "code": "0x01c1",
+        "status": "draft",
+        "description": "Server Name Indication RFC 6066 \u00a7 3"
+    },
+    {
+        "name": "noise",
+        "tag": "multiaddr",
+        "code": "0x01c6",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "shs",
+        "tag": "multiaddr",
+        "code": "0x01c8",
+        "status": "draft",
+        "description": "Secure Scuttlebutt - Secret Handshake Stream"
+    },
+    {
+        "name": "quic",
+        "tag": "multiaddr",
+        "code": "0x01cc",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "quic-v1",
+        "tag": "multiaddr",
+        "code": "0x01cd",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "webtransport",
+        "tag": "multiaddr",
+        "code": "0x01d1",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "certhash",
+        "tag": "multiaddr",
+        "code": "0x01d2",
+        "status": "draft",
+        "description": "TLS certificate's fingerprint as a multihash"
+    },
+    {
+        "name": "ws",
+        "tag": "multiaddr",
+        "code": "0x01dd",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "wss",
+        "tag": "multiaddr",
+        "code": "0x01de",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "p2p-websocket-star",
+        "tag": "multiaddr",
+        "code": "0x01df",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "http",
+        "tag": "multiaddr",
+        "code": "0x01e0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "swhid-1-snp",
+        "tag": "ipld",
+        "code": "0x01f0",
+        "status": "draft",
+        "description": "SoftWare Heritage persistent IDentifier version 1 snapshot"
+    },
+    {
+        "name": "json",
+        "tag": "ipld",
+        "code": "0x0200",
+        "status": "permanent",
+        "description": "JSON (UTF-8-encoded)"
+    },
+    {
+        "name": "messagepack",
+        "tag": "serialization",
+        "code": "0x0201",
+        "status": "draft",
+        "description": "MessagePack"
+    },
+    {
+        "name": "car",
+        "tag": "serialization",
+        "code": "0x0202",
+        "status": "draft",
+        "description": "Content Addressable aRchive (CAR)"
+    },
+    {
+        "name": "ipns-record",
+        "tag": "serialization",
+        "code": "0x0300",
+        "status": "permanent",
+        "description": "Signed IPNS Record"
+    },
+    {
+        "name": "libp2p-peer-record",
+        "tag": "libp2p",
+        "code": "0x0301",
+        "status": "permanent",
+        "description": "libp2p peer record type"
+    },
+    {
+        "name": "libp2p-relay-rsvp",
+        "tag": "libp2p",
+        "code": "0x0302",
+        "status": "permanent",
+        "description": "libp2p relay reservation voucher"
+    },
+    {
+        "name": "memorytransport",
+        "tag": "libp2p",
+        "code": "0x0309",
+        "status": "permanent",
+        "description": "in memory transport for self-dialing and testing; arbitrary"
+    },
+    {
+        "name": "car-index-sorted",
+        "tag": "serialization",
+        "code": "0x0400",
+        "status": "draft",
+        "description": "CARv2 IndexSorted index format"
+    },
+    {
+        "name": "car-multihash-index-sorted",
+        "tag": "serialization",
+        "code": "0x0401",
+        "status": "draft",
+        "description": "CARv2 MultihashIndexSorted index format"
+    },
+    {
+        "name": "transport-bitswap",
+        "tag": "transport",
+        "code": "0x0900",
+        "status": "draft",
+        "description": "Bitswap datatransfer"
+    },
+    {
+        "name": "transport-graphsync-filecoinv1",
+        "tag": "transport",
+        "code": "0x0910",
+        "status": "draft",
+        "description": "Filecoin graphsync datatransfer"
+    },
+    {
+        "name": "transport-ipfs-gateway-http",
+        "tag": "transport",
+        "code": "0x0920",
+        "status": "draft",
+        "description": "HTTP IPFS Gateway trustless datatransfer"
+    },
+    {
+        "name": "multidid",
+        "tag": "multiformat",
+        "code": "0x0d1d",
+        "status": "draft",
+        "description": "Compact encoding for Decentralized Identifers"
+    },
+    {
+        "name": "sha2-256-trunc254-padded",
+        "tag": "multihash",
+        "code": "0x1012",
+        "status": "permanent",
+        "description": "SHA2-256 with the two most significant bits from the last byte zeroed (as via a mask with 0b00111111) - used for proving trees as in Filecoin"
+    },
+    {
+        "name": "sha2-224",
+        "tag": "multihash",
+        "code": "0x1013",
+        "status": "permanent",
+        "description": "aka SHA-224; as specified by FIPS 180-4."
+    },
+    {
+        "name": "sha2-512-224",
+        "tag": "multihash",
+        "code": "0x1014",
+        "status": "permanent",
+        "description": "aka SHA-512/224; as specified by FIPS 180-4."
+    },
+    {
+        "name": "sha2-512-256",
+        "tag": "multihash",
+        "code": "0x1015",
+        "status": "permanent",
+        "description": "aka SHA-512/256; as specified by FIPS 180-4."
+    },
+    {
+        "name": "murmur3-x64-128",
+        "tag": "hash",
+        "code": "0x1022",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ripemd-128",
+        "tag": "multihash",
+        "code": "0x1052",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ripemd-160",
+        "tag": "multihash",
+        "code": "0x1053",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ripemd-256",
+        "tag": "multihash",
+        "code": "0x1054",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "ripemd-320",
+        "tag": "multihash",
+        "code": "0x1055",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "x11",
+        "tag": "multihash",
+        "code": "0x1100",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "p256-pub",
+        "tag": "key",
+        "code": "0x1200",
+        "status": "draft",
+        "description": "P-256 public Key (compressed)"
+    },
+    {
+        "name": "p384-pub",
+        "tag": "key",
+        "code": "0x1201",
+        "status": "draft",
+        "description": "P-384 public Key (compressed)"
+    },
+    {
+        "name": "p521-pub",
+        "tag": "key",
+        "code": "0x1202",
+        "status": "draft",
+        "description": "P-521 public Key (compressed)"
+    },
+    {
+        "name": "ed448-pub",
+        "tag": "key",
+        "code": "0x1203",
+        "status": "draft",
+        "description": "Ed448 public Key"
+    },
+    {
+        "name": "x448-pub",
+        "tag": "key",
+        "code": "0x1204",
+        "status": "draft",
+        "description": "X448 public Key"
+    },
+    {
+        "name": "rsa-pub",
+        "tag": "key",
+        "code": "0x1205",
+        "status": "draft",
+        "description": "RSA public key. DER-encoded ASN.1 type RSAPublicKey according to IETF RFC 8017 (PKCS #1)"
+    },
+    {
+        "name": "sm2-pub",
+        "tag": "key",
+        "code": "0x1206",
+        "status": "draft",
+        "description": "SM2 public key (compressed)"
+    },
+    {
+        "name": "ed25519-priv",
+        "tag": "key",
+        "code": "0x1300",
+        "status": "draft",
+        "description": "Ed25519 private key"
+    },
+    {
+        "name": "secp256k1-priv",
+        "tag": "key",
+        "code": "0x1301",
+        "status": "draft",
+        "description": "Secp256k1 private key"
+    },
+    {
+        "name": "x25519-priv",
+        "tag": "key",
+        "code": "0x1302",
+        "status": "draft",
+        "description": "Curve25519 private key"
+    },
+    {
+        "name": "sr25519-priv",
+        "tag": "key",
+        "code": "0x1303",
+        "status": "draft",
+        "description": "Sr25519 private key"
+    },
+    {
+        "name": "rsa-priv",
+        "tag": "key",
+        "code": "0x1305",
+        "status": "draft",
+        "description": "RSA private key"
+    },
+    {
+        "name": "p256-priv",
+        "tag": "key",
+        "code": "0x1306",
+        "status": "draft",
+        "description": "P-256 private key"
+    },
+    {
+        "name": "p384-priv",
+        "tag": "key",
+        "code": "0x1307",
+        "status": "draft",
+        "description": "P-384 private key"
+    },
+    {
+        "name": "p521-priv",
+        "tag": "key",
+        "code": "0x1308",
+        "status": "draft",
+        "description": "P-521 private key"
+    },
+    {
+        "name": "bls12_381-g1-priv",
+        "tag": "key",
+        "code": "0x1309",
+        "status": "draft",
+        "description": "BLS12-381 G1 private key"
+    },
+    {
+        "name": "bls12_381-g2-priv",
+        "tag": "key",
+        "code": "0x130a",
+        "status": "draft",
+        "description": "BLS12-381 G2 private key"
+    },
+    {
+        "name": "bls12_381-g1g2-priv",
+        "tag": "key",
+        "code": "0x130b",
+        "status": "draft",
+        "description": "BLS12-381 G1 and G2 private key"
+    },
+    {
+        "name": "kangarootwelve",
+        "tag": "multihash",
+        "code": "0x1d01",
+        "status": "draft",
+        "description": "KangarooTwelve is an extendable-output hash function based on Keccak-p"
+    },
+    {
+        "name": "aes-gcm-256",
+        "tag": "encryption",
+        "code": "0x2000",
+        "status": "draft",
+        "description": "AES Galois/Counter Mode with 256-bit key and 12-byte IV"
+    },
+    {
+        "name": "silverpine",
+        "tag": "multiaddr",
+        "code": "0x3f42",
+        "status": "draft",
+        "description": "Experimental QUIC over yggdrasil and ironwood routing protocol"
+    },
+    {
+        "name": "sm3-256",
+        "tag": "multihash",
+        "code": "0x534d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "sha256a",
+        "tag": "hash",
+        "code": "0x7012",
+        "status": "draft",
+        "description": "The sum of multiple sha2-256 hashes; as specified by Ceramic CIP-124."
+    },
+    {
+        "name": "blake2b-8",
+        "tag": "multihash",
+        "code": "0xb201",
+        "status": "draft",
+        "description": "Blake2b consists of 64 output lengths that give different hashes"
+    },
+    {
+        "name": "blake2b-16",
+        "tag": "multihash",
+        "code": "0xb202",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-24",
+        "tag": "multihash",
+        "code": "0xb203",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-32",
+        "tag": "multihash",
+        "code": "0xb204",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-40",
+        "tag": "multihash",
+        "code": "0xb205",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-48",
+        "tag": "multihash",
+        "code": "0xb206",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-56",
+        "tag": "multihash",
+        "code": "0xb207",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-64",
+        "tag": "multihash",
+        "code": "0xb208",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-72",
+        "tag": "multihash",
+        "code": "0xb209",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-80",
+        "tag": "multihash",
+        "code": "0xb20a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-88",
+        "tag": "multihash",
+        "code": "0xb20b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-96",
+        "tag": "multihash",
+        "code": "0xb20c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-104",
+        "tag": "multihash",
+        "code": "0xb20d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-112",
+        "tag": "multihash",
+        "code": "0xb20e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-120",
+        "tag": "multihash",
+        "code": "0xb20f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-128",
+        "tag": "multihash",
+        "code": "0xb210",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-136",
+        "tag": "multihash",
+        "code": "0xb211",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-144",
+        "tag": "multihash",
+        "code": "0xb212",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-152",
+        "tag": "multihash",
+        "code": "0xb213",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-160",
+        "tag": "multihash",
+        "code": "0xb214",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-168",
+        "tag": "multihash",
+        "code": "0xb215",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-176",
+        "tag": "multihash",
+        "code": "0xb216",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-184",
+        "tag": "multihash",
+        "code": "0xb217",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-192",
+        "tag": "multihash",
+        "code": "0xb218",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-200",
+        "tag": "multihash",
+        "code": "0xb219",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-208",
+        "tag": "multihash",
+        "code": "0xb21a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-216",
+        "tag": "multihash",
+        "code": "0xb21b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-224",
+        "tag": "multihash",
+        "code": "0xb21c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-232",
+        "tag": "multihash",
+        "code": "0xb21d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-240",
+        "tag": "multihash",
+        "code": "0xb21e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-248",
+        "tag": "multihash",
+        "code": "0xb21f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-256",
+        "tag": "multihash",
+        "code": "0xb220",
+        "status": "permanent",
+        "description": ""
+    },
+    {
+        "name": "blake2b-264",
+        "tag": "multihash",
+        "code": "0xb221",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-272",
+        "tag": "multihash",
+        "code": "0xb222",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-280",
+        "tag": "multihash",
+        "code": "0xb223",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-288",
+        "tag": "multihash",
+        "code": "0xb224",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-296",
+        "tag": "multihash",
+        "code": "0xb225",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-304",
+        "tag": "multihash",
+        "code": "0xb226",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-312",
+        "tag": "multihash",
+        "code": "0xb227",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-320",
+        "tag": "multihash",
+        "code": "0xb228",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-328",
+        "tag": "multihash",
+        "code": "0xb229",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-336",
+        "tag": "multihash",
+        "code": "0xb22a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-344",
+        "tag": "multihash",
+        "code": "0xb22b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-352",
+        "tag": "multihash",
+        "code": "0xb22c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-360",
+        "tag": "multihash",
+        "code": "0xb22d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-368",
+        "tag": "multihash",
+        "code": "0xb22e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-376",
+        "tag": "multihash",
+        "code": "0xb22f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-384",
+        "tag": "multihash",
+        "code": "0xb230",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-392",
+        "tag": "multihash",
+        "code": "0xb231",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-400",
+        "tag": "multihash",
+        "code": "0xb232",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-408",
+        "tag": "multihash",
+        "code": "0xb233",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-416",
+        "tag": "multihash",
+        "code": "0xb234",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-424",
+        "tag": "multihash",
+        "code": "0xb235",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-432",
+        "tag": "multihash",
+        "code": "0xb236",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-440",
+        "tag": "multihash",
+        "code": "0xb237",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-448",
+        "tag": "multihash",
+        "code": "0xb238",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-456",
+        "tag": "multihash",
+        "code": "0xb239",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-464",
+        "tag": "multihash",
+        "code": "0xb23a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-472",
+        "tag": "multihash",
+        "code": "0xb23b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-480",
+        "tag": "multihash",
+        "code": "0xb23c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-488",
+        "tag": "multihash",
+        "code": "0xb23d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-496",
+        "tag": "multihash",
+        "code": "0xb23e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-504",
+        "tag": "multihash",
+        "code": "0xb23f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2b-512",
+        "tag": "multihash",
+        "code": "0xb240",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-8",
+        "tag": "multihash",
+        "code": "0xb241",
+        "status": "draft",
+        "description": "Blake2s consists of 32 output lengths that give different hashes"
+    },
+    {
+        "name": "blake2s-16",
+        "tag": "multihash",
+        "code": "0xb242",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-24",
+        "tag": "multihash",
+        "code": "0xb243",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-32",
+        "tag": "multihash",
+        "code": "0xb244",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-40",
+        "tag": "multihash",
+        "code": "0xb245",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-48",
+        "tag": "multihash",
+        "code": "0xb246",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-56",
+        "tag": "multihash",
+        "code": "0xb247",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-64",
+        "tag": "multihash",
+        "code": "0xb248",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-72",
+        "tag": "multihash",
+        "code": "0xb249",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-80",
+        "tag": "multihash",
+        "code": "0xb24a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-88",
+        "tag": "multihash",
+        "code": "0xb24b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-96",
+        "tag": "multihash",
+        "code": "0xb24c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-104",
+        "tag": "multihash",
+        "code": "0xb24d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-112",
+        "tag": "multihash",
+        "code": "0xb24e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-120",
+        "tag": "multihash",
+        "code": "0xb24f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-128",
+        "tag": "multihash",
+        "code": "0xb250",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-136",
+        "tag": "multihash",
+        "code": "0xb251",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-144",
+        "tag": "multihash",
+        "code": "0xb252",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-152",
+        "tag": "multihash",
+        "code": "0xb253",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-160",
+        "tag": "multihash",
+        "code": "0xb254",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-168",
+        "tag": "multihash",
+        "code": "0xb255",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-176",
+        "tag": "multihash",
+        "code": "0xb256",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-184",
+        "tag": "multihash",
+        "code": "0xb257",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-192",
+        "tag": "multihash",
+        "code": "0xb258",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-200",
+        "tag": "multihash",
+        "code": "0xb259",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-208",
+        "tag": "multihash",
+        "code": "0xb25a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-216",
+        "tag": "multihash",
+        "code": "0xb25b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-224",
+        "tag": "multihash",
+        "code": "0xb25c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-232",
+        "tag": "multihash",
+        "code": "0xb25d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-240",
+        "tag": "multihash",
+        "code": "0xb25e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-248",
+        "tag": "multihash",
+        "code": "0xb25f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "blake2s-256",
+        "tag": "multihash",
+        "code": "0xb260",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-8",
+        "tag": "multihash",
+        "code": "0xb301",
+        "status": "draft",
+        "description": "Skein256 consists of 32 output lengths that give different hashes"
+    },
+    {
+        "name": "skein256-16",
+        "tag": "multihash",
+        "code": "0xb302",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-24",
+        "tag": "multihash",
+        "code": "0xb303",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-32",
+        "tag": "multihash",
+        "code": "0xb304",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-40",
+        "tag": "multihash",
+        "code": "0xb305",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-48",
+        "tag": "multihash",
+        "code": "0xb306",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-56",
+        "tag": "multihash",
+        "code": "0xb307",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-64",
+        "tag": "multihash",
+        "code": "0xb308",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-72",
+        "tag": "multihash",
+        "code": "0xb309",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-80",
+        "tag": "multihash",
+        "code": "0xb30a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-88",
+        "tag": "multihash",
+        "code": "0xb30b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-96",
+        "tag": "multihash",
+        "code": "0xb30c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-104",
+        "tag": "multihash",
+        "code": "0xb30d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-112",
+        "tag": "multihash",
+        "code": "0xb30e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-120",
+        "tag": "multihash",
+        "code": "0xb30f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-128",
+        "tag": "multihash",
+        "code": "0xb310",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-136",
+        "tag": "multihash",
+        "code": "0xb311",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-144",
+        "tag": "multihash",
+        "code": "0xb312",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-152",
+        "tag": "multihash",
+        "code": "0xb313",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-160",
+        "tag": "multihash",
+        "code": "0xb314",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-168",
+        "tag": "multihash",
+        "code": "0xb315",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-176",
+        "tag": "multihash",
+        "code": "0xb316",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-184",
+        "tag": "multihash",
+        "code": "0xb317",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-192",
+        "tag": "multihash",
+        "code": "0xb318",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-200",
+        "tag": "multihash",
+        "code": "0xb319",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-208",
+        "tag": "multihash",
+        "code": "0xb31a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-216",
+        "tag": "multihash",
+        "code": "0xb31b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-224",
+        "tag": "multihash",
+        "code": "0xb31c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-232",
+        "tag": "multihash",
+        "code": "0xb31d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-240",
+        "tag": "multihash",
+        "code": "0xb31e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-248",
+        "tag": "multihash",
+        "code": "0xb31f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein256-256",
+        "tag": "multihash",
+        "code": "0xb320",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-8",
+        "tag": "multihash",
+        "code": "0xb321",
+        "status": "draft",
+        "description": "Skein512 consists of 64 output lengths that give different hashes"
+    },
+    {
+        "name": "skein512-16",
+        "tag": "multihash",
+        "code": "0xb322",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-24",
+        "tag": "multihash",
+        "code": "0xb323",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-32",
+        "tag": "multihash",
+        "code": "0xb324",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-40",
+        "tag": "multihash",
+        "code": "0xb325",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-48",
+        "tag": "multihash",
+        "code": "0xb326",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-56",
+        "tag": "multihash",
+        "code": "0xb327",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-64",
+        "tag": "multihash",
+        "code": "0xb328",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-72",
+        "tag": "multihash",
+        "code": "0xb329",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-80",
+        "tag": "multihash",
+        "code": "0xb32a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-88",
+        "tag": "multihash",
+        "code": "0xb32b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-96",
+        "tag": "multihash",
+        "code": "0xb32c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-104",
+        "tag": "multihash",
+        "code": "0xb32d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-112",
+        "tag": "multihash",
+        "code": "0xb32e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-120",
+        "tag": "multihash",
+        "code": "0xb32f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-128",
+        "tag": "multihash",
+        "code": "0xb330",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-136",
+        "tag": "multihash",
+        "code": "0xb331",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-144",
+        "tag": "multihash",
+        "code": "0xb332",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-152",
+        "tag": "multihash",
+        "code": "0xb333",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-160",
+        "tag": "multihash",
+        "code": "0xb334",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-168",
+        "tag": "multihash",
+        "code": "0xb335",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-176",
+        "tag": "multihash",
+        "code": "0xb336",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-184",
+        "tag": "multihash",
+        "code": "0xb337",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-192",
+        "tag": "multihash",
+        "code": "0xb338",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-200",
+        "tag": "multihash",
+        "code": "0xb339",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-208",
+        "tag": "multihash",
+        "code": "0xb33a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-216",
+        "tag": "multihash",
+        "code": "0xb33b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-224",
+        "tag": "multihash",
+        "code": "0xb33c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-232",
+        "tag": "multihash",
+        "code": "0xb33d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-240",
+        "tag": "multihash",
+        "code": "0xb33e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-248",
+        "tag": "multihash",
+        "code": "0xb33f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-256",
+        "tag": "multihash",
+        "code": "0xb340",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-264",
+        "tag": "multihash",
+        "code": "0xb341",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-272",
+        "tag": "multihash",
+        "code": "0xb342",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-280",
+        "tag": "multihash",
+        "code": "0xb343",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-288",
+        "tag": "multihash",
+        "code": "0xb344",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-296",
+        "tag": "multihash",
+        "code": "0xb345",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-304",
+        "tag": "multihash",
+        "code": "0xb346",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-312",
+        "tag": "multihash",
+        "code": "0xb347",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-320",
+        "tag": "multihash",
+        "code": "0xb348",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-328",
+        "tag": "multihash",
+        "code": "0xb349",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-336",
+        "tag": "multihash",
+        "code": "0xb34a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-344",
+        "tag": "multihash",
+        "code": "0xb34b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-352",
+        "tag": "multihash",
+        "code": "0xb34c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-360",
+        "tag": "multihash",
+        "code": "0xb34d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-368",
+        "tag": "multihash",
+        "code": "0xb34e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-376",
+        "tag": "multihash",
+        "code": "0xb34f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-384",
+        "tag": "multihash",
+        "code": "0xb350",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-392",
+        "tag": "multihash",
+        "code": "0xb351",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-400",
+        "tag": "multihash",
+        "code": "0xb352",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-408",
+        "tag": "multihash",
+        "code": "0xb353",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-416",
+        "tag": "multihash",
+        "code": "0xb354",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-424",
+        "tag": "multihash",
+        "code": "0xb355",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-432",
+        "tag": "multihash",
+        "code": "0xb356",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-440",
+        "tag": "multihash",
+        "code": "0xb357",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-448",
+        "tag": "multihash",
+        "code": "0xb358",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-456",
+        "tag": "multihash",
+        "code": "0xb359",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-464",
+        "tag": "multihash",
+        "code": "0xb35a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-472",
+        "tag": "multihash",
+        "code": "0xb35b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-480",
+        "tag": "multihash",
+        "code": "0xb35c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-488",
+        "tag": "multihash",
+        "code": "0xb35d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-496",
+        "tag": "multihash",
+        "code": "0xb35e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-504",
+        "tag": "multihash",
+        "code": "0xb35f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein512-512",
+        "tag": "multihash",
+        "code": "0xb360",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-8",
+        "tag": "multihash",
+        "code": "0xb361",
+        "status": "draft",
+        "description": "Skein1024 consists of 128 output lengths that give different hashes"
+    },
+    {
+        "name": "skein1024-16",
+        "tag": "multihash",
+        "code": "0xb362",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-24",
+        "tag": "multihash",
+        "code": "0xb363",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-32",
+        "tag": "multihash",
+        "code": "0xb364",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-40",
+        "tag": "multihash",
+        "code": "0xb365",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-48",
+        "tag": "multihash",
+        "code": "0xb366",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-56",
+        "tag": "multihash",
+        "code": "0xb367",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-64",
+        "tag": "multihash",
+        "code": "0xb368",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-72",
+        "tag": "multihash",
+        "code": "0xb369",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-80",
+        "tag": "multihash",
+        "code": "0xb36a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-88",
+        "tag": "multihash",
+        "code": "0xb36b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-96",
+        "tag": "multihash",
+        "code": "0xb36c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-104",
+        "tag": "multihash",
+        "code": "0xb36d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-112",
+        "tag": "multihash",
+        "code": "0xb36e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-120",
+        "tag": "multihash",
+        "code": "0xb36f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-128",
+        "tag": "multihash",
+        "code": "0xb370",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-136",
+        "tag": "multihash",
+        "code": "0xb371",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-144",
+        "tag": "multihash",
+        "code": "0xb372",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-152",
+        "tag": "multihash",
+        "code": "0xb373",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-160",
+        "tag": "multihash",
+        "code": "0xb374",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-168",
+        "tag": "multihash",
+        "code": "0xb375",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-176",
+        "tag": "multihash",
+        "code": "0xb376",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-184",
+        "tag": "multihash",
+        "code": "0xb377",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-192",
+        "tag": "multihash",
+        "code": "0xb378",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-200",
+        "tag": "multihash",
+        "code": "0xb379",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-208",
+        "tag": "multihash",
+        "code": "0xb37a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-216",
+        "tag": "multihash",
+        "code": "0xb37b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-224",
+        "tag": "multihash",
+        "code": "0xb37c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-232",
+        "tag": "multihash",
+        "code": "0xb37d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-240",
+        "tag": "multihash",
+        "code": "0xb37e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-248",
+        "tag": "multihash",
+        "code": "0xb37f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-256",
+        "tag": "multihash",
+        "code": "0xb380",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-264",
+        "tag": "multihash",
+        "code": "0xb381",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-272",
+        "tag": "multihash",
+        "code": "0xb382",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-280",
+        "tag": "multihash",
+        "code": "0xb383",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-288",
+        "tag": "multihash",
+        "code": "0xb384",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-296",
+        "tag": "multihash",
+        "code": "0xb385",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-304",
+        "tag": "multihash",
+        "code": "0xb386",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-312",
+        "tag": "multihash",
+        "code": "0xb387",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-320",
+        "tag": "multihash",
+        "code": "0xb388",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-328",
+        "tag": "multihash",
+        "code": "0xb389",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-336",
+        "tag": "multihash",
+        "code": "0xb38a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-344",
+        "tag": "multihash",
+        "code": "0xb38b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-352",
+        "tag": "multihash",
+        "code": "0xb38c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-360",
+        "tag": "multihash",
+        "code": "0xb38d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-368",
+        "tag": "multihash",
+        "code": "0xb38e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-376",
+        "tag": "multihash",
+        "code": "0xb38f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-384",
+        "tag": "multihash",
+        "code": "0xb390",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-392",
+        "tag": "multihash",
+        "code": "0xb391",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-400",
+        "tag": "multihash",
+        "code": "0xb392",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-408",
+        "tag": "multihash",
+        "code": "0xb393",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-416",
+        "tag": "multihash",
+        "code": "0xb394",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-424",
+        "tag": "multihash",
+        "code": "0xb395",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-432",
+        "tag": "multihash",
+        "code": "0xb396",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-440",
+        "tag": "multihash",
+        "code": "0xb397",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-448",
+        "tag": "multihash",
+        "code": "0xb398",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-456",
+        "tag": "multihash",
+        "code": "0xb399",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-464",
+        "tag": "multihash",
+        "code": "0xb39a",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-472",
+        "tag": "multihash",
+        "code": "0xb39b",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-480",
+        "tag": "multihash",
+        "code": "0xb39c",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-488",
+        "tag": "multihash",
+        "code": "0xb39d",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-496",
+        "tag": "multihash",
+        "code": "0xb39e",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-504",
+        "tag": "multihash",
+        "code": "0xb39f",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-512",
+        "tag": "multihash",
+        "code": "0xb3a0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-520",
+        "tag": "multihash",
+        "code": "0xb3a1",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-528",
+        "tag": "multihash",
+        "code": "0xb3a2",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-536",
+        "tag": "multihash",
+        "code": "0xb3a3",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-544",
+        "tag": "multihash",
+        "code": "0xb3a4",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-552",
+        "tag": "multihash",
+        "code": "0xb3a5",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-560",
+        "tag": "multihash",
+        "code": "0xb3a6",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-568",
+        "tag": "multihash",
+        "code": "0xb3a7",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-576",
+        "tag": "multihash",
+        "code": "0xb3a8",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-584",
+        "tag": "multihash",
+        "code": "0xb3a9",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-592",
+        "tag": "multihash",
+        "code": "0xb3aa",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-600",
+        "tag": "multihash",
+        "code": "0xb3ab",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-608",
+        "tag": "multihash",
+        "code": "0xb3ac",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-616",
+        "tag": "multihash",
+        "code": "0xb3ad",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-624",
+        "tag": "multihash",
+        "code": "0xb3ae",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-632",
+        "tag": "multihash",
+        "code": "0xb3af",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-640",
+        "tag": "multihash",
+        "code": "0xb3b0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-648",
+        "tag": "multihash",
+        "code": "0xb3b1",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-656",
+        "tag": "multihash",
+        "code": "0xb3b2",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-664",
+        "tag": "multihash",
+        "code": "0xb3b3",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-672",
+        "tag": "multihash",
+        "code": "0xb3b4",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-680",
+        "tag": "multihash",
+        "code": "0xb3b5",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-688",
+        "tag": "multihash",
+        "code": "0xb3b6",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-696",
+        "tag": "multihash",
+        "code": "0xb3b7",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-704",
+        "tag": "multihash",
+        "code": "0xb3b8",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-712",
+        "tag": "multihash",
+        "code": "0xb3b9",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-720",
+        "tag": "multihash",
+        "code": "0xb3ba",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-728",
+        "tag": "multihash",
+        "code": "0xb3bb",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-736",
+        "tag": "multihash",
+        "code": "0xb3bc",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-744",
+        "tag": "multihash",
+        "code": "0xb3bd",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-752",
+        "tag": "multihash",
+        "code": "0xb3be",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-760",
+        "tag": "multihash",
+        "code": "0xb3bf",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-768",
+        "tag": "multihash",
+        "code": "0xb3c0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-776",
+        "tag": "multihash",
+        "code": "0xb3c1",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-784",
+        "tag": "multihash",
+        "code": "0xb3c2",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-792",
+        "tag": "multihash",
+        "code": "0xb3c3",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-800",
+        "tag": "multihash",
+        "code": "0xb3c4",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-808",
+        "tag": "multihash",
+        "code": "0xb3c5",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-816",
+        "tag": "multihash",
+        "code": "0xb3c6",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-824",
+        "tag": "multihash",
+        "code": "0xb3c7",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-832",
+        "tag": "multihash",
+        "code": "0xb3c8",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-840",
+        "tag": "multihash",
+        "code": "0xb3c9",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-848",
+        "tag": "multihash",
+        "code": "0xb3ca",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-856",
+        "tag": "multihash",
+        "code": "0xb3cb",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-864",
+        "tag": "multihash",
+        "code": "0xb3cc",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-872",
+        "tag": "multihash",
+        "code": "0xb3cd",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-880",
+        "tag": "multihash",
+        "code": "0xb3ce",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-888",
+        "tag": "multihash",
+        "code": "0xb3cf",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-896",
+        "tag": "multihash",
+        "code": "0xb3d0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-904",
+        "tag": "multihash",
+        "code": "0xb3d1",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-912",
+        "tag": "multihash",
+        "code": "0xb3d2",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-920",
+        "tag": "multihash",
+        "code": "0xb3d3",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-928",
+        "tag": "multihash",
+        "code": "0xb3d4",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-936",
+        "tag": "multihash",
+        "code": "0xb3d5",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-944",
+        "tag": "multihash",
+        "code": "0xb3d6",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-952",
+        "tag": "multihash",
+        "code": "0xb3d7",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-960",
+        "tag": "multihash",
+        "code": "0xb3d8",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-968",
+        "tag": "multihash",
+        "code": "0xb3d9",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-976",
+        "tag": "multihash",
+        "code": "0xb3da",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-984",
+        "tag": "multihash",
+        "code": "0xb3db",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-992",
+        "tag": "multihash",
+        "code": "0xb3dc",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-1000",
+        "tag": "multihash",
+        "code": "0xb3dd",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-1008",
+        "tag": "multihash",
+        "code": "0xb3de",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-1016",
+        "tag": "multihash",
+        "code": "0xb3df",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "skein1024-1024",
+        "tag": "multihash",
+        "code": "0xb3e0",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "xxh-32",
+        "tag": "hash",
+        "code": "0xb3e1",
+        "status": "draft",
+        "description": "Extremely fast non-cryptographic hash algorithm"
+    },
+    {
+        "name": "xxh-64",
+        "tag": "hash",
+        "code": "0xb3e2",
+        "status": "draft",
+        "description": "Extremely fast non-cryptographic hash algorithm"
+    },
+    {
+        "name": "xxh3-64",
+        "tag": "hash",
+        "code": "0xb3e3",
+        "status": "draft",
+        "description": "Extremely fast non-cryptographic hash algorithm"
+    },
+    {
+        "name": "xxh3-128",
+        "tag": "hash",
+        "code": "0xb3e4",
+        "status": "draft",
+        "description": "Extremely fast non-cryptographic hash algorithm"
+    },
+    {
+        "name": "poseidon-bls12_381-a2-fc1",
+        "tag": "multihash",
+        "code": "0xb401",
+        "status": "permanent",
+        "description": "Poseidon using BLS12-381 and arity of 2 with Filecoin parameters"
+    },
+    {
+        "name": "poseidon-bls12_381-a2-fc1-sc",
+        "tag": "multihash",
+        "code": "0xb402",
+        "status": "draft",
+        "description": "Poseidon using BLS12-381 and arity of 2 with Filecoin parameters - high-security variant"
+    },
+    {
+        "name": "rdfc-1",
+        "tag": "ipld",
+        "code": "0xb403",
+        "status": "draft",
+        "description": "The result of canonicalizing an input according to RDFC-1.0 and then expressing its hash value as a multihash value."
+    },
+    {
+        "name": "ssz",
+        "tag": "serialization",
+        "code": "0xb501",
+        "status": "draft",
+        "description": "SimpleSerialize (SSZ) serialization"
+    },
+    {
+        "name": "ssz-sha2-256-bmt",
+        "tag": "multihash",
+        "code": "0xb502",
+        "status": "draft",
+        "description": "SSZ Merkle tree root using SHA2-256 as the hashing function and SSZ serialization for the block binary"
+    },
+    {
+        "name": "json-jcs",
+        "tag": "ipld",
+        "code": "0xb601",
+        "status": "draft",
+        "description": "The result of canonicalizing an input according to JCS - JSON Canonicalisation Scheme (RFC 8785)"
+    },
+    {
+        "name": "iscc",
+        "tag": "softhash",
+        "code": "0xcc01",
+        "status": "draft",
+        "description": "ISCC (International Standard Content Code) - similarity preserving hash"
+    },
+    {
+        "name": "zeroxcert-imprint-256",
+        "tag": "zeroxcert",
+        "code": "0xce11",
+        "status": "draft",
+        "description": "0xcert Asset Imprint (root hash)"
+    },
+    {
+        "name": "nonstandard-sig",
+        "tag": "varsig",
+        "code": "0xd000",
+        "status": "deprecated",
+        "description": "Namespace for all not yet standard signature algorithms"
+    },
+    {
+        "name": "es256k",
+        "tag": "varsig",
+        "code": "0xd0e7",
+        "status": "draft",
+        "description": "ES256K Siganture Algorithm (secp256k1)"
+    },
+    {
+        "name": "bls-12381-g1-sig",
+        "tag": "varsig",
+        "code": "0xd0ea",
+        "status": "draft",
+        "description": "G1 signature for BLS-12381-G2"
+    },
+    {
+        "name": "bls-12381-g2-sig",
+        "tag": "varsig",
+        "code": "0xd0eb",
+        "status": "draft",
+        "description": "G2 signature for BLS-12381-G1"
+    },
+    {
+        "name": "eddsa",
+        "tag": "varsig",
+        "code": "0xd0ed",
+        "status": "draft",
+        "description": "Edwards-Curve Digital Signature Algorithm"
+    },
+    {
+        "name": "eip-191",
+        "tag": "varsig",
+        "code": "0xd191",
+        "status": "draft",
+        "description": "EIP-191 Ethereum Signed Data Standard"
+    },
+    {
+        "name": "jwk_jcs-pub",
+        "tag": "key",
+        "code": "0xeb51",
+        "status": "draft",
+        "description": "JSON object containing only the required members of a JWK (RFC 7518 and RFC 7517) representing the public key. Serialisation based on JCS (RFC 8785)"
+    },
+    {
+        "name": "fil-commitment-unsealed",
+        "tag": "filecoin",
+        "code": "0xf101",
+        "status": "permanent",
+        "description": "Filecoin piece or sector data commitment merkle node/root (CommP & CommD)"
+    },
+    {
+        "name": "fil-commitment-sealed",
+        "tag": "filecoin",
+        "code": "0xf102",
+        "status": "permanent",
+        "description": "Filecoin sector data commitment merkle node/root - sealed and replicated (CommR)"
+    },
+    {
+        "name": "plaintextv2",
+        "tag": "multiaddr",
+        "code": "0x706c61",
+        "status": "draft",
+        "description": ""
+    },
+    {
+        "name": "holochain-adr-v0",
+        "tag": "holochain",
+        "code": "0x807124",
+        "status": "draft",
+        "description": "Holochain v0 address    + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "holochain-adr-v1",
+        "tag": "holochain",
+        "code": "0x817124",
+        "status": "draft",
+        "description": "Holochain v1 address    + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "holochain-key-v0",
+        "tag": "holochain",
+        "code": "0x947124",
+        "status": "draft",
+        "description": "Holochain v0 public key + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "holochain-key-v1",
+        "tag": "holochain",
+        "code": "0x957124",
+        "status": "draft",
+        "description": "Holochain v1 public key + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "holochain-sig-v0",
+        "tag": "holochain",
+        "code": "0xa27124",
+        "status": "draft",
+        "description": "Holochain v0 signature  + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "holochain-sig-v1",
+        "tag": "holochain",
+        "code": "0xa37124",
+        "status": "draft",
+        "description": "Holochain v1 signature  + 8 R-S (63 x Base-32)"
+    },
+    {
+        "name": "skynet-ns",
+        "tag": "namespace",
+        "code": "0xb19910",
+        "status": "draft",
+        "description": "Skynet Namespace"
+    },
+    {
+        "name": "arweave-ns",
+        "tag": "namespace",
+        "code": "0xb29910",
+        "status": "draft",
+        "description": "Arweave Namespace"
+    },
+    {
+        "name": "subspace-ns",
+        "tag": "namespace",
+        "code": "0xb39910",
+        "status": "draft",
+        "description": "Subspace Network Namespace"
+    },
+    {
+        "name": "kumandra-ns",
+        "tag": "namespace",
+        "code": "0xb49910",
+        "status": "draft",
+        "description": "Kumandra Network Namespace"
+    },
+    {
+        "name": "es256",
+        "tag": "varsig",
+        "code": "0xd01200",
+        "status": "draft",
+        "description": "ES256 Signature Algorithm"
+    },
+    {
+        "name": "es284",
+        "tag": "varsig",
+        "code": "0xd01201",
+        "status": "draft",
+        "description": "ES384 Signature Algorithm"
+    },
+    {
+        "name": "es512",
+        "tag": "varsig",
+        "code": "0xd01202",
+        "status": "draft",
+        "description": "ES512 Signature Algorithm"
+    },
+    {
+        "name": "rs256",
+        "tag": "varsig",
+        "code": "0xd01205",
+        "status": "draft",
+        "description": "RS256 Signature Algorithm"
+    },
+    {
+        "name": "scion",
+        "tag": "multiaddr",
+        "code": "0xd02000",
+        "status": "draft",
+        "description": "SCION Internet architecture"
+    }
+]

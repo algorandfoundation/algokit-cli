@@ -1,0 +1,67 @@
+name: "Setup, Build, and Test"
+description: "Set up Python with Poetry, build and test binaries"
+inputs:
+  package_name:
+    description: "The name of the package to build and test"
+    required: true
+  upload_binaries:
+    description: "Flag to determine if this is a production release"
+    required: true
+  operating_system:
+    description: "Operating system to set the correct binary path and extension"
+    required: true
+  build_command:
+    description: "Command to build the binaries"
+    required: true
+  python_version:
+    description: "Python version to use"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build Executable
+      run: ${{ inputs.build_command }}
+      shell: bash
+
+    - name: Test Executable
+      run: |
+        ls -l dist
+        ./dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --help
+      shell: bash
+
+    - name: Set release version
+      shell: bash
+      continue-on-error: true
+      if: ${{ inputs.upload_binaries == 'true' }}
+      run: |
+        echo "RELEASE_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
+        git describe --tags $(git rev-list --tags --max-count=1)
+
+    - name: Zip binaries
+      shell: bash
+      continue-on-error: true
+      if: ${{ inputs.upload_binaries == 'true' }}
+      run: |
+        ls -l dist
+        cd dist/algokit/
+        tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        cd ../..
+        ls -l
+
+    - name: Upload binary as artifact
+      if: ${{ inputs.upload_binaries == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: algokit-cli-${{ inputs.operating_system }}-py${{ inputs.python_version }}
+        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
+
+    - name: Append binary to release
+      continue-on-error: true
+      if: ${{ inputs.upload_binaries == 'true' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
+        tag_name: ${{ env.RELEASE_VERSION }}
+        prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}

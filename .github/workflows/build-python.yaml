@@ -6,35 +6,49 @@ jobs:
   build-python:
     strategy:
       matrix:
-        #os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
         # Mac and Windows chew through build minutes - waiting until repo is public to enable
-        os: ["ubuntu-latest", "windows-latest"]
-        python: ["3.10"]
+        python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-          cache: "poetry"
+
+      - name: Set up Poetry
+        uses: ./.github/actions/setup-poetry
+
+      - uses: actions/cache@v4
+        name: Setup poetry cache
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ matrix.os }}-${{ matrix.python }}
 
       - name: Install dependencies
-        run: poetry install --no-interaction && pipx install tealer==0.1.1
+        # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
+        # track here -> https://github.com/crytic/tealer/pull/209
+        run: poetry install --no-interaction && pipx install git+https://github.com/algorandfoundation/tealer@3-12
 
       - name: pytest + coverage
         shell: bash
         run: |
           set -o pipefail
           poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
+        id: pytest
 
-      - name: pytest coverage comment - using Python 3.10 on ubuntu-latest
-        if: matrix.python == '3.10' && matrix.os == 'ubuntu-latest'
+      - name: Upload received snapshots (in case of failure)
+        if: failure() && steps.pytest.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.os }}-python${{ matrix.python }}
+          path: tests/**/*.received.txt
+
+      - name: pytest coverage comment - using Python 3.12 on ubuntu-latest
+        if: matrix.python == '3.12' && matrix.os == 'ubuntu-latest'
         continue-on-error: true # forks fail to add a comment, so continue any way
         uses: MishaKav/pytest-coverage-comment@main
         with:

@@ -1,0 +1,152 @@
+[
+    {
+        "name": "identity",
+        "code": "0x00",
+        "status": "reserved",
+        "description": "(No base encoding)"
+    },
+    {
+        "name": "base2",
+        "code": "0",
+        "status": "experimental",
+        "description": "Binary (01010101)"
+    },
+    {
+        "name": "base8",
+        "code": "7",
+        "status": "draft",
+        "description": "Octal"
+    },
+    {
+        "name": "base10",
+        "code": "9",
+        "status": "draft",
+        "description": "Decimal"
+    },
+    {
+        "name": "base32upper",
+        "code": "B",
+        "status": "final",
+        "description": "RFC4648 case-insensitive - no padding"
+    },
+    {
+        "name": "base32padupper",
+        "code": "C",
+        "status": "draft",
+        "description": "RFC4648 case-insensitive - with padding"
+    },
+    {
+        "name": "base16upper",
+        "code": "F",
+        "status": "final",
+        "description": "Hexadecimal (uppercase)"
+    },
+    {
+        "name": "base36upper",
+        "code": "K",
+        "status": "draft",
+        "description": "Base36 [0-9a-z] case-insensitive - no padding"
+    },
+    {
+        "name": "base64pad",
+        "code": "M",
+        "status": "experimental",
+        "description": "RFC4648 with padding - MIME encoding"
+    },
+    {
+        "name": "base32hexpadupper",
+        "code": "T",
+        "status": "experimental",
+        "description": "RFC4648 case-insensitive - with padding"
+    },
+    {
+        "name": "base64urlpad",
+        "code": "U",
+        "status": "final",
+        "description": "RFC4648 with padding"
+    },
+    {
+        "name": "base32hexupper",
+        "code": "V",
+        "status": "experimental",
+        "description": "RFC4648 case-insensitive - no padding - highest char"
+    },
+    {
+        "name": "base58flickr",
+        "code": "Z",
+        "status": "experimental",
+        "description": "Base58 Flicker"
+    },
+    {
+        "name": "base32",
+        "code": "b",
+        "status": "final",
+        "description": "RFC4648 case-insensitive - no padding"
+    },
+    {
+        "name": "base32pad",
+        "code": "c",
+        "status": "draft",
+        "description": "RFC4648 case-insensitive - with padding"
+    },
+    {
+        "name": "base16",
+        "code": "f",
+        "status": "final",
+        "description": "Hexadecimal (lowercase)"
+    },
+    {
+        "name": "base32z",
+        "code": "h",
+        "status": "draft",
+        "description": "z-base-32 (used by Tahoe-LAFS)"
+    },
+    {
+        "name": "base36",
+        "code": "k",
+        "status": "draft",
+        "description": "Base36 [0-9a-z] case-insensitive - no padding"
+    },
+    {
+        "name": "base64",
+        "code": "m",
+        "status": "final",
+        "description": "RFC4648 no padding"
+    },
+    {
+        "name": "proquint",
+        "code": "p",
+        "status": "experimental",
+        "description": "Proquint (https://arxiv.org/html/0901.4016)"
+    },
+    {
+        "name": "base32hexpad",
+        "code": "t",
+        "status": "experimental",
+        "description": "RFC4648 case-insensitive - with padding"
+    },
+    {
+        "name": "base64url",
+        "code": "u",
+        "status": "final",
+        "description": "RFC4648 no padding"
+    },
+    {
+        "name": "base32hex",
+        "code": "v",
+        "status": "experimental",
+        "description": "RFC4648 case-insensitive - no padding - highest char"
+    },
+    {
+        "name": "base58btc",
+        "code": "z",
+        "status": "final",
+        "description": "Base58 Bitcoin"
+    },
+    {
+        "name": "base256emoji",
+        "code": "0x01F680",
+        "status": "experimental",
+        "description": "base256 with custom alphabet using variable-sized-codepoints"
+    }
+]

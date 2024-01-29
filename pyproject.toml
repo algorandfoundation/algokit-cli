@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.13"
 click = "^8.1.3"
 httpx = "^0.23.1"
 copier = "^9.0.0"
@@ -28,6 +28,7 @@ aiohttp = "3.9.1"
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
+pyinstaller = {version = "^6.3.0"}
 pytest = "^7.2.0"
 ruff = "^0.1.6"
 pip-audit = "^2.4.7"
@@ -57,6 +58,9 @@ docs_generate = "sphinx-build -b markdown -E docs/sphinx docs/cli"
 docs_toc = "gfm-toc docs/cli/index.md -e 3"
 docs_title = {shell = "(echo \"# AlgoKit CLI Reference Documentation\\n\\n\"; cat docs/cli/index.md) > docs/cli/temp.md && mv docs/cli/temp.md docs/cli/index.md"}
 docs = ["docs_generate", "docs_toc", "docs_title"]
+package_unix = "pyinstaller --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config/multibase-table.json:multiformats_config/' --add-data './misc/multiformats_config/multicodec-table.json:multiformats_config/'"
+package_windows = "pyinstaller --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config/multibase-table.json;multiformats_config/ --add-data ./misc/multiformats_config/multicodec-table.json;multiformats_config/"
+
 
 [tool.ruff]
 line-length = 120

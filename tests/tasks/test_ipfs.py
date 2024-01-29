@@ -1,9 +1,17 @@
 import pytest
 from algokit.core.tasks.ipfs import ALGOKIT_PINATA_TOKEN_KEY
 from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
 
-from tests.utils.approvals import verify
+from tests.utils.approvals import TokenScrubber, verify
 from tests.utils.click_invoker import invoke
+
+scrubber = TokenScrubber({})
+
+
+@pytest.fixture(autouse=True)
+def _disable_animation(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.animate", return_value=None)
 
 
 class TestIpfsLogin:
@@ -50,7 +58,7 @@ class TestIpfsUpload:
 
         # Assert
         assert result.exit_code == 0
-        verify(result.output)
+        verify(result.output, scrubber=scrubber)
 
     def test_ipfs_not_logged_in(
         self, tmp_path_factory: pytest.TempPathFactory, mock_keyring: dict[str, str | None]
@@ -80,4 +88,4 @@ class TestIpfsUpload:
 
         # Assert
         assert result.exit_code == 1
-        verify(result.output)
+        verify(result.output, scrubber=scrubber)

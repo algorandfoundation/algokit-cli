@@ -2,6 +2,10 @@ name: Pull Request validation
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr-check:
     name: Check Python
@@ -11,3 +15,11 @@ jobs:
     name: Build and Test Python
     needs: pr-check
     uses: ./.github/workflows/build-python.yaml
+
+  pr-binaries-build:
+    name: Build Binaries
+    needs: pr-check
+    uses: ./.github/workflows/build-binaries.yaml
+    with:
+      upload_binaries: "false"
+      python_version: "3.12"
