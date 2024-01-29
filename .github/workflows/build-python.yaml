@@ -29,7 +29,9 @@ jobs:
           key: venv-${{ hashFiles('poetry.lock') }}-${{ matrix.os }}-${{ matrix.python }}
 
       - name: Install dependencies
-        run: poetry install --no-interaction && pipx install tealer==0.1.1
+        # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
+        # track here -> https://github.com/crytic/tealer/pull/209
+        run: poetry install --no-interaction && pipx install git+https://github.com/algorandfoundation/tealer@3-12
 
       - name: pytest + coverage
         shell: bash
