@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.1 (2024-01-30)
+
+### Fix
+
+* Patching tealer 3.12 compatibility ([#401](https://github.com/algorandfoundation/algokit-cli/issues/401)) ([`05ea554`](https://github.com/algorandfoundation/algokit-cli/commit/05ea554fcad9fdf3eb5b038231eaf1155f9e5ce7))
+* Patch cd pipeline merge conflict ([#399](https://github.com/algorandfoundation/algokit-cli/issues/399)) ([`806d0e2`](https://github.com/algorandfoundation/algokit-cli/commit/806d0e269f9e621c3ed8f47a8fd3d4e24a5a366c))
+
 ## v1.11.0 (2024-01-28)
 
 ### Feature
