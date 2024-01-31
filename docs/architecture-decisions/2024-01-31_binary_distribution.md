@@ -73,7 +73,7 @@ flowchart
 
 **Cons**
 
-- Ability to rely on package manager to handle installation, updates and removal of the binaries
+- Increase complexity of release pipeline as we need to introduce additional steps to build the binaries for different architectures as well as introduce tailored workflows for each package manager
 - PoC tests on building pyinstaller inside QEMU armv7 ubuntu images are proven to be **extremely** slow (up to an hour without cached based docker images). Additionally the build process is complicated by the fact that wheels like `cryptography` require `rust` to be installed as part of building the wheel, which increases the build time even further.
 
 #### Snap
@@ -82,11 +82,11 @@ flowchart
 
 - Snap is available on all major Linux distributions
 - Ubuntu provides a Launchpad platform that simplifies compiling snaps on different architectures remotely
-- Snap supports distribution of pyinstaller binaries
+- Snap supports distribution of pyinstaller binaries (verified in a PoC on a fork of algokit-cli)
 
 **Cons**
 
-- Snap provides a native support for pyhon applications which may be simpler to use than pyinstaller.
+- Snap provides a native support for pyhon applications which may be simpler to use than pyinstaller rather than distributing the binaries as it allows us to rely directly on remote Launchpad builds instead of pre-building the binaries per each architecture
 - If we are to distribute pyinstaller binaries, the binaries itself need to be cross compiled on target architecutres. Currently we get `amd64` binaries with `ubuntu` runners, however we would need to introduce extra self hosted runners to get `arm64` binaries. In this case we would need to run building of binaries AND building of snaps in build matrices consiting of default `ubuntu` runners and self hosted `arm64` runners. This will increase the build time and complexity of the build process.
 
 #### Brew
@@ -94,12 +94,12 @@ flowchart
 **Pros**
 
 - A flow for distributing algokit wheel via `brew` is already established
-- Brew supports distribution of pyinstaller binaries
+- Brew supports distribution of pyinstaller binaries (verified in a PoC on a fork of algokit-cli)
 - Will require minor changes in the existing brew workflow to operate with binary artifacts instead of wheel artifacts
-- Pyinstaller allows compiling a `universal2` binary that works on both `arm64` and `amd64` architectures. This means that for `Mac` we can use the existing `ubuntu` runners to build the binaries and distribute them via `brew` to both `arm64` and `amd64` architectures.
 
 **Cons**
 
+- Algokit cli relies on dependencies that are not `fat` binaries. This means we can't use pyinstaller to target `universal2` architecture and instead need to build the binaries for each architecture separately. Hence using a paid ARM macos runner is a simple solution to get binaries for Apple Silicon.
 - Codesigning is required for distribution of binaries via `brew`. This means that we need to have a valid Apple Developer account and a valid certificate to sign the binaries. While this is a good practice regardless, listing this as a con given non deterministic nature of obtaining a valid certificate from Apple.
 - Separate ARM worker for apple silicon binaries is required. Github provides beta version of such runners for with paid billing plans.
 
