@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.2 (2024-02-01)
+
+### Fix
+
+* Bump algokit-client-generator to 1.1.1 ([#403](https://github.com/algorandfoundation/algokit-cli/issues/403)) ([`28dd709`](https://github.com/algorandfoundation/algokit-cli/commit/28dd709314b5557b1351a6db6f2305e168438d28))
+
 ## v1.11.1 (2024-01-30)
 
 ### Fix
