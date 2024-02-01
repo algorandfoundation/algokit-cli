@@ -237,7 +237,9 @@ This approach combines option 1 and option 3. This means that we are distributin
 
 ## Preferred option
 
-TBD
+- We are not supporting Windows ARM and Ubuntu ARM
+- We are not using self-hosted runners approach
+- Pending on key decision from Algorand Foundation on whether we want to have brew, snap, winget distribution vs self contained binary executables.
 
 ## Selected option
 
