@@ -1,6 +1,6 @@
 # AlgoKit CLI binary distribution
 
-- **Status**: Draft
+- **Status**: Proposed (rev #2)
 - **Owner:** Altynbek Orumbayev (MakerX)
 - **Deciders**: Alessandro (Algorand Foundation), Rob Moore (MakerX), MakerX team
 - **Date created**: 2024-01-31
