@@ -37,7 +37,7 @@ flowchart
 	n3 --- n4["Linux"]
 	n3 --- n5["Mac"]
 	n3 --- n6["Windows"]
-	n4 --- n7["ubuntu-latest amd64"]
+	n4 --- n7["ubuntu-latest x86-64"]
 	n7 --- n9["Upload artifacts"]
 	n5 --- n10["macos-latest x86-64"]
 	n5 --- n11["macos-large-latest ARM"]
@@ -54,8 +54,8 @@ flowchart
 	n18 --- n19["submit release PR to winget community repo"]
 	n16 --- n20["refresh cask definition"]
 	n20 --- n21["submit pr to algorandfoundation/tap"]
-	n15 --- n22["amd64"]
-	n22 --- n23["build and submit amd64 snap on ubuntu-latest runner"]
+	n15 --- n22["x86-64"]
+	n22 --- n23["build and submit x86-64 snap on ubuntu-latest runner"]
 	n23 --- n24["publish snap"]
 ```
 
@@ -68,7 +68,7 @@ flowchart
 
 **Cons**
 
-- Assuming we are targeting AMD64/ARM64 on mac, AMD64 on Windows and AMD64 on Linux, no major cons are identified with this approach other than certain non deteministic factos around initial setup of Apple dev account, approval of PR on winget repo and setup of the Snapstore profile.
+- Assuming we are targeting x86-64/ARM64 on mac, x86-64 on Windows and x86-64 on Linux, no major cons are identified with this approach other than certain non deteministic factos around initial setup of Apple dev account, approval of PR on winget repo and setup of the Snapstore profile.
 
 #### Snap
 
@@ -82,7 +82,7 @@ flowchart
 **Cons**
 
 - ~~Snap provides a native support for pyhon applications which may be simpler to use than pyinstaller rather than distributing the binaries as it allows us to rely directly on remote Launchpad builds instead of pre-building the binaries per each architecture.~~ **No longer an issue given latest decision not to support ARM64 linux given that pipx is still gonna be a first class citizen alternative.**
-- ~~If we are to distribute pyinstaller binaries, the binaries itself need to be cross compiled on target architectures. Currently we get `amd64` binaries with `ubuntu` runners, however we would need to introduce extra self hosted runners to get `arm64` binaries. In this case we would need to run building of binaries AND building of snaps in build matrices consiting of default `ubuntu` runners and self hosted `arm64` runners. This will increase the build time and complexity of the build process.~~ **No longer an issue given latest decision not to support ARM64 linux given that pipx is still gonna be a first class citizen alternative.**
+- ~~If we are to distribute pyinstaller binaries, the binaries itself need to be cross compiled on target architectures. Currently we get `x86-64` binaries with `ubuntu` runners, however we would need to introduce extra self hosted runners to get `arm64` binaries. In this case we would need to run building of binaries AND building of snaps in build matrices consiting of default `ubuntu` runners and self hosted `arm64` runners. This will increase the build time and complexity of the build process.~~ **No longer an issue given latest decision not to support ARM64 linux given that pipx is still gonna be a first class citizen alternative.**
 
 #### Brew
 
