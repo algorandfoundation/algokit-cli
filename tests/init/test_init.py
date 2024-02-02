@@ -685,6 +685,32 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     )
 
 
+def test_init_fullstack_template_fails_on_missing_python(which_mock: WhichMock,
+                                                         mock_questionary_input: PipeInput) -> None:
+    which_mock.remove("python")
+    mock_questionary_input.send_text("y")
+    mock_questionary_input.send_text("y")
+    ref = "python_path"
+    result = invoke("init --name myapp --no-git --defaults --template-url "
+                    "https://github.com/algorandfoundation/algokit-fullstack-template"
+                    f"--template-url-ref {ref} --UNSAFE-SECURITY-accept-template-url")
+
+    assert result.exit_code != 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_fullstack_template_works(which_mock: WhichMock, mock_questionary_input: PipeInput) -> None:
+    mock_questionary_input.send_text("y")
+    mock_questionary_input.send_text("y")
+    ref = "python_path"  # this is the branch of the full stack template that has the changes to the python path
+    result = invoke("init --name myapp --no-git --defaults --template-url "
+                    "https://github.com/algorandfoundation/algokit-fullstack-template"
+                    f"--template-url-ref {ref} --UNSAFE-SECURITY-accept-template-url")
+
+    assert result.exit_code != 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def _remove_git_hints(output: str) -> str:
     git_init_hint_prefix = "DEBUG: git: hint:"
     lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]
