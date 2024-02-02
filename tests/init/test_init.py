@@ -685,29 +685,90 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     )
 
 
-def test_init_fullstack_template_fails_on_missing_python(which_mock: WhichMock,
-                                                         mock_questionary_input: PipeInput) -> None:
-    which_mock.remove("python")
-    mock_questionary_input.send_text("y")
-    mock_questionary_input.send_text("y")
-    ref = "python_path"
-    result = invoke("init --name myapp --no-git --defaults --template-url "
-                    "https://github.com/algorandfoundation/algokit-fullstack-template"
-                    f"--template-url-ref {ref} --UNSAFE-SECURITY-accept-template-url")
+def test_init_fullstack_template_fails_on_missing_python(
+    mocker: MockerFixture, tmp_path_factory: TempPathFactory
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    dummy_template_path = cwd / "dummy_template"
+    dummy_template_path.mkdir()
+    (dummy_template_path / "copier.yaml").write_text(
+        """
+_tasks:
+    - "echo '==== 1/1 - Emulate fullstack template python task ===='"
+    - '{{ system_path }} -c ''print("hello world")'''
 
-    assert result.exit_code != 1
+system_path:
+    type: str
+    help: Path to the sys.executable.
+"""
+    )
+    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
+
+    which_mock = WhichMock()
+    mocker.patch("algokit.core.utils.which").side_effect = which_mock.which
+    mocker.patch("algokit.core.utils.get_base_python_path", return_value=None)
+    which_mock.remove("python")
+    which_mock.remove("python3")
+
+    ref = "HEAD"
+    result = invoke(
+        [
+            "init",
+            "--name",
+            "myapp",
+            "--no-git",
+            "--defaults",
+            f"--template-url={dummy_template_path}",
+            f"--template-url-ref={ref}",
+            "--UNSAFE-SECURITY-accept-template-url",
+        ],
+        cwd=cwd,
+        input="y\n",
+    )
+
+    assert result.exit_code == 1
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_fullstack_template_works(which_mock: WhichMock, mock_questionary_input: PipeInput) -> None:
-    mock_questionary_input.send_text("y")
-    mock_questionary_input.send_text("y")
-    ref = "python_path"  # this is the branch of the full stack template that has the changes to the python path
-    result = invoke("init --name myapp --no-git --defaults --template-url "
-                    "https://github.com/algorandfoundation/algokit-fullstack-template"
-                    f"--template-url-ref {ref} --UNSAFE-SECURITY-accept-template-url")
+def test_init_fullstack_template_works(which_mock: WhichMock, tmp_path_factory: TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    dummy_template_path = cwd / "dummy_template"
+    dummy_template_path.mkdir()
+    (dummy_template_path / "copier.yaml").write_text(
+        """
+_tasks:
+    - "echo '==== 1/1 - Emulate fullstack template python task ===='"
+    - '{{ system_path }} -c ''print("hello world")'''
 
-    assert result.exit_code != 0
+system_path:
+    type: str
+    help: Path to the sys.executable.
+"""
+    )
+    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
+
+    which_mock.remove("python")
+    ref = "HEAD"
+    result = invoke(
+        [
+            "init",
+            "--name",
+            "myapp",
+            "--no-git",
+            "--defaults",
+            f"--template-url={dummy_template_path}",
+            f"--template-url-ref={ref}",
+            "--UNSAFE-SECURITY-accept-template-url",
+        ],
+        cwd=cwd,
+        input="y\n",
+    )
+
+    assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
 
 

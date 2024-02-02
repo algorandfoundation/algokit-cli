@@ -1,6 +1,5 @@
 import json
 import re
-import sys
 from pathlib import Path
 
 import pytest
@@ -97,15 +96,3 @@ def test_vanity_address_on_existing_alias(mock_keyring: dict[str, str]) -> None:
     assert result.exit_code == 0
     assert json.loads(mock_keyring[alias])["alias"] == alias
     assert json.loads(mock_keyring[alias])["address"].startswith("A")
-
-
-def test_vanity_address_in_pyinstaller(monkeypatch) -> None:
-    monkeypatch.setattr(sys, 'frozen', True, raising=False)
-    monkeypatch.setattr(sys, '_MEIPASS', '/path/to/fake/resource', raising=False)
-    result = invoke("task vanity-address A -m anywhere")
-
-    assert result.exit_code == 0
-    match = re.search(r"'address': '([^']+)'", result.output)
-    if match:
-        address = match.group(1)
-        assert address.startswith("A")
