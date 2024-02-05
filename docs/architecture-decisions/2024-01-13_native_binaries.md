@@ -1,6 +1,6 @@
 # AlgoKit CLI native binaries
 
-- **Status**: Draft
+- **Status**: Approved
 - **Owner:** Altynbek Orumbayev (MakerX), Negar Abbasi (MakerX)
 - **Deciders**: Alessandro (Algorand Foundation), MakerX
 - **Date created**: 2024-01-13
