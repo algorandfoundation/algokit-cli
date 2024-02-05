@@ -2,4 +2,4 @@ WARNING: Community templates have not been reviewed, and can execute arbitrary c
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 DEBUG: template source = {current_working_directory}/dummy_template@HEAD
 DEBUG: project path = {current_working_directory}/myapp
-Error: You need to have python installed to use this command
+Error: Python not found on system path. You need to have python installed to use this command.
