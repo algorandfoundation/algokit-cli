@@ -74,6 +74,28 @@ def _override_bootstrap(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.init.bootstrap_any_including_subdirs").side_effect = bootstrap_mock
 
 
+@pytest.fixture()
+def dummy_template(tmp_path_factory: TempPathFactory) -> dict[str, Path]:
+    cwd = tmp_path_factory.mktemp("cwd")
+    dummy_template_path = cwd / "dummy_template"
+    dummy_template_path.mkdir()
+    (dummy_template_path / "copier.yaml").write_text(
+        """
+        _tasks:
+            - "echo '==== 1/1 - Emulate fullstack template python task ===='"
+            - '{{ system_path }} -c ''print("hello world")'''
+
+        system_path:
+            type: str
+            help: Path to the sys.executable.
+        """
+    )
+    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
+    return {"template_path": dummy_template_path, "cwd": cwd}
+
+
 def test_init_help() -> None:
     result = invoke("init -h")
 
@@ -686,26 +708,8 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
 
 
 def test_init_fullstack_template_fails_on_missing_python(
-    mocker: MockerFixture, tmp_path_factory: TempPathFactory
+    mocker: MockerFixture, dummy_template: dict[str, Path]
 ) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-    dummy_template_path = cwd / "dummy_template"
-    dummy_template_path.mkdir()
-    (dummy_template_path / "copier.yaml").write_text(
-        """
-_tasks:
-    - "echo '==== 1/1 - Emulate fullstack template python task ===='"
-    - '{{ system_path }} -c ''print("hello world")'''
-
-system_path:
-    type: str
-    help: Path to the sys.executable.
-"""
-    )
-    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
-    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
-    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
-
     which_mock = WhichMock()
     mocker.patch("algokit.core.utils.which").side_effect = which_mock.which
     mocker.patch("algokit.core.utils.get_base_python_path", return_value=None)
@@ -720,11 +724,11 @@ system_path:
             "myapp",
             "--no-git",
             "--defaults",
-            f"--template-url={dummy_template_path}",
+            f"--template-url={dummy_template['template_path']}",
             f"--template-url-ref={ref}",
             "--UNSAFE-SECURITY-accept-template-url",
         ],
-        cwd=cwd,
+        cwd=dummy_template["cwd"],
         input="y\n",
     )
 
@@ -732,25 +736,7 @@ system_path:
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_fullstack_template_works(which_mock: WhichMock, tmp_path_factory: TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-    dummy_template_path = cwd / "dummy_template"
-    dummy_template_path.mkdir()
-    (dummy_template_path / "copier.yaml").write_text(
-        """
-_tasks:
-    - "echo '==== 1/1 - Emulate fullstack template python task ===='"
-    - '{{ system_path }} -c ''print("hello world")'''
-
-system_path:
-    type: str
-    help: Path to the sys.executable.
-"""
-    )
-    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
-    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
-    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
-
+def test_init_fullstack_template_works(which_mock: WhichMock, dummy_template: dict[str, Path]) -> None:
     which_mock.remove("python")
     ref = "HEAD"
     result = invoke(
@@ -760,11 +746,11 @@ system_path:
             "myapp",
             "--no-git",
             "--defaults",
-            f"--template-url={dummy_template_path}",
+            f"--template-url={dummy_template['template_path']}",
             f"--template-url-ref={ref}",
             "--UNSAFE-SECURITY-accept-template-url",
         ],
-        cwd=cwd,
+        cwd=dummy_template["cwd"],
         input="y\n",
     )
 
