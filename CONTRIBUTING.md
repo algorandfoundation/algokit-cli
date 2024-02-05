@@ -18,7 +18,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
    - Manually:
      - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`, but `3.11` is recommended.)
      - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
-     - If you're not using PyCharm, then run `poetry install` in the root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
+     - If you're not using PyCharm, then run `poetry install` in the repository root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via AlgoKit CLI:
 
      - [Install AlgoKit CLI](./README.md#install) and run `algokit bootstrap poetry` in the root directory
@@ -26,9 +26,9 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 
 3. Install pre-commit hooks (optional but recommended):
 
-   [pre-commit](https://pre-commit.com/) is configured in this repository, so once `poetry install` has been run,
-   execute `pre-commit install` inside the virtual-env, and git will ensure formatting, linting, and static typing (via `mypy`)
-   is correct when you perform a commit.
+   [pre-commit](https://pre-commit.com/) is configured in this repository. To enable it, make sure that `poetry install` has been run and the virtual-env is activated by running `poetry shell`. Then execute `pre-commit install` to install the git hook scripts.
+
+   Once it is done, git will ensure formatting, linting, and static typing (via `mypy`) is correct when you perform a commit.
 
 4. Open the project and start debugging / developing via:
 
