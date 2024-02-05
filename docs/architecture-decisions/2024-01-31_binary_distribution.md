@@ -1,11 +1,11 @@
 # AlgoKit CLI binary distribution
 
-- **Status**: Proposed (rev #2)
+- **Status**: Approved
 - **Owner:** Altynbek Orumbayev (MakerX)
 - **Deciders**: Alessandro (Algorand Foundation), Rob Moore (MakerX), MakerX team
 - **Date created**: 2024-01-31
-- **Date decided:** TBD
-- **Date updated**: 2024-02-01
+- **Date decided:** 2024-02-01
+- **Date updated**: 2024-02-05
 
 ## Context
 
@@ -241,7 +241,7 @@ Based on the above, the most balanced option in terms of user experience and mai
 
 ## Selected option
 
-TBD
+Option 1
 
 ## Next Steps
 
