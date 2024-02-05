@@ -40,6 +40,7 @@ if not args_file.exists():
         err=True,
     )
     args_file.touch(exist_ok=False)
+    args_file.write_text("--version")
 
 commands_sequence = args_file.read_text().splitlines()
 
