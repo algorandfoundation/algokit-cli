@@ -34,12 +34,14 @@ runs:
 
     - name: Zip binaries
       shell: bash
-      continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
       run: |
         ls -l dist
         cd dist/algokit/
-        tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        if [ "${{ inputs.upload_binaries }}" == "true" ]; then
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        else
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        fi
         cd ../..
         ls -l
 
