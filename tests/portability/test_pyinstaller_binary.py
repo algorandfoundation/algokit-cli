@@ -1,6 +1,8 @@
 import logging
 import subprocess
+import sys
 import time
+from os import environ
 
 import pytest
 
@@ -14,20 +16,25 @@ def command_str_to_list(command: str) -> list[str]:
 
 
 @pytest.mark.parametrize(
-    "command",
+    ("command", "exit_codes"),
     [
-        command_str_to_list("--help"),
-        command_str_to_list("doctor"),
-        command_str_to_list("task vanity-address PY"),
+        (command_str_to_list("--help"), [0]),
+        (command_str_to_list("doctor"), [0]),
+        (command_str_to_list("task vanity-address PY"), [0]),
     ],
 )
 def test_non_interactive_algokit_commands(
-    command: list[str], cli_path: str, tmp_path_factory: pytest.TempPathFactory
+    command: list[str], exit_codes: list[int], cli_path: str, tmp_path_factory: pytest.TempPathFactory
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     execution_result = subprocess.run([cli_path, *command], capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {command} returned {execution_result.stdout}")
-    assert execution_result.returncode == 0, f"Command {command} failed with {execution_result.stderr}"
+
+    # Parts of doctor will fail in CI on macOS on github actions since docker isn't available by default
+    if "doctor" in command and sys.platform == "darwin" and environ.get("CI"):
+        exit_codes.append(1)
+
+    assert execution_result.returncode in exit_codes, f"Command {command} failed with {execution_result.stderr}"
 
 
 def test_algokit_init(cli_path: str, tmp_path_factory: pytest.TempPathFactory) -> None:
@@ -50,19 +57,19 @@ def test_algokit_init(cli_path: str, tmp_path_factory: pytest.TempPathFactory) -
         cwd=cwd,
     )
 
-    # Write 'y' to stdin while the process is still running
+    full_output = ""
     while process.poll() is None and process.stdout and process.stdin:
-        output = process.stdout.readline().lower()
-        logger.debug(
-            output,
-        )  # print stdout in real-time, without adding an extra newline
+        output = process.stdout.readline()
+        full_output += output  # Accumulate the output
+        logger.debug(output.strip())  # Log each line of stdout in real-time
 
-        if "y/n" in output:  # adjust this as needed based on the exact prompt text
+        if "y/n" in output.lower():  # adjust this as needed based on the exact prompt text
             answer = "y\n"
             process.stdin.write(answer)
             process.stdin.flush()
 
         time.sleep(0.1)
 
-    logger.info(f"Command init returned {process.stdout}")
+    # After the process ends, log the full stdout
+    logger.info(f"Command init returned:\n{full_output}")
     assert process.returncode == 0, f"Command init failed with {process.stderr}"
