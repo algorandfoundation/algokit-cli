@@ -735,6 +735,7 @@ def test_init_fullstack_template_fails_on_missing_python(
             "GIT_COMMITTER_NAME": "GitHub Actions",
             "GIT_AUTHOR_EMAIL": "no-reply@example.com",
             "GIT_COMMITTER_EMAIL": "no-reply@example.com",
+            "EMAIL": "no-reply@example.com",
         },
     )
 
@@ -763,6 +764,7 @@ def test_init_fullstack_template_works(which_mock: WhichMock, dummy_template: di
             "GIT_COMMITTER_NAME": "GitHub Actions",
             "GIT_AUTHOR_EMAIL": "no-reply@example.com",
             "GIT_COMMITTER_EMAIL": "no-reply@example.com",
+            "EMAIL": "no-reply@example.com",
         },
     )
 
