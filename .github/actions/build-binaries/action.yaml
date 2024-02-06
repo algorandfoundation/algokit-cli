@@ -1,5 +1,5 @@
 name: "Setup, Build, and Test"
-description: "Set up Python with Poetry, build and test binaries"
+description: "Build, test and upload binaries to GitHub releases and/or artifacts (ensure poetry dependencies are installed before running this action)"
 inputs:
   package_name:
     description: "The name of the package to build and test"
@@ -24,10 +24,10 @@ runs:
       run: ${{ inputs.build_command }}
       shell: bash
 
-    - name: Test Executable
+    - name: Run portability tests
       run: |
         ls -l dist
-        ./dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --help
+        poetry run pytest tests/portability/test_pyinstaller_binary.py --cli_path ./dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --log-cli-level=INFO
       shell: bash
 
     - name: Set release version

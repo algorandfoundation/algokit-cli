@@ -190,3 +190,15 @@ def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None
     # Teardown step: reset the credentials
     for key in credentials:
         credentials[key] = None
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption("--cli_path", action="store")
+
+
+@pytest.fixture(scope="session")
+def cli_path(request: pytest.FixtureRequest) -> str | None:
+    cli_path_value = str(request.config.option.cli_path)
+    if cli_path_value is None:
+        pytest.skip()
+    return cli_path_value
