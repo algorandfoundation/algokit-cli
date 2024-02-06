@@ -52,6 +52,13 @@ jobs:
           operating_system: ${{ runner.os }}
           build_command: "poetry run poe package_unix"
 
+      - name: Test linux binary
+        uses: ./.github/actions/test-binaries
+        with:
+          package_name: "algokit"
+          operating_system: ${{ runner.os }}
+          python_version: ${{ inputs.python_version }}
+
   build-binaries-windows:
     runs-on: windows-latest
     steps:
@@ -93,6 +100,13 @@ jobs:
           operating_system: ${{ runner.os }}
           build_command: "poetry run poe package_windows"
 
+      - name: Test windows binary
+        uses: ./.github/actions/test-binaries
+        with:
+          package_name: "algokit"
+          operating_system: ${{ runner.os }}
+          python_version: ${{ inputs.python_version }}
+
   build-binaries-macos:
     runs-on: macos-latest
     steps:
@@ -133,3 +147,10 @@ jobs:
           upload_binaries: ${{ inputs.upload_binaries }}
           operating_system: ${{ runner.os }}
           build_command: "poetry run poe package_unix"
+
+      - name: Test macos binary
+        uses: ./.github/actions/test-binaries
+        with:
+          package_name: "algokit"
+          operating_system: ${{ runner.os }}
+          python_version: ${{ inputs.python_version }}
