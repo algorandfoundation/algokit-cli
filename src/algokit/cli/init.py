@@ -221,10 +221,7 @@ def init_command(  # noqa: PLR0913
     if system_python_path is not None:
         answers_dict.setdefault("python_path", system_python_path)
     else:
-        answers_dict.setdefault("python_path", "Python not found on system path.")
-        raise click.ClickException(
-            f"{answers_dict['python_path']} " "You need to have python installed to use this command."
-        )
+        answers_dict.setdefault("python_path", "no_system_python_available")
 
     logger.info("Starting template copy and render...")
     # copier is lazy imported for two reasons

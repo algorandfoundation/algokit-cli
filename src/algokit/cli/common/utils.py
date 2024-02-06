@@ -1,7 +1,6 @@
 # Cli/Click related helper functions and classes
 
 
-import sys
 import typing as t
 
 import click
@@ -124,15 +123,3 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
         raise ValueError(f"Invalid explorer type: {entity_type}")
 
     return base_urls[network][entity_type.value] + str(identifier)
-
-
-def is_binary_mode() -> bool:
-    """
-    Returns True if the cli is executed inside a PyInstaller binary, False otherwise.
-    See https://pyinstaller.org/en/stable/runtime-information.html?highlight=_MEIPASS#run-time-information
-
-    Returns:
-        bool: True if the current process is running in binary mode, False otherwise.
-    """
-
-    return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
