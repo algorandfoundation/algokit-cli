@@ -83,9 +83,9 @@ def dummy_template(tmp_path_factory: TempPathFactory) -> dict[str, Path]:
         """
         _tasks:
             - "echo '==== 1/1 - Emulate fullstack template python task ===='"
-            - '{{ system_path }} -c ''print("hello world")'''
+            - '{{ python_path }} -c ''print("hello world")'''
 
-        system_path:
+        python_path:
             type: str
             help: Path to the sys.executable.
         """

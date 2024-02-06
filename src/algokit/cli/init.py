@@ -219,11 +219,11 @@ def init_command(  # noqa: PLR0913
 
     system_python_path = next(get_python_paths(), None)
     if system_python_path is not None:
-        answers_dict.setdefault("system_path", system_python_path)
+        answers_dict.setdefault("python_path", system_python_path)
     else:
-        answers_dict.setdefault("system_path", "Python not found on system path.")
+        answers_dict.setdefault("python_path", "Python not found on system path.")
         raise click.ClickException(
-            f"{answers_dict['system_path']} " "You need to have python installed to use this command."
+            f"{answers_dict['python_path']} " "You need to have python installed to use this command."
         )
 
     logger.info("Starting template copy and render...")
