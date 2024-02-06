@@ -30,8 +30,8 @@ def test_non_interactive_algokit_commands(
     execution_result = subprocess.run([cli_path, *command], capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {command} returned {execution_result.stdout}")
 
-    # Parts of doctor will fail in CI on macOS on github actions since docker isn't available by default
-    if "doctor" in command and sys.platform == "darwin" and environ.get("CI"):
+    # Parts of doctor will fail in CI on macOS and windows on github actions since docker isn't available by default
+    if "doctor" in command and sys.platform in ["darwin", "windows"] and environ.get("CI"):
         exit_codes.append(1)
 
     assert execution_result.returncode in exit_codes, f"Command {command} failed with {execution_result.stderr}"
