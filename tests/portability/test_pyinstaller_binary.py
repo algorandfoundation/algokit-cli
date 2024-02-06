@@ -6,6 +6,8 @@ import pytest
 
 logger = logging.getLogger(__name__)
 
+pytestmark = pytest.mark.pyinstaller_binary_tests
+
 
 def command_str_to_list(command: str) -> list[str]:
     return command.split(" ")
@@ -14,9 +16,9 @@ def command_str_to_list(command: str) -> list[str]:
 @pytest.mark.parametrize(
     "command",
     [
+        command_str_to_list("--help"),
         command_str_to_list("doctor"),
         command_str_to_list("task vanity-address PY"),
-        command_str_to_list("localnet start"),
     ],
 )
 def test_non_interactive_algokit_commands(

@@ -161,7 +161,9 @@ suppress-none-returning = true
 pythonpath = ["src", "tests"]
 markers = [
     "mock_platform_system",
+    "pyinstaller_binary_tests: mark as a test that require algokit binary to be passed via cli arg"
 ]
+addopts = "-m 'not pyinstaller_binary_tests'" # by default, exclude pyinstaller_binary_tests
 [tool.mypy]
 files = ["src", "tests"]
 exclude = ["dist"]

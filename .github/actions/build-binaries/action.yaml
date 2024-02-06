@@ -27,7 +27,7 @@ runs:
     - name: Run portability tests
       run: |
         ls -l dist
-        poetry run pytest tests/portability/test_pyinstaller_binary.py --cli_path ${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --log-cli-level=INFO
+        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path ${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --log-cli-level=INFO
       shell: bash
 
     - name: Set release version
