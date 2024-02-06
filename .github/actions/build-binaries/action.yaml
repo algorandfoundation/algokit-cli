@@ -43,12 +43,19 @@ runs:
         cd ../..
         ls -l
 
-    - name: Upload binary as artifact
+    - name: Upload binary as artifact (release)
       if: ${{ inputs.upload_binaries == 'true' }}
       uses: actions/upload-artifact@v4
       with:
-        name: algokit-cli-${{ inputs.operating_system }}-py${{ inputs.python_version }}
+        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
         path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
+
+    - name: Upload binary as artifact (dev)
+      if: ${{ inputs.upload_binaries != 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
+        path: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Append binary to release
       continue-on-error: true

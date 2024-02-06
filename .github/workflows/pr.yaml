@@ -12,12 +12,12 @@ jobs:
     uses: ./.github/workflows/check-python.yaml
 
   pr-build:
-    name: Build and Test Python
+    name: Build & Test Python
     needs: pr-check
     uses: ./.github/workflows/build-python.yaml
 
   pr-binaries-build:
-    name: Build Binaries
+    name: Build & Test Binaries
     needs: pr-check
     uses: ./.github/workflows/build-binaries.yaml
     with:
