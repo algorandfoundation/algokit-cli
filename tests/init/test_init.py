@@ -730,13 +730,6 @@ def test_init_fullstack_template_fails_on_missing_python(
         ],
         cwd=dummy_template["cwd"],
         input="y\n",
-        env={
-            "GIT_AUTHOR_NAME": "GitHub Actions",
-            "GIT_COMMITTER_NAME": "GitHub Actions",
-            "GIT_AUTHOR_EMAIL": "no-reply@example.com",
-            "GIT_COMMITTER_EMAIL": "no-reply@example.com",
-            "EMAIL": "no-reply@example.com",
-        },
     )
 
     assert result.exit_code == 1
@@ -759,13 +752,6 @@ def test_init_fullstack_template_works(which_mock: WhichMock, dummy_template: di
         ],
         cwd=dummy_template["cwd"],
         input="y\n",
-        env={
-            "GIT_AUTHOR_NAME": "GitHub Actions",
-            "GIT_COMMITTER_NAME": "GitHub Actions",
-            "GIT_AUTHOR_EMAIL": "no-reply@example.com",
-            "GIT_COMMITTER_EMAIL": "no-reply@example.com",
-            "EMAIL": "no-reply@example.com",
-        },
     )
 
     assert result.exit_code == 0
