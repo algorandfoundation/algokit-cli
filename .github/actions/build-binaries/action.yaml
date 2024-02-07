@@ -26,7 +26,6 @@ runs:
 
     - name: Set TEST_CLI_PATH
       run: |
-        ls -la dist/algokit/
         TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
         if [ "${{ inputs.operating_system }}" == "Windows" ]; then
           TEST_CLI_PATH="${{ github.workspace }}\dist\${{ inputs.package_name }}\${{ inputs.package_name }}.exe"
