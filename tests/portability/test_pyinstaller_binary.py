@@ -46,8 +46,7 @@ def test_algokit_init(
         "init --name testproject "
         "--UNSAFE-SECURITY-accept-template-url "
         f"--template-url {dummy_algokit_template_with_python_task['template_path']} "
-        "--template-url-ref=HEAD --no-git --no-ide --defaults "
-        "-a deployment_language python -a ide_vscode false -a preset_name starter"
+        "--template-url-ref=HEAD --no-git --no-ide --defaults"
     )
 
     process = subprocess.Popen(
