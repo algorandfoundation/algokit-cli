@@ -1,4 +1,5 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 You are about to run a generator. Please make sure it's from a trusted source (for example, official AlgoKit Templates). Do you want to proceed? [y/N]: y
-DEBUG: Running generator in {current_working_directory}/smart_contract
-Generator {current_working_directory}/smart_contract executed successfully
+DEBUG: Running generator in {current_working_directory}/dummy_template
+No git tags found in template; using HEAD as ref
+Generator {current_working_directory}/dummy_template executed successfully

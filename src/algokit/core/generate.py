@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.utils import get_python_paths
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,15 @@ def run_generator(answers: dict, path: Path) -> None:
     :param path: Path to the generator.
     """
 
+    # Below ensures that if the generator copier.yaml relies on python_path answer
+    # it will be set to the system python path if available by algokit cli
+    answers_dict = answers.copy()
+    system_python_path = next(get_python_paths(), None)
+    if system_python_path is not None:
+        answers_dict.setdefault("python_path", system_python_path)
+    else:
+        answers_dict.setdefault("python_path", "no_system_python_available")
+
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
@@ -42,12 +52,14 @@ def run_generator(answers: dict, path: Path) -> None:
     with Worker(
         src_path=str(path),
         dst_path=cwd,
-        data=answers,
+        data=answers_dict,
         quiet=True,
         unsafe=True,
     ) as copier_worker:
         logger.debug(f"Running generator in {copier_worker.src_path}")
         copier_worker.run_copy()
+
+    logger.info(f"Generator {path} executed successfully")
 
 
 def load_generators(project_dir: Path) -> list[Generator]:
