@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/build-python.yaml
 
   pr-binaries-build:
-    name: Build & Test Binaries
+    name: Build Binaries
     needs: pr-check
     uses: ./.github/workflows/build-binaries.yaml
     with:
