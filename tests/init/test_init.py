@@ -707,7 +707,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     )
 
 
-def test_init_fullstack_template_fails_on_missing_python(
+def test_init_template_with_python_task_fails_on_missing_python(
     mocker: MockerFixture, dummy_template: dict[str, Path]
 ) -> None:
     which_mock = WhichMock()
@@ -736,7 +736,7 @@ def test_init_fullstack_template_fails_on_missing_python(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_fullstack_template_works(which_mock: WhichMock, dummy_template: dict[str, Path]) -> None:
+def test_init_template_with_python_task_works(which_mock: WhichMock, dummy_template: dict[str, Path]) -> None:
     which_mock.remove("python")
     ref = "HEAD"
     result = invoke(
