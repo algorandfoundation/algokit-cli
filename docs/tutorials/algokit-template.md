@@ -143,6 +143,20 @@ When creating an AlgoKit template, there are a few default behaviors that you ca
 
 By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
 
+### Executing Python Tasks in Templates
+When using Python scripts as tasks within your Copier templates, you have the flexibility to manage Python execution paths. If AlgoKit has been installed using native binaries (such as via Snap, Brew, Winget, or direct downloads from GitHub releases), you should specify `python_path` to direct Copier to the correct Python executable. This ensures compatibility regardless of how AlgoKit was installed. In environments without AlgoKit's native binaries, utilize `_copier_python` to automatically use the available Python interpreter. This requires Python to be pre-installed on the host machine for smooth execution. Here's how to specify the execution of a Python script in your `copier.yaml`:
+
+```yaml
+- '{{ python_path }} inject.py'
+```
+And to define `python_path` in your Copier questions:
+
+```yaml
+python_path:
+  type: str
+  help: Path to the Python executable.
+```
+
 ### Working with Generators
 
 After mastering the use of `copier` and building your templates based on the official AlgoKit template repositories, you can enhance your proficiency by learning to define `custom generators`. Essentially, generators are smaller-scope `copier` templates designed to provide additional functionality after a project has been initialized from the template.
