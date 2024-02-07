@@ -25,14 +25,17 @@ runs:
         tar -xzf ${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz -C binaries
       shell: bash
 
-    - name: Run portability tests
+    - name: Set CLI_PATH
       run: |
         CLI_PATH="${{ github.workspace }}/binaries/${{ inputs.package_name }}"
         if [ "${{ inputs.operating_system }}" == "Windows" ]; then
-          CLI_PATH+=".exe"
-        else
-          CLI_PATH="./$CLI_PATH"
+          CLI_PATH="${{ github.workspace }}\binaries\${{ inputs.package_name }}.exe"
         fi
-        echo "Executing: $CLI_PATH"
-        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "$CLI_PATH" --log-cli-level=INFO
+        echo "CLI_PATH=$CLI_PATH" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Run portability tests
+      run: |
+        echo "Executing: ${{ env.CLI_PATH }}"
+        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "${{ env.CLI_PATH }}" --log-cli-level=INFO
       shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}

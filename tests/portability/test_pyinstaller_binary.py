@@ -60,7 +60,7 @@ def test_algokit_init(
     )
 
     full_output = ""
-    logger.info(f"Running command: {" ".join([cli_path, *command])}")
+    logger.info(f'Running command: {" ".join([cli_path, *command])}')
     while process.poll() is None and process.stdout and process.stdin:
         output = process.stdout.readline()
         full_output += output  # Accumulate the output
