@@ -4,7 +4,7 @@ inputs:
   package_name:
     description: "The name of the package to build and test"
     required: true
-  upload_binaries:
+  production_release:
     description: "Flag to determine if this is a production release"
     required: true
   operating_system:
@@ -27,13 +27,13 @@ runs:
     - name: Set release version
       shell: bash
       continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       run: |
         echo "RELEASE_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
         git describe --tags $(git rev-list --tags --max-count=1)
 
     - name: Zip binaries
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       shell: bash
       run: |
         ls -l dist
@@ -43,14 +43,14 @@ runs:
         ls -l
 
     - name: Upload binary as artifact (release)
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
         path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Upload binary as artifact (dev)
-      if: ${{ inputs.upload_binaries != 'true' }}
+      if: ${{ inputs.production_release != 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
@@ -58,7 +58,7 @@ runs:
 
     - name: Append binary to release
       continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
         files: |

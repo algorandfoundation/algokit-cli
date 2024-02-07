@@ -123,7 +123,7 @@ jobs:
     uses: ./.github/workflows/build-binaries.yaml
     needs: release
     with:
-      upload_binaries: "true"
+      production_release: "true"
       python_version: "3.12"
 
   cd-publish-release-packages:

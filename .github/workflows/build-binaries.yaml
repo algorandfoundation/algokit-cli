@@ -3,7 +3,7 @@ name: Build Pyinstaller Binaries
 on:
   workflow_call:
     inputs:
-      upload_binaries:
+      production_release:
         required: true
         type: string
       python_version:
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ inputs.upload_binaries == 'true' && '0' || '1' }}
+          fetch-depth: ${{ inputs.production_release == 'true' && '0' || '1' }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,6 +51,6 @@ jobs:
         with:
           python_version: ${{ inputs.python_version }}
           package_name: "algokit"
-          upload_binaries: ${{ inputs.upload_binaries }}
+          production_release: ${{ inputs.production_release }}
           operating_system: ${{ runner.os }}
           build_command: ${{ matrix.build_command }}
