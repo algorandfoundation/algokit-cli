@@ -1,4 +1,4 @@
-name: Build Pyinstaller Binaries
+name: Build, Test and Publish Pyinstaller Binaries
 
 on:
   workflow_call:
