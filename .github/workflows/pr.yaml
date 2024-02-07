@@ -17,16 +17,9 @@ jobs:
     uses: ./.github/workflows/build-python.yaml
 
   pr-binaries-build:
-    name: Build Binaries
+    name: Build & Test Binaries
     needs: pr-check
     uses: ./.github/workflows/build-binaries.yaml
     with:
       production_release: "false"
-      python_version: "3.12"
-
-  pr-binaries-test:
-    name: Test Binaries
-    needs: pr-binaries-build
-    uses: ./.github/workflows/test-binaries.yaml
-    with:
       python_version: "3.12"
