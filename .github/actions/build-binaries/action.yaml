@@ -24,6 +24,22 @@ runs:
       run: ${{ inputs.build_command }}
       shell: bash
 
+    - name: Set TEST_CLI_PATH
+      run: |
+        TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}"
+        if [ "${{ inputs.operating_system }}" == "Windows" ]; then
+          TEST_CLI_PATH="${{ github.workspace }}\dist\${{ inputs.package_name }}.exe"
+        fi
+        echo "TEST_CLI_PATH=$TEST_CLI_PATH" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Run portability tests
+      run: |
+        echo "Executing: ${{ env.TEST_CLI_PATH }}"
+        git config --global user.email "actions@github.com" && git config --global user.name "github-actions" 
+        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "${{ env.TEST_CLI_PATH }}" --log-cli-level=INFO
+      shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
+
     - name: Set release version
       shell: bash
       continue-on-error: true
