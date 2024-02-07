@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 from os import environ
+from pathlib import Path
 
 import pytest
 
@@ -37,14 +38,15 @@ def test_non_interactive_algokit_commands(
     assert execution_result.returncode in exit_codes, f"Command {command} failed with {execution_result.stderr}"
 
 
-def test_algokit_init(cli_path: str, tmp_path_factory: pytest.TempPathFactory) -> None:
-    cwd = tmp_path_factory.mktemp("cwd")
-
+def test_algokit_init(
+    cli_path: str,
+    dummy_algokit_template_with_python_task: dict[str, Path],
+) -> None:
     command = command_str_to_list(
         "init --name testproject "
         "--UNSAFE-SECURITY-accept-template-url "
-        "--template-url https://github.com/algorandfoundation/algokit-fullstack-template "
-        "--template-url-ref=python_path --no-git --no-ide --defaults "
+        f"--template-url {dummy_algokit_template_with_python_task['template_path']} "
+        "--template-url-ref=HEAD --no-git --no-ide --defaults "
         "-a deployment_language python -a ide_vscode false -a preset_name starter"
     )
 
@@ -54,10 +56,11 @@ def test_algokit_init(cli_path: str, tmp_path_factory: pytest.TempPathFactory) -
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
-        cwd=cwd,
+        cwd=dummy_algokit_template_with_python_task["cwd"],
     )
 
     full_output = ""
+    logger.info(f"Running command: {" ".join([cli_path, *command])}")
     while process.poll() is None and process.stdout and process.stdin:
         output = process.stdout.readline()
         full_output += output  # Accumulate the output

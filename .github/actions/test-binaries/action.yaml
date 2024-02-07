@@ -15,29 +15,19 @@ runs:
   using: "composite"
   steps:
     - name: Download Artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}
 
-    - name: Run portability tests (Unix)
-      if: ${{ inputs.operating_system != 'Windows' }}
+    - name: Unzip Artifacts
       run: |
-        echo "Artifact path: ${{ github.workspace }}/${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}"
-        CLI_PATH="${{ github.workspace }}/${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}/${{ inputs.package_name }}"
-        if [ "${{ inputs.operating_system }}" == "Windows" ]; then
-          CLI_PATH+=".exe"
-        else
-          CLI_PATH="./$CLI_PATH"
-        fi
-        echo "Executing: $CLI_PATH"
-        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "$CLI_PATH" --log-cli-level=INFO
+        mkdir -p binaries
+        tar -xzf ${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz -C binaries
       shell: bash
 
-    - name: Run portability tests (Windows)
-      if: ${{ inputs.operating_system == 'Windows' }}
+    - name: Run portability tests
       run: |
-        echo "Artifact path: ${{ github.workspace }}/${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}"
-        CLI_PATH="${{ github.workspace }}/${{ inputs.package_name }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}/${{ inputs.package_name }}"
+        CLI_PATH="${{ github.workspace }}/binaries/${{ inputs.package_name }}"
         if [ "${{ inputs.operating_system }}" == "Windows" ]; then
           CLI_PATH+=".exe"
         else
@@ -45,4 +35,4 @@ runs:
         fi
         echo "Executing: $CLI_PATH"
         poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "$CLI_PATH" --log-cli-level=INFO
-      shell: cmd
+      shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
