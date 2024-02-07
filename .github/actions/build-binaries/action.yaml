@@ -33,12 +33,15 @@ runs:
         git describe --tags $(git rev-list --tags --max-count=1)
 
     - name: Zip binaries
-      if: ${{ inputs.production_release == 'true' }}
       shell: bash
       run: |
         ls -l dist
         cd dist/algokit/
-        tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        if [ "${{ inputs.production_release }}" == "true" ]; then
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        else
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        fi
         cd ../..
         ls -l
 
@@ -54,7 +57,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
-        path: /dist/algokit/algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
+        path: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Append binary to release
       continue-on-error: true
