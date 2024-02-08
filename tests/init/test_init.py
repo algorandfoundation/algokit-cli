@@ -714,10 +714,7 @@ def test_init_template_with_python_task_fails_on_missing_python(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-def test_init_template_with_python_task_works(
-    which_mock: WhichMock, dummy_algokit_template_with_python_task: dict[str, Path]
-) -> None:
-    which_mock.remove("python")
+def test_init_template_with_python_task_works(dummy_algokit_template_with_python_task: dict[str, Path]) -> None:
     ref = "HEAD"
     result = invoke(
         [

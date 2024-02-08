@@ -123,7 +123,7 @@ def get_python_paths() -> Iterator[str]:
 
 def get_base_python_path() -> str | None:
     this_python: str | None = sys.executable
-    if not this_python:
+    if not this_python or this_python.endswith("algokit"):
         # Not: can be empty or None... yikes! unlikely though
         # https://docs.python.org/3.10/library/sys.html#sys.executable
         return None
