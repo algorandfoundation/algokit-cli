@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.3 (2024-02-08)
+
+### Fix
+
+* Binary execution mode compatibility ([#406](https://github.com/algorandfoundation/algokit-cli/issues/406)) ([`5cb9b1f`](https://github.com/algorandfoundation/algokit-cli/commit/5cb9b1f8e1f7fc3cc7114cba5cef78c9fcc7df95))
+
+### Documentation
+
+* ADR - native binaries distribution via snap/winget/brew ([#404](https://github.com/algorandfoundation/algokit-cli/issues/404)) ([`b7301bf`](https://github.com/algorandfoundation/algokit-cli/commit/b7301bf7ef4d776aa0b0b16e061f2a546780cabb))
+* Improve onboarding experience  ([`a4d6bb5`](https://github.com/algorandfoundation/algokit-cli/commit/a4d6bb502ed5bbfe87682ea863590c47393aed6a))
+
 ## v1.11.2 (2024-02-01)
 
 ### Fix
