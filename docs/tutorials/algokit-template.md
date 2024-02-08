@@ -144,20 +144,32 @@ When creating an AlgoKit template, there are a few default behaviors that you ca
 By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
 
 ### Executing Python Tasks in Templates
+
 If you need to use Python scripts as tasks within your Copier templates, ensure that you have Python installed on the host machine.
 By convention, AlgoKit automatically detects the Python installation on your machine and fills in the `python_path` variable accordingly.
 This process ensures that any Python scripts included as tasks within your Copier templates will execute using the system's Python interpreter.
 It's important to note that the use of `_copier_python` is not recommended. Here's an example of specifying a Python script execution in your `copier.yaml` without needing to explicitly use `_copier_python`:
 
 ```yaml
-- '{{ python_path }} inject.py'
+- "{{ python_path }} your_python_script.py"
 ```
+
+If you'd like your template to be backwards compatible with versions of `algokit-cli` older than `v1.11.3` when executing custom python scripts via `copier` tasks, you can use a conditional statement to determine the Python path:
+
+```yaml
+- "{{ python_path if python_path else _copier_python }} your_python_script.py"
+# _copier_python above is used for backwards compatibility with versions < v1.11.3 of the algokit cli
+```
+
 And to define `python_path` in your Copier questions:
 
 ```yaml
+# Auto determined by algokit-cli from v1.11.3 to allow execution of python script
+# in binary mode.
 python_path:
   type: str
-  help: Path to the Python executable.
+  help: Path to the sys.executable.
+  when: false
 ```
 
 ### Working with Generators
