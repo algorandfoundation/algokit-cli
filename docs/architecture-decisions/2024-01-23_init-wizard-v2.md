@@ -10,21 +10,67 @@
 
 ### Context
 
-Building upon the decisions made in the "Advanced algokit generate command" and "Frontend Templates" ADRs, we aim to further evolve the AlgoKit templating system with two main target audiences in mind. First, the users of the CLI, where the new experience should further abstract away Algorand specific concepts during the init wizard. Second, the Algorand Foundation engineers and maintainers of AlgoKit CLI, where the goal is to simplify the maintenance of the generators and templates by breaking the existing monolithic approach into a monorepo structure. This involves establishing a base template structure within the AlgoKit CLI and creating a new repository, algokit-generators, to serve as a monorepo for all custom generators.
+Building upon the decisions made in the "Advanced algokit generate command" and "Frontend Templates" ADRs, we aim to further evolve the AlgoKit templating system aiming to improve the following aspects:
 
-### Proposal 1 - Monorepo powered by NPM workspaces
+- The current fullstack template approach requires additional `injector` scripts to integrate new combinations of contracts and frontends, a process that will become more complex with the introduction of new languages like .NET.
+- While algokit defines notions of `bootstrap`, `algokit.toml`, `.algokit` folder and conventions around `.env` variables used for smart contract deployment. They are not always directly managed by `algokit` cli, introducing more formal conventions around what defines an `algokit` compliant project can enable more consistent and convenient developer experience.
+- The existing init wizard is not beginner-friendly, relying certain Algorand-specific terminology. Simplifying the wizard and reducing the number of questions will enhance the onboarding experience for new users.
 
-#### Refined init questions
+### 1. Init wizard v2 improvements
 
-Would you like to build a smart contract or a frontend?
+#### Proposal A - Simplify the questions
+
+This is a general proposal concernign the init wizard v2 questions that can be improved as part of the new version of the wizard and is _unrelated_ to the further proposal of the monorepo and base template structure.
+
+```mermaid
+graph TD
+    A[Start] --> B[Name for this project.]
+    B --> C[Package author name]
+    C --> D[Package author email]
+    D --> E[Do you want to add VSCode configuration?]
+    E -->|yes| F[Do you want to use ESLint and Prettier for code linting and formatting?]
+    E -->|no| G[Do you want to add JetBrains configuration - primarily optimized for WebStorm?]
+    F --> H[Do you want to use Tailwind CSS? A utility-first CSS framework for rapidly building custom designs.]
+    G --> H
+    H -->|yes| I[Do you want to use a daisyUI? Framework agnostic CSS component library for building modern websites and web applications fast.]
+    H -->|no| J[Do you want to include unit tests via Jest?]
+    I --> J
+    J --> K[Do you want to include end to end tests via Playwright?]
+    K --> L[Do you want to include Github Actions workflows for build validation?]
+    L -->|yes| M[Pick your website hosting provider for continuous delivery]
+    L -->|no| N[End]
+    M --> N
+```
+
+```mermaid
+graph TD
+    A[Start] --> B["Name for this project."]
+    B --> C["Package author name"]
+    C --> D["Package author email"]
+    D --> E["Do you want to add VSCode configuration?"]
+    E -->|yes| F["Do you want to add JetBrains configuration (primarily optimized for PyCharm CE)?"]
+    E -->|no| G["What programming language do you want to use for your contract deployment code?"]
+    F --> G
+    G --> H["Do you want to include unit tests (via pytest)?"]
+    G -->|TypeScript| I["Do you want to include unit tests (via jest)?"]
+    H --> J["Do you want to use a Python linter?"]
+    I --> K["Do you want to use a Python formatter (via Black)?"]
+    J --> K
+    K --> L["Do you want to use a Python type checker via mypy?"]
+    L --> M["Do you want to include Python dependency vulnerability scanning via pip-audit?"]
+    M --> N["Do you want to include Github Actions workflows for build and testnet deployment?"]
+    N --> O["Do you want to include pre-commit for linting, type checking and formatting?"]
+    O --> P["Do you want to fund your deployment account using an optional dispenser account?"]
+    P --> Q[End]
+```
 
 ```mermaid
 graph TB
     A[Would you like to build a smart contract or a dapp frontend?]
     B[If smart contract, which language would you like to use?]
     C[If frontend, which framework would you like to use?]
-    D[Puya]
-    E[TealScript]
+    D[Python, implies puya]
+    E[Typescript, implies TealScript]
     F[React]
     G[`production`/`starter`]
     H[Preset `production`/`starter`]
@@ -39,7 +85,11 @@ graph TB
     F --> I
 ```
 
-#### Base Template Structure
+There are no explicit disadvantages to this proposal as this is a matter of refining the individual questions that are asked as part of the main algokit init flow. It is also worth noting that the proposed changes are not a breaking change and are not expected to have any negative impact on the existing users of the init wizard.
+
+### 2. Base Template Structure and Generators Monorepo
+
+#### Proposal A - Merging algokit templates into smaller sub-templates to be hosted on algokit-generators monorepo. Introducing a base template.
 
 The base template will be moved into the AlgoKit CLI and will contain a minimum set of folders and files to constitute a base template. This base template will include:
 
@@ -56,10 +106,6 @@ The base template will be moved into the AlgoKit CLI and will contain a minimum 
 ```
 
 This structure will provide a clear and consistent framework for developers to build upon, ensuring that all AlgoKit projects follow the same basic structure.
-
-###### Notes
-
-- having it as a repo allows to startup a github codespaces with base skeleton in-place + algokit pre-installed. User is then able to go ahead and rely on generators to expand the base to fit his needs.
 
 #### AlgoKit Generators Monorepo
 
