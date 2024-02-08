@@ -2,6 +2,7 @@ import functools
 import json
 import logging
 import os
+import subprocess
 import typing
 from collections.abc import Callable, Sequence  # noqa: RUF100, TCH003
 from pathlib import Path
@@ -190,3 +191,41 @@ def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None
     # Teardown step: reset the credentials
     for key in credentials:
         credentials[key] = None
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption("--cli_path", action="store")
+
+
+@pytest.fixture(scope="session")
+def cli_path(request: pytest.FixtureRequest) -> str | None:
+    cli_path_value = str(request.config.option.cli_path)
+    if cli_path_value is None:
+        pytest.skip()
+    return cli_path_value
+
+
+@pytest.fixture()
+def dummy_algokit_template_with_python_task(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
+    """
+    Used in init approval tests and binary portability tests
+    """
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    dummy_template_path = cwd / "dummy_template"
+    dummy_template_path.mkdir()
+    (dummy_template_path / "copier.yaml").write_text(
+        """
+        _tasks:
+            - "echo '==== 1/1 - Emulate fullstack template python task ===='"
+            - '{{ python_path }} -c ''print("hello world")'''
+
+        python_path:
+            type: str
+            help: Path to the sys.executable.
+        """
+    )
+    subprocess.run(["git", "init"], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
+    subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
+    return {"template_path": dummy_template_path, "cwd": cwd}

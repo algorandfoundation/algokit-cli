@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -35,8 +35,10 @@ jobs:
 
       - name: pytest + coverage
         shell: bash
+        # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
         run: |
           set -o pipefail
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
           poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
         id: pytest
 

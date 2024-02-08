@@ -155,3 +155,23 @@ path = "invalidpath"
 
     assert result.exit_code == 0
     verify(result.output)
+
+
+def test_generate_custom_generate_commands_valid_generator_run_with_python_path(
+    dummy_algokit_template_with_python_task: dict[str, Path],
+) -> None:
+    cwd = dummy_algokit_template_with_python_task["cwd"]
+    template_path = str(dummy_algokit_template_with_python_task["template_path"]).replace("\\", r"\\")
+    (cwd / ALGOKIT_CONFIG).write_text(
+        f"""
+[generate.smart_contract]
+description = "Generates a new smart contract"
+path = "{template_path}"
+    """.strip(),
+        encoding="utf-8",
+    )
+
+    result = invoke("generate smart-contract", cwd=cwd, input="y\n")
+
+    assert result.exit_code == 0
+    verify(result.output)

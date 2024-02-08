@@ -13,6 +13,7 @@ from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+from algokit.core.utils import get_python_paths
 
 logger = logging.getLogger(__name__)
 
@@ -215,6 +216,12 @@ def init_command(  # noqa: PLR0913
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
+
+    system_python_path = next(get_python_paths(), None)
+    if system_python_path is not None:
+        answers_dict.setdefault("python_path", system_python_path)
+    else:
+        answers_dict.setdefault("python_path", "no_system_python_available")
 
     logger.info("Starting template copy and render...")
     # copier is lazy imported for two reasons

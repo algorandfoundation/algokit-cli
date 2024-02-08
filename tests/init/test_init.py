@@ -685,6 +685,56 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     )
 
 
+def test_init_template_with_python_task_fails_on_missing_python(
+    mocker: MockerFixture, dummy_algokit_template_with_python_task: dict[str, Path]
+) -> None:
+    which_mock = WhichMock()
+    mocker.patch("algokit.core.utils.which").side_effect = which_mock.which
+    mocker.patch("algokit.core.utils.get_base_python_path", return_value=None)
+    which_mock.remove("python")
+    which_mock.remove("python3")
+
+    ref = "HEAD"
+    result = invoke(
+        [
+            "init",
+            "--name",
+            "myapp",
+            "--no-git",
+            "--defaults",
+            f"--template-url={dummy_algokit_template_with_python_task['template_path']}",
+            f"--template-url-ref={ref}",
+            "--UNSAFE-SECURITY-accept-template-url",
+        ],
+        cwd=dummy_algokit_template_with_python_task["cwd"],
+        input="y\n",
+    )
+
+    assert result.exit_code == 1
+    verify(result.output, scrubber=make_output_scrubber())
+
+
+def test_init_template_with_python_task_works(dummy_algokit_template_with_python_task: dict[str, Path]) -> None:
+    ref = "HEAD"
+    result = invoke(
+        [
+            "init",
+            "--name",
+            "myapp",
+            "--no-git",
+            "--defaults",
+            f"--template-url={dummy_algokit_template_with_python_task['template_path']}",
+            f"--template-url-ref={ref}",
+            "--UNSAFE-SECURITY-accept-template-url",
+        ],
+        cwd=dummy_algokit_template_with_python_task["cwd"],
+        input="y\n",
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
+
+
 def _remove_git_hints(output: str) -> str:
     git_init_hint_prefix = "DEBUG: git: hint:"
     lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]

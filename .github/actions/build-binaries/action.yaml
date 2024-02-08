@@ -1,10 +1,10 @@
-name: "Setup, Build, and Test"
-description: "Set up Python with Poetry, build and test binaries"
+name: "Setup, Build, and Test Pyinstaller Binaries"
+description: "Build, test and upload binaries to GitHub releases and/or artifacts (ensure poetry dependencies are installed before running this action)"
 inputs:
   package_name:
     description: "The name of the package to build and test"
     required: true
-  upload_binaries:
+  production_release:
     description: "Flag to determine if this is a production release"
     required: true
   operating_system:
@@ -24,41 +24,60 @@ runs:
       run: ${{ inputs.build_command }}
       shell: bash
 
-    - name: Test Executable
+    - name: Set TEST_CLI_PATH
       run: |
-        ls -l dist
-        ./dist/${{ inputs.package_name }}/${{ inputs.package_name }}${{ inputs.operating_system == 'windows-latest' && '.exe' || '' }} --help
+        TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
+        if [ "${{ inputs.operating_system }}" == "Windows" ]; then
+          TEST_CLI_PATH="${{ github.workspace }}\dist\${{ inputs.package_name }}\${{ inputs.package_name }}.exe"
+        fi
+        echo "TEST_CLI_PATH=$TEST_CLI_PATH" >> $GITHUB_ENV
       shell: bash
+
+    - name: Run portability tests
+      run: |
+        echo "Executing: ${{ env.TEST_CLI_PATH }}"
+        git config --global user.email "actions@github.com" && git config --global user.name "github-actions" 
+        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "${{ env.TEST_CLI_PATH }}" --log-cli-level=INFO
+      shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
 
     - name: Set release version
       shell: bash
       continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       run: |
         echo "RELEASE_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
         git describe --tags $(git rev-list --tags --max-count=1)
 
     - name: Zip binaries
       shell: bash
-      continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
       run: |
         ls -l dist
         cd dist/algokit/
-        tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        if [ "${{ inputs.production_release }}" == "true" ]; then
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        else
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz *
+        fi
         cd ../..
         ls -l
 
-    - name: Upload binary as artifact
-      if: ${{ inputs.upload_binaries == 'true' }}
+    - name: Upload binary as artifact (release)
+      if: ${{ inputs.production_release == 'true' }}
       uses: actions/upload-artifact@v4
       with:
-        name: algokit-cli-${{ inputs.operating_system }}-py${{ inputs.python_version }}
+        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
         path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
+
+    - name: Upload binary as artifact (dev)
+      if: ${{ inputs.production_release != 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
+        path: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Append binary to release
       continue-on-error: true
-      if: ${{ inputs.upload_binaries == 'true' }}
+      if: ${{ inputs.production_release == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
         files: |
