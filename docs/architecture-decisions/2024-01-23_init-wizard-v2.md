@@ -8,23 +8,48 @@
 
 **Date created:** 2024-01-23
 
+TODO NOTES:
+
+1. What init wizard v2 has to be? (ignoring how we implement it)
+2. How to we improve existing templates? ()
+
 ### Context
 
 Building upon the decisions made in the "Advanced algokit generate command" and "Frontend Templates" ADRs, we aim to further evolve the AlgoKit templating system aiming to improve the following aspects:
 
-- The current fullstack template approach requires additional `injector` scripts to integrate new combinations of contracts and frontends, a process that will become more complex with the introduction of new languages like .NET.
-- While algokit defines notions of `bootstrap`, `algokit.toml`, `.algokit` folder and conventions around `.env` variables used for smart contract deployment. They are not always directly managed by `algokit` cli, introducing more formal conventions around what defines an `algokit` compliant project can enable more consistent and convenient developer experience.
+#### Wizard
+
 - The existing init wizard is not beginner-friendly, relying certain Algorand-specific terminology. Simplifying the wizard and reducing the number of questions will enhance the onboarding experience for new users.
+- Notion of `presets` is valuable and allowed to reduce number of default questions to be asked, but a deeper rethinking of the questions and the way they are asked is needed to make the wizard more user-friendly and less intimidating for beginners.
+
+#### Templates
+
+- The current fullstack template approach requires additional `injector` scripts to integrate new combinations of contracts and frontends, a process that will become more complex with the introduction of new languages like .NET.
+- Lack of `codespaces` configurations that a user can rely on to get started with a new algokit template based project in a github codespaces environment.
+
+#### CLI
+
+- While algokit defines notions of `bootstrap`, `algokit.toml`, `.algokit` folder and conventions around `.env` variables used for smart contract deployment. They are not always directly managed by `algokit` cli, introducing more formal conventions around what defines an `algokit` compliant project can enable more consistent and convenient developer experience.
 
 ### 1. Init wizard v2 improvements
 
-#### Proposal A - Simplify the questions
+#### Option A - Simplify the questions
 
-This is a general proposal concernign the init wizard v2 questions that can be improved as part of the new version of the wizard and is _unrelated_ to the further proposal of the monorepo and base template structure.
+This is a general proposal to refine the init wizard v2 questions that can be improved as part of the new version of the wizard and is _unrelated_ to the further proposal of the monorepo and base template structure.
+
+<table>
+    <tr>
+        <th>v1 wizard</th>
+        <th>v2 wizard</th>
+    </tr>
+    <tr>
+        <td>
+<pre>
 
 ```mermaid
 graph TD
-    A[Start] --> B[Name for this project.]
+    A[Start] --> Z[Pick an official template Puya, TealScript, React, Beaker]
+    Z --> B[Name for this project.]
     B --> C[Package author name]
     C --> D[Package author email]
     D --> E[Do you want to add VSCode configuration?]
@@ -42,27 +67,10 @@ graph TD
     M --> N
 ```
 
-```mermaid
-graph TD
-    A[Start] --> B["Name for this project."]
-    B --> C["Package author name"]
-    C --> D["Package author email"]
-    D --> E["Do you want to add VSCode configuration?"]
-    E -->|yes| F["Do you want to add JetBrains configuration (primarily optimized for PyCharm CE)?"]
-    E -->|no| G["What programming language do you want to use for your contract deployment code?"]
-    F --> G
-    G --> H["Do you want to include unit tests (via pytest)?"]
-    G -->|TypeScript| I["Do you want to include unit tests (via jest)?"]
-    H --> J["Do you want to use a Python linter?"]
-    I --> K["Do you want to use a Python formatter (via Black)?"]
-    J --> K
-    K --> L["Do you want to use a Python type checker via mypy?"]
-    L --> M["Do you want to include Python dependency vulnerability scanning via pip-audit?"]
-    M --> N["Do you want to include Github Actions workflows for build and testnet deployment?"]
-    N --> O["Do you want to include pre-commit for linting, type checking and formatting?"]
-    O --> P["Do you want to fund your deployment account using an optional dispenser account?"]
-    P --> Q[End]
-```
+  </pre>
+  </td>
+  <td>
+  <pre>
 
 ```mermaid
 graph TB
@@ -72,73 +80,95 @@ graph TB
     D[Python, implies puya]
     E[Typescript, implies TealScript]
     F[React]
-    G[`production`/`starter`]
-    H[Preset `production`/`starter`]
-    I[`production`/`starter`]
+    G[`production`/`starter`/`custom`]
+    I[`production`/`starter`/`custom`]
+    J[Would you like to include a frontend component?]
     A --> B
     A --> C
     B --> D
-    D --> G
+    D --> J
+    E --> J
+    J --> G
+    J --> F
     B --> E
-    E --> H
     C --> F
     F --> I
 ```
 
-There are no explicit disadvantages to this proposal as this is a matter of refining the individual questions that are asked as part of the main algokit init flow. It is also worth noting that the proposed changes are not a breaking change and are not expected to have any negative impact on the existing users of the init wizard.
+</pre>
+</td>
+</tr>
+</table>
 
-### 2. Base Template Structure and Generators Monorepo
+There are no explicit disadvantages to this proposal as this is a matter of refining the individual questions that are asked as part of the main algokit init flow. It is also worth noting that the proposed changes are not a breaking change from a standpoint of init command's behaviour since it only modifies the interactive aspects of the comman. Hencem, not expected to have any negative impact on the existing users of the init wizard.
 
-#### Proposal A - Merging algokit templates into smaller sub-templates to be hosted on algokit-generators monorepo. Introducing a base template.
+### 2. Improved fullstack templates && algokit-cli command orchestration
 
-The base template will be moved into the AlgoKit CLI and will contain a minimum set of folders and files to constitute a base template. This base template will include:
+#### Option A - Make full stack fully agnostic of frontend templates, introduce notion of command orchestration to algokit-cli
 
-- A conventionally named folder, contracts, to host all sub-projects with specific contract languages.
-- A folder named sites to host all sub-projects with specific frontends.
+This 2 step approach suggests that we can offload the business logic that deals with linking smart contracts and frontens within fullstack into a self sufficient generator available in `react` template that the fullstack component can invoke. And suggests introducing notion of command orchestration to algokit-cli to manage the lifecycle of a project.
 
-```
-- README.md
-- .gitignore
-- .algokit.toml
-- .algokit/
-- contracts/
-- sites/
-```
+**Fullstack Template Structure**:
 
-This structure will provide a clear and consistent framework for developers to build upon, ensuring that all AlgoKit projects follow the same basic structure.
+| Feature              | Before                                                                                                                                                                                                                                                     | After                                                                                                                                                                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Template Integration | The current fullstack is tightly coupled with the frontend template, handling the connection between frontend and backend. This coupling necessitates additional safety checks whenever there are changes in the expected structure of the React template. | The frontend now invokes the import-contract generator within the React template, which autonomously manages the linkage with a smart contract project. This adjustment makes the fullstack less reliant on template-specific changes that it should not be concerned with. |
 
-#### AlgoKit Generators Monorepo
+This gives us the following benefits:
 
-A new repository, `algokit-generators`, will be created to serve as a monorepo for all custom generators. This repository will provide a centralized location for developers to find and contribute to the development of custom generators.
+- **Simplified Integration**: The frontend template can now autonomously manage the linkage with a smart contract project, reducing the need for additional safety checks and improving maintainability of official templates.
+- **Improved templatization**: The fullstack template is further generalized allowing you to dynamically pick which smart contract language to use for backend component.
 
-NPM workspaces will be utilized to manage the monorepo, providing a streamlined and efficient way to manage dependencies across the various generators.
+**AlgoKit CLI Command Orchestration**:
 
-#### Entrypoint Commands
+The goal is to enhance the reliance on algokit.toml files to consolidate `project` specific commands under `project` and move `boostrap` with `deploy` under it yet also allowing defining any extra number of arbitrary commands to be run in the context of the project.
 
-The base template will define entrypoint commands such as:
+### 3. Alternatives considered
 
-- `build` (compile teal in the context of contracts, build frontend in the context of sites)
-- `dev` (deploy to localnet in the context of contracts, start frontend with hot reload in the context of sites)
-- `deploy` (deploy to target network in the context of contracts, deploy frontend to a static host in the context of sites)
-- `test` (run tests in the context of contracts, run frontend tests in the context of sites)
+#### Option A - Merging algokit templates into smaller sub-templates to be hosted on algokit-generators monorepo. Introducing a base template.
 
-These commands will be orchestrated by a root `package.json` file, providing a consistent interface for developers to interact with their AlgoKit projects.
+**Overview**: This proposal suggests consolidating AlgoKit templates into smaller, more focused sub-templates within a single `algokit-generators` monorepo. A base template will be introduced and integrated into the AlgoKit CLI, providing a standardized project structure.
 
-### Consequences
+**Base Template Structure**:
 
-This decision will result in a more streamlined and consistent developer experience when using AlgoKit. By providing a base template structure and a centralized location for custom generators, developers will have a clear framework to build upon and a single source of truth for custom generators.
+- Central folders: `contracts` for contract languages and `sites` for frontends.
+- Includes essential files: `README.md`, `.gitignore`, `.algokit.toml`, and a `.algokit/` directory.
 
-However, this decision will also require significant work to implement, including the creation of the `algokit-generators` monorepo and the migration of the base template into the AlgoKit CLI. Additionally, the use of NPM workspaces to manage the monorepo may introduce complexity and potential issues with dependency management.
+**AlgoKit Generators Monorepo**:
 
-### Decision
+- A new `algokit-generators` repository will centralize custom generator development.
+- Managed using NPM workspaces for efficient dependency handling.
+
+**Entrypoint Commands**:
+
+- Defined in the base template's `package.json`, including `build`, `dev`, `deploy`, and `test`.
+
+### Pros
+
+- Simplifies referencing of smart contracts in npm-centric projects (assuming those are also available as npm packages).
+- Simplifies project orchestration in monorepo setups.
+
+### Cons
+
+- **Complexity**: The use of NPM workspaces and a monorepo approach forces dependency on NPM and diminishes the value of the existing cli capabilities, shifting orchestration to algokit-cli instead could give us more control over precise features we want to offer under `orchestration` (see PART 2 proposal).
+- **Incompatibility with Copier**: The proposed structure does not align with Copier, complicating template updates and maintenance. In-fact copier recommends a single template per repository as part of [best practices for template development](https://copier.readthedocs.io/en/latest/configuring/#subdirectory).
+
+## Preferred option
+
+Part 1: Option A
+Part 2: Option A
+
+## Selected option
 
 TBD
 
 ### Next Steps
 
-1. Implement the base template structure within the AlgoKit CLI.
-2. Create the algokit-generators monorepo and migrate existing custom generators into it.
-3. Implement NPM workspaces to manage the algokit-generators monorepo.
-4. Define the entrypoint commands in the base template's package.json file.
-5. Update documentation to reflect these changes and provide guidance for developers.
-6. Test the new structure and monorepo to ensure they work as expected.
+1. Defining granular work items based on decided options.
+2. Implementing the changes in the AlgoKit CLI and templates.
+3. Updating the documentation and onboarding materials to reflect the new changes.
+4. Announcing the changes to the community/DevRel and gathering feedback for further improvements.
+
+```
+
+```
