@@ -207,5 +207,5 @@ A phased implementation of both proposals, starting with user-facing enhancement
 
 ### Open Questions
 
-1. Is there merit in implementing a bidirectional query mechanism within the wizard, facilitating a more integrated approach to adding frontends or smart contracts based on initial selections? This would require a slight adjustment in the wording and sequencing of questions to ensure a seamless user experience.
+1. Should we implement a bidirectional query mechanism where selecting a smart contract prompts the option to add a frontend, and similarly, choosing a frontend first triggers a query about integrating a smart contract? This approach necessitates a minor modification in the wording of the initial query. In the current workflow, we don't prompt adding smart contracts part since this question is prominently positioned as the initial query in the wizard's sequence.
 2. Alternative suggestions for 'type' categorization for `.algokit.toml` files? Or we are clear to proceed with `workspace` to highlight roots of full-stack/monorepo projects, `backend` to represent anything non webapp related and `frontend` to represent anything related?
