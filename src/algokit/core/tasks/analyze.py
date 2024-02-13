@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 TEALER_REPORTS_ROOT = Path.cwd() / ".algokit/static-analysis"
 TEALER_SNAPSHOTS_ROOT = TEALER_REPORTS_ROOT / "snapshots"
 TEALER_DOT_FILES_ROOT = TEALER_REPORTS_ROOT / "tealer"
-TEALER_VERSION = "0.1.1"
-TEALER_FORK = "git+https://github.com/algorandfoundation/tealer@3-12"
+TEALER_VERSION = "0.1.2"
 
 
 class TealerBlock(BaseModel):
@@ -104,7 +103,7 @@ def install_tealer_if_needed() -> None:
             "and then try `algokit task analyze ...` again."
         )
         run(
-            [*pipx_command, "install", f"{TEALER_FORK}"],
+            [*pipx_command, "install", f"tealer=={TEALER_VERSION}"],
             bad_return_code_error_message=(
                 "Unable to install tealer via pipx; please install tealer "
                 "manually and try `algokit task analyze ...` again."
