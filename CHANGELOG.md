@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.0 (2024-02-13)
+
+### Feature
+
+* Only build for mac ([`174ba64`](https://github.com/PatrickDinh/algokit-cli/commit/174ba64aeb17ce3185e07dd36fee3e9eb4ff81a6))
+
 ## v1.11.3 (2024-02-08)
 
 ### Fix
