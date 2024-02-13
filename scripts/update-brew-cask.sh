@@ -78,10 +78,11 @@ create_cask() {
 
 cat << EOF > $cask_file
 cask "$package_name" do
+  arch arm: "arm64", intel: "X64"
   version "$version"
   sha256 "$sha256"
 
-  url "$repo/releases/download/v#{version}/algokit-v#{version}-macos-py3.12.zip"
+  url "$repo/releases/download/v#{version}/algokit-v#{version}-macOS-#{arch}-py3.12.zip"
   name "$package_name"
   desc "$desc"
   homepage "$homepage"
