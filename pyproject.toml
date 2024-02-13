@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "1.12.2"
+version = "1.12.3"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
