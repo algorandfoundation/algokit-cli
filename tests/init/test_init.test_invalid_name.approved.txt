@@ -1,4 +1,4 @@
 Usage: algokit init [OPTIONS]
 Try 'algokit init -h' for help.
 
-Error: Invalid value for '--name' / '-n': Received invalid value for directory name; expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)
+Error: Invalid value for '--name' / '-n': Received invalid value for directory name; expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.), underscores (_), slashes (/ or \) for paths, and spaces within the name parts

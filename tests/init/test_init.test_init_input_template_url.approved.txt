@@ -1,12 +1,3 @@
-? Select a project template: 
-simple
-     Does nothing helpful.
-beaker
-     Provides a good starting point to build Beaker smart contracts productively.
-beaker_with_version
-     Provides a good starting point to build Beaker smart contracts productively, but pinned.
-<other>
-     Enter a custom URL - potentially dangerous!
 WARNING: 
 Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml

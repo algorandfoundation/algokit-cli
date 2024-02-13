@@ -90,7 +90,7 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
         ),
         "fullstack": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
-            description="Official template for starter or production fullstack applications (React + Beaker).",
+            description="Official template for starter or production fullstack applications.",
             branch="poc/wizard_v2",
         ),
         "playground": BlessedTemplateSource(
