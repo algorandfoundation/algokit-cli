@@ -10,6 +10,9 @@ inputs:
   operating_system:
     description: "Operating system to set the correct binary path and extension"
     required: true
+  architecture:
+    description: "Architecture to set the correct binary path and extension"
+    required: true
   build_command:
     description: "Command to build the binaries"
     required: true
@@ -54,9 +57,9 @@ runs:
         ls -l dist
         cd dist/algokit/
         if [ "${{ inputs.production_release }}" == "true" ]; then
-          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.zip *
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip *
         else
-          tar -zcvf ../../algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.zip *
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip *
         fi
         cd ../..
         ls -l
@@ -65,15 +68,15 @@ runs:
       if: ${{ inputs.production_release == 'true' }}
       uses: actions/upload-artifact@v4
       with:
-        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
-        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.zip
+        name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
+        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
 
     - name: Upload binary as artifact (dev)
       if: ${{ inputs.production_release != 'true' }}
       uses: actions/upload-artifact@v4
       with:
-        name: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}
-        path: algokit-${{ inputs.operating_system }}-py${{ inputs.python_version }}.zip
+        name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
+        path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
 
     - name: Append binary to release
       continue-on-error: true
@@ -81,6 +84,6 @@ runs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-py${{ inputs.python_version }}.zip
+          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
         tag_name: ${{ env.RELEASE_VERSION }}
         prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}

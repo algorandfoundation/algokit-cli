@@ -80,6 +80,6 @@ jobs:
         run: ls -la dist
 
       - name: Update homebrew cask
-        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macOS-py3.12.zip" "PatrickDinh/homebrew-tap"
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macOS-*-py3.12.zip" "PatrickDinh/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}

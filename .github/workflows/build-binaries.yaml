@@ -15,9 +15,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-latest, macos-14]
         include:
           - os: macos-latest
+            build_command: "poetry run poe package_unix"
+          - os: macos-14
             build_command: "poetry run poe package_unix"
     steps:
       - name: Checkout source code
