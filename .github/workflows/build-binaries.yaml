@@ -49,4 +49,5 @@ jobs:
           package_name: "algokit"
           production_release: ${{ inputs.production_release }}
           operating_system: ${{ runner.os }}
+          architecture: : ${{ runner.arch }}
           build_command: ${{ matrix.build_command }}
