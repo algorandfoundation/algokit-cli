@@ -28,11 +28,31 @@ DEFAULT_ANSWERS: dict[str, str] = {
 }
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
+# Constants for project types
+PROJECT_TYPE_SMART_CONTRACT = "Smart Contract"
+PROJECT_TYPE_DAPP_FRONTEND = "App Frontend"
+PROJECT_TYPE_CUSTOM_TEMPLATE = "Custom Template"
+
+# Constants for programming languages
+LANGUAGE_PYTHON = "Python"
+LANGUAGE_TYPESCRIPT = "Typescript"
+
+# Constants for frontend components
+FRONTEND_COMPONENT_YES = "Yes, include a frontend component"
+FRONTEND_COMPONENT_NO = "No, only the smart contract"
+
+# Constants for templates
+TEMPLATE_PUYA = "puya"
+TEMPLATE_TEALSCRIPT = "TealScript"
+TEMPLATE_FULLSTACK = "fullstack"
+TEMPLATE_REACT = "react"
+
 
 @dataclass(kw_only=True)
 class TemplateSource:
     url: str
     commit: str | None = None
+    branch: str | None = None
     """when adding a blessed template that is verified but not controlled by Algorand,
     ensure a specific commit is used"""
 
@@ -61,14 +81,17 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
         "puya": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-puya-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
+            branch="poc/wizard_v2",
         ),
         "react": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
+            branch="poc/wizard_v2",
         ),
         "fullstack": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications (React + Beaker).",
+            branch="poc/wizard_v2",
         ),
         "playground": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
@@ -85,10 +108,11 @@ _unofficial_template_warning = (
 
 
 def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    if value is not None and not re.match(r"^[\w\-.]+$", value):
+    if value is not None and not re.match(r"^[\w\-.\\/]+(?:[\w\-. ]+)*$", value):
         raise click.BadParameter(
             "Received invalid value for directory name; "
-            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.), underscores (_), "
+            "slashes (/ or \\) for paths, and spaces within the name parts",
             context,
             param,
         )
@@ -238,7 +262,7 @@ def init_command(  # noqa: PLR0913
         dst_path=project_path,
         data=answers_dict,
         quiet=True,
-        vcs_ref=template.commit,
+        vcs_ref=template.branch or template.commit,
         unsafe=True,
     ) as copier_worker:
         if use_defaults:
@@ -354,20 +378,28 @@ class DirectoryNameValidator(questionary.Validator):
 
 
 def _get_project_path(directory_name_option: str | None = None) -> Path:
-    base_path = Path.cwd()
     if directory_name_option is not None:
-        directory_name = directory_name_option
+        # Check if the provided directory name is an absolute path
+        project_path = Path(directory_name_option)
+        if not project_path.is_absolute():
+            # If not absolute, treat it as relative to the current working directory
+            base_path = Path.cwd()
+            project_path = base_path / directory_name_option.strip()
     else:
+        base_path = Path.cwd()
         directory_name = questionary_extensions.prompt_text(
             "Name of project / directory to create the project in: ",
             validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
-    project_path = base_path / directory_name.strip()
-    if project_path.exists():
-        # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
-        if not project_path.is_dir():
-            logger.error("File with same name already exists in current directory, please supply a different name")
-            _fail_and_bail()
+        project_path = base_path / directory_name.strip()
+
+    # Create the directory if it does not exist
+    if not project_path.exists():
+        project_path.mkdir(parents=True, exist_ok=True)
+    elif not project_path.is_dir():
+        logger.error("File with same name already exists in current directory, please supply a different name")
+        _fail_and_bail()
+    else:
         logger.warning(
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
@@ -378,6 +410,7 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
                 return _get_project_path()
             else:
                 _fail_and_bail()
+
     return project_path
 
 
@@ -422,21 +455,44 @@ class GitRepoValidator(questionary.Validator):
 
 
 def _get_template_interactive() -> TemplateSource:
-    description_prefix = "\n     "
+    # First question
+    project_type = questionary.select(
+        "How would you like to build your project?",
+        choices=[PROJECT_TYPE_SMART_CONTRACT, PROJECT_TYPE_DAPP_FRONTEND, PROJECT_TYPE_CUSTOM_TEMPLATE],
+    ).ask()
 
-    choice_value = questionary_extensions.prompt_select(
-        "Select a project template: ",
-        *[
-            questionary.Choice(
-                title=[("bold", key), ("", description_prefix + tmpl.description)],
-                value=tmpl,
-            )
-            for key, tmpl in _get_blessed_templates().items()
-        ],
-        f"<other>{description_prefix}Enter a custom URL - potentially dangerous!",
-    )
-    if isinstance(choice_value, TemplateSource):
-        return choice_value
+    template = None  # Initialize template variable
+
+    if project_type == PROJECT_TYPE_SMART_CONTRACT:
+        language = questionary.select(
+            "Which language would you like to use for the smart contract?",
+            choices=[LANGUAGE_PYTHON, LANGUAGE_TYPESCRIPT],
+        ).ask()
+
+        if language == LANGUAGE_PYTHON:
+            include_frontend = questionary.confirm("Would you like to include a frontend component?").ask()
+            if include_frontend:
+                template = TEMPLATE_FULLSTACK
+            else:
+                template = TEMPLATE_PUYA
+        elif language == LANGUAGE_TYPESCRIPT:
+            include_frontend = questionary.confirm("Would you like to include a frontend component?").ask()
+            if include_frontend:
+                template = TEMPLATE_FULLSTACK
+            else:
+                template = TEMPLATE_TEALSCRIPT
+
+    elif project_type == PROJECT_TYPE_DAPP_FRONTEND:
+        template = TEMPLATE_REACT
+
+    # Ensure a template has been selected
+    if not template and not project_type == PROJECT_TYPE_CUSTOM_TEMPLATE:
+        raise click.ClickException("No template selected. Please try again.")
+
+    # Map the template string directly to the TemplateSource
+    blessed_templates = _get_blessed_templates()
+    if template in blessed_templates:
+        return blessed_templates[template]
     # else: user selected custom url
     # note we print the warning but don't prompt for confirmation like we would when the URL is passed
     # as a command line argument, instead we allow the user to return to the official selection list

@@ -34,15 +34,17 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
         bootstrap_npm(project_dir)
 
 
-def bootstrap_any_including_subdirs(base_path: Path, *, ci_mode: bool) -> None:
+def bootstrap_any_including_subdirs(base_path: Path, *, ci_mode: bool, depth: int = 0) -> None:
+    if depth > 2:
+        return
+
     bootstrap_any(base_path, ci_mode=ci_mode)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
-        if sub_dir.is_dir():
-            if sub_dir.name.lower() in [".venv", "node_modules", "__pycache__"]:
-                logger.debug(f"Skipping {sub_dir}")
-            else:
-                bootstrap_any(sub_dir, ci_mode=ci_mode)
+        if sub_dir.is_dir() and sub_dir.name.lower() not in [".venv", "node_modules", "__pycache__"]:
+            bootstrap_any_including_subdirs(sub_dir, ci_mode=ci_mode, depth=depth + 1)
+        else:
+            logger.debug(f"Skipping {sub_dir}")
 
 
 def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:
