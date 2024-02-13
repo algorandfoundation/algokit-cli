@@ -11,6 +11,7 @@ from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_pa
 from algokit.core.utils import find_valid_pipx_command
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
+MAX_BOOTSTRAP_DEPTH = 2
 logger = logging.getLogger(__name__)
 
 
@@ -35,7 +36,7 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
 
 
 def bootstrap_any_including_subdirs(base_path: Path, *, ci_mode: bool, depth: int = 0) -> None:
-    if depth > 2:
+    if depth > MAX_BOOTSTRAP_DEPTH:
         return
 
     bootstrap_any(base_path, ci_mode=ci_mode)

@@ -319,16 +319,14 @@ def test_init_existing_filename_same_as_folder_name(
 
 
 # TODO: Restore this test
+# ruff: noqa: ERA001
 # def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
 #     cwd = tmp_path_factory.mktemp("cwd")
-
 #     mock_questionary_input.send_text("\n\n\n")
-
 #     result = invoke(
 #         "init --name myapp --no-git --defaults",
 #         cwd=cwd,
 #     )
-
 #     assert result.exit_code == 0
 #     verify(result.output, scrubber=make_output_scrubber())
 
