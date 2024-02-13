@@ -3,15 +3,18 @@
 #script arguments
 wheel_files=( $1 )
 wheel_file=${wheel_files[0]}
-homebrew_tap_repo=$2
+executable_files=( $2 )
+executable_file=${executable_files[0]}
+homebrew_tap_repo=$3
 
 #globals
 command=algokit
 
 #error codes
 MISSING_WHEEL=1
-CASK_GENERATION_FAILED=2
-PR_CREATION_FAILED=3
+MISSING_EXECUTABLE=2
+CASK_GENERATION_FAILED=3
+PR_CREATION_FAILED=4
 
 if [[ ! -f $wheel_file ]]; then
   >&2 echo "$wheel_file not found. 🚫"
@@ -19,6 +22,14 @@ if [[ ! -f $wheel_file ]]; then
 else
   echo "Found $wheel_file 🎉"
 fi
+
+if [[ ! -f $executable_file ]]; then
+  >&2 echo "$executable_file not found. 🚫"
+  exit $MISSING_EXECUTABLE
+else
+  echo "Found $executable_file 🎉"
+fi
+
 
 get_metadata() {
   local field=$1
@@ -29,10 +40,11 @@ create_cask() {
   repo="https://github.com/${GITHUB_REPOSITORY}"
   homepage="$repo"
   
-  wheel=`basename $wheel_file`
-  echo "Creating brew cask from $wheel_file"
+  echo "Creating brew cask from $executable_file"
 
-  #determine package_name, version and release tag from .whl
+  # determine package_name, version and release tag from .whl
+  wheel=`basename $wheel_file`
+  executable=`basename $executable_file`
   package_name=`echo $wheel | cut -d- -f1`
 
   version=None
@@ -50,78 +62,60 @@ create_cask() {
   echo Version: $version
   echo Release Tag: $release_tag
 
-  url="$repo/releases/download/$release_tag/$wheel"
-  #get other metadata from wheel
+  # get other metadata from wheel
   unzip -o $wheel_file -d . >/dev/null 2>&1
   metadata=`echo $wheel | cut -f 1,2 -d "-"`.dist-info/METADATA
 
   desc=`get_metadata Summary`
   license=`get_metadata License`
+  binary_url="$repo/releases/download/$release_tag/$executable"
+  echo "Calculating sha256 of $binary_url..."
+  sha256=`curl -s -L $binary_url | sha256sum | cut -f 1 -d ' '`
 
-  echo "Calculating sha256 of $url..."
-  sha256=`curl -s -L $url | sha256sum | cut -f 1 -d ' '`
-
-  ruby=${command}.rb
+  cask_file=${command}.rb
   
-  echo "Outputting $ruby..."
+  echo "Outputting $cask_file..."
 
-cat << EOF > $ruby
-# typed: false
-# frozen_string_literal: true
-
-cask "$command" do
+cat << EOF > $cask_file
+cask "$package_name" do
   version "$version"
   sha256 "$sha256"
 
-  url "$repo/releases/download/v#{version}/algokit-#{version}-py3-none-any.whl"
-  name "$command"
+  url "$repo/releases/download/v#{version}/algokit-v#{version}-macos-py3.12.zip"
+  name "$package_name"
   desc "$desc"
   homepage "$homepage"
 
-  depends_on formula: "pipx"
-  container type: :naked
+  binary "#{staged_path}/#{token}"
 
-  installer script: {
-    executable:   "pipx",
-    args:         ["install", "--force", "#{staged_path}/algokit-#{version}-py3-none-any.whl"],
-    print_stderr: false,
-  }
-  installer script: {
-    executable: "pipx",
-    args:       ["ensurepath"],
-  }
-  installer script: {
-    executable: "bash",
-    args:       ["-c", "echo \$(which pipx) uninstall $package_name >#{staged_path}/uninstall.sh"],
-  }
+  postflight do
+    set_permissions "#{staged_path}/#{token}", "0755"
+  end
 
-  uninstall script: {
-    executable: "bash",
-    args:       ["#{staged_path}/uninstall.sh"],
-  }
+  uninstall delete: "/usr/local/bin/#{token}"
 end
 EOF
 
-  if [[ ! -f $ruby ]]; then
-    >&2 echo "Failed to generate $ruby 🚫"
+  if [[ ! -f $cask_file ]]; then
+    >&2 echo "Failed to generate $cask_file 🚫"
     exit $CASK_GENERATION_FAILED
   else
-    echo "Created $ruby 🎉"
+    echo "Created $cask_file 🎉"
   fi
 }
 
 create_pr() {
-  local full_ruby=`realpath $ruby`  
+  local full_cask_filepath=`realpath $cask_file`  
   echo "Cloning $homebrew_tap_repo..."
   clone_dir=`mktemp -d`
   git clone "https://oauth2:${TAP_GITHUB_TOKEN}@github.com/${homebrew_tap_repo}.git" $clone_dir
 
-  echo "Commiting Casks/$ruby..."
+  echo "Commiting Casks/$cask_file..."
   pushd $clone_dir
   dest_branch="$command-update-$version"
   git checkout -b $dest_branch
   mkdir -p $clone_dir/Casks
-  cp $full_ruby $clone_dir/Casks
+  cp $full_cask_filepath $clone_dir/Casks
   message="Updating $command to $version"
   git add .
   git commit --message "$message"

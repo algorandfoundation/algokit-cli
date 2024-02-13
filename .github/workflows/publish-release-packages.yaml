@@ -3,10 +3,14 @@ name: Publish packages to public repositories
 on:
   workflow_call:
     inputs:
-      artifactName:
+      wheelArtifactName:
         required: true
         type: string
-        description: "The github artifact holding the wheel file which will be published"
+        description: "The GitHub artifact holding the wheel file which will be published"
+      binaryArtifactName:
+        required: true
+        type: string
+        description: "The GitHub artifact holding the binary file which will be published"
       do_brew:
         required: false
         default: true
@@ -22,7 +26,7 @@ on:
       release:
         required: true
         type: string
-        description: "The existing github release which will be published (e.g. v0.1.0)"
+        description: "The existing GitHub release which will be published (e.g. v0.1.0)"
       do_brew:
         required: false
         default: true
@@ -40,27 +44,40 @@ jobs:
     if: ${{ inputs.do_brew }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download either via release or provided artifact
-      - name: Download release
+      - name: Download wheel from release
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: gh release download ${{ inputs.release }} --pattern "*.whl" --dir dist
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Download artifact
+      - name: Download wheel from artifact
         if: ${{ github.event_name == 'workflow_call' }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.artifactName }}
+          name: ${{ inputs.wheelArtifactName }}
+          path: dist
+
+      - name: Download macOS binary from release
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: gh release download ${{ inputs.release }} --pattern "*.zip" --dir dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Download macOS binary from artifact
+        uses: actions/download-artifact@v4
+        if: ${{ github.event_name == 'workflow_call' }}
+        with:
+          name: ${{ inputs.binaryArtifactName }}
           path: dist
 
       - name: Set Git user as GitHub actions
         run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
 
       - name: Update homebrew cask
-        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "algorandfoundation/homebrew-tap"
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos-py3.12.zip" "PatrickDinh/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
 
