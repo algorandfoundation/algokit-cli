@@ -4,7 +4,7 @@
 - **Owner:** Altynbek Orumbayev
 - **Deciders:** Alessandro (Algorand Foundation), Rob Moore (MakerX), MakerX team
 - **Creation Date:** 2024-01-23
-- **Decision Date:** TBD
+- **Decision Date:** 2024-02-13
 - **Update Date:** 2024-02-12
 
 ## Revisions
@@ -27,7 +27,7 @@ This ADR emerges from various discussions aimed at enhancing the `init` wizard v
 
    - Address potential complexities in maintaining the `fullstack` template with new `smart-contract` template combinations, including future `.NET` integration alongside `puya` compiler-compatible stacks.
    - Implement `codespaces` configurations for simplified project setup in GitHub Codespaces.
-   - Consider unifying `add smart contract` generators in the `puya` and `beaker` templates into a single, generic generator managed by the CLI itself (suggestion added as part of revision 2 based on DevRel feedback).
+   - Consider unifying `add smart contract` generators in the `puya` and `beaker` templates into a single, generic generator managed by the CLI itself (suggestion added as part of revision 2 based on DevRel feedback). This helps solving the problem of simplifying template building experience (removing duplication of generators that are essentially generic) while still giving an option for template builders to have custom generators within templates.
 
 3. **CLI Enhancements:**
 
@@ -193,7 +193,7 @@ build = { command = "poetry run python -m smart_contracts build", description = 
 
 - Increases complexity and potential conflicts with existing CLI capabilities and Copier's recommendations, suggesting that a better alternative might be to consider a shift to where we have a more CLI-centric approach that handles orchestration without introducing extra dependant pre-requisites.
 
-## Preferred Approach
+## Decision
 
 A phased implementation of both proposals, starting with user-facing enhancements to the `init` wizard followed by template and CLI command orchestration improvements. This strategy allows for immediate impact and addresses urgent needs first, with potential for further simplification through subsequent enhancements.
 
