@@ -22,7 +22,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
    - Via AlgoKit CLI:
 
      - [Install AlgoKit CLI](./README.md#install) and run `algokit bootstrap poetry` in the root directory
-     - Install `tealer` - by running `pipx install git+https://github.com/algorandfoundation/tealer@3-12`. This is a prerequisite to running `pytest`, tealer is a third party tool for static analysis of TEAL code, algokit uses it in `task analyse` command. AlgoKit uses `pytest-xdist` to speed up the test suite execution by running tests in parallel, this requires `tealer` to be installed globally to avoid race conditions.
+     - Install `tealer` - by running `pipx install tealer==0.1.2`. This is a prerequisite to running `pytest`, tealer is a third party tool for static analysis of TEAL code, algokit uses it in `task analyse` command. AlgoKit uses `pytest-xdist` to speed up the test suite execution by running tests in parallel, this requires `tealer` to be installed globally to avoid race conditions.
 
 3. Install pre-commit hooks (optional but recommended):
 
