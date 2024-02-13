@@ -20,3 +20,14 @@ runs:
       run: |
         pipx install poetry==${{ inputs.poetry-version }}
       shell: bash
+
+    - name: Get full Python version
+      id: full-python-version
+      shell: bash
+      run: echo "full_version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')" >> $GITHUB_OUTPUT
+
+    - name: Setup poetry cache
+      uses: actions/cache@v4
+      with:
+        path: ./.venv
+        key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ steps.full-python-version.outputs.full_version }}

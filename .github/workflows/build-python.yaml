@@ -22,12 +22,6 @@ jobs:
       - name: Set up Poetry
         uses: ./.github/actions/setup-poetry
 
-      - uses: actions/cache@v4
-        name: Setup poetry cache
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}-${{ matrix.os }}-${{ matrix.python }}
-
       - name: Install dependencies
         # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
         # track here -> https://github.com/crytic/tealer/pull/209
