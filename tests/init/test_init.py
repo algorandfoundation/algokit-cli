@@ -796,7 +796,9 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
         ],
     ],
 )
-def test_init_interactive_flow(flow_steps: list, tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+def test_init_interactive_flow(
+    flow_steps: list, tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
     # Arrange
     cwd = tmp_path_factory.mktemp("cwd")
     for step in flow_steps:

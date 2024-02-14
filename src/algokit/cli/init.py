@@ -75,9 +75,10 @@ class MiscTemplateKey(str, Enum):
 class TemplateSource:
     url: str
     commit: str | None = None
-    branch: str | None = None
     """when adding a blessed template that is verified but not controlled by Algorand,
     ensure a specific commit is used"""
+    branch: str | None = None
+    answers: list[tuple[str, str]] | None = None
 
     def __str__(self) -> str:
         if self.commit:
@@ -88,6 +89,14 @@ class TemplateSource:
 @dataclass(kw_only=True)
 class BlessedTemplateSource(TemplateSource):
     description: str
+
+
+def _language_to_smart_contract(language: ContractLanguage) -> str:
+    if language == ContractLanguage.PYTHON:
+        return "puya"
+    elif language == ContractLanguage.TYPESCRIPT:
+        return "tealscript"
+    raise ValueError(f"Unknown language {language}")
 
 
 # this is a function so we can modify the values in unit tests
@@ -256,6 +265,10 @@ def init_command(  # noqa: PLR0913
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+
+    for custom_answer in template.answers or []:
+        answers_dict.setdefault(*custom_answer)
+
     logger.debug(f"template source = {template}")
 
     project_path = _get_project_path(directory_name)
@@ -486,7 +499,8 @@ def _get_template_interactive() -> TemplateSource:
     )
     logger.debug(f"selected project_type = {project_type}")
 
-    template = None  # Initialize template variable
+    template = None
+    language = None
     if project_type == ProjectType.SMART_CONTRACT:
         language = questionary_extensions.prompt_select(
             "Which language would you like to use for the smart contract?",
@@ -509,6 +523,14 @@ def _get_template_interactive() -> TemplateSource:
         include_contract = questionary_extensions.prompt_confirm(
             "Would you like to include a smart contracts component?", default=False
         )
+        if include_contract:
+            language = questionary_extensions.prompt_select(
+                "Which language would you like to use for the smart contract?",
+                *[
+                    questionary.Choice(title=lang.name.title(), value=lang) for lang in ContractLanguage
+                ],  # Modified line
+            )
+            logger.debug(f"selected language = {language}")
         logger.debug(f"selected include_contract = {include_contract}")
         template = TemplateKey.FULLSTACK if include_contract else TemplateKey.REACT
 
@@ -519,7 +541,12 @@ def _get_template_interactive() -> TemplateSource:
     # Map the template string directly to the TemplateSource
     blessed_templates = _get_blessed_templates()
     if template in blessed_templates:
-        return blessed_templates[template]
+        selected_template_source = blessed_templates[template]
+        if template == TemplateKey.FULLSTACK and language is not None:
+            smart_contract_template = _language_to_smart_contract(language)
+            selected_template_source.answers = [("contract_template", smart_contract_template)]
+        return selected_template_source
+
     # else: user selected custom url
     # note we print the warning but don't prompt for confirmation like we would when the URL is passed
     # as a command line argument, instead we allow the user to return to the official selection list
