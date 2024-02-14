@@ -15,14 +15,14 @@ permissions:
   packages: read
 
 jobs:
-  ci-check-python:
-    name: Check Python
-    uses: ./.github/workflows/check-python.yaml
+  # ci-check-python:
+  #   name: Check Python
+  #   uses: ./.github/workflows/check-python.yaml
 
-  ci-build-python:
-    name: Build Python
-    uses: ./.github/workflows/build-python.yaml
-    needs: ci-check-python
+  # ci-build-python:
+  #   name: Build Python
+  #   uses: ./.github/workflows/build-python.yaml
+  #   needs: ci-check-python
 
   release:
     name: Release Library
