@@ -116,6 +116,7 @@ jobs:
     with:
       production_release: "true"
       python_version: "3.12"
+    secrets: inherit
 
   cd-publish-release-packages:
     name: Publish Release Packages
