@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        pip install --user pipx
+        python -m pip install pipx
         pipx ensurepath
       shell: bash
     - if: ${{ inputs.poetry-version == 'latest' }}
