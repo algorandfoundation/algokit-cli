@@ -11,6 +11,7 @@ from algokit.cli.generate import generate_group
 from algokit.cli.goal import goal_command
 from algokit.cli.init import init_command
 from algokit.cli.localnet import localnet_group
+from algokit.cli.project import project_group
 from algokit.cli.task import task_group
 from algokit.core.conf import PACKAGE_NAME
 from algokit.core.log_handlers import color_option, verbose_option
@@ -49,3 +50,4 @@ algokit.add_command(generate_group)
 algokit.add_command(deploy_command)
 algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
+algokit.add_command(project_group)
