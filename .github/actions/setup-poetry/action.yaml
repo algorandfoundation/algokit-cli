@@ -8,17 +8,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: |
-        python -m pip install pipx
-        pipx ensurepath
-      shell: bash
     - if: ${{ inputs.poetry-version == 'latest' }}
       run: |
-        pipx install poetry
+        pip install poetry
       shell: bash
     - if: ${{ inputs.poetry-version != 'latest' }}
       run: |
-        pipx install poetry==${{ inputs.poetry-version }}
+        pip install poetry==${{ inputs.poetry-version }}
       shell: bash
 
     - name: Get full Python version
