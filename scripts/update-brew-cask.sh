@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #script arguments
-wheel_file=$1
-arm_artifact=$2
-intel_artifact=$3
+wheel_file=${($1)[0]}
+arm_artifact=${($2)[0]}
+intel_artifact=${($3)[0]}
 homebrew_tap_repo=$4
 
 #globals
