@@ -1,11 +1,10 @@
 #!/bin/bash
 
 #script arguments
-wheel_files=( $1 )
-wheel_file=${wheel_files[0]}
-executable_files=( $2 )
-executable_file=${executable_files[0]}
-homebrew_tap_repo=$3
+wheel_file=$1
+arm_artifact=$2
+intel_artifact=$3
+homebrew_tap_repo=$4
 
 #globals
 command=algokit
@@ -23,11 +22,18 @@ else
   echo "Found $wheel_file 🎉"
 fi
 
-if [[ ! -f $executable_file ]]; then
-  >&2 echo "$executable_file not found. 🚫"
+if [[ ! -f $arm_artifact ]]; then
+  >&2 echo "$arm_artifact not found. 🚫"
   exit $MISSING_EXECUTABLE
 else
-  echo "Found $executable_file 🎉"
+  echo "Found $arm_artifact 🎉"
+fi
+
+if [[ ! -f $intel_artifact ]]; then
+  >&2 echo "$intel_artifact not found. 🚫"
+  exit $MISSING_EXECUTABLE
+else
+  echo "Found $intel_artifact 🎉"
 fi
 
 
@@ -40,11 +46,10 @@ create_cask() {
   repo="https://github.com/${GITHUB_REPOSITORY}"
   homepage="$repo"
   
-  echo "Creating brew cask from $executable_file"
+  echo "Creating brew cask"
 
   # determine package_name, version and release tag from .whl
   wheel=`basename $wheel_file`
-  executable=`basename $executable_file`
   package_name=`echo $wheel | cut -d- -f1`
 
   version=None
@@ -68,9 +73,14 @@ create_cask() {
 
   desc=`get_metadata Summary`
   license=`get_metadata License`
-  binary_url="$repo/releases/download/$release_tag/$executable"
-  echo "Calculating sha256 of $binary_url..."
-  sha256=`curl -s -L $binary_url | sha256sum | cut -f 1 -d ' '`
+
+  arm_binary_url="$repo/releases/download/$release_tag/$(basename $arm_artifact)"
+  echo "Calculating sha256 of $arm_binary_url..."
+  arm_sha256=`curl -s -L $arm_binary_url | sha256sum | cut -f 1 -d ' '`
+
+  intel_binary_url="$repo/releases/download/$release_tag/$(basename $intel_artifact)"
+  echo "Calculating sha256 of $intel_binary_url..."
+  intel_sha256=`curl -s -L $intel_binary_url | sha256sum | cut -f 1 -d ' '`
 
   cask_file=${command}.rb
   
@@ -78,9 +88,9 @@ create_cask() {
 
 cat << EOF > $cask_file
 cask "$package_name" do
-  arch arm: "arm64", intel: "X64"
+  arch arm: "ARM64", intel: "X64"
   version "$version"
-  sha256 "$sha256"
+  sha256 arm: "$arm_sha256", intel: "$intel_sha256"
 
   url "$repo/releases/download/v#{version}/algokit-v#{version}-macOS-#{arch}-py3.12.zip"
   name "$package_name"
