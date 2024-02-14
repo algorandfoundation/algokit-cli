@@ -8,7 +8,7 @@ Python
 Typescript
 DEBUG: selected language = ContractLanguage.PYTHON
 ? Would you like to include a frontend component? (y/N)
-DEBUG: selected include_frontend = False
+DEBUG: selected include_frontend = True
 DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: project path = {current_working_directory}/myapp
 Starting template copy and render...

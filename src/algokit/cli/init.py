@@ -2,6 +2,7 @@ import logging
 import re
 import shutil
 from dataclasses import dataclass
+from enum import Enum, auto
 from pathlib import Path
 from typing import NoReturn
 
@@ -28,24 +29,46 @@ DEFAULT_ANSWERS: dict[str, str] = {
 }
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
-# Constants for project types
-PROJECT_TYPE_SMART_CONTRACT = "Smart Contract"
-PROJECT_TYPE_DAPP_FRONTEND = "App Frontend"
-PROJECT_TYPE_CUSTOM_TEMPLATE = "Custom Template"
 
-# Constants for programming languages
-LANGUAGE_PYTHON = "Python"
-LANGUAGE_TYPESCRIPT = "Typescript"
+class ProjectType(Enum):
+    """
+    For distinquishing main project type question invoked by `algokit init`
+    """
 
-# Constants for frontend components
-FRONTEND_COMPONENT_YES = "Yes, include a frontend component"
-FRONTEND_COMPONENT_NO = "No, only the smart contract"
+    SMART_CONTRACT = auto()
+    DAPP_FRONTEND = auto()
+    CUSTOM_TEMPLATE = auto()
 
-# Constants for templates
-TEMPLATE_PUYA = "puya"
-TEMPLATE_TEALSCRIPT = "TealScript"
-TEMPLATE_FULLSTACK = "fullstack"
-TEMPLATE_REACT = "react"
+
+class ContractLanguage(Enum):
+    """
+    For general purpose languages that have corresponding smart contract languages
+    python -> puya
+    typescript -> tealscript
+    """
+
+    PYTHON = auto()
+    TYPESCRIPT = auto()
+
+
+class TemplateKey(str, Enum):
+    """
+    For templates included in wizard v2 by default
+    """
+
+    PUYA = "puya"
+    TEALSCRIPT = "tealscript"
+    FULLSTACK = "fullstack"
+    REACT = "react"
+
+
+class MiscTemplateKey(str, Enum):
+    """
+    For templates not included in wizard v2 by default OR in process of deprecation
+    """
+
+    BEAKER = "beaker"
+    PLAYGROUND = "playground"
 
 
 @dataclass(kw_only=True)
@@ -70,32 +93,32 @@ class BlessedTemplateSource(TemplateSource):
 # this is a function so we can modify the values in unit tests
 def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
     return {
-        "beaker": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for starter or production Beaker applications.",
-        ),
-        "tealscript": BlessedTemplateSource(
+        TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
         ),
-        "puya": BlessedTemplateSource(
+        TemplateKey.PUYA: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-puya-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
             branch="poc/wizard_v2",
         ),
-        "react": BlessedTemplateSource(
+        TemplateKey.REACT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
             branch="poc/wizard_v2",
         ),
-        "fullstack": BlessedTemplateSource(
+        TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
             branch="poc/wizard_v2",
         ),
-        "playground": BlessedTemplateSource(
+        MiscTemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="Official template showcasing a number of small example applications and demos.",
+        ),
+        MiscTemplateKey.BEAKER: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Official template for starter or production Beaker applications.",
         ),
     }
 
@@ -134,7 +157,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "-t",
     type=click.Choice(list(_get_blessed_templates())),
     default=None,
-    help="Name of an official template to use. To see a list of descriptions, run this command with no arguments.",
+    help="Name of an official template to use. To choose interactively, run this command with no arguments.",
 )
 @click.option(
     "--template-url",
@@ -455,38 +478,42 @@ class GitRepoValidator(questionary.Validator):
 
 
 def _get_template_interactive() -> TemplateSource:
-    # First question
-    project_type = questionary.select(
+    project_type = questionary_extensions.prompt_select(
         "How would you like to build your project?",
-        choices=[PROJECT_TYPE_SMART_CONTRACT, PROJECT_TYPE_DAPP_FRONTEND, PROJECT_TYPE_CUSTOM_TEMPLATE],
-    ).ask()
+        *[
+            questionary.Choice(title=p_type.name.replace("_", " ").title(), value=p_type) for p_type in ProjectType
+        ],  # Modified line
+    )
+    logger.debug(f"selected project_type = {project_type}")
 
     template = None  # Initialize template variable
-
-    if project_type == PROJECT_TYPE_SMART_CONTRACT:
-        language = questionary.select(
+    if project_type == ProjectType.SMART_CONTRACT:
+        language = questionary_extensions.prompt_select(
             "Which language would you like to use for the smart contract?",
-            choices=[LANGUAGE_PYTHON, LANGUAGE_TYPESCRIPT],
-        ).ask()
+            *[questionary.Choice(title=lang.name.title(), value=lang) for lang in ContractLanguage],  # Modified line
+        )
+        logger.debug(f"selected language = {language}")
 
-        if language == LANGUAGE_PYTHON:
-            include_frontend = questionary.confirm("Would you like to include a frontend component?").ask()
-            if include_frontend:
-                template = TEMPLATE_FULLSTACK
-            else:
-                template = TEMPLATE_PUYA
-        elif language == LANGUAGE_TYPESCRIPT:
-            include_frontend = questionary.confirm("Would you like to include a frontend component?").ask()
-            if include_frontend:
-                template = TEMPLATE_FULLSTACK
-            else:
-                template = TEMPLATE_TEALSCRIPT
+        include_frontend = questionary_extensions.prompt_confirm(
+            "Would you like to include a frontend component?", default=False
+        )
 
-    elif project_type == PROJECT_TYPE_DAPP_FRONTEND:
-        template = TEMPLATE_REACT
+        logger.debug(f"selected include_frontend = {include_frontend}")
+        template = (
+            TemplateKey.FULLSTACK
+            if include_frontend
+            else (TemplateKey.PUYA if language == ContractLanguage.PYTHON else TemplateKey.TEALSCRIPT)
+        )
+
+    elif project_type == ProjectType.DAPP_FRONTEND:
+        include_contract = questionary_extensions.prompt_confirm(
+            "Would you like to include a smart contracts component?", default=False
+        )
+        logger.debug(f"selected include_contract = {include_contract}")
+        template = TemplateKey.FULLSTACK if include_contract else TemplateKey.REACT
 
     # Ensure a template has been selected
-    if not template and not project_type == PROJECT_TYPE_CUSTOM_TEMPLATE:
+    if not template and not project_type == ProjectType.CUSTOM_TEMPLATE:
         raise click.ClickException("No template selected. Please try again.")
 
     # Map the template string directly to the TemplateSource

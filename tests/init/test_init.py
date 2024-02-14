@@ -1,10 +1,13 @@
 import subprocess
 from collections.abc import Callable
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.namer import NamerFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
@@ -18,6 +21,25 @@ from tests.utils.which_mock import WhichMock
 
 PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
+
+
+class MockPipeInput(str, Enum):
+    LEFT = "\x1b[D"
+    RIGHT = "\x1b[C"
+    UP = "\x1b[A"
+    DOWN = "\x1b[B"
+    ENTER = "\n"
+
+
+@dataclass
+class MockQuestionaryAnswer:
+    """
+    Dummy class used to represent questionary answer with value indicating the question, and commands
+    being an array of emulated inputs required to be sent to the questionary to pick the desired answer.
+    """
+
+    value: str
+    commands: list[MockPipeInput]
 
 
 def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens: str) -> Scrubber:
@@ -59,9 +81,20 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
             description="Provides a good starting point to build Beaker smart contracts productively, but pinned.",
         ),
         "fullstack": BlessedTemplateSource(
-            # TODO: patch url to point to the real template
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for starter or production fullstack applications.",
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
+        ),
+        "tealscript": BlessedTemplateSource(
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
+        ),
+        "puya": BlessedTemplateSource(
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
+        ),
+        "react": BlessedTemplateSource(
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
         ),
     }
 
@@ -318,17 +351,15 @@ def test_init_existing_filename_same_as_folder_name(
     verify(result.output, scrubber=make_output_scrubber())
 
 
-# TODO: Restore this test
-# ruff: noqa: ERA001
-# def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
-#     cwd = tmp_path_factory.mktemp("cwd")
-#     mock_questionary_input.send_text("\n\n\n")
-#     result = invoke(
-#         "init --name myapp --no-git --defaults",
-#         cwd=cwd,
-#     )
-#     assert result.exit_code == 0
-#     verify(result.output, scrubber=make_output_scrubber())
+def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    mock_questionary_input.send_text("\n\n\n")
+    result = invoke(
+        "init --name myapp --no-git --defaults",
+        cwd=cwd,
+    )
+    assert result.exit_code == 0
+    verify(result.output, scrubber=make_output_scrubber())
 
 
 def test_init_invalid_template_url(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
@@ -737,6 +768,51 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
+
+
+@pytest.mark.parametrize(
+    ("flow_steps"),
+    [
+        # Fullstack flow selected, no additional options needed,
+        [
+            MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER]),
+            MockQuestionaryAnswer("Python", [MockPipeInput.ENTER]),
+            "y",  # yes to include frontend
+            None,  # no custom template URL
+        ],
+        # Dapp frontend flow selected, decline smart contracts component,
+        [
+            MockQuestionaryAnswer("Dapp Frontend", [MockPipeInput.DOWN, MockPipeInput.ENTER]),
+            None,  # no contract language selection
+            "n",  # no to include frontend
+            None,  # no custom template URL
+        ],
+        # Custom template URL provided
+        [
+            MockQuestionaryAnswer("Custom Template", [MockPipeInput.DOWN, MockPipeInput.DOWN, MockPipeInput.ENTER]),
+            None,  # no contract language selection
+            None,  # no frontend inclusion question
+            "gh:robdmoore/copier-helloworld\n",  # custom template URL
+        ],
+    ],
+)
+def test_init_interactive_flow(flow_steps: list, tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput):
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    for step in flow_steps:
+        if isinstance(step, MockQuestionaryAnswer):
+            for command in step.commands:
+                mock_questionary_input.send_text(command.value)
+        elif isinstance(step, str):
+            mock_questionary_input.send_text(step)
+
+    # Act
+    result = invoke("init --defaults --no-git --name myapp", cwd=cwd)
+
+    # Assert
+    project_type = flow_steps[0].value  # The first step always determines the project type
+    assert result.exit_code == 0
+    verify(result.output, options=NamerFactory.with_parameters(project_type), scrubber=make_output_scrubber())
 
 
 def _remove_git_hints(output: str) -> str:

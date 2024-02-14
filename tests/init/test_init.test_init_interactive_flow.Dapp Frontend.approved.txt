@@ -2,13 +2,9 @@
 Smart Contract
 Dapp Frontend
 Custom Template
-DEBUG: selected project_type = ProjectType.SMART_CONTRACT
-? Which language would you like to use for the smart contract?
-Python
-Typescript
-DEBUG: selected language = ContractLanguage.PYTHON
-? Would you like to include a frontend component? (y/N)
-DEBUG: selected include_frontend = False
+DEBUG: selected project_type = ProjectType.DAPP_FRONTEND
+? Would you like to include a smart contracts component? (y/N)
+DEBUG: selected include_contract = False
 DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: project path = {current_working_directory}/myapp
 Starting template copy and render...
