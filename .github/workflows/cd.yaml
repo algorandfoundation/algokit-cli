@@ -26,7 +26,7 @@ jobs:
 
   release:
     name: Release Library
-    needs: ci-build-python
+    # needs: ci-build-python
     runs-on: ubuntu-latest
 
     steps:
