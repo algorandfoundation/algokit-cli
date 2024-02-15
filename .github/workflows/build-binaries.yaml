@@ -15,13 +15,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-14]
         include:
           - os: ubuntu-latest
             build_command: "poetry run poe package_unix"
           - os: windows-latest
             build_command: "poetry run poe package_windows"
           - os: macos-latest
+            build_command: "poetry run poe package_unix"
+          - os: macos-14
             build_command: "poetry run poe package_unix"
     steps:
       - name: Checkout source code
@@ -37,6 +39,12 @@ jobs:
       - name: Set up Poetry
         uses: ./.github/actions/setup-poetry
 
+      - name: Setup poetry cache
+        uses: actions/cache@v4
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ inputs.python_version }}
+
       - name: Install dependencies
         run: poetry install --no-interaction
 
@@ -47,4 +55,5 @@ jobs:
           package_name: "algokit"
           production_release: ${{ inputs.production_release }}
           operating_system: ${{ runner.os }}
+          architecture: ${{ runner.arch }}
           build_command: ${{ matrix.build_command }}
