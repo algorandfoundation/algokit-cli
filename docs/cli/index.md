@@ -604,12 +604,12 @@ Name of the project / directory / repository to create.
 
 
 ### -t, --template <template_name>
-Name of an official template to use. To see a list of descriptions, run this command with no arguments.
+Name of an official template to use. To choose interactively, run this command with no arguments.
 
 
 * **Options**
 
-    beaker | tealscript | puya | react | fullstack | playground
+    TemplateKey.TEALSCRIPT | TemplateKey.PUYA | TemplateKey.REACT | TemplateKey.FULLSTACK | TemplateKey.BEAKER | MiscTemplateKey.PLAYGROUND
 
 
 

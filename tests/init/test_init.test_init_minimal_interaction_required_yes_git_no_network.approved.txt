@@ -1,3 +1,5 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 ? Continue anyway? (y/N)
@@ -7,6 +9,9 @@ Starting template copy and render...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+cwd: {current_working_directory}
 DEBUG: Attempting to load project config from {current_working_directory}/myapp/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/myapp

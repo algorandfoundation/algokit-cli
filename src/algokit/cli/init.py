@@ -12,6 +12,8 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
+from algokit.core.conf import get_algokit_config, get_algokit_projects_from_config
+from algokit.core.init import ProjectType, get_default_algokit_toml
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
@@ -30,9 +32,9 @@ DEFAULT_ANSWERS: dict[str, str] = {
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
 
-class ProjectType(Enum):
+class TemplatePresetType(Enum):
     """
-    For distinquishing main project type question invoked by `algokit init`
+    For distinguishing main template preset type question invoked by `algokit init`
     """
 
     SMART_CONTRACT = auto()
@@ -49,6 +51,7 @@ class ContractLanguage(Enum):
 
     PYTHON = auto()
     TYPESCRIPT = auto()
+    PYTEAL = auto()
 
 
 class TemplateKey(str, Enum):
@@ -60,14 +63,14 @@ class TemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
+    BEAKER = "beaker"
 
 
 class MiscTemplateKey(str, Enum):
     """
-    For templates not included in wizard v2 by default OR in process of deprecation
+    For templates not included in wizard v2 by default
     """
 
-    BEAKER = "beaker"
     PLAYGROUND = "playground"
 
 
@@ -96,6 +99,8 @@ def _language_to_smart_contract(language: ContractLanguage) -> str:
         return "puya"
     elif language == ContractLanguage.TYPESCRIPT:
         return "tealscript"
+    elif language == ContractLanguage.PYTEAL:
+        return "beaker"
     raise ValueError(f"Unknown language {language}")
 
 
@@ -121,13 +126,13 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             description="Official template for starter or production fullstack applications.",
             branch="poc/wizard_v2",
         ),
+        TemplateKey.BEAKER: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Official template for starter or production Beaker applications.",
+        ),
         MiscTemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="Official template showcasing a number of small example applications and demos.",
-        ),
-        MiscTemplateKey.BEAKER: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for starter or production Beaker applications.",
         ),
     }
 
@@ -140,11 +145,17 @@ _unofficial_template_warning = (
 
 
 def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    if value is not None and not re.match(r"^[\w\-.\\/]+(?:[\w\-. ]+)*$", value):
+    algokit_project_names = get_algokit_projects_from_config()
+    if value in algokit_project_names:
+        raise click.BadParameter(
+            f"Received invalid value for directory name; "
+            f"project with name '{value}' already exists in the current workspace",
+        )
+
+    if value is not None and not re.match(r"^[\w\-.]+$", value):
         raise click.BadParameter(
             "Received invalid value for directory name; "
-            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.), underscores (_), "
-            "slashes (/ or \\) for paths, and spaces within the name parts",
+            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
             context,
             param,
         )
@@ -214,6 +225,13 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     help="Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.",
 )
 @click.option(
+    "use_workspace",
+    "--workspace/--no-workspace",
+    is_flag=True,
+    default=True,
+    help="Whether to prefer structuring standalone projects as part of a workspace.",
+)
+@click.option(
     "answers",
     "--answer",
     "-a",
@@ -234,6 +252,7 @@ def init_command(  # noqa: PLR0913
     answers: list[tuple[str, str]],
     use_defaults: bool,
     run_bootstrap: bool | None,
+    use_workspace: bool,
     open_ide: bool,
 ) -> None:
     """
@@ -308,6 +327,9 @@ def init_command(  # noqa: PLR0913
         copier_worker.run_copy()
 
     logger.info("Template render complete!")
+    project_path = _adjust_project_path_for_workspace(
+        template_source=template, project_path=project_path, use_workspace=use_workspace
+    )
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
 
@@ -414,28 +436,20 @@ class DirectoryNameValidator(questionary.Validator):
 
 
 def _get_project_path(directory_name_option: str | None = None) -> Path:
+    base_path = Path.cwd()
     if directory_name_option is not None:
-        # Check if the provided directory name is an absolute path
-        project_path = Path(directory_name_option)
-        if not project_path.is_absolute():
-            # If not absolute, treat it as relative to the current working directory
-            base_path = Path.cwd()
-            project_path = base_path / directory_name_option.strip()
+        directory_name = directory_name_option
     else:
-        base_path = Path.cwd()
         directory_name = questionary_extensions.prompt_text(
             "Name of project / directory to create the project in: ",
             validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
-        project_path = base_path / directory_name.strip()
-
-    # Create the directory if it does not exist
-    if not project_path.exists():
-        project_path.mkdir(parents=True, exist_ok=True)
-    elif not project_path.is_dir():
-        logger.error("File with same name already exists in current directory, please supply a different name")
-        _fail_and_bail()
-    else:
+    project_path = base_path / directory_name.strip()
+    if project_path.exists():
+        # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
+        if not project_path.is_dir():
+            logger.error("File with same name already exists in current directory, please supply a different name")
+            _fail_and_bail()
         logger.warning(
             "Re-using existing directory, this is not recommended because if project generation fails, "
             "then we can't automatically cleanup."
@@ -446,7 +460,6 @@ def _get_project_path(directory_name_option: str | None = None) -> Path:
                 return _get_project_path()
             else:
                 _fail_and_bail()
-
     return project_path
 
 
@@ -494,14 +507,15 @@ def _get_template_interactive() -> TemplateSource:
     project_type = questionary_extensions.prompt_select(
         "How would you like to build your project?",
         *[
-            questionary.Choice(title=p_type.name.replace("_", " ").title(), value=p_type) for p_type in ProjectType
+            questionary.Choice(title=p_type.name.replace("_", " ").title(), value=p_type)
+            for p_type in TemplatePresetType
         ],  # Modified line
     )
     logger.debug(f"selected project_type = {project_type}")
 
     template = None
     language = None
-    if project_type == ProjectType.SMART_CONTRACT:
+    if project_type == TemplatePresetType.SMART_CONTRACT:
         language = questionary_extensions.prompt_select(
             "Which language would you like to use for the smart contract?",
             *[questionary.Choice(title=lang.name.title(), value=lang) for lang in ContractLanguage],  # Modified line
@@ -516,10 +530,14 @@ def _get_template_interactive() -> TemplateSource:
         template = (
             TemplateKey.FULLSTACK
             if include_frontend
-            else (TemplateKey.PUYA if language == ContractLanguage.PYTHON else TemplateKey.TEALSCRIPT)
+            else TemplateKey.PUYA
+            if language == ContractLanguage.PYTHON
+            else TemplateKey.TEALSCRIPT
+            if language == ContractLanguage.TYPESCRIPT
+            else TemplateKey.BEAKER
         )
 
-    elif project_type == ProjectType.DAPP_FRONTEND:
+    elif project_type == TemplatePresetType.DAPP_FRONTEND:
         include_contract = questionary_extensions.prompt_confirm(
             "Would you like to include a smart contracts component?", default=False
         )
@@ -535,10 +553,11 @@ def _get_template_interactive() -> TemplateSource:
         template = TemplateKey.FULLSTACK if include_contract else TemplateKey.REACT
 
     # Ensure a template has been selected
-    if not template and not project_type == ProjectType.CUSTOM_TEMPLATE:
+    if not template and not project_type == TemplatePresetType.CUSTOM_TEMPLATE:
         raise click.ClickException("No template selected. Please try again.")
 
     # Map the template string directly to the TemplateSource
+    # This is needed to be able to reuse fullstack to work with beaker, puya, and tealscript templates
     blessed_templates = _get_blessed_templates()
     if template in blessed_templates:
         selected_template_source = blessed_templates[template]
@@ -610,3 +629,28 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         and git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
     ):
         logger.info("🎉 Performed initial git commit successfully! 🎉")
+
+
+def _adjust_project_path_for_workspace(
+    *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
+) -> Path:
+    cwd = Path.cwd()
+    is_standalone = TemplateKey.FULLSTACK.value not in template_source.url
+    config = get_algokit_config(cwd)
+    logger.info("cwd: " + str(cwd))
+
+    if config is None and is_standalone and use_workspace:
+        new_project_path = cwd / project_path.name / "projects" / project_path.name
+        new_project_path.mkdir(parents=True, exist_ok=True)
+        for item in project_path.iterdir():
+            if item.name != "projects":
+                shutil.move(str(item), str(new_project_path))
+        (cwd / project_path.name / ".algokit.toml").write_text(get_default_algokit_toml(ProjectType.WORKSPACE))
+        return new_project_path
+
+    if config and config.get("project", {}).get("type") == ProjectType.WORKSPACE.value and is_standalone:
+        projects_root = cwd / "projects"
+        shutil.move(str(project_path), str(projects_root))
+        return projects_root / project_path.name
+
+    return project_path

@@ -139,7 +139,7 @@ def test_init_no_interaction_required_no_git_no_network(tmp_path_factory: TempPa
 
     result = invoke(
         f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
 
@@ -231,7 +231,7 @@ def test_init_no_interaction_required_defaults_no_git_no_network(tmp_path_factor
 
     result = invoke(
         f"init --name myapp --no-git --defaults "
-        f"--template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
+        f"--template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --no-workspace",
         cwd=cwd,
     )
 
@@ -253,7 +253,7 @@ def test_init_minimal_interaction_required_no_git_no_network_no_bootstrap(
     # Accept community template
     mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults --no-bootstrap",
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --defaults --no-bootstrap --no-workspace",
         cwd=cwd,
     )
 
@@ -275,7 +275,7 @@ def test_init_minimal_interaction_required_yes_git_no_network(
     mock_questionary_input.send_text("Y")
     dir_name = "myapp"
     result = invoke(
-        f"init --name {dir_name} --git --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --name {dir_name} --git --template-url '{GIT_BUNDLE_PATH}' --defaults --no-workspace",
         cwd=cwd,
         env={
             "GIT_AUTHOR_NAME": "GitHub Actions",
@@ -381,7 +381,8 @@ def test_init_project_name(tmp_path_factory: TempPathFactory, mock_questionary_i
     mock_questionary_input.send_text(project_name + "\n")
     mock_questionary_input.send_text("Y")
     result = invoke(
-        f"init --no-git --defaults --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url ",
+        f"init --no-git --defaults --template-url '{GIT_BUNDLE_PATH}' "
+        f"--UNSAFE-SECURITY-accept-template-url --no-workspace",
         cwd=cwd,
     )
 
@@ -426,10 +427,11 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     project_name = "FAKE_PROJECT"
     mock_questionary_input.send_text("\n")
     mock_questionary_input.send_text(project_name + "\n")
-    result = invoke(
-        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --defaults",
-        cwd=cwd,
+    command = (
+        "init --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        "--UNSAFE-SECURITY-accept-template-url --defaults --no-workspace"
     )
+    result = invoke(command, cwd=cwd)
 
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
@@ -452,10 +454,11 @@ def test_init_project_name_reenter_folder_name(
     mock_questionary_input.send_text("N")
     project_name_2 = "FAKE_PROJECT_2"
     mock_questionary_input.send_text(project_name_2 + "\n")
-    result = invoke(
-        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --defaults",
-        cwd=cwd,
+    command = (
+        "init --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        "--UNSAFE-SECURITY-accept-template-url --defaults --no-workspace"
     )
+    result = invoke(command, cwd=cwd)
 
     assert result.exit_code == 0
     paths = {p.relative_to(cwd) for p in cwd.rglob("*")}
@@ -475,7 +478,7 @@ def test_init_ask_about_git(tmp_path_factory: TempPathFactory, mock_questionary_
     mock_questionary_input.send_text("Y")  # git
     dir_name = "myapp"
     result = invoke(
-        f"init --name myapp --template-url '{GIT_BUNDLE_PATH}' --defaults",
+        f"init --name myapp --template-url '{GIT_BUNDLE_PATH}' --defaults --no-workspace",
         cwd=cwd,
         env={
             "GIT_AUTHOR_NAME": "GitHub Actions",
@@ -558,7 +561,7 @@ def test_init_with_any_template_url_get_community_warning(
     mock_questionary_input.send_text("Y")
     result = invoke(
         "init --name myapp --no-git --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults --no-workspace "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -585,7 +588,7 @@ def test_init_with_any_template_url_get_community_warning_with_unsafe_tag(tmp_pa
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
         "init --name myapp --no-git --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults --no-workspace "
         "-a author_name None -a author_email None --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
@@ -642,7 +645,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --no-bootstrap --template beaker --defaults "
+        "init --name myapp --no-git --no-bootstrap --template beaker --defaults --no-workspace "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -670,7 +673,7 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
 
     result = invoke(
         "init --name myapp --no-git --template beaker_with_version"
-        " --defaults -a run_poetry_install False -a author_name None -a author_email None ",
+        " --defaults -a run_poetry_install False -a author_name None -a author_email None --no-workspace ",
         cwd=cwd,
     )
 
@@ -691,7 +694,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
 
     result = invoke(
         (
-            "init --name myapp --no-git --no-bootstrap --template beaker --defaults "
+            "init --name myapp --no-git --no-bootstrap --template beaker --defaults --no-workspace "
             "-a author_name None -a author_email None "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
             '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '

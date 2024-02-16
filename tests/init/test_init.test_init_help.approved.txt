@@ -39,6 +39,8 @@ Options:
   --ide / --no-ide                Whether to open an IDE for you if the IDE and
                                   IDE config are detected. Supported IDEs: VS
                                   Code.
+  --workspace / --no-workspace    Whether to prefer structuring standalone
+                                  projects as part of a workspace.
   -a, --answer <key> <value>      Answers key/value pairs to pass to the
                                   template.
   -h, --help                      Show this message and exit.
