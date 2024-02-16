@@ -151,8 +151,6 @@ jobs:
       - name: Generate snapcraft.yaml
         run: |
           ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ env.RELEASE_VERSION }} ${{ env.BINARY_PATH }}
-          ls -la ${{ github.workspace }}/snap
-          cat ${{ github.workspace }}/snap/snapcraft.yaml
 
       - name: Build snap
         uses: snapcore/action-build@v1
