@@ -35,7 +35,7 @@ description: |
   secure, automated production-ready applications rapidly.
 
 base: core22
-confinement: devmode
+confinement: classic
 grade: devel
 
 parts:
