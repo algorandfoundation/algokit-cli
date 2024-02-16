@@ -120,8 +120,6 @@ jobs:
       matrix:
         arch: [amd64, arm64, armhf]
     if: ${{ inputs.do_snap }}
-    env:
-      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
     steps:
       - name: Checkout source code
@@ -165,7 +163,7 @@ jobs:
       - name: Publish snap
         uses: snapcore/action-publish@v1
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAP_STORE_LOGIN }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_RELEASE_TOKEN }}
         with:
           snap: ${{ env.SNAP_BINARY_PATH }}
           release: beta
