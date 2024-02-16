@@ -116,9 +116,6 @@ jobs:
 
   publish-snap:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [amd64, arm64, armhf]
     if: ${{ inputs.do_snap }}
 
     steps:
@@ -141,8 +138,8 @@ jobs:
       - name: Download binary artifact from release
         if: ${{ (env.RELEASE_VERSION != '') || (github.event_name == 'workflow_dispatch' && inputs.release != '') }}
         run: |
-          gh release download ${{ inputs.release }} --pattern "*Linux-py3.12.tar.gz" --dir dist
-          echo "BINARY_PATH=$(ls dist/*Linux-py3.12.tar.gz)" >> $GITHUB_ENV
+          gh release download ${{ inputs.release }} --pattern "*Linux*.tar.gz" --dir dist
+          echo "BINARY_PATH=$(ls dist/*Linux*.tar.gz)" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -153,7 +150,7 @@ jobs:
       - name: Build snap
         uses: snapcore/action-build@v1
         with:
-          snapcraft-args: --target-arch ${{ matrix.arch }}
+          snapcraft-args: --target-arch amd64
 
       - name: Set path to snap binary
         shell: bash
