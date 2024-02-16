@@ -85,6 +85,7 @@
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
     - [--ide, --no-ide](#--ide---no-ide)
+    - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
   - [localnet](#localnet)
     - [console](#console)
@@ -639,6 +640,10 @@ Whether to run algokit bootstrap to install and configure the new project's depe
 
 ### --ide, --no-ide
 Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.
+
+
+### --workspace, --no-workspace
+Whether to prefer structuring standalone projects as part of a workspace.
 
 
 ### -a, --answer <key> <value>
