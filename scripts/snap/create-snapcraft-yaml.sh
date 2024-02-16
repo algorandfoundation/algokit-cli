@@ -27,7 +27,7 @@ SOURCE="$ARTIFACT_PATH"
 cat > "${DESTINATION_DIR}/snap/snapcraft.yaml" <<EOF
 name: algokit-dev
 version: "$VERSION"
-summary: The AlgoKit tool for developers building on the Algorand network.
+summary: The AlgoKit CLI is the one-stop shop tool for developers building on Algorand
 description: |
   AlgoKit gets developers of all levels up and running with a familiar, 
   fun and productive development environment in minutes. 
