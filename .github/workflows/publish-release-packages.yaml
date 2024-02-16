@@ -17,6 +17,11 @@ on:
         default: true
         type: boolean
         description: "Publish to Chocolatey repository"
+      do_snap:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to snap repository"
   workflow_dispatch:
     inputs:
       release:
@@ -33,6 +38,11 @@ on:
         default: true
         type: boolean
         description: "Publish to Chocolatey repository"
+      do_snap:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to snap repository"
 
 jobs:
   publish-brew:
@@ -103,3 +113,61 @@ jobs:
         uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: push --source https://push.chocolatey.org/
+
+  publish-snap:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64, arm64, armhf]
+    if: ${{ inputs.do_snap }}
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set release version
+        shell: bash
+        continue-on-error: true
+        run: |
+          if [ -z "${{ inputs.release }}" ]; then
+            echo "RELEASE_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
+            git describe --tags $(git rev-list --tags --max-count=1)
+          else
+            echo "RELEASE_VERSION=${{ inputs.release }}" >> $GITHUB_ENV
+          fi
+
+      - name: Download binary artifact from release
+        if: ${{ (env.RELEASE_VERSION != '') || (github.event_name == 'workflow_dispatch' && inputs.release != '') }}
+        run: |
+          gh release download ${{ inputs.release }} --pattern "*Linux-py3.12.tar.gz" --dir dist
+          echo "BINARY_PATH=$(ls dist/*Linux-py3.12.tar.gz)" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Generate snapcraft.yaml
+        run: |
+          ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ env.RELEASE_VERSION }} ${{ env.BINARY_PATH }}
+          ls -la ${{ github.workspace }}/snap
+          cat ${{ github.workspace }}/snap/snapcraft.yaml
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        with:
+          snapcraft-args: --target-arch ${{ matrix.arch }}
+
+      - name: Set path to snap binary
+        shell: bash
+        run: |
+          echo "SNAP_BINARY_PATH=$(find ${{ github.workspace }} -name '*.snap')" >> $GITHUB_ENV
+
+      - name: Publish snap
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ env.SNAP_BINARY_PATH }}
+          release: edge
