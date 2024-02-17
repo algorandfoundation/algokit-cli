@@ -16,9 +16,9 @@ jobs:
     strategy:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-14]
+        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             build_command: "poetry run poe package_unix"
           - os: windows-latest
             build_command: "poetry run poe package_windows"
