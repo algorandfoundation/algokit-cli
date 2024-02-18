@@ -57,9 +57,9 @@ runs:
         ls -l dist
         cd dist/algokit/
         if [ "${{ inputs.production_release }}" == "true" ]; then
-          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip *
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         else
-          tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip *
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         fi
         cd ../..
         ls -l
@@ -69,14 +69,14 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
-        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
+        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Upload binary as artifact (dev)
       if: ${{ inputs.production_release != 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
-        path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
+        path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
 
     - name: Append binary to release
       continue-on-error: true
@@ -84,6 +84,6 @@ runs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.zip
+          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
         tag_name: ${{ env.RELEASE_VERSION }}
         prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}
