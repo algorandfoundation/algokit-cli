@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.4 (2024-02-19)
+
+### Documentation
+
+* Adr init wizard v2 and related improvements ([#411](https://github.com/PatrickDinh/algokit-cli/issues/411)) ([`8c5445a`](https://github.com/PatrickDinh/algokit-cli/commit/8c5445a558e503590fee636a9e5826026a5aacaf))
+
 ## v1.12.21 (2024-02-14)
 
 
