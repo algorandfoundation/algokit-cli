@@ -27,6 +27,20 @@ runs:
       run: ${{ inputs.build_command }}
       shell: bash
 
+    - if: ${{ runner.os != 'macOS' }}
+      name: Sign binary for Mac
+      uses: lando/code-sign-action@v2
+      with:
+        file: dist/algokit/algokit
+        certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+        certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+        apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+        apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+        apple-notary-tool: notarytool
+        apple-team-id: 7287T82947
+        apple-product-id: dev.patrick.algokit
+        options: --options runtime --entitlements "${{ github.workspace }}/entitlements.xml"
+
     - name: Set TEST_CLI_PATH
       run: |
         TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
