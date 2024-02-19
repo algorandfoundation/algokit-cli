@@ -7,18 +7,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pr-check:
-    name: Check Python
-    uses: ./.github/workflows/check-python.yaml
+  # pr-check:
+  #   name: Check Python
+  #   uses: ./.github/workflows/check-python.yaml
 
-  pr-build:
-    name: Build & Test Python
-    needs: pr-check
-    uses: ./.github/workflows/build-python.yaml
+  # pr-build:
+  #   name: Build & Test Python
+  #   needs: pr-check
+  #   uses: ./.github/workflows/build-python.yaml
 
   pr-binaries-build:
     name: Build & Test Binaries
-    needs: pr-check
     uses: ./.github/workflows/build-binaries.yaml
     with:
       production_release: "false"

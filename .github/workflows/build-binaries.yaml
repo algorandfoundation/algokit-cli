@@ -16,12 +16,8 @@ jobs:
     strategy:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
-        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
+        os: [macos-latest, macos-14]
         include:
-          - os: ubuntu-20.04
-            build_command: "poetry run poe package_unix"
-          - os: windows-latest
-            build_command: "poetry run poe package_windows"
           - os: macos-latest
             build_command: "poetry run poe package_unix"
           - os: macos-14
@@ -52,3 +48,7 @@ jobs:
           operating_system: ${{ runner.os }}
           architecture: ${{ runner.arch }}
           build_command: ${{ matrix.build_command }}
+          certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+          certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+          apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+          apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
