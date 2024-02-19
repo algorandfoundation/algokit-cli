@@ -12,6 +12,13 @@ Usage: algokit init [OPTIONS]
   This should be run in the parent directory that you want the project folder
   created in.
 
+  By default, the `--workspace` flag creates projects within a workspace
+  structure or integrates them into an existing one, promoting organized
+  management of multiple projects. Conversely, using `--no-workspace`
+  initializes projects as standalone, bypassing workspace integration even if
+  available, suitable for isolated projects or when workspace integration is
+  unnecessary.
+
 Options:
   -n, --name TEXT                 Name of the project / directory / repository
                                   to create.
@@ -43,4 +50,9 @@ Options:
                                   projects as part of a workspace.
   -a, --answer <key> <value>      Answers key/value pairs to pass to the
                                   template.
+  --bootstrap-depth INTEGER       Maximum depth to apply when running
+                                  `bootstrap` in new project. Defaults to 2
+                                  levels down in the folder tree with
+                                  `--workspace` and 1 when used with `--no-
+                                  workspace`.
   -h, --help                      Show this message and exit.

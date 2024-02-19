@@ -11,7 +11,11 @@ import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
+from algokit.core.bootstrap import (
+    MAX_BOOTSTRAP_DEPTH,
+    bootstrap_any_including_subdirs,
+    project_minimum_algokit_version_check,
+)
 from algokit.core.conf import get_algokit_config, get_algokit_projects_from_config
 from algokit.core.init import ProjectType
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
@@ -246,6 +250,17 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
+@click.option(
+    "bootstrap_depth",
+    "--bootstrap-depth",
+    type=int,
+    default=MAX_BOOTSTRAP_DEPTH,
+    help=(
+        "Maximum depth to apply when running `bootstrap` in new project. "
+        "Defaults to 2 levels down in the folder tree with `--workspace` "
+        "and 1 when used with `--no-workspace`."
+    ),
+)
 def init_command(  # noqa: PLR0913
     *,
     directory_name: str | None,
@@ -255,6 +270,7 @@ def init_command(  # noqa: PLR0913
     unsafe_security_accept_template_url: bool,
     use_git: bool | None,
     answers: list[tuple[str, str]],
+    bootstrap_depth: int,
     use_defaults: bool,
     run_bootstrap: bool | None,
     use_workspace: bool,
@@ -272,6 +288,11 @@ def init_command(  # noqa: PLR0913
 
     This should be run in the parent directory that you want the project folder
     created in.
+
+    By default, the `--workspace` flag creates projects within a workspace structure or integrates them into an existing
+    one, promoting organized management of multiple projects. Conversely, using `--no-workspace`
+    initializes projects as standalone, bypassing workspace integration even if available,
+    suitable for isolated projects or when workspace integration is unnecessary.
     """
 
     if not shutil.which("git"):
@@ -282,6 +303,9 @@ def init_command(  # noqa: PLR0913
 
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
     answers_dict = DEFAULT_ANSWERS | dict(answers)
+
+    # if user prefers to ignore creating the `workspace` setup, set bootstrap depth to 1
+    bootstrap_depth = 1 if not use_workspace else bootstrap_depth
 
     template = _get_template(
         name=template_name,
@@ -337,7 +361,7 @@ def init_command(  # noqa: PLR0913
 
     logger.info("Template render complete!")
 
-    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
+    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, max_depth=bootstrap_depth)
 
     _maybe_git_init(
         project_path,
@@ -382,7 +406,7 @@ def init_command(  # noqa: PLR0913
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
 
 
-def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
+def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool, max_depth: int) -> None:
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or questionary_extensions.prompt_confirm(
@@ -395,7 +419,7 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # but if something goes wrong, we don't want to block
         try:
             project_minimum_algokit_version_check(project_path)
-            bootstrap_any_including_subdirs(project_path, ci_mode=False)
+            bootstrap_any_including_subdirs(project_path, ci_mode=False, max_depth=max_depth)
         except Exception as e:
             logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(
@@ -650,18 +674,31 @@ def _adjust_project_path_for_workspace(
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
-        # 1.1 Move standalone under projects folder
         _instantiate_base_template(project_path)
 
-        new_project_path = cwd / project_path.name / "projects" / project_path.name
+        config = get_algokit_config(project_path)
+        if not config:
+            logger.error("Failed to instantiate workspace structure for standalone project")
+            _fail_and_bail()
+
+        sub_projects_path = config.get("project", {}).get("projects_root_path") or "projects"
+        new_project_path = cwd / project_path.name / sub_projects_path / project_path.name
         new_project_path.mkdir(parents=True, exist_ok=True)
 
+        logger.debug(f"Workspace structure is ready! The project is to be placed under {new_project_path}")
         return new_project_path
 
-    # 2. If its a standalone project being instantiated inside an existing workspace project
+    # 2. If its a standalone project being instantiated inside an existing workspace project and use_workspace is True
     # then place the new project inside expected projects folder defined by workspace toml
-    if config and config.get("project", {}).get("type") == ProjectType.WORKSPACE.value and is_standalone:
-        projects_root = cwd / "projects"
+    if (
+        config
+        and config.get("project", {}).get("type") == ProjectType.WORKSPACE.value
+        and is_standalone
+        and use_workspace
+    ):
+        sub_projects_path = config.get("project", {}).get("projects_root_path") or "projects"
+        projects_root = cwd / sub_projects_path
+        logger.debug(f"Workspace structure detected! Moving the project to be instantiated into {projects_root}")
         return projects_root / project_path.name
 
     return project_path
