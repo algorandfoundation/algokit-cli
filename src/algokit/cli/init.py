@@ -13,7 +13,7 @@ import questionary
 from algokit.core import proc, questionary_extensions
 from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
 from algokit.core.conf import get_algokit_config, get_algokit_projects_from_config
-from algokit.core.init import ProjectType, get_default_algokit_toml
+from algokit.core.init import ProjectType
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
@@ -59,6 +59,7 @@ class TemplateKey(str, Enum):
     For templates included in wizard v2 by default
     """
 
+    BASE = "base"
     PUYA = "puya"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
@@ -104,7 +105,7 @@ def _language_to_smart_contract(language: ContractLanguage) -> str:
     raise ValueError(f"Unknown language {language}")
 
 
-# this is a function so we can modify the values in unit tests
+# Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
 def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
     return {
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
@@ -129,6 +130,10 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Official template for starter or production Beaker applications.",
+        ),
+        TemplateKey.BASE: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-base-template",
+            description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
         ),
         MiscTemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
@@ -302,7 +307,11 @@ def init_command(  # noqa: PLR0913
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
 
-    logger.info("Starting template copy and render...")
+    project_path = _adjust_project_path_for_workspace(
+        template_source=template, project_path=project_path, use_workspace=use_workspace
+    )
+
+    logger.info(f"Starting template copy and render at {project_path}...")
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
@@ -327,9 +336,6 @@ def init_command(  # noqa: PLR0913
         copier_worker.run_copy()
 
     logger.info("Template render complete!")
-    project_path = _adjust_project_path_for_workspace(
-        template_source=template, project_path=project_path, use_workspace=use_workspace
-    )
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
 
@@ -634,23 +640,51 @@ def _git_init(project_path: Path, commit_message: str) -> None:
 def _adjust_project_path_for_workspace(
     *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
 ) -> Path:
+    blessed_template = _get_blessed_templates()
+    if template_source.url == blessed_template[TemplateKey.BASE].url:
+        return project_path
+
     cwd = Path.cwd()
-    is_standalone = TemplateKey.FULLSTACK.value not in template_source.url
+    is_standalone = template_source.url != blessed_template[TemplateKey.FULLSTACK].url
     config = get_algokit_config(cwd)
     logger.info("cwd: " + str(cwd))
 
+    # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
+        # 1.1 Move standalone under projects folder
+        _instantiate_base_template(project_path)
+
         new_project_path = cwd / project_path.name / "projects" / project_path.name
         new_project_path.mkdir(parents=True, exist_ok=True)
-        for item in project_path.iterdir():
-            if item.name != "projects":
-                shutil.move(str(item), str(new_project_path))
-        (cwd / project_path.name / ".algokit.toml").write_text(get_default_algokit_toml(ProjectType.WORKSPACE))
+
         return new_project_path
 
+    # 2. If its a standalone project being instantiated inside an existing workspace project
+    # then place the new project inside expected projects folder defined by workspace toml
     if config and config.get("project", {}).get("type") == ProjectType.WORKSPACE.value and is_standalone:
         projects_root = cwd / "projects"
-        shutil.move(str(project_path), str(projects_root))
         return projects_root / project_path.name
 
     return project_path
+
+
+def _instantiate_base_template(target_path: Path) -> None:
+    """
+    Instantiate the base template for a standalone project.
+    """
+
+    # Instantiate the base template
+    blessed_templates = _get_blessed_templates()
+    base_template = blessed_templates[TemplateKey.BASE]
+    base_template_answers = {"use_default_readme": "yes", "project_name": target_path.name}
+    from copier.main import Worker
+
+    with Worker(
+        src_path=base_template.url,
+        dst_path=target_path,
+        data=base_template_answers,
+        quiet=True,
+        vcs_ref=base_template.branch or base_template.commit,
+        unsafe=True,
+    ) as copier_worker:
+        copier_worker.run_copy()

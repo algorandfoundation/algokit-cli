@@ -6,13 +6,13 @@ DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 WARNING: Re-using existing directory, this is not recommended because if project generation fails, then we can't automatically cleanup.
 ? Continue anyway? (y/N)
 DEBUG: project path = {current_working_directory}/myapp
-Starting template copy and render...
-DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
-No git tags found in template; using HEAD as ref
-Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 cwd: {current_working_directory}
+Starting template copy and render at {current_working_directory}/myapp/projects/myapp...
+DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
+No git tags found in template; using HEAD as ref
+Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/myapp/projects/myapp/.algokit.toml
 ERROR: Received an error while attempting bootstrap: This template requires AlgoKit version 999.99.99 or higher, but you have AlgoKit version {current_version}. Please update AlgoKit.
 ERROR: Bootstrap failed. Once any errors above are resolved, you can run `algokit bootstrap` in {current_working_directory}/myapp/projects/myapp

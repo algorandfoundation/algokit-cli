@@ -84,16 +84,12 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "tealscript": BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
-        ),
         "puya": BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "react": BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
+        "base": BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful.",
         ),
     }
@@ -172,7 +168,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode(
 
     result = invoke(
         f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
     assert result.exit_code == 0
@@ -194,7 +190,7 @@ def test_init_no_interaction_required_no_git_no_network_with_vscode_and_readme(
 
     result = invoke(
         f"init --name {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap",
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
     assert result.exit_code == 0
@@ -218,8 +214,10 @@ def test_init_no_interaction_required_no_git_no_network_with_no_ide(
     mock_questionary_input.send_text("Y")  # reuse existing directory
 
     result = invoke(
-        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url "
-        "--answer project_name test --answer greeting hi --answer include_extra_file yes --bootstrap --no-ide",
+        f"init --name myapp --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        "--UNSAFE-SECURITY-accept-template-url "
+        "--answer project_name test --answer greeting hi --answer include_extra_file yes "
+        "--bootstrap --no-ide --no-workspace",
         cwd=cwd,
     )
     assert result.exit_code == 0
@@ -325,7 +323,7 @@ def test_init_use_existing_folder(tmp_path_factory: TempPathFactory, mock_questi
 
     result = invoke(
         "init --name myapp --no-git --defaults"
-        f" --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url",
+        f" --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url --no-workspace",
         cwd=cwd,
     )
 
@@ -355,7 +353,7 @@ def test_init_template_selection(tmp_path_factory: TempPathFactory, mock_questio
     cwd = tmp_path_factory.mktemp("cwd")
     mock_questionary_input.send_text("\n\n\n")
     result = invoke(
-        "init --name myapp --no-git --defaults",
+        "init --name myapp --no-git --defaults --no-workspace",
         cwd=cwd,
     )
     assert result.exit_code == 0
@@ -401,7 +399,7 @@ def test_init_bootstrap_yes(tmp_path_factory: TempPathFactory, mock_questionary_
     mock_questionary_input.send_text("Y")
     result = invoke(
         f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes",
+        " --answer greeting hi --answer include_extra_file yes --no-workspace",
         cwd=cwd,
     )
 
@@ -414,7 +412,7 @@ def test_init_bootstrap_no(tmp_path_factory: TempPathFactory, mock_questionary_i
     mock_questionary_input.send_text("N")
     result = invoke(
         f"init -n myapp --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes",
+        " --answer greeting hi --answer include_extra_file yes --no-workspace",
         cwd=cwd,
     )
 
@@ -428,7 +426,7 @@ def test_init_project_name_not_empty(tmp_path_factory: TempPathFactory, mock_que
     mock_questionary_input.send_text("\n")
     mock_questionary_input.send_text(project_name + "\n")
     command = (
-        "init --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' "
         "--UNSAFE-SECURITY-accept-template-url --defaults --no-workspace"
     )
     result = invoke(command, cwd=cwd)
@@ -455,7 +453,7 @@ def test_init_project_name_reenter_folder_name(
     project_name_2 = "FAKE_PROJECT_2"
     mock_questionary_input.send_text(project_name_2 + "\n")
     command = (
-        "init --no-git --template-url '{GIT_BUNDLE_PATH}' "
+        f"init --no-git --template-url '{GIT_BUNDLE_PATH}' "
         "--UNSAFE-SECURITY-accept-template-url --defaults --no-workspace"
     )
     result = invoke(command, cwd=cwd)
@@ -529,7 +527,7 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
         "init --name myapp --no-git --no-bootstrap "
         "--template-url gh:algorandfoundation/algokit-beaker-default-template "
         f"--template-url-ref {ref} "
-        "--UNSAFE-SECURITY-accept-template-url",
+        "--UNSAFE-SECURITY-accept-template-url --no-workspace",
         cwd=cwd,
     )
 
@@ -633,7 +631,7 @@ def test_init_input_template_url(tmp_path_factory: TempPathFactory, mock_questio
 
     mock_questionary_input.send_text(str(GIT_BUNDLE_PATH) + "\n")  # name
     result = invoke(
-        "init --name myapp --no-git --defaults",
+        "init --name myapp --no-git --defaults --no-workspace",
         cwd=cwd,
     )
 
@@ -764,6 +762,7 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
             f"--template-url={dummy_algokit_template_with_python_task['template_path']}",
             f"--template-url-ref={ref}",
             "--UNSAFE-SECURITY-accept-template-url",
+            "--no-workspace",
         ],
         cwd=dummy_algokit_template_with_python_task["cwd"],
         input="y\n",
@@ -785,8 +784,8 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
         ],
         # Dapp frontend flow selected, decline smart contracts component,
         [
-            MockQuestionaryAnswer("Dapp Frontend", [MockPipeInput.DOWN, MockPipeInput.ENTER]),
-            None,  # no contract language selection
+            MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER]),
+            MockQuestionaryAnswer("Python", [MockPipeInput.ENTER]),  # no contract language selection
             "n",  # no to include frontend
             None,  # no custom template URL
         ],
@@ -799,7 +798,7 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
         ],
     ],
 )
-def test_init_interactive_flow(
+def test_init_wizard_v2_flow(
     flow_steps: list, tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ) -> None:
     # Arrange
@@ -812,12 +811,19 @@ def test_init_interactive_flow(
             mock_questionary_input.send_text(step)
 
     # Act
-    result = invoke("init --defaults --no-git --name myapp", cwd=cwd)
+    result = invoke("init --defaults --no-git --name myapp --UNSAFE-SECURITY-accept-template-url", cwd=cwd)
 
     # Assert
     project_type = flow_steps[0].value  # The first step always determines the project type
+    with_frontend = (
+        "with_frontend" if flow_steps[2] == "y" else "standalone"
+    )  # The third step determines the frontend inclusion
     assert result.exit_code == 0
-    verify(result.output, options=NamerFactory.with_parameters(project_type), scrubber=make_output_scrubber())
+    verify(
+        result.output,
+        options=NamerFactory.with_parameters(project_type, with_frontend),
+        scrubber=make_output_scrubber(),
+    )
 
 
 def _remove_git_hints(output: str) -> str:
