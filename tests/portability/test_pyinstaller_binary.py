@@ -42,6 +42,11 @@ def test_algokit_init(
     cli_path: str,
     dummy_algokit_template_with_python_task: dict[str, Path],
 ) -> None:
+    # TODO: revisit to improve
+    # currently we are passing non default option --no-workspace to avoid creating a workspace since its a dummy
+    # template. To cover and test workspace creation on real templates, we need to find a way to have `algokit`
+    # available globally within the worker running the binary IF the template defined custom copier tasks that invoke
+    # global `algokit` executable as part of instantiation of child template (for example fullstack).
     command = command_str_to_list(
         "init --name testproject "
         "--UNSAFE-SECURITY-accept-template-url "
