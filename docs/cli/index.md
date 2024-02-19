@@ -610,7 +610,7 @@ Name of an official template to use. To choose interactively, run this command w
 
 * **Options**
 
-    TemplateKey.TEALSCRIPT | TemplateKey.PUYA | TemplateKey.REACT | TemplateKey.FULLSTACK | TemplateKey.BEAKER | MiscTemplateKey.PLAYGROUND
+    TemplateKey.TEALSCRIPT | TemplateKey.PUYA | TemplateKey.REACT | TemplateKey.FULLSTACK | TemplateKey.BEAKER | TemplateKey.BASE | MiscTemplateKey.PLAYGROUND
 
 
 
