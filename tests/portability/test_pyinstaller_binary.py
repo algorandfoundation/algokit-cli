@@ -46,7 +46,7 @@ def test_algokit_init(
         "init --name testproject "
         "--UNSAFE-SECURITY-accept-template-url "
         f"--template-url {dummy_algokit_template_with_python_task['template_path']} "
-        "--template-url-ref=HEAD --no-git --no-ide --defaults"
+        "--template-url-ref=HEAD --no-git --no-ide --defaults --no-workspace"
     )
 
     process = subprocess.Popen(
@@ -74,4 +74,5 @@ def test_algokit_init(
 
     # After the process ends, log the full stdout
     logger.info(f"Command init returned:\n{full_output}")
+    logger.error(process.stderr)
     assert process.returncode == 0, f"Command init failed with {process.stderr}"

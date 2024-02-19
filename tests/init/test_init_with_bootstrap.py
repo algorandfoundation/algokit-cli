@@ -33,14 +33,14 @@ def test_init_bootstrap_broken_poetry(
     proc_mock.should_bad_exit_on("poetry --version")
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"
-    project_path = cwd / app_name / "projects" / app_name
-    project_path.mkdir(parents=True, exist_ok=True)
+    project_path = cwd / app_name
+    project_path.mkdir()
     (project_path / "poetry.toml").touch()
     mock_questionary_input.send_text("Y")  # reuse existing directory
 
     result = invoke(
         f"init -n {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes --bootstrap",
+        " --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
 
@@ -54,14 +54,14 @@ def test_init_bootstrap_version_fail(
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"
-    project_path = cwd / app_name / "projects" / app_name
-    project_path.mkdir(parents=True, exist_ok=True)
+    project_path = cwd / app_name
+    project_path.mkdir()
     (project_path / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
     mock_questionary_input.send_text("Y")  # reuse existing directory
 
     result = invoke(
         f"init -n {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes --bootstrap",
+        " --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
 

@@ -647,7 +647,6 @@ def _adjust_project_path_for_workspace(
     cwd = Path.cwd()
     is_standalone = template_source.url != blessed_template[TemplateKey.FULLSTACK].url
     config = get_algokit_config(cwd)
-    logger.info("cwd: " + str(cwd))
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
@@ -671,6 +670,7 @@ def _adjust_project_path_for_workspace(
 def _instantiate_base_template(target_path: Path) -> None:
     """
     Instantiate the base template for a standalone project.
+    Sets up the common workspace structure for standalone projects.
     """
 
     # Instantiate the base template
@@ -684,7 +684,7 @@ def _instantiate_base_template(target_path: Path) -> None:
         dst_path=target_path,
         data=base_template_answers,
         quiet=True,
-        vcs_ref=base_template.branch or base_template.commit,
+        vcs_ref=base_template.commit,
         unsafe=True,
     ) as copier_worker:
         copier_worker.run_copy()
