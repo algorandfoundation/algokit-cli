@@ -16,7 +16,7 @@ def get_volume_mount_path_local(directory_name: str) -> Path:
     return get_app_config_dir().joinpath(directory_name, "goal_mount")
 
 
-filename_pattern = re.compile(r"^[\w-]+(\.[\w-]+)*\.\w+$")
+filename_pattern = re.compile(r"^[\w\-\.]+\.\w+$")
 
 
 def is_path_or_filename(argument: str) -> bool:
