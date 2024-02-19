@@ -19,12 +19,29 @@ inputs:
   python_version:
     description: "Python version to use"
     required: true
+  apple-notary-user:
+    description: apple-notary-user
+    require: true
+  apple-notary-password:
+    description: apple-notary-password
+    require: true
 runs:
   using: "composite"
   steps:
     - name: Build Executable
       run: ${{ inputs.build_command }}
       shell: bash
+
+    - name: Notarize
+      uses: lando/notarize-action@v2
+      with:
+        appstore-connect-username: ${{ inputs.apple-notary-user }}
+        appstore-connect-password: ${{ inputs.apple-notary-password }}
+        appstore-connect-team-id: 7287T82947
+        primary-bundle-id: dev.algokit.pat
+        product-path: "${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
+        tool: notarytool
+        verbose: true
 
     - name: Set TEST_CLI_PATH
       run: |
