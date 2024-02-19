@@ -741,6 +741,7 @@ def test_init_template_with_python_task_fails_on_missing_python(
             f"--template-url={dummy_algokit_template_with_python_task['template_path']}",
             f"--template-url-ref={ref}",
             "--UNSAFE-SECURITY-accept-template-url",
+            "--no-workspace",
         ],
         cwd=dummy_algokit_template_with_python_task["cwd"],
         input="y\n",

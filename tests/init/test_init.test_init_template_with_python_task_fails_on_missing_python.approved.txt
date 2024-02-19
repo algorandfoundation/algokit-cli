@@ -7,5 +7,5 @@ DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 cwd: {current_working_directory}
-Starting template copy and render at {current_working_directory}/myapp/projects/myapp...
+Starting template copy and render at {current_working_directory}/myapp...
 DEBUG: final clone URL = {current_working_directory}/dummy_template
