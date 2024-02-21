@@ -538,7 +538,11 @@ def _get_template_interactive() -> TemplateSource:
             *[questionary.Choice(title=lang.value, value=lang) for lang in ContractLanguage],
         )
         logger.debug(f"selected language = {language}")
-        template = LANGUAGE_TO_TEMPLATE_MAP[language]
+        template = (
+            TemplateKey.FULLSTACK
+            if project_type == TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND
+            else LANGUAGE_TO_TEMPLATE_MAP[language]
+        )
 
     elif project_type == TemplatePresetType.DAPP_FRONTEND:
         template = TemplateKey.REACT
