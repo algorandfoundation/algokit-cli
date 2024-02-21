@@ -1,6 +1,7 @@
 import logging
 import re
 import shutil
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -17,7 +18,7 @@ from algokit.core.bootstrap import (
     project_minimum_algokit_version_check,
 )
 from algokit.core.conf import get_algokit_config, get_algokit_projects_from_config
-from algokit.core.init import ProjectType
+from algokit.core.init import ProjectType, get_git_user_info
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
@@ -25,7 +26,7 @@ from algokit.core.utils import get_python_paths
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_ANSWERS: dict[str, str] = {
+DEFAULT_STATIC_ANSWERS: dict[str, str] = {
     "algod_token": DEFAULT_ALGOD_TOKEN,
     "algod_server": DEFAULT_ALGOD_SERVER,
     "algod_port": str(DEFAULT_ALGOD_PORT),
@@ -33,6 +34,17 @@ DEFAULT_ANSWERS: dict[str, str] = {
     "indexer_server": DEFAULT_ALGOD_SERVER,
     "indexer_port": str(DEFAULT_INDEXER_PORT),
 }
+DEFAULT_DYNAMIC_ANSWERS: dict[str, Callable[[], str]] = {
+    "author_name": lambda: get_git_user_info("name") or "John Doe",
+    "author_email": lambda: get_git_user_info("email") or "my@mail.com",
+}
+
+
+def _get_default_answers() -> dict[str, str]:
+    """get all default answers"""
+    return {**DEFAULT_STATIC_ANSWERS, **{k: v() for k, v in DEFAULT_DYNAMIC_ANSWERS.items()}}
+
+
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
 
@@ -290,7 +302,7 @@ def init_command(  # noqa: PLR0913
         )
 
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
-    answers_dict = DEFAULT_ANSWERS | dict(answers)
+    answers_dict = _get_default_answers() | dict(answers)
 
     template = _get_template(
         name=template_name,
