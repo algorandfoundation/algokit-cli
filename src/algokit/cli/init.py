@@ -2,7 +2,7 @@ import logging
 import re
 import shutil
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import NoReturn
 
@@ -36,14 +36,15 @@ DEFAULT_ANSWERS: dict[str, str] = {
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
 
 
-class TemplatePresetType(Enum):
+class TemplatePresetType(str, Enum):
     """
     For distinguishing main template preset type question invoked by `algokit init`
     """
 
-    SMART_CONTRACT = auto()
-    DAPP_FRONTEND = auto()
-    CUSTOM_TEMPLATE = auto()
+    SMART_CONTRACT = "Smart Contracts 📜"
+    DAPP_FRONTEND = "DApp Frontend 🖥️"
+    SMART_CONTRACT_AND_DAPP_FRONTEND = "Smart Contracts & DApp Frontend 🎛️"
+    CUSTOM_TEMPLATE = "Custom Template 🛠️"
 
 
 class ContractLanguage(Enum):
@@ -53,9 +54,9 @@ class ContractLanguage(Enum):
     typescript -> tealscript
     """
 
-    PYTHON = auto()
-    TYPESCRIPT = auto()
-    PYTEAL = auto()
+    PYTHON = "Python 🐍"
+    TYPESCRIPT = "TypeScript 📘"
+    PYTEAL = "PyTeal 🔧"
 
 
 class TemplateKey(str, Enum):
@@ -99,14 +100,11 @@ class BlessedTemplateSource(TemplateSource):
     description: str
 
 
-def _language_to_smart_contract(language: ContractLanguage) -> str:
-    if language == ContractLanguage.PYTHON:
-        return "puya"
-    elif language == ContractLanguage.TYPESCRIPT:
-        return "tealscript"
-    elif language == ContractLanguage.PYTEAL:
-        return "beaker"
-    raise ValueError(f"Unknown language {language}")
+LANGUAGE_TO_TEMPLATE_MAP = {
+    ContractLanguage.PYTHON: TemplateKey.PUYA,
+    ContractLanguage.TYPESCRIPT: TemplateKey.TEALSCRIPT,
+    ContractLanguage.PYTEAL: TemplateKey.BEAKER,
+}
 
 
 # Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
@@ -133,6 +131,7 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
         ),
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
+            branch="feat/wizard_v2",
             description="Official template for starter or production Beaker applications.",
         ),
         TemplateKey.BASE: BlessedTemplateSource(
@@ -535,11 +534,8 @@ class GitRepoValidator(questionary.Validator):
 
 def _get_template_interactive() -> TemplateSource:
     project_type = questionary_extensions.prompt_select(
-        "How would you like to build your project?",
-        *[
-            questionary.Choice(title=p_type.name.replace("_", " ").title(), value=p_type)
-            for p_type in TemplatePresetType
-        ],  # Modified line
+        "Which of these options best describes the project you want to start?",
+        *[questionary.Choice(title=p_type.value, value=p_type) for p_type in TemplatePresetType],  # Modified line
     )
     logger.debug(f"selected project_type = {project_type}")
 
@@ -548,39 +544,16 @@ def _get_template_interactive() -> TemplateSource:
     if project_type == TemplatePresetType.SMART_CONTRACT:
         language = questionary_extensions.prompt_select(
             "Which language would you like to use for the smart contract?",
-            *[questionary.Choice(title=lang.name.title(), value=lang) for lang in ContractLanguage],  # Modified line
+            *[questionary.Choice(title=lang.value, value=lang) for lang in ContractLanguage],
         )
         logger.debug(f"selected language = {language}")
-
-        include_frontend = questionary_extensions.prompt_confirm(
-            "Would you like to include a frontend component?", default=False
-        )
-
-        logger.debug(f"selected include_frontend = {include_frontend}")
-        template = (
-            TemplateKey.FULLSTACK
-            if include_frontend
-            else TemplateKey.PUYA
-            if language == ContractLanguage.PYTHON
-            else TemplateKey.TEALSCRIPT
-            if language == ContractLanguage.TYPESCRIPT
-            else TemplateKey.BEAKER
-        )
+        template = LANGUAGE_TO_TEMPLATE_MAP[language]
 
     elif project_type == TemplatePresetType.DAPP_FRONTEND:
-        include_contract = questionary_extensions.prompt_confirm(
-            "Would you like to include a smart contracts component?", default=False
-        )
-        if include_contract:
-            language = questionary_extensions.prompt_select(
-                "Which language would you like to use for the smart contract?",
-                *[
-                    questionary.Choice(title=lang.name.title(), value=lang) for lang in ContractLanguage
-                ],  # Modified line
-            )
-            logger.debug(f"selected language = {language}")
-        logger.debug(f"selected include_contract = {include_contract}")
-        template = TemplateKey.FULLSTACK if include_contract else TemplateKey.REACT
+        template = TemplateKey.REACT
+
+    elif project_type == TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND:
+        template = TemplateKey.FULLSTACK
 
     # Ensure a template has been selected
     if not template and not project_type == TemplatePresetType.CUSTOM_TEMPLATE:
@@ -592,7 +565,7 @@ def _get_template_interactive() -> TemplateSource:
     if template in blessed_templates:
         selected_template_source = blessed_templates[template]
         if template == TemplateKey.FULLSTACK and language is not None:
-            smart_contract_template = _language_to_smart_contract(language)
+            smart_contract_template = LANGUAGE_TO_TEMPLATE_MAP[language]
             selected_template_source.answers = [("contract_template", smart_contract_template)]
         return selected_template_source
 
