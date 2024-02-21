@@ -16,8 +16,10 @@ jobs:
     strategy:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
-        os: [macos-14]
+        os: [macos-latest, macos-14]
         include:
+          - os: macos-latest
+            build_command: "poetry run poe package_mac"
           - os: macos-14
             build_command: "poetry run poe package_mac"
     steps:
