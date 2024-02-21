@@ -43,6 +43,11 @@ runs:
         tool: notarytool
         verbose: true
 
+    - name: "Staple Release Build"
+      uses: BoundfoxStudios/action-xcode-staple@v1
+      with:
+        product-path: "${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
+
     - name: Set TEST_CLI_PATH
       run: |
         TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
