@@ -16,10 +16,8 @@ jobs:
     strategy:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
-        os: [macos-latest, macos-14]
+        os: [macos-14]
         include:
-          - os: macos-latest
-            build_command: "poetry run poe package_mac"
           - os: macos-14
             build_command: "poetry run poe package_mac"
     steps:
@@ -78,3 +76,5 @@ jobs:
           build_command: ${{ matrix.build_command }}
           apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
           apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+
+      # TODO: delete /tmp/certs.p12
