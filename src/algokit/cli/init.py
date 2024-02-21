@@ -541,7 +541,7 @@ def _get_template_interactive() -> TemplateSource:
 
     template = None
     language = None
-    if project_type == TemplatePresetType.SMART_CONTRACT:
+    if project_type in [TemplatePresetType.SMART_CONTRACT, TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND]:
         language = questionary_extensions.prompt_select(
             "Which language would you like to use for the smart contract?",
             *[questionary.Choice(title=lang.value, value=lang) for lang in ContractLanguage],
@@ -551,9 +551,6 @@ def _get_template_interactive() -> TemplateSource:
 
     elif project_type == TemplatePresetType.DAPP_FRONTEND:
         template = TemplateKey.REACT
-
-    elif project_type == TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND:
-        template = TemplateKey.FULLSTACK
 
     # Ensure a template has been selected
     if not template and not project_type == TemplatePresetType.CUSTOM_TEMPLATE:

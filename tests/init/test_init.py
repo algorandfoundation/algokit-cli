@@ -789,7 +789,9 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
             None,  # no custom template URL
         ],
         [
-            MockQuestionaryAnswer("Full Stack", [MockPipeInput.DOWN, MockPipeInput.DOWN, MockPipeInput.ENTER]),
+            MockQuestionaryAnswer(
+                "Full Stack", [MockPipeInput.DOWN, MockPipeInput.DOWN, MockPipeInput.ENTER, MockPipeInput.ENTER]
+            ),
             None,  # no custom template URL
         ],
         [
