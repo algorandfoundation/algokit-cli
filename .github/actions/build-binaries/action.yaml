@@ -32,6 +32,23 @@ runs:
       run: ${{ inputs.build_command }}
       shell: bash
 
+    - name: Codesign extra
+      run: |
+        codesign --force --sign "5C716D78FBA687E3CE8ADE883997BAA56C7C8520" --timestamp ./dist/algokit/_internal/Python.framework
+        codesign --force --sign "5C716D78FBA687E3CE8ADE883997BAA56C7C8520" --timestamp ./dist/algokit/_internal/Python
+      shell: bash
+
+    - name: Notarize
+      uses: lando/notarize-action@v2
+      with:
+        appstore-connect-username: ${{ inputs.apple-notary-user }}
+        appstore-connect-password: ${{ inputs.apple-notary-password }}
+        appstore-connect-team-id: 7287T82947
+        primary-bundle-id: dev.algokit.pat
+        product-path: "${{ github.workspace }}/dist/${{ inputs.package_name }}"
+        tool: notarytool
+        verbose: true
+
     - name: Set TEST_CLI_PATH
       run: |
         TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
@@ -69,36 +86,12 @@ runs:
         cd ../..
         ls -l
 
-    - name: Notarize
-      uses: lando/notarize-action@v2
-      if: ${{ inputs.production_release == 'true' }}
-      with:
-        appstore-connect-username: ${{ inputs.apple-notary-user }}
-        appstore-connect-password: ${{ inputs.apple-notary-password }}
-        appstore-connect-team-id: 7287T82947
-        primary-bundle-id: dev.algokit.pat
-        product-path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
-        tool: notarytool
-        verbose: true
-
     - name: Upload binary as artifact (release)
       if: ${{ inputs.production_release == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
         path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
-
-    - name: Notarize
-      uses: lando/notarize-action@v2
-      if: ${{ inputs.production_release != 'true' }}
-      with:
-        appstore-connect-username: ${{ inputs.apple-notary-user }}
-        appstore-connect-password: ${{ inputs.apple-notary-password }}
-        appstore-connect-team-id: 7287T82947
-        primary-bundle-id: dev.algokit.pat
-        product-path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
-        tool: notarytool
-        verbose: true
 
     - name: Upload binary as artifact (dev)
       if: ${{ inputs.production_release != 'true' }}
