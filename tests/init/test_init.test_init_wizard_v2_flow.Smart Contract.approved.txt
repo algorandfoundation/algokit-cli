@@ -1,23 +1,20 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-? How would you like to build your project?
-Smart Contract
-Dapp Frontend
-Custom Template
+? Which of these options best describes the project you want to start?
+Smart Contracts 📜
+DApp Frontend 🖥️
+Smart Contracts & DApp Frontend 🎛️
+Custom Template 🛠️
 DEBUG: selected project_type = TemplatePresetType.SMART_CONTRACT
 ? Which language would you like to use for the smart contract?
-Python
-Typescript
-Pyteal
+Python 🐍
+TypeScript 📘
+PyTeal 🔧
 DEBUG: selected language = ContractLanguage.PYTHON
-? Would you like to include a frontend component? (y/N)
-DEBUG: selected include_frontend = False
 DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-
-
 Starting template copy and render at {current_working_directory}/myapp...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = https://github.com/robdmoore/copier-helloworld.git

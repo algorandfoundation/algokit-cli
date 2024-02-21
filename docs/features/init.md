@@ -16,13 +16,11 @@ As outlined in [quick start](#quick-start), the simplest use of the command is t
 
 ```
 $ ~ algokit init
-? How would you like to build your project? Smart Contract
-? Which language would you like to use for the smart contract? Python
-? Would you like to include a frontend component? Yes
+? Which of these options best describes the project you want to start? `Smart Contract` | `Dapp Frontend` | `Smart Contract & Dapp Frontend` | `Custom`
 ? Name of project / directory to create the project in:  my-cool-app
 ```
 
-Once above 4 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `puya`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features pick `Production`. Lastly, if you are a prefer to modify the experience and tailor the template to your needs pick `Custom` preset.
+Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `puya`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features pick `Production`. Lastly, if you are a prefer to modify the experience and tailor the template to your needs pick `Custom` preset.
 
 If you want to accept the default for each option simply hit [enter] or alternatively to speed things up you can run `algokit init --defaults` and they will be auto-accepted.
 

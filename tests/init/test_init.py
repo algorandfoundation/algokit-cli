@@ -88,6 +88,10 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
+        "react": BlessedTemplateSource(
+            url="gh:robdmoore/copier-helloworld",
+            description="Does nothing helpful.",
+        ),
         "base": BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful.",
@@ -776,25 +780,20 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
 @pytest.mark.parametrize(
     ("flow_steps"),
     [
-        # Fullstack flow selected, no additional options needed,
         [
-            MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER]),
-            MockQuestionaryAnswer("Python", [MockPipeInput.ENTER]),
-            "y",  # yes to include frontend
+            MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER]),
             None,  # no custom template URL
         ],
-        # Dapp frontend flow selected, decline smart contracts component,
         [
-            MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER]),
-            MockQuestionaryAnswer("Python", [MockPipeInput.ENTER]),  # no contract language selection
-            "n",  # no to include frontend
+            MockQuestionaryAnswer("DApp Frontend", [MockPipeInput.DOWN, MockPipeInput.ENTER]),
             None,  # no custom template URL
         ],
-        # Custom template URL provided
         [
-            MockQuestionaryAnswer("Custom Template", [MockPipeInput.DOWN, MockPipeInput.DOWN, MockPipeInput.ENTER]),
-            None,  # no contract language selection
-            None,  # no frontend inclusion question
+            MockQuestionaryAnswer("Full Stack", [MockPipeInput.DOWN, MockPipeInput.DOWN, MockPipeInput.ENTER]),
+            None,  # no custom template URL
+        ],
+        [
+            MockQuestionaryAnswer("Custom Template", [MockPipeInput.UP, MockPipeInput.ENTER]),
             "gh:robdmoore/copier-helloworld\n",  # custom template URL
         ],
     ],
@@ -816,13 +815,10 @@ def test_init_wizard_v2_flow(
 
     # Assert
     project_type = flow_steps[0].value  # The first step always determines the project type
-    with_frontend = (
-        "with_frontend" if flow_steps[2] == "y" else "standalone"
-    )  # The third step determines the frontend inclusion
     assert result.exit_code == 0
     verify(
         result.output,
-        options=NamerFactory.with_parameters(project_type, with_frontend),
+        options=NamerFactory.with_parameters(project_type),
         scrubber=make_output_scrubber(),
     )
 
