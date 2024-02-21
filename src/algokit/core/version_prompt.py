@@ -1,18 +1,26 @@
 import logging
 import re
 from datetime import timedelta
+from pathlib import Path
 from time import time
 
 import click
 import httpx
 
 from algokit.core.conf import get_app_config_dir, get_app_state_dir, get_current_package_version
+from algokit.core.utils import is_binary_mode
 
 logger = logging.getLogger(__name__)
 
 LATEST_URL = "https://api.github.com/repos/algorandfoundation/algokit-cli/releases/latest"
 VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 DISABLE_CHECK_MARKER = "disable-version-prompt"
+
+VERSION_UPDATE_MESSAGES = {
+    "snap": "snap refresh algokit",
+    "winget": "winget upgrade algokit",
+    "brew": "brew upgrade algokit",
+}
 
 
 def do_version_prompt() -> None:
@@ -27,7 +35,18 @@ def do_version_prompt() -> None:
         return
 
     if _get_version_sequence(current_version) < _get_version_sequence(latest_version):
-        logger.info(f"You are using AlgoKit version {current_version}, however version {latest_version} is available.")
+        if is_binary_mode():
+            distribution = read_distribution_file()
+            update_message = VERSION_UPDATE_MESSAGES.get(distribution, "manual process.")
+            logger.info(
+                f"You are using AlgoKit version {current_version}, however version {latest_version} is available."
+                f"Please use {update_message} to update."
+            )
+        else:
+            logger.info(
+                f"You are using AlgoKit version {current_version}, however version {latest_version} is available."
+                f"Please use `pipx upgrade algokit` to update."
+            )
     else:
         logger.debug("Current version is up to date")
 
@@ -83,6 +102,20 @@ def get_latest_github_version() -> str:
 def _skip_version_prompt() -> bool:
     disable_marker = get_app_config_dir() / DISABLE_CHECK_MARKER
     return disable_marker.exists()
+
+
+def read_distribution_file() -> str:
+    if not is_binary_mode():
+        file_path = Path(__file__).resolve().parents[3] / "misc" / "distribution_channel.txt"
+    else:
+        file_path = Path(__file__).resolve().parents[2] / "distribution_channel" / "distribution_channel.txt"
+    with Path.open(file_path) as file:
+        content = file.read().strip()
+
+        if content in ["snap", "winget", "brew"]:
+            return content
+        else:
+            return "manual"
 
 
 skip_version_check_option = click.option(

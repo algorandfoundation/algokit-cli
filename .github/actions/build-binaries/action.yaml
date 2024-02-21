@@ -19,6 +19,9 @@ inputs:
   python_version:
     description: "Python version to use"
     required: true
+  distribution:
+    description: "Distribution channel to use"
+    required: true
 
 runs:
   using: "composite"
@@ -58,6 +61,8 @@ runs:
         cd dist/algokit/
         if [ "${{ inputs.production_release }}" == "true" ]; then
           tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
+          echo ${{ inputs.distribution }} > ./_internal/distribution_channel/distribution_channel.txt
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.distribution }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         else
           tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         fi
@@ -78,6 +83,14 @@ runs:
         name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
         path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
 
+    - name: Upload binary as artifact (distribution)
+      if: ${{ inputs.production_release == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: algokit-${{ inputs.distribution }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
+        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.distribution }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
+
+
     - name: Append binary to release
       continue-on-error: true
       if: ${{ inputs.production_release == 'true' }}
@@ -85,5 +98,15 @@ runs:
       with:
         files: |
           algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
+        tag_name: ${{ env.RELEASE_VERSION }}
+        prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}
+
+    - name: Append binary to release (distribution)
+      continue-on-error: true
+      if: ${{ inputs.production_release == 'true' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.distribution }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
         tag_name: ${{ env.RELEASE_VERSION }}
         prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}
