@@ -537,7 +537,7 @@ def _get_template_interactive() -> TemplateSource:
         "Which of these options best describes the project you want to start?",
         *[questionary.Choice(title=p_type.value, value=p_type) for p_type in TemplatePresetType],  # Modified line
     )
-    logger.debug(f"selected project_type = {project_type}")
+    logger.debug(f"selected project_type = {project_type.value}")
 
     template = None
     language = None

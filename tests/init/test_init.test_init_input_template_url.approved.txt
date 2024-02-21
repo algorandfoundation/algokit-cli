@@ -5,7 +5,7 @@ Smart Contracts 📜
 DApp Frontend 🖥️
 Smart Contracts & DApp Frontend 🎛️
 Custom Template 🛠️
-DEBUG: selected project_type = TemplatePresetType.CUSTOM_TEMPLATE
+DEBUG: selected project_type = Custom Template 🛠️
 WARNING: 
 Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml

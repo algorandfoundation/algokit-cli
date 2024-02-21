@@ -5,7 +5,7 @@ Smart Contracts 📜
 DApp Frontend 🖥️
 Smart Contracts & DApp Frontend 🎛️
 Custom Template 🛠️
-DEBUG: selected project_type = TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND
+DEBUG: selected project_type = Smart Contracts & DApp Frontend 🎛️
 DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml

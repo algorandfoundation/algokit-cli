@@ -5,7 +5,7 @@ Smart Contracts 📜
 DApp Frontend 🖥️
 Smart Contracts & DApp Frontend 🎛️
 Custom Template 🛠️
-DEBUG: selected project_type = TemplatePresetType.SMART_CONTRACT
+DEBUG: selected project_type = Smart Contracts 📜
 ? Which language would you like to use for the smart contract?
 Python 🐍
 TypeScript 📘
