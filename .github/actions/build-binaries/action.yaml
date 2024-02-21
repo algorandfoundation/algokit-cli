@@ -35,7 +35,6 @@ runs:
     - name: Codesign extra
       run: |
         codesign --force --sign "5C716D78FBA687E3CE8ADE883997BAA56C7C8520" --timestamp ./dist/algokit/_internal/Python.framework
-        codesign --force --sign "5C716D78FBA687E3CE8ADE883997BAA56C7C8520" --timestamp ./dist/algokit/_internal/Python
       shell: bash
 
     - name: Notarize
@@ -79,9 +78,9 @@ runs:
         ls -l dist
         cd dist/algokit/
         if [ "${{ inputs.production_release }}" == "true" ]; then
-          tar -zhcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
+          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         else
-          tar -zhcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
+          tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
         fi
         cd ../..
         ls -l
