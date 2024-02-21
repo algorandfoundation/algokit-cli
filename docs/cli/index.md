@@ -87,7 +87,6 @@
     - [--ide, --no-ide](#--ide---no-ide)
     - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
-    - [--bootstrap-depth ](#--bootstrap-depth-)
   - [localnet](#localnet)
     - [console](#console)
     - [explore](#explore-1)
@@ -595,8 +594,9 @@ This should be run in the parent directory that you want the project folder
 created in.
 
 By default, the --workspace flag creates projects within a workspace structure or integrates them into an existing
-one, promoting organized management of multiple projects. Conversely, using --no-workspace
-initializes projects as standalone, bypassing workspace integration even if available,
+one, promoting organized management of multiple projects. Alternatively,
+to disable this behavior use the --no-workspace flag, which ensures
+the new project is created in a standalone target directory. This is
 suitable for isolated projects or when workspace integration is unnecessary.
 
 ```shell
@@ -654,10 +654,6 @@ Whether to prefer structuring standalone projects as part of a workspace.
 
 ### -a, --answer <key> <value>
 Answers key/value pairs to pass to the template.
-
-
-### --bootstrap-depth <bootstrap_depth>
-Maximum depth to apply when running bootstrap in new project. Defaults to 2 levels down in the folder tree with --workspace and 1 when used with --no-workspace.
 
 ## localnet
 
