@@ -16,12 +16,15 @@ runs:
     - name: Build binary
       shell: bash
       run: |
+        echo "BINARY_BUILD_DIR=dist\algokit\" >> $GITHUB_ENV
         poetry run poe package_windows
+
+    # TODO: NC - Do we want to run a codesign of the exe before packaging it?
 
     - name: Package binary artifact
       shell: pwsh
       run: |
-        Set-Location -Path dist\algokit\
+        Set-Location -Path ${{ env.BINARY_BUILD_DIR }}
         tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz *
         Set-Location -Path ..\..
 
@@ -30,3 +33,24 @@ runs:
       with:
         name: ${{ inputs.package_name }}
         path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz
+
+    - name: Add build tools to path
+      run: |
+        echo "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Build msix
+      shell: pwsh
+      run: |
+        & .\scripts\create-winget-package.ps1 `
+          -binaryDir ${{ env.BINARY_BUILD_DIR }} `
+          -releaseVersion ${{ inputs.version }} `
+          -outputFile ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix
+
+    # TODO: NC - Codesign winget package
+
+    - name: Upload winget artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package_name }}-winget
+        path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix
