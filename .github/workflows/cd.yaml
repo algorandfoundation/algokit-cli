@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - winget-distribution
   workflow_dispatch:
     inputs:
       production_release:
