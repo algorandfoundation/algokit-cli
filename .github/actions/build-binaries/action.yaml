@@ -60,21 +60,15 @@ runs:
         version: ${{ env.RELEASE_VERSION }}
         artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-    # TODO: NC - Add to path and run like that instead and use artifacts_dir
-    - name: Set TEST_CLI_PATH
+    - name: Add binary to path
       run: |
-        test_cli_path="${{ github.workspace }}/dist/algokit/algokit"
-        if [ "${{ inputs.operating_system }}" == "Windows" ]; then
-          test_cli_path="${{ github.workspace }}\dist\algokit\algokit.exe"
-        fi
-        echo "TEST_CLI_PATH=${test_cli_path}" >> $GITHUB_ENV
+        echo "${{ github.workspace }}${{ inputs.operating_system == 'Windows' && '\dist\algokit' || '/dist/algokit' }}" >> $GITHUB_PATH
       shell: bash
 
     - name: Run portability tests
       run: |
-        echo "Executing: ${{ env.TEST_CLI_PATH }}"
-        git config --global user.email "actions@github.com" && git config --global user.name "github-actions" 
-        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "${{ env.TEST_CLI_PATH }}" --log-cli-level=INFO
+        git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+        poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
       shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
 
     - name: Append artifacts to release
@@ -82,6 +76,6 @@ runs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          "${{ env.ARTIFACTS_DIR }}/*.*"
+          "${{ env.ARTIFACTS_DIR }}${{ inputs.operating_system == 'Windows' && '\' || '/' }}*.*"
         tag_name: ${{ env.RELEASE_VERSION_TAG }}
         prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
