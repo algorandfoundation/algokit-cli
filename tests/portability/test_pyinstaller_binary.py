@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
+algokit = "algokit"
 logger = logging.getLogger(__name__)
-
 pytestmark = pytest.mark.pyinstaller_binary_tests
 
 
@@ -28,7 +28,7 @@ def test_non_interactive_algokit_commands(
     command: list[str], exit_codes: list[int], tmp_path_factory: pytest.TempPathFactory
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    execution_result = subprocess.run(["algokit", *command], capture_output=True, text=True, check=False, cwd=cwd)
+    execution_result = subprocess.run([algokit, *command], capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {command} returned {execution_result.stdout}")
 
     # Parts of doctor will fail in CI on macOS and windows on github actions since docker isn't available by default
@@ -49,7 +49,7 @@ def test_algokit_init(
     )
 
     process = subprocess.Popen(
-        ["algokit", *command],
+        [algokit, *command],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -58,7 +58,7 @@ def test_algokit_init(
     )
 
     full_output = ""
-    logger.info(f'Running command: {" ".join(["algokit", *command])}')
+    logger.info(f'Running command: {" ".join([algokit, *command])}')
     while process.poll() is None and process.stdout and process.stdin:
         output = process.stdout.readline()
         full_output += output  # Accumulate the output
