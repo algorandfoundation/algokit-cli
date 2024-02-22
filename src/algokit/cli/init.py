@@ -17,8 +17,8 @@ from algokit.core.bootstrap import (
     bootstrap_any_including_subdirs,
     project_minimum_algokit_version_check,
 )
-from algokit.core.conf import get_algokit_config, get_algokit_projects_from_config
-from algokit.core.init import ProjectType, get_git_user_info
+from algokit.core.conf import get_algokit_config
+from algokit.core.init import ProjectType, get_git_user_info, is_valid_project_dir_name
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
@@ -170,17 +170,10 @@ _unofficial_template_warning = (
 
 
 def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    algokit_project_names = get_algokit_projects_from_config()
-    if value in algokit_project_names:
+    if value is not None and not is_valid_project_dir_name(value):
         raise click.BadParameter(
-            f"Received invalid value for directory name; "
-            f"project with name '{value}' already exists in the current workspace",
-        )
-
-    if value is not None and not re.match(r"^[\w\-.]+$", value):
-        raise click.BadParameter(
-            "Received invalid value for directory name; "
-            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
+            "periods, and/or underscores, and not already used.",
             context,
             param,
         )
@@ -473,6 +466,11 @@ class DirectoryNameValidator(questionary.Validator):
         if new_path.exists() and not new_path.is_dir():
             raise questionary.ValidationError(
                 message="File with same name already exists in current directory, please enter a different name"
+            )
+        if not is_valid_project_dir_name(document.text):
+            raise questionary.ValidationError(
+                message="Invalid name. Use letters, numbers, dashes, periods, underscores, and ensure it's unique.",
+                cursor_position=len(document.text),
             )
 
 

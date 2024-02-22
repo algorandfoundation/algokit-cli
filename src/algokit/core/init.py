@@ -1,8 +1,11 @@
+import re
 import shutil
 from enum import Enum
 from logging import getLogger
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
+
+from algokit.core.conf import get_algokit_projects_from_config
 
 logger = getLogger(__name__)
 
@@ -63,3 +66,14 @@ def get_git_user_info(param: str) -> str | None:
         )
         logger.debug("Failed to get user info from git", exc_info=True)
         return None
+
+
+def is_valid_project_dir_name(value: str) -> bool:
+    """Check if the project directory name for algokit project is valid."""
+
+    algokit_project_names = get_algokit_projects_from_config()
+    if value in algokit_project_names:
+        return False
+    if not re.match(r"^[\w\-.]+$", value):
+        return False
+    return True
