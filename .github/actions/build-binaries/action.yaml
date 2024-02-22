@@ -24,7 +24,7 @@ runs:
     - name: Configure build environment
       shell: bash
       run: |
-        artifacts_dir="${{ github.workspace }}/dist/artifacts"
+        artifacts_dir="${{ github.workspace }}${{ inputs.operating_system == 'Windows' && '\dist\artifacts' || '/dist/artifacts' }}"
         mkdir -p $artifacts_dir
         if [ -n "${RELEASE_VERSION_TAG}" ]; then
           release_version="${RELEASE_VERSION_TAG:1}"
@@ -32,40 +32,40 @@ runs:
           echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
         fi
         package_name="algokit${package_name_version}-${{ inputs.operating_system }}_${{ inputs.architecture }}"
-        echo "PACKAGE_NAME=${package_name,,}" >> $GITHUB_ENV
+        echo "PACKAGE_NAME=`echo $package_name | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
         echo "ARTIFACTS_DIR=${artifacts_dir}" >> $GITHUB_ENV
 
     # GitHub doesn't support expressions in the uses block
-    - name: Build & test windows binary
+    - name: Build windows binary
       if: ${{ inputs.operating_system == 'Windows' }}
       uses: ./.github/actions/build-binaries/windows
       with:
-        package_name: ${{ env.PACKAGE_NAME }}}
+        package_name: ${{ env.PACKAGE_NAME }}
         version: ${{ env.RELEASE_VERSION }}
         artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-    - name: Build & test linux binary
+    - name: Build linux binary
       if: ${{ inputs.operating_system == 'Linux' }}
       uses: ./.github/actions/build-binaries/linux
       with:
-        package_name: ${{ env.PACKAGE_NAME }}}
+        package_name: ${{ env.PACKAGE_NAME }}
         version: ${{ env.RELEASE_VERSION }}
         artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-    - name: Build & test macOS binary
+    - name: Build macOS binary
       if: ${{ inputs.operating_system == 'macOS' }}
       uses: ./.github/actions/build-binaries/macos
       with:
-        package_name: ${{ env.PACKAGE_NAME }}}
+        package_name: ${{ env.PACKAGE_NAME }}
         version: ${{ env.RELEASE_VERSION }}
         artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
     # TODO: NC - Add to path and run like that instead and use artifacts_dir
     - name: Set TEST_CLI_PATH
       run: |
-        test_cli_path="${{ github.workspace }}/dist/artifacts/${{ env.PACKAGE_NAME }}"
+        test_cli_path="${{ github.workspace }}/dist/algokit/algokit"
         if [ "${{ inputs.operating_system }}" == "Windows" ]; then
-          test_cli_path="${{ github.workspace }}\dist\artifacts\${{ env.PACKAGE_NAME }}.exe"
+          test_cli_path="${{ github.workspace }}\dist\algokit\algokit.exe"
         fi
         echo "TEST_CLI_PATH=${test_cli_path}" >> $GITHUB_ENV
       shell: bash

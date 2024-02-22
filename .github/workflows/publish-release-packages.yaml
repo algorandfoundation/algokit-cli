@@ -40,7 +40,7 @@ jobs:
     if: ${{ inputs.do_brew }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download either via release or provided artifact
       - name: Download release
@@ -69,7 +69,7 @@ jobs:
     if: ${{ inputs.do_chocolatey }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download either via release or provided artifact
       - name: Download release
