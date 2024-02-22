@@ -1,6 +1,6 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-? Which of these options best describes the project you want to start?
+? Which of these options best describes the project you want to build?
 Smart Contracts 📜
 DApp Frontend 🖥️
 Smart Contracts & DApp Frontend 🎛️

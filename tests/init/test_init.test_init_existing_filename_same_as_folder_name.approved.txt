@@ -3,5 +3,5 @@ DEBUG: No .algokit.toml file found in the project directory.
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
-ERROR: File with same name already exists in current directory, please supply a different name
+ERROR: A file with the same name already exists in the current directory. Please use a different name.
 🛑 Bailing out... 👋

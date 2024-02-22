@@ -111,6 +111,11 @@ class TemplateSource:
 class BlessedTemplateSource(TemplateSource):
     description: str
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BlessedTemplateSource):
+            return NotImplemented
+        return self.description == other.description and self.url == other.url
+
 
 LANGUAGE_TO_TEMPLATE_MAP = {
     ContractLanguage.PYTHON: TemplateKey.PUYA,
@@ -316,7 +321,11 @@ def init_command(  # noqa: PLR0913
 
     logger.debug(f"template source = {template}")
 
-    project_path = _get_project_path(directory_name)
+    # allow skipping prompt if the template is the base template to avoid redundant
+    # 're-using existing directory' warning in fullstack template init
+    project_path = _get_project_path(
+        directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
+    )
     logger.debug(f"project path = {project_path}")
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
@@ -467,31 +476,42 @@ class DirectoryNameValidator(questionary.Validator):
             )
 
 
-def _get_project_path(directory_name_option: str | None = None) -> Path:
+def _get_project_path(*, directory_name_option: str | None = None, force: bool = False) -> Path:
+    """
+    Determines the project path based on the provided directory name option.
+
+    Args:
+        directory_name_option: The name of the directory provided by the user.
+                               If None, the user will be prompted to enter a name.
+        force: A flag to auto accept warning prompts.
+
+    Returns:
+        The path to the project directory.
+    """
+
     base_path = Path.cwd()
-    if directory_name_option is not None:
-        directory_name = directory_name_option
-    else:
-        directory_name = questionary_extensions.prompt_text(
+    directory_name = (
+        directory_name_option
+        if directory_name_option is not None
+        else questionary_extensions.prompt_text(
             "Name of project / directory to create the project in: ",
             validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
-    project_path = base_path / directory_name.strip()
-    if project_path.exists():
-        # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
-        if not project_path.is_dir():
-            logger.error("File with same name already exists in current directory, please supply a different name")
-            _fail_and_bail()
+    ).strip()
+
+    project_path = base_path / directory_name
+    if project_path.exists() and not project_path.is_dir():
+        logger.error("A file with the same name already exists in the current directory. Please use a different name.")
+        _fail_and_bail()
+
+    if project_path.is_dir() and not force:
         logger.warning(
-            "Re-using existing directory, this is not recommended because if project generation fails, "
-            "then we can't automatically cleanup."
+            "Re-using existing directory, this is not recommended because if project "
+            "generation fails, then we can't automatically cleanup."
         )
         if not questionary_extensions.prompt_confirm("Continue anyway?", default=False):
-            # re-prompt only if interactive and user didn't cancel
-            if directory_name_option is None:
-                return _get_project_path()
-            else:
-                _fail_and_bail()
+            return _get_project_path() if directory_name_option is None else _fail_and_bail()
+
     return project_path
 
 
@@ -537,7 +557,7 @@ class GitRepoValidator(questionary.Validator):
 
 def _get_template_interactive() -> TemplateSource:
     project_type = questionary_extensions.prompt_select(
-        "Which of these options best describes the project you want to start?",
+        "Which of these options best describes the project you want to build?",
         *[questionary.Choice(title=p_type.value, value=p_type) for p_type in TemplatePresetType],  # Modified line
     )
     logger.debug(f"selected project_type = {project_type.value}")
@@ -642,11 +662,11 @@ def _adjust_project_path_for_workspace(
     *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
 ) -> Path:
     blessed_template = _get_blessed_templates()
-    if template_source.url == blessed_template[TemplateKey.BASE].url:
+    if template_source == blessed_template[TemplateKey.BASE]:
         return project_path
 
     cwd = Path.cwd()
-    is_standalone = template_source.url != blessed_template[TemplateKey.FULLSTACK].url
+    is_standalone = template_source != blessed_template[TemplateKey.FULLSTACK]
     config = get_algokit_config(cwd)
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
