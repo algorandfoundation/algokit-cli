@@ -1,9 +1,6 @@
 name: "Setup, Build, and Test Pyinstaller Binaries"
 description: "Build, test and upload binaries to GitHub releases and/or artifacts (ensure poetry dependencies are installed before running this action)"
 inputs:
-  package_name:
-    description: "The name of the package to build and test"
-    required: true
   production_release:
     description: "Flag to determine if this is a production release"
     required: true
@@ -13,77 +10,72 @@ inputs:
   architecture:
     description: "Architecture to set the correct binary path and extension"
     required: true
-  build_command:
-    description: "Command to build the binaries"
-    required: true
-  python_version:
-    description: "Python version to use"
-    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Build Executable
-      run: ${{ inputs.build_command }}
-      shell: bash
-
-    - name: Set TEST_CLI_PATH
-      run: |
-        TEST_CLI_PATH="${{ github.workspace }}/dist/${{ inputs.package_name }}/${{ inputs.package_name }}"
-        if [ "${{ inputs.operating_system }}" == "Windows" ]; then
-          TEST_CLI_PATH="${{ github.workspace }}\dist\${{ inputs.package_name }}\${{ inputs.package_name }}.exe"
-        fi
-        echo "TEST_CLI_PATH=$TEST_CLI_PATH" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Run portability tests
-      run: |
-        echo "Executing: ${{ env.TEST_CLI_PATH }}"
-        git config --global user.email "actions@github.com" && git config --global user.name "github-actions" 
-        poetry run pytest tests/ -m pyinstaller_binary_tests --cli_path "${{ env.TEST_CLI_PATH }}" --log-cli-level=INFO
-      shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
-
     - name: Set release version
       shell: bash
       continue-on-error: true
       if: ${{ inputs.production_release == 'true' }}
       run: |
-        echo "RELEASE_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
-        git describe --tags $(git rev-list --tags --max-count=1)
+        echo "RELEASE_VERSION_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
 
-    - name: Zip binaries
+    - name: Configure build environment
       shell: bash
       run: |
-        ls -l dist
-        cd dist/algokit/
-        if [ "${{ inputs.production_release }}" == "true" ]; then
-          tar -zcvf ../../algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
-        else
-          tar -zcvf ../../algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz *
+        artifacts_dir="${{ github.workspace }}${{ inputs.operating_system == 'Windows' && '\dist\artifacts' || '/dist/artifacts' }}"
+        mkdir -p $artifacts_dir
+        if [ -n "${RELEASE_VERSION_TAG}" ]; then
+          release_version="${RELEASE_VERSION_TAG:1}"
+          package_name_version="-${release_version}"
+          echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
         fi
-        cd ../..
-        ls -l
+        package_name="algokit${package_name_version}-${{ inputs.operating_system }}_${{ inputs.architecture }}"
+        echo "PACKAGE_NAME=`echo $package_name | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+        echo "ARTIFACTS_DIR=${artifacts_dir}" >> $GITHUB_ENV
 
-    - name: Upload binary as artifact (release)
-      if: ${{ inputs.production_release == 'true' }}
-      uses: actions/upload-artifact@v4
+    # GitHub doesn't support expressions in the uses block
+    - name: Build windows binary
+      if: ${{ inputs.operating_system == 'Windows' }}
+      uses: ./.github/actions/build-binaries/windows
       with:
-        name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
-        path: algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
+        package_name: ${{ env.PACKAGE_NAME }}
+        version: ${{ env.RELEASE_VERSION }}
+        artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-    - name: Upload binary as artifact (dev)
-      if: ${{ inputs.production_release != 'true' }}
-      uses: actions/upload-artifact@v4
+    - name: Build linux binary
+      if: ${{ inputs.operating_system == 'Linux' }}
+      uses: ./.github/actions/build-binaries/linux
       with:
-        name: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}
-        path: algokit-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
+        package_name: ${{ env.PACKAGE_NAME }}
+        version: ${{ env.RELEASE_VERSION }}
+        artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-    - name: Append binary to release
-      continue-on-error: true
+    - name: Build macOS binary
+      if: ${{ inputs.operating_system == 'macOS' }}
+      uses: ./.github/actions/build-binaries/macos
+      with:
+        package_name: ${{ env.PACKAGE_NAME }}
+        version: ${{ env.RELEASE_VERSION }}
+        artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+
+    - name: Add binary to path
+      run: |
+        echo "${{ github.workspace }}${{ inputs.operating_system == 'Windows' && '\dist\algokit' || '/dist/algokit' }}" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Run portability tests
+      run: |
+        git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+        poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+      shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
+
+    - name: Append artifacts to release
       if: ${{ inputs.production_release == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.operating_system }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
-        tag_name: ${{ env.RELEASE_VERSION }}
-        prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}
+          ${{ env.ARTIFACTS_DIR }}${{ inputs.operating_system == 'Windows' && '\' || '/' }}*.*
+        tag_name: ${{ env.RELEASE_VERSION_TAG }}
+        prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
