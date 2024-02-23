@@ -20,12 +20,16 @@ jobs:
         include:
           - os: ubuntu-20.04
             build_command: "poetry run poe package_unix"
+            distribution: "snap"
           - os: windows-latest
             build_command: "poetry run poe package_windows"
+            distribution: "winget"
           - os: macos-latest
             build_command: "poetry run poe package_unix"
+            distribution: "brew"
           - os: macos-14
             build_command: "poetry run poe package_unix"
+            distribution: "brew"
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -52,3 +56,4 @@ jobs:
           operating_system: ${{ runner.os }}
           architecture: ${{ runner.arch }}
           build_command: ${{ matrix.build_command }}
+          distribution: ${{ matrix.distribution }}
