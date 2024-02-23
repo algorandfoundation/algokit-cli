@@ -62,37 +62,56 @@ def which_mock(mocker: MockerFixture) -> WhichMock:
     return which_mock
 
 
+class ExtendedTemplateKey(str, Enum):
+    # Include all keys from TemplateKey and add new ones
+    BASE = "base"
+    PUYA = "puya"
+    TEALSCRIPT = "tealscript"
+    FULLSTACK = "fullstack"
+    REACT = "react"
+    BEAKER = "beaker"
+    PLAYGROUND = "playground"
+    BEAKER_WITH_VERSION = "beaker_with_version"
+    SIMPLE = "simple"
+
+
+# Define a fixture to monkeypatch TemplateKey with ExtendedTemplateKey
+@pytest.fixture(autouse=True)
+def _set_mocked_template_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("algokit.cli.init.TemplateKey", ExtendedTemplateKey)
+
+
 @pytest.fixture(autouse=True)
 def _set_blessed_templates(mocker: MockerFixture) -> None:
     from algokit.cli.init import BlessedTemplateSource, init_command
 
     blessed_templates = {
-        "simple": BlessedTemplateSource(
+        ExtendedTemplateKey.SIMPLE: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "beaker": BlessedTemplateSource(
+        ExtendedTemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Provides a good starting point to build Beaker smart contracts productively.",
         ),
-        "beaker_with_version": BlessedTemplateSource(
+        ExtendedTemplateKey.BEAKER_WITH_VERSION: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             commit="96fc7fd766fac607cdf5d69ee6e85ade04dddd47",
             description="Provides a good starting point to build Beaker smart contracts productively, but pinned.",
         ),
-        "fullstack": BlessedTemplateSource(
+        ExtendedTemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "puya": BlessedTemplateSource(
+        ExtendedTemplateKey.PUYA: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "react": BlessedTemplateSource(
+        ExtendedTemplateKey.REACT: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful.",
         ),
-        "base": BlessedTemplateSource(
+        ExtendedTemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful.",
         ),

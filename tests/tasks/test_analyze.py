@@ -189,16 +189,14 @@ def test_analyze_error_in_tealer(
     cwd: Path,
     mocker: MockerFixture,
 ) -> None:
-    with mocker.patch("algokit.cli.tasks.analyze.run_tealer", side_effect=Exception("dummy")):
-        teal_file = cwd / "dummy.teal"
-        teal_file.touch()
-        result = invoke(
-            f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd
-        )
+    mocker.patch("algokit.cli.tasks.analyze.run_tealer", side_effect=Exception("dummy"))
+    teal_file = cwd / "dummy.teal"
+    teal_file.touch()
+    result = invoke(f"task analyze {_normalize_path(teal_file)} --output {_normalize_path(cwd)}", input="y\n", cwd=cwd)
 
-        assert result.exit_code == 1
-        result.output = _format_snapshot(result.output, [str(cwd)])
-        verify(result.output)
+    assert result.exit_code == 1
+    result.output = _format_snapshot(result.output, [str(cwd)])
+    verify(result.output)
 
 
 @pytest.mark.usefixtures("generate_report_filename_mock")
