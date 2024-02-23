@@ -82,13 +82,6 @@ class TemplateKey(str, Enum):
     FULLSTACK = "fullstack"
     REACT = "react"
     BEAKER = "beaker"
-
-
-class MiscTemplateKey(str, Enum):
-    """
-    For templates not included in wizard v2 by default
-    """
-
     PLAYGROUND = "playground"
 
 
@@ -125,7 +118,7 @@ LANGUAGE_TO_TEMPLATE_MAP = {
 
 
 # Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
-def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
+def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
     return {
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
@@ -155,7 +148,7 @@ def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
         ),
-        MiscTemplateKey.PLAYGROUND: BlessedTemplateSource(
+        TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="Official template showcasing a number of small example applications and demos.",
         ),
@@ -193,7 +186,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "template_name",
     "--template",
     "-t",
-    type=click.Choice(list(_get_blessed_templates())),
+    type=click.Choice([k.value for k in _get_blessed_templates()]),
     default=None,
     help="Name of an official template to use. To choose interactively, run this command with no arguments.",
 )
@@ -526,7 +519,7 @@ def _get_template(
         if commit:
             raise click.ClickException("--template-url-ref has no effect when template name is specified")
         blessed_templates = _get_blessed_templates()
-        template: TemplateSource = blessed_templates[name]
+        template: TemplateSource = blessed_templates[TemplateKey(name)]
     elif not url:
         template = _get_template_interactive()
     else:
