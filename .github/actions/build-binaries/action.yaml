@@ -71,11 +71,20 @@ runs:
         poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
       shell: ${{ inputs.operating_system == 'Windows' && 'cmd' || 'bash' }}
 
+    # softprops/action-gh-release doesn't support the \ character in paths
+    - name: Adjust artifacts directory for softprops/action-gh-release
+      if: ${{ inputs.operating_system == 'Windows' }}
+      shell: pwsh
+      run: |
+        $adjusted = '${{ env.ARTIFACTS_DIR }}' -replace '\\','/'
+        echo "ARTIFACTS_DIR=$adjusted" >> $env:GITHUB_ENV
+
     - name: Append artifacts to release
       if: ${{ inputs.production_release == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
+        fail_on_unmatched_files: true
         files: |
-          ${{ env.ARTIFACTS_DIR }}${{ inputs.operating_system == 'Windows' && '\' || '/' }}*.*
+          ${{ env.ARTIFACTS_DIR }}/*.*
         tag_name: ${{ env.RELEASE_VERSION_TAG }}
         prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
