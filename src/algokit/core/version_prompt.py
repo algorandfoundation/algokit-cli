@@ -15,12 +15,14 @@ logger = logging.getLogger(__name__)
 LATEST_URL = "https://api.github.com/repos/algorandfoundation/algokit-cli/releases/latest"
 VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 DISABLE_CHECK_MARKER = "disable-version-prompt"
-
-VERSION_UPDATE_MESSAGES = {
-    "snap": "snap refresh algokit",
-    "winget": "winget upgrade algokit",
-    "brew": "brew upgrade algokit",
+DISTRIBUTION_METHOD_UPDATE_COMMAND = {
+    "snap": "`snap refresh algokit`",
+    "winget": "`winget upgrade algokit`",
+    "brew": "`brew upgrade algokit`",
 }
+UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION = "the tool used to install AlgoKit"
+# TODO: Set this version as part of releasing the binary distributions.
+BINARY_DISTRIBUTION_RELEASE_VERSION = "99.99.99"
 
 
 def do_version_prompt() -> None:
@@ -34,19 +36,24 @@ def do_version_prompt() -> None:
         logger.debug("Could not determine latest version")
         return
 
-    if _get_version_sequence(current_version) < _get_version_sequence(latest_version):
+    current_version_sequence = _get_version_sequence(current_version)
+    if current_version_sequence < _get_version_sequence(latest_version):
+        update_instruction = UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
         if is_binary_mode():
             distribution = _get_distribution_method()
-            update_message = VERSION_UPDATE_MESSAGES.get(distribution, "manual process.")
-            logger.info(
-                f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
-                f"Please use {update_message} to update."
+            update_instruction = DISTRIBUTION_METHOD_UPDATE_COMMAND.get(
+                distribution, UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
             )
-        else:
-            logger.info(
-                f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
-                f"Please use `pipx upgrade algokit` to update."
-            )
+        # If you're not using the binary mode, then you've used pipx to install AlgoKit.
+        # One exception is that older versions of the brew package used pipx,
+        # however require updating via brew, so we show the default update instruction instead.
+        elif current_version_sequence >= _get_version_sequence(BINARY_DISTRIBUTION_RELEASE_VERSION):
+            update_instruction = "`pipx upgrade algokit`"
+
+        logger.info(
+            f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
+            f"Please update using {update_instruction}."
+        )
     else:
         logger.debug("Current version is up to date")
 
