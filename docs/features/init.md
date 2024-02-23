@@ -34,6 +34,14 @@ Workspaces are designed for managing multiple related projects under a single ro
 
 To initialize a project within a workspace, use the `--workspace` flag. If a workspace does not already exist, AlgoKit will create one for you by default (unless you disable it via `--no-workspace` flag). Once established, new projects can be added to this workspace, allowing for centralized management.
 
+To mark your project as `workspace` fill in the following in your `.algokit.toml` file:
+
+```toml
+[project]
+type = 'workspace' # type specifying if the project is a workspace or standalone
+projects_root_path = 'projects' # path to the root folder containing all sub-projects in the workspace
+```
+
 ### Standalone Projects
 
 Standalone projects are suitable for simpler applications or when working on a single component. This structure is straightforward, with each project residing in its own directory, independent of others. Standalone projects are ideal for developers who prefer simplicity or are focusing on a single aspect of their application and are sure that they will not need to add more sub-projects in the future.
@@ -41,6 +49,14 @@ Standalone projects are suitable for simpler applications or when working on a s
 To create a standalone project, use the `--no-workspace` flag during initialization. This instructs AlgoKit to bypass the workspace structure and set up the project as an isolated entity.
 
 Both workspaces and standalone projects are fully supported by AlgoKit's suite of tools, ensuring developers can choose the structure that best fits their workflow without compromising on functionality.
+
+To mark your project as a standalone project fill in the following in your `.algokit.toml` file:
+
+```toml
+[project]
+type = {'backend' | 'contract' | 'frontend'} # currently support 3 generic categories for standalone projects
+name = 'my-project' # unique name for the project inside workspace
+```
 
 > We recommend using workspaces for most projects (hence enabled by default), as it provides a more organized and scalable approach to managing multiple sub-projects. However, standalone projects are a great choice for simple applications or when you are certain that you will not need to add more sub-projects in the future, for such cases simply append `--no-workspace` when using `algokit init` command.
 
@@ -130,3 +146,15 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 ```
 
 For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#init).
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```

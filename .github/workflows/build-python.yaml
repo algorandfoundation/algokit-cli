@@ -29,6 +29,8 @@ jobs:
 
       - name: pytest + coverage
         shell: bash
+        env:
+          COVERAGE_CORE: sysmon
         # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
         run: |
           set -o pipefail
