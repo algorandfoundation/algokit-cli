@@ -23,6 +23,8 @@ runs:
       run: |
         Set-Location -Path dist\algokit\
         tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz *
+        echo ${{ inputs.distribution }} > .\_internal\algokit\distribution-method
+        tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.tar.gz *
         Set-Location -Path ..\..
 
     - name: Upload binary artifact
@@ -30,3 +32,9 @@ runs:
       with:
         name: ${{ inputs.package_name }}
         path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz
+
+    - name: Upload binary artifact (winget)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package_name }}-winget
+        path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.tar.gz

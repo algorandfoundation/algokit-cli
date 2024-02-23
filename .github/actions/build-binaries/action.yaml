@@ -80,12 +80,3 @@ runs:
         tag_name: ${{ env.RELEASE_VERSION_TAG }}
         prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
 
-    - name: Append binary to release (distribution)
-      continue-on-error: true
-      if: ${{ inputs.production_release == 'true' }}
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          algokit-${{ env.RELEASE_VERSION }}-${{ inputs.distribution }}-${{ inputs.architecture }}-py${{ inputs.python_version }}.tar.gz
-        tag_name: ${{ env.RELEASE_VERSION }}
-        prerelease: ${{ contains(env.RELEASE_VERSION, 'beta') }}
