@@ -26,8 +26,19 @@ jobs:
         # track here -> https://github.com/crytic/tealer/pull/209
         run: poetry install --no-interaction && pipx install tealer==0.1.2
 
+      - name: pytest
+        shell: bash
+        if: matrix.python != '3.12' && matrix.os != 'ubuntu-latest'
+        # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
+        run: |
+          set -o pipefail
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+          poetry run pytest -n auto
+        id: pytest
+
       - name: pytest + coverage
         shell: bash
+        if: matrix.python == '3.12' && matrix.os == 'ubuntu-latest'
         env:
           COVERAGE_CORE: sysmon
         # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
@@ -35,10 +46,10 @@ jobs:
           set -o pipefail
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
           poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
-        id: pytest
+        id: pytest-cov
 
       - name: Upload received snapshots (in case of failure)
-        if: failure() && steps.pytest.outcome == 'failure'
+        if: failure() && (steps.pytest.outcome == 'failure' || steps.pytest-cov.outcome == 'failure')
         uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-${{ matrix.os }}-python${{ matrix.python }}
