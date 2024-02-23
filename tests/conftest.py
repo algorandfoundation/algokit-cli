@@ -195,18 +195,6 @@ def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None
         credentials[key] = None
 
 
-def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption("--cli_path", action="store")
-
-
-@pytest.fixture(scope="session")
-def cli_path(request: pytest.FixtureRequest) -> str | None:
-    cli_path_value = str(request.config.option.cli_path)
-    if cli_path_value is None:
-        pytest.skip()
-    return cli_path_value
-
-
 @pytest.fixture()
 def dummy_algokit_template_with_python_task(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     """

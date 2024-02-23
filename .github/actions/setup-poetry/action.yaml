@@ -1,24 +1,21 @@
 name: "Python Poetry Action"
 description: "An action to setup Poetry"
-inputs:
-  poetry-version:
-    description: "The version of poetry to install"
-    required: false
-    default: "latest"
 runs:
   using: "composite"
   steps:
-    - run: |
+    # A workaround for pipx isn't installed on M1 runner.
+    # We should remove it after this issue is resolved.
+    # https://github.com/actions/runner-images/issues/9256
+    - if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
+      run: |
+        pip install poetry
+      shell: bash
+
+    - if: ${{ runner.os != 'macOS' || runner.arch != 'ARM64' }}
+      run: |
         pip install --user pipx
         pipx ensurepath
-      shell: bash
-    - if: ${{ inputs.poetry-version == 'latest' }}
-      run: |
         pipx install poetry
-      shell: bash
-    - if: ${{ inputs.poetry-version != 'latest' }}
-      run: |
-        pipx install poetry==${{ inputs.poetry-version }}
       shell: bash
 
     - name: Get full Python version
@@ -30,4 +27,4 @@ runs:
       uses: actions/cache@v4
       with:
         path: ./.venv
-        key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ steps.full-python-version.outputs.full_version }}
+        key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}

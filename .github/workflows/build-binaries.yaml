@@ -15,14 +15,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            build_command: "poetry run poe package_unix"
-          - os: windows-latest
-            build_command: "poetry run poe package_windows"
-          - os: macos-latest
-            build_command: "poetry run poe package_unix"
+        # macos-14 is the Apple Silicon M1 runner
+        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -43,8 +37,6 @@ jobs:
       - name: Build & test binary
         uses: ./.github/actions/build-binaries
         with:
-          python_version: ${{ inputs.python_version }}
-          package_name: "algokit"
           production_release: ${{ inputs.production_release }}
           operating_system: ${{ runner.os }}
-          build_command: ${{ matrix.build_command }}
+          architecture: ${{ runner.arch }}

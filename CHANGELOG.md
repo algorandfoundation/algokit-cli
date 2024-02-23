@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.11.4 (2024-02-19)
+
+### Fix
+
+* Fix issue of goal command interacting with filename containing dot ([#424](https://github.com/algorandfoundation/algokit-cli/issues/424)) ([`22ece81`](https://github.com/algorandfoundation/algokit-cli/commit/22ece811af63c69734169029db1a477730d1e0ad))
+
+### Documentation
+
+* Adr init wizard v2 and related improvements ([#411](https://github.com/algorandfoundation/algokit-cli/issues/411)) ([`8c5445a`](https://github.com/algorandfoundation/algokit-cli/commit/8c5445a558e503590fee636a9e5826026a5aacaf))
+
 ## v1.11.3 (2024-02-08)
 
 ### Fix

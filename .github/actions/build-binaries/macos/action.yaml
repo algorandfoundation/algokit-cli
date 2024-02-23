@@ -1,0 +1,32 @@
+name: "Build macOS Binary Artifacts"
+description: "Build macOS specific pyinstaller binary artifacts"
+inputs:
+  package_name:
+    description: "The name of the package"
+    required: true
+  artifacts_dir:
+    description: "The directory to write artifacts you want to publish"
+    required: true
+  version:
+    description: "The version to use for this artifact"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build binary
+      shell: bash
+      run: |
+        poetry run poe package_unix
+
+    - name: Package binary artifact
+      shell: bash
+      run: |
+        cd dist/algokit/
+        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz *
+        cd ../..
+
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package_name }}
+        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz
