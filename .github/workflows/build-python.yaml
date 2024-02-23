@@ -28,7 +28,7 @@ jobs:
 
       - name: pytest
         shell: bash
-        if: !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest')
+        if: ${{ !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest') }}
         # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
         run: |
           set -o pipefail
