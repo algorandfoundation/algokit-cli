@@ -23,7 +23,7 @@ runs:
       run: |
         cd dist/algokit/
         tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz *
-        echo ${{ inputs.distribution }} > ./_internal/algokit/distribution-method
+        echo brew > ./_internal/algokit/distribution-method
         tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz *
         cd ../..
 

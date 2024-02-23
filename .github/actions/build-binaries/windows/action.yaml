@@ -23,7 +23,7 @@ runs:
       run: |
         Set-Location -Path dist\algokit\
         tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz *
-        echo ${{ inputs.distribution }} > .\_internal\algokit\distribution-method
+        echo winget > .\_internal\algokit\distribution-method
         tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.tar.gz *
         Set-Location -Path ..\..
 
