@@ -40,3 +40,6 @@ jobs:
           production_release: ${{ inputs.production_release }}
           operating_system: ${{ runner.os }}
           architecture: ${{ runner.arch }}
+          sm_code_signing_cert: ${{ secrets.SM_CODE_SIGNING_CERT }}
+          sm_code_signing_cert_sha1_hash: ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}
+          sm_code_signing_cert_password: ${{ secrets.SM_CODE_SIGNING_CERT_PASSWORD }}

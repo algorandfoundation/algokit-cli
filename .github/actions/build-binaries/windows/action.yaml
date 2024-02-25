@@ -4,29 +4,103 @@ inputs:
   package_name:
     description: "The name of the package"
     required: true
+  version:
+    description: "The version to use for this artifact"
   artifacts_dir:
     description: "The directory to write artifacts you want to publish"
     required: true
-  version:
-    description: "The version to use for this artifact"
+  production_release:
+    description: "Flag to determine if this is a production release"
+    required: true
+  code_signing_cert:
+    description: "The base64 encoded code signing certificate"
+    required: true
+  code_signing_cert_sha1_hash:
+    description: "The SHA1 hash of the code signing certificate"
+    required: true
+  code_signing_cert_password:
+    description: "The password for the code signing certificate"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Configure build environment
+      shell: bash
+      run: |
+        echo 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64' >> $GITHUB_PATH
+        echo 'BINARY_BUILD_DIR=dist\algokit' >> $GITHUB_ENV
+        echo 'BINARY_ARTIFACT=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz' >> $GITHUB_ENV
+        echo 'WINGET_INSTALLER=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix' >> $GITHUB_ENV
+
     - name: Build binary
       shell: bash
       run: |
         poetry run poe package_windows
 
+    # We only sign the release artifacts, as each signing request will use up the HSM quota
+    - name: Download signing certificate
+      if: ${{ inputs.production_release == 'true' }}
+      run: |
+        signing_cert="${{ runner.temp }}\code_signing_cert.pfx"
+        echo "SIGNING_CERT=${signing_cert}" >> $GITHUB_ENV
+        echo '${{ inputs.code_signing_cert }}' | base64 -d > $signing_cert
+      shell: bash
+
+    - name: Import signing certificate
+      if: ${{ inputs.production_release == 'true' }}
+      shell: pwsh
+      run: |
+        Import-PfxCertificate -FilePath ${{ env.SIGNING_CERT }} -Password (ConvertTo-SecureString -String ${{ inputs.code_signing_cert_password }} -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My | Out-Null
+
+    - name: Sign executable
+      if: ${{ inputs.production_release == 'true' }}
+      shell: pwsh
+      run: |
+        $executablePath = '${{ env.BINARY_BUILD_DIR }}\algokit.exe'
+        signtool sign /sha1 ${{ inputs.code_signing_cert_sha1_hash }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $executablePath
+        # signtool verify /v /pa $executablePath
+
     - name: Package binary artifact
       shell: pwsh
       run: |
-        Set-Location -Path dist\algokit\
-        tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz *
+        Set-Location -Path ${{ env.BINARY_BUILD_DIR }}
+        tar -zcf ${{ env.BINARY_ARTIFACT }} *
         Set-Location -Path ..\..
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.package_name }}
-        path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz
+        path: ${{ env.BINARY_ARTIFACT }}
+        if-no-files-found: error
+
+    - name: Build winget installer
+      shell: pwsh
+      run: |
+        & .\scripts\winget\build-installer.ps1 `
+          -binaryDir ${{ env.BINARY_BUILD_DIR }} `
+          -releaseVersion ${{ inputs.version }} `
+          -outputFile ${{ env.WINGET_INSTALLER }}
+
+    - name: Sign winget installer
+      if: ${{ inputs.production_release == 'true' }}
+      shell: pwsh
+      run: |
+        signtool sign /sha1 ${{ inputs.code_signing_cert_sha1_hash }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 ${{ env.WINGET_INSTALLER }}
+        # signtool verify /v /pa ${{ env.WINGET_INSTALLER }}
+
+    - name: Remove signing certificate
+      if: ${{ inputs.production_release == 'true' }}
+      shell: pwsh
+      run: |
+        $cert = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object { $_.Thumbprint -eq '${{ inputs.code_signing_cert_sha1_hash }}' }
+        Remove-Item -Path $cert.PSPath
+        Remove-Item -Path ${{ env.SIGNING_CERT }}
+
+    - name: Upload winget artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.package_name }}-winget
+        path: ${{ env.WINGET_INSTALLER }}
+        if-no-files-found: error

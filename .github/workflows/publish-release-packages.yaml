@@ -17,6 +17,11 @@ on:
         default: true
         type: boolean
         description: "Publish to Chocolatey repository"
+      do_winget:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to Winget repository"
   workflow_dispatch:
     inputs:
       release:
@@ -33,6 +38,11 @@ on:
         default: true
         type: boolean
         description: "Publish to Chocolatey repository"
+      do_winget:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to Winget repository"
 
 jobs:
   publish-brew:
@@ -103,3 +113,17 @@ jobs:
         uses: crazy-max/ghaction-chocolatey@v2
         with:
           args: push --source https://push.chocolatey.org/
+
+  publish-winget:
+    runs-on: windows-latest
+    if: ${{ inputs.do_winget }}
+    steps:
+      - name: Publish to winget
+        shell: pwsh
+        env:
+          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
+        run: |
+          echo 'Publishing to winget'
+          # The below can be uncommented after we've manually created the first release on winget
+          # & .\scripts\winget\update-package.ps1 `
+          #   -releaseVersionTag ${{ inputs.release }}

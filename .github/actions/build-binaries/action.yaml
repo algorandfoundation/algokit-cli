@@ -10,6 +10,15 @@ inputs:
   architecture:
     description: "Architecture to set the correct binary path and extension"
     required: true
+  sm_code_signing_cert:
+    description: "The base64 encoded code signing certificate"
+    required: true
+  sm_code_signing_cert_sha1_hash:
+    description: "The SHA1 hash of the code signing certificate"
+    required: true
+  sm_code_signing_cert_password:
+    description: "The password for the code signing certificate"
+    required: true
 
 runs:
   using: "composite"
@@ -43,6 +52,10 @@ runs:
         package_name: ${{ env.PACKAGE_NAME }}
         version: ${{ env.RELEASE_VERSION }}
         artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+        production_release: ${{ inputs.production_release }}
+        code_signing_cert: ${{ inputs.sm_code_signing_cert }}
+        code_signing_cert_sha1_hash: ${{ inputs.sm_code_signing_cert_sha1_hash }}
+        code_signing_cert_password: ${{ inputs.sm_code_signing_cert_password }}
 
     - name: Build linux binary
       if: ${{ inputs.operating_system == 'Linux' }}
@@ -83,8 +96,8 @@ runs:
       if: ${{ inputs.production_release == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
-        fail_on_unmatched_files: true
         files: |
           ${{ env.ARTIFACTS_DIR }}/*.*
         tag_name: ${{ env.RELEASE_VERSION_TAG }}
         prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
+        fail_on_unmatched_files: true
