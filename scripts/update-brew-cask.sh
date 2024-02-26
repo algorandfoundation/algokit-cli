@@ -91,7 +91,7 @@ create_cask() {
 
 cat << EOF > $cask_file
 cask "$package_name" do
-  artifact arm: "arm_artifact", intel: "intel_artifact"
+  artifact arm: "$arm_artifact", intel: "$intel_artifact"
   version "$version"
   sha256 arm: "$arm_sha256", intel: "$intel_sha256"
 
