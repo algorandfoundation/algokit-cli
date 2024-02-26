@@ -389,6 +389,7 @@ name: "{name}"
 
 services:
   algod:
+    init: true
     container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
@@ -411,6 +412,7 @@ services:
       - ./goal_mount:/root/goal_mount
 
   conduit:
+    init: true
     container_name: "{name}_conduit"
     image: {CONDUIT_IMAGE}
     restart: unless-stopped
@@ -423,6 +425,7 @@ services:
       - algod
 
   indexer-db:
+    init: true
     container_name: "{name}_postgres"
     image: postgres:13-alpine
     ports:
@@ -434,6 +437,7 @@ services:
       POSTGRES_DB: indexerdb
 
   indexer:
+    init: true
     container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
     ports:
