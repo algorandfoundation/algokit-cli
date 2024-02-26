@@ -62,7 +62,7 @@ create_cask() {
     version_beta=${BASH_REMATCH[2]}
   fi
 
-  release_tag="v${version}"
+  release_tag="${version}"
   if [[ -n $version_beta ]]; then
     release_tag=${release_tag}-beta.${version_beta}
   fi
