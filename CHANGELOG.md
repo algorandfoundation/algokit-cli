@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.0 (2024-02-26)
+
+### Feature
+
+* Init wizard v2 ([#415](https://github.com/algorandfoundation/algokit-cli/issues/415)) ([`55d6922`](https://github.com/algorandfoundation/algokit-cli/commit/55d6922e5ae1c8b1f6e42a910f387739344f53a5))
+
+### Fix
+
+* Upload windows artifact to release ([#429](https://github.com/algorandfoundation/algokit-cli/issues/429)) ([`d922a49`](https://github.com/algorandfoundation/algokit-cli/commit/d922a493f8f92c61ae56df0043a356f8fd523f4d))
+
 ## v1.11.4 (2024-02-19)
 
 ### Fix
