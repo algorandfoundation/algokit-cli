@@ -23,3 +23,4 @@ jobs:
     with:
       production_release: "false"
       python_version: "3.12"
+    secrets: inherit

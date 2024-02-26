@@ -17,6 +17,7 @@ jobs:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
         os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -34,12 +35,89 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Build & test binary
-        uses: ./.github/actions/build-binaries
+      - name: Set release version
+        shell: bash
+        continue-on-error: true
+        if: ${{ inputs.production_release == 'true' }}
+        run: |
+          echo "RELEASE_VERSION_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
+
+      - name: Configure build environment
+        shell: bash
+        run: |
+          artifacts_dir="${{ github.workspace }}${{ runner.os == 'Windows' && '\dist\artifacts' || '/dist/artifacts' }}"
+          mkdir -p $artifacts_dir
+          if [ -n "${RELEASE_VERSION_TAG}" ]; then
+            release_version="${RELEASE_VERSION_TAG:1}"
+            package_name_version="-${release_version}"
+            echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
+          fi
+          package_name="algokit${package_name_version}-${{ runner.os }}_${{ runner.arch }}"
+          echo "PACKAGE_NAME=`echo $package_name | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+          echo "ARTIFACTS_DIR=${artifacts_dir}" >> $GITHUB_ENV
+
+      # GitHub doesn't support expressions in the uses block
+      - name: Build windows binary
+        if: ${{ runner.os == 'Windows' }}
+        uses: ./.github/actions/build-binaries/windows
         with:
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
           production_release: ${{ inputs.production_release }}
-          operating_system: ${{ runner.os }}
-          architecture: ${{ runner.arch }}
-          sm_code_signing_cert: ${{ secrets.SM_CODE_SIGNING_CERT }}
-          sm_code_signing_cert_sha1_hash: ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}
-          sm_code_signing_cert_password: ${{ secrets.SM_CODE_SIGNING_CERT_PASSWORD }}
+          code_signing_cert: ${{ secrets.SM_CODE_SIGNING_CERT }}
+          code_signing_cert_sha1_hash: ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}
+          code_signing_cert_password: ${{ secrets.SM_CODE_SIGNING_CERT_PASSWORD }}
+
+      - name: Build linux binary
+        if: ${{ runner.os == 'Linux' }}
+        uses: ./.github/actions/build-binaries/linux
+        with:
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Build macOS binary
+        if: ${{ runner.os == 'macOS' }}
+        uses: ./.github/actions/build-binaries/macos
+        with:
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Add binary to path
+        run: |
+          echo "${{ github.workspace }}${{ runner.os == 'Windows' && '\dist\algokit' || '/dist/algokit' }}" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Run portability tests
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+        shell: cmd
+
+      - name: Run portability tests
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+        shell: bash
+
+      # softprops/action-gh-release doesn't support the \ character in paths
+      - name: Adjust artifacts directory for softprops/action-gh-release
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          $adjusted = '${{ env.ARTIFACTS_DIR }}' -replace '\\','/'
+          echo "ARTIFACTS_DIR=$adjusted" >> $env:GITHUB_ENV
+
+      - name: Append artifacts to release
+        if: ${{ inputs.production_release == 'true' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+          files: |
+            ${{ env.ARTIFACTS_DIR }}/*.*
+          tag_name: ${{ env.RELEASE_VERSION_TAG }}
+          prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
