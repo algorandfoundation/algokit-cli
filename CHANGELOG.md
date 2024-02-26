@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.0 (2024-02-26)
+
+### Feature
+
+* Bump ([`78d4b7e`](https://github.com/PatrickDinh/algokit-cli/commit/78d4b7e95009cade0abc776407229c25bc1c3417))
+
+### Breaking
+
+* bump ([`78d4b7e`](https://github.com/PatrickDinh/algokit-cli/commit/78d4b7e95009cade0abc776407229c25bc1c3417))
+
 ## v1.11.4 (2024-02-19)
 
 ### Fix
