@@ -17,11 +17,7 @@ jobs:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
         os: [macos-latest, macos-14]
-        include:
-          - os: macos-latest
-            build_command: "poetry run poe package_mac"
-          - os: macos-14
-            build_command: "poetry run poe package_mac"
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -39,44 +35,97 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Install cert
+      - name: Set release version
         shell: bash
-        if: runner.os == 'macOS'
-        env:
-          FILE: ${{ inputs.file }}
-          OPTIONS: ${{ inputs.options }}
-          APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
-          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
-          APPLE_TEAM_ID: 7287T82947
+        continue-on-error: true
+        if: ${{ inputs.production_release == 'true' }}
         run: |
-          # Export certs
-          echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
+          echo "RELEASE_VERSION_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
 
-          # Create keychain
-          security create-keychain -p actions macos-build.keychain
-          security default-keychain -s macos-build.keychain
-          security unlock-keychain -p actions macos-build.keychain
-          security set-keychain-settings -t 3600 -u macos-build.keychain
-          echo "keychain created"
+      - name: Configure build environment
+        shell: bash
+        run: |
+          artifacts_dir="${{ github.workspace }}${{ runner.os == 'Windows' && '\dist\artifacts' || '/dist/artifacts' }}"
+          mkdir -p $artifacts_dir
+          if [ -n "${RELEASE_VERSION_TAG}" ]; then
+            release_version="${RELEASE_VERSION_TAG:1}"
+            package_name_version="-${release_version}"
+            echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
+          fi
+          package_name="algokit${package_name_version}-${{ runner.os }}_${{ runner.arch }}"
+          echo "PACKAGE_NAME=`echo $package_name | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
+          echo "ARTIFACTS_DIR=${artifacts_dir}" >> $GITHUB_ENV
 
-          # Import certs to keychain
-          security import /tmp/certs.p12 -k ~/Library/Keychains/macos-build.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productsign
-          echo "cert imported"
-
-          # Key signing
-          security set-key-partition-list -S apple-tool:,apple: -s -k actions macos-build.keychain
-          echo "key signed"
-
-      - name: Build & test binary
-        uses: ./.github/actions/build-binaries
+      # GitHub doesn't support expressions in the uses block
+      - name: Build windows binary
+        if: ${{ runner.os == 'Windows' }}
+        uses: ./.github/actions/build-binaries/windows
         with:
-          python_version: ${{ inputs.python_version }}
-          package_name: "algokit"
-          production_release: ${{ inputs.production_release }}
-          operating_system: ${{ runner.os }}
-          architecture: ${{ runner.arch }}
-          build_command: ${{ matrix.build_command }}
-          apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
-          apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-      # TODO: delete /tmp/certs.p12
+      - name: Build linux binary
+        if: ${{ runner.os == 'Linux' }}
+        uses: ./.github/actions/build-binaries/linux
+        with:
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Install Apple Developer Id Cert
+        if: runner.os == 'macOS'
+        uses: ./.github/actions/install-apple-dev-id-cert
+        with:
+          cert_data: ${{ secrets.APPLE_CERT_DATA }}
+          cert_password: ${{ secrets.APPLE_CERT_PASSWORD }}
+
+      - name: Build macOS binary
+        if: ${{ runner.os == 'macOS' }}
+        uses: ./.github/actions/build-binaries/macos
+        with:
+          package_name: ${{ env.PACKAGE_NAME }}
+          version: ${{ env.RELEASE_VERSION }}
+          artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+          apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+          apple_bundle_id: ${{ inputs.production_release == 'true' && vars.APPLE_BUNDLE_ID || format('beta.{0}', vars.APPLE_BUNDLE_ID) }}
+          apple_cert_id: ${{ secrets.APPLE_CERT_ID }}
+          apple_notary_user: ${{ secrets.APPLE_NOTARY_USER }}
+          apple_notary_password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+
+      - name: Add binary to path
+        run: |
+          echo "${{ github.workspace }}${{ runner.os == 'Windows' && '\dist\algokit' || '/dist/algokit' }}" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Run portability tests
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+        shell: cmd
+
+      - name: Run portability tests
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+        shell: bash
+
+      # softprops/action-gh-release doesn't support the \ character in paths
+      - name: Adjust artifacts directory for softprops/action-gh-release
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          $adjusted = '${{ env.ARTIFACTS_DIR }}' -replace '\\','/'
+          echo "ARTIFACTS_DIR=$adjusted" >> $env:GITHUB_ENV
+
+      - name: Append artifacts to release
+        if: ${{ inputs.production_release == 'true' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+          files: |
+            ${{ env.ARTIFACTS_DIR }}/*.*
+          tag_name: ${{ env.RELEASE_VERSION_TAG }}
+          prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}

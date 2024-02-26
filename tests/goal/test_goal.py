@@ -523,3 +523,48 @@ def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock, app_dir_mock: A
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+
+
+@pytest.mark.usefixtures(
+    "mocked_goal_mount_path",
+    "_setup_input_files",
+    "_setup_latest_dummy_compose",
+    "_mock_proc_with_running_localnet",
+    "_mock_proc_with_algod_running_state",
+)
+@pytest.mark.parametrize(
+    "_setup_input_files", [[{"name": "contract.approval.teal", "content": DUMMY_CONTRACT_TEAL}]], indirect=True
+)
+def test_goal_simple_args_with_input_output_files_with_dot_convention_name(
+    proc_mock: ProcMock,
+    cwd: Path,
+    app_dir_mock: AppDirs,
+) -> None:
+    expected_arguments = [
+        "docker",
+        "exec",
+        "--interactive",
+        "--workdir",
+        "/root",
+        "algokit_sandbox_algod",
+        "goal",
+        "clerk",
+        "compile",
+    ]
+
+    proc_mock.set_output(
+        expected_arguments, output=["File compiled"], side_effect=dump_file, side_effect_args={"cwd": cwd}
+    )
+
+    result = invoke("goal clerk compile contract.approval.teal -o approval.compiled", cwd=cwd)
+
+    # Check if the paths in command have changed in preprocess step
+    assert _normalize_output(proc_mock.called[3].command[9]) == "/root/goal_mount/contract.approval.teal"
+    assert _normalize_output(proc_mock.called[3].command[11]) == "/root/goal_mount/approval.compiled"
+
+    # Check for the result status
+    assert result.exit_code == 0
+
+    # Check if the output file is created and copied in cwd in postprocess step
+    assert (cwd / "approval.compiled").exists()
+    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))

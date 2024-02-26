@@ -2,139 +2,15 @@
 
 <!--next-version-placeholder-->
 
-## v1.11.13 (2024-02-21)
-
-
-
-## v1.11.12 (2024-02-21)
-
-
-
-## v1.11.11 (2024-02-21)
-
-
-
-## v1.11.10 (2024-02-21)
-
-
-
-## v1.11.9 (2024-02-21)
-
-
-
-## v1.11.8 (2024-02-21)
-
-
-
-## v1.11.7 (2024-02-20)
-
-
-
-## v1.11.6 (2024-02-19)
-
-
-
-## v1.11.5 (2024-02-19)
-
-
-
 ## v1.11.4 (2024-02-19)
 
-### Documentation
+### Fix
 
-* Adr init wizard v2 and related improvements ([#411](https://github.com/PatrickDinh/algokit-cli/issues/411)) ([`8c5445a`](https://github.com/PatrickDinh/algokit-cli/commit/8c5445a558e503590fee636a9e5826026a5aacaf))
-
-## v1.12.21 (2024-02-14)
-
-
-
-## v1.12.20 (2024-02-14)
-
-
-
-## v1.12.19 (2024-02-14)
-
-
-
-## v1.12.18 (2024-02-14)
-
-
-
-## v1.12.17 (2024-02-14)
-
-
-
-## v1.12.16 (2024-02-14)
-
-
-
-## v1.12.15 (2024-02-14)
-
-
-
-## v1.12.14 (2024-02-14)
-
-
-
-## v1.12.13 (2024-02-14)
-
-
-
-## v1.12.12 (2024-02-14)
-
-
-
-## v1.12.11 (2024-02-14)
-
-
-
-## v1.12.10 (2024-02-14)
-
-
-
-## v1.12.9 (2024-02-14)
-
-
-
-## v1.12.8 (2024-02-14)
+* Fix issue of goal command interacting with filename containing dot ([#424](https://github.com/algorandfoundation/algokit-cli/issues/424)) ([`22ece81`](https://github.com/algorandfoundation/algokit-cli/commit/22ece811af63c69734169029db1a477730d1e0ad))
 
 ### Documentation
 
-* Adr init wizard v2 and related improvements ([#411](https://github.com/PatrickDinh/algokit-cli/issues/411)) ([`8c5445a`](https://github.com/PatrickDinh/algokit-cli/commit/8c5445a558e503590fee636a9e5826026a5aacaf))
-
-## v1.12.7 (2024-02-13)
-
-
-
-## v1.12.6 (2024-02-13)
-
-
-
-## v1.12.5 (2024-02-13)
-
-
-
-## v1.12.4 (2024-02-13)
-
-
-
-## v1.12.3 (2024-02-13)
-
-
-
-## v1.12.2 (2024-02-13)
-
-
-
-## v1.12.1 (2024-02-13)
-
-
-
-## v1.12.0 (2024-02-13)
-
-### Feature
-
-* Only build for mac ([`174ba64`](https://github.com/PatrickDinh/algokit-cli/commit/174ba64aeb17ce3185e07dd36fee3e9eb4ff81a6))
+* Adr init wizard v2 and related improvements ([#411](https://github.com/algorandfoundation/algokit-cli/issues/411)) ([`8c5445a`](https://github.com/algorandfoundation/algokit-cli/commit/8c5445a558e503590fee636a9e5826026a5aacaf))
 
 ## v1.11.3 (2024-02-08)
 

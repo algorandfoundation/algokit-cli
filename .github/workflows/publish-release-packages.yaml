@@ -80,6 +80,46 @@ jobs:
         run: ls -la dist
 
       - name: Update homebrew cask
-        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macOS-ARM64-py3.12.tar.gz" "dist/algokit*-macOS-X64-py3.12.tar.gz" "PatrickDinh/homebrew-tap"
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos-arm64.tar.gz" "dist/algokit*-macos-x64.tar.gz" "PatrickDinh/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+
+  publish-chocolatey:
+    runs-on: windows-latest
+    if: ${{ inputs.do_chocolatey }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Download either via release or provided artifact
+      - name: Download release
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: gh release download ${{ inputs.release }} --pattern "*.whl" --dir dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Download artifact
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName }}
+          path: dist
+
+      - name: Update chocolatey files
+        id: update_chocolatey_files
+        run: scripts/update-chocolatey-package.ps1
+
+      - name: Build package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: pack --version ${{ steps.update_chocolatey_files.outputs.version }} .\scripts\chocolatey\algokit\algokit.nuspec
+
+      - name: Set API key
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: apikey --api-key ${{ secrets.CHOCOLATEY_API_KEY }} -source https://push.chocolatey.org/
+
+      - name: Push package
+        uses: crazy-max/ghaction-chocolatey@v2
+        with:
+          args: push --source https://push.chocolatey.org/

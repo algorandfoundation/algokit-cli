@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Fetch entire repository history so we can determine version number from it
           fetch-depth: 0
@@ -108,7 +108,7 @@ jobs:
           path: dist/algokit*-py3-none-any.whl
           if-no-files-found: error
 
-  upload-binaries:
+  build-and-upload-binaries:
     name: Build and Upload Binaries
     if: ${{ github.ref_name == 'main' }}
     uses: ./.github/workflows/build-binaries.yaml
@@ -125,5 +125,5 @@ jobs:
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
       wheelArtifactName: algokit-cli
-      binaryArtifactName: algokit-cli-macos-py3.12
+      binaryArtifactName: algokit-cli-macos
     secrets: inherit
