@@ -11,6 +11,7 @@ from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_pa
 from algokit.core.utils import find_valid_pipx_command
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
+MAX_BOOTSTRAP_DEPTH = 2
 logger = logging.getLogger(__name__)
 
 
@@ -34,15 +35,19 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
         bootstrap_npm(project_dir)
 
 
-def bootstrap_any_including_subdirs(base_path: Path, *, ci_mode: bool) -> None:
+def bootstrap_any_including_subdirs(
+    base_path: Path, *, ci_mode: bool, max_depth: int = MAX_BOOTSTRAP_DEPTH, depth: int = 0
+) -> None:
+    if depth > max_depth:
+        return
+
     bootstrap_any(base_path, ci_mode=ci_mode)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
-        if sub_dir.is_dir():
-            if sub_dir.name.lower() in [".venv", "node_modules", "__pycache__"]:
-                logger.debug(f"Skipping {sub_dir}")
-            else:
-                bootstrap_any(sub_dir, ci_mode=ci_mode)
+        if sub_dir.is_dir() and sub_dir.name.lower() not in [".venv", "node_modules", "__pycache__"]:
+            bootstrap_any_including_subdirs(sub_dir, ci_mode=ci_mode, max_depth=max_depth, depth=depth + 1)
+        else:
+            logger.debug(f"Skipping {sub_dir}")
 
 
 def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:

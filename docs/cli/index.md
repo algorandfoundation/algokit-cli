@@ -85,6 +85,7 @@
     - [--defaults](#--defaults)
     - [--bootstrap, --no-bootstrap](#--bootstrap---no-bootstrap)
     - [--ide, --no-ide](#--ide---no-ide)
+    - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
   - [localnet](#localnet)
     - [console](#console)
@@ -592,6 +593,12 @@ automatically open Visual Studio Code.
 This should be run in the parent directory that you want the project folder
 created in.
 
+By default, the --workspace flag creates projects within a workspace structure or integrates them into an existing
+one, promoting organized management of multiple projects. Alternatively,
+to disable this behavior use the --no-workspace flag, which ensures
+the new project is created in a standalone target directory. This is
+suitable for isolated projects or when workspace integration is unnecessary.
+
 ```shell
 algokit init [OPTIONS]
 ```
@@ -604,12 +611,12 @@ Name of the project / directory / repository to create.
 
 
 ### -t, --template <template_name>
-Name of an official template to use. To see a list of descriptions, run this command with no arguments.
+Name of an official template to use. To choose interactively, run this command with no arguments.
 
 
 * **Options**
 
-    beaker | tealscript | puya | react | fullstack | playground
+    tealscript | puya | react | fullstack | beaker | base | playground
 
 
 
@@ -639,6 +646,10 @@ Whether to run algokit bootstrap to install and configure the new project's depe
 
 ### --ide, --no-ide
 Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.
+
+
+### --workspace, --no-workspace
+Whether to prefer structuring standalone projects as part of a workspace.
 
 
 ### -a, --answer <key> <value>

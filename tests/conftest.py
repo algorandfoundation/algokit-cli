@@ -108,11 +108,13 @@ def _patch_questionary_prompts(monkeypatch: pytest.MonkeyPatch) -> None:
     ) -> None:
         print(f"? {message}")  # noqa: T201
         for choice in choices:
-            print(  # noqa: T201
-                (choice.value if choice.title is None else "".join([token[1] for token in choice.title]))
-                if isinstance(choice, questionary.Choice)
-                else choice
-            )
+            if isinstance(choice, questionary.Choice):
+                if isinstance(choice.title, str):
+                    print(choice.title)  # noqa: T201
+                elif isinstance(choice.title, list):
+                    print("".join([token[1] for token in choice.title]))  # noqa: T201
+            else:
+                print(choice)  # noqa: T201
 
     def log_prompt_confirm(message: str, *, default: bool) -> None:
         if default:

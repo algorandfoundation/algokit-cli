@@ -178,3 +178,5 @@ docs/cli/temp.md
 ci_token.txt
 
 .algokit/
+
+temp/
