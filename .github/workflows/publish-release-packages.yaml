@@ -126,4 +126,4 @@ jobs:
           echo 'Publishing to winget'
           # The below can be uncommented after we've manually created the first release on winget
           # & .\scripts\winget\update-package.ps1 `
-          #   -releaseVersionTag ${{ inputs.release }}
+          #   -releaseVersionTag '${{ inputs.release }}'

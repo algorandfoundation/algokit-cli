@@ -79,9 +79,9 @@ runs:
       shell: pwsh
       run: |
         & .\scripts\winget\build-installer.ps1 `
-          -binaryDir ${{ env.BINARY_BUILD_DIR }} `
-          -releaseVersion ${{ inputs.version }} `
-          -outputFile ${{ env.WINGET_INSTALLER }}
+          -binaryDir '${{ env.BINARY_BUILD_DIR }}' `
+          -releaseVersion '${{ inputs.version }}' `
+          -outputFile '${{ env.WINGET_INSTALLER }}'
 
     - name: Sign winget installer
       if: ${{ inputs.production_release == 'true' }}
