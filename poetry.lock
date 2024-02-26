@@ -582,21 +582,21 @@ files = [
 
 [[package]]
 name = "copier"
-version = "9.1.1"
+version = "9.0.1"
 description = "A library for rendering project templates."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "copier-9.1.1-py3-none-any.whl", hash = "sha256:d6983127a7d1af7970bf8d5a50948ca6057a592a87ed4b39eaf6a86b8746fa2a"},
-    {file = "copier-9.1.1.tar.gz", hash = "sha256:1127771e33d00453bdc716ab314b06c11bd0925815ab1e1010c03278d7934ebd"},
+    {file = "copier-9.0.1-py3-none-any.whl", hash = "sha256:0c5d0a0de372e1b0cb9f0f19988fadf6f652a5df78931ef5e9206b27fab8766e"},
+    {file = "copier-9.0.1.tar.gz", hash = "sha256:eaf525bbccad7acc66fb11ff52f1a96bf32b2470389d3c077c21e339b755842e"},
 ]
 
 [package.dependencies]
-colorama = ">=0.4.6"
+colorama = ">=0.4.3"
 decorator = ">=5.1.1"
-dunamai = {version = ">=1.7.0", markers = "python_version < \"4\""}
+dunamai = ">=1.7.0"
 funcy = ">=1.17"
-jinja2 = ">=3.1.3"
+jinja2 = ">=3.1.1"
 jinja2-ansible-filters = ">=1.3.1"
 packaging = ">=23.0"
 pathspec = ">=0.9.0"
