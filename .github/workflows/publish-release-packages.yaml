@@ -18,7 +18,7 @@ on:
         description: "Publish to brew repository"
       do_chocolatey:
         required: false
-        default: true
+        default: false
         type: boolean
         description: "Publish to Chocolatey repository"
   workflow_dispatch:
@@ -80,7 +80,7 @@ jobs:
         run: ls -la dist
 
       - name: Update homebrew cask
-        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos-arm64.tar.gz" "dist/algokit*-macos-x64.tar.gz" "PatrickDinh/homebrew-tap"
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos_arm64.tar.gz" "dist/algokit*-macos_x64.tar.gz" "PatrickDinh/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
 
