@@ -91,11 +91,11 @@ create_cask() {
 
 cat << EOF > $cask_file
 cask "$package_name" do
-  arch arm: "ARM64", intel: "X64"
+  arch arm: "arm64", intel: "x64"
   version "$version"
   sha256 arm: "$arm_sha256", intel: "$intel_sha256"
 
-  url "$repo/releases/download/v#{version}/algokit-v#{version}-macOS-#{arch}.tar.gz"
+  url "$repo/releases/download/v#{version}/algokit-v#{version}-macos_#{arch}.tar.gz"
   name "$package_name"
   desc "$desc"
   homepage "$homepage"
