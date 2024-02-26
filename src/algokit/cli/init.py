@@ -127,21 +127,17 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.PUYA: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-puya-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
-            branch="poc/wizard_v2",
         ),
         TemplateKey.REACT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
-            branch="poc/wizard_v2",
         ),
         TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
-            branch="poc/wizard_v2",
         ),
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
-            branch="feat/wizard_v2",
             description="Official template for starter or production Beaker applications.",
         ),
         TemplateKey.BASE: BlessedTemplateSource(
