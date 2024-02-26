@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         # macos-14 is the Apple Silicon M1 runner
-        os: [macos-latest, macos-14]
+        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
 
     steps:
       - name: Checkout source code
@@ -73,13 +73,6 @@ jobs:
           version: ${{ env.RELEASE_VERSION }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-      - name: Install Apple Developer Id Cert
-        if: runner.os == 'macOS'
-        uses: ./.github/actions/install-apple-dev-id-cert
-        with:
-          cert_data: ${{ secrets.APPLE_CERT_DATA }}
-          cert_password: ${{ secrets.APPLE_CERT_PASSWORD }}
-
       - name: Build macOS binary
         if: ${{ runner.os == 'macOS' }}
         uses: ./.github/actions/build-binaries/macos
@@ -87,11 +80,6 @@ jobs:
           package_name: ${{ env.PACKAGE_NAME }}
           version: ${{ env.RELEASE_VERSION }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
-          apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
-          apple_bundle_id: ${{ inputs.production_release == 'true' && vars.APPLE_BUNDLE_ID || format('beta.{0}', vars.APPLE_BUNDLE_ID) }}
-          apple_cert_id: ${{ secrets.APPLE_CERT_ID }}
-          apple_notary_user: ${{ secrets.APPLE_NOTARY_USER }}
-          apple_notary_password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
 
       - name: Add binary to path
         run: |

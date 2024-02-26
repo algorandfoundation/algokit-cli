@@ -2,52 +2,6 @@
 
 <!--next-version-placeholder-->
 
-## v2.0.9 (2024-02-26)
-
-
-
-## v2.0.8 (2024-02-26)
-
-
-
-## v2.0.7 (2024-02-26)
-
-
-
-## v2.0.6 (2024-02-26)
-
-
-
-## v2.0.5 (2024-02-26)
-
-
-
-## v2.0.4 (2024-02-26)
-
-
-
-## v2.0.3 (2024-02-26)
-
-
-
-## v2.0.2 (2024-02-26)
-
-
-
-## v2.0.1 (2024-02-26)
-
-
-
-## v2.0.0 (2024-02-26)
-
-### Feature
-
-* Bump ([`78d4b7e`](https://github.com/PatrickDinh/algokit-cli/commit/78d4b7e95009cade0abc776407229c25bc1c3417))
-
-### Breaking
-
-* bump ([`78d4b7e`](https://github.com/PatrickDinh/algokit-cli/commit/78d4b7e95009cade0abc776407229c25bc1c3417))
-
 ## v1.11.4 (2024-02-19)
 
 ### Fix
