@@ -58,6 +58,8 @@ docs_title = {shell = "(echo \"# AlgoKit CLI Reference Documentation\\n\\n\"; ca
 docs = ["docs_generate", "docs_toc", "docs_title"]
 package_unix = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config:multiformats_config/' --add-data './src/algokit/resources:algokit/resources/'"
 package_windows = { cmd = "scripts/package_windows.bat" }
+package_mac = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config/multibase-table.json:multiformats_config/' --add-data './misc/multiformats_config/multicodec-table.json:multiformats_config/' --osx-bundle-identifier '$APPLE_BUNDLE_ID' --codesign-identity '$APPLE_CERT_ID' --osx-entitlements-file './entitlements.xml'"
+
 [tool.ruff]
 line-length = 120
 lint.select = [
