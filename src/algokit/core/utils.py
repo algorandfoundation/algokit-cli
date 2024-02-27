@@ -39,8 +39,8 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 
     try:
         socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
     except OSError:
         return False
 
