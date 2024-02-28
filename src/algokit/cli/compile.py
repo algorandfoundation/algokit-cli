@@ -16,6 +16,7 @@ def compile_group() -> None:
 @compile_group.command(
     "py",
     short_help="Compile Python to TEAL with PuyaPy",
+    help="Compile Python to TEAL with PuyaPy, review https://github.com/algorandfoundation/puya for usage",
     context_settings={
         "ignore_unknown_options": True,
     },
