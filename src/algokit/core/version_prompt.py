@@ -1,12 +1,13 @@
+import importlib.resources as importlib_resources
 import logging
 import re
 from datetime import timedelta
-from pathlib import Path
 from time import time
 
 import click
 import httpx
 
+from algokit import __name__ as algokit_name
 from algokit.core.conf import get_app_config_dir, get_app_state_dir, get_current_package_version
 from algokit.core.utils import is_binary_mode
 
@@ -26,6 +27,9 @@ BINARY_DISTRIBUTION_RELEASE_VERSION = "99.99.99"
 
 
 def do_version_prompt() -> None:
+    test = _get_distribution_method()
+    logger.error(test)
+
     if _skip_version_prompt():
         logger.debug("Version prompt disabled")
         return
@@ -39,6 +43,7 @@ def do_version_prompt() -> None:
     current_version_sequence = _get_version_sequence(current_version)
     if current_version_sequence < _get_version_sequence(latest_version):
         update_instruction = UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
+
         if is_binary_mode():
             distribution = _get_distribution_method()
             update_instruction = DISTRIBUTION_METHOD_UPDATE_COMMAND.get(
@@ -112,11 +117,9 @@ def _skip_version_prompt() -> bool:
 
 
 def _get_distribution_method() -> str:
-    if not is_binary_mode():
-        file_path = Path(__file__).resolve().parents[3] / "misc" / "distribution-method"
-    else:
-        file_path = Path(__file__).resolve().parents[2] / "algokit" / "distribution-method"
-    with Path.open(file_path) as file:
+    file_path = importlib_resources.files(algokit_name) / "resources" / "distribution-method"
+
+    with file_path.open("r", encoding="utf-8", errors="strict") as file:
         content = file.read().strip()
 
         if content in ["snap", "winget", "brew"]:
