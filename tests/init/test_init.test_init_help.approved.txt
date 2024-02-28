@@ -12,12 +12,19 @@ Usage: algokit init [OPTIONS]
   This should be run in the parent directory that you want the project folder
   created in.
 
+  By default, the `--workspace` flag creates projects within a workspace
+  structure or integrates them into an existing one, promoting organized
+  management of multiple projects. Alternatively, to disable this behavior use
+  the `--no-workspace` flag, which ensures the new project is created in a
+  standalone target directory. This is suitable for isolated projects or when
+  workspace integration is unnecessary.
+
 Options:
   -n, --name TEXT                 Name of the project / directory / repository
                                   to create.
-  -t, --template [simple|beaker|beaker_with_version]
-                                  Name of an official template to use. To see a
-                                  list of descriptions, run this command with no
+  -t, --template [simple|beaker|beaker_with_version|fullstack|puya|react|base]
+                                  Name of an official template to use. To choose
+                                  interactively, run this command with no
                                   arguments.
   --template-url URL              URL to a git repo with a custom project
                                   template.
@@ -39,6 +46,8 @@ Options:
   --ide / --no-ide                Whether to open an IDE for you if the IDE and
                                   IDE config are detected. Supported IDEs: VS
                                   Code.
+  --workspace / --no-workspace    Whether to prefer structuring standalone
+                                  projects as part of a workspace.
   -a, --answer <key> <value>      Answers key/value pairs to pass to the
                                   template.
   -h, --help                      Show this message and exit.

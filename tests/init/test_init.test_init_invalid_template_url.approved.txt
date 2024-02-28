@@ -1,2 +1,4 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 ERROR: Couldn't parse repo URL https://www.google.com. Try prefixing it with git+ ?
 🛑 Bailing out... 👋
