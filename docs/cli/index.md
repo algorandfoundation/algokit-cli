@@ -294,7 +294,7 @@ algokit compile [OPTIONS] COMMAND [ARGS]...
 
 ### py
 
-Compile Python contract(s) with PuyaPy
+Compile Python to TEAL with PuyaPy, review [https://github.com/algorandfoundation/puya](https://github.com/algorandfoundation/puya) for usage
 
 ```shell
 algokit compile py [OPTIONS] [PUYA_ARGS]...
