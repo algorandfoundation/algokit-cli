@@ -23,8 +23,6 @@ runs:
       run: |
         cd dist/algokit/
         tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz *
-        echo snap > ./_internal/algokit/distribution-method
-        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-snap.tar.gz *
         cd ../..
 
     - name: Upload binary artifact
@@ -32,9 +30,3 @@ runs:
       with:
         name: ${{ inputs.package_name }}
         path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz
-
-    - name: Upload binary artifact (snap)
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ inputs.package_name }}-snap
-        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-snap.tar.gz

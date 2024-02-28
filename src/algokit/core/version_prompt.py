@@ -41,8 +41,10 @@ def do_version_prompt() -> None:
         update_instruction = UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
         if is_binary_mode():
             distribution = _get_distribution_method()
-            update_instruction = DISTRIBUTION_METHOD_UPDATE_COMMAND.get(
-                distribution, UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
+            update_instruction = (
+                DISTRIBUTION_METHOD_UPDATE_COMMAND.get(distribution, UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION)
+                if distribution
+                else UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
             )
         # If you're not using the binary mode, then you've used pipx to install AlgoKit.
         # One exception is that older versions of the brew package used pipx,
@@ -111,18 +113,15 @@ def _skip_version_prompt() -> bool:
     return disable_marker.exists()
 
 
-def _get_distribution_method() -> str:
-    if not is_binary_mode():
-        file_path = Path(__file__).resolve().parents[3] / "misc" / "distribution-method"
-    else:
-        file_path = Path(__file__).resolve().parents[2] / "algokit" / "distribution-method"
+def _get_distribution_method() -> str | None:
+    file_path = Path(__file__).resolve().parents[2] / "algokit" / "distribution-method"
     with Path.open(file_path) as file:
         content = file.read().strip()
 
         if content in ["snap", "winget", "brew"]:
             return content
         else:
-            return "manual"
+            return None
 
 
 skip_version_check_option = click.option(
