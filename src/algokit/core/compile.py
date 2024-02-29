@@ -5,14 +5,14 @@ from algokit.core.utils import extract_version_triple, find_valid_pipx_command
 
 
 def find_valid_puyapy_command(version: str | None) -> list[str]:
-    return (
-        _find_puya_command_with_version_specifier(version)
-        if version is not None
-        else _find_puya_command_without_version_specifier()
-    )
+    return _find_puya_command_at_version(version) if version is not None else _find_puya_command()
 
 
-def _find_puya_command_with_version_specifier(version: str) -> list[str]:
+def _find_puya_command_at_version(version: str) -> list[str]:
+    """
+    Find puya command with a specific version.
+    If the puya version isn't installed, install it with pipx run.
+    """
     for puyapy_command in _get_candidates_puyapy_commands():
         try:
             puyapy_version_result = run([*puyapy_command, "--version"])
@@ -37,7 +37,11 @@ def _find_puya_command_with_version_specifier(version: str) -> list[str]:
     ]
 
 
-def _find_puya_command_without_version_specifier() -> list[str]:
+def _find_puya_command() -> list[str]:
+    """
+    Find puya command.
+    If puya isn't installed, install the latest version with pipx.
+    """
     for puyapy_command in _get_candidates_puyapy_commands():
         try:
             puyapy_help_result = run([*puyapy_command, "-h"])
