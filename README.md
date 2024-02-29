@@ -104,35 +104,18 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 ## Install AlgoKit on Windows
 
-> **Note**
-> This method will install the most recent python3 version [via winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/). If you already have python 3.10+ installed, you may [prefer to use pipx directly instead](#install-algokit-with-pipx-on-any-os) so you can control the python version used.
-
 1. Ensure prerequisites are installed
 
+   - [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
      > **Note**
      > See [our LocalNet documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
-
-2. Install using WinGet
-
-   1. Install python: `winget install python.python.3.11`
-   2. Restart the terminal to ensure Python and pip are available on the path
-
-      > **Note**
-      > Windows has a feature called **App Execution Aliases** that provides redirects for the Python command that guide users to the
-      > Windows Store. Unfortunately these aliases can prevent normal execution of Python if Python is installed via other means, to disable them
-      > search for **Manage app execution aliases** from the start menu, and then turn off entries listed as
-      > **App Installer python.exe** or **App Installer python3.exe**.
-
-   3. Install pipx:
-      ```
-      pip install --user pipx
-      python -m pipx ensurepath
-      ```
-   4. Restart the terminal to ensure pipx is available on the path
-   5. Install AlgoKit via pipx: `pipx install algokit`
-   6. Restart the terminal to ensure AlgoKit is available on the path
+     
+2. Install using winget
+    ```shell
+    winget install AlgoKit
+    ```
 
 3. [Verify installation](#verify-installation)
 
@@ -140,13 +123,10 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 Some useful commands for updating or removing AlgoKit in the future.
 
-- To update AlgoKit: `pipx upgrade algokit`
-- To remove AlgoKit: `pipx uninstall algokit`
+- To update AlgoKit: `winget upgrade AlgoKit`
+- To remove AlgoKit: `winget uninstall AlgoKit`
 
 ## Install AlgoKit on Mac
-
-> **Note**
-> This method will install Python 3.10 as a dependency via Homebrew. If you already have python installed, you may prefer to use `pipx install algokit` as explained [here](#install-algokit-with-pipx-on-any-os).
 
 1. Ensure prerequisites are installed
 
@@ -156,7 +136,10 @@ Some useful commands for updating or removing AlgoKit in the future.
      > **Note**
      > Docker requires MacOS 11+
 
-2. Install using Homebrew `brew install algorandfoundation/tap/algokit`
+2. Install using Homebrew 
+    ```shell
+    brew install algorandfoundation/tap/algokit
+    ```
 3. Restart the terminal to ensure AlgoKit is available on the path
 4. [Verify installation](#verify-installation)
 
@@ -171,16 +154,22 @@ Some useful commands for updating or removing AlgoKit in the future.
 
 1. Ensure prerequisites are installed
 
-   - [Python 3.10+](https://www.python.org/downloads/)
-
-     > **Note**
-     > There is probably a better way to install Python than to download it directly, e.g. your local Linux package manager
-
-   - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
+   - [Snap](https://snapcraft.io/docs/installing-snapd)
    - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
 
-2. Continue with step 2 in the following section to install via [pipx](#install-algokit-with-pipx-on-any-os)
+2. Install using snap
+    ```shell
+    snap install algokit --classic
+    ```
+3. [Verify installation](#verify-installation)
+
+### Maintenance
+
+Some useful commands for updating or removing AlgoKit in the future.
+
+- To update AlgoKit: `snap refresh algokit`
+- To remove AlgoKit: `snap remove --purge algokit`
 
 ## Install AlgoKit with pipx on any OS
 
@@ -191,7 +180,10 @@ Some useful commands for updating or removing AlgoKit in the future.
    - [Git](https://github.com/git-guides/install-git)
    - [Docker](https://docs.docker.com/get-docker/)
 
-2. Install using pipx `pipx install algokit`
+2. Install using pipx 
+    ```shell
+    pipx install algokit
+    ```
 3. Restart the terminal to ensure AlgoKit is available on the path
 4. [Verify installation](#verify-installation)
 
