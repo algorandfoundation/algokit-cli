@@ -286,7 +286,7 @@ algokit bootstrap poetry [OPTIONS]
 
 ## compile
 
-Compile smart contracts to TEAL
+Compile high level language smart contracts to TEAL
 
 ```shell
 algokit compile [OPTIONS] COMMAND [ARGS]...
