@@ -30,12 +30,32 @@ def test_puyapy_is_not_installed_anywhere(hello_world_contract_path: Path, mocke
     proc_mock.should_bad_exit_on(["puyapy", "-h"], exit_code=1, output=["Puyapy not found"])
 
     proc_mock.set_output(["pipx", "--version"], ["1.0.0"])
+
     proc_mock.set_output(["pipx", "install", "puya"], ["Puyapy is installed"])
     proc_mock.set_output(["puyapy", str(hello_world_contract_path)], ["Done"])
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
     result = invoke(f"compile py {_normalize_path(hello_world_contract_path)}")
+
+    assert result.exit_code == 0
+    verify(result.output)
+
+
+def test_specificed_puyapy_version_is_not_installed(hello_world_contract_path: Path, mocker: MockerFixture) -> None:
+    current_version = "1.0.0"
+    target_version = "1.1.0"
+
+    proc_mock = ProcMock()
+    proc_mock.set_output(["poetry", "run", "puyapy", "--version"], output=[current_version])
+    proc_mock.should_bad_exit_on(["puyapy", "--version"], exit_code=1, output=["Puyapy not found"])
+
+    proc_mock.set_output(["pipx", "--version"], ["1.0.0"])
+    proc_mock.set_output(["pipx", "run", f"puya=={target_version}", str(hello_world_contract_path)], ["Done"])
+
+    mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
+
+    result = invoke(f"compile py {_normalize_path(hello_world_contract_path)} --version {target_version}")
 
     assert result.exit_code == 0
     verify(result.output)
