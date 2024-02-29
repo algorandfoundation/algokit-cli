@@ -83,24 +83,26 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
-
-AlgoKit also has some runtime dependencies that also need to be available for particular commands.
+AlgoKit has some runtime dependencies that also need to be available for particular commands.
 
 > **Note**
-> You can still install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
+> You can still install and use AlgoKit without these dependencies, and AlgoKit will tell you if you are missing one for a given command.
 
 - Git - Git is used when creating and updating projects from templates
 - Docker - Docker Compose (and by association, Docker) is used to run the AlgoKit LocalNet environment, we require Docker Compose 2.5.0+
 
+> **Note**
+> If you are using pipx to install AlgoKit, the key required dependency is Python 3.10+.
+> However, it is not recommended to install AlgoKit using pipx.
+
 ## Cross-platform installation
 
-AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/) see below for specific installation instructions.
+AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/). See below for specific installation instructions.
 
 - [Windows](#install-algokit-on-windows)
 - [Mac](#install-algokit-on-mac)
 - [Linux](#install-algokit-on-linux)
-- [pipx](#install-algokit-with-pipx-on-any-os)
+- [pipx](#install-algokit-with-pipx-on-any-os) (not recommended, but available for advanced users)
 
 ## Install AlgoKit on Windows
 
@@ -154,7 +156,7 @@ Some useful commands for updating or removing AlgoKit in the future.
 
 1. Ensure prerequisites are installed
 
-   - [Snap](https://snapcraft.io/docs/installing-snapd)
+   - [Snap](https://snapcraft.io/docs/installing-snapd) (should already be available on Ubuntu 16.04.4 LTS (Xenial Xerus) or later)
    - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
 
