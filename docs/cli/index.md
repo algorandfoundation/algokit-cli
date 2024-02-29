@@ -304,7 +304,7 @@ algokit compile py [OPTIONS] [PUYA_ARGS]...
 
 
 ### -v, --version <version>
-PuyaPy compiler version. Default to latest
+PuyaPy compiler version, for example, 0.6.0. Default to latest
 
 ### Arguments
 

@@ -5,16 +5,23 @@ from algokit.core.utils import extract_version_triple, find_valid_pipx_command
 
 
 def find_valid_puyapy_command(version: str | None) -> list[str]:
-    puya_version_triple = extract_version_triple(version) if version is not None else None
+    return (
+        _find_puya_command_with_version_specifier(version)
+        if version is not None
+        else _find_puya_command_without_version_specifier()
+    )
 
+
+def _find_puya_command_with_version_specifier(version: str) -> list[str]:
     for puyapy_command in _get_candidates_puyapy_commands():
         try:
             puyapy_version_result = run([*puyapy_command, "--version"])
         except OSError:
             pass  # in case of path/permission issues, go to next candidate
         else:
-            version_output_triple = extract_version_triple(puyapy_version_result.output)
-            if puya_version_triple is None or version_output_triple == puya_version_triple:
+            if puyapy_version_result.exit_code == 0 and (
+                extract_version_triple(version) == extract_version_triple(puyapy_version_result.output)
+            ):
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
@@ -22,15 +29,31 @@ def find_valid_puyapy_command(version: str | None) -> list[str]:
         "please install pipx via https://pypa.github.io/pipx/ "
         "and then try `algokit compile py ...` again."
     )
-    if puya_version_triple is None:
-        _install_puyapy_with_pipx(pipx_command)
-        return ["puyapy"]
-    else:
-        return [
-            *pipx_command,
-            "run",
-            "puya" if puya_version_triple is None else f"puya=={puya_version_triple}",
-        ]
+
+    return [
+        *pipx_command,
+        "run",
+        f"puya=={version}",
+    ]
+
+
+def _find_puya_command_without_version_specifier() -> list[str]:
+    for puyapy_command in _get_candidates_puyapy_commands():
+        try:
+            puyapy_help_result = run([*puyapy_command, "-h"])
+        except OSError:
+            pass  # in case of path/permission issues, go to next candidate
+        else:
+            if puyapy_help_result.exit_code == 0:
+                return puyapy_command
+
+    pipx_command = find_valid_pipx_command(
+        "Unable to find pipx install so that `PuyaPy` compiler can be installed; "
+        "please install pipx via https://pypa.github.io/pipx/ "
+        "and then try `algokit compile py ...` again."
+    )
+    _install_puyapy_with_pipx(pipx_command)
+    return ["puyapy"]
 
 
 def _install_puyapy_with_pipx(pipx_command: list[str]) -> None:
