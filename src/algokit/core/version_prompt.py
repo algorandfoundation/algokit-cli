@@ -114,7 +114,7 @@ def _skip_version_prompt() -> bool:
 
 
 def _get_distribution_method() -> str | None:
-    file_path = Path(__file__).resolve().parents[2] / "algokit" / "distribution-method"
+    file_path = Path(__file__).parent.parent / "distribution-method"
     with Path.open(file_path) as file:
         content = file.read().strip()
 
