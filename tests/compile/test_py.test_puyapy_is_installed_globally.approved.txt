@@ -1,0 +1,6 @@
+DEBUG: Running 'poetry run puyapy -h' in '{current_working_directory}'
+DEBUG: poetry: Puyapy not found
+DEBUG: Running 'puyapy -h' in '{current_working_directory}'
+DEBUG: puyapy: Puyapy help
+DEBUG: Running 'puyapy {current_working_directory}/tests/compile/hello_world_contract.py' in '{current_working_directory}'
+DEBUG: puyapy: Done
