@@ -27,7 +27,7 @@ def compile_group() -> None:
     "version",
     required=False,
     default=None,
-    help=("PuyaPy compiler version. " "Default to latest"),
+    help=("PuyaPy compiler version. Default to latest"),
 )
 @click.argument("puya_args", nargs=-1, type=click.UNPROCESSED)
 def compile_py_command(version: str | None, puya_args: list[str]) -> None:

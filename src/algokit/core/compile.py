@@ -14,7 +14,7 @@ def find_valid_puyapy_command(version: str | None) -> list[str]:
             pass  # in case of path/permission issues, go to next candidate
         else:
             version_output_triple = extract_version_triple(puyapy_version_result.output)
-            if version is None or version_output_triple == puya_version_triple:
+            if puya_version_triple is None or version_output_triple == puya_version_triple:
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
