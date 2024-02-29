@@ -65,6 +65,18 @@ When you want more control, named LocalNet instances can be used by running `alg
 Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
 If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
 
+### Named LocalNet Configuration Directory
+
+Upon running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific folder on your system. The location of this folder depends on your operating system:
+
+- **Windows**: The configuration files are stored in the `APPDATA` folder. 
+- **Linux or Mac**: The configuration files are stored in the `XDG_CONFIG_HOME` directory if it is set. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
+
+Inside the designated configuration folder, you will find a folder named `algokit` which contains the default sandbox hosting default configuration settings. Additionally, you will find folders named `sandbox{custom-name}` for each named LocalNet instance you have created. These folders contain the specific configuration settings for the respective named LocalNet instances.
+
+It is important to note that the configuration files are stored in a way that ensures separation between the default LocalNet environment and any named LocalNet environments you may create. This allows for more control and customization of your development environments.
+
+
 ### Stopping and Resetting the LocalNet
 
 To stop the LocalNet you can execute `algokit localnet stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit localnet start`.
