@@ -35,7 +35,7 @@ def test_puyapy_not_installed_anywhere(hello_world_contract_path: Path, mocker: 
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
-    result = invoke(f"compile py {hello_world_contract_path}")
+    result = invoke(f"compile py {_normalize_path(hello_world_contract_path)}")
 
     assert result.exit_code == 0
     verify(result.output)
