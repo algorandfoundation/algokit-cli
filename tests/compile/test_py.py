@@ -31,7 +31,7 @@ def test_puyapy_not_installed_anywhere(hello_world_contract_path: Path, mocker: 
 
     proc_mock.set_output(["pipx", "--version"], ["1.0.0"])
     proc_mock.set_output(["pipx", "install", "puya"], ["Puyapy is installed"])
-    proc_mock.set_output(["puyapy", _normalize_path(hello_world_contract_path)], ["Done"])
+    proc_mock.set_output(["puyapy", str(hello_world_contract_path)], ["Done"])
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
