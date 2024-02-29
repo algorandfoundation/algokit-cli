@@ -1,12 +1,13 @@
+import importlib.resources as importlib_resources
 import logging
 import re
 from datetime import timedelta
-from pathlib import Path
 from time import time
 
 import click
 import httpx
 
+from algokit import __name__ as algokit_name
 from algokit.core.conf import get_app_config_dir, get_app_state_dir, get_current_package_version
 from algokit.core.utils import is_binary_mode
 
@@ -114,8 +115,8 @@ def _skip_version_prompt() -> bool:
 
 
 def _get_distribution_method() -> str | None:
-    file_path = Path(__file__).parent.parent / "distribution-method"
-    with Path.open(file_path) as file:
+    file_path = importlib_resources.files(algokit_name) / "resources" / "distribution-method"
+    with file_path.open("r", encoding="utf-8", errors="strict") as file:
         content = file.read().strip()
 
         if content in ["snap", "winget", "brew"]:
