@@ -93,7 +93,7 @@ AlgoKit has some runtime dependencies that also need to be available for particu
 
 > **Note**
 > If you are using pipx to install AlgoKit, the key required dependency is Python 3.10+.
-> However, it is not recommended to install AlgoKit using pipx.
+
 
 ## Cross-platform installation
 
@@ -102,7 +102,7 @@ AlgoKit can be installed using OS specific package managers, or using the python
 - [Windows](#install-algokit-on-windows)
 - [Mac](#install-algokit-on-mac)
 - [Linux](#install-algokit-on-linux)
-- [pipx](#install-algokit-with-pipx-on-any-os) (not recommended, but available for advanced users)
+- [pipx](#install-algokit-with-pipx-on-any-os)
 
 ## Install AlgoKit on Windows
 
@@ -116,7 +116,7 @@ AlgoKit can be installed using OS specific package managers, or using the python
      
 2. Install using winget
     ```shell
-    winget install AlgoKit
+    winget install algokit
     ```
 
 3. [Verify installation](#verify-installation)
