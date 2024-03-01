@@ -40,7 +40,7 @@ def test_init_bootstrap_broken_poetry(
 
     result = invoke(
         f"init -n {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes --bootstrap",
+        " --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
 
@@ -61,7 +61,7 @@ def test_init_bootstrap_version_fail(
 
     result = invoke(
         f"init -n {app_name} --no-git --template-url '{GIT_BUNDLE_PATH}' --UNSAFE-SECURITY-accept-template-url"
-        " --answer greeting hi --answer include_extra_file yes --bootstrap",
+        " --answer greeting hi --answer include_extra_file yes --bootstrap --no-workspace",
         cwd=cwd,
     )
 

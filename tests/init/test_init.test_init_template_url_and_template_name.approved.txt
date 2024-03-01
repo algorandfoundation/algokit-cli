@@ -1,1 +1,3 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Error: Cannot specify both --template and --template-url

@@ -1,7 +1,9 @@
 import logging
 import re
 import shutil
+from collections.abc import Callable
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import NoReturn
 
@@ -10,7 +12,13 @@ import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.bootstrap import bootstrap_any_including_subdirs, project_minimum_algokit_version_check
+from algokit.core.bootstrap import (
+    MAX_BOOTSTRAP_DEPTH,
+    bootstrap_any_including_subdirs,
+    project_minimum_algokit_version_check,
+)
+from algokit.core.conf import get_algokit_config
+from algokit.core.init import ProjectType, get_git_user_info, is_valid_project_dir_name
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
@@ -18,7 +26,7 @@ from algokit.core.utils import get_python_paths
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_ANSWERS: dict[str, str] = {
+DEFAULT_STATIC_ANSWERS: dict[str, str] = {
     "algod_token": DEFAULT_ALGOD_TOKEN,
     "algod_server": DEFAULT_ALGOD_SERVER,
     "algod_port": str(DEFAULT_ALGOD_PORT),
@@ -26,7 +34,55 @@ DEFAULT_ANSWERS: dict[str, str] = {
     "indexer_server": DEFAULT_ALGOD_SERVER,
     "indexer_port": str(DEFAULT_INDEXER_PORT),
 }
+DEFAULT_DYNAMIC_ANSWERS: dict[str, Callable[[], str]] = {
+    "author_name": lambda: get_git_user_info("name") or "John Doe",
+    "author_email": lambda: get_git_user_info("email") or "my@mail.com",
+}
+
+
+def _get_default_answers() -> dict[str, str]:
+    """get all default answers"""
+    return {**DEFAULT_STATIC_ANSWERS, **{k: v() for k, v in DEFAULT_DYNAMIC_ANSWERS.items()}}
+
+
 """Answers that are not really answers, but useful to pass through to templates in case they want to make use of them"""
+
+
+class TemplatePresetType(str, Enum):
+    """
+    For distinguishing main template preset type question invoked by `algokit init`
+    """
+
+    SMART_CONTRACT = "Smart Contracts 📜"
+    DAPP_FRONTEND = "DApp Frontend 🖥️"
+    SMART_CONTRACT_AND_DAPP_FRONTEND = "Smart Contracts & DApp Frontend 🎛️"
+    CUSTOM_TEMPLATE = "Custom Template 🛠️"
+
+
+class ContractLanguage(Enum):
+    """
+    For programming languages that have corresponding smart contract languages
+    python -> puya
+    typescript -> tealscript
+    """
+
+    PYTHON = "Python 🐍"
+    TYPESCRIPT = "TypeScript 📘"
+    PYTEAL = "PyTeal 🔧"
+
+
+class TemplateKey(str, Enum):
+    """
+    For templates included in wizard v2 by default
+    """
+
+    BASE = "base"
+    PUYA = "puya"
+    TEALSCRIPT = "tealscript"
+    FULLSTACK = "fullstack"
+    REACT = "react"
+    BEAKER = "beaker"
+    PLAYGROUND = "playground"
 
 
 @dataclass(kw_only=True)
@@ -35,6 +91,8 @@ class TemplateSource:
     commit: str | None = None
     """when adding a blessed template that is verified but not controlled by Algorand,
     ensure a specific commit is used"""
+    branch: str | None = None
+    answers: list[tuple[str, str]] | None = None
 
     def __str__(self) -> str:
         if self.commit:
@@ -46,31 +104,47 @@ class TemplateSource:
 class BlessedTemplateSource(TemplateSource):
     description: str
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BlessedTemplateSource):
+            return NotImplemented
+        return self.description == other.description and self.url == other.url
 
-# this is a function so we can modify the values in unit tests
-def _get_blessed_templates() -> dict[str, BlessedTemplateSource]:
+
+LANGUAGE_TO_TEMPLATE_MAP = {
+    ContractLanguage.PYTHON: TemplateKey.PUYA,
+    ContractLanguage.TYPESCRIPT: TemplateKey.TEALSCRIPT,
+    ContractLanguage.PYTEAL: TemplateKey.BEAKER,
+}
+
+
+# Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
+def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
     return {
-        "beaker": BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for starter or production Beaker applications.",
-        ),
-        "tealscript": BlessedTemplateSource(
+        TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
         ),
-        "puya": BlessedTemplateSource(
+        TemplateKey.PUYA: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-puya-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
         ),
-        "react": BlessedTemplateSource(
+        TemplateKey.REACT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
         ),
-        "fullstack": BlessedTemplateSource(
+        TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
-            description="Official template for starter or production fullstack applications (React + Beaker).",
+            description="Official template for starter or production fullstack applications.",
         ),
-        "playground": BlessedTemplateSource(
+        TemplateKey.BEAKER: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-beaker-default-template",
+            description="Official template for starter or production Beaker applications.",
+        ),
+        TemplateKey.BASE: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-base-template",
+            description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
+        ),
+        TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
             description="Official template showcasing a number of small example applications and demos.",
         ),
@@ -85,10 +159,10 @@ _unofficial_template_warning = (
 
 
 def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    if value is not None and not re.match(r"^[\w\-.]+$", value):
+    if value is not None and not is_valid_project_dir_name(value):
         raise click.BadParameter(
-            "Received invalid value for directory name; "
-            "expected a mix of letters (a-z, A-Z), numbers (0-9), dashes (-), periods (.) and/or underscores (_)",
+            "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
+            "periods, and/or underscores, and not already used.",
             context,
             param,
         )
@@ -108,9 +182,9 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "template_name",
     "--template",
     "-t",
-    type=click.Choice(list(_get_blessed_templates())),
+    type=click.Choice([k.value for k in _get_blessed_templates()]),
     default=None,
-    help="Name of an official template to use. To see a list of descriptions, run this command with no arguments.",
+    help="Name of an official template to use. To choose interactively, run this command with no arguments.",
 )
 @click.option(
     "--template-url",
@@ -158,6 +232,13 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     help="Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.",
 )
 @click.option(
+    "use_workspace",
+    "--workspace/--no-workspace",
+    is_flag=True,
+    default=True,
+    help="Whether to prefer structuring standalone projects as part of a workspace.",
+)
+@click.option(
     "answers",
     "--answer",
     "-a",
@@ -178,6 +259,7 @@ def init_command(  # noqa: PLR0913
     answers: list[tuple[str, str]],
     use_defaults: bool,
     run_bootstrap: bool | None,
+    use_workspace: bool,
     open_ide: bool,
 ) -> None:
     """
@@ -192,6 +274,12 @@ def init_command(  # noqa: PLR0913
 
     This should be run in the parent directory that you want the project folder
     created in.
+
+    By default, the `--workspace` flag creates projects within a workspace structure or integrates them into an existing
+    one, promoting organized management of multiple projects. Alternatively,
+    to disable this behavior use the `--no-workspace` flag, which ensures
+    the new project is created in a standalone target directory. This is
+    suitable for isolated projects or when workspace integration is unnecessary.
     """
 
     if not shutil.which("git"):
@@ -201,7 +289,7 @@ def init_command(  # noqa: PLR0913
         )
 
     # parse the input early to prevent frustration - combined with some defaults but they can be overridden
-    answers_dict = DEFAULT_ANSWERS | dict(answers)
+    answers_dict = _get_default_answers() | dict(answers)
 
     template = _get_template(
         name=template_name,
@@ -209,9 +297,17 @@ def init_command(  # noqa: PLR0913
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
+
+    for custom_answer in template.answers or []:
+        answers_dict.setdefault(*custom_answer)
+
     logger.debug(f"template source = {template}")
 
-    project_path = _get_project_path(directory_name)
+    # allow skipping prompt if the template is the base template to avoid redundant
+    # 're-using existing directory' warning in fullstack template init
+    project_path = _get_project_path(
+        directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
+    )
     logger.debug(f"project path = {project_path}")
     directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
@@ -223,7 +319,11 @@ def init_command(  # noqa: PLR0913
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
 
-    logger.info("Starting template copy and render...")
+    project_path = _adjust_project_path_for_workspace(
+        template_source=template, project_path=project_path, use_workspace=use_workspace
+    )
+
+    logger.info(f"Starting template copy and render at {project_path}...")
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
@@ -238,7 +338,7 @@ def init_command(  # noqa: PLR0913
         dst_path=project_path,
         data=answers_dict,
         quiet=True,
-        vcs_ref=template.commit,
+        vcs_ref=template.branch or template.commit,
         unsafe=True,
     ) as copier_worker:
         if use_defaults:
@@ -249,7 +349,7 @@ def init_command(  # noqa: PLR0913
 
     logger.info("Template render complete!")
 
-    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults)
+    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
     _maybe_git_init(
         project_path,
@@ -294,7 +394,9 @@ def init_command(  # noqa: PLR0913
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
 
 
-def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool) -> None:
+def _maybe_bootstrap(
+    project_path: Path, *, run_bootstrap: bool | None, use_defaults: bool, use_workspace: bool
+) -> None:
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or questionary_extensions.prompt_confirm(
@@ -307,7 +409,10 @@ def _maybe_bootstrap(project_path: Path, *, run_bootstrap: bool | None, use_defa
         # but if something goes wrong, we don't want to block
         try:
             project_minimum_algokit_version_check(project_path)
-            bootstrap_any_including_subdirs(project_path, ci_mode=False)
+
+            # if user prefers to ignore creating the `workspace` setup, set bootstrap depth to 1 else default
+            bootstrap_depth = 1 if not use_workspace else MAX_BOOTSTRAP_DEPTH
+            bootstrap_any_including_subdirs(project_path, ci_mode=False, max_depth=bootstrap_depth)
         except Exception as e:
             logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(
@@ -351,33 +456,49 @@ class DirectoryNameValidator(questionary.Validator):
             raise questionary.ValidationError(
                 message="File with same name already exists in current directory, please enter a different name"
             )
+        if not is_valid_project_dir_name(document.text):
+            raise questionary.ValidationError(
+                message="Invalid name. Use letters, numbers, dashes, periods, underscores, and ensure it's unique.",
+                cursor_position=len(document.text),
+            )
 
 
-def _get_project_path(directory_name_option: str | None = None) -> Path:
+def _get_project_path(*, directory_name_option: str | None = None, force: bool = False) -> Path:
+    """
+    Determines the project path based on the provided directory name option.
+
+    Args:
+        directory_name_option: The name of the directory provided by the user.
+                               If None, the user will be prompted to enter a name.
+        force: A flag to auto accept warning prompts.
+
+    Returns:
+        The path to the project directory.
+    """
+
     base_path = Path.cwd()
-    if directory_name_option is not None:
-        directory_name = directory_name_option
-    else:
-        directory_name = questionary_extensions.prompt_text(
+    directory_name = (
+        directory_name_option
+        if directory_name_option is not None
+        else questionary_extensions.prompt_text(
             "Name of project / directory to create the project in: ",
             validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
-    project_path = base_path / directory_name.strip()
-    if project_path.exists():
-        # NOTE: could get non-dir if passed as command line argument (we validate this interactively)
-        if not project_path.is_dir():
-            logger.error("File with same name already exists in current directory, please supply a different name")
-            _fail_and_bail()
+    ).strip()
+
+    project_path = base_path / directory_name
+    if project_path.exists() and not project_path.is_dir():
+        logger.error("A file with the same name already exists in the current directory. Please use a different name.")
+        _fail_and_bail()
+
+    if project_path.is_dir() and not force:
         logger.warning(
-            "Re-using existing directory, this is not recommended because if project generation fails, "
-            "then we can't automatically cleanup."
+            "Re-using existing directory, this is not recommended because if project "
+            "generation fails, then we can't automatically cleanup."
         )
         if not questionary_extensions.prompt_confirm("Continue anyway?", default=False):
-            # re-prompt only if interactive and user didn't cancel
-            if directory_name_option is None:
-                return _get_project_path()
-            else:
-                _fail_and_bail()
+            return _get_project_path() if directory_name_option is None else _fail_and_bail()
+
     return project_path
 
 
@@ -394,7 +515,7 @@ def _get_template(
         if commit:
             raise click.ClickException("--template-url-ref has no effect when template name is specified")
         blessed_templates = _get_blessed_templates()
-        template: TemplateSource = blessed_templates[name]
+        template: TemplateSource = blessed_templates[TemplateKey(name)]
     elif not url:
         template = _get_template_interactive()
     else:
@@ -422,21 +543,43 @@ class GitRepoValidator(questionary.Validator):
 
 
 def _get_template_interactive() -> TemplateSource:
-    description_prefix = "\n     "
-
-    choice_value = questionary_extensions.prompt_select(
-        "Select a project template: ",
-        *[
-            questionary.Choice(
-                title=[("bold", key), ("", description_prefix + tmpl.description)],
-                value=tmpl,
-            )
-            for key, tmpl in _get_blessed_templates().items()
-        ],
-        f"<other>{description_prefix}Enter a custom URL - potentially dangerous!",
+    project_type = questionary_extensions.prompt_select(
+        "Which of these options best describes the project you want to build?",
+        *[questionary.Choice(title=p_type.value, value=p_type) for p_type in TemplatePresetType],  # Modified line
     )
-    if isinstance(choice_value, TemplateSource):
-        return choice_value
+    logger.debug(f"selected project_type = {project_type.value}")
+
+    template = None
+    language = None
+    if project_type in [TemplatePresetType.SMART_CONTRACT, TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND]:
+        language = questionary_extensions.prompt_select(
+            "Which language would you like to use for the smart contract?",
+            *[questionary.Choice(title=lang.value, value=lang) for lang in ContractLanguage],
+        )
+        logger.debug(f"selected language = {language}")
+        template = (
+            TemplateKey.FULLSTACK
+            if project_type == TemplatePresetType.SMART_CONTRACT_AND_DAPP_FRONTEND
+            else LANGUAGE_TO_TEMPLATE_MAP[language]
+        )
+
+    elif project_type == TemplatePresetType.DAPP_FRONTEND:
+        template = TemplateKey.REACT
+
+    # Ensure a template has been selected
+    if not template and not project_type == TemplatePresetType.CUSTOM_TEMPLATE:
+        raise click.ClickException("No template selected. Please try again.")
+
+    # Map the template string directly to the TemplateSource
+    # This is needed to be able to reuse fullstack to work with beaker, puya, and tealscript templates
+    blessed_templates = _get_blessed_templates()
+    if template in blessed_templates:
+        selected_template_source = blessed_templates[template]
+        if template == TemplateKey.FULLSTACK and language is not None:
+            smart_contract_template = LANGUAGE_TO_TEMPLATE_MAP[language]
+            selected_template_source.answers = [("contract_template", smart_contract_template)]
+        return selected_template_source
+
     # else: user selected custom url
     # note we print the warning but don't prompt for confirmation like we would when the URL is passed
     # as a command line argument, instead we allow the user to return to the official selection list
@@ -500,3 +643,69 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         and git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
     ):
         logger.info("🎉 Performed initial git commit successfully! 🎉")
+
+
+def _adjust_project_path_for_workspace(
+    *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
+) -> Path:
+    blessed_template = _get_blessed_templates()
+    if template_source == blessed_template[TemplateKey.BASE]:
+        return project_path
+
+    cwd = Path.cwd()
+    is_standalone = template_source != blessed_template[TemplateKey.FULLSTACK]
+    config = get_algokit_config(cwd)
+
+    # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
+    if config is None and is_standalone and use_workspace:
+        _instantiate_base_template(project_path)
+
+        config = get_algokit_config(project_path)
+        if not config:
+            logger.error("Failed to instantiate workspace structure for standalone project")
+            _fail_and_bail()
+
+        sub_projects_path = config.get("project", {}).get("projects_root_path") or "projects"
+        new_project_path = cwd / project_path.name / sub_projects_path / project_path.name
+        new_project_path.mkdir(parents=True, exist_ok=True)
+
+        logger.debug(f"Workspace structure is ready! The project is to be placed under {new_project_path}")
+        return new_project_path
+
+    # 2. If its a standalone project being instantiated inside an existing workspace project and use_workspace is True
+    # then place the new project inside expected projects folder defined by workspace toml
+    if (
+        config
+        and config.get("project", {}).get("type") == ProjectType.WORKSPACE.value
+        and is_standalone
+        and use_workspace
+    ):
+        sub_projects_path = config.get("project", {}).get("projects_root_path") or "projects"
+        projects_root = cwd / sub_projects_path
+        logger.debug(f"Workspace structure detected! Moving the project to be instantiated into {projects_root}")
+        return projects_root / project_path.name
+
+    return project_path
+
+
+def _instantiate_base_template(target_path: Path) -> None:
+    """
+    Instantiate the base template for a standalone project.
+    Sets up the common workspace structure for standalone projects.
+    """
+
+    # Instantiate the base template
+    blessed_templates = _get_blessed_templates()
+    base_template = blessed_templates[TemplateKey.BASE]
+    base_template_answers = {"use_default_readme": "yes", "project_name": target_path.name}
+    from copier.main import Worker
+
+    with Worker(
+        src_path=base_template.url,
+        dst_path=target_path,
+        data=base_template_answers,
+        quiet=True,
+        vcs_ref=base_template.commit,
+        unsafe=True,
+    ) as copier_worker:
+        copier_worker.run_copy()

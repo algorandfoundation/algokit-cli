@@ -1,3 +1,4 @@
+import importlib.resources as importlib_resources
 import logging
 import re
 from datetime import timedelta
@@ -6,13 +7,23 @@ from time import time
 import click
 import httpx
 
+from algokit import __name__ as algokit_name
 from algokit.core.conf import get_app_config_dir, get_app_state_dir, get_current_package_version
+from algokit.core.utils import is_binary_mode
 
 logger = logging.getLogger(__name__)
 
 LATEST_URL = "https://api.github.com/repos/algorandfoundation/algokit-cli/releases/latest"
 VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 DISABLE_CHECK_MARKER = "disable-version-prompt"
+DISTRIBUTION_METHOD_UPDATE_COMMAND = {
+    "snap": "`snap refresh algokit`",
+    "winget": "`winget upgrade algokit`",
+    "brew": "`brew upgrade algokit`",
+}
+UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION = "the tool used to install AlgoKit"
+# TODO: Set this version as part of releasing the binary distributions.
+BINARY_DISTRIBUTION_RELEASE_VERSION = "99.99.99"
 
 
 def do_version_prompt() -> None:
@@ -26,8 +37,26 @@ def do_version_prompt() -> None:
         logger.debug("Could not determine latest version")
         return
 
-    if _get_version_sequence(current_version) < _get_version_sequence(latest_version):
-        logger.info(f"You are using AlgoKit version {current_version}, however version {latest_version} is available.")
+    current_version_sequence = _get_version_sequence(current_version)
+    if current_version_sequence < _get_version_sequence(latest_version):
+        update_instruction = UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
+        if is_binary_mode():
+            distribution = _get_distribution_method()
+            update_instruction = (
+                DISTRIBUTION_METHOD_UPDATE_COMMAND.get(distribution, UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION)
+                if distribution
+                else UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
+            )
+        # If you're not using the binary mode, then you've used pipx to install AlgoKit.
+        # One exception is that older versions of the brew package used pipx,
+        # however require updating via brew, so we show the default update instruction instead.
+        elif current_version_sequence >= _get_version_sequence(BINARY_DISTRIBUTION_RELEASE_VERSION):
+            update_instruction = "`pipx upgrade algokit`"
+
+        logger.info(
+            f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
+            f"Please update using {update_instruction}."
+        )
     else:
         logger.debug("Current version is up to date")
 
@@ -83,6 +112,17 @@ def get_latest_github_version() -> str:
 def _skip_version_prompt() -> bool:
     disable_marker = get_app_config_dir() / DISABLE_CHECK_MARKER
     return disable_marker.exists()
+
+
+def _get_distribution_method() -> str | None:
+    file_path = importlib_resources.files(algokit_name) / "resources" / "distribution-method"
+    with file_path.open("r", encoding="utf-8", errors="strict") as file:
+        content = file.read().strip()
+
+        if content in ["snap", "winget", "brew"]:
+            return content
+        else:
+            return None
 
 
 skip_version_check_option = click.option(

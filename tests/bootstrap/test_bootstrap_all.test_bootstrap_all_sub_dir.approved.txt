@@ -15,4 +15,7 @@ Installing Python dependencies and setting up Python virtual environment via Poe
 DEBUG: Running 'poetry install' in '{current_working_directory}/live_dir'
 poetry: STDOUT
 poetry: STDERR
+DEBUG: Skipping {current_working_directory}/live_dir/.env
+DEBUG: Skipping {current_working_directory}/live_dir/.env.template
+DEBUG: Skipping {current_working_directory}/live_dir/poetry.toml
 Finished bootstrapping {current_working_directory}

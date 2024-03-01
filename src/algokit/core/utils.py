@@ -39,8 +39,8 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 
     try:
         socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
     except OSError:
         return False
 
@@ -150,3 +150,11 @@ def get_base_python_path() -> str | None:
                 return str(candidate_path)
     # give up, we tried...
     return this_python
+
+
+def is_binary_mode() -> bool:
+    """
+    Check if the current Python interpreter is running in a native binary frozen environment.
+    return: True if running in a native binary frozen environment, False otherwise.
+    """
+    return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")

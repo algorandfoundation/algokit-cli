@@ -1,4 +1,5 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 WARNING: This template requires AlgoKit version 999.99.99 or higher, but you have AlgoKit version {current_version}. Please update AlgoKit.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
+DEBUG: Skipping {current_working_directory}/.algokit.toml
 Finished bootstrapping {current_working_directory}
