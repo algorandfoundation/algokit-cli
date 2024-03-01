@@ -67,7 +67,7 @@ If at any point you'd like to switch back to the default LocalNet, simply run `a
 
 ### Named LocalNet Configuration Directory
 
-When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific folder on your system. The location of this folder depends on your operating system:
+When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific directory on your system. The location of this directory depends on your operating system:
 
 - **Windows**: We use the value of the `APPDATA` environment variable to determine the directory to store the configuration files. This is usually `C:\Users\USERNAME\AppData\Roaming`.
 - **Linux or Mac**: We use the value of the `XDG_CONFIG_HOME` environment variable to determine the directory to store the configuration files. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
