@@ -17,7 +17,11 @@ def hello_world_contract_path() -> Path:
     return Path(__file__).parent / "hello_world_contract.py"
 
 
-def test_compile_py_help() -> None:
+def test_compile_py_help(mocker: MockerFixture) -> None:
+    proc_mock = ProcMock()
+    proc_mock.set_output(["poetry", "run", "puyapy", "-h"], output=["Puyapy help"])
+
+    mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
     result = invoke("compile py -h")
 
     assert result.exit_code == 0
@@ -55,7 +59,7 @@ def test_specificed_puyapy_version_is_not_installed(hello_world_contract_path: P
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
-    result = invoke(f"compile py {_normalize_path(hello_world_contract_path)} --version {target_version}")
+    result = invoke(f"compile --version {target_version} py {_normalize_path(hello_world_contract_path)}")
 
     assert result.exit_code == 0
     verify(result.output)

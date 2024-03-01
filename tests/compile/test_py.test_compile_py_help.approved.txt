@@ -1,9 +1,5 @@
-Usage: algokit compile py [OPTIONS] [PUYA_ARGS]...
-
-  Compile Python to TEAL with PuyaPy, review
-  https://github.com/algorandfoundation/puya for usage
-
-Options:
-  -v, --version TEXT  PuyaPy compiler version, for example, 0.6.0. Default to
-                      latest
-  -h, --help          Show this message and exit.
+DEBUG: Running 'poetry run puyapy -h' in '{current_working_directory}'
+DEBUG: poetry: Puyapy help
+DEBUG: Running 'poetry run puyapy -h' in '{current_working_directory}'
+DEBUG: poetry: Puyapy help
+Puyapy help
