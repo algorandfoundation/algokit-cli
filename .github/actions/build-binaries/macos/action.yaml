@@ -36,6 +36,11 @@ runs:
         APPLE_CERT_ID: ${{ inputs.apple_cert_id }}
         APPLE_BUNDLE_ID: ${{ inputs.apple_bundle_id }}
 
+    - name: Add metadata to binary
+      shell: bash
+      run: |
+        echo brew > ${{ github.workspace }}/dist/algokit/_internal/algokit/resources/distribution-method
+
     # Workaround an issue with PyInstaller where Python.framework was incorrectly signed during the build
     - name: Codesign python.framework
       shell: bash
@@ -57,7 +62,6 @@ runs:
       shell: bash
       run: |
         cd dist/algokit/
-        echo brew > ./_internal/algokit/resources/distribution-method
         tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz *
         cd ../..
 
