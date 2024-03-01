@@ -67,14 +67,14 @@ If at any point you'd like to switch back to the default LocalNet, simply run `a
 
 ### Named LocalNet Configuration Directory
 
-With running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific folder on your system. The location of this folder depends on your operating system:
+When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific folder on your system. The location of this folder depends on your operating system:
 
-- **Windows**: The configuration files are stored in the `APPDATA` folder. 
-- **Linux or Mac**: The configuration files are stored in the `XDG_CONFIG_HOME` directory if it is set. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
+- **Windows**: We use the value of the `APPDATA` environment variable to determine the directory to store the configuration files. This is usually `C:\Users\USERNAME\AppData\Roaming`.
+- **Linux or Mac**: We use the value of the `XDG_CONFIG_HOME` environment variable to determine the directory to store the configuration files. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
 
-Inside the designated configuration folder, you will find a folder named `algokit`. Within the `algokit` folder, there is a `sandbox` directory that contains the default configuration settings. Additionally, for each named LocalNet instance you have created, there will be a folder named `sandbox_{name}` within the `algokit` directory. These folders contain the specific configuration settings for the respective named LocalNet instances.
+Assuming you have previously used a default LocalNet, the path `./algokit/sandbox/` will exist inside the configuration directory, containing the configuration settings for the default LocalNet instance. Additionally, for each named LocalNet instance you have created, the path `./algokit/sandbox_{name}/` will exist, containing the configuration settings for the respective named LocalNet instances.
 
-It is important to note that the configuration files are stored in a way that ensures separation between the default LocalNet environment and any named LocalNet environments you may create. This allows for more control and customization of your development environments.
+It is important to note that only the configuration files for a named LocalNet instance should be changed. Any changes made to the default LocalNet instance will be reverted by AlgoKit.
 
 
 ### Stopping and Resetting the LocalNet
