@@ -140,3 +140,26 @@ def test_version_check_enable_version_check(app_dir_mock: AppDirs) -> None:
     assert result.exit_code == 0
     assert not disable_version_check_path.exists()
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
+
+
+@pytest.mark.parametrize(
+    ("method", "message"),
+    [
+        ("snap", "snap refresh algokit"),
+        ("brew", "brew upgrade algokit"),
+        ("winget", "winget upgrade algokit"),
+        (None, "the tool used to install AlgoKit"),
+    ],
+)
+def test_version_prompt_according_to_distribution_method(
+    mocker: MockerFixture, app_dir_mock: AppDirs, method: str, message: str
+) -> None:
+    mocker.patch("algokit.core.version_prompt._get_distribution_method").return_value = method
+    mocker.patch("algokit.core.version_prompt.is_binary_mode").return_value = True
+    mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = "1.0.0"
+    version_cache = app_dir_mock.app_state_dir / "last-version-check"
+    version_cache.write_text("2.0.0", encoding="utf-8")
+
+    result = invoke("bootstrap env", skip_version_check=False)
+    assert result.exit_code == 0
+    assert message in result.output
