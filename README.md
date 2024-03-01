@@ -83,7 +83,8 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-AlgoKit has some runtime dependencies that also need to be available for particular commands.
+The specific installation methods document the prerequisites for running AlgoKit. 
+Additionally, AlgoKit has some runtime dependencies that also need to be available for particular commands.
 
 > **Note**
 > You can still install and use AlgoKit without these dependencies, and AlgoKit will tell you if you are missing one for a given command.
@@ -99,13 +100,7 @@ AlgoKit has some runtime dependencies that also need to be available for particu
 ## Cross-platform installation
 
 AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/). 
-See below for specific installation instructions and supported architectures.
-
-### Supported Operating Systems and Architectures
-
-- **macOS**: x64 and ARM (Apple Silicon)
-- **Windows**: Windows 10 and later (x64 only; ARM not supported)
-- **Linux**: Ubuntu 16.04 and later, Debian, Fedora, and CentOS (x64 only; ARM not supported)
+See below for specific installation instructions.
 
 ### Installation Methods
 - [Windows](#install-algokit-on-windows)
@@ -114,6 +109,10 @@ See below for specific installation instructions and supported architectures.
 - [pipx](#install-algokit-with-pipx-on-any-os)
 
 ## Install AlgoKit on Windows
+> **Note** 
+> Algokit is supported on Windows 10 1709 (build 16299) and later. 
+We have not built a specific binary for ARM architecture. 
+However, our x64 binaries can run on ARM devices through Windows' x64 emulation feature. 
 
 1. Ensure prerequisites are installed
 
@@ -121,7 +120,7 @@ See below for specific installation instructions and supported architectures.
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
      > **Note**
-     > See [our LocalNet documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
+     See [our LocalNet documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
      
 2. Install using winget
     ```shell
@@ -138,6 +137,8 @@ Some useful commands for updating or removing AlgoKit in the future.
 - To remove AlgoKit: `winget uninstall algokit`
 
 ## Install AlgoKit on Mac
+> **Note** 
+> Algokit is supported on macOS x64 and ARM (Apple Silicon)
 
 1. Ensure prerequisites are installed
 
@@ -162,6 +163,8 @@ Some useful commands for updating or removing AlgoKit in the future.
 - To remove AlgoKit: `brew uninstall algokit`
 
 ## Install AlgoKit on Linux
+> **Note**
+> AlgoKit is compatible with Ubuntu 16.04 and later, Debian, RedHat, and any distribution that supports [Snap](https://snapcraft.io/docs/installing-snapd), but it is only supported on x64 architecture; ARM is not supported.
 
 1. Ensure prerequisites are installed
 
