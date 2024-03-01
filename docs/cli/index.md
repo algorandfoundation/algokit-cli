@@ -19,9 +19,9 @@
     - [npm](#npm)
     - [poetry](#poetry)
   - [compile](#compile)
-    - [py](#py)
     - [Options](#options-4)
     - [-v, --version ](#-v---version-)
+    - [py](#py)
     - [Arguments](#arguments)
     - [PUYA_ARGS](#puya_args)
   - [completions](#completions)
@@ -292,6 +292,12 @@ Compile high level language smart contracts to TEAL
 algokit compile [OPTIONS] COMMAND [ARGS]...
 ```
 
+### Options
+
+
+### -v, --version <version>
+Compiler version, for example, 1.0.0. If the version isn't specified, AlgoKit will check if the compiler is installed locally, and execute that. If the compiler is not found, it will install the latest version. If the version is specified, AlgoKit will check if the local compiler's version satisfies, and execute that. Otherwise, AlgoKit will install the specifed compiler version.
+
 ### py
 
 Compile Python to TEAL with PuyaPy, review [https://github.com/algorandfoundation/puya](https://github.com/algorandfoundation/puya) for usage
@@ -299,12 +305,6 @@ Compile Python to TEAL with PuyaPy, review [https://github.com/algorandfoundatio
 ```shell
 algokit compile py [OPTIONS] [PUYA_ARGS]...
 ```
-
-### Options
-
-
-### -v, --version <version>
-PuyaPy compiler version, for example, 0.6.0. Default to latest
 
 ### Arguments
 
