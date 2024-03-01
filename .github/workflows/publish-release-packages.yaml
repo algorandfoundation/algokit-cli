@@ -82,7 +82,7 @@ jobs:
 
       - name: Download macOS binary from release
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: gh release download ${{ inputs.release }} --pattern "*.tar.gz" --dir dist
+        run: gh release download ${{ inputs.release }} --pattern "*-brew.tar.gz" --dir dist
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -100,7 +100,7 @@ jobs:
         run: ls -la dist
 
       - name: Update homebrew cask
-        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos_arm64.tar.gz" "dist/algokit*-macos_x64.tar.gz" "algorandfoundation/homebrew-tap"
+        run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos_arm64-brew.tar.gz" "dist/algokit*-macos_x64-brew.tar.gz" "algorandfoundation/homebrew-tap"
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
 

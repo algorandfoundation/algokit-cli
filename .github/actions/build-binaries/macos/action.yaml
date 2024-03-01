@@ -57,11 +57,12 @@ runs:
       shell: bash
       run: |
         cd dist/algokit/
-        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz *
+        echo brew > ./_internal/algokit/resources/distribution-method
+        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz *
         cd ../..
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.package_name }}
-        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz
+        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz
