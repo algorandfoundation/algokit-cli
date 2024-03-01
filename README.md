@@ -92,13 +92,22 @@ AlgoKit has some runtime dependencies that also need to be available for particu
 - Docker - Docker Compose (and by association, Docker) is used to run the AlgoKit LocalNet environment, we require Docker Compose 2.5.0+
 
 > **Note**
-> If you are using pipx to install AlgoKit, the key required dependency is Python 3.10+.
+> If you have previously installed AlgoKit using `pipx` and would like to switch to a different installation method, please ensure that 
+> you first uninstall the existing version by running `pipx uninstall algokit`. Once uninstalled, you can follow the installation instructions for your preferred platform.
 
 
 ## Cross-platform installation
 
-AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/). See below for specific installation instructions.
+AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/). 
+See below for specific installation instructions and supported architectures.
 
+### Supported Operating Systems and Architectures
+
+- **macOS**: x64 and ARM (Apple Silicon)
+- **Windows**: Windows 10 and later (x64 only; ARM not supported)
+- **Linux**: Ubuntu 16.04 and later, Debian, Fedora, and CentOS (x64 only; ARM not supported)
+
+### Installation Methods
 - [Windows](#install-algokit-on-windows)
 - [Mac](#install-algokit-on-mac)
 - [Linux](#install-algokit-on-linux)
@@ -108,7 +117,7 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 1. Ensure prerequisites are installed
 
-   - [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
+   - [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (should be installed by default on recent Windows 10 or later)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
      > **Note**
@@ -125,8 +134,8 @@ AlgoKit can be installed using OS specific package managers, or using the python
 
 Some useful commands for updating or removing AlgoKit in the future.
 
-- To update AlgoKit: `winget upgrade AlgoKit`
-- To remove AlgoKit: `winget uninstall AlgoKit`
+- To update AlgoKit: `winget upgrade algokit`
+- To remove AlgoKit: `winget uninstall algokit`
 
 ## Install AlgoKit on Mac
 
@@ -156,7 +165,7 @@ Some useful commands for updating or removing AlgoKit in the future.
 
 1. Ensure prerequisites are installed
 
-   - [Snap](https://snapcraft.io/docs/installing-snapd) (should already be available on Ubuntu 16.04.4 LTS (Xenial Xerus) or later)
+   - [Snap](https://snapcraft.io/docs/installing-snapd) (should be installed by default on Ubuntu 16.04.4 LTS (Xenial Xerus) or later)
    - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
 
