@@ -30,13 +30,16 @@ runs:
       run: |
         echo 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64' >> $GITHUB_PATH
         echo 'BINARY_BUILD_DIR=dist\algokit' >> $GITHUB_ENV
-        echo 'BINARY_ARTIFACT=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz' >> $GITHUB_ENV
         echo 'WINGET_INSTALLER=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix' >> $GITHUB_ENV
 
     - name: Build binary
       shell: bash
       run: |
         poetry run poe package_windows
+
+    - name: Add metadata to binary
+      shell: bash
+      run: echo winget > ${{BINARY_BUILD_DIR}}/_internal/algokit/resources/distribution-method
 
     # We only sign the release artifacts, as each signing request will use up the HSM quota
     - name: Download signing certificate
@@ -60,20 +63,6 @@ runs:
         $executablePath = '${{ env.BINARY_BUILD_DIR }}\algokit.exe'
         signtool sign /sha1 ${{ inputs.code_signing_cert_sha1_hash }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $executablePath
         # signtool verify /v /pa $executablePath
-
-    - name: Package binary artifact
-      shell: pwsh
-      run: |
-        Set-Location -Path ${{ env.BINARY_BUILD_DIR }}
-        tar -zcf ${{ env.BINARY_ARTIFACT }} *
-        Set-Location -Path ..\..
-
-    - name: Upload binary artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ inputs.package_name }}
-        path: ${{ env.BINARY_ARTIFACT }}
-        if-no-files-found: error
 
     - name: Build winget installer
       shell: pwsh
