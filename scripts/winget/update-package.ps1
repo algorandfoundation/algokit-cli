@@ -12,7 +12,7 @@ Function ThrowOnNonZeroExit {
 }
 
 $wingetPackage = 'AlgorandFoundation.AlgoKit'
-$release = Invoke-RestMethod -uri "https://api.github.com/repos/neilcampbell/algokit-cli/releases/tags/$releaseVersionTag"
+$release = Invoke-RestMethod -uri "https://api.github.com/repos/algorandfoundation/algokit-cli/releases/tags/$releaseVersionTag"
 $installerUrl = $release | Select -ExpandProperty assets -First 1 | Where-Object -Property name -match '-windows_x64-winget\.msix$' | Select -ExpandProperty browser_download_url
 $releaseVersion = $releaseVersionTag.Trim("v")
 
