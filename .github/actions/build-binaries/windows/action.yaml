@@ -40,7 +40,7 @@ runs:
     - name: Add metadata to binary
       shell: bash
       run: |
-        echo winget > ${{BINARY_BUILD_DIR}}\_internal\algokit\resources\distribution-method
+        echo winget > ${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method
 
     # We only sign the release artifacts, as each signing request will use up the HSM quota
     - name: Download signing certificate
