@@ -161,7 +161,7 @@ markers = [
     "mock_platform_system",
     "pyinstaller_binary_tests"
 ]
-addopts = "-m 'not pyinstaller_binary_tests'" # by default, exclude pyinstaller_binary_tests
+addopts = "-m 'not pyinstaller_binary_tests' --ignore=tests/compile" # by default, exclude pyinstaller_binary_tests
 [tool.mypy]
 files = ["src", "tests"]
 exclude = ["dist"]

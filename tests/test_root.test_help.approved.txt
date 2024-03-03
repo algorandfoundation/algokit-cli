@@ -16,7 +16,6 @@ Options:
 Commands:
   bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
                project root directory.
-  compile      Compile high level language smart contracts to TEAL
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
   deploy       Deploy smart contracts from AlgoKit compliant repository.
