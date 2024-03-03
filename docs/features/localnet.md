@@ -22,7 +22,7 @@ The AlgoKit LocalNet is built with 30,000 participation keys generated and after
 
 ## Supported operating environments
 
-We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
+We rely on the official Algorand docker images for Indexer, Conduit and Algod, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Apple Silicon).
 
 ## Functionality
 
@@ -37,8 +37,9 @@ To create / start your AlgoKit LocalNet instance you can run `algokit localnet s
 
 If it's the first time running it on your machine then it will download the following images from DockerHub:
 
-- [`makerxau/algorand-sandbox-dev`](https://hub.docker.com/r/makerxau/algorand-sandbox-dev) (~150-200 MB)
-- [`makerxau/algorand-indexer-dev`](https://hub.docker.com/r/makerxau/algorand-indexer-dev) (~25 MB)
+- [`algorand/algod`](https://hub.docker.com/r/algorand/algod) (~500 MB)
+- [`algorand/indexer`](https://hub.docker.com/r/algorand/indexer) (~96 MB)
+- [`algorand/conduit`](https://hub.docker.com/r/algorand/conduit) (~98 MB)
 - [`postgres:13-alpine`](https://hub.docker.com/_/postgres) (~80 MB)
 
 Once they have downloaded, it won't try and re-download images unless you perform a `algokit localnet reset`.
@@ -64,6 +65,17 @@ When you want more control, named LocalNet instances can be used by running `alg
 
 Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
 If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
+
+### Named LocalNet Configuration Directory
+
+When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific directory on your system. The location of this directory depends on your operating system:
+
+- **Windows**: We use the value of the `APPDATA` environment variable to determine the directory to store the configuration files. This is usually `C:\Users\USERNAME\AppData\Roaming`.
+- **Linux or Mac**: We use the value of the `XDG_CONFIG_HOME` environment variable to determine the directory to store the configuration files. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
+
+Assuming you have previously used a default LocalNet, the path `./algokit/sandbox/` will exist inside the configuration directory, containing the configuration settings for the default LocalNet instance. Additionally, for each named LocalNet instance you have created, the path `./algokit/sandbox_{name}/` will exist, containing the configuration settings for the respective named LocalNet instances.
+
+It is important to note that only the configuration files for a named LocalNet instance should be changed. Any changes made to the default LocalNet instance will be reverted by AlgoKit.
 
 ### Stopping and Resetting the LocalNet
 

@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.2 (2024-03-01)
+
+### Fix
+
+* Algod container proper SIGTERM handling ([#438](https://github.com/algorandfoundation/algokit-cli/issues/438)) ([`1a654ca`](https://github.com/algorandfoundation/algokit-cli/commit/1a654ca6b1519beda0a1d23fefb9673591cd5eea))
+
+### Documentation
+
+* Update named localnet documents on config file locations ([#444](https://github.com/algorandfoundation/algokit-cli/issues/444)) ([`643ab01`](https://github.com/algorandfoundation/algokit-cli/commit/643ab011bae488d24c18e8351e29de439a31c24e))
+* Minor patch in the badge ([#440](https://github.com/algorandfoundation/algokit-cli/issues/440)) ([`7d82db0`](https://github.com/algorandfoundation/algokit-cli/commit/7d82db08a127ef486f31687affca184f1229039b))
+
 ## v1.12.1 (2024-02-26)
 
 

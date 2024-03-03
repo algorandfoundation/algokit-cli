@@ -150,3 +150,11 @@ def get_base_python_path() -> str | None:
                 return str(candidate_path)
     # give up, we tried...
     return this_python
+
+
+def is_binary_mode() -> bool:
+    """
+    Check if the current Python interpreter is running in a native binary frozen environment.
+    return: True if running in a native binary frozen environment, False otherwise.
+    """
+    return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")

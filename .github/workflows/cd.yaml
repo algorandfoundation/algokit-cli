@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".vscode/**"
+      - ".idea/**"
   workflow_dispatch:
     inputs:
       production_release:
