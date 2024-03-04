@@ -83,7 +83,8 @@ def _create_workspace_project(
         mock_command (bool, optional): Indicates whether to mock the command. Defaults to False.
         which_mock (WhichMock | None, optional): The mock object for the 'which' command. Defaults to None.
         proc_mock (ProcMock | None, optional): The mock object for the process execution. Defaults to None.
-        custom_project_order (list[str] | None, optional): Specifies a custom order for project execution. Defaults to None.
+        custom_project_order (list[str] | None, optional): Specifies a custom order for project execution.
+        Defaults to None.
     """
     workspace_dir.mkdir()
     custom_project_order = custom_project_order if custom_project_order else ["contract_project", "frontend_project"]
