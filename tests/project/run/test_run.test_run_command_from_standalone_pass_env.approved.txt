@@ -1,6 +1,3 @@
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: Running '<sys.executable> print_env.py' in '{current_working_directory}'
-DEBUG: <sys.executable>: Hello World from env variable!
 Hello World from env variable!
 
 ✅ contract_project: '<sys.executable> print_env.py' executed successfully.

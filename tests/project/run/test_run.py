@@ -18,6 +18,21 @@ PYTHON_EXECUTABLE = sys.executable
 PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
 
 
+def _format_output(output: str) -> str:
+    """
+    Strips lines from the output that start with the specified string.
+
+    Args:
+        output (str): The output string to process.
+        start_str (str): The string that identifies the start of lines to be stripped.
+
+    Returns:
+        str: The processed output with specified lines stripped.
+    """
+    output = "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")])
+    return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>")
+
+
 @pytest.fixture()
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
@@ -68,8 +83,7 @@ def _create_workspace_project(
         mock_command (bool, optional): Indicates whether to mock the command. Defaults to False.
         which_mock (WhichMock | None, optional): The mock object for the 'which' command. Defaults to None.
         proc_mock (ProcMock | None, optional): The mock object for the process execution. Defaults to None.
-        custom_project_order (list[str] | None, optional): Specifies a custom order for project execution.
-        Defaults to None.
+        custom_project_order (list[str] | None, optional): Specifies a custom order for project execution. Defaults to None.
     """
     workspace_dir.mkdir()
     custom_project_order = custom_project_order if custom_project_order else ["contract_project", "frontend_project"]
@@ -251,6 +265,7 @@ def test_run_command_from_workspace_resolution_error(
     Args:
         tmp_path_factory (pytest.TempPathFactory): Pytest fixture to create temporary directories.
     """
+
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -299,7 +314,7 @@ def test_run_command_from_workspace_execution_error(
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_standalone_resolution_error(
@@ -352,7 +367,7 @@ def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.Te
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_partially_sequential(
@@ -417,4 +432,4 @@ def test_run_command_from_standalone_pass_env(
     result = invoke("project run hello", cwd=cwd, env={"HELLO": "Hello World from env variable!"})
 
     assert result.exit_code == 0
-    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
+    verify(_format_output(result.output))
