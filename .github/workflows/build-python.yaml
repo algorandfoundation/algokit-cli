@@ -24,7 +24,10 @@ jobs:
       - name: Install dependencies
         # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
         # track here -> https://github.com/crytic/tealer/pull/209
-        run: poetry install --no-interaction && pipx install tealer==0.1.2
+        run: |
+          poetry install --no-interaction
+          pipx install tealer==0.1.2
+          pipx install puya
 
       - name: pytest
         shell: bash
