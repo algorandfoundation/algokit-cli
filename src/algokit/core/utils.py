@@ -166,7 +166,7 @@ def split_command_string(command: str) -> list[str]:
     Parses a command string into a list of arguments, handling both shell and non-shell commands
     """
 
-    if shutil.which("mslex"):  # Check for mslex directly
+    if platform.system() == "Windows":
         import mslex
 
         return mslex.split(command)
@@ -188,9 +188,9 @@ def resolve_command_path(command: list[str]) -> list[str]:
     """
 
     cmd, *args = command
-    if "/" in cmd or "\\" in cmd:  # More accurate path check
-        return command  # Assume full path provided
-
+    # if the command has any path separators or such, don't try and resolve
+    if Path(cmd).name != cmd:
+        return command
     resolved_cmd = shutil.which(cmd)
     if not resolved_cmd:
         raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
