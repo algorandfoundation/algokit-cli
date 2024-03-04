@@ -335,4 +335,4 @@ def test_run_command_from_workspace_partially_sequential(
 
     result = invoke("project run hello", cwd=cwd)
     assert result.exit_code == 0
-    verify(_strip_line_starting_with(result.output, "✅"))
+    verify(_strip_line_starting_with(result.output, "DEBUG"))

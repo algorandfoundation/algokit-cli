@@ -1,3 +1,3 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Attempting to load project config from {current_working_directory}/projects/project2/.algokit.toml
-Error: Failed to resolve custom command, 'failthiscommand' wasn't found
+Error: Failed to resolve command path, 'failthiscommand' wasn't found
