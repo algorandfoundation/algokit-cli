@@ -215,7 +215,7 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
 
 
 def test_run_command_from_workspace_resolution_error(
-    tmp_path_factory: pytest.TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
@@ -263,7 +263,7 @@ def test_run_command_from_workspace_execution_error(
 
 
 def test_run_command_from_standalone_resolution_error(
-    tmp_path_factory: pytest.TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
