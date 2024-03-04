@@ -105,9 +105,11 @@ def run_workspace_command(
             workspace_command.commands, key=lambda c: order_map.get(c.project_name, len(order_map))
         )
 
-        if project_names and not any(cmd.project_name in project_names for cmd in sorted_commands):
-            logger.warning("None of the specified project names exist in the workspace. Skipping execution.")
-            return
+        if project_names:
+            existing_projects = {cmd.project_name for cmd in workspace_command.commands}
+            missing_projects = set(project_names) - existing_projects
+            if missing_projects:
+                logger.warning(f"Missing projects: {', '.join(missing_projects)}. Proceeding with available ones.")
 
         for cmd in sorted_commands:
             if project_names and cmd.project_name not in project_names:

@@ -52,8 +52,8 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
         # in the case of no algokit toml file, we return the (empty) defaults
         return deploy_config
 
-    # ensure there is at least some config under [deploy] and that it's a dict type
-    # (which should implicitly exist even if only [deploy.{name}] exists)
+    # ensure there is at least some config under [project.deploy] and that it's a dict type
+    # (which should implicitly exist even if only [project.deploy.{name}] exists)
     legacy_deploy_table = config.get("deploy")
     project_deploy_table = config.get("project", {}).get("deploy", {})
     deploy_table = project_deploy_table or legacy_deploy_table

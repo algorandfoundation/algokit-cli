@@ -113,4 +113,4 @@ poetry: Installing the current project: algokit (0.1.0)
 
 You can run `algokit project bootstrap all` which will run all three commands `algokit project bootstrap env`, `algokit project bootstrap npm` and `algokit project bootstrap poetry` inside the current directory and all immediate sub-directories. This command is executed by default after initialising a new project via the [AlgoKit Init](./init.md) command.
 
-To learn more about the `algokit project bootstrap` command, please refer to [bootstrap](../cli/index.md#bootstrap) in the AlgoKit CLI reference documentation.
+To learn more about the `algokit project bootstrap` command, please refer to [bootstrap](../../cli/index.md#bootstrap) in the AlgoKit CLI reference documentation.
