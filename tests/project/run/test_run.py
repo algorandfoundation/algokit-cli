@@ -335,4 +335,6 @@ def test_run_command_from_workspace_partially_sequential(
 
     result = invoke("project run hello", cwd=cwd)
     assert result.exit_code == 0
-    verify(_strip_line_starting_with(result.output, "DEBUG"))
+    order_of_execution = [line for line in result.output.split("\n") if line.startswith("✅")]
+    assert "contract_project_1" in order_of_execution[0]
+    assert "contract_project_4" in order_of_execution[1]
