@@ -1,0 +1,6 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Running '/Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python print_env.py' in '{current_working_directory}'
+DEBUG: /Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python: Hello World from env variable!
+Hello World from env variable!
+
+✅ contract_project: '/Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python print_env.py' executed successfully.

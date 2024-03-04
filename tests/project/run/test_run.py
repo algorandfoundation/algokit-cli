@@ -18,10 +18,6 @@ PYTHON_EXECUTABLE = sys.executable
 PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
 
 
-def _strip_line_starting_with(output: str, start_str: str) -> str:
-    return "\n".join([line for line in output.split("\n") if not line.startswith(start_str)])
-
-
 @pytest.fixture()
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
@@ -265,7 +261,7 @@ def test_run_command_from_workspace_execution_error(
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(_strip_line_starting_with(result.output, "DEBUG"))
+    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
 def test_run_command_from_standalone_resolution_error(
@@ -306,7 +302,7 @@ def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.Te
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(_strip_line_starting_with(result.output, "DEBUG"))
+    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
 def test_run_command_from_workspace_partially_sequential(
@@ -338,3 +334,23 @@ def test_run_command_from_workspace_partially_sequential(
     order_of_execution = [line for line in result.output.split("\n") if line.startswith("✅")]
     assert "contract_project_1" in order_of_execution[0]
     assert "contract_project_4" in order_of_execution[1]
+
+
+def test_run_command_from_standalone_pass_env(
+    tmp_path_factory: TempPathFactory,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    cwd.mkdir()
+    (cwd / "print_env.py").write_text('import os; print(os.environ.get("HELLO"))')
+
+    _create_project_config(
+        cwd,
+        "contract",
+        "contract_project",
+        PYTHON_EXECUTABLE_ESCAPED + " print_env.py",
+        "Prints hello contracts",
+    )
+    result = invoke("project run hello", cwd=cwd, env={"HELLO": "Hello World from env variable!"})
+
+    assert result.exit_code == 0
+    verify(result.output)

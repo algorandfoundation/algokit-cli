@@ -654,13 +654,13 @@ def _adjust_project_path_for_workspace(
 
     cwd = Path.cwd()
     is_standalone = template_source != blessed_template[TemplateKey.FULLSTACK]
-    config = get_algokit_config(cwd)
+    config = get_algokit_config(project_dir=cwd)
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
         _instantiate_base_template(project_path)
 
-        config = get_algokit_config(project_path)
+        config = get_algokit_config(project_dir=project_path)
         if not config:
             logger.error("Failed to instantiate workspace structure for standalone project")
             _fail_and_bail()

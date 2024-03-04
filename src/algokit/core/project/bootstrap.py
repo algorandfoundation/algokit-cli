@@ -177,7 +177,7 @@ def bootstrap_npm(project_dir: Path) -> None:
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:
-    config = get_algokit_config(project_dir)
+    config = get_algokit_config(project_dir=project_dir)
     if config is None:
         return None
     try:

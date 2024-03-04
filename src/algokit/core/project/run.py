@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,7 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     result = run(
         command=command.command,
         cwd=command.cwd,
+        env={**os.environ},
         stdout_log_level=logging.DEBUG,
     )
 
@@ -145,7 +147,7 @@ def load_commands_from_workspace(
         if not subproject_dir.is_dir():
             continue
 
-        subproject_config = get_algokit_config(subproject_dir)
+        subproject_config = get_algokit_config(project_dir=subproject_dir, verbose_validation=True)
         if not subproject_config:
             continue
 
@@ -167,7 +169,7 @@ def load_commands_from_workspace(
 
 def load_commands(project_dir: Path) -> list[ProjectCommand] | list[WorkspaceProjectCommand] | None:
     """Loads project commands based on the project's type"""
-    config = get_algokit_config(project_dir)
+    config = get_algokit_config(project_dir=project_dir, verbose_validation=True)
     if not config:
         return None
 

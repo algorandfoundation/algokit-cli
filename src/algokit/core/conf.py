@@ -55,10 +55,11 @@ def get_current_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
 
 
-def get_algokit_config(project_dir: Path | None = None) -> dict[str, t.Any] | None:
+def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: bool = False) -> dict[str, t.Any] | None:
     """
     Load and parse a TOML configuration file. Will never throw.
     :param project_dir: Project directory path.
+    :param verbose_validation: Whether to warn user if toml validation failed.
     :return: A dictionary containing the configuration or None if not found.
     """
     project_dir = project_dir or Path.cwd()
@@ -76,7 +77,10 @@ def get_algokit_config(project_dir: Path | None = None) -> dict[str, t.Any] | No
     try:
         return tomllib.loads(config_text)
     except Exception as ex:
-        logger.debug(f"Error parsing {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
+        if verbose_validation:
+            logger.warning(f"{ALGOKIT_CONFIG} file at {project_dir} is not valid toml! Skipping...", exc_info=True)
+        else:
+            logger.debug(f"Error parsing {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
 
 
@@ -85,7 +89,7 @@ def get_algokit_projects_from_config(project_dir: Path | None = None) -> list[st
     Get the list of projects from the .algokit.toml file.
     :return: List of projects.
     """
-    config = get_algokit_config(project_dir)
+    config = get_algokit_config(project_dir=project_dir)
     if config is None:
         return []
 

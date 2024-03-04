@@ -44,7 +44,7 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
     """
 
     # Load and parse the TOML configuration file
-    config = get_algokit_config(project_dir)
+    config = get_algokit_config(project_dir=project_dir)
 
     deploy_config = DeployConfig()
 

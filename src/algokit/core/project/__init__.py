@@ -20,7 +20,7 @@ def get_algokit_projects_from_config(project_dir: Path | None = None) -> list[st
     Get the list of projects from the .algokit.toml file.
     :return: List of project names in a list.
     """
-    config = get_algokit_config(project_dir or Path.cwd())
+    config = get_algokit_config(project_dir=project_dir or Path.cwd())
     if config is None:
         return []
 
