@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from pathlib import Path
+from typing import List, Dict
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -10,7 +11,9 @@ from tests.utils.click_invoker import invoke
 DirWithAppSpecFactory = Callable[[Path], Path]
 
 
-def _create_project_config(project_dir: Path, project_type: str, project_name: str, command: str, description: str):
+def _create_project_config(
+    project_dir: Path, project_type: str, project_name: str, command: str, description: str
+) -> None:
     """
     Creates a .algokit.toml configuration file for a project.
     """
@@ -25,7 +28,7 @@ hello = {{ command = '{command}', description = '{description}' }}
     (project_dir / ".algokit.toml").write_text(project_config, encoding="utf-8")
 
 
-def _create_workspace_project(workspace_dir: Path, projects: list[dict]):
+def _create_workspace_project(workspace_dir: Path, projects: List[Dict[str, str]]) -> None:
     """
     Creates a workspace project and its subprojects.
     """
@@ -109,7 +112,7 @@ def cwd_with_standalone(tmp_path_factory: TempPathFactory) -> Path:
     return cwd
 
 
-def test_run_command_from_workspace_success(cwd_with_workspace: Path):
+def test_run_command_from_workspace_success(cwd_with_workspace: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -120,7 +123,7 @@ def test_run_command_from_workspace_success(cwd_with_workspace: Path):
     verify(result.output)
 
 
-def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequential: Path):
+def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequential: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -131,7 +134,7 @@ def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequen
     verify(result.output)
 
 
-def test_run_command_from_standalone(cwd_with_standalone: Path):
+def test_run_command_from_standalone(cwd_with_standalone: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -142,7 +145,7 @@ def test_run_command_from_standalone(cwd_with_standalone: Path):
     verify(result.output)
 
 
-def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path):
+def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -153,7 +156,7 @@ def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path
     verify(result.output)
 
 
-def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path):
+def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -164,7 +167,7 @@ def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path):
     verify(result.output)
 
 
-def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_sequential: Path):
+def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_sequential: Path) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -175,7 +178,7 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
     verify(result.output)
 
 
-def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.TempPathFactory):
+def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -194,7 +197,7 @@ def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.Te
     verify(result.output)
 
 
-def test_run_command_from_workspace_execution_error(tmp_path_factory: pytest.TempPathFactory):
+def test_run_command_from_workspace_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -213,7 +216,7 @@ def test_run_command_from_workspace_execution_error(tmp_path_factory: pytest.Tem
     verify(result.output)
 
 
-def test_run_command_from_standalone_resolution_error(tmp_path_factory: pytest.TempPathFactory):
+def test_run_command_from_standalone_resolution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -232,7 +235,7 @@ def test_run_command_from_standalone_resolution_error(tmp_path_factory: pytest.T
     verify(result.output)
 
 
-def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.TempPathFactory):
+def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()
     _create_project_config(
