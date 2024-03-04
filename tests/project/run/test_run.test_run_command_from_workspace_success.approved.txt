@@ -2,6 +2,6 @@ DEBUG: Attempting to load project config from {current_working_directory}/.algok
 DEBUG: Attempting to load project config from {current_working_directory}/projects/project1/.algokit.toml
 Detected execution order, running commands sequentially
 ⏳ contract_project: 'hello' command in progress...
-DEBUG: Running '/bin/echo hello contracts' in '{current_working_directory}/projects/project1'
-DEBUG: /bin/echo: hello contracts
-✅ contract_project: '/bin/echo hello contracts' executed successfully.
+DEBUG: Running '/bin/command_a' in '{current_working_directory}/projects/project1'
+DEBUG: /bin/command_a: picked command_a
+✅ contract_project: '/bin/command_a' executed successfully.

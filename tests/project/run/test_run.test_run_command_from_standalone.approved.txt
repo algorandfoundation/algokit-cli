@@ -1,6 +1,7 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: Running '/bin/echo hello contracts' in '{current_working_directory}'
-DEBUG: /bin/echo: hello contracts
-hello contracts
-
-✅ contract_project: '/bin/echo hello contracts' executed successfully.
+DEBUG: Running '/bin/command_a' in '{current_working_directory}'
+DEBUG: /bin/command_a: STDOUT
+DEBUG: /bin/command_a: STDERR
+STDOUT
+STDERR
+✅ contract_project: '/bin/command_a' executed successfully.

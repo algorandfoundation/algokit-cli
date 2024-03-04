@@ -1,13 +1,28 @@
+import sys
 from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+from tests.utils.proc_mock import ProcMock
+from tests.utils.which_mock import WhichMock
 
 DirWithAppSpecFactory = Callable[[Path], Path]
+
+PYTHON_EXECUTABLE = sys.executable
+# need to use an escaped python executable path in config files for windows
+PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
+
+
+@pytest.fixture()
+def which_mock(mocker: MockerFixture) -> WhichMock:
+    which_mock = WhichMock()
+    mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which
+    return which_mock
 
 
 def _create_project_config(
@@ -27,7 +42,14 @@ hello = {{ command = '{command}', description = '{description}' }}
     (project_dir / ".algokit.toml").write_text(project_config, encoding="utf-8")
 
 
-def _create_workspace_project(workspace_dir: Path, projects: list[dict[str, str]]) -> None:
+def _create_workspace_project(
+    *,
+    workspace_dir: Path,
+    projects: list[dict[str, str]],
+    mock_command: bool = False,
+    which_mock: WhichMock | None = None,
+    proc_mock: ProcMock | None = None,
+) -> None:
     """
     Creates a workspace project and its subprojects.
     """
@@ -47,38 +69,46 @@ hello = ['contract_project', 'frontend_project']
     for project in projects:
         project_dir = workspace_dir / "projects" / project["dir"]
         project_dir.mkdir()
+        if mock_command and proc_mock and which_mock:
+            resolved_mocked_cmd = which_mock.add(project["command"])
+            proc_mock.set_output([resolved_mocked_cmd], ["picked " + project["command"]])
+
         _create_project_config(
             project_dir, project["type"], project["name"], project["command"], project["description"]
         )
 
 
 @pytest.fixture()
-def cwd_with_workspace_sequential(tmp_path_factory: TempPathFactory) -> Path:
+def cwd_with_workspace_sequential(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> Path:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
             "dir": "project1",
             "type": "contract",
             "name": "contract_project",
-            "command": 'echo "hello contracts"',
+            "command": "command_a",
             "description": "Prints hello",
         },
         {
             "dir": "project2",
             "type": "frontend",
             "name": "frontend_project",
-            "command": 'echo "hello frontend"',
+            "command": "command_b",
             "description": "Prints hello",
         },
     ]
-    _create_workspace_project(cwd, projects)
+    _create_workspace_project(
+        workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
+    )
 
     # Required for windows compatibility
     return cwd
 
 
 @pytest.fixture()
-def cwd_with_workspace(tmp_path_factory: TempPathFactory) -> Path:
+def cwd_with_workspace(tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock) -> Path:
     """
     Creates a standalone project with a single command.
     Single project is specified due to the fact that these are run concurrently,
@@ -91,27 +121,34 @@ def cwd_with_workspace(tmp_path_factory: TempPathFactory) -> Path:
             "dir": "project1",
             "type": "contract",
             "name": "contract_project",
-            "command": 'echo "hello contracts"',
+            "command": "command_a",
             "description": "Prints hello",
         },
     ]
-    _create_workspace_project(cwd, projects)
+    _create_workspace_project(
+        workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
+    )
 
     # Required for windows compatibility
     return cwd
 
 
 @pytest.fixture()
-def cwd_with_standalone(tmp_path_factory: TempPathFactory) -> Path:
+def cwd_with_standalone(tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock) -> Path:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()
-    _create_project_config(cwd, "contract", "contract_project", 'echo "hello contracts"', "Prints hello contracts")
+
+    which_mock.add("command_a")
+    proc_mock.set_output(["command_a"], ["picked command_a"])
+    _create_project_config(cwd, "contract", "contract_project", "command_a", "Prints hello contracts")
 
     # Required for windows compatibility
     return cwd
 
 
-def test_run_command_from_workspace_success(cwd_with_workspace: Path) -> None:
+def test_run_command_from_workspace_success(
+    cwd_with_workspace: Path,
+) -> None:
     """
     Test running commands through the CLI.
     This includes both valid commands and handling of invalid commands.
@@ -177,7 +214,9 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
     verify(result.output)
 
 
-def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
+def test_run_command_from_workspace_resolution_error(
+    tmp_path_factory: pytest.TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -188,7 +227,10 @@ def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.Te
             "description": "Prints hello",
         },
     ]
-    _create_workspace_project(cwd, projects)
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+    )
 
     result = invoke("project run hello", cwd=cwd)
 
@@ -196,18 +238,23 @@ def test_run_command_from_workspace_resolution_error(tmp_path_factory: pytest.Te
     verify(result.output)
 
 
-def test_run_command_from_workspace_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
+def test_run_command_from_workspace_execution_error(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
             "dir": "project2",
             "type": "frontend",
             "name": "frontend_project",
-            "command": 'python -c "raise Exception()"',
+            "command": PYTHON_EXECUTABLE_ESCAPED + ' -c "raise Exception()"',
             "description": "Prints hello",
         },
     ]
-    _create_workspace_project(cwd, projects)
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+    )
 
     result = invoke("project run hello", cwd=cwd)
 
@@ -215,7 +262,9 @@ def test_run_command_from_workspace_execution_error(tmp_path_factory: pytest.Tem
     verify(result.output)
 
 
-def test_run_command_from_standalone_resolution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
+def test_run_command_from_standalone_resolution_error(
+    tmp_path_factory: pytest.TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -226,7 +275,10 @@ def test_run_command_from_standalone_resolution_error(tmp_path_factory: pytest.T
             "description": "Prints hello",
         },
     ]
-    _create_workspace_project(cwd, projects)
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+    )
 
     result = invoke("project run hello", cwd=cwd)
 
@@ -238,7 +290,11 @@ def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.Te
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()
     _create_project_config(
-        cwd, "contract", "contract_project", 'python -c "raise Exception()"', "Prints hello contracts"
+        cwd,
+        "contract",
+        "contract_project",
+        PYTHON_EXECUTABLE_ESCAPED + ' -c "raise Exception()"',
+        "Prints hello contracts",
     )
 
     result = invoke("project run hello", cwd=cwd)
