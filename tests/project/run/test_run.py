@@ -1,6 +1,5 @@
 from collections.abc import Callable
 from pathlib import Path
-from typing import List, Dict
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -28,7 +27,7 @@ hello = {{ command = '{command}', description = '{description}' }}
     (project_dir / ".algokit.toml").write_text(project_config, encoding="utf-8")
 
 
-def _create_workspace_project(workspace_dir: Path, projects: List[Dict[str, str]]) -> None:
+def _create_workspace_project(workspace_dir: Path, projects: list[dict[str, str]]) -> None:
     """
     Creates a workspace project and its subprojects.
     """
