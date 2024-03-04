@@ -8,8 +8,9 @@ from algosdk.mnemonic import from_private_key
 
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.deploy import load_deploy_config, load_env_files, parse_command, resolve_command
+from algokit.core.project.deploy import load_deploy_config, load_env_files
 from algokit.core.tasks.wallet import get_alias
+from algokit.core.utils import resolve_command_path, split_command_string
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +89,7 @@ class CommandParamType(click.types.StringParamType):
     ) -> list[str]:
         str_value = super().convert(value=value, param=param, ctx=ctx)
         try:
-            return parse_command(str_value)
+            return split_command_string(str_value)
         except ValueError as ex:
             logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
             raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
@@ -136,7 +137,9 @@ class CommandParamType(click.types.StringParamType):
         "if specified in .algokit.toml file."
     ),
 )
+@click.pass_context
 def deploy_command(  # noqa: PLR0913
+    ctx: click.Context,
     *,
     environment_name: str | None,
     command: list[str] | None,
@@ -146,6 +149,14 @@ def deploy_command(  # noqa: PLR0913
     dispenser_alias: str | None,
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
+
+    if ctx.parent and ctx.parent.command.name == "algokit":
+        click.secho(
+            "The 'deploy' command is scheduled for deprecation in v2.x release. "
+            "Please migrate to using 'algokit project deploy' instead.",
+            fg="yellow",
+        )
+
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
     config = load_deploy_config(name=environment_name, project_dir=path)
@@ -160,7 +171,7 @@ def deploy_command(  # noqa: PLR0913
                 "and no generic command."
             )
         raise click.ClickException(msg)
-    resolved_command = resolve_command(config.command)
+    resolved_command = resolve_command_path(config.command)
     logger.info(f"Using deploy command: {' '.join(resolved_command)}")
     # TODO: [future-note] do we want to walk up for env/config?
     logger.info("Loading deployment environment variables...")

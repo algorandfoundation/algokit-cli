@@ -1,0 +1,14 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/projects/project2/.algokit.toml
+Detected execution order, running commands sequentially
+⏳ frontend_project: 'hello' command in progress...
+DEBUG: Running '/Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python -c raise Exception()' in '{current_working_directory}/projects/project2'
+DEBUG: /Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python: Traceback (most recent call last):
+DEBUG: /Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python: File "<string>", line 1, in <module>
+DEBUG: /Users/aorumbayev/MakerX/projects/algokit/algokit-cli/.venv/bin/python: Exception
+ERROR: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+Exception
+
+ERROR: ❌ frontend_project: execution failed: Command hello failed with exit code 1
+Error: Command hello failed with exit code 1

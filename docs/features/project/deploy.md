@@ -1,11 +1,13 @@
-# AlgoKit Deploy Feature Documentation
+# algokit project deploy
 
-Deploy your smart contracts effortlessly to various networks with the AlgoKit Deploy feature. This feature is essential for automation in CI/CD pipelines and for seamless deployment to various Algorand network environments.
+Deploy your smart contracts effortlessly to various networks with the algokit project deploy feature. This feature is essential for automation in CI/CD pipelines and for seamless deployment to various Algorand network environments.
+
+> **Note**: Invoking deploy from `algokit deploy` is scheduled for deprecation in the next major release. Please migrate to using `algokit project deploy` instead.
 
 ## Usage
 
 ```sh
-$ algokit deploy [OPTIONS] [ENVIRONMENT_NAME]
+$ algokit project deploy [OPTIONS] [ENVIRONMENT_NAME]
 ```
 
 This command deploys smart contracts from an AlgoKit compliant repository to the specified network.
@@ -54,23 +56,27 @@ Here's an example of what the `.algokit.toml` file might look like. When deployi
 [algokit]
 min_version = "v{lastest_version}"
 
-[deploy]
+[project]
+
+... # project configuration and custom commands
+
+[project.deploy]
 command = "poetry run python -m smart_contracts deploy"
 environment_secrets = [
   "DEPLOYER_MNEMONIC",
 ]
 
-[deploy.localnet]
+[project.deploy.localnet]
 environment_secrets = []
 ```
 
-The `command` key under each `[deploy.{network_name}]` section should contain a string that represents the deployment command for that particular network. If a `command` key is not provided in a network-specific section, the command from the general `[deploy]` section will be used.
+The `command` key under each `[project.deploy.{network_name}]` section should contain a string that represents the deployment command for that particular network. If a `command` key is not provided in a network-specific section, the command from the general `[project.deploy]` section will be used.
 
-The `environment_secrets` key should contain a list of names of environment variables that should be treated as secrets. This can be defined in the general `[deploy]` section, as well as in the network-specific sections. The environment-specific secrets will be added to the general secrets during deployment.
+The `environment_secrets` key should contain a list of names of environment variables that should be treated as secrets. This can be defined in the general `[project.deploy]` section, as well as in the network-specific sections. The environment-specific secrets will be added to the general secrets during deployment.
 
 The `[algokit]` section with the `min_version` key allows you to specify the minimum version of AlgoKit that the project requires.
 
-This way, you can define common deployment logic and environment secrets in the `[deploy]` section, and provide overrides or additions for specific environments in the `[deploy.{environment_name}]` sections.
+This way, you can define common deployment logic and environment secrets in the `[project.deploy]` section, and provide overrides or additions for specific environments in the `[project.deploy.{environment_name}]` sections.
 
 ## Deploying to a Specific Network
 
@@ -79,7 +85,7 @@ The command requires a `ENVIRONMENT` argument, which specifies the network envir
 Example:
 
 ```sh
-$ algokit deploy testnet
+$ algokit project deploy testnet
 ```
 
 This command deploys the smart contracts to the testnet.
@@ -91,7 +97,7 @@ By default, the deploy command looks for the `.algokit.toml` file in the current
 Example:
 
 ```sh
-$ algokit deploy testnet --project-dir="path/to/project"
+$ algokit project deploy testnet --project-dir="path/to/project"
 ```
 
 ## Custom Deploy Command
@@ -101,7 +107,7 @@ You can provide a custom deploy command using the `--custom-deploy-command` opti
 Example:
 
 ```sh
-$ algokit deploy testnet --custom-deploy-command="your-custom-command"
+$ algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
 ## CI Mode
@@ -113,13 +119,13 @@ This is useful in CI/CD environments where user interaction is not possible. Whe
 Example:
 
 ```sh
-$ algokit deploy testnet --ci
+$ algokit project deploy testnet --ci
 ```
 
 ## Example of a Full Deployment
 
 ```sh
-$ algokit deploy testnet --custom-deploy-command="your-custom-command"
+$ algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
 This example shows how to deploy smart contracts to the testnet using a custom deploy command. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.

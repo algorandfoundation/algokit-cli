@@ -1,5 +1,6 @@
 import logging
 import shutil
+from functools import cache
 from pathlib import Path
 
 import click
@@ -10,6 +11,7 @@ from algokit.core.typed_client_generation import ClientGenerator
 logger = logging.getLogger(__name__)
 
 
+@cache
 def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command]:
     """
     Load custom generate commands from .algokit.toml file.

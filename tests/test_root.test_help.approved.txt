@@ -27,4 +27,5 @@ Commands:
   init         Initializes a new project from a template; run from project
                parent directory.
   localnet     Manage the AlgoKit LocalNet.
+  project      Define custom project specific commands to run via cli or,...
   task         Collection of useful tasks to help you develop on Algorand.

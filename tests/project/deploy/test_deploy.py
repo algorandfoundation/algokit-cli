@@ -28,20 +28,20 @@ TEST_PYTHON_COMMAND = "print(' test_command_invocation ')"
 @pytest.fixture(autouse=True)
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
-    mocker.patch("algokit.core.deploy.shutil.which").side_effect = which_mock.which
+    mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which
     return which_mock
 
 
 def test_algokit_config_empty_array(tmp_path_factory: TempPathFactory) -> None:
     empty_array_config = """
-[deploy]
+[project.deploy]
 command = []
     """.strip()
 
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ALGOKIT_CONFIG).write_text(empty_array_config, encoding="utf-8")
     (cwd / ".env").touch()
-    result = invoke(["deploy"], cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
 
     assert result.exit_code != 0
     verify(result.output)
@@ -55,7 +55,7 @@ def test_algokit_config_invalid_syntax(tmp_path_factory: TempPathFactory) -> Non
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / ALGOKIT_CONFIG).write_text(invalid_config, encoding="utf-8")
     (cwd / ".env").touch()
-    result = invoke(["deploy"], cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
 
     assert result.exit_code != 0
     verify(result.output)
@@ -65,13 +65,13 @@ def test_algokit_config_name_overrides(
     tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
     config_with_override = """
-[deploy]
+[project.deploy]
 command = "command_a"
 
-[deploy.localnet]
+[project.deploy.localnet]
 command = "command_b"
 
-[deploy.testnet]
+[project.deploy.testnet]
 command = "command_c"
     """.strip()
     cwd = tmp_path_factory.mktemp("cwd")
@@ -83,7 +83,7 @@ command = "command_c"
     resolved_cmd = which_mock.add("command_c")
     proc_mock.set_output([resolved_cmd], ["picked testnet"])
 
-    result = invoke(["deploy", "testnet"], cwd=cwd)
+    result = invoke(["project", "deploy", "testnet"], cwd=cwd)
 
     assert result.exit_code == 0
     verify(result.output)
@@ -93,10 +93,10 @@ def test_algokit_config_name_no_base(
     tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
     config_with_override = """
-[deploy.localnet]
+[project.deploy.localnet]
 command = "command_a"
 
-[deploy.testnet]
+[project.deploy.testnet]
 command = "command_b"
     """.strip()
     cwd = tmp_path_factory.mktemp("cwd")
@@ -107,7 +107,7 @@ command = "command_b"
     cmd = which_mock.add("command_a")
     proc_mock.set_output([cmd], ["picked localnet"])
 
-    result = invoke(["deploy", "localnet"], cwd=cwd)
+    result = invoke(["project", "deploy", "localnet"], cwd=cwd)
 
     assert result.exit_code == 0
     verify(result.output)
@@ -115,12 +115,13 @@ command = "command_b"
 
 def test_command_invocation_and_command_splitting(tmp_path: Path) -> None:
     config_data = """
-[deploy]
+[project.deploy]
 command = ["not", "used"]
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
     result = invoke(
         [
+            "project",
             "deploy",
             "--command",
             f'{PYTHON_EXECUTABLE} -c "{TEST_PYTHON_COMMAND}"',
@@ -133,22 +134,22 @@ command = ["not", "used"]
 
 def test_command_splitting_from_config(tmp_path: Path) -> None:
     config_data = rf"""
-[deploy]
+[project.deploy]
 command = "{PYTHON_EXECUTABLE_ESCAPED} -c \"{TEST_PYTHON_COMMAND}\""
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
-    result = invoke("deploy", cwd=tmp_path)
+    result = invoke(["project", "deploy"], cwd=tmp_path)
     assert result.exit_code == 0
     verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
 
 def test_command_without_splitting_from_config(tmp_path: Path) -> None:
     config_data = rf"""
-[deploy]
+[project.deploy]
 command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
     """.strip()
     (tmp_path / ALGOKIT_CONFIG).write_text(config_data, encoding="utf-8")
-    result = invoke("deploy", cwd=tmp_path)
+    result = invoke(["project", "deploy"], cwd=tmp_path)
     assert result.exit_code == 0
     verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
 
@@ -156,7 +157,7 @@ command = ["{PYTHON_EXECUTABLE_ESCAPED}", "-c", "{TEST_PYTHON_COMMAND}"]
 @pytest.mark.usefixtures("proc_mock")
 def test_command_not_found_and_no_config(tmp_path: Path) -> None:
     cmd = "gm"
-    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
+    result = invoke(["project", "deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
@@ -165,7 +166,7 @@ def test_command_not_executable(proc_mock: ProcMock, tmp_path: Path, which_mock:
     cmd = "gm"
     cmd_resolved = which_mock.add(cmd)
     proc_mock.should_deny_on([cmd_resolved])
-    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
+    result = invoke(["project", "deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
@@ -174,14 +175,14 @@ def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path, which_mock: 
     cmd = "gm"
     cmd_resolved = which_mock.add(cmd)
     proc_mock.should_bad_exit_on([cmd_resolved], output=["it is not morning"])
-    result = invoke(["deploy", "--command", cmd], cwd=tmp_path)
+    result = invoke(["project", "deploy", "--command", cmd], cwd=tmp_path)
     assert result.exit_code != 0
     verify(result.output)
 
 
 def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory, which_mock: WhichMock) -> None:
     config_with_override = """
-[deploy.localnet]
+[project.deploy.localnet]
 command = "command_a"
     """.strip()
     cwd = tmp_path_factory.mktemp("cwd")
@@ -189,7 +190,7 @@ command = "command_a"
     (cwd / ".env").touch()
 
     which_mock.add("command_a")
-    result = invoke(["deploy", "localnet"], cwd=cwd)
+    result = invoke(["project", "deploy", "localnet"], cwd=cwd)
 
     assert result.exit_code == 1
     verify(result.output)
@@ -212,10 +213,10 @@ ENV_B=LOCALNET_ENV_B
     monkeypatch.setenv("ENV_A", "ENVIRON_ENV_A")
 
     config_with_deploy_name = """
-[deploy]
+[project.deploy]
 command = "command_a"
 
-[deploy.localnet]
+[project.deploy.localnet]
 command = "command_b"
     """.strip()
 
@@ -227,7 +228,7 @@ command = "command_b"
     cmd_resolved = which_mock.add("command_b")
     proc_mock.set_output([cmd_resolved], ["picked localnet"])
 
-    result = invoke(["deploy", "localnet"], cwd=cwd)
+    result = invoke(["project", "deploy", "localnet"], cwd=cwd)
 
     assert proc_mock.called[0].env
     passed_env_vars = proc_mock.called[0].env
@@ -243,7 +244,7 @@ def test_algokit_deploy_only_base_deploy_config(
     tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
 ) -> None:
     config_with_only_base_deploy = """
-[deploy]
+[project.deploy]
 command = "command_a"
     """.strip()
 
@@ -258,7 +259,7 @@ ENV_A=GENERIC_ENV_A
     cmd_resolved = which_mock.add("command_a")
     proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
-    result = invoke(["deploy"], cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
 
     assert result.exit_code == 0
     assert proc_mock.called[0].env
@@ -281,7 +282,7 @@ def test_ci_flag_interactivity_mode_via_env(
     mock_prompt = mocker.patch("click.prompt")
 
     config_with_only_base_deploy = """
-[deploy]
+[project.deploy]
 command = "command_a"
 environment_secrets = [
     "DEPLOYER_MNEMONIC"
@@ -295,7 +296,7 @@ environment_secrets = [
     cmd_resolved = which_mock.add("command_a")
     proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
-    result = invoke(["deploy"], cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
 
     mock_prompt.assert_not_called()
     assert result.exit_code != 0
@@ -312,7 +313,7 @@ def test_ci_flag_interactivity_mode_via_cli(
     mock_prompt = mocker.patch("click.prompt")
 
     config_with_only_base_deploy = """
-[deploy]
+[project.deploy]
 command = "command_a"
 environment_secrets = [
     "DEPLOYER_MNEMONIC"
@@ -326,7 +327,7 @@ environment_secrets = [
     cmd_resolved = which_mock.add("command_a")
     proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
-    result = invoke(["deploy", "--ci"], cwd=cwd)
+    result = invoke(["project", "deploy", "--ci"], cwd=cwd)
 
     mock_prompt.assert_not_called()
     assert result.exit_code != 0
@@ -348,7 +349,7 @@ def test_secrets_prompting_via_stdin(
     # mock click.prompt
     mock_prompt = mocker.patch("click.prompt", return_value="secret_value")
     config_with_only_base_deploy = """
-[deploy]
+[project.deploy]
 command = "command_a"
 environment_secrets = [
     "DEPLOYER_MNEMONIC"
@@ -361,7 +362,7 @@ environment_secrets = [
     cmd_resolved = which_mock.add("command_a")
     proc_mock.set_output([cmd_resolved], ["picked base deploy command"])
 
-    result = invoke(["deploy"], cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
     mock_prompt.assert_called_once()  # ensure called
     assert result.exit_code == 0  # ensure success
 
@@ -383,7 +384,7 @@ def test_deploy_custom_project_dir(
     custom_folder.mkdir()
     (custom_folder / ALGOKIT_CONFIG).write_text(
         """
-[deploy]
+[project.deploy]
 command = "command_a"
     """.strip(),
         encoding="utf-8",
@@ -397,7 +398,7 @@ command = "command_a"
     # Below is needed for escaping the backslash in the path on Windows
     # Works on Linux as well since \\ doesn't exist in the path in such cases
     path = str(custom_folder.absolute()).replace("\\", r"\\")
-    result = invoke(f"deploy testnet --path={path}", cwd=cwd, input="\n".join(input_answers))
+    result = invoke(f"project deploy testnet --path={path}", cwd=cwd, input="\n".join(input_answers))
 
     assert result.exit_code == 0
     verify(result.output)
@@ -408,14 +409,14 @@ def test_deploy_shutil_command_not_found(tmp_path_factory: TempPathFactory) -> N
 
     (cwd / ALGOKIT_CONFIG).write_text(
         """
-[deploy]
+[project.deploy]
 command = "command_a"
     """.strip(),
         encoding="utf-8",
     )
     (cwd / ".env").touch()
 
-    result = invoke("deploy", cwd=cwd)
+    result = invoke(["project", "deploy"], cwd=cwd)
 
     assert result.exit_code == 1
     verify(result.output)
@@ -444,7 +445,7 @@ def test_deploy_dispenser_alias(
     monkeypatch.setenv(env_var_name, "GENERIC_ENV_A")
 
     config_with_deploy_name = f"""
-[deploy]
+[project.deploy]
 command = "command_a"
 environment_secrets = [
     "{env_var_name}"
@@ -459,7 +460,7 @@ environment_secrets = [
     (cwd / ALGOKIT_CONFIG).write_text(config_with_deploy_name, encoding="utf-8")
     (cwd / ".env").write_text(env_config, encoding="utf-8")
     which_mock.add("command_a")
-    result = invoke(["deploy", f"--{alias}", alias], cwd=cwd)
+    result = invoke(["project", "deploy", f"--{alias}", alias], cwd=cwd)
 
     assert proc_mock.called[0].env
     passed_env_vars = proc_mock.called[0].env

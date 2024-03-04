@@ -1,4 +1,4 @@
 DEBUG: Deploying from project directory: {current_working_directory}
 DEBUG: Loading deploy command from project config
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-Error: Failed to resolve deploy command, 'command_a' wasn't found
+Error: Failed to resolve custom command, 'command_a' wasn't found

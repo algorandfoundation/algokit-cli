@@ -1,6 +1,7 @@
 import codecs
 import platform
 import re
+import shutil
 import socket
 import sys
 import threading
@@ -158,3 +159,39 @@ def is_binary_mode() -> bool:
     return: True if running in a native binary frozen environment, False otherwise.
     """
     return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+
+
+def split_command_string(command: str) -> list[str]:
+    """
+    Parses a command string into a list of arguments, handling both shell and non-shell commands
+    """
+
+    if shutil.which("mslex"):  # Check for mslex directly
+        import mslex
+
+        return mslex.split(command)
+    else:
+        import shlex
+
+        return shlex.split(command)
+
+
+def resolve_command_path(command: list[str]) -> list[str]:
+    """
+    Encapsulates custom command resolution, promotes reusability
+
+    Args:
+        command (list[str]): The command to resolve
+
+    Returns:
+        list[str]: The resolved command
+    """
+
+    cmd, *args = command
+    if "/" in cmd or "\\" in cmd:  # More accurate path check
+        return command  # Assume full path provided
+
+    resolved_cmd = shutil.which(cmd)
+    if not resolved_cmd:
+        raise click.ClickException(f"Failed to resolve custom command, '{cmd}' wasn't found")
+    return [resolved_cmd, *args]

@@ -1,0 +1,12 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/projects/project1/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/projects/project2/.algokit.toml
+Detected execution order, running commands sequentially
+⏳ contract_project: 'hello' command in progress...
+DEBUG: Running '/bin/echo hello contracts' in '{current_working_directory}/projects/project1'
+DEBUG: /bin/echo: hello contracts
+✅ contract_project: '/bin/echo hello contracts' executed successfully.
+⏳ frontend_project: 'hello' command in progress...
+DEBUG: Running '/bin/echo hello frontend' in '{current_working_directory}/projects/project2'
+DEBUG: /bin/echo: hello frontend
+✅ frontend_project: '/bin/echo hello frontend' executed successfully.

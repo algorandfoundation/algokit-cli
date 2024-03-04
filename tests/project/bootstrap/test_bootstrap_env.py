@@ -18,7 +18,7 @@ def test_bootstrap_env_no_files(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -32,7 +32,7 @@ def test_bootstrap_env_dotenv_exists(tmp_path_factory: TempPathFactory) -> None:
     (cwd / ".env.template").touch()
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -56,7 +56,7 @@ def test_bootstrap_network_prefixed_envs(env_file_name: str, tmp_path_factory: T
         (cwd / f"{env_file_name}.template").touch()
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -71,7 +71,7 @@ def test_bootstrap_env_multiple_templates(tmp_path_factory: TempPathFactory) -> 
     (cwd / ".env.testnet.template").touch()
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -84,7 +84,7 @@ def test_bootstrap_env_dotenv_missing_template_exists(tmp_path_factory: TempPath
     (cwd / ".env.template").write_text("env_template_contents")
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -110,7 +110,7 @@ TOKEN_5_SPECIAL_CHAR=*
     )
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 
@@ -158,7 +158,7 @@ TOKEN_8_SPECIAL_CHAR=*
     mock_questionary_input.send_text("\n")  # enter
 
     result = invoke(
-        "bootstrap env",
+        "project bootstrap env",
         cwd=cwd,
     )
 

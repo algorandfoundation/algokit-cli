@@ -1,13 +1,12 @@
 import dataclasses
 import logging
-import platform
-import shutil
 from pathlib import Path
 
 import click
 import dotenv
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.utils import split_command_string
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,11 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
 
     # ensure there is at least some config under [deploy] and that it's a dict type
     # (which should implicitly exist even if only [deploy.{name}] exists)
-    match deploy_table := config.get("deploy"):
+    legacy_deploy_table = config.get("deploy")
+    project_deploy_table = config.get("project", {}).get("deploy", {})
+    deploy_table = project_deploy_table or legacy_deploy_table
+
+    match deploy_table:
         case dict():
             pass  # expected case if there is a file with deploy config
         case None:
@@ -69,7 +72,7 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
         match tbl:
             case {"command": str(command)}:
                 try:
-                    deploy_config.command = parse_command(command)
+                    deploy_config.command = split_command_string(command)
                 except ValueError as ex:
                     logger.debug(f"Failed to parse command string: {command}", exc_info=True)
                     raise click.ClickException(f"Failed to parse command '{command}': {ex}") from ex
@@ -84,25 +87,3 @@ def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
                 raise click.ClickException(f"Invalid data provided under 'environment_secrets' key: {bad_data}")
 
     return deploy_config
-
-
-def parse_command(command: str) -> list[str]:
-    if platform.system() == "Windows":
-        import mslex
-
-        return mslex.split(command)
-    else:
-        import shlex
-
-        return shlex.split(command)
-
-
-def resolve_command(command: list[str]) -> list[str]:
-    cmd, *args = command
-    # if the command has any path separators or such, don't try and resolve
-    if Path(cmd).name != cmd:
-        return command
-    resolved_cmd = shutil.which(cmd)
-    if not resolved_cmd:
-        raise click.ClickException(f"Failed to resolve deploy command, '{cmd}' wasn't found")
-    return [resolved_cmd, *args]

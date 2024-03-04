@@ -44,7 +44,7 @@ def test_base_python_path(python_base_executable: str) -> None:
 
 @pytest.mark.usefixtures("proc_mock")
 def test_bootstrap_poetry_with_poetry() -> None:
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -55,7 +55,7 @@ def test_bootstrap_poetry_without_poetry(proc_mock: ProcMock, mock_questionary_i
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -67,7 +67,7 @@ def test_bootstrap_poetry_without_poetry_failed_install(proc_mock: ProcMock, moc
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 1
     verify(result.output)
@@ -81,7 +81,7 @@ def test_bootstrap_poetry_without_poetry_failed_poetry_path(
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 1
     verify(result.output)
@@ -109,7 +109,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 0
     verify(result.output.replace(python_base_executable, "{python_base_executable}"), namer=PyTestNamer(request))
@@ -125,7 +125,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 1
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))
@@ -141,7 +141,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 1
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))
@@ -157,7 +157,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
-    result = invoke("bootstrap poetry")
+    result = invoke("project bootstrap poetry")
 
     assert result.exit_code == 1
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))

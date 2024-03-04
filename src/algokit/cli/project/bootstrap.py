@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from algokit.core.bootstrap import (
+from algokit.core.project.bootstrap import (
     bootstrap_any_including_subdirs,
     bootstrap_env,
     bootstrap_npm,
@@ -21,11 +21,19 @@ logger = logging.getLogger(__name__)
 @click.group(
     "bootstrap", short_help="Bootstrap local dependencies in an AlgoKit project; run from project root directory."
 )
-def bootstrap_group(*, force: bool) -> None:
+@click.pass_context
+def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
     """
     Expedited initial setup for any developer by installing and configuring dependencies and other
     key development environment setup activities.
     """
+
+    if ctx.parent and ctx.parent.command.name == "algokit":
+        click.secho(
+            "The 'bootstrap' command group is scheduled for deprecation in v2.x release. "
+            "Please migrate to using 'algokit project bootstrap' instead.",
+            fg="yellow",
+        )
     project_minimum_algokit_version_check(Path.cwd(), ignore_version_check_fail=force)
 
 

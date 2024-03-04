@@ -11,7 +11,7 @@ def test_bootstrap_all_empty(tmp_path_factory: TempPathFactory) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -24,7 +24,7 @@ def test_bootstrap_all_algokit_min_version(tmp_path_factory: TempPathFactory) ->
     current_version = get_current_package_version()
     (cwd / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -37,7 +37,7 @@ def test_bootstrap_all_algokit_min_version_ignore_error(tmp_path_factory: TempPa
     current_version = get_current_package_version()
     (cwd / ALGOKIT_CONFIG).write_text('[algokit]\nmin_version = "999.99.99"\n')
     result = invoke(
-        "bootstrap --force all",
+        "project bootstrap --force all",
         cwd=cwd,
     )
 
@@ -50,7 +50,7 @@ def test_bootstrap_all_env(tmp_path_factory: TempPathFactory) -> None:
     (cwd / ".env.template").touch()
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -64,7 +64,7 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory) -> None:
     (cwd / "poetry.toml").touch()
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -78,7 +78,7 @@ def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.Fi
     (cwd / "package.json").touch()
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -92,7 +92,7 @@ def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory) -
     (cwd / "pyproject.toml").write_text("[tool.poetry]", encoding="utf-8")
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -115,7 +115,7 @@ def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory) -> None:
     (cwd / "double_nested_dir" / "nest2" / "file.txt").touch()
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 
@@ -132,7 +132,7 @@ def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory) -> None:
     (cwd / "live_dir" / "poetry.toml").touch()
 
     result = invoke(
-        "bootstrap all",
+        "project bootstrap all",
         cwd=cwd,
     )
 

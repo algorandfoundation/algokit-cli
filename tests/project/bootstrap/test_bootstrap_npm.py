@@ -15,7 +15,7 @@ def test_bootstrap_npm_without_npm(
     (cwd / "package.json").touch()
 
     result = invoke(
-        "bootstrap npm",
+        "project bootstrap npm",
         cwd=cwd,
     )
 
@@ -27,7 +27,7 @@ def test_bootstrap_npm_without_npm(
 def test_bootstrap_npm_without_package_file(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
-        "bootstrap npm",
+        "project bootstrap npm",
         cwd=cwd,
     )
 
@@ -44,7 +44,7 @@ def test_bootstrap_npm_without_npm_and_package_file(
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "bootstrap npm",
+        "project bootstrap npm",
         cwd=cwd,
     )
 
@@ -58,7 +58,7 @@ def test_bootstrap_npm_happy_path(tmp_path_factory: TempPathFactory, request: py
     (cwd / "package.json").touch()
 
     result = invoke(
-        "bootstrap npm",
+        "project bootstrap npm",
         cwd=cwd,
     )
 
