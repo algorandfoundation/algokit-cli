@@ -193,5 +193,5 @@ def resolve_command_path(command: list[str]) -> list[str]:
 
     resolved_cmd = shutil.which(cmd)
     if not resolved_cmd:
-        raise click.ClickException(f"Failed to resolve custom command, '{cmd}' wasn't found")
+        raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
     return [resolved_cmd, *args]

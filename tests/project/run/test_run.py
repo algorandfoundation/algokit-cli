@@ -18,6 +18,10 @@ PYTHON_EXECUTABLE = sys.executable
 PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
 
 
+def _strip_line_starting_with(output: str, start_str: str) -> str:
+    return "\n".join([line for line in output.split("\n") if not line.startswith(start_str)])
+
+
 @pytest.fixture()
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
@@ -49,19 +53,21 @@ def _create_workspace_project(
     mock_command: bool = False,
     which_mock: WhichMock | None = None,
     proc_mock: ProcMock | None = None,
+    custom_project_order: list[str] | None = None,
 ) -> None:
     """
     Creates a workspace project and its subprojects.
     """
     workspace_dir.mkdir()
+    custom_project_order = custom_project_order if custom_project_order else ["contract_project", "frontend_project"]
     (workspace_dir / ".algokit.toml").write_text(
-        """
+        f"""
 [project]
 type = 'workspace'
 projects_root_path = 'projects'
 
 [project.run]
-hello = ['contract_project', 'frontend_project']
+hello = {custom_project_order}
         """.strip(),
         encoding="utf-8",
     )
@@ -259,7 +265,7 @@ def test_run_command_from_workspace_execution_error(
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_strip_line_starting_with(result.output, "DEBUG"))
 
 
 def test_run_command_from_standalone_resolution_error(
@@ -300,4 +306,33 @@ def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.Te
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_strip_line_starting_with(result.output, "DEBUG"))
+
+
+def test_run_command_from_workspace_partially_sequential(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    projects = []
+    for i in range(1, 6):
+        projects.append(
+            {
+                "dir": f"project{i}",
+                "type": "contract",
+                "name": f"contract_project_{i}",
+                "command": f"hello{i}",
+                "description": "Prints hello",
+            }
+        )
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+        mock_command=True,
+        which_mock=which_mock,
+        proc_mock=proc_mock,
+        custom_project_order=["contract_project_1", "contract_project_4"],
+    )
+
+    result = invoke("project run hello", cwd=cwd)
+    assert result.exit_code == 0
+    verify(_strip_line_starting_with(result.output, "✅"))
