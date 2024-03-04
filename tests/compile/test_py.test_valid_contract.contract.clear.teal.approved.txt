@@ -1,0 +1,7 @@
+#pragma version 10
+
+contract.HelloWorldContract.clear_state_program:
+    // {temp_output_directory}/contract.py:12
+    // return True
+    int 1
+    return

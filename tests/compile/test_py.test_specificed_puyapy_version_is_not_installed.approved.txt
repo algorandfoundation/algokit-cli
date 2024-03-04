@@ -4,6 +4,6 @@ DEBUG: Running 'puyapy --version' in '{current_working_directory}'
 DEBUG: puyapy: Puyapy not found
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: 1.0.0
-DEBUG: Running 'pipx run puya==1.1.0 {current_working_directory}/tests/compile/hello_world_contract.py' in '{current_working_directory}'
+DEBUG: Running 'pipx run puya==1.1.0 {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
 DEBUG: pipx: Done
 Done

@@ -58,4 +58,9 @@ def compile_py_command(context: click.Context, puya_args: list[str]) -> None:
     click.echo(run_result.output)
 
     if run_result.exit_code != 0:
+        click.secho(
+            "An error occurred during compile. Ensure supplied files are valid PuyaPy code before retrying.",
+            err=True,
+            fg="red",
+        )
         raise click.exceptions.Exit(run_result.exit_code)
