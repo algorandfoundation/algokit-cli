@@ -14,7 +14,7 @@ from tests.utils.which_mock import WhichMock
 DirWithAppSpecFactory = Callable[[Path], Path]
 
 PYTHON_EXECUTABLE = sys.executable
-# need to use an escaped python executable path in config files for windows
+# Escaping the python executable path for use in config files on Windows platforms
 PYTHON_EXECUTABLE_ESCAPED = PYTHON_EXECUTABLE.replace("\\", "\\\\")
 
 
@@ -29,7 +29,14 @@ def _create_project_config(
     project_dir: Path, project_type: str, project_name: str, command: str, description: str
 ) -> None:
     """
-    Creates a .algokit.toml configuration file for a project.
+    Creates a .algokit.toml configuration file in the specified project directory.
+
+    Args:
+        project_dir (Path): The directory of the project.
+        project_type (str): The type of the project.
+        project_name (str): The name of the project.
+        command (str): The command associated with the project.
+        description (str): A description of the project.
     """
     project_config = f"""
 [project]
@@ -52,7 +59,17 @@ def _create_workspace_project(
     custom_project_order: list[str] | None = None,
 ) -> None:
     """
-    Creates a workspace project and its subprojects.
+    Creates a workspace project and its subprojects within the specified directory.
+
+    Args:
+        workspace_dir (Path): The directory of the workspace.
+        projects (list[dict[str, str]]): A list of dictionaries, each representing a project with
+        keys for directory, type, name, command, and description.
+        mock_command (bool, optional): Indicates whether to mock the command. Defaults to False.
+        which_mock (WhichMock | None, optional): The mock object for the 'which' command. Defaults to None.
+        proc_mock (ProcMock | None, optional): The mock object for the process execution. Defaults to None.
+        custom_project_order (list[str] | None, optional): Specifies a custom order for project execution.
+        Defaults to None.
     """
     workspace_dir.mkdir()
     custom_project_order = custom_project_order if custom_project_order else ["contract_project", "frontend_project"]
@@ -105,7 +122,6 @@ def cwd_with_workspace_sequential(
         workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
     )
 
-    # Required for windows compatibility
     return cwd
 
 
@@ -131,7 +147,6 @@ def cwd_with_workspace(tmp_path_factory: TempPathFactory, which_mock: WhichMock,
         workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
     )
 
-    # Required for windows compatibility
     return cwd
 
 
@@ -144,7 +159,6 @@ def cwd_with_standalone(tmp_path_factory: TempPathFactory, which_mock: WhichMock
     proc_mock.set_output(["command_a"], ["picked command_a"])
     _create_project_config(cwd, "contract", "contract_project", "command_a", "Prints hello contracts")
 
-    # Required for windows compatibility
     return cwd
 
 
@@ -152,8 +166,10 @@ def test_run_command_from_workspace_success(
     cwd_with_workspace: Path,
 ) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Verifies successful command execution within a workspace project.
+
+    Args:
+        cwd_with_workspace (Path): The path to the workspace directory.
     """
     result = invoke("project run hello", cwd=cwd_with_workspace)
 
@@ -163,8 +179,10 @@ def test_run_command_from_workspace_success(
 
 def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequential: Path) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Verifies successful sequential command execution within a workspace project.
+
+    Args:
+        cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
     result = invoke("project run hello", cwd=cwd_with_workspace_sequential)
 
@@ -174,8 +192,10 @@ def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequen
 
 def test_run_command_from_standalone(cwd_with_standalone: Path) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Verifies successful command execution within a standalone project.
+
+    Args:
+        cwd_with_standalone (Path): The path to the standalone project directory.
     """
     result = invoke("project run hello", cwd=cwd_with_standalone)
 
@@ -185,8 +205,10 @@ def test_run_command_from_standalone(cwd_with_standalone: Path) -> None:
 
 def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Verifies successful command execution within a workspace project with filtering by project name.
+
+    Args:
+        cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
     result = invoke("project run hello --project_name 'contract_project'", cwd=cwd_with_workspace_sequential)
 
@@ -196,8 +218,10 @@ def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path
 
 def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Lists all commands available within a workspace project.
+
+    Args:
+        cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
     result = invoke("project run hello --list", cwd=cwd_with_workspace_sequential)
 
@@ -207,8 +231,10 @@ def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path) -> 
 
 def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_sequential: Path) -> None:
     """
-    Test running commands through the CLI.
-    This includes both valid commands and handling of invalid commands.
+    Verifies command execution within a workspace project when the specified project does not exist.
+
+    Args:
+        cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
     result = invoke("project run hello --project_name contract_project2", cwd=cwd_with_workspace_sequential)
 
@@ -219,6 +245,12 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
 def test_run_command_from_workspace_resolution_error(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
+    """
+    Verifies the behavior when a command resolution error occurs within a workspace project.
+
+    Args:
+        tmp_path_factory (pytest.TempPathFactory): Pytest fixture to create temporary directories.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -243,6 +275,12 @@ def test_run_command_from_workspace_resolution_error(
 def test_run_command_from_workspace_execution_error(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
+    """
+    Verifies the behavior when a command execution error occurs within a workspace project.
+
+    Args:
+        tmp_path_factory (pytest.TempPathFactory): Pytest fixture to create temporary directories.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -267,6 +305,12 @@ def test_run_command_from_workspace_execution_error(
 def test_run_command_from_standalone_resolution_error(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
+    """
+    Verifies the behavior when a command resolution error occurs within a standalone project.
+
+    Args:
+        tmp_path_factory (pytest.TempPathFactory): Pytest fixture to create temporary directories.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = [
         {
@@ -289,6 +333,12 @@ def test_run_command_from_standalone_resolution_error(
 
 
 def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
+    """
+    Verifies the behavior when a command execution error occurs within a standalone project.
+
+    Args:
+        tmp_path_factory (pytest.TempPathFactory): Pytest fixture to create temporary directories.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()
     _create_project_config(
@@ -308,6 +358,14 @@ def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.Te
 def test_run_command_from_workspace_partially_sequential(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
 ) -> None:
+    """
+    Verifies successful execution of commands in a partially sequential order within a workspace project.
+
+    Args:
+        tmp_path_factory (TempPathFactory): Pytest fixture to create temporary directories.
+        which_mock (WhichMock): Mock object for the 'which' command.
+        proc_mock (ProcMock): Mock object for process execution.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = []
     for i in range(1, 6):
@@ -339,6 +397,12 @@ def test_run_command_from_workspace_partially_sequential(
 def test_run_command_from_standalone_pass_env(
     tmp_path_factory: TempPathFactory,
 ) -> None:
+    """
+    Verifies successful command execution within a standalone project with environment variables passed.
+
+    Args:
+        tmp_path_factory (TempPathFactory): Pytest fixture to create temporary directories.
+    """
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()
     (cwd / "print_env.py").write_text('import os; print(os.environ.get("HELLO"))')

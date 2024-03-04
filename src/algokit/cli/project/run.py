@@ -19,9 +19,16 @@ logger = logging.getLogger(__name__)
 @cache
 def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
     """
-    Load project commands from .algokit.toml file.
-    :param project_dir: Project directory path.
-    :return: Custom generate commands.
+    Loads project commands from the .algokit.toml file located in the specified project directory.
+
+    This function reads the project directory's .algokit.toml configuration file, extracts custom commands defined
+    within it, and returns a dictionary mapping command names to their corresponding Click command objects.
+
+    Args:
+        project_dir (Path): The path to the project directory.
+
+    Returns:
+        dict[str, click.Command]: A dictionary where keys are command names and values are Click command objects.
     """
 
     custom_commands = load_commands(project_dir)
@@ -39,6 +46,22 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             project_names: list[str] | None = None,
             list_projects: bool = False,
         ) -> None:
+            """
+            Executes a base command function with optional parameters for listing projects or specifying project names.
+
+            This function serves as the base for executing both ProjectCommand and WorkspaceProjectCommand instances.
+            It handles listing projects within a workspace and executing commands for specific projects or all projects
+            within a workspace.
+
+            Args:
+                custom_command (ProjectCommand | WorkspaceProjectCommand): The custom command to be executed.
+                project_names (list[str] | None): Optional. A list of project names to execute the command on.
+                list_projects (bool): Optional. A flag indicating whether to list projects associated
+                with a workspace command.
+
+            Returns:
+                None
+            """
             if list_projects and isinstance(custom_command, WorkspaceProjectCommand):
                 for command in custom_command.commands:
                     logger.info(
@@ -96,7 +119,24 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
 
 
 class RunCommandGroup(click.Group):
+    """
+    A custom Click command group for dynamically loading and executing project commands.
+
+    This command group overrides the default Click command loading mechanism to include dynamically loaded project
+    commands from the .algokit.toml configuration file. It supports both predefined and dynamically loaded commands.
+    """
+
     def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        """
+        Retrieves a command by name, including dynamically loaded project commands.
+
+        Args:
+            ctx (click.Context): The current Click context.
+            cmd_name (str): The name of the command to retrieve.
+
+        Returns:
+            click.Command | None: The requested command if found; otherwise, None.
+        """
         return_value = super().get_command(ctx, cmd_name)
 
         if return_value is not None:
@@ -105,6 +145,15 @@ class RunCommandGroup(click.Group):
         return _load_project_commands(Path.cwd()).get(cmd_name)
 
     def list_commands(self, ctx: click.Context) -> list[str]:
+        """
+        Lists all available commands, including dynamically loaded project commands.
+
+        Args:
+            ctx (click.Context): The current Click context.
+
+        Returns:
+            list[str]: A sorted list of all available command names.
+        """
         predefined_command_names = super().list_commands(ctx)
         dynamic_commands = _load_project_commands(Path.cwd())
         dynamic_command_names = list(dynamic_commands)

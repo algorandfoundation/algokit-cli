@@ -17,6 +17,16 @@ logger = logging.getLogger("rich")
 
 @dataclasses.dataclass(kw_only=True)
 class ProjectCommand:
+    """Represents a command to be executed within a project context.
+
+    Attributes:
+        name (str): The name of the command.
+        command (list[str]): The command to be executed, as a list of strings.
+        cwd (Path | None): The current working directory from which the command should be executed.
+        description (str | None): A brief description of the command.
+        project_name (str): The name of the project associated with this command.
+    """
+
     name: str
     command: list[str]
     cwd: Path | None = None
@@ -26,6 +36,15 @@ class ProjectCommand:
 
 @dataclasses.dataclass(kw_only=True)
 class WorkspaceProjectCommand:
+    """Represents a command that encompasses multiple project commands within a workspace.
+
+    Attributes:
+        name (str): The name of the workspace command.
+        description (str | None): A brief description of the workspace command.
+        commands (list[ProjectCommand]): A list of `ProjectCommand` instances to be executed.
+        execution_order (list[str]): The order in which the commands should be executed.
+    """
+
     name: str
     description: str | None = None
     commands: list[ProjectCommand]
@@ -33,7 +52,15 @@ class WorkspaceProjectCommand:
 
 
 def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> None:
-    """Encapsulates the execution of a single project command"""
+    """Executes a specified project command.
+
+    Args:
+        command (ProjectCommand): The project command to be executed.
+        from_workspace (bool): Indicates whether the command is being executed from a workspace context.
+
+    Raises:
+        click.ClickException: If the command execution fails.
+    """
     result = run(
         command=command.command,
         cwd=command.cwd,
@@ -54,7 +81,15 @@ def run_workspace_command(
     workspace_command: WorkspaceProjectCommand,
     project_names: list[str] | None = None,
 ) -> None:
-    def _execute_command(cmd: ProjectCommand) -> None:  # Nested for clarity
+    """Executes a workspace command, potentially limited to specified projects.
+
+    Args:
+        workspace_command (WorkspaceProjectCommand): The workspace command to be executed.
+        project_names (list[str] | None): Optional; specifies a subset of projects to execute the command for.
+    """
+
+    def _execute_command(cmd: ProjectCommand) -> None:
+        """Helper function to execute a single project command within the workspace context."""
         logger.info(f"⏳ {cmd.project_name}: '{cmd.name}' command in progress...")
         try:
             run_command(command=cmd, from_workspace=True)
@@ -70,7 +105,6 @@ def run_workspace_command(
             workspace_command.commands, key=lambda c: order_map.get(c.project_name, len(order_map))
         )
 
-        # Check if any project_names match the existing projects in the workspace
         if project_names and not any(cmd.project_name in project_names for cmd in sorted_commands):
             logger.warning("None of the specified project names exist in the workspace. Skipping execution.")
             return
@@ -90,7 +124,18 @@ def load_commands_from_standalone(
     config: dict[str, Any],
     project_dir: Path,
 ) -> list[ProjectCommand]:
-    """Loads commands for standalone projects (backend, frontend, etc.)"""
+    """Loads commands for standalone projects based on the project configuration.
+
+    Args:
+        config (dict[str, Any]): The project configuration.
+        project_dir (Path): The directory of the project.
+
+    Returns:
+        list[ProjectCommand]: A list of project commands derived from the configuration.
+
+    Raises:
+        click.ClickException: If the project configuration is invalid.
+    """
     commands: list[ProjectCommand] = []
     project_config = config.get("project", {})
     project_commands = project_config.get("run", {})
@@ -129,7 +174,15 @@ def load_commands_from_workspace(
     config: dict[str, Any],
     project_dir: Path,
 ) -> list[WorkspaceProjectCommand]:
-    """Loads commands from a workspace configuration"""
+    """Loads workspace commands based on the workspace configuration.
+
+    Args:
+        config (dict[str, Any]): The workspace configuration.
+        project_dir (Path): The directory of the workspace.
+
+    Returns:
+        list[WorkspaceProjectCommand]: A list of workspace project commands derived from the configuration.
+    """
     workspace_commands: dict[str, WorkspaceProjectCommand] = {}
     execution_order = config.get("project", {}).get("run", {})
     sub_projects_root = config.get("project", {}).get("projects_root_path")
@@ -168,7 +221,15 @@ def load_commands_from_workspace(
 
 
 def load_commands(project_dir: Path) -> list[ProjectCommand] | list[WorkspaceProjectCommand] | None:
-    """Loads project commands based on the project's type"""
+    """Determines and loads the appropriate project commands based on the project type.
+
+    Args:
+        project_dir (Path): The directory of the project.
+
+    Returns:
+        list[ProjectCommand] | list[WorkspaceProjectCommand] | None: A list of project or workspace commands,
+        or None if the project configuration is not found.
+    """
     config = get_algokit_config(project_dir=project_dir, verbose_validation=True)
     if not config:
         return None
