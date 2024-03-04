@@ -353,4 +353,4 @@ def test_run_command_from_standalone_pass_env(
     result = invoke("project run hello", cwd=cwd, env={"HELLO": "Hello World from env variable!"})
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(result.output.replace(PYTHON_EXECUTABLE, "<sys.executable>"))
