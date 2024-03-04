@@ -102,22 +102,40 @@
     - [-n, --name ](#-n---name--1)
     - [status](#status)
     - [stop](#stop)
+  - [project](#project)
+    - [bootstrap](#bootstrap-1)
+    - [Options](#options-18)
+    - [--force](#--force-1)
+    - [Options](#options-19)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-3)
+    - [Options](#options-20)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-4)
+    - [deploy](#deploy-1)
+    - [Options](#options-21)
+    - [-C, --command ](#-c---command--1)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-5)
+    - [-P, --path ](#-p---path--1)
+    - [--deployer ](#--deployer--1)
+    - [--dispenser ](#--dispenser--1)
+    - [Arguments](#arguments-5)
+    - [ENVIRONMENT_NAME](#environment_name-1)
+    - [run](#run)
   - [task](#task)
     - [analyze](#analyze)
-    - [Options](#options-18)
+    - [Options](#options-22)
     - [-r, --recursive](#-r---recursive)
-    - [--force](#--force-1)
+    - [--force](#--force-2)
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-5)
+    - [Arguments](#arguments-6)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
-    - [Options](#options-19)
+    - [Options](#options-23)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-20)
+    - [Options](#options-24)
     - [--creator ](#--creator-)
     - [-n, --name ](#-n---name--3)
     - [-u, --unit ](#-u---unit-)
@@ -129,37 +147,37 @@
     - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-21)
+    - [Options](#options-25)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-7)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-22)
+    - [Options](#options-26)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-8)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-23)
+    - [Options](#options-27)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-9)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-24)
+    - [Options](#options-28)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-25)
+    - [Options](#options-29)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
-    - [--force](#--force-2)
+    - [--force](#--force-3)
     - [transfer](#transfer)
-    - [Options](#options-26)
+    - [Options](#options-30)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -167,28 +185,28 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-27)
+    - [Options](#options-31)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-10)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-28)
+    - [Options](#options-32)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-10)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-11)
-    - [ALIAS](#alias)
-    - [Options](#options-29)
-    - [-f, --force](#-f---force-2)
+    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-12)
+    - [ALIAS](#alias)
+    - [Options](#options-33)
+    - [-f, --force](#-f---force-2)
+    - [Arguments](#arguments-13)
     - [ALIAS](#alias-1)
-    - [Options](#options-30)
+    - [Options](#options-34)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -745,6 +763,118 @@ Stop the AlgoKit LocalNet.
 
 ```shell
 algokit localnet stop [OPTIONS]
+```
+
+## project
+
+Define custom project specific commands to run via cli or, manage bootstrap of dependencies and
+deployment of smart contracts in your project.
+
+```shell
+algokit project [OPTIONS] COMMAND [ARGS]...
+```
+
+### bootstrap
+
+Expedited initial setup for any developer by installing and configuring dependencies and other
+key development environment setup activities.
+
+```shell
+algokit project bootstrap [OPTIONS] COMMAND [ARGS]...
+```
+
+### Options
+
+
+### --force
+Continue even if minimum AlgoKit version is not met
+
+#### all
+
+Runs all bootstrap sub-commands in the current directory and immediate sub directories.
+
+```shell
+algokit project bootstrap all [OPTIONS]
+```
+
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+#### env
+
+Copies .env.template file to .env in the current working directory and prompts for any unspecified values.
+
+```shell
+algokit project bootstrap env [OPTIONS]
+```
+
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+#### npm
+
+Runs npm install in the current working directory to install Node.js dependencies.
+
+```shell
+algokit project bootstrap npm [OPTIONS]
+```
+
+#### poetry
+
+Installs Python Poetry (if not present) and runs poetry install in the current working directory to install Python dependencies.
+
+```shell
+algokit project bootstrap poetry [OPTIONS]
+```
+
+### deploy
+
+Deploy smart contracts from AlgoKit compliant repository.
+
+```shell
+algokit project deploy [OPTIONS] [ENVIRONMENT_NAME]
+```
+
+### Options
+
+
+### -C, --command <command>
+Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+
+### -P, --path <path>
+Specify the project directory. If not provided, current working directory will be used.
+
+
+### --deployer <deployer_alias>
+(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic if specified in .algokit.toml file.
+
+
+### --dispenser <dispenser_alias>
+(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic if specified in .algokit.toml file.
+
+### Arguments
+
+
+### ENVIRONMENT_NAME
+Optional argument
+
+### run
+
+Define custom commands and manage their execution in you projects.
+
+```shell
+algokit project run [OPTIONS] COMMAND [ARGS]...
 ```
 
 ## task
