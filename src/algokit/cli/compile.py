@@ -8,7 +8,7 @@ from algokit.core.proc import run
 logger = logging.getLogger(__name__)
 
 
-@click.group("compile")
+@click.group("compile", hidden=True)
 @click.option(
     "-v",
     "--version",

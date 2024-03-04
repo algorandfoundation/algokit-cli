@@ -1,6 +1,7 @@
 import click
 
 from algokit.cli.bootstrap import bootstrap_group
+from algokit.cli.compile import compile_group
 from algokit.cli.completions import completions_group
 from algokit.cli.config import config_group
 from algokit.cli.deploy import deploy_command
@@ -49,5 +50,4 @@ algokit.add_command(generate_group)
 algokit.add_command(deploy_command)
 algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
-# TODO enable pytest for tests/compile after adding this back
-# algokit.add_command(compile_group)  # noqa: ERA001
+algokit.add_command(compile_group)
