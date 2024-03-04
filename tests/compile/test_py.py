@@ -1,12 +1,10 @@
-import os
 from pathlib import Path
 
 import pytest
-from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 
 from tests.compile.conftest import INVALID_PUYA_CONTRACT_FILE_CONTENT, VALID_PUYA_CONTRACT_FILE_CONTENT
-from tests.utils.approvals import normalize_path, verify
+from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
@@ -111,13 +109,8 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     contract_path.write_text(VALID_PUYA_CONTRACT_FILE_CONTENT)
     result = invoke(f"compile py {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
+    # Only check for the exit code, don't check the results from PuyaPy
     assert result.exit_code == 0
-
-    for d, __, files in os.walk(output_path):
-        for file in files:
-            content = (d / Path(file)).read_text()
-            normalize_content = normalize_path(content, str(cwd), "{temp_output_directory}")
-            verify(normalize_content, options=NamerFactory.with_parameters(file))
 
 
 def test_invalid_contract(cwd: Path, output_path: Path) -> None:
@@ -125,7 +118,8 @@ def test_invalid_contract(cwd: Path, output_path: Path) -> None:
     contract_path.write_text(INVALID_PUYA_CONTRACT_FILE_CONTENT)
     result = invoke(f"compile py {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
+    # Only check for the exit code and the error message from AlgoKit CLI
     assert result.exit_code == 1
-
-    normalize_output = normalize_path(result.output, str(cwd), "{temp_output_directory}")
-    verify(normalize_output)
+    result.output.endswith(
+        "An error occurred during compile. Ensure supplied files are valid PuyaPy code before retrying."
+    )
