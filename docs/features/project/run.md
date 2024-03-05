@@ -1,4 +1,4 @@
-# algokit project run {custom command}
+# AlgoKit Project Run
 
 The `algokit project run` command allows defining custom commands to execute at standalone project level or being orchestrated from a workspace containing multiple standalone projects.
 
@@ -40,7 +40,7 @@ E --> F;
 - **AlgoKit Project**: The root command that encompasses all project-related functionalities.
 - **Workspace**: A root folder that is managing multiple related sub-projects.
 - **Standalone Project**: An isolated project structure for simpler applications.
-- **Custom Commands**: Commands defined by the user in the `.algokit.toml` and automatically injected into `algokit project run` command group when running `algokit project run` from a root of a workspace containing standalone projects with custom commands or directly from a standalone project with custom commands defined in `.algokit.toml` file.
+- **Custom Commands**: Commands defined by the user in the `.algokit.toml` and automatically injected into the `algokit project run` command group.
 
 ### Workspace cli options
 
@@ -135,4 +135,4 @@ Now if project_a and project_b are both defined as standalone projects, the orde
 
 ## Further Reading
 
-For in-depth details, visit the [deploy](../../cli/index.md#run) section in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [run](../../cli/index.md#run) section in the AlgoKit CLI reference documentation.

@@ -1,6 +1,6 @@
-# algokit project bootstrap
+# AlgoKit Project Bootstrap
 
-The algokit project bootstrap feature allows you to bootstrap different project dependencies by looking up specific files in your current directory and immediate sub directories by convention.
+The AlgoKit Project Bootstrap feature allows you to bootstrap different project dependencies by looking up specific files in your current directory and immediate sub directories by convention.
 
 This is useful to allow for expedited initial setup for each developer e.g. when they clone a repository for the first time. It's also useful to provide a quick getting started experience when initialising a new project via [AlgoKit Init](./init.md) and meeting our goal of "nothing to debugging code in 5 minutes".
 
