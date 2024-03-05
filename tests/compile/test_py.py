@@ -10,8 +10,6 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
-pytestmark = pytest.mark.skipif(sys.version_info < (3, 12), reason="requires python3.12 or higher")
-
 
 def _normalize_path(path: Path) -> str:
     return str(path.absolute()).replace("\\", r"\\")
@@ -108,6 +106,7 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
     verify(result.output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_valid_contract(cwd: Path, output_path: Path) -> None:
     # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
     os.environ["NO_COLOR"] = "1"
@@ -121,6 +120,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     assert result.exit_code == 0
 
 
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_invalid_contract(cwd: Path, output_path: Path) -> None:
     # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
     os.environ["NO_COLOR"] = "1"
