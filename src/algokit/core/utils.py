@@ -13,6 +13,7 @@ from shutil import which
 from typing import Any
 
 import click
+import dotenv
 
 from algokit.core import proc
 
@@ -195,3 +196,25 @@ def resolve_command_path(command: list[str]) -> list[str]:
     if not resolved_cmd:
         raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
     return [resolved_cmd, *args]
+
+
+def load_env_file(path: Path) -> dict[str, str | None]:
+    """Load the general .env configuration.
+
+    Args:
+        path (Path): Path to the .env file or directory containing the .env file.
+
+    Returns:
+        dict[str, str | None]: Dictionary with .env configurations.
+    """
+
+    # Check if the path is a file, if yes, use it directly
+    if path.is_file():
+        env_path = path
+    else:
+        # Assume the default .env file name in the given directory
+        env_path = path / ".env"
+
+    if env_path.exists():
+        return dotenv.dotenv_values(env_path, verbose=True)
+    return {}

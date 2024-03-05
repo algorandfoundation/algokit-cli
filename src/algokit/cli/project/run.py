@@ -45,6 +45,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             custom_command: ProjectCommand | WorkspaceProjectCommand = custom_command,
             project_names: list[str] | None = None,
             list_projects: bool = False,
+            env_file_path: Path | None = None,
         ) -> None:
             """
             Executes a base command function with optional parameters for listing projects or specifying project names.
@@ -58,6 +59,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 project_names (list[str] | None): Optional. A list of project names to execute the command on.
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
                 with a workspace command.
+                env_file_path (str | None): Optional. A path to a custom env file to load.
 
             Returns:
                 None
@@ -75,8 +77,12 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 raise click.ClickException("--list is only available for workspace commands.")
 
             return (
-                run_command(command=custom_command)
+                run_command(
+                    command=custom_command,
+                )
                 if isinstance(custom_command, ProjectCommand)
+                else run_workspace_command(custom_command, project_names)
+                if env_file_path
                 else run_workspace_command(custom_command, project_names)
             )
 

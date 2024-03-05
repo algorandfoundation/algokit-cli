@@ -8,7 +8,7 @@ from algosdk.mnemonic import from_private_key
 
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.project.deploy import load_deploy_config, load_env_files
+from algokit.core.project.deploy import load_deploy_config, load_deploy_env_files
 from algokit.core.tasks.wallet import get_alias
 from algokit.core.utils import resolve_command_path, split_command_string
 
@@ -175,7 +175,7 @@ def deploy_command(  # noqa: PLR0913
     logger.info(f"Using deploy command: {' '.join(resolved_command)}")
     # TODO: [future-note] do we want to walk up for env/config?
     logger.info("Loading deployment environment variables...")
-    config_dotenv = load_env_files(environment_name, path)
+    config_dotenv = load_deploy_env_files(environment_name, path)
     # environment variables take precedence over those in .env* files
     config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
     _ensure_aliases(config_env, deployer_alias=deployer_alias, dispenser_alias=dispenser_alias)

@@ -10,7 +10,7 @@ import click
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 from algokit.core.proc import run
 from algokit.core.project import ProjectType
-from algokit.core.utils import resolve_command_path, split_command_string
+from algokit.core.utils import load_env_file, resolve_command_path, split_command_string
 
 logger = logging.getLogger("rich")
 
@@ -32,6 +32,7 @@ class ProjectCommand:
     cwd: Path | None = None
     description: str | None = None
     project_name: str
+    env_file: Path | None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -57,14 +58,21 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     Args:
         command (ProjectCommand): The project command to be executed.
         from_workspace (bool): Indicates whether the command is being executed from a workspace context.
+        env_file_path (str | None): Optional. A path to a custom env file to load.
 
     Raises:
         click.ClickException: If the command execution fails.
     """
+    config_dotenv = (
+        load_env_file(command.env_file) if command.env_file else load_env_file(command.cwd) if command.cwd else {}
+    )
+    # environment variables take precedence over those in .env* files
+    config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
+
     result = run(
         command=command.command,
         cwd=command.cwd,
-        env={**os.environ},
+        env=config_env,
         stdout_log_level=logging.DEBUG,
     )
 
@@ -154,6 +162,8 @@ def load_commands_from_standalone(
     for name, command_config in project_commands.items():
         raw_command = command_config.get("command")
         description = command_config.get("description", "Description not available")
+        raw_env_file = command_config.get("env_file", None)
+        env_file = Path(raw_env_file) if raw_env_file else None
 
         if not raw_command:
             logger.warning(f"Command '{name}' has no command, skipping...")
@@ -166,6 +176,7 @@ def load_commands_from_standalone(
                 cwd=project_dir,  # Assumed to be Path object
                 description=description,
                 project_name=project_name,
+                env_file=env_file,
             )
         )
 

@@ -6,21 +6,18 @@ import click
 import dotenv
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
-from algokit.core.utils import split_command_string
+from algokit.core.utils import load_env_file, split_command_string
 
 logger = logging.getLogger(__name__)
 
 
-def load_env_files(name: str | None, project_dir: Path) -> dict[str, str | None]:
+def load_deploy_env_files(name: str | None, project_dir: Path) -> dict[str, str | None]:
     """
     Load the deploy configuration for the given network.
     :param name: Network name.
     :param project_dir: Project directory path.
     """
-    general_env_path = project_dir / ".env"
-    result: dict[str, str | None] = {}
-    if general_env_path.exists():
-        result = dotenv.dotenv_values(general_env_path, verbose=True)
+    result = load_env_file(project_dir)
     if name is not None:
         specific_env_path = project_dir / f".env.{name}"
         if not specific_env_path.exists():
