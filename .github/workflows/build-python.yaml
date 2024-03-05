@@ -29,6 +29,10 @@ jobs:
           pipx install tealer==0.1.2
           pipx install puya
 
+      - name: Install PuyaPy
+        if: ${{ matrix.python == '3.12' }}
+        run: pipx install puya
+
       - name: pytest
         shell: bash
         if: ${{ !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest') }}

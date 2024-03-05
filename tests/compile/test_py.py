@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,8 @@ from tests.compile.conftest import INVALID_PUYA_CONTRACT_FILE_CONTENT, VALID_PUY
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+
+pytestmark = pytest.mark.skipif(sys.version_info < (3, 12), reason="requires python3.12 or higher")
 
 
 def _normalize_path(path: Path) -> str:
