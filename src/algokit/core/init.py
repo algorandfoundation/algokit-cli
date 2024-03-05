@@ -5,7 +5,7 @@ from logging import getLogger
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
 
-from algokit.core.conf import get_algokit_projects_from_config
+from algokit.core.project import get_algokit_projects_names_from_workspace
 
 logger = getLogger(__name__)
 
@@ -19,8 +19,9 @@ class ProjectType(str, Enum):
     """
 
     WORKSPACE = "workspace"
-    BACKEND = "backend"  # any project focused on smart contracts or standalone backend services
+    BACKEND = "backend"  # any project focused on standalone backend services
     FRONTEND = "frontend"  # any project focused on user facing services
+    CONTRACTS = "contract"  # any project focused on pure smart contracts development
 
 
 def populate_default_answers(worker: Worker) -> None:
@@ -71,7 +72,7 @@ def get_git_user_info(param: str) -> str | None:
 def is_valid_project_dir_name(value: str) -> bool:
     """Check if the project directory name for algokit project is valid."""
 
-    algokit_project_names = get_algokit_projects_from_config()
+    algokit_project_names = get_algokit_projects_names_from_workspace()
     if value in algokit_project_names:
         return False
     if not re.match(r"^[\w\-.]+$", value):

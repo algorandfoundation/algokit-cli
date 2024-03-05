@@ -1,5 +1,5 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Attempting to load project config from {current_working_directory}/projects/project1/.algokit.toml
 DEBUG: Attempting to load project config from {current_working_directory}/projects/project2/.algokit.toml
-ℹ️ Project: contract_project, Command name: hello, Command: /bin/command_a
-ℹ️ Project: frontend_project, Command name: hello, Command: /bin/command_b
+ℹ️  Project: contract_project, Command name: hello, Command: /bin/command_a
+ℹ️  Project: frontend_project, Command name: hello, Command: /bin/command_b
