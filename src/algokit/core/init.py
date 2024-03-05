@@ -21,7 +21,7 @@ class ProjectType(str, Enum):
     WORKSPACE = "workspace"
     BACKEND = "backend"  # any project focused on standalone backend services
     FRONTEND = "frontend"  # any project focused on user facing services
-    CONTRACTS = "contract"  # any project focused on pure smart contracts development
+    CONTRACT = "contract"  # any project focused on pure smart contracts development
 
 
 def populate_default_answers(worker: Worker) -> None:

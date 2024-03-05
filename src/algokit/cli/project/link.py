@@ -42,13 +42,14 @@ def _get_contract_projects() -> list[ContractArtifacts]:
             project_type = project.get("type")
             project_name = project.get("name")
             project_cwd = config.get("cwd", Path.cwd())
-            contract_artifacts = project.get("contract_artifacts")
+            contract_artifacts = project.get("artifacts")
 
             # if any of the above are none then continue
             if any([not project_type, not project_name, not project_cwd, not contract_artifacts]):
                 continue
 
-            contract_configs.append(ContractArtifacts(project_name, project_cwd))
+            if project_type == ProjectType.CONTRACT:
+                contract_configs.append(ContractArtifacts(project_name, project_cwd))
 
         return contract_configs
     except Exception:
@@ -124,17 +125,17 @@ def link_command(*, project_name: str | None, link_all: bool = False) -> None:
     if not _is_frontend(project_data):
         raise click.ClickException("This command is only available in a standalone frontend projects.")
 
-    frontend_client_path = project_data.get("contract_clients")
-    if not frontend_client_path:
+    frontend_artifacts_path = project_data.get("artifacts")
+    if not frontend_artifacts_path:
         raise click.ClickException("No `contract_clients` path specified in .algokit.toml")
 
     iteration = 1
     total = len(contract_projects)
     for contract_project in contract_projects:
-        _link_projects(Path.cwd() / frontend_client_path, contract_project.cwd)
+        _link_projects(Path.cwd() / frontend_artifacts_path, contract_project.cwd)
 
         click.echo(
             f"✅ {iteration}/{total}: Exported typed clients from "
-            f"{contract_project.project_name} typed clients to {frontend_client_path}"
+            f"{contract_project.project_name} typed clients to {frontend_artifacts_path}"
         )
         iteration += 1
