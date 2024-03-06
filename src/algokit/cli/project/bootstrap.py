@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from algokit.core.project import ProjectType
 from algokit.core.project.bootstrap import (
     bootstrap_any_including_subdirs,
     bootstrap_env,
@@ -46,9 +47,18 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
     default=lambda: "CI" not in os.environ,
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
-def bootstrap_all(*, interactive: bool) -> None:
+@click.option(
+    "project_type",
+    "--project-type",
+    "-t",
+    type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
+    required=False,
+    default=None,
+    help="Limit execution to specific project types if executing from workspace. (Optional)",
+)
+def bootstrap_all(*, interactive: bool, project_type: str | None) -> None:
     cwd = Path.cwd()
-    bootstrap_any_including_subdirs(cwd, ci_mode=not interactive)
+    bootstrap_any_including_subdirs(cwd, ci_mode=not interactive, project_type=project_type)
     logger.info(f"Finished bootstrapping {cwd}")
 
 

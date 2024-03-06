@@ -1,5 +1,3 @@
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
 Poetry not found; attempting to install it...
 ? We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies? (Y/n)

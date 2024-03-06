@@ -78,7 +78,6 @@ def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: b
     try:
         return tomllib.loads(config_text)
     except Exception as ex:
-        print("failed", ex)
         if verbose_validation:
             logger.warning(f"{ALGOKIT_CONFIG} file at {project_dir} is not valid toml! Skipping...", exc_info=True)
         else:

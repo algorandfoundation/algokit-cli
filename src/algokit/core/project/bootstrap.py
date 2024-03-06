@@ -36,12 +36,21 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
 
 
 def bootstrap_any_including_subdirs(
-    base_path: Path, *, ci_mode: bool, max_depth: int = MAX_BOOTSTRAP_DEPTH, depth: int = 0
+    base_path: Path,
+    *,
+    ci_mode: bool,
+    max_depth: int = MAX_BOOTSTRAP_DEPTH,
+    depth: int = 0,
+    project_type: str | None = None,
 ) -> None:
     if depth > max_depth:
         return
 
-    bootstrap_any(base_path, ci_mode=ci_mode)
+    config = get_algokit_config(project_dir=base_path)
+    skip = config and config.get("project", {}).get("type") != project_type
+
+    if not skip:
+        bootstrap_any(base_path, ci_mode=ci_mode)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
         if sub_dir.is_dir() and sub_dir.name.lower() not in [".venv", "node_modules", "__pycache__"]:
