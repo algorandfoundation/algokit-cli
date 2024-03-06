@@ -10,7 +10,7 @@ It can bootstrap one or all of the following (with other options potentially bei
 - Node.js project - Checks if npm is installed and runs `npm install`
 - dotenv (.env) file - Checks for `.env.template` files, copies them to `.env` (which should be in `.gitignore` so developers can safely make local specific changes) and prompts for any blank values (so the developer has an easy chance to fill in their initial values where there isn't a clear default).
 
-> **Note**: Invoking bootstrap from `algokit bootstrap` is scheduled for deprecation in the next major release. Please migrate to using `algokit project bootstrap` instead.
+> **Note**: Invoking bootstrap from `algokit bootstrap` is not recommended. Please prefer using `algokit project bootstrap` instead.
 
 ## Usage
 

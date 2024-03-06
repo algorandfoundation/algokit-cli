@@ -2,7 +2,7 @@
 
 Deploy your smart contracts effortlessly to various networks with the algokit project deploy feature. This feature is essential for automation in CI/CD pipelines and for seamless deployment to various Algorand network environments.
 
-> **Note**: Invoking deploy from `algokit deploy` is scheduled for deprecation in the next major release. Please migrate to using `algokit project deploy` instead.
+> **Note**: Invoking deploy from `algokit deploy` is not recommended. Please prefer using `algokit project deploy` instead.
 
 ## Usage
 

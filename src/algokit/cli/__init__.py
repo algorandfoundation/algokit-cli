@@ -17,12 +17,28 @@ from algokit.core.conf import PACKAGE_NAME
 from algokit.core.log_handlers import color_option, verbose_option
 from algokit.core.version_prompt import do_version_prompt, skip_version_check_option
 
+HIDDEN_COMMANDS: dict[str, click.Command] = {"deploy": deploy_command, "bootstrap": bootstrap_group}
+
+
+class CustomGroup(click.Group):
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+
+        # ensures hidden commands are still invocable yet not visible in help
+        if cmd_name in HIDDEN_COMMANDS:
+            return HIDDEN_COMMANDS[cmd_name]
+
+        return None
+
 
 @click.group(
     context_settings={
         "help_option_names": ["-h", "--help"],
         "max_content_width": 120,
     },
+    cls=CustomGroup,
 )
 @click.version_option(package_name=PACKAGE_NAME)
 @verbose_option
@@ -49,7 +65,3 @@ algokit.add_command(generate_group)
 algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
 algokit.add_command(project_group)
-
-# TODO: Remove these after v2.x release
-algokit.add_command(deploy_command)
-algokit.add_command(bootstrap_group)

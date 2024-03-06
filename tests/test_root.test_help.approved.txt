@@ -14,11 +14,8 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
-               project root directory.
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
-  deploy       Deploy smart contracts from AlgoKit compliant repository.
   dispenser    Interact with the AlgoKit TestNet Dispenser.
   doctor       Diagnose potential environment issues that may affect AlgoKit.
   explore      Explore the specified network in the browser using Dappflow.
@@ -27,5 +24,5 @@ Commands:
   init         Initializes a new project from a template; run from project
                parent directory.
   localnet     Manage the AlgoKit LocalNet.
-  project      Define custom project specific commands to run via cli or,...
+  project      Commands available to run against your initialised AlgoKit...
   task         Collection of useful tasks to help you develop on Algorand.

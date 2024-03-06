@@ -4,7 +4,6 @@ import click
 
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
-from algokit.cli.project.deploy import deploy_command
 from algokit.core import proc
 from algokit.core.sandbox import (
     DEFAULT_NAME,
@@ -227,5 +226,3 @@ def localnet_explore(context: click.Context) -> None:
 def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
     sandbox = ComposeSandbox()
     sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
-
-    ctx.forward(deploy_command, {})
