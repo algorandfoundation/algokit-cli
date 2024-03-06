@@ -9,7 +9,8 @@ from algokit.cli.project.run import run_group
     "project",
 )
 def project_group() -> None:
-    """Commands available to run against your initialised AlgoKit project. For example you can bootstrap project dependencies, deploy your smart contracts or run any custom commands that have been defined.
+    """Commands available to run against your initialised AlgoKit project. For example you can
+    bootstrap project dependencies, deploy your smart contracts or run any custom commands that have been defined.
     deployment of smart contracts in your project."""
 
 
