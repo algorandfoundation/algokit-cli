@@ -49,7 +49,7 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
 )
 @click.option(
     "project_type",
-    "--project-type",
+    "--type",
     "-t",
     type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
     required=False,

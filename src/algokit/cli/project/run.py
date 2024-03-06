@@ -111,7 +111,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             )(command)
             command = click.option(
                 "project_type",
-                "--project-type",
+                "--type",
                 "-t",
                 type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
                 required=False,
