@@ -177,12 +177,15 @@ def split_command_string(command: str) -> list[str]:
         return shlex.split(command)
 
 
-def resolve_command_path(command: list[str]) -> list[str]:
+def resolve_command_path(
+    command: list[str],
+) -> list[str]:
     """
     Encapsulates custom command resolution, promotes reusability
 
     Args:
         command (list[str]): The command to resolve
+        allow_chained_commands (bool): Whether to allow chained commands (e.g. "&&" or "||")
 
     Returns:
         list[str]: The resolved command
@@ -191,6 +194,9 @@ def resolve_command_path(command: list[str]) -> list[str]:
     cmd, *args = command
     # if the command has any path separators or such, don't try and resolve
     if Path(cmd).name != cmd:
+        return command
+    # if command contains simple chaining, don't try and resolve
+    if "&&" in command or "||" in command:
         return command
     resolved_cmd = shutil.which(cmd)
     if not resolved_cmd:
