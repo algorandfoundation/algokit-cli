@@ -13,8 +13,9 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config
-from algokit.core.init import ProjectType, get_git_user_info, is_valid_project_dir_name
+from algokit.core.init import get_git_user_info, is_valid_project_dir_name
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from algokit.core.project import ProjectType
 from algokit.core.project.bootstrap import (
     MAX_BOOTSTRAP_DEPTH,
     bootstrap_any_including_subdirs,

@@ -31,6 +31,7 @@ class ProjectCommand:
     """
 
     name: str
+    project_type: str
     commands: list[list[str]]
     cwd: Path | None = None
     description: str | None = None
@@ -75,6 +76,7 @@ def _load_commands_from_standalone(
     project_config = config.get("project", {})
     project_commands = project_config.get("run", {})
     project_name = project_config.get("name")  # Ensure name is present
+    project_type = project_config.get("type")
 
     if not project_name:
         raise click.ClickException(
@@ -102,6 +104,7 @@ def _load_commands_from_standalone(
                 description=description,
                 project_name=project_name,
                 env_file=env_file,
+                project_type=project_type,
             )
         )
 
@@ -164,7 +167,6 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     Args:
         command (ProjectCommand): The project command to be executed.
         from_workspace (bool): Indicates whether the command is being executed from a workspace context.
-        env_file_path (str | None): Optional. A path to a custom env file to load.
 
     Raises:
         click.ClickException: If the command execution fails.
@@ -199,12 +201,14 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
 def run_workspace_command(
     workspace_command: WorkspaceProjectCommand,
     project_names: list[str] | None = None,
+    project_type: str | None = None,
 ) -> None:
     """Executes a workspace command, potentially limited to specified projects.
 
     Args:
         workspace_command (WorkspaceProjectCommand): The workspace command to be executed.
         project_names (list[str] | None): Optional; specifies a subset of projects to execute the command for.
+        project_type (str | None): Optional; specifies a subset of project types to execute the command for.
     """
 
     def _execute_command(cmd: ProjectCommand) -> None:
@@ -232,7 +236,11 @@ def run_workspace_command(
                 logger.warning(f"Missing projects: {', '.join(missing_projects)}. Proceeding with available ones.")
 
         for cmd in sorted_commands:
-            if project_names and cmd.project_name not in project_names:
+            if (
+                project_names
+                and cmd.project_name not in project_names
+                and (not project_type or project_type != cmd.project_type)
+            ):
                 continue
             _execute_command(cmd)
     else:

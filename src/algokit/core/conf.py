@@ -3,6 +3,7 @@ import os
 import platform
 import sys
 import typing as t
+from functools import cache
 from importlib import metadata
 from pathlib import Path
 
@@ -55,6 +56,7 @@ def get_current_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
 
 
+@cache
 def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: bool = False) -> dict[str, t.Any] | None:
     """
     Load and parse a TOML configuration file. Will never throw.
@@ -76,6 +78,7 @@ def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: b
     try:
         return tomllib.loads(config_text)
     except Exception as ex:
+        print("failed", ex)
         if verbose_validation:
             logger.warning(f"{ALGOKIT_CONFIG} file at {project_dir} is not valid toml! Skipping...", exc_info=True)
         else:

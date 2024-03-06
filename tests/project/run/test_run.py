@@ -225,7 +225,7 @@ def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path
     Args:
         cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
-    result = invoke("project run hello --project_name 'contract_project'", cwd=cwd_with_workspace_sequential)
+    result = invoke("project run hello --project-name 'contract_project'", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
     verify(result.output)
@@ -251,7 +251,7 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
     Args:
         cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
-    result = invoke("project run hello --project_name contract_project2", cwd=cwd_with_workspace_sequential)
+    result = invoke("project run hello --project-name contract_project2", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
     verify(result.output)

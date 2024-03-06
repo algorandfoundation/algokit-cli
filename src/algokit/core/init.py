@@ -1,6 +1,5 @@
 import re
 import shutil
-from enum import Enum
 from logging import getLogger
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
@@ -11,17 +10,6 @@ logger = getLogger(__name__)
 
 DEFAULT_MIN_VERSION = "1.8.0"
 DEFAULT_PROJECTS_ROOT_PATH = "projects"
-
-
-class ProjectType(str, Enum):
-    """
-    For distinguishing main template preset type question invoked by `algokit init`
-    """
-
-    WORKSPACE = "workspace"
-    BACKEND = "backend"  # any project focused on standalone backend services
-    FRONTEND = "frontend"  # any project focused on user facing services
-    CONTRACT = "contract"  # any project focused on pure smart contracts development
 
 
 def populate_default_answers(worker: Worker) -> None:

@@ -6,8 +6,10 @@ from pathlib import Path
 import click
 from algosdk.mnemonic import from_private_key
 
+from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core import proc
-from algokit.core.conf import ALGOKIT_CONFIG
+from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.project import ProjectType, get_algokit_project_configs
 from algokit.core.project.deploy import load_deploy_config, load_deploy_env_files
 from algokit.core.tasks.wallet import get_alias
 from algokit.core.utils import resolve_command_path, split_command_string
@@ -78,85 +80,15 @@ def _ensure_environment_secrets(
             config_env[key] = click.prompt(key, hide_input=True)
 
 
-class CommandParamType(click.types.StringParamType):
-    name = "command"
-
-    def convert(
-        self,
-        value: t.Any,  # noqa: ANN401
-        param: click.Parameter | None,
-        ctx: click.Context | None,
-    ) -> list[str]:
-        str_value = super().convert(value=value, param=param, ctx=ctx)
-        try:
-            return split_command_string(str_value)
-        except ValueError as ex:
-            logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
-            raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
-
-
-@click.command("deploy")
-@click.argument("environment_name", default=None, required=False)
-@click.option(
-    "--command",
-    "-C",
-    type=CommandParamType(),
-    default=None,
-    help="Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.",
-)
-@click.option(
-    "--interactive/--non-interactive",
-    " /--ci",  # this aliases --non-interactive to --ci
-    default=lambda: "CI" not in os.environ,
-    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
-)
-@click.option(
-    "--path",
-    "-P",
-    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
-    default=".",
-    help="Specify the project directory. If not provided, current working directory will be used.",
-)
-@click.option(
-    "--deployer",
-    "deployer_alias",
-    type=click.STRING,
-    required=False,
-    help=(
-        "(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic "
-        "if specified in .algokit.toml file."
-    ),
-)
-@click.option(
-    "--dispenser",
-    "dispenser_alias",
-    type=click.STRING,
-    required=False,
-    help=(
-        "(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic "
-        "if specified in .algokit.toml file."
-    ),
-)
-@click.pass_context
-def deploy_command(  # noqa: PLR0913
-    ctx: click.Context,
+def _execute_deploy_command(
     *,
+    path: Path,
     environment_name: str | None,
     command: list[str] | None,
     interactive: bool,
-    path: Path,
     deployer_alias: str | None,
     dispenser_alias: str | None,
 ) -> None:
-    """Deploy smart contracts from AlgoKit compliant repository."""
-
-    if ctx.parent and ctx.parent.command.name == "algokit":
-        click.secho(
-            "The 'deploy' command is scheduled for deprecation in v2.x release. "
-            "Please migrate to using 'algokit project deploy' instead.",
-            fg="yellow",
-        )
-
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
     config = load_deploy_config(name=environment_name, project_dir=path)
@@ -198,3 +130,144 @@ def deploy_command(  # noqa: PLR0913
     else:
         if result.exit_code != 0:
             raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+
+
+class CommandParamType(click.types.StringParamType):
+    name = "command"
+
+    def convert(
+        self,
+        value: t.Any,  # noqa: ANN401
+        param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> list[str]:
+        str_value = super().convert(value=value, param=param, ctx=ctx)
+        try:
+            return split_command_string(str_value)
+        except ValueError as ex:
+            logger.debug(f"Failed to parse command string: {str_value}", exc_info=True)
+            raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
+
+
+@click.command("deploy")
+@click.argument("environment_name", default=None, required=False)
+@click.option(
+    "--command",
+    "-C",
+    type=CommandParamType(),
+    default=None,
+    help=("Custom deploy command. If not provided, will load the deploy command " "from .algokit.toml file."),
+    required=False,
+)
+@click.option(
+    "--interactive/--non-interactive",
+    " /--ci",  # this aliases --non-interactive to --ci
+    default=lambda: "CI" not in os.environ,
+    help=(
+        "Enable/disable interactive prompts. Defaults to non-interactive if the CI "
+        "environment variable is set. MainNet deployments prompt a security warning."
+    ),
+)
+@click.option(
+    "--path",
+    "-P",
+    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
+    default=".",
+    help="Specify the project directory. If not provided, current working directory will be used.",
+)
+@click.option(
+    "--deployer",
+    "deployer_alias",
+    type=click.STRING,
+    required=False,
+    help=(
+        "(Optional) Alias of the deployer account. Otherwise, will prompt the deployer mnemonic "
+        "if specified in .algokit.toml file."
+    ),
+)
+@click.option(
+    "--dispenser",
+    "dispenser_alias",
+    type=click.STRING,
+    required=False,
+    help=(
+        "(Optional) Alias of the dispenser account. Otherwise, will prompt the dispenser mnemonic "
+        "if specified in .algokit.toml file."
+    ),
+)
+@click.option(
+    "--project-name",
+    "-p",
+    "project_names",
+    multiple=True,
+    help="Projects to execute the command on. (Defaults to all projects if inside the workspace)",
+    nargs=1,
+    default=[],
+    required=False,
+    cls=MutuallyExclusiveOption,
+    not_required_if=[
+        "command",
+    ],
+)
+@click.pass_context
+def deploy_command(  # noqa: PLR0913
+    ctx: click.Context,
+    *,
+    environment_name: str | None,
+    command: list[str] | None,
+    interactive: bool,
+    path: Path,
+    deployer_alias: str | None,
+    dispenser_alias: str | None,
+    project_names: list[str] | None,
+) -> None:
+    """Deploy smart contracts from AlgoKit compliant repository."""
+    project_names = list(project_names) if project_names else None
+
+    if ctx.parent and ctx.parent.command.name == "algokit":
+        click.secho(
+            "The 'deploy' command is scheduled for deprecation in v2.x release. "
+            "Please migrate to using 'algokit project deploy' instead.",
+            fg="yellow",
+        )
+
+    if interactive and environment_name and environment_name.lower() == "mainnet":
+        click.confirm(
+            click.style(
+                "Warning: Proceed with MainNet deployment?",
+                fg="yellow",
+            ),
+            default=True,
+            abort=True,
+        )
+
+    config = get_algokit_config() or {}
+    is_workspace = config.get("project", {}).get("type") == ProjectType.WORKSPACE
+
+    if not is_workspace and project_names:
+        raise click.ClickException("The --project-name option can only be used inside a workspace.")
+
+    if is_workspace:
+        projects = get_algokit_project_configs(project_type=ProjectType.CONTRACT)
+
+        for project in projects:
+            if project_names and project.get("name") not in project_names:
+                continue
+
+            _execute_deploy_command(
+                path=project.get("cwd", None),
+                environment_name=environment_name,
+                command=None,
+                interactive=interactive,
+                deployer_alias=deployer_alias,
+                dispenser_alias=dispenser_alias,
+            )
+    else:
+        _execute_deploy_command(
+            path=path,
+            environment_name=environment_name,
+            command=command,
+            interactive=interactive,
+            deployer_alias=deployer_alias,
+            dispenser_alias=dispenser_alias,
+        )

@@ -3,8 +3,7 @@ import logging
 import click
 
 from algokit.core.conf import get_algokit_config
-from algokit.core.init import ProjectType
-from algokit.core.project import get_algokit_projects_names_from_workspace
+from algokit.core.project import ProjectType, get_algokit_projects_names_from_workspace
 
 logger = logging.getLogger(__name__)
 

@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
+from algokit.core.project import ProjectType
 from algokit.core.project.run import (
     ProjectCommand,
     WorkspaceProjectCommand,
@@ -12,6 +13,7 @@ from algokit.core.project.run import (
     run_command,
     run_workspace_command,
 )
+from algokit.core.utils import run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +47,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             custom_command: ProjectCommand | WorkspaceProjectCommand = custom_command,
             project_names: list[str] | None = None,
             list_projects: bool = False,
-            env_file_path: Path | None = None,
+            project_type: str | None = None,
         ) -> None:
             """
             Executes a base command function with optional parameters for listing projects or specifying project names.
@@ -59,7 +61,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 project_names (list[str] | None): Optional. A list of project names to execute the command on.
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
                 with a workspace command.
-                env_file_path (str | None): Optional. A path to a custom env file to load.
+                project_type (str | None): Optional. Only execute commands in projects of specified type.
 
             Returns:
                 None
@@ -74,24 +76,23 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 raise click.ClickException("--list is only available for workspace commands.")
 
             return (
-                run_command(
-                    command=custom_command,
+                run_with_animation(
+                    run_command, command=custom_command, animation_text=f"Running `{custom_command.name}` command"
                 )
                 if isinstance(custom_command, ProjectCommand)
-                else run_workspace_command(custom_command, project_names)
-                if env_file_path
-                else run_workspace_command(custom_command, project_names)
+                else run_workspace_command(custom_command, project_names, project_type)
             )
 
         # Check if the command is a WorkspaceProjectCommand and conditionally decorate
         if isinstance(custom_command, WorkspaceProjectCommand):
             command = click.option(
                 "project_names",
-                "--project_name",
+                "--project-name",
                 "-p",
                 multiple=True,
                 help="Projects to execute the command on. (Defaults to all projects in the workspace)",
                 nargs=1,
+                default=[],
                 required=False,
                 cls=MutuallyExclusiveOption,
                 not_required_if=["list"],
@@ -107,6 +108,15 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 required=False,
                 cls=MutuallyExclusiveOption,
                 not_required_if=["project_name"],
+            )(command)
+            command = click.option(
+                "project_type",
+                "--project-type",
+                "-t",
+                type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
+                required=False,
+                default=None,
+                help="Limit execution to specific project types if executing from workspace. (Optional)",
             )(command)
         else:
             command = base_command

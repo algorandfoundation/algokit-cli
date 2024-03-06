@@ -47,7 +47,7 @@ E --> F;
 Below is only visible and available when running from a workspace root.
 
 - `-l, --list`: Outputs all projects containing the command with the same name.
-- `-p, --project_name`: Allows specifying a specific project or projects to run the command.
+- `-p, --project-name`: Allows specifying a specific project or projects to run the command.
 
 To get a detailed help on the above commands execute:
 

@@ -9,8 +9,7 @@ import questionary
 from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config
-from algokit.core.init import ProjectType
-from algokit.core.project import get_algokit_project_configs
+from algokit.core.project import ProjectType, get_algokit_project_configs
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +82,7 @@ def _prompt_contract_project() -> ContractArtifacts:
 
 @click.command("link")
 @click.option(
-    "--project_name",
+    "--project-name",
     "-p",
     "project_name",
     type=click.STRING,

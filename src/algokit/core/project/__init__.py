@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -53,8 +54,9 @@ def _get_project_root_dirs(config: dict[str, Any], project_dir: Path) -> list[Pa
     return [p for p in project_root_path.iterdir() if p.is_dir() and (p / ALGOKIT_CONFIG).exists()]
 
 
+@cache
 def get_algokit_project_configs(
-    project_dir: Path | None = None, lookup_level: int = WORKSPACE_LOOKUP_LEVELS
+    project_dir: Path | None = None, lookup_level: int = WORKSPACE_LOOKUP_LEVELS, project_type: str | None = None
 ) -> list[dict[str, Any]]:
     """Fetches configurations for all algokit projects within the specified directory or the current working directory.
 
@@ -65,6 +67,7 @@ def get_algokit_project_configs(
         project_dir (Path | None): The base directory to search for project configurations. If None, the current
         working directory is used.
         lookup_level (int): The number of levels to go up the directory to search for workspace projects
+        project_type (str | None): The type of project to filter by. If None, all project types are returned.
 
     Returns:
         list[dict[str, Any] | None]: A list of dictionaries, each containing the configuration of an algokit project.
@@ -81,10 +84,9 @@ def get_algokit_project_configs(
         return get_algokit_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
 
     configs = []
-
     for sub_project_dir in _get_project_root_dirs(project_config, project_dir):
-        config = get_algokit_config(project_dir=sub_project_dir)
-        if config is not None:
+        config = get_algokit_config(project_dir=sub_project_dir) or {}
+        if not project_type or config.get("project", {}).get("type") == project_type:
             config["cwd"] = sub_project_dir
             configs.append(config)
 
@@ -95,6 +97,7 @@ def get_algokit_project_configs(
     )
 
 
+@cache
 def get_algokit_projects_names_from_workspace(project_dir: Path | None = None) -> list[str]:
     """
     Generates a list of project names from the .algokit.toml file within the specified directory or the current
