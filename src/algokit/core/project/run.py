@@ -245,7 +245,12 @@ def run_workspace_command(
             _execute_command(cmd)
     else:
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(_execute_command, cmd): cmd for cmd in workspace_command.commands}
+            futures = {
+                executor.submit(_execute_command, cmd): cmd
+                for cmd in workspace_command.commands
+                if (not project_names or cmd.project_name in project_names)
+                and (not project_type or cmd.project_type == project_type)
+            }
             for future in as_completed(futures):
                 future.result()
 
