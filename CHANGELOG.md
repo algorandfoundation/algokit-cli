@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v1.12.3 (2024-03-06)
+
+### Fix
+
+* Path resolution to ensure git is initialized at workspace level ([#447](https://github.com/algorandfoundation/algokit-cli/issues/447)) ([`4fa1eaf`](https://github.com/algorandfoundation/algokit-cli/commit/4fa1eafe604129bb0595d0774ee4eb1484d3c13b))
+
+### Documentation
+
+* Updating dockerhub links on localnet docs ([#445](https://github.com/algorandfoundation/algokit-cli/issues/445)) ([`9d4df31`](https://github.com/algorandfoundation/algokit-cli/commit/9d4df31abe1de07909c7d03de1dc2dcc4334d7dc))
+
 ## v1.12.2 (2024-03-01)
 
 ### Fix
