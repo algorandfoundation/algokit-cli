@@ -239,7 +239,7 @@ def run_workspace_command(
             if (
                 project_names
                 and cmd.project_name not in project_names
-                and (not project_type or project_type != cmd.project_type)
+                or (project_type and project_type != cmd.project_type)
             ):
                 continue
             _execute_command(cmd)
