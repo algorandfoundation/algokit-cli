@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from algokit.core.compile import find_valid_puyapy_command
+from algokit.core.compile.py import find_valid_puyapy_command
 from algokit.core.proc import run
 
 logger = logging.getLogger(__name__)

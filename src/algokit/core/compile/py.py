@@ -25,7 +25,7 @@ def _find_puya_command_at_version(version: str) -> list[str]:
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that `PuyaPy` compiler can be installed; "
+        "Unable to find pipx install so that the `PuyaPy` compiler can be installed; "
         "please install pipx via https://pypa.github.io/pipx/ "
         "and then try `algokit compile py ...` again."
     )
@@ -52,7 +52,7 @@ def _find_puya_command() -> list[str]:
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that `PuyaPy` compiler can be installed; "
+        "Unable to find pipx install so that the `PuyaPy` compiler can be installed; "
         "please install pipx via https://pypa.github.io/pipx/ "
         "and then try `algokit compile py ...` again."
     )
