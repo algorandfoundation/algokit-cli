@@ -66,11 +66,8 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             """
             if list_projects and isinstance(custom_command, WorkspaceProjectCommand):
                 for command in custom_command.commands:
-                    logger.info(
-                        f"ℹ️  Project: {command.project_name}, "  # noqa: RUF001
-                        f"Command name: {command.name}, "
-                        f"Command: {' '.join(command.command)}"
-                    )
+                    cmds = " && ".join(" ".join(cmd) for cmd in command.commands)
+                    logger.info(f"ℹ️  Project: {command.project_name}, Command name: {command.name}, Command(s): {cmds}")  # noqa: RUF001
                 return None
 
             if isinstance(custom_command, ProjectCommand) and list_projects:

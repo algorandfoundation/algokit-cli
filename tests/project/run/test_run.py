@@ -59,7 +59,7 @@ type = '{project_type}'
 name = '{project_name}'
 
 [project.run]
-hello = {{ command = '{command}', description = '{description}' }}
+hello = {{ commands = ['{command}'], description = '{description}' }}
     """.strip()
     (project_dir / ".algokit.toml").write_text(project_config, encoding="utf-8")
 

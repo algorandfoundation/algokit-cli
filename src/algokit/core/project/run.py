@@ -10,7 +10,10 @@ import click
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 from algokit.core.proc import run
 from algokit.core.project import ProjectType
-from algokit.core.utils import load_env_file, resolve_command_path, split_command_string
+from algokit.core.utils import (
+    load_env_file,
+    split_and_resolve_command_strings,
+)
 
 logger = logging.getLogger("rich")
 
@@ -28,7 +31,7 @@ class ProjectCommand:
     """
 
     name: str
-    command: list[str]
+    commands: list[list[str]]
     cwd: Path | None = None
     description: str | None = None
     project_name: str
@@ -82,19 +85,19 @@ def _load_commands_from_standalone(
         raise click.ClickException(f"Bad data for [project.commands] key in '{ALGOKIT_CONFIG}'")
 
     for name, command_config in project_commands.items():
-        raw_command = command_config.get("command")
+        raw_commands = command_config.get("commands")
         description = command_config.get("description", "Description not available")
         raw_env_file = command_config.get("env_file", None)
         env_file = Path(raw_env_file) if raw_env_file else None
 
-        if not raw_command:
-            logger.warning(f"Command '{name}' has no command, skipping...")
+        if not raw_commands:
+            logger.warning(f"Command '{name}' has no custom commands to execute, skipping...")
             continue
 
         commands.append(
             ProjectCommand(
                 name=name,
-                command=resolve_command_path(split_command_string(raw_command)),
+                commands=split_and_resolve_command_strings(raw_commands),
                 cwd=project_dir,  # Assumed to be Path object
                 description=description,
                 project_name=project_name,
@@ -172,20 +175,25 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     # environment variables take precedence over those in .env* files
     config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
 
-    result = run(
-        command=command.command,
-        cwd=command.cwd,
-        env=config_env,
-        stdout_log_level=logging.DEBUG,
-    )
+    for index, cmd in enumerate(command.commands):
+        result = run(
+            command=cmd,
+            cwd=command.cwd,
+            env=config_env,
+            stdout_log_level=logging.DEBUG,
+        )
 
-    if result.exit_code != 0:
-        logger.error(result.output)
-        raise click.ClickException(f"Command {command.name} failed with exit code = {result.exit_code}")
+        if result.exit_code != 0:
+            logger.error(result.output)
+            raise click.ClickException(
+                f"Command {command.name} failed executing `{' '.join(cmd)}` with exit code = {result.exit_code}"
+            )
 
-    if not from_workspace:
-        logger.info(result.output)
-        logger.info(f"✅ {command.project_name}: '{' '.join(command.command)}' executed successfully.")
+        # Log after each command if not from workspace, and also log success after the last command
+        if not from_workspace or logger.level == logging.DEBUG:
+            logger.info(f"Executed `{' '.join(cmd)}` with output:\n{result.output}")
+            if index == len(command.commands) - 1:
+                logger.info(f"✅ {command.project_name}: '{' '.join(cmd)}' executed successfully.")
 
 
 def run_workspace_command(
@@ -204,7 +212,8 @@ def run_workspace_command(
         logger.info(f"⏳ {cmd.project_name}: '{cmd.name}' command in progress...")
         try:
             run_command(command=cmd, from_workspace=True)
-            logger.info(f"✅ {cmd.project_name}: '{' '.join(cmd.command)}' executed successfully.")
+            executed_commands = " && ".join(" ".join(command) for command in cmd.commands)
+            logger.info(f"✅ {cmd.project_name}: '{executed_commands}' executed successfully.")
         except Exception as e:
             logger.error(f"❌ {cmd.project_name}: execution failed: {e}")
             raise e

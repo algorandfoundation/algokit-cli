@@ -195,13 +195,30 @@ def resolve_command_path(
     # if the command has any path separators or such, don't try and resolve
     if Path(cmd).name != cmd:
         return command
-    # if command contains simple chaining, don't try and resolve
-    if "&&" in command or "||" in command:
-        return command
     resolved_cmd = shutil.which(cmd)
     if not resolved_cmd:
         raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
     return [resolved_cmd, *args]
+
+
+def split_and_resolve_command_strings(
+    commands: list[str],
+) -> list[list[str]]:
+    """
+    Splits each command in a list of raw command strings and resolves their paths.
+
+    This function takes a list of command strings, splits each command into its constituent
+    arguments, and then resolves the path for each command. This is useful for preparing
+    commands for execution in a system-agnostic manner.
+
+    Args:
+        commands: A list of raw command strings.
+
+    Returns:
+        A list of lists, where each inner list contains the resolved command path followed by its arguments.
+    """
+
+    return [resolve_command_path(split_command_string(raw_command)) for raw_command in commands]
 
 
 def load_env_file(path: Path) -> dict[str, str | None]:

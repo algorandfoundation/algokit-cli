@@ -89,7 +89,7 @@ type = 'contract'
 name = 'project_a'
 
 [project.run]
-hello = { command = 'echo hello', description = 'Prints hello' }
+hello = { commands = ['echo hello'], description = 'Prints hello' }
 
 # ... other non [project.run] related metadata
 ```
@@ -102,7 +102,7 @@ type = 'frontend'
 name = 'project_b'
 
 [project.run]
-hello = { command = 'echo hello', description = 'Prints hello' }
+hello = { commands = ['echo hello'], description = 'Prints hello' }
 
 # ... other non [project.run] related metadata
 ```

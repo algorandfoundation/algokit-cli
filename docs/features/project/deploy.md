@@ -110,6 +110,8 @@ Example:
 $ algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
+> ⚠️ Please note, chaining multiple commands with `&&` is **not** currently supported. If you need to run multiple commands, you can defer to a custom script. Refer to [run](../project/run.md#custom-command-injection) for scenarios where multiple sub-command invocations are required.
+
 ## CI Mode
 
 By using the `--ci` or `--non-interactive` flag, you can skip the interactive prompt for mnemonics.
