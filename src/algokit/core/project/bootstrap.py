@@ -47,7 +47,7 @@ def bootstrap_any_including_subdirs(
         return
 
     config = get_algokit_config(project_dir=base_path)
-    skip = config and config.get("project", {}).get("type") != project_type
+    skip = config and project_type and config.get("project", {}).get("type") != project_type
     if not skip:
         bootstrap_any(base_path, ci_mode=ci_mode)
 
@@ -171,7 +171,7 @@ def bootstrap_npm(project_dir: Path) -> None:
     if not package_json_path.exists():
         logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
     else:
-        logger.info("Installing npm dependencies")
+        logger.info("Installing npm dependencies (this may take a while)")
         is_windows = platform.system() == "Windows"
         cmd = ["npm" if not is_windows else "npm.cmd", "install"]
         try:

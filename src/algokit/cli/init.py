@@ -4,6 +4,7 @@ import shutil
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from functools import cache
 from pathlib import Path
 from typing import NoReturn
 
@@ -119,6 +120,7 @@ LANGUAGE_TO_TEMPLATE_MAP = {
 
 
 # Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
+@cache
 def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
     return {
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
@@ -147,6 +149,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
+            branch="feat/orchestration",
         ),
         TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",

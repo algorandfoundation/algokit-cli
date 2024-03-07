@@ -80,7 +80,7 @@ def _ensure_environment_secrets(
             config_env[key] = click.prompt(key, hide_input=True)
 
 
-def _execute_deploy_command(
+def _execute_deploy_command(  # noqa: PLR0913
     *,
     path: Path,
     environment_name: str | None,
