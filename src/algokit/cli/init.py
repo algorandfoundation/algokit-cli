@@ -312,11 +312,11 @@ def init_command(  # noqa: PLR0913
 
     # allow skipping prompt if the template is the base template to avoid redundant
     # 're-using existing directory' warning in fullstack template init
-    project_path = _get_project_path(
+    root_project_path = _get_project_path(
         directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
     )
-    logger.debug(f"project path = {project_path}")
-    directory_name = project_path.name
+    logger.debug(f"project path = {root_project_path}")
+    directory_name = root_project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
@@ -326,8 +326,8 @@ def init_command(  # noqa: PLR0913
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
 
-    project_path = _adjust_project_path_for_workspace(
-        template_source=template, project_path=project_path, use_workspace=use_workspace
+    project_path = _resolve_workspace_project_path(
+        template_source=template, project_path=root_project_path, use_workspace=use_workspace
     )
 
     logger.info(f"Starting template copy and render at {project_path}...")
@@ -359,7 +359,7 @@ def init_command(  # noqa: PLR0913
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
     _maybe_git_init(
-        project_path,
+        root_project_path,
         use_git=use_git,
         commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
     )
@@ -652,7 +652,7 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         logger.info("🎉 Performed initial git commit successfully! 🎉")
 
 
-def _adjust_project_path_for_workspace(
+def _resolve_workspace_project_path(
     *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
 ) -> Path:
     blessed_template = _get_blessed_templates()

@@ -2,7 +2,7 @@
 
 - **Status**: Approved
 - **Owner:** Altynbek Orumbayev, Inaie Ignacio
-- **Deciders**: Rob Moore, Daniel McGregor, Alessandro Ferrari
+- **Deciders**: Rob Moore, Daniel McGregor, Alessandro Cappellato
 - **Date created**: 2023-07-19
 - **Date decided:** 2023-07-24
 - **Date updated**: 2023-07-24
