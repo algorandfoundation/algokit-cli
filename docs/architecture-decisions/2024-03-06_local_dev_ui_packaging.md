@@ -1,7 +1,7 @@
 # Local dev UI packaging
 
 - **Status**: Draft
-- **Owner:** Patrick Dinh (MakerX)
+- **Owner:** Patrick Dinh (MakerX), Negar Abbasi (MakerX)
 - **Deciders**: Alessandro (Algorand Foundation), Rob Moore (MakerX), MakerX team
 - **Date created**: 2024-03-06
 
@@ -26,6 +26,24 @@ The explorer will be packaged as a executable as well as deployed as a website.
 ## Options
 
 ### Option 1 - Election
+
+[Electron](https://www.electronjs.org/) is a framework for creating native applications with web technologies like JavaScript, HTML, and CSS. It allows developers to build cross-platform desktop apps using their existing web development skills.
+
+- Electron is a mature framework with a large community and a lot of resources available.
+- It supports all intended operations for the local dev UI MVP via [icpMain](https://www.electronjs.org/docs/latest/api/ipc-main) to communicate asynchronously from the main process to renderer processes.
+  1. **File Systems**: we can use the Node.js `fs` module to manage file systems in Electron.we can refer to the Node.js `fs` documentation: [Node.js File System (fs) Module](https://nodejs.org/api/fs.html).
+
+  2. **Launching Another Process**: In Electron, you can use the `child_process` module to spawn new processes. [Node.js Child Processes](https://nodejs.org/api/child_process.html). Specifically, Use the `spawn` or `exec` functions to launch another process.
+
+  3. **Running a Shell Command**: we can again use the `child_process` module's `exec` function to run shell commands in Electron.
+- Electron support an [auto update](https://www.electronjs.org/docs/latest/api/auto-updater) for windows and macOS only.
+- Electron does not have any tooling for packaging and distribution bundled into its core modules. However, there are several third-party tools available for packaging and distribution, such as [electron-builder](https://www.electron.build/), [electron-packager](https://www.npmjs.com/package/electron-packager), and [electron-forge](https://www.electronforge.io/).
+- Electron Forge is an all-in-one tool that handles the packaging and distribution of Electron apps. Under the hood, it combines a lot of existing Electron tools (e.g. @electron/packager, @electron/osx-sign, electron-winstaller, etc.) into a single interface so we do not have to worry about wiring them all together. [docs](https://www.electronjs.org/docs/latest/tutorial/tutorial-packaging#using-electron-forge)
+- Resource used (running on macos m2 chip with 12 cores and 16GB of memory):
+  - 146.0 MB of memory
+  - 0.47% of CPU
+- Link to PoC: [Electron PoC](https://github.com/negar-abbasi/electron-poc)
+
 
 ### Option 2 - Tauri
 
