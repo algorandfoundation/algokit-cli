@@ -78,3 +78,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 
 - If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust.
 - Arm based Linux runner is required to build binaries for Arm Linux. Currently, GitHub doesn't support Arm based runner yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
+- At the point of writing, building with `snap` (for Linux) isn't officially supported by Tauri. There is a open [PR](https://github.com/tauri-apps/tauri/pull/6532).
+- Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. It introduce a risk that we will need to make CSS works across different Webview versions.
+  - This can be a none issue because we will need to make our CSS works across modern browsers for the website.
+  - For reference, [here](https://github.com/tauri-apps/tauri/issues?q=is%3Aissue+webview+css) are Tauri's issues related to CSS.
