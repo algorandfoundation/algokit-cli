@@ -57,4 +57,6 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 - Tauri claims to be less resource hungry than Electron, however, I haven't been able to test it intensively in this work.
 
 **Cons**
-If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust.
+
+- If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust.
+- Arm based Linux runner is required to build binaries for Arm Linux. Currently, GitHub doesn't support Arm based runner yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
