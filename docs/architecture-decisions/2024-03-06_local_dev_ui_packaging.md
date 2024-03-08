@@ -31,11 +31,13 @@ The explorer will be packaged as a executable as well as deployed as a website.
 
 - Electron is a mature framework with a large community and a lot of resources available.
 - It supports all intended operations for the local dev UI MVP via [icpMain](https://www.electronjs.org/docs/latest/api/ipc-main) to communicate asynchronously from the main process to renderer processes.
+
   1. **File Systems**: we can use the Node.js `fs` module to manage file systems in Electron.we can refer to the Node.js `fs` documentation: [Node.js File System (fs) Module](https://nodejs.org/api/fs.html).
 
   2. **Launching Another Process**: In Electron, you can use the `child_process` module to spawn new processes. [Node.js Child Processes](https://nodejs.org/api/child_process.html). Specifically, Use the `spawn` or `exec` functions to launch another process.
 
   3. **Running a Shell Command**: we can again use the `child_process` module's `exec` function to run shell commands in Electron.
+
 - Electron support an [auto update](https://www.electronjs.org/docs/latest/api/auto-updater) for windows and macOS only.
 - Electron does not have any tooling for packaging and distribution bundled into its core modules. However, there are several third-party tools available for packaging and distribution, such as [electron-builder](https://www.electron.build/), [electron-packager](https://www.npmjs.com/package/electron-packager), and [electron-forge](https://www.electronforge.io/).
 - Electron Forge is an all-in-one tool that handles the packaging and distribution of Electron apps. Under the hood, it combines a lot of existing Electron tools (e.g. @electron/packager, @electron/osx-sign, electron-winstaller, etc.) into a single interface so we do not have to worry about wiring them all together. [docs](https://www.electronjs.org/docs/latest/tutorial/tutorial-packaging#using-electron-forge)
@@ -43,7 +45,6 @@ The explorer will be packaged as a executable as well as deployed as a website.
   - 146.0 MB of memory
   - 0.47% of CPU
 - Link to PoC: [Electron PoC](https://github.com/negar-abbasi/electron-poc)
-
 
 ### Option 2 - Tauri
 
@@ -82,3 +83,24 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 - Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. It introduce a risk that we will need to make CSS works across different Webview versions.
   - This can be a none issue because we will need to make our CSS works across modern browsers for the website.
   - For reference, [here](https://github.com/tauri-apps/tauri/issues?q=is%3Aissue+webview+css) are Tauri's issues related to CSS.
+
+### Option 3 - Wails
+
+[Wails](https://wails.io/) is similar to Tauri but the core is written in Go.
+
+**Pros**
+
+- Wails has init templates for major web framework. React + TypeScript + Vite is supported.
+- Wails has a auto codegen to generate the contract between the main process and the renderer process.
+- Wails doesn't have built-in code signing for Windows and Mac. However, the document on how to do code signing with GitHub actions is very detailed.
+
+**Cons**
+
+- Documentation isn't as comprehensive as Election and Tauir.
+- The code to interact with file systems, shell and child processes will be written in Go.
+- No built-in updater. It is tracked in this [issue](https://github.com/wailsapp/wails/issues/1178).
+- Wails is based on WebView, therefore, it has the same cross-platform issues with Tauri.
+- Wails supports building for Windows, Mac and Linux. The documentation isn't clear:
+  - I could build Windows binaries from Mac.
+  - I can't build Linux binaries from Mac.
+  - The document doesn't mention options to build installers.
