@@ -21,6 +21,10 @@ The explorer will be packaged as a executable as well as deployed as a website.
 ## Requirements
 
 - The explorer should support a wide variety of Linux distributions, macOS (both Apple Silicon and Intel architectures), and Windows.
+- To facilitate Algokit projects, the explorer should have access to local machine resouces:
+  - File system.
+  - Launch child processes.
+  - Launch commands from shell.
 - The explorer can be deployed to a website. The explorer website has limited functionalities, compared to the desktop version.
 
 ## Options
@@ -77,7 +81,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 
 **Cons**
 
-- If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust.
+- If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - Arm based Linux runner is required to build binaries for Arm Linux. Currently, GitHub doesn't support Arm based runner yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
 - At the point of writing, building with `snap` (for Linux) isn't officially supported by Tauri. There is a open [PR](https://github.com/tauri-apps/tauri/pull/6532).
 - Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. It introduce a risk that we will need to make CSS works across different Webview versions.
@@ -97,7 +101,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 **Cons**
 
 - Documentation isn't as comprehensive as Election and Tauir.
-- The code to interact with file systems, shell and child processes will be written in Go.
+- The code to interact with file systems, shell and child processes will be written in Go, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - No built-in updater. It is tracked in this [issue](https://github.com/wailsapp/wails/issues/1178).
 - Wails is based on WebView, therefore, it has the same cross-platform issues with Tauri.
 - Wails supports building for Windows, Mac and Linux. The documentation isn't clear:
