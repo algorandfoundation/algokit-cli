@@ -30,7 +30,7 @@ def _format_output(output: str) -> str:
         str: The processed output with specified lines stripped.
     """
     output = "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")])
-    return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>")
+    return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>").replace("\\", r"\\")
 
 
 @pytest.fixture(autouse=True)

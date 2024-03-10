@@ -31,7 +31,7 @@ def _format_output(output: str, replacements: list[tuple[str, str]]) -> str:
     """
     for old, new in replacements:
         output = output.replace(old, new)
-    return "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")])
+    return "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")]).replace("\\", r"\\")
 
 
 def _create_project_config(
