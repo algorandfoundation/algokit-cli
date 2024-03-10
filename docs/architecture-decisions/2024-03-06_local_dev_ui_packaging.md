@@ -7,9 +7,9 @@
 
 ## Context
 
-We are building a web-based local explorer interface to support:
+We are building a web-based local development interface to support:
 
-- Transaction / asset / account explorer
+- Transaction / asset / account exploration
 - Dev wallet integration (including KMD support)
 - Network switching
 - ARC-32 app studio
@@ -21,7 +21,7 @@ The explorer will be packaged as a executable as well as deployed as a website.
 ## Requirements
 
 - The explorer should support a wide variety of Linux distributions, macOS (both Apple Silicon and Intel architectures), and Windows.
-- To facilitate Algokit projects, the explorer should have access to local machine resouces:
+- To facilitate AlgoKit projects, the explorer should have access to local machine resouces:
   - File system.
   - Launch child processes.
   - Launch commands from shell.
@@ -29,14 +29,14 @@ The explorer will be packaged as a executable as well as deployed as a website.
 
 ## Options
 
-### Option 1 - Election
+### Option 1 - Electron
 
 [Electron](https://www.electronjs.org/) is a framework for creating native applications with web technologies like JavaScript, HTML, and CSS. It allows developers to build cross-platform desktop apps using their existing web development skills.
 
 - Electron is a mature framework with a large community and a lot of resources available.
 - It supports all intended operations for the local dev UI MVP via [icpMain](https://www.electronjs.org/docs/latest/api/ipc-main) to communicate asynchronously from the main process to renderer processes.
 
-  1. **File Systems**: we can use the Node.js `fs` module to manage file systems in Electron.we can refer to the Node.js `fs` documentation: [Node.js File System (fs) Module](https://nodejs.org/api/fs.html).
+  1. **File Systems**: we can use the Node.js `fs` module to manage file systems in Electron. See [Node.js File System (fs) module docs](https://nodejs.org/api/fs.html).
 
   2. **Launching Another Process**: In Electron, you can use the `child_process` module to spawn new processes. [Node.js Child Processes](https://nodejs.org/api/child_process.html). Specifically, Use the `spawn` or `exec` functions to launch another process.
 
@@ -82,9 +82,9 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 **Cons**
 
 - If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
-- Arm based Linux runner is required to build binaries for Arm Linux. Currently, GitHub doesn't support Arm based runner yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
+- An ARM based Linux runner is required to build binaries for ARM Linux. Currently, GitHub doesn't support ARM based runners yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
 - At the point of writing, building with `snap` (for Linux) isn't officially supported by Tauri. There is a open [PR](https://github.com/tauri-apps/tauri/pull/6532).
-- Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. It introduce a risk that we will need to make CSS works across different Webview versions.
+- Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. This means that we'll need to perform more testing on the styling and rendering, to ensure the CSS works across the different platform Webviews and the supported versions.
   - This can be a none issue because we will need to make our CSS works across modern browsers for the website.
   - For reference, [here](https://github.com/tauri-apps/tauri/issues?q=is%3Aissue+webview+css) are Tauri's issues related to CSS.
 
@@ -100,7 +100,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 
 **Cons**
 
-- Documentation isn't as comprehensive as Election and Tauir.
+- Documentation isn't as comprehensive as Electron and Tauri.
 - The code to interact with file systems, shell and child processes will be written in Go, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - No built-in updater. It is tracked in this [issue](https://github.com/wailsapp/wails/issues/1178).
 - Wails is based on WebView, therefore, it has the same cross-platform issues with Tauri.
