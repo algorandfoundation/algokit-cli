@@ -241,3 +241,11 @@ def load_env_file(path: Path) -> dict[str, str | None]:
     if env_path.exists():
         return dotenv.dotenv_values(env_path, verbose=True)
     return {}
+
+
+def alphanumeric_sort_key(s: str) -> list[int | str]:
+    """
+    Generate a key for sorting strings that contain both text and numbers.
+    For instance, ensures that "name_digit_1" comes before "name_digit_2".
+    """
+    return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]

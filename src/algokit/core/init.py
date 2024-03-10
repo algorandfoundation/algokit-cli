@@ -4,7 +4,7 @@ from logging import getLogger
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
 
-from algokit.core.project import get_algokit_projects_names_from_workspace
+from algokit.core.project import get_project_dir_names_from_workspace
 
 logger = getLogger(__name__)
 
@@ -60,7 +60,7 @@ def get_git_user_info(param: str) -> str | None:
 def is_valid_project_dir_name(value: str) -> bool:
     """Check if the project directory name for algokit project is valid."""
 
-    algokit_project_names = get_algokit_projects_names_from_workspace()
+    algokit_project_names = get_project_dir_names_from_workspace()
     if value in algokit_project_names:
         return False
     if not re.match(r"^[\w\-.]+$", value):

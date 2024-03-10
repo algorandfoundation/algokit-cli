@@ -1,4 +1,8 @@
-ERROR: Traceback (most recent call last):
+Running '<sys.executable> -c raise Exception()' in '{current_working_directory}'
+<sys.executable>: Traceback (most recent call last):
+<sys.executable>: File "<string>", line 1, in <module>
+<sys.executable>: Exception
+Traceback (most recent call last):
   File "<string>", line 1, in <module>
 Exception
 

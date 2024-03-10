@@ -9,7 +9,7 @@ from algosdk.mnemonic import from_private_key
 from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
-from algokit.core.project import ProjectType, get_algokit_project_configs
+from algokit.core.project import ProjectType, get_project_configs
 from algokit.core.project.deploy import load_deploy_config, load_deploy_env_files
 from algokit.core.tasks.wallet import get_alias
 from algokit.core.utils import resolve_command_path, split_command_string
@@ -200,9 +200,10 @@ class CommandParamType(click.types.StringParamType):
     "-p",
     "project_names",
     multiple=True,
-    help="Projects to execute the command on. (Defaults to all projects if inside the workspace)",
+    help="(Optional) Projects to execute the command on. Defaults to all projects found in the current directory.",
     nargs=1,
     default=[],
+    metavar="<value>",
     required=False,
     cls=MutuallyExclusiveOption,
     not_required_if=[
@@ -219,10 +220,9 @@ def deploy_command(  # noqa: PLR0913
     path: Path,
     deployer_alias: str | None,
     dispenser_alias: str | None,
-    project_names: list[str] | None,
+    project_names: tuple[str],
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
-    project_names = list(project_names) if project_names else None
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(
@@ -248,10 +248,11 @@ def deploy_command(  # noqa: PLR0913
         raise click.ClickException("The --project-name option can only be used inside a workspace.")
 
     if is_workspace:
-        projects = get_algokit_project_configs(project_type=ProjectType.CONTRACT)
+        projects = get_project_configs(project_type=ProjectType.CONTRACT)
 
         for project in projects:
-            if project_names and project.get("name") not in project_names:
+            project_name = project.get("project", {}).get("name", None)
+            if not project_name or (project_names and project_name not in project_names):
                 continue
 
             _execute_deploy_command(

@@ -1,3 +1,5 @@
+Running '<sys.executable> print_env.py' in '{current_working_directory}'
+<sys.executable>: Hello World from env variable!
 Executed `<sys.executable> print_env.py` with output:
 Hello World from env variable!
 

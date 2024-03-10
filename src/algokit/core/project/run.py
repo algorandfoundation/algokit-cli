@@ -137,7 +137,7 @@ def _load_commands_from_workspace(
         logger.warning(f"Path {sub_projects_root_dir} does not exist or is not a directory, skipping...")
         return []
 
-    for subproject_dir in sub_projects_root_dir.iterdir():
+    for subproject_dir in sorted(sub_projects_root_dir.iterdir(), key=lambda p: p.name):
         if not subproject_dir.is_dir():
             continue
 

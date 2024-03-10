@@ -1,26 +1,42 @@
 import logging
+import typing
 from dataclasses import dataclass
-from functools import cache
 from pathlib import Path
 
 import click
 import questionary
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
-from algokit.core import proc, questionary_extensions
+from algokit.core import questionary_extensions
 from algokit.core.conf import get_algokit_config
-from algokit.core.project import ProjectType, get_algokit_project_configs
+from algokit.core.project import ProjectType, get_project_configs
+from algokit.core.typed_client_generation import ClientGenerator
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class ContractArtifacts:
+    """Represents the contract project artifacts.
+
+    Attributes:
+        project_name (str): The name of the project.
+        cwd (Path): The current working directory of the project.
+    """
+
     project_name: str
     cwd: Path
 
 
 def _get_project_data() -> dict:
+    """Retrieves project configuration data.
+
+    Returns:
+        dict: The project configuration data.
+
+    Raises:
+        click.ClickException: If no .algokit.toml config is found.
+    """
     config = get_algokit_config()
     if not config:
         raise click.ClickException("No .algokit.toml config found.")
@@ -28,14 +44,26 @@ def _get_project_data() -> dict:
 
 
 def _is_frontend(project_data: dict) -> bool:
+    """Determines if the project is a frontend project.
+
+    Args:
+        project_data (dict): The project data to evaluate.
+
+    Returns:
+        bool: True if the project is a frontend project, False otherwise.
+    """
     return project_data.get("type") == ProjectType.FRONTEND
 
 
-@cache
 def _get_contract_projects() -> list[ContractArtifacts]:
+    """Retrieves contract projects configurations.
+
+    Returns:
+        list[ContractArtifacts]: A list of contract project artifacts.
+    """
     contract_configs = []
     try:
-        project_configs = get_algokit_project_configs()
+        project_configs = get_project_configs(project_type="contract")
         for config in project_configs:
             project = config.get("project", {})
             project_type = project.get("type")
@@ -43,56 +71,100 @@ def _get_contract_projects() -> list[ContractArtifacts]:
             project_cwd = config.get("cwd", Path.cwd())
             contract_artifacts = project.get("artifacts")
 
-            # if any of the above are none then continue
             if any([not project_type, not project_name, not project_cwd, not contract_artifacts]):
                 continue
 
-            if project_type == ProjectType.CONTRACT:
-                contract_configs.append(ContractArtifacts(project_name, project_cwd))
+            contract_configs.append(ContractArtifacts(project_name, project_cwd))
 
         return contract_configs
     except Exception:
         return []
 
 
-@cache
-def _get_contract_project(project_name: str) -> ContractArtifacts:
-    return next(filter(lambda x: x.project_name == project_name, _get_contract_projects()))
+def _link_projects(*, frontend_clients_path: Path, contract_project_root: Path, language: str, fail_fast: bool) -> None:
+    """Links projects by generating client code.
+
+    Args:
+        frontend_clients_path (Path): The path to the frontend clients.
+        contract_project_root (Path): The root path of the contract project.
+        language (str): The programming language of the generated client code.
+        fail_fast (bool): Whether to exit immediately if a client generation process fails.
+    """
+    output_path_pattern = f"{frontend_clients_path}/{{contract_name}}.{'ts' if language == 'typescript' else 'py'}"
+    generator = ClientGenerator.create_for_language(language)
+    app_specs = list(contract_project_root.rglob("application.json"))
+    for app_spec in app_specs:
+        output_path = generator.resolve_output_path(app_spec, output_path_pattern)
+        if output_path is None:
+            if fail_fast:
+                raise click.ClickException(f"Error generating client for {app_spec}")
+
+            logger.warning(f"Error generating client for {app_spec}")
+            continue
+        generator.generate(app_spec, output_path)
 
 
-def _link_projects(frontend_clients_path: Path, contract_project_root: Path) -> None:
-    frontend_output_argument = f"-o {frontend_clients_path}/" + "{contract_name}.ts"
-    link_command = f"algokit generate client {frontend_output_argument} {contract_project_root}".split()
+def _prompt_contract_project() -> ContractArtifacts | None:
+    """Prompts the user to select a contract project.
 
-    result = proc.run(link_command)
-    if result.exit_code != 0:
-        raise click.ClickException(
-            f"Generating typed clients at {contract_project_root} exited with exit code {result.exit_code}"
-        )
+    Returns:
+        ContractArtifacts | None: The selected contract project artifacts or None if no projects are available.
+    """
+    contract_projects = _get_contract_projects()
 
+    if not contract_projects:
+        return None
 
-def _prompt_contract_project() -> ContractArtifacts:
-    return questionary_extensions.prompt_select(
-        "Select contract project to link with",
-        *[
-            questionary.Choice(title=contract.project_name, value=contract) for contract in _get_contract_projects()
-        ],  # Modified line
+    return typing.cast(
+        ContractArtifacts,
+        questionary_extensions.prompt_select(
+            "Select contract project to link with",
+            *[questionary.Choice(title=contract.project_name, value=contract) for contract in contract_projects],
+        ),
     )
+
+
+def _select_contract_projects_to_link(
+    *,
+    project_names: typing.Sequence[str] | None = None,
+    link_all: bool = False,
+) -> list[ContractArtifacts]:
+    """Selects contract projects to link based on criteria.
+
+    Args:
+        project_names (typing.Sequence[str] | None): Specific project names to link. Defaults to None.
+        link_all (bool): Whether to link all projects. Defaults to False.
+
+    Returns:
+        list[ContractArtifacts]: A list of contract project artifacts to link.
+    """
+    if link_all:
+        return _get_contract_projects()
+    elif project_names:
+        return [project for project in _get_contract_projects() if project.project_name in project_names]
+    else:
+        contract_project = _prompt_contract_project()
+        return [contract_project] if contract_project else []
 
 
 @click.command("link")
 @click.option(
+    "project_names",
     "--project-name",
     "-p",
-    "project_name",
-    type=click.STRING,
+    multiple=True,
+    help="Specify contract projects for the command. Defaults to all in the current workspace.",
+    nargs=1,
+    default=[],
+    metavar="<value>",
     required=False,
-    help=(
-        "(Optional) Name of the contract project to link with the frontend project. "
-        "If not specified, will prompt the user to select from the available contract projects."
-    ),
-    cls=MutuallyExclusiveOption,
-    not_required_if=["link_all"],
+)
+@click.option(
+    "--language",
+    "-l",
+    default="typescript",
+    type=click.Choice(ClientGenerator.languages()),
+    help="Programming language of the generated client code",
 )
 @click.option(
     "link_all",
@@ -106,32 +178,60 @@ def _prompt_contract_project() -> ContractArtifacts:
     cls=MutuallyExclusiveOption,
     not_required_if=["project_name"],
 )
-def link_command(*, project_name: str | None, link_all: bool = False) -> None:
-    """Link contract projects with the frontend project"""
+@click.option(
+    "fail_fast",
+    "--fail-fast",
+    "-f",
+    help="Exit immediately if at least one client generation process fails",
+    default=False,
+    is_flag=True,
+    type=click.BOOL,
+    required=False,
+)
+def link_command(
+    *,
+    project_names: tuple[str] | None,
+    language: str,
+    link_all: bool,
+    fail_fast: bool,
+) -> None:
+    """Automatically invoke 'algokit generate client' on contract projects available in the workspace.
+    Must be invoked from the root of a standalone 'frontend' typed project."""
 
-    contract_projects = []
-    if link_all:
-        contract_projects = _get_contract_projects()
-    else:
-        contract_projects = [_prompt_contract_project() if not project_name else _get_contract_project(project_name)]
+    config = get_algokit_config() or {}
+    project_data = config.get("project", {})
 
-    if not contract_projects:
-        raise click.ClickException("No contract project selected or found")
-
-    """Automatically export typed clients from contract projects into frontends (if any)."""
-    project_data = _get_project_data()
+    if not config:
+        click.secho("WARNING: No .algokit.toml config found. Skipping...", fg="yellow")
+        return
 
     if not _is_frontend(project_data):
-        raise click.ClickException("This command is only available in a standalone frontend projects.")
+        click.secho(
+            "WARNING: This command is only available in a standalone frontend projects. Skipping...", fg="yellow"
+        )
+        return
 
     frontend_artifacts_path = project_data.get("artifacts")
     if not frontend_artifacts_path:
         raise click.ClickException("No `contract_clients` path specified in .algokit.toml")
 
+    contract_projects = _select_contract_projects_to_link(
+        project_names=project_names,
+        link_all=link_all,
+    )
+
+    if not contract_projects:
+        raise click.ClickException(f"No {' '.join(project_names) if project_names else 'contract project(s)'} found")
+
     iteration = 1
     total = len(contract_projects)
     for contract_project in contract_projects:
-        _link_projects(Path.cwd() / frontend_artifacts_path, contract_project.cwd)
+        _link_projects(
+            frontend_clients_path=Path.cwd() / frontend_artifacts_path,
+            contract_project_root=contract_project.cwd,
+            language=language,
+            fail_fast=fail_fast,
+        )
 
         click.echo(
             f"✅ {iteration}/{total}: Exported typed clients from "

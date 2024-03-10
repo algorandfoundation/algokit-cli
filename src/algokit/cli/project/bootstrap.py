@@ -48,17 +48,30 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
 @click.option(
+    "project_names",
+    "--project-name",
+    "-p",
+    multiple=True,
+    help="(Optional) Projects to execute the command on. Defaults to all projects found in the current directory.",
+    nargs=1,
+    default=[],
+    metavar="<value>",
+    required=False,
+)
+@click.option(
     "project_type",
     "--type",
     "-t",
     type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
     required=False,
     default=None,
-    help="Limit execution to specific project types if executing from workspace. (Optional)",
+    help="(Optional) Limit execution to specific project types if executing from workspace.",
 )
-def bootstrap_all(*, interactive: bool, project_type: str | None) -> None:
+def bootstrap_all(*, interactive: bool, project_names: tuple[str], project_type: str | None) -> None:
     cwd = Path.cwd()
-    bootstrap_any_including_subdirs(cwd, ci_mode=not interactive, project_type=project_type)
+    bootstrap_any_including_subdirs(
+        cwd, ci_mode=not interactive, project_names=list(project_names), project_type=project_type
+    )
     logger.info(f"Finished bootstrapping {cwd}")
 
 

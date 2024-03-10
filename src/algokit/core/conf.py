@@ -3,7 +3,6 @@ import os
 import platform
 import sys
 import typing as t
-from functools import cache
 from importlib import metadata
 from pathlib import Path
 
@@ -56,7 +55,6 @@ def get_current_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
 
 
-@cache
 def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: bool = False) -> dict[str, t.Any] | None:
     """
     Load and parse a TOML configuration file. Will never throw.

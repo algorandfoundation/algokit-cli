@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.utils import alphanumeric_sort_key
 
 WORKSPACE_LOOKUP_LEVELS = 2
 
@@ -25,11 +26,8 @@ class ProjectType(str, Enum):
     CONTRACT = "contract"
 
 
-def _get_project_root_dirs(config: dict[str, Any], project_dir: Path) -> list[Path]:
-    """Retrieves a list of project root directories based on the provided project directory or the current working
-    directory.
-
-    This function searches for project directories within the specified root directory. It filters out directories that
+def _get_subprojects_paths(config: dict[str, Any], project_dir: Path) -> list[Path]:
+    """Searches for project directories within the specified workspace. It filters out directories that
     do not contain an algokit configuration file.
 
     Args:
@@ -51,14 +49,19 @@ def _get_project_root_dirs(config: dict[str, Any], project_dir: Path) -> list[Pa
     if not project_root_path.exists():
         return []
 
-    return [p for p in project_root_path.iterdir() if p.is_dir() and (p / ALGOKIT_CONFIG).exists()]
+    return [
+        sub_project
+        for sub_project in project_root_path.iterdir()
+        if sub_project.is_dir() and (sub_project / ALGOKIT_CONFIG).exists()
+    ]
 
 
 @cache
-def get_algokit_project_configs(
+def get_project_configs(
     project_dir: Path | None = None, lookup_level: int = WORKSPACE_LOOKUP_LEVELS, project_type: str | None = None
 ) -> list[dict[str, Any]]:
-    """Fetches configurations for all algokit projects within the specified directory or the current working directory.
+    """Recursively finds configurations for all algokit projects within the specified directory or the
+    current working directory.
 
     This function reads the .algokit.toml configuration file from each project directory and returns a list of
     dictionaries, each representing a project's configuration.
@@ -81,24 +84,27 @@ def get_algokit_project_configs(
     project_config = get_algokit_config(project_dir=project_dir)
 
     if not project_config:
-        return get_algokit_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
+        return get_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
 
     configs = []
-    for sub_project_dir in _get_project_root_dirs(project_config, project_dir):
+    for sub_project_dir in _get_subprojects_paths(project_config, project_dir):
         config = get_algokit_config(project_dir=sub_project_dir) or {}
         if not project_type or config.get("project", {}).get("type") == project_type:
-            config["cwd"] = sub_project_dir
+            config["cwd"] = sub_project_dir  # TODO: refactor
             configs.append(config)
 
+    # Sort configs by the directory name alphanumerically
+    sorted_configs = sorted(configs, key=lambda x: alphanumeric_sort_key(x["cwd"].name))
+
     return (
-        configs
-        if configs
-        else get_algokit_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
+        sorted_configs
+        if sorted_configs
+        else get_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
     )
 
 
 @cache
-def get_algokit_projects_names_from_workspace(project_dir: Path | None = None) -> list[str]:
+def get_project_dir_names_from_workspace(project_dir: Path | None = None) -> list[str]:
     """
     Generates a list of project names from the .algokit.toml file within the specified directory or the current
     working directory.
@@ -119,5 +125,29 @@ def get_algokit_projects_names_from_workspace(project_dir: Path | None = None) -
     if not config:
         return []
 
-    project_dirs = _get_project_root_dirs(config, project_dir)
-    return [p.name for p in project_dirs]
+    return [p.name for p in _get_subprojects_paths(config, project_dir)]
+
+
+def get_workspace_project_path(
+    project_dir: Path | None = None, lookup_level: int = WORKSPACE_LOOKUP_LEVELS
+) -> Path | None:
+    """Recursively searches for the workspace project path within the specified directory.
+
+    Args:
+        project_dir (Path): The base directory to search for the workspace project path.
+        lookup_level (int): The number of levels to go up the directory to search for workspace projects.
+
+    Returns:
+        Path | None: The path to the workspace project directory or None if not found.
+    """
+
+    if lookup_level < 0:
+        return None
+
+    project_dir = project_dir or Path.cwd()
+    project_config = get_algokit_config(project_dir=project_dir)
+
+    if not project_config or project_config.get("project", {}).get("type") != ProjectType.WORKSPACE:
+        return get_workspace_project_path(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
+
+    return project_dir

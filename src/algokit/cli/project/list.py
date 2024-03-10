@@ -1,27 +1,58 @@
 import logging
+from pathlib import Path
 
 import click
 
 from algokit.core.conf import get_algokit_config
-from algokit.core.project import ProjectType, get_algokit_projects_names_from_workspace
+from algokit.core.project import ProjectType, get_project_configs
 
 logger = logging.getLogger(__name__)
 
 
-def _is_workspace() -> bool:
-    config = get_algokit_config() or {}
+PROJECT_TYPE_TO_ICON = {
+    ProjectType.CONTRACT: "📜",
+    ProjectType.FRONTEND: "🖥️",
+    ProjectType.WORKSPACE: "📁",
+    ProjectType.BACKEND: "⚙️",
+}
+
+
+def _is_workspace(workspace_path: Path | None = None) -> bool:
+    config = get_algokit_config(project_dir=workspace_path) or {}
     project = config.get("project", {})
-    return project.get("type", None) == ProjectType.WORKSPACE
+    return bool(project.get("type", None) == ProjectType.WORKSPACE)
 
 
-@click.command("list", hidden=not _is_workspace())
-def list_command() -> None:
+@click.command("list")
+@click.argument(
+    "workspace_path",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, readable=True, path_type=Path),
+    default=".",
+)
+@click.option("-v", "--verbose", is_flag=True, default=False, help="Enable verbose output")
+def list_command(*, workspace_path: Path, verbose: bool) -> None:
     """List all projects in the workspace"""
 
-    if not _is_workspace():
-        raise click.ClickException("This command is only available in a workspace.")
+    if not _is_workspace(workspace_path):
+        click.secho(
+            "WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml",
+            fg="yellow",
+            err=True,
+        )
+        return
 
-    project_names = get_algokit_projects_names_from_workspace()
+    configs = get_project_configs(workspace_path)
 
-    for project_name in project_names:
-        click.echo(f"ℹ️  {project_name}")  # noqa: RUF001
+    if not configs:
+        click.secho(
+            "WARNING: No AlgoKit project(s) found in the workspace. Check [project.type] definition at .algokit.toml",
+            fg="yellow",
+            err=True,
+        )
+        return
+
+    for config in configs:
+        project = config.get("project", {})
+        name, project_type = project.get("name"), project.get("type")
+        cwd = f": ({config.get('cwd')})" if not verbose else ""
+        click.echo(f"{name}{cwd} {PROJECT_TYPE_TO_ICON[project_type]}")

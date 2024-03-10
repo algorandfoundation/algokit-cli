@@ -111,6 +111,18 @@ poetry: Installing the current project: algokit (0.1.0)
 
 ### Bootstrap all
 
-You can run `algokit project bootstrap all` which will run all three commands `algokit project bootstrap env`, `algokit project bootstrap npm` and `algokit project bootstrap poetry` inside the current directory and all immediate sub-directories. This command is executed by default after initialising a new project via the [AlgoKit Init](./init.md) command.
+Execute `algokit project bootstrap all` to initiate `algokit project bootstrap env`, `algokit project bootstrap npm`, and `algokit project bootstrap poetry` commands within the current directory and all its immediate sub-directories. This comprehensive command is automatically triggered following the initialization of a new project through the [AlgoKit Init](./init.md) command.
+
+#### Filtering Options
+
+The `algokit project bootstrap all` command includes flags for more granular control over the bootstrapping process within [AlgoKit workspaces](../init.md#workspaces):
+
+- `--project-name`: This flag allows you to specify one or more project names to bootstrap. Only projects matching the provided names will be bootstrapped. This is particularly useful in monorepos or when working with multiple projects in the same directory structure.
+
+- `--type`: Use this flag to limit the bootstrapping process to projects of a specific type (e.g., `frontend`, `backend`, `contract`). This option streamlines the setup process by focusing on relevant project types, reducing the overall bootstrapping time.
+
+These new flags enhance the flexibility and efficiency of the bootstrapping process, enabling developers to tailor the setup according to project-specific needs.
+
+## Further Reading
 
 To learn more about the `algokit project bootstrap` command, please refer to [bootstrap](../../cli/index.md#bootstrap) in the AlgoKit CLI reference documentation.
