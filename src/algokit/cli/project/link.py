@@ -191,9 +191,7 @@ def link_command(
         return
 
     if not _is_frontend(project_data):
-        click.secho(
-            "WARNING: This command is only available in a standalone frontend projects. Skipping...", fg="yellow"
-        )
+        click.secho("WARNING: This command is only available in projects of type `frontend`. Skipping...", fg="yellow")
         return
 
     frontend_artifacts_path = project_data.get("artifacts")

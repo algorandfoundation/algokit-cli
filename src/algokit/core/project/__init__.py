@@ -83,7 +83,7 @@ def get_project_configs(
     """
 
     if lookup_level < 0:
-        raise FileNotFoundError("Could not find any workspace projects")
+        return []
 
     project_dir = project_dir or Path.cwd()
     project_config = get_algokit_config(project_dir=project_dir)
