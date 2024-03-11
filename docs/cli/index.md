@@ -763,7 +763,7 @@ Custom deploy command. If not provided, will load the deploy command from .algok
 
 
 ### --interactive, --non-interactive, --ci
-Enable/disable interactive prompts. Defaults to non-interactive if the CI environment variable is set. MainNet deployments prompt a security warning.
+Enable/disable interactive prompts. Defaults to non-interactive if the CI environment variable is set. Interactive MainNet deployments prompt for confirmation.
 
 
 ### -P, --path <path>

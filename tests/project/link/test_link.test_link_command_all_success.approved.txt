@@ -1,9 +1,8 @@
-✅ 1/5: Exported typed clients from contract_project_1 typed clients to dist
 Generating TypeScript client code for application specified in <cwd>/projects/project2/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 2/5: Exported typed clients from contract_project_2 typed clients to dist
+✅ 1/4: Exported typed clients from contract_project_2 to dist
 Generating TypeScript client code for application specified in <cwd>/projects/project3/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 3/5: Exported typed clients from contract_project_3 typed clients to dist
+✅ 2/4: Exported typed clients from contract_project_3 to dist
 Generating TypeScript client code for application specified in <cwd>/projects/project4/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 4/5: Exported typed clients from contract_project_4 typed clients to dist
+✅ 3/4: Exported typed clients from contract_project_4 to dist
 Generating TypeScript client code for application specified in <cwd>/projects/project5/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 5/5: Exported typed clients from contract_project_5 typed clients to dist
+✅ 4/4: Exported typed clients from contract_project_5 to dist
