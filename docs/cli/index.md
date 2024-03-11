@@ -666,9 +666,9 @@ algokit localnet stop [OPTIONS]
 
 ## project
 
-Commands available to run against your initialised AlgoKit project. For example you can
-bootstrap project dependencies, deploy your smart contracts or run any custom commands that have been defined.
-deployment of smart contracts in your project.
+Provides a suite of commands for managing your AlgoKit project.
+This includes initializing project dependencies, deploying smart contracts,
+and executing predefined or custom commands within your project environment.
 
 ```shell
 algokit project [OPTIONS] COMMAND [ARGS]...
