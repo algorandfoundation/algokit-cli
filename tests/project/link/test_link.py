@@ -36,7 +36,12 @@ def _format_output(output: str, replacements: list[tuple[str, str]]) -> str:
 
 
 def _create_project_config(
-    project_dir: Path, project_type: str, project_name: str, command: str, description: str
+    project_dir: Path,
+    project_type: str,
+    project_name: str,
+    command: str,
+    description: str,
+    with_app_spec: bool = False,  # noqa: FBT001, FBT002
 ) -> None:
     """
     Generates .algokit.toml configuration file in project directory.
@@ -54,8 +59,9 @@ hello = {{ commands = ['{command}'], description = '{description}' }}
 
     if project_type == "contract":
         (project_dir / "dist").mkdir()
-        app_spec_example_path = Path(__file__).parent / "application.json"
-        shutil.copy(app_spec_example_path, project_dir / "dist" / "application.json")
+        if with_app_spec:
+            app_spec_example_path = Path(__file__).parent / "application.json"
+            shutil.copy(app_spec_example_path, project_dir / "dist" / "application.json")
 
 
 def _create_workspace_project(
@@ -66,6 +72,7 @@ def _create_workspace_project(
     which_mock: WhichMock | None = None,
     proc_mock: ProcMock | None = None,
     custom_project_order: list[str] | None = None,
+    with_app_spec: bool = True,
 ) -> None:
     """
     Sets up a workspace and its subprojects.
@@ -92,12 +99,21 @@ hello = {custom_project_order}
             proc_mock.set_output([resolved_mocked_cmd], ["picked " + project["command"]])
 
         _create_project_config(
-            project_dir, project["type"], project["name"], project["command"], project["description"]
+            project_dir,
+            project["type"],
+            project["name"],
+            project["command"],
+            project["description"],
+            with_app_spec=with_app_spec,
         )
 
 
 def _cwd_with_workspace(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, num_projects: int = 1
+    tmp_path_factory: TempPathFactory,
+    which_mock: WhichMock,
+    proc_mock: ProcMock,
+    num_projects: int = 1,
+    with_app_spec: bool = True,  # noqa: FBT002, FBT001
 ) -> Path:
     """
     Generates a workspace with specified number of projects.
@@ -118,7 +134,12 @@ def _cwd_with_workspace(
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     projects = _generate_projects(num_projects)
     _create_workspace_project(
-        workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
+        workspace_dir=cwd,
+        projects=projects,
+        mock_command=True,
+        which_mock=which_mock,
+        proc_mock=proc_mock,
+        with_app_spec=with_app_spec,
     )
 
     return cwd
@@ -157,6 +178,24 @@ def test_link_command_multiple_names_success(
     Ensures 'project list' command success for multiple specified project names.
     """
     cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=5)
+    result = invoke(
+        "project link --project-name contract_project_3 --project-name contract_project_5",
+        cwd=cwd_with_workspace / "projects" / "project1",
+    )
+
+    assert result.exit_code == 0
+    verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
+
+
+def test_link_command_multiple_names_no_specs_success(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    """
+    Ensures 'project list' command success for multiple specified project names.
+    """
+    cwd_with_workspace = _cwd_with_workspace(
+        tmp_path_factory, which_mock, proc_mock, num_projects=5, with_app_spec=False
+    )
     result = invoke(
         "project link --project-name contract_project_3 --project-name contract_project_5",
         cwd=cwd_with_workspace / "projects" / "project1",

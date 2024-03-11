@@ -1,8 +1,8 @@
 Generating TypeScript client code for application specified in <cwd>/projects/project2/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 1/4: Exported typed clients from contract_project_2 to dist
+✅ 1/4: Finished processing contract_project_2
 Generating TypeScript client code for application specified in <cwd>/projects/project3/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 2/4: Exported typed clients from contract_project_3 to dist
+✅ 2/4: Finished processing contract_project_3
 Generating TypeScript client code for application specified in <cwd>/projects/project4/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 3/4: Exported typed clients from contract_project_4 to dist
+✅ 3/4: Finished processing contract_project_4
 Generating TypeScript client code for application specified in <cwd>/projects/project5/dist/application.json and writing to {current_working_directory}/dist/HelloWorldApp.ts
-✅ 4/4: Exported typed clients from contract_project_5 to dist
+✅ 4/4: Finished processing contract_project_5
