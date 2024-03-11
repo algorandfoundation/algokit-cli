@@ -105,7 +105,6 @@ def _execute_deploy_command(  # noqa: PLR0913
         raise click.ClickException(msg)
     resolved_command = resolve_command_path(config.command)
     logger.info(f"Using deploy command: {' '.join(resolved_command)}")
-    # TODO: [future-note] do we want to walk up for env/config?
     logger.info("Loading deployment environment variables...")
     config_dotenv = load_deploy_env_files(environment_name, path)
     # environment variables take precedence over those in .env* files
