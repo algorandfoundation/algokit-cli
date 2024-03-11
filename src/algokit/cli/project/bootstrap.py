@@ -31,7 +31,7 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(
-            "The 'bootstrap' command group is scheduled for deprecation in v2.x release. "
+            "WARNING: The 'bootstrap' command group is scheduled for deprecation in v2.x release. "
             "Please migrate to using 'algokit project bootstrap' instead.",
             fg="yellow",
         )

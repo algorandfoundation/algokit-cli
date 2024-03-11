@@ -226,7 +226,7 @@ def deploy_command(  # noqa: PLR0913
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(
-            "The 'deploy' command is scheduled for deprecation in v2.x release. "
+            "WARNING: The 'deploy' command is scheduled for deprecation in v2.x release. "
             "Please migrate to using 'algokit project deploy' instead.",
             fg="yellow",
         )
@@ -243,16 +243,36 @@ def deploy_command(  # noqa: PLR0913
 
     config = get_algokit_config() or {}
     is_workspace = config.get("project", {}).get("type") == ProjectType.WORKSPACE
+    project_name = config.get("project", {}).get("name", None)
 
     if not is_workspace and project_names:
-        raise click.ClickException("The --project-name option can only be used inside a workspace.")
+        message = (
+            f"Deploying `{project_name}`..."
+            if project_name in project_names
+            else "No project with the specified name found in the current directory or workspace."
+        )
+        if project_name in project_names:
+            click.echo(message)
+        else:
+            raise click.ClickException(message)
 
     if is_workspace:
         projects = get_project_configs(project_type=ProjectType.CONTRACT)
 
         for project in projects:
             project_name = project.get("project", {}).get("name", None)
-            if not project_name or (project_names and project_name not in project_names):
+
+            if not project_name:
+                click.secho("WARNING: Skipping an unnamed project...", fg="yellow")
+                continue
+            if project_names and project_name not in project_names:
+                click.secho(
+                    (
+                        f"WARNING: Skipping project {project_name} "
+                        "as it does not match the arguments in --project-name option..."
+                    ),
+                    fg="yellow",
+                )
                 continue
 
             _execute_deploy_command(
