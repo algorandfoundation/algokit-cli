@@ -1,4 +1,6 @@
 import logging
+from collections.abc import MutableMapping, Sequence
+from typing import Any
 
 import click
 
@@ -9,16 +11,28 @@ logger = logging.getLogger(__name__)
 
 
 class CompileGroup(click.Group):
+    def __init__(
+        self,
+        name: str | None = None,
+        commands: MutableMapping[str, click.Command] | Sequence[click.Command] | None = None,
+        **attrs: Any,
+    ) -> None:
+        super().__init__(name, commands, **attrs)
+        self.command_dict = {"py": "python"}
+
     def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
         rv = click.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv
-
-        command_dict = {"py": "python"}
-        if cmd_name in command_dict:
-            return click.Group.get_command(self, ctx, command_dict[cmd_name])
+        if cmd_name in self.command_dict:
+            return click.Group.get_command(self, ctx, self.command_dict[cmd_name])
 
         return None
+
+    def list_commands(self, ctx: click.Context) -> list[str]:
+        predefined_command_names = super().list_commands(ctx)
+
+        return sorted(predefined_command_names + list(self.command_dict.keys()))
 
 
 @click.group("compile", cls=CompileGroup, hidden=True)
