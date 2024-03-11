@@ -26,6 +26,10 @@ jobs:
         # track here -> https://github.com/crytic/tealer/pull/209
         run: poetry install --no-interaction && pipx install tealer==0.1.2
 
+      - name: Install PuyaPy
+        if: ${{ matrix.python == '3.12' }}
+        run: pipx install puya
+
       - name: pytest
         shell: bash
         if: ${{ !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest') }}
