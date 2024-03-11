@@ -14,9 +14,7 @@ We are building a web-based local development interface to support:
 - Network switching
 - ARC-32 app studio
 - Visual transaction representations and basic visual debugging interface to help new users understand what’s happening
-- AlgoKit init and Algokit tasks CLI exploration user interfaces to help new users get the most out of the CLI
-
-The explorer will be packaged as a executable as well as deployed as a website.
+- Integration with AlgoKit CLI, for example, calling AlgoKit init and explore AlgoKit tasks
 
 ## Requirements
 
@@ -26,6 +24,10 @@ The explorer will be packaged as a executable as well as deployed as a website.
   - Launch child processes.
   - Launch commands from shell.
 - The explorer can be deployed to a website. The explorer website has limited functionalities, compared to the desktop version.
+- The explorer will be distributed:
+  - As standalone installers.
+  - Via package managers: Winget for Windows, Homebrew for macOS and Snapcraft for Linux.
+- (Nice to have) the explorer should support self-update.
 
 ## Options
 
@@ -42,13 +44,18 @@ The explorer will be packaged as a executable as well as deployed as a website.
 
   3. **Running a Shell Command**: we can again use the `child_process` module's `exec` function to run shell commands in Electron.
 
-- Electron support an [auto update](https://www.electronjs.org/docs/latest/api/auto-updater) for windows and macOS only.
+- Electron support an [auto update](https://www.electronjs.org/docs/latest/api/auto-updater) for windows and macOS only. For Linux, if the explorer is distributed via Snapcraft, it should get auto updated.
 - Electron does not have any tooling for packaging and distribution bundled into its core modules. However, there are several third-party tools available for packaging and distribution, such as [electron-builder](https://www.electron.build/), [electron-packager](https://www.npmjs.com/package/electron-packager), and [electron-forge](https://www.electronforge.io/).
 - Electron Forge is an all-in-one tool that handles the packaging and distribution of Electron apps. Under the hood, it combines a lot of existing Electron tools (e.g. @electron/packager, @electron/osx-sign, electron-winstaller, etc.) into a single interface so we do not have to worry about wiring them all together. [docs](https://www.electronjs.org/docs/latest/tutorial/tutorial-packaging#using-electron-forge)
-- Resource used (running on macos m2 chip with 12 cores and 16GB of memory):
-  - 146.0 MB of memory
-  - 0.47% of CPU
-- Link to PoC: [Electron PoC](https://github.com/negar-abbasi/electron-poc)
+  - It can package the app into format that we are interested in:
+    - `.deb`, `.snap` for Linux
+    - `.msi` for Windows
+    - `.dmg` for macOS
+- Link to PoC: [Electron PoC](https://github.com/negar-abbasi/electron-poc).
+  - Resource used (running on macos m2 chip with 12 cores and 16GB of memory):
+    - 146.0 MB of memory
+    - 0.47% of CPU
+  - When built on local machine, the package size for macOS is ~250MB.
 
 ### Option 2 - Tauri
 
@@ -77,15 +84,18 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
   - [Linux](https://tauri.app/v1/guides/distribution/sign-linux)
   - [macOS](https://tauri.app/v1/guides/distribution/sign-macos)
 - Tauri offers a [built-in updater](https://tauri.app/v1/guides/distribution/updater) for the NSIS (Windows), MSI (Windows), AppImage (Linux) and App bundle (macOS) distribution formats.
-- Tauri claims to be less resource hungry than Electron, however, I haven't been able to test it intensively in this work.
+- Tauri is less resource hungry than Electron. Testing with a simple app (Hello World):
+  - Tauri uses 30MB of RAM and 0.1% CPU on a M1 Mac, 32GB of RAM.
+  - The package size for macOS is about 5MB.
+- When packing a Tauri app, we can specify whether WebView should be included in the package or downloaded during installation. Including WebView can add about 130MB to the package size.
 
 **Cons**
 
 - If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - An ARM based Linux runner is required to build binaries for ARM Linux. Currently, GitHub doesn't support ARM based runners yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
 - At the point of writing, building with `snap` (for Linux) isn't officially supported by Tauri. There is a open [PR](https://github.com/tauri-apps/tauri/pull/6532).
+  - Note: the `.snap` file can be produced by packaging the output of a Linux build.
 - Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. This means that we'll need to perform more testing on the styling and rendering, to ensure the CSS works across the different platform Webviews and the supported versions.
-  - This can be a none issue because we will need to make our CSS works across modern browsers for the website.
   - For reference, [here](https://github.com/tauri-apps/tauri/issues?q=is%3Aissue+webview+css) are Tauri's issues related to CSS.
 
 ### Option 3 - Wails
@@ -97,10 +107,13 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 - Wails has init templates for major web framework. React + TypeScript + Vite is supported.
 - Wails has a auto codegen to generate the contract between the main process and the renderer process.
 - Wails doesn't have built-in code signing for Windows and Mac. However, the document on how to do code signing with GitHub actions is very detailed.
+- Wails is less resource hungry compared to Electron, testing with a simple (Hello World) app:
+  - Wails uses 30MB of RAM and 0.1% CPU on a M1 Mac, 32GB of RAM.
+  - The package size for macOS is about 5MB.
 
 **Cons**
 
-- Documentation isn't as comprehensive as Electron and Tauri.
+- Documentation isn't as comprehensive as Electron and Tauri. Because of this, I didn't investigate much further into Wails.
 - The code to interact with file systems, shell and child processes will be written in Go, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - No built-in updater. It is tracked in this [issue](https://github.com/wailsapp/wails/issues/1178).
 - Wails is based on WebView, therefore, it has the same cross-platform issues with Tauri.
