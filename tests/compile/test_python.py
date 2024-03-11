@@ -35,7 +35,7 @@ def test_compile_py_help(mocker: MockerFixture) -> None:
     proc_mock.set_output(["poetry", "run", "puyapy", "-h"], output=["Puyapy help"])
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
-    result = invoke("compile py -h")
+    result = invoke("compile python -h")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -53,7 +53,7 @@ def test_puyapy_is_not_installed_anywhere(dummy_contract_path: Path, mocker: Moc
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
-    result = invoke(f"compile py {_normalize_path(dummy_contract_path)}")
+    result = invoke(f"compile python {_normalize_path(dummy_contract_path)}")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -85,7 +85,7 @@ def test_puyapy_is_installed_in_project(dummy_contract_path: Path, mocker: Mocke
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
-    result = invoke(f"compile py {_normalize_path(dummy_contract_path)}")
+    result = invoke(f"compile python {_normalize_path(dummy_contract_path)}")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -100,7 +100,7 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
-    result = invoke(f"compile py {_normalize_path(dummy_contract_path)}")
+    result = invoke(f"compile python {_normalize_path(dummy_contract_path)}")
 
     assert result.exit_code == 0
     verify(result.output)
@@ -114,7 +114,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     contract_path = cwd / "contract.py"
     contract_path.write_text(VALID_PUYA_CONTRACT_FILE_CONTENT)
 
-    result = invoke(f"compile py {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
+    result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
     # Only check for the exit code, don't check the results from PuyaPy
     assert result.exit_code == 0
@@ -127,7 +127,7 @@ def test_invalid_contract(cwd: Path, output_path: Path) -> None:
 
     contract_path = cwd / "contract.py"
     contract_path.write_text(INVALID_PUYA_CONTRACT_FILE_CONTENT)
-    result = invoke(f"compile py {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
+    result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
     # Only check for the exit code and the error message from AlgoKit CLI
     assert result.exit_code == 1

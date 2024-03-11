@@ -2,13 +2,26 @@ import logging
 
 import click
 
-from algokit.core.compile.py import find_valid_puyapy_command
+from algokit.core.compile.python import find_valid_puyapy_command
 from algokit.core.proc import run
 
 logger = logging.getLogger(__name__)
 
 
-@click.group("compile", hidden=True)
+class CompileGroup(click.Group):
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+
+        command_dict = {"py": "python"}
+        if cmd_name in command_dict:
+            return click.Group.get_command(self, ctx, command_dict[cmd_name])
+
+        return None
+
+
+@click.group("compile", cls=CompileGroup, hidden=True)
 @click.option(
     "-v",
     "--version",
@@ -31,7 +44,7 @@ def compile_group(context: click.Context, version: str | None) -> None:
 
 
 @compile_group.command(
-    "py",
+    "python",
     short_help="Compile Python to TEAL with PuyaPy",
     help="Compile Python to TEAL with PuyaPy, review https://github.com/algorandfoundation/puya for usage",
     context_settings={
