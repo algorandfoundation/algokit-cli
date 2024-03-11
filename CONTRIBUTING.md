@@ -34,7 +34,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 
    - VS Code
 
-     1. Open the repository root in VS Code
+     1. Open the repository root in VS Code.
      2. Install recommended extensions
      3. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
 
