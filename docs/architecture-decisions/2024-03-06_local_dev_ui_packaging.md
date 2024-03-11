@@ -24,16 +24,20 @@ We are building a web-based local development interface to support:
   - Launch child processes.
   - Launch commands from shell.
 - The explorer can be deployed to a website. The explorer website has limited functionalities, compared to the desktop version.
-- The explorer will be distributed:
-  - As standalone installers.
-  - Via package managers: Winget for Windows, Homebrew for macOS and Snapcraft for Linux.
-- (Nice to have) the explorer should support self-update.
+- The explorer will be distributed via package managers: Winget for Windows, Homebrew for macOS and Snapcraft for Linux.
+- The user should be notified when a new version is available. (Nice to have) self auto update is supported.
+
+## Out of scope
+
+- ARM Linux isn't supported.
 
 ## Options
 
 ### Option 1 - Electron
 
 [Electron](https://www.electronjs.org/) is a framework for creating native applications with web technologies like JavaScript, HTML, and CSS. It allows developers to build cross-platform desktop apps using their existing web development skills.
+
+**Pros**
 
 - Electron is a mature framework with a large community and a lot of resources available.
 - It supports all intended operations for the local dev UI MVP via [icpMain](https://www.electronjs.org/docs/latest/api/ipc-main) to communicate asynchronously from the main process to renderer processes.
@@ -52,10 +56,11 @@ We are building a web-based local development interface to support:
     - `.msi` for Windows
     - `.dmg` for macOS
 - Link to PoC: [Electron PoC](https://github.com/negar-abbasi/electron-poc).
-  - Resource used (running on macos m2 chip with 12 cores and 16GB of memory):
-    - 146.0 MB of memory
-    - 0.47% of CPU
-  - When built on local machine, the package size for macOS is ~250MB.
+
+**Cons**
+
+- Electron is resource hungry, for a small test app (Hello World) it uses 146.0 MB of memory and 0.47% of CPU (running on macos m2 chip with 12 cores and 16GB of memory)
+- When built on local machine, the package size for macOS is ~250MB.
 
 ### Option 2 - Tauri
 
@@ -87,16 +92,15 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 - Tauri is less resource hungry than Electron. Testing with a simple app (Hello World):
   - Tauri uses 30MB of RAM and 0.1% CPU on a M1 Mac, 32GB of RAM.
   - The package size for macOS is about 5MB.
-- When packing a Tauri app, we can specify whether WebView should be included in the package or downloaded during installation. Including WebView can add about 130MB to the package size.
 
 **Cons**
 
 - If we need to extend the functionalities beyond the support of Tauri's JavaScript API, we will need to write the code in Rust, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
-- An ARM based Linux runner is required to build binaries for ARM Linux. Currently, GitHub doesn't support ARM based runners yet, but will be [soon](https://github.blog/changelog/2023-10-30-accelerate-your-ci-cd-with-arm-based-hosted-runners-in-github-actions/) in the future.
 - At the point of writing, building with `snap` (for Linux) isn't officially supported by Tauri. There is a open [PR](https://github.com/tauri-apps/tauri/pull/6532).
   - Note: the `.snap` file can be produced by packaging the output of a Linux build.
 - Tauri relies on [Webview](https://tauri.app/v1/references/webview-versions/) which are not the same across platforms. This means that we'll need to perform more testing on the styling and rendering, to ensure the CSS works across the different platform Webviews and the supported versions.
   - For reference, [here](https://github.com/tauri-apps/tauri/issues?q=is%3Aissue+webview+css) are Tauri's issues related to CSS.
+- For some versions of Windows 10, WebView2 needs to be installed. This process required internet connection.
 
 ### Option 3 - Wails
 
@@ -113,7 +117,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
 
 **Cons**
 
-- Documentation isn't as comprehensive as Electron and Tauri. Because of this, I didn't investigate much further into Wails.
+- Documentation isn't as comprehensive as Electron and Tauri. Because of this, I didn't investigate much further into Wails. Tauri seems to be a more supported project, Wails doesn't give us anything additional.
 - The code to interact with file systems, shell and child processes will be written in Go, which would be a new language in the AlgoKit ecosystem and a less common skill in market.
 - No built-in updater. It is tracked in this [issue](https://github.com/wailsapp/wails/issues/1178).
 - Wails is based on WebView, therefore, it has the same cross-platform issues with Tauri.
@@ -121,3 +125,7 @@ Tauri supports all intended operations for the local dev UI MVP via their JavaSc
   - I could build Windows binaries from Mac.
   - I can't build Linux binaries from Mac.
   - The document doesn't mention options to build installers.
+
+## Preferred option
+
+- **Option2** Tauri is the preferred option because it is well documented and has a big community behind it. Tauri supports all of our use cases. It is less resource hungry than Electron.
