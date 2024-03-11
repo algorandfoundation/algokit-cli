@@ -58,19 +58,24 @@ def _get_subprojects_paths(config: dict[str, Any], project_dir: Path) -> list[Pa
 
 @cache
 def get_project_configs(
-    project_dir: Path | None = None, lookup_level: int = WORKSPACE_LOOKUP_LEVELS, project_type: str | None = None
+    project_dir: Path | None = None,
+    lookup_level: int = WORKSPACE_LOOKUP_LEVELS,
+    project_type: str | None = None,
+    project_names: tuple[str, ...] | None = None,
 ) -> list[dict[str, Any]]:
     """Recursively finds configurations for all algokit projects within the specified directory or the
     current working directory.
 
     This function reads the .algokit.toml configuration file from each project directory and returns a list of
-    dictionaries, each representing a project's configuration.
+    dictionaries, each representing a project's configuration. Additionally appends 'cwd' at the root of each dict
+    object loa
 
     Args:
         project_dir (Path | None): The base directory to search for project configurations. If None, the current
         working directory is used.
         lookup_level (int): The number of levels to go up the directory to search for workspace projects
         project_type (str | None): The type of project to filter by. If None, all project types are returned.
+        project_names (list[str] | None): The names of the projects to filter by. If None, all projects are returned.
 
     Returns:
         list[dict[str, Any] | None]: A list of dictionaries, each containing the configuration of an algokit project.
@@ -84,13 +89,20 @@ def get_project_configs(
     project_config = get_algokit_config(project_dir=project_dir)
 
     if not project_config:
-        return get_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
+        return get_project_configs(
+            project_dir=project_dir.parent,
+            lookup_level=lookup_level - 1,
+            project_type=project_type,
+            project_names=project_names,
+        )
 
     configs = []
     for sub_project_dir in _get_subprojects_paths(project_config, project_dir):
         config = get_algokit_config(project_dir=sub_project_dir) or {}
-        if not project_type or config.get("project", {}).get("type") == project_type:
-            config["cwd"] = sub_project_dir  # TODO: refactor
+        type_mismatch = project_type and config.get("project", {}).get("type") != project_type
+        name_mismatch = project_names and config.get("project", {}).get("name") not in project_names
+        if not type_mismatch and not name_mismatch:
+            config["cwd"] = sub_project_dir
             configs.append(config)
 
     # Sort configs by the directory name alphanumerically
@@ -99,7 +111,12 @@ def get_project_configs(
     return (
         sorted_configs
         if sorted_configs
-        else get_project_configs(project_dir=project_dir.parent, lookup_level=lookup_level - 1)
+        else get_project_configs(
+            project_dir=project_dir.parent,
+            lookup_level=lookup_level - 1,
+            project_type=project_type,
+            project_names=project_names,
+        )
     )
 
 

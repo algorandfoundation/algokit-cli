@@ -257,22 +257,13 @@ def deploy_command(  # noqa: PLR0913
             raise click.ClickException(message)
 
     if is_workspace:
-        projects = get_project_configs(project_type=ProjectType.CONTRACT)
+        projects = get_project_configs(project_type=ProjectType.CONTRACT, project_names=project_names)
 
         for project in projects:
             project_name = project.get("project", {}).get("name", None)
 
             if not project_name:
                 click.secho("WARNING: Skipping an unnamed project...", fg="yellow")
-                continue
-            if project_names and project_name not in project_names:
-                click.secho(
-                    (
-                        f"WARNING: Skipping project {project_name} "
-                        "as it does not match the arguments in --project-name option..."
-                    ),
-                    fg="yellow",
-                )
                 continue
 
             _execute_deploy_command(

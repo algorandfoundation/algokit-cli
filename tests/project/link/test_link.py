@@ -186,7 +186,7 @@ def test_link_command_name_not_found(
         cwd=cwd_with_workspace / "projects" / "project1",
     )
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 

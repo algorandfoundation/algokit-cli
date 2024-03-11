@@ -1,20 +1,20 @@
-contract_project_1 📜
-contract_project_2 📜
-contract_project_3 📜
-contract_project_4 📜
-contract_project_5 📜
-contract_project_6 📜
-contract_project_7 📜
-contract_project_8 📜
-contract_project_9 📜
-contract_project_10 📜
-contract_project_11 📜
-contract_project_12 📜
-contract_project_13 📜
-contract_project_14 📜
-contract_project_15 📜
-contract_project_16 📜
-contract_project_17 📜
-contract_project_18 📜
-contract_project_19 📜
-contract_project_20 📜
+contract_project_1: ({current_working_directory}/projects/project1) 📜
+contract_project_2: ({current_working_directory}/projects/project2) 📜
+contract_project_3: ({current_working_directory}/projects/project3) 📜
+contract_project_4: ({current_working_directory}/projects/project4) 📜
+contract_project_5: ({current_working_directory}/projects/project5) 📜
+contract_project_6: ({current_working_directory}/projects/project6) 📜
+contract_project_7: ({current_working_directory}/projects/project7) 📜
+contract_project_8: ({current_working_directory}/projects/project8) 📜
+contract_project_9: ({current_working_directory}/projects/project9) 📜
+contract_project_10: ({current_working_directory}/projects/project10) 📜
+contract_project_11: ({current_working_directory}/projects/project11) 📜
+contract_project_12: ({current_working_directory}/projects/project12) 📜
+contract_project_13: ({current_working_directory}/projects/project13) 📜
+contract_project_14: ({current_working_directory}/projects/project14) 📜
+contract_project_15: ({current_working_directory}/projects/project15) 📜
+contract_project_16: ({current_working_directory}/projects/project16) 📜
+contract_project_17: ({current_working_directory}/projects/project17) 📜
+contract_project_18: ({current_working_directory}/projects/project18) 📜
+contract_project_19: ({current_working_directory}/projects/project19) 📜
+contract_project_20: ({current_working_directory}/projects/project20) 📜

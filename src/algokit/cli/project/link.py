@@ -28,21 +28,6 @@ class ContractArtifacts:
     cwd: Path
 
 
-def _get_project_data() -> dict:
-    """Retrieves project configuration data.
-
-    Returns:
-        dict: The project configuration data.
-
-    Raises:
-        click.ClickException: If no .algokit.toml config is found.
-    """
-    config = get_algokit_config()
-    if not config:
-        raise click.ClickException("No .algokit.toml config found.")
-    return config.get("project", {})
-
-
 def _is_frontend(project_data: dict) -> bool:
     """Determines if the project is a frontend project.
 
@@ -221,7 +206,11 @@ def link_command(
     )
 
     if not contract_projects:
-        raise click.ClickException(f"No {' '.join(project_names) if project_names else 'contract project(s)'} found")
+        click.secho(
+            f"WARNING: No {' '.join(project_names) if project_names else 'contract project(s)'} found. Skipping...",
+            fg="yellow",
+        )
+        return
 
     iteration = 1
     total = len(contract_projects)

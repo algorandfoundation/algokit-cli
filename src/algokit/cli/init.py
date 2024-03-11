@@ -475,20 +475,13 @@ def _maybe_move_github_folder(*, project_path: Path, use_workspace: bool) -> Non
 
     # if source dir does not contain any files or only contains empty folders
     # then remove it
-
     if all(not p.is_file() for p in source_dir.rglob("*")):
         shutil.rmtree(source_dir)
-        click.echo(
-            "The contents of your `.github` folder have been moved to the workspace's root `.github` folder. "
-            "Please review and adjust as necessary. Moving the folder is required due to GitHub not supporting "
-            "workflows in subdirectories."
-        )
+        logger.debug(f"No files found in .github folder after merge. Removing `.github` directory at {source_dir}...")
         return
 
-    click.secho(
-        "Failed to move all files within the project's `.github` folder to the workspace root. "
-        "Please review any files that remain in the project `.github` folder and manually include in the root `.github` directory as required",
-        fg="yellow",
+    click.echo(
+        "Moving files in your project's .github folder to the workspace root .github folder.",
     )
 
 

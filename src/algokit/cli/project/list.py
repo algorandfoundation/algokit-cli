@@ -54,5 +54,5 @@ def list_command(*, workspace_path: Path, verbose: bool) -> None:
     for config in configs:
         project = config.get("project", {})
         name, project_type = project.get("name"), project.get("type")
-        cwd = f": ({config.get('cwd')})" if not verbose else ""
+        cwd = f": ({config.get('cwd')})" if verbose else ""
         click.echo(f"{name}{cwd} {PROJECT_TYPE_TO_ICON[project_type]}")
