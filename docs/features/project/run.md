@@ -46,7 +46,7 @@ E --> F;
 
 Below is only visible and available when running from a workspace root.
 
-- `-l, --list`: List all projects associated with workspace command. (Optional)
+- `-l, --list`: List all projects associated with the workspace command. (Optional)
 - `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
 - `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
   To get a detailed help on the above commands execute:

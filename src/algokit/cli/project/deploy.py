@@ -165,7 +165,7 @@ class CommandParamType(click.types.StringParamType):
     default=lambda: "CI" not in os.environ,
     help=(
         "Enable/disable interactive prompts. Defaults to non-interactive if the CI "
-        "environment variable is set. MainNet deployments prompt a security warning."
+        "environment variable is set. Interactive MainNet deployments prompt for confirmation."
     ),
 )
 @click.option(

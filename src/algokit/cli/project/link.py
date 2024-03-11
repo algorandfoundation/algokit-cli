@@ -235,6 +235,6 @@ def link_command(
 
         click.echo(
             f"✅ {iteration}/{total}: Exported typed clients from "
-            f"{contract_project.project_name} typed clients to {frontend_artifacts_path}"
+            f"{contract_project.project_name} to {frontend_artifacts_path}"
         )
         iteration += 1

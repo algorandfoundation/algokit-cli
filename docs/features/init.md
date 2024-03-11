@@ -42,9 +42,6 @@ type = 'workspace' # type specifying if the project is a workspace or standalone
 projects_root_path = 'projects' # path to the root folder containing all sub-projects in the workspace
 ```
 
-#### GitHub folder merging
-
-When using the `--workspace` flag with AlgoKit's init command, it enables a workspace setup, ideal for handling multiple projects under one directory. This setup is especially useful for complex applications that involve different components like smart contracts and frontend applications.
 
 #### Handling of the `.github` Folder
 

@@ -20,7 +20,7 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 - `--deployer`: Specifies the deployer alias. If not provided and if the deployer is specified in `.algokit.toml` file its mnemonic will be prompted.
 - `--dispenser`: Specifies the dispenser alias. If not provided and if the dispenser is specified in `.algokit.toml` file its mnemonic will be prompted.
 - `-p, --project-name`: (Optional) Projects to execute the command on. Defaults to all projects found in
-  the current directory. Option is mutually exclusive with command.
+  the current directory. Option is mutually exclusive with `--command`.
 - `-h, --help`: Show this message and exit.
 
 ## Environment files
@@ -121,7 +121,7 @@ command = "{custom_deploy_command}"
 $ algokit project deploy testnet --project-name myproject
 ```
 
-This command deploys the smart contracts to the testnet from sub project named 'myproject' available within the current workspace. All `.env` loading logic described in [Environment files](#environment-files) is applicable, execution from the workspace root orchestrates invoking the deploy command from the working directory of each sub project.
+This command deploys the smart contracts to TestNet from a sub project named 'myproject', which is available within the current workspace. All `.env` loading logic described in [Environment files](#environment-files) is applicable, execution from the workspace root orchestrates invoking the deploy command from the working directory of each applicable sub project.
 
 ## Custom Project Directory
 

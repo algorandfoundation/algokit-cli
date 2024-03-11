@@ -486,9 +486,8 @@ def _maybe_move_github_folder(*, project_path: Path, use_workspace: bool) -> Non
         return
 
     click.secho(
-        "Please note, your project's `.github` folder was partially moved to workspace root. "
-        "Please review and tweak as necessary. Moving the folder is required due to GitHub not supporting "
-        "workflows in subdirectories.",
+        "Failed to move all files within the project's `.github` folder to the workspace root. "
+        "Please review any files that remain in the project `.github` folder and manually include in the root `.github` directory as required",
         fg="yellow",
     )
 
