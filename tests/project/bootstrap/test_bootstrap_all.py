@@ -209,7 +209,7 @@ def test_bootstrap_all_projects_type_filter(tmp_path_factory: TempPathFactory) -
     result = invoke("project bootstrap all --type frontend", cwd=cwd)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(result.output.replace(".cmd", ""))
 
 
 @pytest.mark.usefixtures("proc_mock")
