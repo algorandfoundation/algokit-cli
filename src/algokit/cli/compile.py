@@ -31,7 +31,6 @@ def compile_group(context: click.Context, version: str | None) -> None:
 
 
 @click.command(
-    "python",
     context_settings={
         "ignore_unknown_options": True,
     },
