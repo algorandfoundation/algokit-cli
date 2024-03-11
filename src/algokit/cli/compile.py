@@ -1,6 +1,4 @@
 import logging
-from collections.abc import MutableMapping, Sequence
-from typing import Any
 
 import click
 
@@ -10,32 +8,7 @@ from algokit.core.proc import run
 logger = logging.getLogger(__name__)
 
 
-class CompileGroup(click.Group):
-    def __init__(
-        self,
-        name: str | None = None,
-        commands: MutableMapping[str, click.Command] | Sequence[click.Command] | None = None,
-        **attrs: Any,
-    ) -> None:
-        super().__init__(name, commands, **attrs)
-        self.command_dict = {"py": "python"}
-
-    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
-        rv = click.Group.get_command(self, ctx, cmd_name)
-        if rv is not None:
-            return rv
-        if cmd_name in self.command_dict:
-            return click.Group.get_command(self, ctx, self.command_dict[cmd_name])
-
-        return None
-
-    def list_commands(self, ctx: click.Context) -> list[str]:
-        predefined_command_names = super().list_commands(ctx)
-
-        return sorted(predefined_command_names + list(self.command_dict.keys()))
-
-
-@click.group("compile", cls=CompileGroup, hidden=True)
+@click.group("compile", hidden=True)
 @click.option(
     "-v",
     "--version",
@@ -57,10 +30,8 @@ def compile_group(context: click.Context, version: str | None) -> None:
     context.obj["version"] = version
 
 
-@compile_group.command(
+@click.command(
     "python",
-    short_help="Compile Python to TEAL with PuyaPy",
-    help="Compile Python to TEAL with PuyaPy, review https://github.com/algorandfoundation/puya for usage",
     context_settings={
         "ignore_unknown_options": True,
     },
@@ -91,3 +62,7 @@ def compile_py_command(context: click.Context, puya_args: list[str]) -> None:
             fg="red",
         )
         raise click.exceptions.Exit(run_result.exit_code)
+
+
+compile_group.add_command(compile_py_command, "python")
+compile_group.add_command(compile_py_command, "py")
