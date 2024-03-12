@@ -38,7 +38,7 @@ The following tutorials guide you through various scenarios:
 
 ## Guiding Principles
 
-Algorand AlgoKit is guided by the following solution principles which flow through to the applications created by developers.
+AlgoKit is guided by the following solution principles which flow through to the applications created by developers.
 
 1. **Cohesive developer tool suite**: Using AlgoKit should feel professional and cohesive, like it was designed to work together, for the developer; not against them. Developers are guided towards delivering end-to-end, high quality outcomes on MainNet so they and Algorand are more likely to be successful.
 2. **Seamless onramp**: New developers have a seamless experience to get started and they are guided into a pit of success with best practices, supported by great training collateral; you should be able to go from nothing to debugging code in 5 minutes.
