@@ -68,7 +68,13 @@ Now that AlgoKit is installed, you can rapidly create a new project to get start
 algokit init
 ```
 
-This will launch a guided menu system to create a specific project tailored to your needs. You will first be prompted to select a specific template. The templates are basic starter applications for various Algorand development scenarios. To read more about templates checkout AlgoKit detailed documentation. For now, use the arrow keys to select the `playground` template, which is a lightweight starting point for learning and experimentation.
+This will launch a guided menu system to create a specific project tailored to your needs. The templates are basic starter applications for various Algorand development scenarios. To read more about templates checkout AlgoKit detailed documentation.
+
+For now we'll use the `playground` template, which is a lightweight starting point for learning and experimentation. You can initialise a project using this template by running:
+
+```shell
+algokit init -t playground --no-workspace
+```
 
 Next, you will be prompted for the name of your project. Finally, select the default value for the rest of the prompts (enter).
 

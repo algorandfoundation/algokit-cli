@@ -2,6 +2,22 @@
 
 <!--next-version-placeholder-->
 
+## v1.13.0 (2024-03-13)
+
+### Feature
+
+* Add command to compile python to TEAL with Puyapy ([`1030799`](https://github.com/algorandfoundation/algokit-cli/commit/10307990a07fd3fa8ba60f6886f5b4be722dc065))
+
+### Fix
+
+* Adjust how we run npx, so it supports all windows versions ([#454](https://github.com/algorandfoundation/algokit-cli/issues/454)) ([`a997953`](https://github.com/algorandfoundation/algokit-cli/commit/a997953871251b0f1dfed3ad6e2cb8901c2c5cd3))
+
+### Documentation
+
+* Ref commit for snapcraft ([#452](https://github.com/algorandfoundation/algokit-cli/issues/452)) ([`0ab21bc`](https://github.com/algorandfoundation/algokit-cli/commit/0ab21bcd2b7a6d188791a3480eab7fe1b885667d))
+* Update playground init docs ([#451](https://github.com/algorandfoundation/algokit-cli/issues/451)) ([`1a15d5d`](https://github.com/algorandfoundation/algokit-cli/commit/1a15d5def4e610f0b10a41918f5d4055dea19efc))
+* Change last name in 2023-07-19_advanced_generate_command.md ([#448](https://github.com/algorandfoundation/algokit-cli/issues/448)) ([`8df02df`](https://github.com/algorandfoundation/algokit-cli/commit/8df02df981c0b68cfea2a4dc4698759d5e393974))
+
 ## v1.12.3 (2024-03-06)
 
 ### Fix

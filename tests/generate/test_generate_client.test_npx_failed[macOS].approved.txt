@@ -1,0 +1,5 @@
+Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to client.ts
+DEBUG: Running 'npx --yes {typed_client_package} generate -a {current_working_directory}/application.json -o client.ts' in '{current_working_directory}'
+DEBUG: npx: STDOUT
+DEBUG: npx: STDERR
+Error: Client generation failed for {current_working_directory}/application.json.
