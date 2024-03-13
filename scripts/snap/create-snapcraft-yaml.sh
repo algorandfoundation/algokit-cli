@@ -47,7 +47,6 @@ parts:
 apps:
   algokit:
     command: algokit
-    plugs: [home, network]
 EOF
 
 echo "snapcraft.yaml has been created at ${DESTINATION_DIR}/snap/snapcraft.yaml"
