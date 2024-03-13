@@ -844,6 +844,82 @@ def test_init_wizard_v2_flow(
     )
 
 
+def test_init_wizard_v2_github_folder_with_workspace(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    answer = MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER])
+    for command in answer.commands:
+        mock_questionary_input.send_text(command.value)
+
+    # Act
+    result = invoke(
+        "init -t beaker --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        cwd=cwd,
+    )
+
+    # Assert
+    cwd /= "myapp"
+    assert result.exit_code == 0
+    assert not cwd.joinpath("projects/myapp/.github").exists()
+    assert cwd.joinpath(".github").exists()
+    assert cwd.glob(".github/workflows/*.yaml")
+
+
+def test_init_wizard_v2_github_folder_with_workspace_partial(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    mock_questionary_input.send_text("y\n")  # Simulate workspace selection
+
+    github_workflow_path = cwd / "myapp" / ".github" / "workflows"
+    github_workflow_path.mkdir(parents=True, exist_ok=True)
+    (github_workflow_path / "cd.yaml").touch()
+
+    # Act
+    result = invoke(
+        "init -t beaker --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        input="y\n",
+        cwd=cwd,
+    )
+
+    # Assert
+    cwd /= "myapp"
+    assert result.exit_code == 0
+    assert (cwd / "projects/myapp/.github/workflows/cd.yaml").read_text() != ""
+    assert (cwd / ".github/workflows/cd.yaml").read_text() == ""
+    assert cwd.glob(".github/workflows/*.yaml")
+    assert len(list(cwd.glob("projects/myapp/.github/workflows/*.yaml"))) == 1
+
+
+def test_init_wizard_v2_github_folder_no_workspace(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    answer = MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER])
+    for command in answer.commands:
+        mock_questionary_input.send_text(command.value)
+
+    # Act
+    result = invoke(
+        "init -t beaker --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production' --no-workspace",
+        cwd=cwd,
+    )
+
+    # Assert
+    cwd /= "myapp"
+    assert result.exit_code == 0
+    assert not cwd.joinpath("projects").exists()
+    assert cwd.joinpath(".github").exists()
+    assert cwd.glob(".github/workflows/*.yaml")
+
+
 def _remove_git_hints(output: str) -> str:
     git_init_hint_prefix = "DEBUG: git: hint:"
     lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]

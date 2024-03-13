@@ -473,16 +473,16 @@ def _maybe_move_github_folder(*, project_path: Path, use_workspace: bool) -> Non
             except shutil.Error as e:
                 logger.debug(f"Skipping move of {source_file} to {target_file}: {e}")
 
-    # if source dir does not contain any files or only contains empty folders
-    # then remove it
-    if all(not p.is_file() for p in source_dir.rglob("*")):
+    if any(p.is_file() for p in source_dir.rglob("*")):
+        click.secho(
+            "Failed to move all files within your project's .github folder to the workspace root. "
+            "Please review any files that remain in your project's .github folder and manually include "
+            "in the root .github directory as required.",
+            fg="yellow",
+        )
+    else:
         shutil.rmtree(source_dir)
         logger.debug(f"No files found in .github folder after merge. Removing `.github` directory at {source_dir}...")
-        return
-
-    click.echo(
-        "Moving files in your project's .github folder to the workspace root .github folder.",
-    )
 
 
 def _fail_and_bail() -> NoReturn:
