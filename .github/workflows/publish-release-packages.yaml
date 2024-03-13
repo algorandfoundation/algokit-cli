@@ -147,6 +147,12 @@ jobs:
         run: |
           ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ env.RELEASE_VERSION }} ${{ env.BINARY_PATH }} "stable"
 
+      - name: Upload snapcraft.yaml as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: snapcraft-yaml
+          path: ${{ github.workspace }}/snap/snapcraft.yaml
+
       - name: Build snap
         uses: snapcore/action-build@v1
         with:
