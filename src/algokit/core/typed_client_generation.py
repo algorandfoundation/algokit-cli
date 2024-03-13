@@ -10,6 +10,7 @@ import algokit_client_generator
 import click
 
 from algokit.core import proc
+from algokit.core.utils import is_windows
 
 logger = logging.getLogger(__name__)
 
@@ -96,11 +97,10 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         npx_path = shutil.which("npx")
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
-        self._npx_path = npx_path
 
     def generate(self, app_spec: Path, output: Path) -> None:
         cmd = [
-            self._npx_path,
+            "npx" if not is_windows() else "npx.cmd",
             "--yes",
             TYPESCRIPT_NPX_PACKAGE,
             "generate",

@@ -5,7 +5,9 @@ from pathlib import Path
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.core.typed_client_generation import TYPESCRIPT_NPX_PACKAGE, _snake_case
+from algokit.core.utils import is_windows
 from approvaltests.namer import NamerFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
@@ -18,6 +20,10 @@ DirWithAppSpecFactory = Callable[[Path, str], Path]
 
 def _normalize_output(output: str) -> str:
     return output.replace("\\", "/").replace(TYPESCRIPT_NPX_PACKAGE, "{typed_client_package}")
+
+
+def _get_npx_command() -> str:
+    return "npx" if not is_windows() else "npx.cmd"
 
 
 @pytest.fixture()
@@ -102,6 +108,7 @@ def test_generate_client_python_arc32_filename(arc32_json: Path, options: str, e
     assert (arc32_json.parent / expected_output_path).read_text()
 
 
+@pytest.mark.usefixtures("mock_platform_system")
 @pytest.mark.parametrize(
     ("options", "expected_output_path"),
     [
@@ -116,17 +123,20 @@ def test_generate_client_typescript(
     application_json: Path,
     options: str,
     expected_output_path: Path,
+    request: pytest.FixtureRequest,
 ) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
     verify(
         _normalize_output(result.output),
+        namer=PyTestNamer(request),
         options=NamerFactory.with_parameters(*options.split()),
     )
+    npx = _get_npx_command()
     assert len(proc_mock.called) == 1
     assert (
         proc_mock.called[0].command
-        == f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
     )
 
 
@@ -138,12 +148,21 @@ def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:
     verify(_normalize_output(result.output))
 
 
-def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
-    proc_mock.should_bad_exit_on(f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
+@pytest.mark.usefixtures("mock_platform_system")
+def test_npx_failed(
+    proc_mock: ProcMock,
+    application_json: Path,
+    request: pytest.FixtureRequest,
+) -> None:
+    npx = _get_npx_command()
+    proc_mock.should_bad_exit_on(f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
-    verify(_normalize_output(result.output))
+    verify(
+        _normalize_output(result.output),
+        namer=PyTestNamer(request),
+    )
 
 
 def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> None:

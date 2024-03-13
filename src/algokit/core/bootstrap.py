@@ -1,6 +1,5 @@
 import logging
 import os
-import platform
 from pathlib import Path
 
 import click
@@ -8,7 +7,7 @@ from packaging import version
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
-from algokit.core.utils import find_valid_pipx_command
+from algokit.core.utils import find_valid_pipx_command, is_windows
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 MAX_BOOTSTRAP_DEPTH = 2
@@ -162,8 +161,7 @@ def bootstrap_npm(project_dir: Path) -> None:
         logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
     else:
         logger.info("Installing npm dependencies")
-        is_windows = platform.system() == "Windows"
-        cmd = ["npm" if not is_windows else "npm.cmd", "install"]
+        cmd = ["npm" if not is_windows() else "npm.cmd", "install"]
         try:
             proc.run(
                 cmd,
