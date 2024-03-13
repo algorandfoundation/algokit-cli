@@ -50,7 +50,7 @@ Link to PoC is here: [Electron PoC](https://github.com/negar-abbasi/electron-poc
 **Pros**
 
 - Electron is a mature framework with a large community and a lot of resources available.
-- TODO: NC - Something about TypeScript/JS
+- Uses standard JavaScript and Node APIs, which most developers are very familiar with.
 - It supports all the local system access requirements via [icpMain](https://www.electronjs.org/docs/latest/api/ipc-main), allowing asynchronous communication from the main process to renderer processes.
   - File system access is enabled using the Node.js `fs` module. See [Node.js File System (fs) module docs](https://nodejs.org/api/fs.html).
   - Launching processes is enabled using the Node.js `child_process` module to spawn new processes. [Node.js Child Processes](https://nodejs.org/api/child_process.html). Specifically, well use the `spawn` or `exec` functions.
@@ -137,3 +137,7 @@ Link to PoC is here: [Electron PoC](https://github.com/negar-abbasi/electron-poc
 - **Option2** Tauri is the preferred option because it is well documented and has a big community behind it. Tauri supports all of our use cases and is less resource hungry than Electron.
 
 ## Selected option
+
+Option 2
+
+Given the good community support, great docs, low resource consumption and not needing to write much (if any) Rust, Tauri (Option 2) appears to fit our needs very well.
