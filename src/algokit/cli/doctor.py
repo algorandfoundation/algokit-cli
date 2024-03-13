@@ -12,6 +12,7 @@ from algokit.core.sandbox import (
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
 )
+from algokit.core.utils import is_windows as get_is_windows
 from algokit.core.version_prompt import get_latest_github_version
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
     potential issues."""
     os_type = platform.system()
-    is_windows = os_type == "Windows"
+    is_windows = get_is_windows()
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
         "AlgoKit": _get_algokit_version_output(),

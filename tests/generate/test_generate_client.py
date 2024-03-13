@@ -126,7 +126,7 @@ def test_generate_client_typescript(
     assert len(proc_mock.called) == 1
     assert (
         proc_mock.called[0].command
-        == f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+        == f"npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
     )
 
 
@@ -139,7 +139,7 @@ def test_npx_missing(application_json: Path, which_mock: WhichMock) -> None:
 
 
 def test_npx_failed(proc_mock: ProcMock, application_json: Path) -> None:
-    proc_mock.should_bad_exit_on(f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
+    proc_mock.should_bad_exit_on(f"npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1

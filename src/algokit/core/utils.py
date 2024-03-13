@@ -141,10 +141,9 @@ def get_base_python_path() -> str | None:
     # this will be the value of `home = <path>` in pyvenv.cfg if it exists
     if base_home := getattr(sys, "_home", None):
         base_home_path = Path(base_home)
-        is_windows = platform.system() == "Windows"
         for name in ("python", "python3", f"python3.{sys.version_info.minor}"):
             candidate_path = base_home_path / name
-            if is_windows:
+            if is_windows():
                 candidate_path = candidate_path.with_suffix(".exe")
             if candidate_path.is_file():
                 return str(candidate_path)
@@ -158,3 +157,7 @@ def is_binary_mode() -> bool:
     return: True if running in a native binary frozen environment, False otherwise.
     """
     return getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+
+
+def is_windows() -> bool:
+    return platform.system() == "Windows"
