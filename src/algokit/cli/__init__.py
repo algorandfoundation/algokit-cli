@@ -1,5 +1,6 @@
 import click
 
+from algokit.cli.compile import compile_group
 from algokit.cli.completions import completions_group
 from algokit.cli.config import config_group
 from algokit.cli.dispenser import dispenser_group
@@ -64,4 +65,5 @@ algokit.add_command(localnet_group)
 algokit.add_command(generate_group)
 algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
+algokit.add_command(compile_group)
 algokit.add_command(project_group)
