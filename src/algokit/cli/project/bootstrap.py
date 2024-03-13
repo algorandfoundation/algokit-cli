@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from algokit.core.project import ProjectType
 from algokit.core.project.bootstrap import (
     bootstrap_any_including_subdirs,
     bootstrap_env,
@@ -30,7 +31,7 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(
-            "The 'bootstrap' command group is scheduled for deprecation in v2.x release. "
+            "WARNING: The 'bootstrap' command group is scheduled for deprecation in v2.x release. "
             "Please migrate to using 'algokit project bootstrap' instead.",
             fg="yellow",
         )
@@ -46,9 +47,31 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
     default=lambda: "CI" not in os.environ,
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
-def bootstrap_all(*, interactive: bool) -> None:
+@click.option(
+    "project_names",
+    "--project-name",
+    "-p",
+    multiple=True,
+    help="(Optional) Projects to execute the command on. Defaults to all projects found in the current directory.",
+    nargs=1,
+    default=[],
+    metavar="<value>",
+    required=False,
+)
+@click.option(
+    "project_type",
+    "--type",
+    "-t",
+    type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
+    required=False,
+    default=None,
+    help="(Optional) Limit execution to specific project types if executing from workspace.",
+)
+def bootstrap_all(*, interactive: bool, project_names: tuple[str], project_type: str | None) -> None:
     cwd = Path.cwd()
-    bootstrap_any_including_subdirs(cwd, ci_mode=not interactive)
+    bootstrap_any_including_subdirs(
+        cwd, ci_mode=not interactive, project_names=list(project_names), project_type=project_type
+    )
     logger.info(f"Finished bootstrapping {cwd}")
 
 

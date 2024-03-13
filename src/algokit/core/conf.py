@@ -73,7 +73,6 @@ def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: b
     except Exception as ex:
         logger.debug(f"Unexpected error reading {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
-
     try:
         return tomllib.loads(config_text)
     except Exception as ex:
@@ -82,23 +81,3 @@ def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: b
         else:
             logger.debug(f"Error parsing {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
-
-
-def get_algokit_projects_from_config(project_dir: Path | None = None) -> list[str]:
-    """
-    Get the list of projects from the .algokit.toml file.
-    :return: List of projects.
-    """
-    config = get_algokit_config(project_dir=project_dir)
-    if config is None:
-        return []
-
-    project_root = config.get("project", {}).get("projects_root_path", None)
-    if project_root is None:
-        return []
-
-    project_root = Path(project_root)
-    if not project_root.exists():
-        return []
-
-    return [p.name for p in Path(project_root).iterdir() if p.is_dir()]

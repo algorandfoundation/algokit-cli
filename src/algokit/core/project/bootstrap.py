@@ -35,17 +35,37 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
         bootstrap_npm(project_dir)
 
 
-def bootstrap_any_including_subdirs(
-    base_path: Path, *, ci_mode: bool, max_depth: int = MAX_BOOTSTRAP_DEPTH, depth: int = 0
+def bootstrap_any_including_subdirs(  # noqa: PLR0913
+    base_path: Path,
+    *,
+    ci_mode: bool,
+    max_depth: int = MAX_BOOTSTRAP_DEPTH,
+    depth: int = 0,
+    project_names: list[str] | None = None,
+    project_type: str | None = None,
 ) -> None:
     if depth > max_depth:
         return
 
-    bootstrap_any(base_path, ci_mode=ci_mode)
+    config_project = (get_algokit_config(project_dir=base_path) or {}).get("project", {})
+    skip = bool(config_project) and (
+        (project_type and config_project.get("type") != project_type)
+        or (project_names and config_project.get("name") not in project_names)
+    )
+
+    if not skip:
+        bootstrap_any(base_path, ci_mode=ci_mode)
 
     for sub_dir in sorted(base_path.iterdir()):  # sort needed for test output ordering
         if sub_dir.is_dir() and sub_dir.name.lower() not in [".venv", "node_modules", "__pycache__"]:
-            bootstrap_any_including_subdirs(sub_dir, ci_mode=ci_mode, max_depth=max_depth, depth=depth + 1)
+            bootstrap_any_including_subdirs(
+                sub_dir,
+                ci_mode=ci_mode,
+                max_depth=max_depth,
+                depth=depth + 1,
+                project_names=project_names,
+                project_type=project_type,
+            )
         else:
             logger.debug(f"Skipping {sub_dir}")
 

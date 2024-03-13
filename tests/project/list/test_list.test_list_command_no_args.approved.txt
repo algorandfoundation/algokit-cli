@@ -1,0 +1,3 @@
+DEBUG: Attempting to load project config from .algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml

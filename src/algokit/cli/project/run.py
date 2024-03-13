@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
+from algokit.core.project import ProjectType
 from algokit.core.project.run import (
     ProjectCommand,
     WorkspaceProjectCommand,
@@ -12,6 +13,7 @@ from algokit.core.project.run import (
     run_command,
     run_workspace_command,
 )
+from algokit.core.utils import run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +44,11 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
         # Define the base command function
         def base_command(
             *,
+            args: list[str],
             custom_command: ProjectCommand | WorkspaceProjectCommand = custom_command,
-            project_names: list[str] | None = None,
+            project_names: tuple[str] | None = None,
             list_projects: bool = False,
-            env_file_path: Path | None = None,
+            project_type: str | None = None,
         ) -> None:
             """
             Executes a base command function with optional parameters for listing projects or specifying project names.
@@ -55,68 +58,79 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             within a workspace.
 
             Args:
+                args (list[str]): The command arguments to be passed to the custom command.
                 custom_command (ProjectCommand | WorkspaceProjectCommand): The custom command to be executed.
                 project_names (list[str] | None): Optional. A list of project names to execute the command on.
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
                 with a workspace command.
-                env_file_path (str | None): Optional. A path to a custom env file to load.
+                project_type (str | None): Optional. Only execute commands in projects of specified type.
 
             Returns:
                 None
             """
+            if args:
+                logger.warning("Ignoring unrecognized arguments: %s.", " ".join(args))
+
             if list_projects and isinstance(custom_command, WorkspaceProjectCommand):
                 for command in custom_command.commands:
-                    logger.info(
-                        f"ℹ️ Project: {command.project_name}, "  # noqa: RUF001
-                        f"Command name: {command.name}, "
-                        f"Command: {' '.join(command.command)}"
-                    )
-                return None
+                    cmds = " && ".join(" ".join(cmd) for cmd in command.commands)
+                    logger.info(f"ℹ️  Project: {command.project_name}, Command name: {command.name}, Command(s): {cmds}")  # noqa: RUF001
+                return
 
-            if isinstance(custom_command, ProjectCommand) and list_projects:
-                raise click.ClickException("--list is only available for workspace commands.")
-
-            return (
-                run_command(
-                    command=custom_command,
-                )
-                if isinstance(custom_command, ProjectCommand)
-                else run_workspace_command(custom_command, project_names)
-                if env_file_path
-                else run_workspace_command(custom_command, project_names)
+            run_with_animation(
+                run_command, command=custom_command, animation_text=f"Running `{custom_command.name}` command"
+            ) if isinstance(custom_command, ProjectCommand) else run_workspace_command(
+                custom_command, list(project_names or []), project_type
             )
 
         # Check if the command is a WorkspaceProjectCommand and conditionally decorate
-        if isinstance(custom_command, WorkspaceProjectCommand):
+        is_workspace_command = isinstance(custom_command, WorkspaceProjectCommand)
+        command = click.argument("args", nargs=-1, type=click.UNPROCESSED, required=False)(base_command)
+        if is_workspace_command:
             command = click.option(
                 "project_names",
-                "--project_name",
+                "--project-name",
                 "-p",
                 multiple=True,
-                help="Projects to execute the command on. (Defaults to all projects in the workspace)",
+                help=(
+                    "Optional. Execute the command on specified projects. "
+                    "Defaults to all projects in the current directory."
+                ),
                 nargs=1,
+                default=[],
                 required=False,
-                cls=MutuallyExclusiveOption,
-                not_required_if=["list"],
             )(base_command)
             command = click.option(
                 "list_projects",
                 "--list",
                 "-l",
-                help="List all projects associated with workspace command",
+                help="(Optional) List all projects associated with workspace command",
                 default=False,
                 is_flag=True,
                 type=click.BOOL,
                 required=False,
                 cls=MutuallyExclusiveOption,
-                not_required_if=["project_name"],
+                not_required_if=["project_names"],
             )(command)
-        else:
-            command = base_command
+            command = click.option(
+                "project_type",
+                "--type",
+                "-t",
+                type=click.Choice([ProjectType.FRONTEND, ProjectType.CONTRACT, ProjectType.BACKEND]),
+                required=False,
+                default=None,
+                help="Limit execution to specific project types if executing from workspace. (Optional)",
+            )(command)
 
         # Apply the click.command decorator with common options
         command = click.command(
-            name=custom_command.name, help=f"{custom_command.description}" or "Command description is not supplied."
+            name=custom_command.name,
+            help=f"{custom_command.description}" or "Command description is not supplied.",
+            context_settings={
+                # Enables workspace commands in standalone projects without execution impact,
+                # supporting uniform GitHub workflows across official templates.
+                "ignore_unknown_options": not is_workspace_command,
+            },
         )(command)
 
         commands_table[custom_command.name] = command

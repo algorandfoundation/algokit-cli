@@ -42,6 +42,20 @@ type = 'workspace' # type specifying if the project is a workspace or standalone
 projects_root_path = 'projects' # path to the root folder containing all sub-projects in the workspace
 ```
 
+
+#### Handling of the `.github` Folder
+
+A key aspect of using the `--workspace` flag is how the `.github` folder is managed. This folder, which contains GitHub-specific configurations such as workflows and issue templates, is moved from the project directory to the root of the workspace. This move is necessary because GitHub does not recognize workflows located in subdirectories.
+
+Here's a simplified overview of what happens:
+
+1. If a `.github` folder is found in your project, its contents are transferred to the workspace's root `.github` folder.
+2. Files with matching names in the destination are not overwritten; they're skipped.
+3. The original `.github` folder is removed if it's left empty after the move.
+4. A notification is displayed, advising you to review the moved `.github` contents to ensure everything is in order.
+
+This process ensures that your GitHub configurations are properly recognized at the workspace level, allowing you to utilize GitHub Actions and other features seamlessly across your projects.
+
 ### Standalone Projects
 
 Standalone projects are suitable for simpler applications or when working on a single component. This structure is straightforward, with each project residing in its own directory, independent of others. Standalone projects are ideal for developers who prefer simplicity or are focusing on a single aspect of their application and are sure that they will not need to add more sub-projects in the future.

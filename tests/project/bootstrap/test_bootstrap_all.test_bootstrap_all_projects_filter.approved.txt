@@ -1,0 +1,26 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No 'min_version' specified in .algokit.toml file.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Skipping {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Checking {current_working_directory}/artifacts for bootstrapping needs
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project1/.algokit.toml
+DEBUG: Checking {current_working_directory}/artifacts/project1 for bootstrapping needs
+DEBUG: Running `algokit bootstrap env`
+DEBUG: {current_working_directory}/artifacts/project1/.env doesn't exist yet
+DEBUG: {current_working_directory}/artifacts/project1/.env.template exists
+Copying {current_working_directory}/artifacts/project1/.env.template to {current_working_directory}/artifacts/project1/.env and prompting for empty values
+DEBUG: Running `algokit bootstrap poetry`
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+Installing Python dependencies and setting up Python virtual environment via Poetry
+DEBUG: Running 'poetry install' in '{current_working_directory}/artifacts/project1'
+poetry: STDOUT
+poetry: STDERR
+DEBUG: Skipping {current_working_directory}/artifacts/project1/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project1/.env
+DEBUG: Skipping {current_working_directory}/artifacts/project1/.env.template
+DEBUG: Skipping {current_working_directory}/artifacts/project1/poetry.toml
+Finished bootstrapping {current_working_directory}

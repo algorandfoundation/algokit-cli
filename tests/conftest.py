@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 import questionary
 from algokit.core import questionary_extensions
+from algokit.core.project import get_project_configs, get_project_dir_names_from_workspace
 from approvaltests import Reporter, reporters, set_default_reporter
 from approvaltests.reporters.generic_diff_reporter_config import create_config
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter
@@ -159,6 +160,8 @@ else:
         else []
     )
     default_reporters += [
+        # # reporters.ReporterThatAutomaticallyApproves(),  # noqa: ERA001
+        # # uncomment to auto approve all received files, do not commit to VCS!
         GenericDiffReporter(create_config(["kdiff3", "/usr/bin/kdiff3"])),
         GenericDiffReporter(create_config(["DiffMerge", "/Applications/DiffMerge.app/Contents/MacOS/DiffMerge"])),
         GenericDiffReporter(create_config(["TortoiseGit", "{ProgramFiles}\\TortoiseGit\\bin\\TortoiseGitMerge.exe"])),
@@ -219,3 +222,9 @@ def dummy_algokit_template_with_python_task(tmp_path_factory: pytest.TempPathFac
     subprocess.run(["git", "add", "."], cwd=dummy_template_path, check=False)
     subprocess.run(["git", "commit", "-m", "chore: setup dummy test template"], cwd=dummy_template_path, check=False)
     return {"template_path": dummy_template_path, "cwd": cwd}
+
+
+@pytest.fixture(autouse=True)
+def _clear_caches() -> None:
+    get_project_dir_names_from_workspace.cache_clear()
+    get_project_configs.cache_clear()

@@ -1,26 +1,15 @@
 import re
 import shutil
-from enum import Enum
 from logging import getLogger
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
 
-from algokit.core.conf import get_algokit_projects_from_config
+from algokit.core.project import get_project_dir_names_from_workspace
 
 logger = getLogger(__name__)
 
 DEFAULT_MIN_VERSION = "1.8.0"
 DEFAULT_PROJECTS_ROOT_PATH = "projects"
-
-
-class ProjectType(str, Enum):
-    """
-    For distinguishing main template preset type question invoked by `algokit init`
-    """
-
-    WORKSPACE = "workspace"
-    BACKEND = "backend"  # any project focused on smart contracts or standalone backend services
-    FRONTEND = "frontend"  # any project focused on user facing services
 
 
 def populate_default_answers(worker: Worker) -> None:
@@ -71,7 +60,7 @@ def get_git_user_info(param: str) -> str | None:
 def is_valid_project_dir_name(value: str) -> bool:
     """Check if the project directory name for algokit project is valid."""
 
-    algokit_project_names = get_algokit_projects_from_config()
+    algokit_project_names = get_project_dir_names_from_workspace()
     if value in algokit_project_names:
         return False
     if not re.match(r"^[\w\-.]+$", value):

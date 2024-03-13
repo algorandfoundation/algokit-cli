@@ -30,7 +30,12 @@ def _format_output(output: str) -> str:
         str: The processed output with specified lines stripped.
     """
     output = "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")])
-    return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>")
+    return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>").replace("\\", r"\\")
+
+
+@pytest.fixture(autouse=True)
+def _disable_animation(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.animate", return_value=None)
 
 
 @pytest.fixture()
@@ -59,7 +64,7 @@ type = '{project_type}'
 name = '{project_name}'
 
 [project.run]
-hello = {{ command = '{command}', description = '{description}' }}
+hello = {{ commands = ['{command}'], description = '{description}' }}
     """.strip()
     (project_dir / ".algokit.toml").write_text(project_config, encoding="utf-8")
 
@@ -189,7 +194,7 @@ def test_run_command_from_workspace_success(
     result = invoke("project run hello", cwd=cwd_with_workspace)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequential: Path) -> None:
@@ -202,7 +207,7 @@ def test_run_command_from_workspace_sequential_success(cwd_with_workspace_sequen
     result = invoke("project run hello", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_standalone(cwd_with_standalone: Path) -> None:
@@ -215,7 +220,7 @@ def test_run_command_from_standalone(cwd_with_standalone: Path) -> None:
     result = invoke("project run hello", cwd=cwd_with_standalone)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path) -> None:
@@ -225,10 +230,10 @@ def test_run_command_from_workspace_filtered(cwd_with_workspace_sequential: Path
     Args:
         cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
-    result = invoke("project run hello --project_name 'contract_project'", cwd=cwd_with_workspace_sequential)
+    result = invoke("project run hello --project-name 'contract_project'", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path) -> None:
@@ -241,7 +246,7 @@ def test_list_all_commands_in_workspace(cwd_with_workspace_sequential: Path) -> 
     result = invoke("project run hello --list", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_sequential: Path) -> None:
@@ -251,10 +256,10 @@ def test_run_command_from_workspace_filtered_no_project(cwd_with_workspace_seque
     Args:
         cwd_with_workspace_sequential (Path): The path to the workspace directory.
     """
-    result = invoke("project run hello --project_name contract_project2", cwd=cwd_with_workspace_sequential)
+    result = invoke("project run hello --project-name contract_project2", cwd=cwd_with_workspace_sequential)
 
     assert result.exit_code == 0
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_resolution_error(
@@ -285,7 +290,7 @@ def test_run_command_from_workspace_resolution_error(
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_workspace_execution_error(
@@ -345,7 +350,7 @@ def test_run_command_from_standalone_resolution_error(
     result = invoke("project run hello", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(result.output)
+    verify(_format_output(result.output))
 
 
 def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:

@@ -19,6 +19,8 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 - `--path, -P DIRECTORY`: Specifies the project directory. If not provided, the current working directory will be used.
 - `--deployer`: Specifies the deployer alias. If not provided and if the deployer is specified in `.algokit.toml` file its mnemonic will be prompted.
 - `--dispenser`: Specifies the dispenser alias. If not provided and if the dispenser is specified in `.algokit.toml` file its mnemonic will be prompted.
+- `-p, --project-name`: (Optional) Projects to execute the command on. Defaults to all projects found in
+  the current directory. Option is mutually exclusive with `--command`.
 - `-h, --help`: Show this message and exit.
 
 ## Environment files
@@ -90,6 +92,37 @@ $ algokit project deploy testnet
 
 This command deploys the smart contracts to the testnet.
 
+## Deploying to a Specific Network from a workspace with project name filter
+
+The command requires a `ENVIRONMENT` argument, which specifies the network environment to which the smart contracts will be deployed. Please note, the `environment` argument is case-sensitive.
+
+Example:
+
+Root `.algokit.toml`:
+
+```toml
+[project]
+type = "workspace"
+projects_root_dir = 'projects'
+```
+
+Contract project `.algokit.toml`:
+
+```toml
+[project]
+type = "contract"
+name = "myproject"
+
+[project.deploy]
+command = "{custom_deploy_command}"
+```
+
+```bash
+$ algokit project deploy testnet --project-name myproject
+```
+
+This command deploys the smart contracts to TestNet from a sub project named 'myproject', which is available within the current workspace. All `.env` loading logic described in [Environment files](#environment-files) is applicable, execution from the workspace root orchestrates invoking the deploy command from the working directory of each applicable sub project.
+
 ## Custom Project Directory
 
 By default, the deploy command looks for the `.algokit.toml` file in the current working directory. You can specify a custom project directory using the `--project-dir` option.
@@ -109,6 +142,8 @@ Example:
 ```sh
 $ algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
+
+> ⚠️ Please note, chaining multiple commands with `&&` is **not** currently supported. If you need to run multiple commands, you can defer to a custom script. Refer to [run](../project/run.md#custom-command-injection) for scenarios where multiple sub-command invocations are required.
 
 ## CI Mode
 

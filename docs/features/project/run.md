@@ -46,10 +46,10 @@ E --> F;
 
 Below is only visible and available when running from a workspace root.
 
-- `-l, --list`: Outputs all projects containing the command with the same name.
-- `-p, --project_name`: Allows specifying a specific project or projects to run the command.
-
-To get a detailed help on the above commands execute:
+- `-l, --list`: List all projects associated with the workspace command. (Optional)
+- `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
+- `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
+  To get a detailed help on the above commands execute:
 
 ```bash
 algokit project run {name_of_your_command} --help
@@ -89,7 +89,7 @@ type = 'contract'
 name = 'project_a'
 
 [project.run]
-hello = { command = 'echo hello', description = 'Prints hello' }
+hello = { commands = ['echo hello'], description = 'Prints hello' }
 
 # ... other non [project.run] related metadata
 ```
@@ -102,7 +102,7 @@ type = 'frontend'
 name = 'project_b'
 
 [project.run]
-hello = { command = 'echo hello', description = 'Prints hello' }
+hello = { commands = ['echo hello'], description = 'Prints hello' }
 
 # ... other non [project.run] related metadata
 ```

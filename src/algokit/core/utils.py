@@ -177,12 +177,15 @@ def split_command_string(command: str) -> list[str]:
         return shlex.split(command)
 
 
-def resolve_command_path(command: list[str]) -> list[str]:
+def resolve_command_path(
+    command: list[str],
+) -> list[str]:
     """
     Encapsulates custom command resolution, promotes reusability
 
     Args:
         command (list[str]): The command to resolve
+        allow_chained_commands (bool): Whether to allow chained commands (e.g. "&&" or "||")
 
     Returns:
         list[str]: The resolved command
@@ -196,6 +199,26 @@ def resolve_command_path(command: list[str]) -> list[str]:
     if not resolved_cmd:
         raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
     return [resolved_cmd, *args]
+
+
+def split_and_resolve_command_strings(
+    commands: list[str],
+) -> list[list[str]]:
+    """
+    Splits each command in a list of raw command strings and resolves their paths.
+
+    This function takes a list of command strings, splits each command into its constituent
+    arguments, and then resolves the path for each command. This is useful for preparing
+    commands for execution in a system-agnostic manner.
+
+    Args:
+        commands: A list of raw command strings.
+
+    Returns:
+        A list of lists, where each inner list contains the resolved command path followed by its arguments.
+    """
+
+    return [resolve_command_path(split_command_string(raw_command)) for raw_command in commands]
 
 
 def load_env_file(path: Path) -> dict[str, str | None]:
@@ -218,3 +241,11 @@ def load_env_file(path: Path) -> dict[str, str | None]:
     if env_path.exists():
         return dotenv.dotenv_values(env_path, verbose=True)
     return {}
+
+
+def alphanumeric_sort_key(s: str) -> list[int | str]:
+    """
+    Generate a key for sorting strings that contain both text and numbers.
+    For instance, ensures that "name_digit_1" comes before "name_digit_2".
+    """
+    return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]

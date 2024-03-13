@@ -1,14 +1,26 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory} for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/.venv
 DEBUG: Skipping {current_working_directory}/__pycache__
+DEBUG: Attempting to load project config from {current_working_directory}/boring_dir/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory}/boring_dir for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/boring_dir/file.txt
+DEBUG: Attempting to load project config from {current_working_directory}/double_nested_dir/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory}/double_nested_dir for bootstrapping needs
+DEBUG: Attempting to load project config from {current_working_directory}/double_nested_dir/nest1/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory}/double_nested_dir/nest1 for bootstrapping needs
+DEBUG: Attempting to load project config from {current_working_directory}/double_nested_dir/nest2/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory}/double_nested_dir/nest2 for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/double_nested_dir/nest2/file.txt
+DEBUG: Attempting to load project config from {current_working_directory}/empty_dir/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Checking {current_working_directory}/empty_dir for bootstrapping needs
 DEBUG: Skipping {current_working_directory}/file.txt
 DEBUG: Skipping {current_working_directory}/node_modules

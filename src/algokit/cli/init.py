@@ -13,8 +13,9 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config
-from algokit.core.init import ProjectType, get_git_user_info, is_valid_project_dir_name
+from algokit.core.init import get_git_user_info, is_valid_project_dir_name
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from algokit.core.project import ProjectType, get_workspace_project_path
 from algokit.core.project.bootstrap import (
     MAX_BOOTSTRAP_DEPTH,
     bootstrap_any_including_subdirs,
@@ -137,6 +138,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
+            branch="feat/orchestration",
         ),
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
@@ -145,6 +147,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
+            branch="feat/orchestration",
         ),
         TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
@@ -238,7 +241,11 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "--workspace/--no-workspace",
     is_flag=True,
     default=True,
-    help="Whether to prefer structuring standalone projects as part of a workspace.",
+    help=(
+        "Whether to prefer structuring standalone projects as part of a workspace. "
+        "An AlgoKit workspace is a conventional project structure that allows managing "
+        "multiple standalone projects in a monorepo."
+    ),
 )
 @click.option(
     "answers",
@@ -324,6 +331,7 @@ def init_command(  # noqa: PLR0913
     project_path = _resolve_workspace_project_path(
         template_source=template, project_path=root_project_path, use_workspace=use_workspace
     )
+    answers_dict.setdefault("use_workspace", "yes" if use_workspace else "no")
 
     logger.info(f"Starting template copy and render at {project_path}...")
     # copier is lazy imported for two reasons
@@ -350,6 +358,8 @@ def init_command(  # noqa: PLR0913
         copier_worker.run_copy()
 
     logger.info("Template render complete!")
+
+    _maybe_move_github_folder(project_path=project_path, use_workspace=use_workspace)
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
@@ -427,6 +437,52 @@ def _maybe_bootstrap(
 def _maybe_git_init(project_path: Path, *, use_git: bool | None, commit_message: str) -> None:
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(project_path, commit_message=commit_message)
+
+
+def _maybe_move_github_folder(*, project_path: Path, use_workspace: bool) -> None:
+    """Move contents of .github folder from project_path to the root of the workspace if exists
+    and the workspace is used.
+
+    Args:
+        project_path: The path to the project directory.
+        use_workspace: A flag to indicate if the project is initialized with workspace flag
+    """
+
+    source_dir = project_path / ".github"
+
+    if (
+        not use_workspace
+        or not source_dir.exists()
+        or not (workspace_root := get_workspace_project_path(project_path.parent))
+    ):
+        return
+
+    target_dir = workspace_root / ".github"
+
+    for source_file in source_dir.rglob("*"):
+        if source_file.is_file():
+            target_file = target_dir / source_file.relative_to(source_dir)
+
+            if target_file.exists():
+                logger.debug(f"Skipping move of {source_file.name} to {target_file} (duplicate exists)")
+                continue
+
+            try:
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(source_file), str(target_file))
+            except shutil.Error as e:
+                logger.debug(f"Skipping move of {source_file} to {target_file}: {e}")
+
+    # if source dir does not contain any files or only contains empty folders
+    # then remove it
+    if all(not p.is_file() for p in source_dir.rglob("*")):
+        shutil.rmtree(source_dir)
+        logger.debug(f"No files found in .github folder after merge. Removing `.github` directory at {source_dir}...")
+        return
+
+    click.echo(
+        "Moving files in your project's .github folder to the workspace root .github folder.",
+    )
 
 
 def _fail_and_bail() -> NoReturn:
@@ -651,6 +707,8 @@ def _resolve_workspace_project_path(
     *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
 ) -> Path:
     blessed_template = _get_blessed_templates()
+
+    # If its already a Base template, do not modify project path
     if template_source == blessed_template[TemplateKey.BASE]:
         return project_path
 
@@ -660,7 +718,7 @@ def _resolve_workspace_project_path(
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
-        _instantiate_base_template(project_path)
+        _init_base_template(target_path=project_path, is_blessed=template_source in blessed_template.values())
 
         config = get_algokit_config(project_dir=project_path)
         if not config:
@@ -690,16 +748,24 @@ def _resolve_workspace_project_path(
     return project_path
 
 
-def _instantiate_base_template(target_path: Path) -> None:
+def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
     """
     Instantiate the base template for a standalone project.
     Sets up the common workspace structure for standalone projects.
+
+    Args:
+        target_path: The path to the project directory.
+        is_blessed: Whether the template is a blessed template.
     """
 
     # Instantiate the base template
     blessed_templates = _get_blessed_templates()
     base_template = blessed_templates[TemplateKey.BASE]
-    base_template_answers = {"use_default_readme": "yes", "project_name": target_path.name}
+    base_template_answers = {
+        "use_default_readme": "yes",
+        "project_name": target_path.name,
+        "include_github_workflow_template": not is_blessed,
+    }
     from copier.main import Worker
 
     with Worker(

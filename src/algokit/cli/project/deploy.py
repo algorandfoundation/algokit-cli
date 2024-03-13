@@ -6,8 +6,10 @@ from pathlib import Path
 import click
 from algosdk.mnemonic import from_private_key
 
+from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core import proc
-from algokit.core.conf import ALGOKIT_CONFIG
+from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.project import ProjectType, get_project_configs
 from algokit.core.project.deploy import load_deploy_config, load_deploy_env_files
 from algokit.core.tasks.wallet import get_alias
 from algokit.core.utils import resolve_command_path, split_command_string
@@ -78,6 +80,57 @@ def _ensure_environment_secrets(
             config_env[key] = click.prompt(key, hide_input=True)
 
 
+def _execute_deploy_command(  # noqa: PLR0913
+    *,
+    path: Path,
+    environment_name: str | None,
+    command: list[str] | None,
+    interactive: bool,
+    deployer_alias: str | None,
+    dispenser_alias: str | None,
+) -> None:
+    logger.debug(f"Deploying from project directory: {path}")
+    logger.debug("Loading deploy command from project config")
+    config = load_deploy_config(name=environment_name, project_dir=path)
+    if command:
+        config.command = command
+    elif not config.command:
+        if environment_name is None:
+            msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
+        else:
+            msg = (
+                f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, "
+                "and no generic command."
+            )
+        raise click.ClickException(msg)
+    resolved_command = resolve_command_path(config.command)
+    logger.info(f"Using deploy command: {' '.join(resolved_command)}")
+    logger.info("Loading deployment environment variables...")
+    config_dotenv = load_deploy_env_files(environment_name, path)
+    # environment variables take precedence over those in .env* files
+    config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
+    _ensure_aliases(config_env, deployer_alias=deployer_alias, dispenser_alias=dispenser_alias)
+
+    if config.environment_secrets:
+        _ensure_environment_secrets(
+            config_env,
+            config.environment_secrets,
+            skip_mnemonics_prompts=not interactive,
+        )
+    logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
+    try:
+        result = proc.run(resolved_command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
+    except FileNotFoundError as ex:
+        raise click.ClickException(f"Failed to execute deploy command, '{resolved_command[0]}' wasn't found") from ex
+    except PermissionError as ex:
+        raise click.ClickException(
+            f"Failed to execute deploy command '{resolved_command[0]}', permission denied"
+        ) from ex
+    else:
+        if result.exit_code != 0:
+            raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+
+
 class CommandParamType(click.types.StringParamType):
     name = "command"
 
@@ -102,13 +155,17 @@ class CommandParamType(click.types.StringParamType):
     "-C",
     type=CommandParamType(),
     default=None,
-    help="Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.",
+    help=("Custom deploy command. If not provided, will load the deploy command " "from .algokit.toml file."),
+    required=False,
 )
 @click.option(
     "--interactive/--non-interactive",
     " /--ci",  # this aliases --non-interactive to --ci
     default=lambda: "CI" not in os.environ,
-    help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
+    help=(
+        "Enable/disable interactive prompts. Defaults to non-interactive if the CI "
+        "environment variable is set. Interactive MainNet deployments prompt for confirmation."
+    ),
 )
 @click.option(
     "--path",
@@ -137,6 +194,21 @@ class CommandParamType(click.types.StringParamType):
         "if specified in .algokit.toml file."
     ),
 )
+@click.option(
+    "--project-name",
+    "-p",
+    "project_names",
+    multiple=True,
+    help="(Optional) Projects to execute the command on. Defaults to all projects found in the current directory.",
+    nargs=1,
+    default=[],
+    metavar="<value>",
+    required=False,
+    cls=MutuallyExclusiveOption,
+    not_required_if=[
+        "command",
+    ],
+)
 @click.pass_context
 def deploy_command(  # noqa: PLR0913
     ctx: click.Context,
@@ -147,54 +219,66 @@ def deploy_command(  # noqa: PLR0913
     path: Path,
     deployer_alias: str | None,
     dispenser_alias: str | None,
+    project_names: tuple[str],
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(
-            "The 'deploy' command is scheduled for deprecation in v2.x release. "
+            "WARNING: The 'deploy' command is scheduled for deprecation in v2.x release. "
             "Please migrate to using 'algokit project deploy' instead.",
             fg="yellow",
         )
 
-    logger.debug(f"Deploying from project directory: {path}")
-    logger.debug("Loading deploy command from project config")
-    config = load_deploy_config(name=environment_name, project_dir=path)
-    if command:
-        config.command = command
-    elif not config.command:
-        if environment_name is None:
-            msg = f"No generic deploy command specified in '{ALGOKIT_CONFIG}' file."
-        else:
-            msg = (
-                f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, "
-                "and no generic command."
-            )
-        raise click.ClickException(msg)
-    resolved_command = resolve_command_path(config.command)
-    logger.info(f"Using deploy command: {' '.join(resolved_command)}")
-    # TODO: [future-note] do we want to walk up for env/config?
-    logger.info("Loading deployment environment variables...")
-    config_dotenv = load_deploy_env_files(environment_name, path)
-    # environment variables take precedence over those in .env* files
-    config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
-    _ensure_aliases(config_env, deployer_alias=deployer_alias, dispenser_alias=dispenser_alias)
-
-    if config.environment_secrets:
-        _ensure_environment_secrets(
-            config_env,
-            config.environment_secrets,
-            skip_mnemonics_prompts=not interactive,
+    if interactive and environment_name and environment_name.lower() == "mainnet":
+        click.confirm(
+            click.style(
+                "Warning: Proceed with MainNet deployment?",
+                fg="yellow",
+            ),
+            default=True,
+            abort=True,
         )
-    logger.info("Deploying smart contracts from AlgoKit compliant repository 🚀")
-    try:
-        result = proc.run(resolved_command, cwd=path, env=config_env, stdout_log_level=logging.INFO)
-    except FileNotFoundError as ex:
-        raise click.ClickException(f"Failed to execute deploy command, '{resolved_command[0]}' wasn't found") from ex
-    except PermissionError as ex:
-        raise click.ClickException(
-            f"Failed to execute deploy command '{resolved_command[0]}', permission denied"
-        ) from ex
+
+    config = get_algokit_config() or {}
+    is_workspace = config.get("project", {}).get("type") == ProjectType.WORKSPACE
+    project_name = config.get("project", {}).get("name", None)
+
+    if not is_workspace and project_names:
+        message = (
+            f"Deploying `{project_name}`..."
+            if project_name in project_names
+            else "No project with the specified name found in the current directory or workspace."
+        )
+        if project_name in project_names:
+            click.echo(message)
+        else:
+            raise click.ClickException(message)
+
+    if is_workspace:
+        projects = get_project_configs(project_type=ProjectType.CONTRACT, project_names=project_names)
+
+        for project in projects:
+            project_name = project.get("project", {}).get("name", None)
+
+            if not project_name:
+                click.secho("WARNING: Skipping an unnamed project...", fg="yellow")
+                continue
+
+            _execute_deploy_command(
+                path=project.get("cwd", None),
+                environment_name=environment_name,
+                command=None,
+                interactive=interactive,
+                deployer_alias=deployer_alias,
+                dispenser_alias=dispenser_alias,
+            )
     else:
-        if result.exit_code != 0:
-            raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+        _execute_deploy_command(
+            path=path,
+            environment_name=environment_name,
+            command=command,
+            interactive=interactive,
+            deployer_alias=deployer_alias,
+            dispenser_alias=dispenser_alias,
+        )

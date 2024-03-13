@@ -47,7 +47,10 @@ Options:
                                   IDE config are detected. Supported IDEs: VS
                                   Code.
   --workspace / --no-workspace    Whether to prefer structuring standalone
-                                  projects as part of a workspace.
+                                  projects as part of a workspace. An AlgoKit
+                                  workspace is a conventional project structure
+                                  that allows managing multiple standalone
+                                  projects in a monorepo.
   -a, --answer <key> <value>      Answers key/value pairs to pass to the
                                   template.
   -h, --help                      Show this message and exit.
