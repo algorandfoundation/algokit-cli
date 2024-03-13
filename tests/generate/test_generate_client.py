@@ -5,7 +5,9 @@ from pathlib import Path
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.core.typed_client_generation import TYPESCRIPT_NPX_PACKAGE, _snake_case
+from algokit.core.utils import is_windows
 from approvaltests.namer import NamerFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
@@ -102,6 +104,7 @@ def test_generate_client_python_arc32_filename(arc32_json: Path, options: str, e
     assert (arc32_json.parent / expected_output_path).read_text()
 
 
+@pytest.mark.usefixtures("mock_platform_system")
 @pytest.mark.parametrize(
     ("options", "expected_output_path"),
     [
@@ -116,17 +119,20 @@ def test_generate_client_typescript(
     application_json: Path,
     options: str,
     expected_output_path: Path,
+    request: pytest.FixtureRequest,
 ) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
     verify(
         _normalize_output(result.output),
+        namer=PyTestNamer(request),
         options=NamerFactory.with_parameters(*options.split()),
     )
+    npx = "npx" if not is_windows() else "npx.cmd"
     assert len(proc_mock.called) == 1
     assert (
         proc_mock.called[0].command
-        == f"npx --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
     )
 
 
