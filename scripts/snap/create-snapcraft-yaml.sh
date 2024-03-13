@@ -4,8 +4,8 @@
 set -e
 
 # Check if the correct number of arguments are passed
-if [ "$#" -ne 3 ]; then
-  echo "Usage: $0 <destination_directory> <release_tag> <artifact_path>"
+if [ "$#" -ne 4 ]; then
+  echo "Usage: $0 <destination_directory> <release_tag> <artifact_path> <grade>"
   exit 1
 fi
 
