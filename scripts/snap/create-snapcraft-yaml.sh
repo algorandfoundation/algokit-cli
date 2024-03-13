@@ -13,6 +13,7 @@ fi
 DESTINATION_DIR="$1"
 RELEASE_TAG="$2"
 ARTIFACT_PATH="$3"
+GRADE="$4"
 
 # Ensure the destination directory exists
 mkdir -p "${DESTINATION_DIR}/snap"
@@ -36,7 +37,7 @@ description: |
 
 base: core22
 confinement: classic
-grade: devel
+grade: $GRADE
 
 parts:
   algokit:

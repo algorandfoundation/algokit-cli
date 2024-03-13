@@ -145,7 +145,7 @@ jobs:
 
       - name: Generate snapcraft.yaml
         run: |
-          ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ env.RELEASE_VERSION }} ${{ env.BINARY_PATH }}
+          ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ env.RELEASE_VERSION }} ${{ env.BINARY_PATH }} "stable"
 
       - name: Build snap
         uses: snapcore/action-build@v1
@@ -163,4 +163,4 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_RELEASE_TOKEN }}
         with:
           snap: ${{ env.SNAP_BINARY_PATH }}
-          release: beta
+          release: stable
