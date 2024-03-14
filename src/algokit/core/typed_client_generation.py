@@ -6,7 +6,6 @@ import shutil
 from pathlib import Path
 from typing import ClassVar
 
-import algokit_client_generator
 import click
 
 from algokit.core import proc
@@ -14,7 +13,10 @@ from algokit.core.utils import is_windows
 
 logger = logging.getLogger(__name__)
 
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@^2.5.0"
+TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@"
+DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "^2.5.0"
+PYTHON_PYPI_PACKAGE = "algokit-client-generator"
+DEFAULT_PYTHON_PYPI_PACKAGE_VERSION = ">=1.1.1"
 
 
 def _snake_case(s: str) -> str:
@@ -27,9 +29,13 @@ def _snake_case(s: str) -> str:
 class ClientGenerator(abc.ABC):
     language: ClassVar[str]
     extension: ClassVar[str]
+    version: str | None
 
     _by_language: ClassVar[dict[str, type["ClientGenerator"]]] = {}
     _by_extension: ClassVar[dict[str, type["ClientGenerator"]]] = {}
+
+    def __init__(self, version: str | None) -> None:
+        self.version = version
 
     def __init_subclass__(cls, language: str, extension: str) -> None:
         cls.language = language
@@ -42,12 +48,12 @@ class ClientGenerator(abc.ABC):
         return list(cls._by_language.keys())
 
     @classmethod
-    def create_for_language(cls, language: str) -> "ClientGenerator":
-        return cls._by_language[language]()
+    def create_for_language(cls, language: str, version: str | None) -> "ClientGenerator":
+        return cls._by_language[language](version=version)
 
     @classmethod
-    def create_for_extension(cls, extension: str) -> "ClientGenerator":
-        return cls._by_extension[extension]()
+    def create_for_extension(cls, extension: str, version: str | None) -> "ClientGenerator":
+        return cls._by_extension[extension](version=version)
 
     def resolve_output_path(self, app_spec: Path, output_path_pattern: str | None) -> Path | None:
         try:
@@ -80,9 +86,29 @@ class ClientGenerator(abc.ABC):
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
+    def __init__(self, version: str | None) -> None:
+        super().__init__(version=version)
+        self.version = f"=={version}" if version else DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
+        pipx_path = shutil.which("pipx")
+        if not pipx_path:
+            raise click.ClickException("Python generator requires Python and pipx to be installed.")
+        self._pipx_path = pipx_path
+
     def generate(self, app_spec: Path, output: Path) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
-        algokit_client_generator.generate_client(app_spec, output)
+        cmd = [
+            self._pipx_path,
+            "run",
+            f"{PYTHON_PYPI_PACKAGE}{self.version}",
+            "-a",
+            str(app_spec),
+            "-o",
+            str(output),
+        ]
+        proc.run(
+            cmd,
+            bad_return_code_error_message=f"Client generation failed for {app_spec}.",
+        )
 
     @property
     def default_output_pattern(self) -> str:
@@ -93,16 +119,20 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
 
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):
-    def __init__(self) -> None:
+    def __init__(self, version: str | None) -> None:
+        super().__init__(version=version)
+        if self.version is None:
+            self.version = DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION
         npx_path = shutil.which("npx")
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
 
     def generate(self, app_spec: Path, output: Path) -> None:
+        print(f"npx package: {TYPESCRIPT_NPX_PACKAGE}{self.version}")
         cmd = [
             "npx" if not is_windows() else "npx.cmd",
             "--yes",
-            TYPESCRIPT_NPX_PACKAGE,
+            f"{TYPESCRIPT_NPX_PACKAGE}{self.version}",
             "generate",
             "-a",
             str(app_spec),

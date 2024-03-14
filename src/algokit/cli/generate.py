@@ -125,17 +125,24 @@ def generate_group() -> None:
     type=click.Choice(ClientGenerator.languages()),
     help="Programming language of the generated client code",
 )
-def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None) -> None:
+@click.option(
+    "--version",
+    "-v",
+    "version",
+    default=None,
+    help="Version of the client code to generate, if not specified, the latest version will be used",
+)
+def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None) -> None:
     """Create a typed ApplicationClient from an ARC-32 application.json
 
     Supply the path to an application specification file or a directory to recursively search
     for "application.json" files"""
     if language is not None:
-        generator = ClientGenerator.create_for_language(language)
+        generator = ClientGenerator.create_for_language(language, version)
     elif output_path_pattern is not None:
         extension = Path(output_path_pattern).suffix
         try:
-            generator = ClientGenerator.create_for_extension(extension)
+            generator = ClientGenerator.create_for_extension(extension, version)
         except KeyError as ex:
             raise click.ClickException(
                 "Could not determine language from file extension, Please use the --language option to specify a "
