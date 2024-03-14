@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import click
-import requests
+import httpx
 
 from algokit.core import proc
 from algokit.core.utils import is_windows
@@ -82,7 +82,8 @@ class ClientGenerator(abc.ABC):
     def default_output_pattern(self) -> str:
         ...
 
-    def is_version_available(self, version) -> bool:
+    @abc.abstractmethod
+    def is_version_available(self, version: str) -> bool:
         ...
 
     def format_contract_name(self, contract_name: str) -> str:
@@ -107,20 +108,16 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
                                        "Please install pipx via https://pypa.github.io/pipx/ first. ")
         self._pipx_path = pipx_path
 
-    def is_version_available(self, version) -> bool:
+    def is_version_available(self, version: str) -> bool:
         url = f"https://pypi.org/pypi/{PYTHON_PYPI_PACKAGE}/json"
-        response = requests.get(url)
+        response = httpx.get(url)
         if response.status_code == 200:
             data = response.json()
             versions = sorted(data["releases"].keys(), reverse=True)
-            if version not in versions:
-                logger.warn(f"Version {version} is not available in pypi.")
-                return False
-            else:
-                logger.debug(f"Version {version} is not available in pypi.")
-                return True
+            return version in versions
         else:
             logger.debug(f"Failed to fetch data from {url}.")
+            return False
 
     def generate(self, app_spec: Path, output: Path) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
@@ -164,15 +161,16 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
 
-    def is_version_available(self, version) -> bool:
+    def is_version_available(self, version : str) -> bool:
         url = f"https://registry.npmjs.org/{TYPESCRIPT_NPX_PACKAGE}"
-        response = requests.get(url)
+        response = httpx.get(url)
         if response.status_code == 200:
             data = response.json()
             versions = sorted(data["versions"], reverse=True)
             return version in versions
         else:
             logger.debug(f"Failed to fetch data from {url}.")
+            return False
 
     def generate(self, app_spec: Path, output: Path) -> None:
         cmd = [
