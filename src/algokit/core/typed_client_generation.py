@@ -7,14 +7,15 @@ from pathlib import Path
 from typing import ClassVar
 
 import click
+import requests
 
 from algokit.core import proc
 from algokit.core.utils import is_windows
 
 logger = logging.getLogger(__name__)
 
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator@"
-DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "^2.5.0"
+TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator"
+DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "@^2.5.0"
 PYTHON_PYPI_PACKAGE = "algokit-client-generator"
 DEFAULT_PYTHON_PYPI_PACKAGE_VERSION = ">=1.1.1"
 
@@ -81,18 +82,45 @@ class ClientGenerator(abc.ABC):
     def default_output_pattern(self) -> str:
         ...
 
+    def is_version_available(self, version) -> bool:
+        ...
+
     def format_contract_name(self, contract_name: str) -> str:
         return contract_name
+
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
     def __init__(self, version: str | None) -> None:
         super().__init__(version=version)
-        self.version = f"=={version}" if version else DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
+        if version:
+            if not self.is_version_available(version):
+                logger.warn(f"Version {version} is not available in pypi. We will use the latest version.")
+                self.version = DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
+            else:
+                self.version = f"=={version}"
+        else:
+            self.version = DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
         pipx_path = shutil.which("pipx")
         if not pipx_path:
-            raise click.ClickException("Python generator requires Python and pipx to be installed.")
+            raise click.ClickException("Python generator requires Python and pipx to be installed. "
+                                       "Please install pipx via https://pypa.github.io/pipx/ first. ")
         self._pipx_path = pipx_path
+
+    def is_version_available(self, version) -> bool:
+        url = f"https://pypi.org/pypi/{PYTHON_PYPI_PACKAGE}/json"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            versions = sorted(data["releases"].keys(), reverse=True)
+            if version not in versions:
+                logger.warn(f"Version {version} is not available in pypi.")
+                return False
+            else:
+                logger.debug(f"Version {version} is not available in pypi.")
+                return True
+        else:
+            logger.debug(f"Failed to fetch data from {url}.")
 
     def generate(self, app_spec: Path, output: Path) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
@@ -121,14 +149,32 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):
     def __init__(self, version: str | None) -> None:
         super().__init__(version=version)
-        if self.version is None:
+
+        if version:
+            if not self.is_version_available(version):
+                logger.warn(
+                    f"Version {version} is not available in npm. We will use the latest version. ")
+                self.version = DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION
+            else:
+                self.version = f"@{version}"
+        else:
             self.version = DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION
+
         npx_path = shutil.which("npx")
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
 
+    def is_version_available(self, version) -> bool:
+        url = f"https://registry.npmjs.org/{TYPESCRIPT_NPX_PACKAGE}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            versions = sorted(data["versions"], reverse=True)
+            return version in versions
+        else:
+            logger.debug(f"Failed to fetch data from {url}.")
+
     def generate(self, app_spec: Path, output: Path) -> None:
-        print(f"npx package: {TYPESCRIPT_NPX_PACKAGE}{self.version}")
         cmd = [
             "npx" if not is_windows() else "npx.cmd",
             "--yes",
