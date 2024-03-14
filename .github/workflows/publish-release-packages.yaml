@@ -136,10 +136,11 @@ jobs:
           fi
 
       - name: Download binary artifact from release
-        if: ${{ (env.RELEASE_VERSION != '') || (github.event_name == 'workflow_dispatch' && inputs.release != '') }}
+        if: ${{ env.RELEASE_VERSION != '' || (github.event_name == 'workflow_dispatch' && inputs.release != '') }}
         run: |
-          gh release download ${{ inputs.release }} --pattern "*-snap.tar.gz" --dir dist
-          echo "BINARY_PATH=$(ls dist/*-snap.tar.gz)" >> $GITHUB_ENV
+          gh release download ${{ env.RELEASE_VERSION || inputs.release }} --pattern "*-snap.tar.gz" --dir dist
+          BINARY_PATH=$(ls dist/*-snap.tar.gz)
+          echo "BINARY_PATH=$BINARY_PATH" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ github.token }}
 
