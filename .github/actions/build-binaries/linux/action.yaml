@@ -29,5 +29,5 @@ runs:
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.package_name }}
+        name: ${{ inputs.package_name }}-snap
         path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-snap.tar.gz
