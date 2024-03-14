@@ -6,4 +6,4 @@ Traceback (most recent call last):
   File "<string>", line 1, in <module>
 Exception
 
-Error: Command hello failed executing `<sys.executable> -c raise Exception()` with exit code = 1
+Error: Command 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1

@@ -4,5 +4,5 @@ ERROR: Traceback (most recent call last):
   File "<string>", line 1, in <module>
 Exception
 
-ERROR: ❌ frontend_project: execution failed: Command hello failed executing `<sys.executable> -c raise Exception()` with exit code = 1
-Error: Command hello failed executing `<sys.executable> -c raise Exception()` with exit code = 1
+ERROR: ❌ frontend_project: execution failed: Command 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1
+Error: Command 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1

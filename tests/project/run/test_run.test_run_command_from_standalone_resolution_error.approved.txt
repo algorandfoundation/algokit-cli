@@ -1,1 +1,2 @@
+Command 'hello' failed executing: 'failthiscommand'
 Error: Failed to resolve command path, 'failthiscommand' wasn't found

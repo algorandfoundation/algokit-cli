@@ -347,7 +347,7 @@ def test_run_command_from_standalone_resolution_error(
         projects=projects,
     )
 
-    result = invoke("project run hello", cwd=cwd)
+    result = invoke("project run hello", cwd=cwd / "projects" / "project2")
 
     assert result.exit_code == 1
     verify(_format_output(result.output))
@@ -439,3 +439,41 @@ def test_run_command_from_standalone_pass_env(
 
     assert result.exit_code == 0
     verify(_format_output(result.output))
+
+
+def test_run_command_help_works_without_path_resolution(
+    tmp_path_factory: TempPathFactory,
+    which_mock: WhichMock,
+    proc_mock: ProcMock,
+) -> None:
+    """
+    Verifies that the help command works without path resolution.
+    """
+
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    projects = []
+    for i in range(1, 6):
+        projects.append(
+            {
+                "dir": f"project{i}",
+                "type": "contract",
+                "name": f"contract_project_{i}",
+                "command": f"hello{i}",
+                "description": "Prints hello",
+            }
+        )
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+        mock_command=False,
+        which_mock=which_mock,
+        proc_mock=proc_mock,
+        custom_project_order=["contract_project_1", "contract_project_4"],
+    )
+
+    result = invoke("project run --help", cwd=cwd)
+
+    assert result.exit_code == 0
+    verify(_format_output(result.output))
+
+    assert invoke("project run hello", cwd=cwd).exit_code == 1

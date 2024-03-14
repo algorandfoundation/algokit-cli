@@ -78,7 +78,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 return
 
             run_with_animation(
-                run_command, command=custom_command, animation_text=f"Running `{custom_command.name}` command"
+                run_command, command=custom_command, animation_text=f"Running `{custom_command.name}` command\n"
             ) if isinstance(custom_command, ProjectCommand) else run_workspace_command(
                 custom_command, list(project_names or []), project_type
             )

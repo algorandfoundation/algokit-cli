@@ -12,7 +12,8 @@ from algokit.core.proc import run
 from algokit.core.project import ProjectType
 from algokit.core.utils import (
     load_env_file,
-    split_and_resolve_command_strings,
+    resolve_command_path,
+    split_command_string,
 )
 
 logger = logging.getLogger("rich")
@@ -99,7 +100,7 @@ def _load_commands_from_standalone(
         commands.append(
             ProjectCommand(
                 name=name,
-                commands=split_and_resolve_command_strings(raw_commands),
+                commands=[split_command_string(cmd) for cmd in raw_commands],
                 cwd=project_dir,  # Assumed to be Path object
                 description=description,
                 project_name=project_name,
@@ -178,17 +179,24 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     config_env = {**{k: v for k, v in config_dotenv.items() if v is not None}, **os.environ}
 
     for index, cmd in enumerate(command.commands):
+        try:
+            resolved_command = resolve_command_path(cmd)
+        except click.ClickException as e:
+            logger.error(f"Command '{command.name}' failed executing: '{' '.join(cmd)}'")
+            raise e
+
         result = run(
-            command=cmd,
+            command=resolved_command,
             cwd=command.cwd,
             env=config_env,
             stdout_log_level=logging.DEBUG,
+            encoding="utf-8",
         )
 
         if result.exit_code != 0:
             logger.error(result.output)
             raise click.ClickException(
-                f"Command {command.name} failed executing `{' '.join(cmd)}` with exit code = {result.exit_code}"
+                f"Command '{command.name}' failed executing '{' '.join(cmd)}' with exit code = {result.exit_code}"
             )
 
         # Log after each command if not from workspace, and also log success after the last command

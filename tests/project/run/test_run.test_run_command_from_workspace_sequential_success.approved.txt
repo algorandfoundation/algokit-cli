@@ -1,5 +1,5 @@
 Detected execution order, running commands sequentially
 ⏳ contract_project: 'hello' command in progress...
-✅ contract_project: '/bin/command_a' executed successfully.
+✅ contract_project: 'command_a' executed successfully.
 ⏳ frontend_project: 'hello' command in progress...
-✅ frontend_project: '/bin/command_b' executed successfully.
+✅ frontend_project: 'command_b' executed successfully.

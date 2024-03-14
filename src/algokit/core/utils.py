@@ -204,26 +204,6 @@ def resolve_command_path(
     return [resolved_cmd, *args]
 
 
-def split_and_resolve_command_strings(
-    commands: list[str],
-) -> list[list[str]]:
-    """
-    Splits each command in a list of raw command strings and resolves their paths.
-
-    This function takes a list of command strings, splits each command into its constituent
-    arguments, and then resolves the path for each command. This is useful for preparing
-    commands for execution in a system-agnostic manner.
-
-    Args:
-        commands: A list of raw command strings.
-
-    Returns:
-        A list of lists, where each inner list contains the resolved command path followed by its arguments.
-    """
-
-    return [resolve_command_path(split_command_string(raw_command)) for raw_command in commands]
-
-
 def load_env_file(path: Path) -> dict[str, str | None]:
     """Load the general .env configuration.
 

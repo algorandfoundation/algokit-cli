@@ -1,7 +1,7 @@
 Running '/bin/command_a' in '{current_working_directory}'
 /bin/command_a: STDOUT
 /bin/command_a: STDERR
-Executed `/bin/command_a` with output:
+Executed `command_a` with output:
 STDOUT
 STDERR
-✅ contract_project: '/bin/command_a' executed successfully.
+✅ contract_project: 'command_a' executed successfully.
