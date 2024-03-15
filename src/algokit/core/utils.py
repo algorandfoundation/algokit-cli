@@ -206,17 +206,16 @@ def resolve_command_path(
     if Path(cmd).name != cmd:
         return command
 
-    # Try 'shutil.which' first for standard behavior
-    resolved_cmd = shutil.which(cmd)
-    if resolved_cmd:
-        return [resolved_cmd, *args]
-
     # Windows-specific handling if 'shutil.which' fails:
     if is_windows():
         for ext in environ.get("PATHEXT", WIN_DEFAULT_PATHEXT).split(";"):
             potential_path = shutil.which(cmd + ext)
             if potential_path:
                 return [potential_path, *args]
+
+    # If resolves directly, return
+    if resolved_cmd := shutil.which(cmd):
+        return [resolved_cmd, *args]
 
     # Command not found with any extension
     raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
