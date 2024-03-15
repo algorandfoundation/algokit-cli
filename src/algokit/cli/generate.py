@@ -132,7 +132,9 @@ def generate_group() -> None:
     default=None,
     help="Version of the client code to generate, if not specified, the latest version will be used",
 )
-def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None) -> None:
+def generate_client(
+    output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None
+) -> None:
     """Create a typed ApplicationClient from an ARC-32 application.json
 
     Supply the path to an application specification file or a directory to recursively search
