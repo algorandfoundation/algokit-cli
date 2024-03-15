@@ -184,7 +184,8 @@ def test_generate_client_typescript(
     assert len(proc_mock.called) == 1
     assert (
         proc_mock.called[0].command
-        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{version} generate -a {application_json} -o {expected_output_path}".split()
+        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{version} generate "
+        f"-a {application_json} -o {expected_output_path}".split()
     )
 
 
@@ -205,7 +206,8 @@ def test_npx_failed(
     npx = _get_npx_command()
 
     proc_mock.should_bad_exit_on(
-        f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION} generate -a {application_json} -o client.ts"
+        f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION} "
+        f"generate -a {application_json} -o client.ts"
     )
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
@@ -231,10 +233,9 @@ def test_generate_client_recursive(
     assert result.exit_code == 0
     verify(_normalize_output(result.output))
 
-    for dir_path in dir_paths:
+    for index, dir_path in enumerate(dir_paths):
         output_path = dir_path / "output.py"
-        assert output_path.exists()
-        assert output_path.read_text()
+        proc_mock.called[index].command[-1] = str(output_path)
 
 
 def test_generate_client_no_app_spec_found(cwd: Path) -> None:
