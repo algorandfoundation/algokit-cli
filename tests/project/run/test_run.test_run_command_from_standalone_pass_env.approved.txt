@@ -1,6 +1,5 @@
-Running '<sys.executable> print_env.py' in '{current_working_directory}'
-<sys.executable>: Hello World from env variable!
-Executed `<sys.executable> print_env.py` with output:
-Hello World from env variable!
+Running `hello` command in {current_working_directory}...
+Command Executed: '<sys.executable> print_env.py'
+Output: Hello World from env variable!
 
 ✅ contract_project: '<sys.executable> print_env.py' executed successfully.

@@ -1,7 +1,5 @@
-Running '/bin/command_a' in '{current_working_directory}'
-/bin/command_a: STDOUT
-/bin/command_a: STDERR
-Executed `command_a` with output:
-STDOUT
+Running `hello` command in {current_working_directory}...
+Command Executed: 'command_a'
+Output: STDOUT
 STDERR
 ✅ contract_project: 'command_a' executed successfully.

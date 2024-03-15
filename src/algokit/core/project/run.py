@@ -172,6 +172,11 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     Raises:
         click.ClickException: If the command execution fails.
     """
+    is_verbose = not from_workspace or logger.level == logging.DEBUG
+
+    if is_verbose:
+        logger.info(f"Running `{command.name}` command in {command.cwd}...")
+
     config_dotenv = (
         load_env_file(command.env_file) if command.env_file else load_env_file(command.cwd) if command.cwd else {}
     )
@@ -182,7 +187,7 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
         try:
             resolved_command = resolve_command_path(cmd)
         except click.ClickException as e:
-            logger.error(f"Command '{command.name}' failed executing: '{' '.join(cmd)}'")
+            logger.error(f"'{command.name}' failed executing: '{' '.join(cmd)}'")
             raise e
 
         result = run(
@@ -190,20 +195,21 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
             cwd=command.cwd,
             env=config_env,
             stdout_log_level=logging.DEBUG,
-            encoding="utf-8",
         )
 
         if result.exit_code != 0:
-            logger.error(result.output)
+            header = f" project run '{command.name}' command output: ".center(80, "·")
+            logger.error(f"\n{header}\n{result.output}")
             raise click.ClickException(
-                f"Command '{command.name}' failed executing '{' '.join(cmd)}' with exit code = {result.exit_code}"
+                f"'{command.name}' failed executing '{' '.join(cmd)}' with exit code = {result.exit_code}"
             )
 
         # Log after each command if not from workspace, and also log success after the last command
-        if not from_workspace or logger.level == logging.DEBUG:
-            logger.info(f"Executed `{' '.join(cmd)}` with output:\n{result.output}")
+        if is_verbose:
+            log_msg = f"Command Executed: '{' '.join(cmd)}'\nOutput: {result.output}\n"
             if index == len(command.commands) - 1:
-                logger.info(f"✅ {command.project_name}: '{' '.join(cmd)}' executed successfully.")
+                log_msg += f"✅ {command.project_name}: '{' '.join(cmd)}' executed successfully."
+            logger.info(log_msg)
 
 
 def run_workspace_command(
@@ -227,8 +233,8 @@ def run_workspace_command(
             executed_commands = " && ".join(" ".join(command) for command in cmd.commands)
             logger.info(f"✅ {cmd.project_name}: '{executed_commands}' executed successfully.")
         except Exception as e:
-            logger.error(f"❌ {cmd.project_name}: execution failed: {e}")
-            raise e
+            logger.error(f"❌ {cmd.project_name}: {e}")
+            raise click.ClickException(f"failed to execute '{cmd.name}' command in '{cmd.project_name}'") from e
 
     if workspace_command.execution_order:
         logger.info("Detected execution order, running commands sequentially")

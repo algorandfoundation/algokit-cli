@@ -29,7 +29,6 @@ def run(  # noqa: PLR0913
     prefix_process: bool = True,
     stdout_log_level: int = logging.DEBUG,
     pass_stdin: bool = False,
-    encoding: str = "utf-8",
 ) -> RunResult:
     """Wraps subprocess.Popen() similarly to subprocess.run() but adds: logging and streaming (unicode) I/O capture
 
@@ -49,7 +48,6 @@ def run(  # noqa: PLR0913
         cwd=cwd,
         env=env,
         bufsize=1,  # line buffering, works because text=True
-        encoding=encoding,
     ) as proc:
         assert proc.stdout  # type narrowing
         while exit_code is None:

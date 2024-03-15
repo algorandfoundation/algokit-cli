@@ -8,6 +8,7 @@ import threading
 import time
 from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
+from os import environ
 from pathlib import Path
 from shutil import which
 from typing import Any
@@ -19,6 +20,9 @@ from algokit.core import proc
 
 CLEAR_LINE = "\033[K"
 SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+# From _WIN_DEFAULT_PATHEXT from shutils
+WIN_DEFAULT_PATHEXT = ".COM;.EXE;.BAT;.CMD;.VBS;.JS;.WS;.MSC"
 
 
 def extract_version_triple(version_str: str) -> str:
@@ -62,12 +66,14 @@ def animate(name: str, stop_event: threading.Event) -> None:
             except Exception:
                 text = frame
             output = f"\r{text} {name}"
-            sys.stdout.write(output)
-            sys.stdout.write(CLEAR_LINE)
-            sys.stdout.flush()
+            sys.stdout.buffer.write(output.encode("utf-8"))
+            sys.stdout.buffer.write(CLEAR_LINE.encode("utf-8"))
+            sys.stdout.buffer.flush()
             time.sleep(0.001 * spinner["interval"])  # type: ignore  # noqa: PGH003
 
-    sys.stdout.write("\r ")
+    sys.stdout.buffer.write(b"\r")
+    sys.stdout.buffer.write(b"\n")
+    sys.stdout.buffer.flush()
 
 
 def run_with_animation(
@@ -195,13 +201,25 @@ def resolve_command_path(
     """
 
     cmd, *args = command
-    # if the command has any path separators or such, don't try and resolve
+
+    # No resolution needed if the command already has a path or is not Windows-specific
     if Path(cmd).name != cmd:
         return command
+
+    # Try 'shutil.which' first for standard behavior
     resolved_cmd = shutil.which(cmd)
-    if not resolved_cmd:
-        raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
-    return [resolved_cmd, *args]
+    if resolved_cmd:
+        return [resolved_cmd, *args]
+
+    # Windows-specific handling if 'shutil.which' fails:
+    if is_windows():
+        for ext in environ.get("PATHEXT", WIN_DEFAULT_PATHEXT).split(";"):
+            potential_path = shutil.which(cmd + ext)
+            if potential_path:
+                return [potential_path, *args]
+
+    # Command not found with any extension
+    raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
 
 
 def load_env_file(path: Path) -> dict[str, str | None]:

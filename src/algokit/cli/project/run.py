@@ -13,7 +13,6 @@ from algokit.core.project.run import (
     run_command,
     run_workspace_command,
 )
-from algokit.core.utils import run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -77,11 +76,9 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                     logger.info(f"ℹ️  Project: {command.project_name}, Command name: {command.name}, Command(s): {cmds}")  # noqa: RUF001
                 return
 
-            run_with_animation(
-                run_command, command=custom_command, animation_text=f"Running `{custom_command.name}` command\n"
-            ) if isinstance(custom_command, ProjectCommand) else run_workspace_command(
-                custom_command, list(project_names or []), project_type
-            )
+            run_command(command=custom_command) if isinstance(
+                custom_command, ProjectCommand
+            ) else run_workspace_command(custom_command, list(project_names or []), project_type)
 
         # Check if the command is a WorkspaceProjectCommand and conditionally decorate
         is_workspace_command = isinstance(custom_command, WorkspaceProjectCommand)

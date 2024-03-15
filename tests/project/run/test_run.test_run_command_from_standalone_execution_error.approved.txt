@@ -1,9 +1,8 @@
-Running '<sys.executable> -c raise Exception()' in '{current_working_directory}'
-<sys.executable>: Traceback (most recent call last):
-<sys.executable>: File "<string>", line 1, in <module>
-<sys.executable>: Exception
+Running `hello` command in {current_working_directory}...
+ERROR: 
+····················· project run 'hello' command output: ······················
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
 Exception
 
-Error: Command 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1
+Error: 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1
