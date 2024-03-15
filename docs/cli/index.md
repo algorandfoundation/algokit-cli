@@ -67,6 +67,7 @@
     - [Options](#options-12)
     - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
+    - [-v, --version ](#-v---version-)
     - [Arguments](#arguments-3)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
@@ -550,6 +551,10 @@ Programming language of the generated client code
 
     python | typescript
 
+
+
+### -v, --version <version>
+Version of the client code to generate, if not specified, the latest version will be used
 
 ### Arguments
 
