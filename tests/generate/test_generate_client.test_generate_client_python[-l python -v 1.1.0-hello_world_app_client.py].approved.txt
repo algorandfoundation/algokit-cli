@@ -1,0 +1,7 @@
+Generating Python client code for application specified in {current_working_directory}/application.json and writing to hello_world_app_client.py
+Generating Python client code for application specified in {current_working_directory}/application.json and writing to hello_world_app_client.py
+DEBUG: Running '/bin/pipx run algokit-client-generator==1.1.0 -a {current_working_directory}/application.json -o hello_world_app_client.py' in '{current_working_directory}'
+DEBUG: /bin/pipx: STDOUT
+DEBUG: /bin/pipx: STDERR
+STDOUT
+STDERR

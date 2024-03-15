@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import ClassVar
 
 import click
-import httpx
 
 from algokit.core import proc
 from algokit.core.utils import is_windows
@@ -82,42 +81,24 @@ class ClientGenerator(abc.ABC):
     def default_output_pattern(self) -> str:
         ...
 
-    @abc.abstractmethod
-    def is_version_available(self, version: str) -> bool:
-        ...
-
     def format_contract_name(self, contract_name: str) -> str:
         return contract_name
-
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
     def __init__(self, version: str | None) -> None:
         super().__init__(version=version)
         if version:
-            if not self.is_version_available(version):
-                logger.warn(f"Version {version} is not available in pypi. We will use the latest version.")
-                self.version = DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
-            else:
-                self.version = f"=={version}"
+            self.version = f"=={version}"
         else:
             self.version = DEFAULT_PYTHON_PYPI_PACKAGE_VERSION
         pipx_path = shutil.which("pipx")
         if not pipx_path:
-            raise click.ClickException("Python generator requires Python and pipx to be installed. "
-                                       "Please install pipx via https://pypa.github.io/pipx/ first. ")
+            raise click.ClickException(
+                "Python generator requires Python and pipx to be installed. "
+                "Please install pipx via https://pypa.github.io/pipx/ first. "
+            )
         self._pipx_path = pipx_path
-
-    def is_version_available(self, version: str) -> bool:
-        url = f"https://pypi.org/pypi/{PYTHON_PYPI_PACKAGE}/json"
-        response = httpx.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            versions = sorted(data["releases"].keys(), reverse=True)
-            return version in versions
-        else:
-            logger.debug(f"Failed to fetch data from {url}.")
-            return False
 
     def generate(self, app_spec: Path, output: Path) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
@@ -130,10 +111,17 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             "-o",
             str(output),
         ]
-        proc.run(
-            cmd,
-            bad_return_code_error_message=f"Client generation failed for {app_spec}.",
-        )
+        logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
+        run_result = proc.run(cmd)
+        click.echo(run_result.output)
+
+        if run_result.exit_code != 0:
+            click.secho(
+                f"Client generation failed for {app_spec}.",
+                err=True,
+                fg="red",
+            )
+            raise click.exceptions.Exit(run_result.exit_code)
 
     @property
     def default_output_pattern(self) -> str:
@@ -146,31 +134,14 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):
     def __init__(self, version: str | None) -> None:
         super().__init__(version=version)
-
         if version:
-            if not self.is_version_available(version):
-                logger.warn(
-                    f"Version {version} is not available in npm. We will use the latest version. ")
-                self.version = DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION
-            else:
-                self.version = f"@{version}"
+            self.version = f"@{version}"
         else:
             self.version = DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION
 
         npx_path = shutil.which("npx")
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
-
-    def is_version_available(self, version : str) -> bool:
-        url = f"https://registry.npmjs.org/{TYPESCRIPT_NPX_PACKAGE}"
-        response = httpx.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            versions = sorted(data["versions"], reverse=True)
-            return version in versions
-        else:
-            logger.debug(f"Failed to fetch data from {url}.")
-            return False
 
     def generate(self, app_spec: Path, output: Path) -> None:
         cmd = [
@@ -186,10 +157,16 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         logger.info(
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}"
         )
-        proc.run(
-            cmd,
-            bad_return_code_error_message=f"Client generation failed for {app_spec}.",
-        )
+        run_result = proc.run(cmd)
+        click.echo(run_result.output)
+
+        if run_result.exit_code != 0:
+            click.secho(
+                f"Client generation failed for {app_spec}.",
+                err=True,
+                fg="red",
+            )
+            raise click.exceptions.Exit(run_result.exit_code)
 
     @property
     def default_output_pattern(self) -> str:

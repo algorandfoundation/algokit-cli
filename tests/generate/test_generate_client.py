@@ -4,7 +4,13 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.typed_client_generation import TYPESCRIPT_NPX_PACKAGE, _snake_case
+from algokit.core.typed_client_generation import (
+    DEFAULT_PYTHON_PYPI_PACKAGE_VERSION,
+    DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION,
+    PYTHON_PYPI_PACKAGE,
+    TYPESCRIPT_NPX_PACKAGE,
+    _snake_case,
+)
 from algokit.core.utils import is_windows
 from approvaltests.namer import NamerFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
@@ -24,6 +30,13 @@ def _normalize_output(output: str) -> str:
 
 def _get_npx_command() -> str:
     return "npx" if not is_windows() else "npx.cmd"
+
+
+def get_version(options: str, default_version: str) -> str:
+    version_prefix = "==" if default_version == DEFAULT_PYTHON_PYPI_PACKAGE_VERSION else "@"
+    if "--version" in options or "-v" in options:
+        return version_prefix + options.split()[-1]
+    return default_version
 
 
 @pytest.fixture()
@@ -58,6 +71,7 @@ def arc32_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> P
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
     which_mock.add("npx")
+    which_mock.add("pipx")
     mocker.patch("algokit.core.typed_client_generation.shutil.which").side_effect = which_mock.which
     return which_mock
 
@@ -82,15 +96,39 @@ def test_generate_no_options(application_json: Path) -> None:
         ("--output {contract_name}.py", "hello_world_app.py"),
         ("-l python", "hello_world_app_client.py"),
         ("-o client.ts --language python", "client.ts"),
+        ("-o client.py --language python --version 1.1.2", "client.py"),
+        ("-l python -v 1.1.0", "hello_world_app_client.py"),
     ],
 )
-def test_generate_client_python(application_json: Path, options: str, expected_output_path: Path) -> None:
+def test_generate_client_python(
+    proc_mock: ProcMock,
+    application_json: Path,
+    options: str,
+    expected_output_path: Path,
+    request: pytest.FixtureRequest,
+) -> None:
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert (application_json.parent / expected_output_path).exists()
-    assert (application_json.parent / expected_output_path).read_text()
+    verify(
+        _normalize_output(result.output),
+        namer=PyTestNamer(request),
+        options=NamerFactory.with_parameters(*options.split()),
+    )
+    version = get_version(options, DEFAULT_PYTHON_PYPI_PACKAGE_VERSION)
+    assert len(proc_mock.called) == 1
+    assert (
+        proc_mock.called[0].command
+        == f"/bin/pipx run {PYTHON_PYPI_PACKAGE}{version} -a {application_json} -o {expected_output_path}".split()
+    )
+
+
+def test_pipx_missing(application_json: Path, which_mock: WhichMock) -> None:
+    which_mock.remove("pipx")
+    result = invoke(f"generate client -o client.py {application_json.name}", cwd=application_json.parent)
+
+    assert result.exit_code == 1
+    verify(_normalize_output(result.output))
 
 
 @pytest.mark.parametrize(
@@ -99,13 +137,20 @@ def test_generate_client_python(application_json: Path, options: str, expected_o
         ("-o client.py", "client.py"),
     ],
 )
-def test_generate_client_python_arc32_filename(arc32_json: Path, options: str, expected_output_path: Path) -> None:
+def test_generate_client_python_arc32_filename(
+    proc_mock: ProcMock, arc32_json: Path, options: str, expected_output_path: Path
+) -> None:
     result = invoke(f"generate client {options} {arc32_json.name}", cwd=arc32_json.parent)
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert (arc32_json.parent / expected_output_path).exists()
-    assert (arc32_json.parent / expected_output_path).read_text()
+
+    assert len(proc_mock.called) == 1
+    assert (
+        proc_mock.called[0].command
+        == f"/bin/pipx run {PYTHON_PYPI_PACKAGE}{DEFAULT_PYTHON_PYPI_PACKAGE_VERSION} -a {arc32_json} "
+        f"-o {expected_output_path}".split()
+    )
 
 
 @pytest.mark.usefixtures("mock_platform_system")
@@ -116,6 +161,8 @@ def test_generate_client_python_arc32_filename(arc32_json: Path, options: str, e
         ("--output {contract_name}.ts", "HelloWorldApp.ts"),
         ("-l typescript", "HelloWorldAppClient.ts"),
         ("-o client.py --language typescript", "client.py"),
+        ("-o client.ts --language typescript --version 3.0.0", "client.ts"),
+        ("-l typescript -v 2.6.0", "HelloWorldAppClient.ts"),
     ],
 )
 def test_generate_client_typescript(
@@ -133,10 +180,11 @@ def test_generate_client_typescript(
         options=NamerFactory.with_parameters(*options.split()),
     )
     npx = _get_npx_command()
+    version = get_version(options, DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION)
     assert len(proc_mock.called) == 1
     assert (
         proc_mock.called[0].command
-        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o {expected_output_path}".split()
+        == f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{version} generate -a {application_json} -o {expected_output_path}".split()
     )
 
 
@@ -155,17 +203,22 @@ def test_npx_failed(
     request: pytest.FixtureRequest,
 ) -> None:
     npx = _get_npx_command()
-    proc_mock.should_bad_exit_on(f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE} generate -a {application_json} -o client.ts")
+
+    proc_mock.should_bad_exit_on(
+        f"{npx} --yes {TYPESCRIPT_NPX_PACKAGE}{DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION} generate -a {application_json} -o client.ts"
+    )
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
-    assert result.exit_code == 1
+    assert result.exit_code == -1
     verify(
         _normalize_output(result.output),
         namer=PyTestNamer(request),
     )
 
 
-def test_generate_client_recursive(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> None:
+def test_generate_client_recursive(
+    proc_mock: ProcMock, cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory
+) -> None:
     dir_paths = [
         cwd / "dir1",
         cwd / "dir2",
