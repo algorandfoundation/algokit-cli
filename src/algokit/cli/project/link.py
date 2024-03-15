@@ -224,5 +224,5 @@ def link_command(
             fail_fast=fail_fast,
         )
 
-        click.echo(f"✅ {iteration}/{total}: Finished processing {contract_project.project_name}")
+        logger.info(f"✅ {iteration}/{total}: Finished processing {contract_project.project_name}")
         iteration += 1
