@@ -2,6 +2,7 @@ import logging
 
 import click
 
+from algokit.cli.codespace import codespace_group
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
@@ -54,7 +55,7 @@ def localnet_group() -> None:
                 "Please update your Docker install"
             )
 
-    proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+    # proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
 @localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
@@ -226,3 +227,6 @@ def localnet_explore(context: click.Context) -> None:
 def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
     sandbox = ComposeSandbox()
     sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
+
+
+localnet_group.add_command(codespace_group)
