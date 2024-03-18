@@ -124,6 +124,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
+            branch="feat/orchestration",
         ),
         TemplateKey.PUYA: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-puya-template",
