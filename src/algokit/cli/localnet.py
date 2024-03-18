@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 @click.group("localnet", short_help="Manage the AlgoKit LocalNet.")
-def localnet_group() -> None:
+@click.pass_context
+def localnet_group(ctx: click.Context) -> None:
     try:
         compose_version_result = proc.run(DOCKER_COMPOSE_VERSION_COMMAND)
     except OSError as ex:
@@ -55,7 +56,8 @@ def localnet_group() -> None:
                 "Please update your Docker install"
             )
 
-    # proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+    if ctx.invoked_subcommand and "codespace" not in ctx.invoked_subcommand or not ctx.invoked_subcommand:
+        proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
 
 
 @localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
