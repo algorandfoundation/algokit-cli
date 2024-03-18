@@ -1,4 +1,6 @@
 import logging
+from collections.abc import Callable
+from typing import Any
 
 import click
 
@@ -6,9 +8,10 @@ from algokit.core.compile.python import find_valid_puyapy_command
 from algokit.core.proc import run
 
 logger = logging.getLogger(__name__)
+_AnyCallable = Callable[..., Any]
 
 
-@click.group("compile", hidden=True)
+@click.group("compile")
 @click.option(
     "-v",
     "--version",
@@ -30,18 +33,7 @@ def compile_group(context: click.Context, version: str | None) -> None:
     context.obj["version"] = version
 
 
-@click.command(
-    context_settings={
-        "ignore_unknown_options": True,
-    },
-    add_help_option=False,
-)
-@click.argument("puya_args", nargs=-1, type=click.UNPROCESSED)
-@click.pass_context
-def compile_py_command(context: click.Context, puya_args: list[str]) -> None:
-    """
-    Compile Python contract(s) to TEAL with PuyaPy
-    """
+def invoke_puya(context: click.Context, puya_args: list[str]) -> None:
     version = str(context.obj["version"]) if context.obj["version"] else None
 
     puya_command = find_valid_puyapy_command(version)
@@ -63,5 +55,27 @@ def compile_py_command(context: click.Context, puya_args: list[str]) -> None:
         raise click.exceptions.Exit(run_result.exit_code)
 
 
-compile_group.add_command(compile_py_command, "python")
-compile_group.add_command(compile_py_command, "py")
+def common_puya_command_options(function: _AnyCallable) -> click.Command:
+    function = click.argument("puya_args", nargs=-1, type=click.UNPROCESSED)(function)
+    function = click.pass_context(function)
+    return click.command(
+        context_settings={
+            "ignore_unknown_options": True,
+        },
+        add_help_option=False,
+        help="Compile Python contract(s) to TEAL with PuyaPy",
+    )(function)
+
+
+@common_puya_command_options
+def python(context: click.Context, puya_args: list[str]) -> None:
+    invoke_puya(context, puya_args)
+
+
+@common_puya_command_options
+def py(context: click.Context, puya_args: list[str]) -> None:
+    invoke_puya(context, puya_args)
+
+
+compile_group.add_command(python, "python")
+compile_group.add_command(py, "py")
