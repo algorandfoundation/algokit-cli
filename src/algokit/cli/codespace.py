@@ -1,20 +1,19 @@
 import json
 import logging
-import os
-import signal
-import subprocess
+import tempfile
 import time
 from functools import cache
+from pathlib import Path
 from subprocess import CalledProcessError
 
 import click
+import httpx
 
 from algokit.core import proc
-from algokit.core.conf import get_app_config_dir
 from algokit.core.sandbox import (
     DEFAULT_NAME,
 )
-from algokit.core.utils import find_valid_pipx_command, is_windows
+from algokit.core.utils import is_windows, run_with_animation
 
 logger = logging.getLogger(__name__)
 
@@ -31,18 +30,44 @@ def _install_gh_if_needed() -> None:
     except Exception as e:
         logger.debug(e)
         logger.info("gh not found; attempting to install it...")
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that `gh` static analyzer can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit task analyze ...` again."
-        )
-        proc.run(
-            [*pipx_command, "install", "gh"],
-            bad_return_code_error_message=(
-                "Unable to install gh via pipx; please install gh " "manually and try `algokit task analyze ...` again."
-            ),
-        )
-        logger.info("gh installed successfully via pipx!")
+        if is_windows():
+            proc.run(
+                ["winget", "install", "--id", "GitHub.cli", "--silent"],
+                bad_return_code_error_message=(
+                    "Unable to install gh via winget; please install gh "
+                    "manually and try `algokit localnet codespace` again."
+                ),
+            )
+        else:
+            script_path = None
+            try:
+                # Download the script
+                response = httpx.get(
+                    "https://webi.sh/gh",
+                )
+                response.raise_for_status()
+
+                # Save the script to a temporary file
+                with tempfile.NamedTemporaryFile(delete=False, mode="w") as tmp_file:
+                    tmp_file.write(response.text)
+                    script_path = tmp_file.name
+
+                # Make the script executable
+                Path(script_path).chmod(0o755)
+
+                # Execute the script
+                proc.run(
+                    [script_path],
+                    bad_return_code_error_message=(
+                        "Unable to install gh via webi installer script; please install gh "
+                        "manually and try `algokit task analyze ...` again."
+                    ),
+                )
+                logger.info("gh installed successfully via webi installer script!")
+            finally:
+                # Clean up the temporary file
+                if script_path and "script_path" in locals():
+                    Path(script_path).unlink()
 
 
 @cache
@@ -56,7 +81,7 @@ def _is_gh_authenticated() -> bool:
     try:
         result = proc.run(
             ["gh", "auth", "status"],
-            stdout_log_level=logging.INFO,
+            stdout_log_level=logging.DEBUG,
             prefix_process=False,
             pass_stdin=True,
         )
@@ -90,7 +115,7 @@ def _list_gh_codespaces() -> list[str]:
 
     result = proc.run(
         ["gh", "codespace", "list"],
-        stdout_log_level=logging.INFO,
+        stdout_log_level=logging.DEBUG,
         prefix_process=False,
         pass_stdin=True,
     )
@@ -102,64 +127,6 @@ def _list_gh_codespaces() -> list[str]:
     return [line.split("\t")[0] for line in result.output.splitlines()]
 
 
-def run_detached_and_save_pid(command: list[str]) -> int:
-    """
-    Runs a command in detached mode and saves its PID to a file.
-
-    Args:
-        command (list): The command to run as a list of strings.
-
-    Returns:
-        int: The PID of the detached process.
-    """
-    kill_process()
-    pid_file_path = get_app_config_dir() / "codespace.sandbox.pid"
-
-    # Create a detached process and capture its PID
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, start_new_session=True
-    )
-
-    # Adjustments for detaching the process
-    with open(os.devnull, "wb") as devnull:
-        process = subprocess.Popen(
-            command, stdout=devnull, stderr=devnull, stdin=devnull, close_fds=True, start_new_session=True
-        )
-
-    try:
-        # Save the PID to a file
-        with pid_file_path.open("w") as pidfile:
-            pidfile.write(str(process.pid))
-    finally:
-        # The process is already detached due to start_new_session=True
-        pass
-
-    return process.pid
-
-
-def kill_process():
-    """
-    Kills the process with the PID stored in the given file.
-
-    """
-
-    pid_file_path = get_app_config_dir() / "codespace.sandbox.pid"
-
-    if not pid_file_path.exists():
-        return
-
-    with pid_file_path.open("rb") as pidfile:
-        try:
-            pid = int(pidfile.read().strip())
-            if is_windows():
-                subprocess.Popen(["taskkill", "/F", "/PID", str(pid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            else:
-                os.killpg(pid, signal.SIGTERM)
-        except Exception:
-            logger.debug("Failed to kill process with PID", exc_info=True)
-            return
-
-
 @click.group("codespace", short_help="Manage the AlgoKit LocalNet in GitHub Codespaces.")
 def codespace_group() -> None:
     _install_gh_if_needed()
@@ -167,75 +134,114 @@ def codespace_group() -> None:
 
 @codespace_group.command("start", short_help="Start the AlgoKit LocalNet.")
 def start_localnet() -> None:
-    # Logic to start LocalNet in a GitHub Codespace
-    if not _perform_gh_login():
-        return
+    """
+    Logic to start LocalNet in a GitHub Codespace.
+    """
 
-    codespaces = _list_gh_codespaces()
+    codespace_data = None
+    try:
+        if not _perform_gh_login():
+            return
 
-    if codespaces:
-        for codespace in codespaces:
-            if codespace.startswith(DEFAULT_NAME):
-                result = proc.run(
-                    ["gh", "codespace", "delete", "--codespace", codespace, "--force"],
-                    stdout_log_level=logging.INFO,
-                    prefix_process=False,
-                    pass_stdin=False,
-                )
-                if result.exit_code != 0:
-                    logger.error(f"Failed to delete codespace {codespace}")
-                    return
+        codespaces = _list_gh_codespaces()
 
-    codespace_name = f"{DEFAULT_NAME}_{time.time()}"
-    result = proc.run(
-        [
-            "gh",
-            "codespace",
-            "create",
-            "--repo",
-            "algorandfoundation/algokit-base-template",
-            "--display-name",
-            codespace_name,
-            "--machine",
-            "basicLinux32gb",
-        ],
-        stdout_log_level=logging.INFO,
-        prefix_process=False,
-        pass_stdin=False,
-    )
-    if result.exit_code != 0:
-        logger.error("Failed to start LocalNet in GitHub Codespace")
-        raise click.ClickException(result.output)
-    logger.info(f"Waiting for codespace {codespace_name} to be ready...")
-    codespace_ready = False
-    while not codespace_ready:
-        time.sleep(10)  # Poll every 10 seconds
-        status_result = proc.run(
-            ["gh", "codespace", "list", "--json", "displayName", "--json", "state"],
+        # Delete existing codespaces that match the default name
+        for codespace in filter(lambda cs: cs.startswith(DEFAULT_NAME), codespaces):
+            result = proc.run(
+                ["gh", "codespace", "delete", "--codespace", codespace, "--force"],
+                stdout_log_level=logging.DEBUG,
+                prefix_process=False,
+                pass_stdin=False,
+            )
+            if result.exit_code != 0:
+                logger.error(f"Failed to delete codespace {codespace}")
+                return
+
+        # Create a new codespace
+        codespace_name: str = f"{DEFAULT_NAME}_{int(time.time())}"
+        result = proc.run(
+            [
+                "gh",
+                "codespace",
+                "create",
+                "--repo",
+                "algorandfoundation/algokit-base-template",
+                "--display-name",
+                codespace_name,
+                "--machine",
+                "basicLinux32gb",
+            ],
             stdout_log_level=logging.DEBUG,
             prefix_process=False,
             pass_stdin=False,
         )
-        if status_result.exit_code == 0 and json.loads(status_result.output.strip())["state"] == "Available":
-            codespace_ready = True
-            logger.info(f"Codespace {codespace_name} is now ready.")
-            result = proc.run(
-                [
-                    "gh",
-                    "codespace",
-                    "ports",
-                    "forward",
-                    "--codespace",
-                    f"{codespace_name}",
-                    "4001:4001",
-                    "4002:4002",
-                    "8980:8980",
-                ],
+        if result.exit_code != 0:
+            logger.error("Failed to start LocalNet in GitHub Codespace")
+            raise click.ClickException(result.output)
+
+        # Wait for the codespace to be ready
+        logger.info(f"Waiting for codespace {codespace_name} to be ready...")
+        codespace_ready: bool = False
+        while not codespace_ready:
+            run_with_animation(
+                time.sleep,
+                "Provisioning a codespace instance...",
+                60,
+            )  # Poll every 60 seconds
+            status_result = proc.run(
+                ["gh", "codespace", "list", "--json", "displayName", "--json", "state", "--json", "name"],
+                stdout_log_level=logging.DEBUG,
+                prefix_process=False,
+                pass_stdin=False,
+            )
+            try:
+                codespace_data = next(
+                    data for data in json.loads(status_result.output.strip()) if data["displayName"] == codespace_name
+                )
+            except StopIteration:
+                logger.debug(f"No data found for codespace {codespace_name}.")
+                continue
+
+            if status_result.exit_code == 0 and codespace_data["state"] == "Available":
+                codespace_ready = True
+                logger.info(f"Codespace {codespace_name} is now ready.")
+                # Forward necessary ports
+                logger.warning(
+                    "Keep the tab open during the LocalNet session. Terminating the session "
+                    "will delete the codespace instance. For persistent scenarios, use 'algokit localnet start', "
+                    "which utilizes docker."
+                )
+                proc.run(
+                    [
+                        "gh",
+                        "codespace",
+                        "ports",
+                        "forward",
+                        "--codespace",
+                        codespace_data["name"],
+                        "4001:4001",
+                        "4002:4002",
+                        "8980:8980",
+                    ],
+                    stdout_log_level=logging.INFO,
+                    prefix_process=False,
+                    pass_stdin=True,
+                )
+
+            else:
+                logger.debug(
+                    f"Codespace {codespace_name} is not ready yet. Current state: {status_result.output.strip()}"
+                )
+
+        logger.info("LocalNet started in GitHub Codespace")
+    except KeyboardInterrupt as e:
+        logger.warning("Terminating in progress...", exc_info=True)
+        if codespace_data:
+            logger.warning("Deleting the codespace...")
+            proc.run(
+                ["gh", "codespace", "delete", "--codespace", codespace_data["name"], "--force"],
                 stdout_log_level=logging.INFO,
                 prefix_process=False,
                 pass_stdin=True,
             )
-        else:
-            logger.debug(f"Codespace {codespace_name} is not ready yet. Current state: {status_result.output.strip()}")
-
-    logger.info("LocalNet started in GitHub Codespace")
+        raise click.Abort from e

@@ -78,6 +78,7 @@
     - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
   - [localnet](#localnet)
+    - [codespace](#codespace)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
@@ -634,6 +635,22 @@ Manage the AlgoKit LocalNet.
 
 ```shell
 algokit localnet [OPTIONS] COMMAND [ARGS]...
+```
+
+### codespace
+
+Manage the AlgoKit LocalNet in GitHub Codespaces.
+
+```shell
+algokit localnet codespace [OPTIONS] COMMAND [ARGS]...
+```
+
+#### start
+
+Logic to start LocalNet in a GitHub Codespace.
+
+```shell
+algokit localnet codespace start [OPTIONS]
 ```
 
 ### console
