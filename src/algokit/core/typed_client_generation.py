@@ -100,6 +100,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
 
         # Create the npm directory inside %APPDATA% if it doesn't exist, as npx on windows needs this.
+        # See https://github.com/npm/cli/issues/7089 for more details.
         if is_windows():
             appdata_dir = os.getenv("APPDATA")
             if appdata_dir is not None:
@@ -111,8 +112,10 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 except OSError as ex:
                     logger.debug(ex)
                     raise click.ClickException(
-                        f"Failed to create `npm` directory in {appdata_dir_path}, "
-                        "please create this directory manually to ensure npx works correctly."
+                        f"Failed to create the `npm` directory in {appdata_dir_path}.\n"
+                        "This command uses `npx`, which requires the `npm` directory to exist "
+                        "in the above path, otherwise an ENOENT 4058 error will occur.\n"
+                        "Please create this directory manually and try again."
                     ) from ex
 
     def generate(self, app_spec: Path, output: Path) -> None:
