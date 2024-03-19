@@ -1,6 +1,7 @@
 import abc
 import json
 import logging
+import os
 import re
 import shutil
 from pathlib import Path
@@ -142,6 +143,25 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         npx_path = shutil.which("npx")
         if not npx_path:
             raise click.ClickException("Typescript generator requires Node.js and npx to be installed.")
+
+        # Create the npm directory inside %APPDATA% if it doesn't exist, as npx on windows needs this.
+        # See https://github.com/npm/cli/issues/7089 for more details.
+        if is_windows():
+            appdata_dir = os.getenv("APPDATA")
+            if appdata_dir is not None:
+                appdata_dir_path = Path(appdata_dir).expanduser()
+                npm_dir = appdata_dir_path / "npm"
+                try:
+                    if not npm_dir.exists():
+                        npm_dir.mkdir(parents=True)
+                except OSError as ex:
+                    logger.debug(ex)
+                    raise click.ClickException(
+                        f"Failed to create the `npm` directory in {appdata_dir_path}.\n"
+                        "This command uses `npx`, which requires the `npm` directory to exist "
+                        "in the above path, otherwise an ENOENT 4058 error will occur.\n"
+                        "Please create this directory manually and try again."
+                    ) from ex
 
     def generate(self, app_spec: Path, output: Path) -> None:
         cmd = [
