@@ -77,9 +77,14 @@ def _link_projects(*, frontend_clients_path: Path, contract_project_root: Path, 
     """
     output_path_pattern = f"{frontend_clients_path}/{{contract_name}}.{'ts' if language == 'typescript' else 'py'}"
     generator = ClientGenerator.create_for_language(language)
-    app_specs = list(contract_project_root.rglob("application.json"))
+    app_specs = list(contract_project_root.rglob("application.json")) + list(
+        contract_project_root.rglob("*.arc32.json")
+    )
     if not app_specs:
-        click.secho(f"WARNING: No application.json files found in {contract_project_root}. Skipping...", fg="yellow")
+        click.secho(
+            f"WARNING: No application.json | *.arc32.json files found in {contract_project_root}. Skipping...",
+            fg="yellow",
+        )
         return
 
     for app_spec in app_specs:
