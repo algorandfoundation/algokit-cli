@@ -303,6 +303,8 @@ Compiler version, for example, 1.0.0. If the version isn't specified, AlgoKit wi
 
 ### py
 
+Compile Python contract(s) to TEAL with PuyaPy
+
 ```shell
 algokit compile py [OPTIONS] [PUYA_ARGS]...
 ```
@@ -314,6 +316,8 @@ algokit compile py [OPTIONS] [PUYA_ARGS]...
 Optional argument(s)
 
 ### python
+
+Compile Python contract(s) to TEAL with PuyaPy
 
 ```shell
 algokit compile python [OPTIONS] [PUYA_ARGS]...
