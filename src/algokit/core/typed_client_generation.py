@@ -107,7 +107,6 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 npm_dir = appdata_dir_path / "npm"
                 try:
                     if not npm_dir.exists():
-                        logger.debug(f"Creating `npm` directory in {appdata_dir_path}")
                         npm_dir.mkdir(parents=True)
                 except OSError as ex:
                     logger.debug(ex)
