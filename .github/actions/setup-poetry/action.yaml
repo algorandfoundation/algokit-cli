@@ -15,7 +15,8 @@ runs:
       run: |
         pip install --user pipx
         pipx ensurepath
-        pipx install poetry --python ${{ env.Python_ROOT_DIR }}
+        ls -la ${{ env.Python_ROOT_DIR }}/bin
+        pipx install poetry --python ${{ env.Python_ROOT_DIR }}/bin/python
       shell: bash
 
     - name: Get full Python version
