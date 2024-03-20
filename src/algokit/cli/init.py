@@ -790,6 +790,7 @@ def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
     base_template_answers = {
         "use_default_readme": "yes",
         "project_name": target_path.name,
+        "projects_root_path": "projects",
         "include_github_workflow_template": not is_blessed,
     }
     from copier.main import Worker
@@ -799,7 +800,7 @@ def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
         dst_path=target_path,
         data=base_template_answers,
         quiet=True,
-        vcs_ref=base_template.commit,
+        vcs_ref=base_template.branch or base_template.commit,
         unsafe=True,
     ) as copier_worker:
         copier_worker.run_copy()
