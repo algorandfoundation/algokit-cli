@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 from pathlib import Path
@@ -9,6 +10,8 @@ from tests.compile.conftest import INVALID_PUYA_CONTRACT_FILE_CONTENT, VALID_PUY
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
+
+logger = logging.getLogger(__name__)
 
 
 def _normalize_path(path: Path) -> str:
@@ -123,6 +126,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
 @pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_invalid_contract(cwd: Path, output_path: Path) -> None:
     # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
+    logger.debug(f"sys.version_info {sys.version_info}")
     os.environ["NO_COLOR"] = "1"
 
     contract_path = cwd / "contract.py"
