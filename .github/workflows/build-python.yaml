@@ -30,6 +30,9 @@ jobs:
         if: ${{ matrix.python == '3.12' }}
         run: pipx install puya
 
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
       - name: pytest
         shell: bash
         if: ${{ !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest') }}
