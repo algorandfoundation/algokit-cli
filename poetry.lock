@@ -122,6 +122,19 @@ files = [
 ]
 
 [[package]]
+name = "algokit-client-generator"
+version = "1.1.2"
+description = "Algorand typed client Generator"
+optional = false
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "algokit_client_generator-1.1.2-py3-none-any.whl", hash = "sha256:f16d441be68dd6d12a7e9a369df0dac198202080a3546937196c61ecb3923e3d"},
+]
+
+[package.dependencies]
+algokit-utils = "2.2.1"
+
+[[package]]
 name = "algokit-utils"
 version = "2.2.1"
 description = "Utilities for Algorand development for use by AlgoKit"
@@ -3423,4 +3436,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "a7dddee4efa7a5d737f283979d4f66286a46a8b382db0f3b6b842c4b9807939d"
+content-hash = "2400dbf00d7c90ebd77abba4a4b7445d3adfe245f82e140f6ebffd4c77028e0b"
