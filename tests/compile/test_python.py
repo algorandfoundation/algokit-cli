@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from tests.compile.conftest import INVALID_PUYA_CONTRACT_FILE_CONTENT, VALID_PUYA_CONTRACT_FILE_CONTENT
+from tests.compile.conftest import VALID_PUYA_CONTRACT_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
@@ -123,18 +123,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     assert result.exit_code == 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 13), reason="PuyaPy requires python3.12 or higher")
-def test_invalid_contract(cwd: Path, output_path: Path) -> None:
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="PuyaPy requires python3.12 or higher")
+def test_invalid_contract() -> None:
     # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
-    logger.debug(f"sys.version_info {sys.version_info}")
-    os.environ["NO_COLOR"] = "1"
-
-    contract_path = cwd / "contract.py"
-    contract_path.write_text(INVALID_PUYA_CONTRACT_FILE_CONTENT)
-    result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
-
-    # Only check for the exit code and the error message from AlgoKit CLI
-    assert result.exit_code == 1
-    result.output.endswith(
-        "An error occurred during compile. Ensure supplied files are valid PuyaPy code before retrying."
-    )
+    raise Exception(f"sys.version_info {sys.version_info}")
