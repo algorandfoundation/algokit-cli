@@ -6,7 +6,7 @@ jobs:
   build-python:
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        os: ["macos-latest"]
         python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
