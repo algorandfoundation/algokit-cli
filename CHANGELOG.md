@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v1.13.1 (2024-03-20)
+
+### Fix
+
+* Create the npm dir in the app data directory on windows, as npx needs it ([#458](https://github.com/algorandfoundation/algokit-cli/issues/458)) ([`3195a1c`](https://github.com/algorandfoundation/algokit-cli/commit/3195a1c8cd21835d04a472d0d156ca08ef9030ec))
+
 ## v1.13.0 (2024-03-13)
 
 ### Feature
