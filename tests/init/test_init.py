@@ -1,3 +1,4 @@
+import json
 import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -23,6 +24,23 @@ PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
 
 
+def _remove_git_hints(output: str) -> str:
+    git_init_hint_prefix = "DEBUG: git: hint:"
+    lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]
+    return "\n".join(lines)
+
+
+def _remove_project_paths(output: str) -> str:
+    lines = [
+        "DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml"
+        if "DEBUG: Attempting to load project config from " in line
+        else line
+        for line in output.splitlines()
+    ]
+
+    return "\n".join(lines)
+
+
 class MockPipeInput(str, Enum):
     LEFT = "\x1b[D"
     RIGHT = "\x1b[C"
@@ -44,6 +62,7 @@ class MockQuestionaryAnswer:
 
 def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens: str) -> Scrubber:
     default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
+
     tokens = default_tokens | extra_tokens
     return combine_scrubbers(
         *extra_scrubbers,
@@ -51,6 +70,7 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
         TokenScrubber(tokens=tokens),
         TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
         lambda t: t.replace("{test_parent_directory}\\", "{test_parent_directory}/"),
+        _remove_project_paths,
     )
 
 
@@ -88,7 +108,7 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
     blessed_templates = {
         ExtendedTemplateKey.SIMPLE: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. simple",
         ),
         ExtendedTemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
@@ -101,19 +121,19 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
         ),
         ExtendedTemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. fullstack",
         ),
         ExtendedTemplateKey.PUYA: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. puya",
         ),
         ExtendedTemplateKey.REACT: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. react",
         ),
         ExtendedTemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. base",
         ),
     }
 
@@ -844,6 +864,35 @@ def test_init_wizard_v2_flow(
     )
 
 
+def test_init_wizard_v2_workspace_nesting(
+    tmp_path_factory: TempPathFactory,
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    # Act
+    project_a_result = invoke(
+        "init -t puya --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        cwd=cwd,
+    )
+    project_b_result = invoke(
+        "init -t puya --no-git --defaults --name myapp2 "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
+        cwd=cwd / "myapp" / "projects",
+    )
+    project_c_result = invoke(
+        "init -t puya --no-git --defaults --name myapp3 "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter' --no-workspace",
+        cwd=cwd,
+    )
+
+    # Assert
+    assert project_a_result.exit_code == 0
+    assert project_b_result.exit_code == 1
+    assert project_c_result.exit_code == 0
+
+
 def test_init_wizard_v2_github_folder_with_workspace(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ) -> None:
@@ -920,7 +969,76 @@ def test_init_wizard_v2_github_folder_no_workspace(
     assert cwd.glob(".github/workflows/*.yaml")
 
 
-def _remove_git_hints(output: str) -> str:
-    git_init_hint_prefix = "DEBUG: git: hint:"
-    lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]
-    return "\n".join(lines)
+@pytest.mark.parametrize(
+    ("workspace_content", "expected_path", "expect_warning"),
+    [
+        # Scenario 1: Valid codespace, new project added
+        (
+            """
+        {
+          "folders": [
+            {
+              "path": ".",
+              "name": "ROOT"
+            },
+            {
+              "path": "projects/myapp"
+            }
+          ]
+        }
+        """,
+            "projects/myapp2",
+            False,
+        ),
+        # Scenario 2: No codespace, nothing happens
+        (None, None, False),
+        # Scenario 3: Invalid codespace, warning expected
+        ("INVALID_JSON", None, True),
+    ],
+)
+def test_init_wizard_v2_append_to_vscode_workspace(
+    *,
+    which_mock: WhichMock,
+    proc_mock: ProcMock,
+    tmp_path_factory: TempPathFactory,
+    mock_questionary_input: PipeInput,
+    workspace_content: str,
+    expected_path: str,
+    expect_warning: bool,
+) -> None:
+    # Arrange
+    code_cmd = which_mock.add("code")
+    proc_mock.set_output([code_cmd], ["Launch project"])
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    answer = MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER])
+    for command in answer.commands:
+        mock_questionary_input.send_text(command.value)
+
+    # Act
+    project_a_result = invoke(
+        "init -t beaker --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        cwd=cwd,
+    )
+    if workspace_content is not None:
+        workspace_file = cwd / "myapp" / "myapp.code-workspace"
+        workspace_file.write_text(workspace_content)
+
+    project_b_result = invoke(
+        "init -t beaker --no-git --defaults --name myapp2 "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
+        cwd=cwd / "myapp",
+    )
+
+    # Assert
+    assert project_a_result.exit_code == 0
+    assert project_b_result.exit_code == 0
+    if expected_path and "workspace_file" in locals():
+        workspace_data = json.loads(workspace_file.read_text())
+        assert workspace_data["folders"][-1]["path"] == expected_path
+    if expect_warning:
+        # This assumes the existence of a function `verify` to check for warnings in the output
+        verify(
+            project_b_result.output,
+        )

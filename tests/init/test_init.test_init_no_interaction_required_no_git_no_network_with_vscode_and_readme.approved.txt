@@ -8,14 +8,26 @@ WARNING: Re-using existing directory, this is not recommended because if project
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Starting template copy and render at {current_working_directory}/myapp...
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 No git tags found in template; using HEAD as ref
 Template render complete!
-DEBUG: Attempting to load project config from {current_working_directory}/myapp/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 VSCode configuration detected in project directory, and 'code' command is available on path, attempting to launch VSCode
 DEBUG: Running '/bin/code {current_working_directory}/myapp {current_working_directory}/myapp/README.txt' in '{current_working_directory}'
 DEBUG: /bin/code: Launch project

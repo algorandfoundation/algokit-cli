@@ -42,6 +42,12 @@ type = 'workspace' # type specifying if the project is a workspace or standalone
 projects_root_path = 'projects' # path to the root folder containing all sub-projects in the workspace
 ```
 
+#### VSCode optimizations
+
+AlgoKit has a set of minor optimizations for VSCode users that are useful to be aware of:
+
+- Templates created with the `--workspace` flag automatically include a VSCode code-workspace file. New projects added to an AlgoKit workspace are also integrated into an existing VSCode workspace.
+- Using the `--ide` flag with `init` triggers automatic prompts to open the project and, if available, the code workspace in VSCode.
 
 #### Handling of the `.github` Folder
 
@@ -160,15 +166,3 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 ```
 
 For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#init).
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```

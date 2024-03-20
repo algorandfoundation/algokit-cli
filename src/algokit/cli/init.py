@@ -13,7 +13,12 @@ import questionary
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config
-from algokit.core.init import get_git_user_info, is_valid_project_dir_name
+from algokit.core.init import (
+    append_project_to_vscode_workspace,
+    get_git_user_info,
+    is_valid_project_dir_name,
+    resolve_vscode_workspace_file,
+)
 from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.project import ProjectType, get_workspace_project_path
 from algokit.core.project.bootstrap import (
@@ -165,7 +170,7 @@ _unofficial_template_warning = (
 )
 
 
-def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
+def _validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
     if value is not None and not is_valid_project_dir_name(value):
         raise click.BadParameter(
             "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
@@ -176,6 +181,17 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     return value
 
 
+def _prevent_workspace_nesting(*, root_project_path: Path, use_workspace: bool) -> None:
+    parent_workspace_path = get_workspace_project_path(root_project_path.parent)
+    if parent_workspace_path and use_workspace and root_project_path.parent != parent_workspace_path:
+        logger.error(
+            "Error: Workspace nesting detected. Please run 'init' from the workspace root: "
+            f"'{parent_workspace_path}'. For more info, refer to "
+            "https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md"
+        )
+        _fail_and_bail()
+
+
 @click.command("init", short_help="Initializes a new project from a template; run from project parent directory.")
 @click.option(
     "directory_name",
@@ -183,7 +199,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "-n",
     type=str,
     help="Name of the project / directory / repository to create.",
-    callback=validate_dir_name,
+    callback=_validate_dir_name,
 )
 @click.option(
     "template_name",
@@ -259,7 +275,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     default=[],
     metavar="<key> <value>",
 )
-def init_command(  # noqa: PLR0913
+def init_command(  # noqa: PLR0913, PLR0915
     *,
     directory_name: str | None,
     template_name: str | None,
@@ -330,6 +346,8 @@ def init_command(  # noqa: PLR0913
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
 
+    _prevent_workspace_nesting(root_project_path=root_project_path, use_workspace=use_workspace)
+
     project_path = _resolve_workspace_project_path(
         template_source=template, project_path=root_project_path, use_workspace=use_workspace
     )
@@ -384,9 +402,13 @@ def init_command(  # noqa: PLR0913
     readme_path = next(project_path.glob("README*"), None)
 
     # Check if a .workspace file exists
-    workspace_file = next(project_path.glob("*.code-workspace"), None)
+    vscode_workspace_file = resolve_vscode_workspace_file(project_path)
 
-    if open_ide and (project_path / ".vscode").is_dir() and (code_cmd := shutil.which("code")):
+    if (
+        open_ide
+        and ((project_path / ".vscode").is_dir() or vscode_workspace_file)
+        and (code_cmd := shutil.which("code"))
+    ):
         target_path = str(project_path)
 
         logger.info(
@@ -394,9 +416,11 @@ def init_command(  # noqa: PLR0913
             "attempting to launch VSCode"
         )
 
-        if workspace_file:
-            logger.info(f"Detected VSCode workspace file. Opening workspace: {workspace_file}")
-            target_path = str(workspace_file)
+        if vscode_workspace_file:
+            logger.info("Attempting to append project to VSCode workspace.")
+            append_project_to_vscode_workspace(project_path=project_path, workspace_path=vscode_workspace_file)
+            logger.info(f"Detected VSCode workspace file. Opening workspace: {vscode_workspace_file}")
+            target_path = str(vscode_workspace_file)
 
         code_cmd_and_args = [code_cmd, target_path]
 
@@ -766,6 +790,7 @@ def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
     base_template_answers = {
         "use_default_readme": "yes",
         "project_name": target_path.name,
+        "projects_root_path": "projects",
         "include_github_workflow_template": not is_blessed,
     }
     from copier.main import Worker
@@ -775,7 +800,7 @@ def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
         dst_path=target_path,
         data=base_template_answers,
         quiet=True,
-        vcs_ref=base_template.commit,
+        vcs_ref=base_template.branch or base_template.commit,
         unsafe=True,
     ) as copier_worker:
         copier_worker.run_copy()

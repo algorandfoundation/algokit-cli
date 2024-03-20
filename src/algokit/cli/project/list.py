@@ -4,12 +4,12 @@ from pathlib import Path
 import click
 
 from algokit.core.conf import get_algokit_config
-from algokit.core.project import ProjectType, get_project_configs
+from algokit.core.project import ProjectType, get_project_configs, get_workspace_project_path
 
 logger = logging.getLogger(__name__)
 
 
-PROJECT_TYPE_TO_ICON = {
+PROJECT_TYPE_ICONS = {
     ProjectType.CONTRACT: "📜",
     ProjectType.FRONTEND: "🖥️",
     ProjectType.WORKSPACE: "📁",
@@ -18,7 +18,7 @@ PROJECT_TYPE_TO_ICON = {
 
 
 def _is_workspace(workspace_path: Path | None = None) -> bool:
-    config = get_algokit_config(project_dir=workspace_path) or {}
+    config = get_algokit_config(project_dir=get_workspace_project_path(workspace_path)) or {}
     project = config.get("project", {})
     return bool(project.get("type", None) == ProjectType.WORKSPACE)
 
@@ -26,14 +26,18 @@ def _is_workspace(workspace_path: Path | None = None) -> bool:
 @click.command("list")
 @click.argument(
     "workspace_path",
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, readable=True, path_type=Path),
+    type=click.Path(exists=True, resolve_path=True, file_okay=False, dir_okay=True, readable=True, path_type=Path),
     default=".",
 )
-@click.option("-v", "--verbose", is_flag=True, default=False, help="Enable verbose output")
-def list_command(*, workspace_path: Path, verbose: bool) -> None:
+def list_command(*, workspace_path: Path) -> None:
     """List all projects in the workspace"""
 
-    if not _is_workspace(workspace_path):
+    is_workspace = True
+    resolved_workspace_path = get_workspace_project_path(workspace_path)
+    if resolved_workspace_path is None:
+        is_workspace = False
+
+    if not is_workspace:
         click.secho(
             "WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml",
             fg="yellow",
@@ -41,7 +45,7 @@ def list_command(*, workspace_path: Path, verbose: bool) -> None:
         )
         return
 
-    configs = get_project_configs(workspace_path)
+    configs = get_project_configs(resolved_workspace_path)
 
     if not configs:
         click.secho(
@@ -51,8 +55,11 @@ def list_command(*, workspace_path: Path, verbose: bool) -> None:
         )
         return
 
+    click.echo(f"workspace: {resolved_workspace_path} {PROJECT_TYPE_ICONS[ProjectType.WORKSPACE]}")
     for config in configs:
         project = config.get("project", {})
         name, project_type = project.get("name"), project.get("type")
-        cwd = f": ({config.get('cwd')})" if verbose else ""
-        click.echo(f"{name}{cwd} {PROJECT_TYPE_TO_ICON[project_type]}")
+        cwd = Path(config.get("cwd", Path.cwd()))
+        path_label = "this directory" if cwd == Path.cwd() else cwd
+        icon = PROJECT_TYPE_ICONS.get(project_type, "🔍 Unknown")
+        click.echo(f"  - {name} ({path_label}) {icon}")

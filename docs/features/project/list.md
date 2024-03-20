@@ -4,17 +4,13 @@ The `algokit project list` command is designed to enumerate all projects within 
 
 ## Usage
 
-To use the `list` command, navigate to the root directory of your workspace and execute:
+To use the `list` command, execute the following **anywhere** within an AlgoKit workspace:
 
 ```sh
 $ algokit project list [OPTIONS] [WORKSPACE_PATH]
 ```
 
 - `WORKSPACE_PATH` is an optional argument that specifies the path to the workspace. If not provided, the current directory (`.`) is used as the default workspace path.
-
-### Options
-
-- `-v`, `--verbose`: Enable verbose output. This flag provides additional details about the projects listed.
 
 ## How It Works
 
@@ -26,25 +22,17 @@ $ algokit project list [OPTIONS] [WORKSPACE_PATH]
 
 ## Example Output
 
-Without the verbose option:
-
-```plaintext
-ℹ️  project_a
-ℹ️  project_b
-```
-
-With the verbose option enabled:
-
-```plaintext
-ℹ️  project_a ({path_to_sub_project})
-ℹ️  project_b ({path_to_sub_project})
+```sh
+workspace: {path_to_workspace} 📁
+  - myapp ({path_to_myapp}) 📜
+  - myproject-app ({path_to_myproject_app}) 🖥️
 ```
 
 ## Error Handling
 
 If the command is executed in a directory that is not recognized as an AlgoKit workspace, it will issue a warning:
 
-```plaintext
+```sh
 WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml
 ```
 
