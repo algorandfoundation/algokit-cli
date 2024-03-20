@@ -165,7 +165,7 @@ _unofficial_template_warning = (
 )
 
 
-def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
+def _validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
     if value is not None and not is_valid_project_dir_name(value):
         raise click.BadParameter(
             "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
@@ -176,6 +176,17 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     return value
 
 
+def _prevent_workspace_nesting(*, root_project_path: Path, use_workspace: bool) -> None:
+    parent_workspace_path = get_workspace_project_path(root_project_path.parent)
+    if parent_workspace_path and use_workspace and root_project_path.parent != parent_workspace_path:
+        logger.error(
+            "Error: Workspace nesting detected. Please run 'init' from the workspace root: "
+            f"'{parent_workspace_path}'. For more info, refer to "
+            "https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md"
+        )
+        _fail_and_bail()
+
+
 @click.command("init", short_help="Initializes a new project from a template; run from project parent directory.")
 @click.option(
     "directory_name",
@@ -183,7 +194,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "-n",
     type=str,
     help="Name of the project / directory / repository to create.",
-    callback=validate_dir_name,
+    callback=_validate_dir_name,
 )
 @click.option(
     "template_name",
@@ -329,6 +340,8 @@ def init_command(  # noqa: PLR0913
         answers_dict.setdefault("python_path", system_python_path)
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
+
+    _prevent_workspace_nesting(root_project_path=root_project_path, use_workspace=use_workspace)
 
     project_path = _resolve_workspace_project_path(
         template_source=template, project_path=root_project_path, use_workspace=use_workspace

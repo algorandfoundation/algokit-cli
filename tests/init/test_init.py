@@ -44,6 +44,7 @@ class MockQuestionaryAnswer:
 
 def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens: str) -> Scrubber:
     default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
+
     tokens = default_tokens | extra_tokens
     return combine_scrubbers(
         *extra_scrubbers,
@@ -51,6 +52,7 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
         TokenScrubber(tokens=tokens),
         TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
         lambda t: t.replace("{test_parent_directory}\\", "{test_parent_directory}/"),
+        _remove_project_paths,
     )
 
 
@@ -844,6 +846,33 @@ def test_init_wizard_v2_flow(
     )
 
 
+def test_init_wizard_v2_add_from_sub_workspace_level(
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    answer = MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER])
+    for command in answer.commands:
+        mock_questionary_input.send_text(command.value)
+
+    # Act
+    project_a_result = invoke(
+        "init -t beaker --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        cwd=cwd,
+    )
+    project_b_result = invoke(
+        "init -t beaker --no-git --defaults --name myapp2 "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
+        cwd=cwd / "myapp" / "projects",
+    )
+
+    # Assert
+    cwd /= "myapp"
+    assert project_a_result.exit_code == 0
+    assert project_b_result.exit_code == 1
+
+
 def test_init_wizard_v2_github_folder_with_workspace(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
 ) -> None:
@@ -923,4 +952,15 @@ def test_init_wizard_v2_github_folder_no_workspace(
 def _remove_git_hints(output: str) -> str:
     git_init_hint_prefix = "DEBUG: git: hint:"
     lines = [line for line in output.splitlines() if not line.startswith(git_init_hint_prefix)]
+    return "\n".join(lines)
+
+
+def _remove_project_paths(output: str) -> str:
+    lines = [
+        "DEBUG: Attempting to load project config from {cwd}/.algokit.toml"
+        if "DEBUG: Attempting to load project config from " in line
+        else line
+        for line in output.splitlines()
+    ]
+
     return "\n".join(lines)

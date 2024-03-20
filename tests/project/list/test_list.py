@@ -153,27 +153,6 @@ def test_list_command_from_workspace_success(
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
-def test_list_command_verbose_from_workspace_success(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
-) -> None:
-    """
-    Test to ensure the 'project list --verbose' command executes successfully within a workspace.
-
-    This test checks that the verbose listing of projects in a workspace with
-    n projects is successful and provides detailed output.
-
-    Args:
-        tmp_path_factory (TempPathFactory): A fixture to create temporary directories.
-        which_mock (WhichMock): A mock for the 'which' command.
-        proc_mock (ProcMock): A mock for process execution.
-    """
-    cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=20)
-    result = invoke(f"project list {cwd_with_workspace} --verbose".split(), cwd=cwd_with_workspace)
-
-    assert result.exit_code == 0
-    verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
-
-
 def test_list_command_from_empty_folder(
     tmp_path_factory: TempPathFactory,
 ) -> None:

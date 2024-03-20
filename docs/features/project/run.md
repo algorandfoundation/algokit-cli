@@ -18,6 +18,8 @@ AlgoKit supports two main types of project structures: Workspaces and Standalone
 
 - **Standalone Projects**: Suited for simpler applications or when working on a single component. This structure offers straightforward project management, with each project residing in its own directory, independent of others.
 
+> Please note, instantiating a workspace inside a workspace (aka 'workspace nesting') is not supported and not recommended. When you want to add a new project into existing workspace make sure to run `algokit init` **from the root of the workspace**
+
 ### Custom Command Injection
 
 AlgoKit enhances project automation by allowing the injection of custom commands into the `.algokit.toml` configuration file. This feature enables developers to tailor the project setup to their specific needs, automating tasks such as deploying to different network environments or integrating with CI/CD pipelines.
@@ -135,4 +137,4 @@ Now if project_a and project_b are both defined as standalone projects, the orde
 
 ## Further Reading
 
-For in-depth details, visit the [run](../../cli/index.md#run) section in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [run](https://github.com/algorandfoundation/algokit-cli/blob/feat/command_orchestration/docs/features/project/run.md) section in the AlgoKit CLI reference documentation.
