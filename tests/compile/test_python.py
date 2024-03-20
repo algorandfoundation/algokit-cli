@@ -123,7 +123,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     assert result.exit_code == 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 9), reason="PuyaPy requires python3.12 or higher")
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_invalid_contract() -> None:
     # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
     raise Exception(f"sys.version_info {sys.version_info}")
