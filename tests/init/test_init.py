@@ -108,7 +108,7 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
     blessed_templates = {
         ExtendedTemplateKey.SIMPLE: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. simple",
         ),
         ExtendedTemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
@@ -121,19 +121,19 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
         ),
         ExtendedTemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. fullstack",
         ),
         ExtendedTemplateKey.PUYA: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. puya",
         ),
         ExtendedTemplateKey.REACT: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. react",
         ),
         ExtendedTemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
-            description="Does nothing helpful.",
+            description="Does nothing helpful. base",
         ),
     }
 
@@ -864,26 +864,25 @@ def test_init_wizard_v2_flow(
     )
 
 
-def test_init_wizard_v2_workspace_nesting(tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput) -> None:
+def test_init_wizard_v2_workspace_nesting(
+    tmp_path_factory: TempPathFactory,
+) -> None:
     # Arrange
     cwd = tmp_path_factory.mktemp("cwd")
-    answer = MockQuestionaryAnswer("Smart Contract", [MockPipeInput.ENTER, MockPipeInput.ENTER])
-    for command in answer.commands:
-        mock_questionary_input.send_text(command.value)
 
     # Act
     project_a_result = invoke(
-        "init -t beaker --no-git --defaults --name myapp "
+        "init -t puya --no-git --defaults --name myapp "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
     project_b_result = invoke(
-        "init -t beaker --no-git --defaults --name myapp2 "
+        "init -t puya --no-git --defaults --name myapp2 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
         cwd=cwd / "myapp" / "projects",
     )
     project_c_result = invoke(
-        "init -t beaker --no-git --defaults --name myapp3 "
+        "init -t puya --no-git --defaults --name myapp3 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter' --no-workspace",
         cwd=cwd,
     )
