@@ -60,6 +60,6 @@ def list_command(*, workspace_path: Path) -> None:
         project = config.get("project", {})
         name, project_type = project.get("name"), project.get("type")
         cwd = Path(config.get("cwd", Path.cwd()))
-        cwd = "this directory" if cwd == Path.cwd() else cwd
+        path_label = "this directory" if cwd == Path.cwd() else cwd
         icon = PROJECT_TYPE_ICONS.get(project_type, "🔍 Unknown")
-        click.echo(f"  - {name} ({cwd}) {icon}")
+        click.echo(f"  - {name} ({path_label}) {icon}")

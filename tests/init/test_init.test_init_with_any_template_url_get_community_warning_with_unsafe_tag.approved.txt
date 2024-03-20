@@ -6,12 +6,23 @@ DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Starting template copy and render at {current_working_directory}/myapp...
 DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
 Template render complete!
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Your template includes a README.md file, you might want to review that as a next step.
 ----
 .env.template:

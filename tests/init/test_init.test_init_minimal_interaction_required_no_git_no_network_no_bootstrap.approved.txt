@@ -7,8 +7,20 @@ DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Starting template copy and render at {current_working_directory}/myapp...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.

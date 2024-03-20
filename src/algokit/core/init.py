@@ -1,10 +1,13 @@
+import json
 import re
 import shutil
 from logging import getLogger
+from pathlib import Path
+from typing import Any, cast
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
 
-from algokit.core.project import get_project_dir_names_from_workspace
+from algokit.core.project import get_project_dir_names_from_workspace, get_workspace_project_path
 
 logger = getLogger(__name__)
 
@@ -66,3 +69,55 @@ def is_valid_project_dir_name(value: str) -> bool:
     if not re.match(r"^[\w\-.]+$", value):
         return False
     return True
+
+
+def resolve_vscode_workspace_file(project_path: Path | None) -> Path | None:
+    """Resolve the path to the VSCode workspace file for the given project.
+    Works by looking for algokit workspace and checking if there is a matching
+    vscode config at the same level."""
+    algokit_workspace_path = get_workspace_project_path(project_path)
+    search_path = algokit_workspace_path or project_path
+    if search_path is None:
+        return None
+    return next(search_path.glob("*.code-workspace"), None)
+
+
+def append_project_to_vscode_workspace(project_path: Path, workspace_path: Path) -> None:
+    """Append project to the code workspace, ensuring compatibility across Windows and Unix systems."""
+    if not workspace_path.exists():
+        raise FileNotFoundError(f"Workspace path {workspace_path} does not exist.")
+
+    try:
+        workspace = _load_vscode_workspace(workspace_path)
+        # Convert paths to POSIX format for consistent handling, and ensure relative paths are correctly interpreted
+        processed_project_path = project_path.relative_to(workspace_path.parent).as_posix()
+        # Normalize the new project path for comparison, ensuring it does not end with a slash unless it's the root
+        normalized_project_path = processed_project_path if processed_project_path != "." else "./"
+
+        # Normalize existing paths in the workspace for comparison
+        existing_paths = [
+            folder.get("path", "").rstrip("/").replace("\\", "/") for folder in workspace.get("folders", [])
+        ]
+        # Ensure the normalized new path is not already in the workspace
+        if normalized_project_path not in existing_paths:
+            workspace.setdefault("folders", []).append({"path": processed_project_path})
+            _save_vscode_workspace(workspace_path, workspace)
+        logger.debug(f"Appended project {project_path} to workspace {workspace_path}.")
+    except json.JSONDecodeError as json_err:
+        logger.warning(f"Invalid JSON format in the workspace file {workspace_path}. {json_err}")
+    except Exception as e:
+        logger.warning(f"Failed to append project {project_path} to workspace {workspace_path}. {e}")
+
+
+def _load_vscode_workspace(workspace_path: Path) -> dict[str, Any]:
+    """Load the workspace file as a JSON object."""
+    with workspace_path.open("r") as f:
+        data = json.load(f)
+        assert isinstance(data, dict)
+        return cast(dict[str, Any], data)
+
+
+def _save_vscode_workspace(workspace_path: Path, workspace: dict) -> None:
+    """Save the modified workspace back to the file."""
+    with workspace_path.open("w") as f:
+        json.dump(workspace, f, indent=2)

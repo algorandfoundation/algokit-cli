@@ -1,0 +1,23 @@
+DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template
+DEBUG: project path = {current_working_directory}/myapp2
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Workspace structure detected! Moving the project to be instantiated into {current_working_directory}/projects
+Starting template copy and render at {current_working_directory}/projects/myapp2...
+DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
+Template render complete!
+DEBUG: Attempting to load project config from {current_working_directory}/projects/myapp2/.algokit.toml
+Executed `algokit bootstrap all` in {current_working_directory}/projects/myapp2
+🙌 Project initialized at `myapp2`! For template specific next steps, consult the documentation of your selected template 🧐
+Your selected template comes from:
+➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+DEBUG: Attempting to load project config from {current_working_directory}/projects/myapp2/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/projects/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+VSCode configuration detected in project directory, and 'code' command is available on path, attempting to launch VSCode
+Attempting to append project to VSCode workspace.
+WARNING: Invalid JSON format in the workspace file {current_working_directory}/myapp.code-workspace. Expecting value: line 1 column 1 (char 0)
+Detected VSCode workspace file. Opening workspace: {current_working_directory}/myapp.code-workspace
+DEBUG: Running '/bin/code {current_working_directory}/myapp.code-workspace {current_working_directory}/projects/myapp2/README.md' in '{current_working_directory}'
+DEBUG: /bin/code: Launch project
