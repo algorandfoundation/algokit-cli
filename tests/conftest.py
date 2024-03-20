@@ -160,7 +160,7 @@ else:
         else []
     )
     default_reporters += [
-        reporters.ReporterThatAutomaticallyApproves(),
+        # reporters.ReporterThatAutomaticallyApproves(),  # noqa: ERA001
         # # uncomment to auto approve all received files, do not commit to VCS!
         GenericDiffReporter(create_config(["kdiff3", "/usr/bin/kdiff3"])),
         GenericDiffReporter(create_config(["DiffMerge", "/Applications/DiffMerge.app/Contents/MacOS/DiffMerge"])),
