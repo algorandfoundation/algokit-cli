@@ -181,9 +181,12 @@ def _validate_dir_name(context: click.Context, param: click.Parameter, value: st
     return value
 
 
-def _prevent_workspace_nesting(*, root_project_path: Path, use_workspace: bool) -> None:
-    parent_workspace_path = get_workspace_project_path(root_project_path.parent)
-    if parent_workspace_path and use_workspace and root_project_path.parent != parent_workspace_path:
+def _prevent_workspace_nesting(*, workspace_path: Path | None, use_workspace: bool) -> None:
+    if not workspace_path:
+        return
+
+    parent_workspace_path = get_workspace_project_path(workspace_path.parent)
+    if parent_workspace_path and use_workspace and workspace_path != parent_workspace_path:
         logger.error(
             "Error: Workspace nesting detected. Please run 'init' from the workspace root: "
             f"'{parent_workspace_path}'. For more info, refer to "
@@ -332,11 +335,14 @@ def init_command(  # noqa: PLR0913, PLR0915
 
     # allow skipping prompt if the template is the base template to avoid redundant
     # 're-using existing directory' warning in fullstack template init
-    root_project_path = _get_project_path(
+    project_path = _get_project_path(
         directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
     )
-    logger.debug(f"project path = {root_project_path}")
-    directory_name = root_project_path.name
+    workspace_path = get_workspace_project_path(project_path)
+    _prevent_workspace_nesting(workspace_path=workspace_path, use_workspace=use_workspace)
+
+    logger.debug(f"project path = {project_path}")
+    directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
@@ -346,10 +352,8 @@ def init_command(  # noqa: PLR0913, PLR0915
     else:
         answers_dict.setdefault("python_path", "no_system_python_available")
 
-    _prevent_workspace_nesting(root_project_path=root_project_path, use_workspace=use_workspace)
-
     project_path = _resolve_workspace_project_path(
-        template_source=template, project_path=root_project_path, use_workspace=use_workspace
+        template_source=template, project_path=project_path, use_workspace=use_workspace
     )
     answers_dict.setdefault("use_workspace", "yes" if use_workspace else "no")
 
@@ -379,12 +383,15 @@ def init_command(  # noqa: PLR0913, PLR0915
 
     logger.info("Template render complete!")
 
+    # reload workspace path cause it might have been just introduced with new project instance
+    workspace_path = get_workspace_project_path(project_path)
+
     _maybe_move_github_folder(project_path=project_path, use_workspace=use_workspace)
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
     _maybe_git_init(
-        root_project_path,
+        workspace_path or project_path,
         use_git=use_git,
         commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
     )
@@ -402,7 +409,7 @@ def init_command(  # noqa: PLR0913, PLR0915
     readme_path = next(project_path.glob("README*"), None)
 
     # Check if a .workspace file exists
-    vscode_workspace_file = resolve_vscode_workspace_file(project_path)
+    vscode_workspace_file = resolve_vscode_workspace_file(workspace_path or project_path)
 
     if (
         open_ide
