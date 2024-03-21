@@ -24,20 +24,20 @@ runs:
       shell: bash
       run: echo "full_version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')" >> $GITHUB_OUTPUT
 
-    - name: TEST1
-      run: |
-        ls -la ./.venv
-        ./.venv/bin/python --version
-      shell: bash
+#    - name: TEST1
+#      run: |
+##        ls -la ./.venv
+#        ./.venv/bin/python --version
+#      shell: bash
 
-    - name: Setup poetry cache
-      uses: actions/cache@v4
-      with:
-        path: ./.venv
-        key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}
+#    - name: Setup poetry cache
+#      uses: actions/cache@v4
+#      with:
+#        path: ./.venv
+#        key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}
 
-    - name: TEST2
-      run: |
-        ls -la ./.venv
-        ./.venv/bin/python --version
-      shell: bash
+#    - name: TEST2
+#      run: |
+##        ls -la ./.venv
+#        ./.venv/bin/python --version
+#      shell: bash
