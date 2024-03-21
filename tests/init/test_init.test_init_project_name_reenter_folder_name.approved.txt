@@ -7,13 +7,13 @@ DEBUG: No .algokit.toml file found in the project directory.
 WARNING: Re-using existing directory, this is not recommended because if project generation fails, then we can't automatically cleanup.
 ? Continue anyway? (y/N)
 ? Name of project / directory to create the project in: 
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: project path = {current_working_directory}/FAKE_PROJECT_2
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Starting template copy and render at {current_working_directory}/FAKE_PROJECT_2...
@@ -22,11 +22,11 @@ DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/FAKE_PROJECT_2
 🙌 Project initialized at `FAKE_PROJECT_2`! For template specific next steps, consult the documentation of your selected template 🧐
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
