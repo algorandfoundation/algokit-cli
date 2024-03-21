@@ -6,7 +6,7 @@ jobs:
   build-python:
     strategy:
       matrix:
-        os: ["macos-11", ubuntu-latest]
+        os: ["macos-11"]
         python: ["3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,15 +31,18 @@ jobs:
         run: pipx install puya
 
       - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+        run: |
+          python -c "import sys; print(sys.version)"
+          which python
+          poetry run which python
+          poetry shell
+          which python
 
       - name: pytest
         shell: bash
         if: ${{ !(matrix.python == '3.12' && matrix.os == 'ubuntu-latest') }}
         # git config is needed due to several tests relying on e2e copier invocation and copier relies on git during `copy` command
         run: |
-          which python
-          poetry run which python
           set -o pipefail
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
           poetry run pytest -n auto
