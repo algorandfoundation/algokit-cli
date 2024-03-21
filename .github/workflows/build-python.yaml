@@ -35,8 +35,7 @@ jobs:
           python -c "import sys; print(sys.version)"
           which python
           poetry run which python
-          poetry shell
-          which python
+          poetry run python --version
 
       - name: pytest
         shell: bash
