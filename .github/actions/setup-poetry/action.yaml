@@ -15,6 +15,13 @@ runs:
       run: |
         pip install --user pipx
         pipx ensurepath
+        pipx install poetry ${{ runner.os == 'macOS' && '--python ${{ env.Python_ROOT_DIR }}/bin/python' }}
+      shell: bash
+
+    - if: ${{ runner.os != 'macOS' || runner.arch != 'ARM64' }}
+      run: |
+        pip install --user pipx
+        pipx ensurepath
         pipx install poetry --python ${{ env.Python_ROOT_DIR }}/bin/python
       shell: bash
 
