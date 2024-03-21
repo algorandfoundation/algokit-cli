@@ -15,7 +15,6 @@ runs:
       run: |
         pip install --user pipx
         pipx ensurepath
-        ls -la ${{ env.Python_ROOT_DIR }}/bin
         pipx install poetry --python ${{ env.Python_ROOT_DIR }}/bin/python
       shell: bash
 
@@ -28,10 +27,4 @@ runs:
       uses: actions/cache@v4
       with:
         path: ./.venv
-        key: venv-test-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}
-
-#    - name: TEST2
-#      run: |
-##        ls -la ./.venv
-#        ./.venv/bin/python --version
-#      shell: bash
+        key: venv-t1-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}

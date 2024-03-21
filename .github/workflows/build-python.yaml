@@ -6,8 +6,8 @@ jobs:
   build-python:
     strategy:
       matrix:
-        os: ["macos-11"]
-        python: ["3.10", "3.11"]
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -29,13 +29,6 @@ jobs:
       - name: Install PuyaPy
         if: ${{ matrix.python == '3.12' }}
         run: pipx install puya
-
-      - name: Display Python version
-        run: |
-          python -c "import sys; print(sys.version)"
-          which python
-          poetry run which python
-          poetry run python --version
 
       - name: pytest
         shell: bash
