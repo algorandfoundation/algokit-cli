@@ -7,7 +7,7 @@ from typing import Any, cast
 
 from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
 
-from algokit.core.project import get_project_dir_names_from_workspace, get_workspace_project_path
+from algokit.core.project import get_project_dir_names_from_workspace
 
 logger = getLogger(__name__)
 
@@ -71,15 +71,13 @@ def is_valid_project_dir_name(value: str) -> bool:
     return True
 
 
-def resolve_vscode_workspace_file(project_path: Path | None) -> Path | None:
+def resolve_vscode_workspace_file(project_root: Path | None) -> Path | None:
     """Resolve the path to the VSCode workspace file for the given project.
     Works by looking for algokit workspace and checking if there is a matching
     vscode config at the same level."""
-    algokit_workspace_path = get_workspace_project_path(project_path)
-    search_path = algokit_workspace_path or project_path
-    if search_path is None:
+    if not project_root:
         return None
-    return next(search_path.glob("*.code-workspace"), None)
+    return next(project_root.glob("*.code-workspace"), None)
 
 
 def append_project_to_vscode_workspace(project_path: Path, workspace_path: Path) -> None:
