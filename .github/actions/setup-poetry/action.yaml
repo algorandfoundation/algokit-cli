@@ -3,6 +3,12 @@ description: "An action to setup Poetry"
 runs:
   using: "composite"
   steps:
+    - name: TEST1
+      run: |
+        ls -la ./.venv
+        ./.venv/bin/python --version
+      shell: bash
+
     # A workaround for pipx isn't installed on M1 runner.
     # We should remove it after this issue is resolved.
     # https://github.com/actions/runner-images/issues/9256
@@ -24,8 +30,15 @@ runs:
       shell: bash
       run: echo "full_version=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')" >> $GITHUB_OUTPUT
 
+    - name: TEST2
+      run: |
+        ls -la ./.venv
+        ./.venv/bin/python --version
+      shell: bash
+
     - name: Setup poetry cache
       uses: actions/cache@v4
       with:
         path: ./.venv
         key: venv-${{ hashFiles('poetry.lock') }}-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.full_version }}
+
