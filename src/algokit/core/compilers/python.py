@@ -5,12 +5,12 @@ from algokit.core.utils import extract_version_triple, find_valid_pipx_command
 
 
 def find_valid_puyapy_command(version: str | None) -> list[str]:
-    return _find_puya_command_at_version(version) if version is not None else _find_puya_command()
+    return _find_puyapy_command_at_version(version) if version is not None else _find_puyapy_command()
 
 
-def _find_puya_command_at_version(version: str) -> list[str]:
+def _find_puyapy_command_at_version(version: str) -> list[str]:
     """
-    Find puya command with a specific version.
+    Find puyapy command with a specific version.
     If the puya version isn't installed, install it with pipx run.
     """
     for puyapy_command in _get_candidates_puyapy_commands():
@@ -37,9 +37,9 @@ def _find_puya_command_at_version(version: str) -> list[str]:
     ]
 
 
-def _find_puya_command() -> list[str]:
+def _find_puyapy_command() -> list[str]:
     """
-    Find puya command.
+    Find puyapy command.
     If puya isn't installed, install the latest version with pipx.
     """
     for puyapy_command in _get_candidates_puyapy_commands():
@@ -56,11 +56,11 @@ def _find_puya_command() -> list[str]:
         "please install pipx via https://pypa.github.io/pipx/ "
         "and then try `algokit compile py ...` again."
     )
-    _install_puyapy_with_pipx(pipx_command)
+    _install_puya_with_pipx(pipx_command)
     return ["puyapy"]
 
 
-def _install_puyapy_with_pipx(pipx_command: list[str]) -> None:
+def _install_puya_with_pipx(pipx_command: list[str]) -> None:
     run(
         [
             *pipx_command,

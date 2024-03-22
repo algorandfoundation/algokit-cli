@@ -23,10 +23,10 @@
     - [-v, --version ](#-v---version-)
     - [py](#py)
     - [Arguments](#arguments)
-    - [PUYA_ARGS](#puya_args)
+    - [PUYAPY_ARGS](#puyapy_args)
     - [python](#python)
     - [Arguments](#arguments-1)
-    - [PUYA_ARGS](#puya_args-1)
+    - [PUYAPY_ARGS](#puyapy_args-1)
   - [completions](#completions)
     - [install](#install)
     - [Options](#options-5)
@@ -289,7 +289,7 @@ algokit bootstrap poetry [OPTIONS]
 
 ## compile
 
-Compile high level language smart contracts to TEAL
+Compile smart contracts written in a high level language to TEAL.
 
 ```shell
 algokit compile [OPTIONS] COMMAND [ARGS]...
@@ -299,34 +299,34 @@ algokit compile [OPTIONS] COMMAND [ARGS]...
 
 
 ### -v, --version <version>
-Compiler version, for example, 1.0.0. If the version isn't specified, AlgoKit will check if the compiler is installed locally, and execute that. If the compiler is not found, it will install the latest version. If the version is specified, AlgoKit will check if the local compiler's version satisfies, and execute that. Otherwise, AlgoKit will install the specifed compiler version.
+The compiler version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the compiler is installed and runs the installed version. If the compiler is not installed, AlgoKit runs the latest version.If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
 
 ### py
 
-Compile Python contract(s) to TEAL with PuyaPy
+Compile Python contract(s) to TEAL using the PuyaPy compiler.
 
 ```shell
-algokit compile py [OPTIONS] [PUYA_ARGS]...
+algokit compile py [OPTIONS] [PUYAPY_ARGS]...
 ```
 
 ### Arguments
 
 
-### PUYA_ARGS
+### PUYAPY_ARGS
 Optional argument(s)
 
 ### python
 
-Compile Python contract(s) to TEAL with PuyaPy
+Compile Python contract(s) to TEAL using the PuyaPy compiler.
 
 ```shell
-algokit compile python [OPTIONS] [PUYA_ARGS]...
+algokit compile python [OPTIONS] [PUYAPY_ARGS]...
 ```
 
 ### Arguments
 
 
-### PUYA_ARGS
+### PUYAPY_ARGS
 Optional argument(s)
 
 ## completions
