@@ -27,7 +27,7 @@ def invoke_puyapy(context: click.Context, puyapy_args: list[str]) -> None:
     if run_result.exit_code != 0:
         click.secho(
             "An error occurred during compile. Please ensure that any supplied arguments are valid "
-            "and any files passed are valid PuyaPy code before retrying.",
+            "and any files passed are valid Algorand Python code before retrying.",
             err=True,
             fg="red",
         )
@@ -42,7 +42,7 @@ def common_puyapy_command_options(function: _AnyCallable) -> click.Command:
             "ignore_unknown_options": True,
         },
         add_help_option=False,
-        help="Compile Python contract(s) to TEAL using the PuyaPy compiler.",
+        help="Compile Algorand Python contract(s) to TEAL using the PuyaPy compiler.",
     )(function)
 
 

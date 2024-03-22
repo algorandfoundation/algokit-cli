@@ -7,7 +7,7 @@ from algokit.cli.compilers.python import py, python
 logger = logging.getLogger(__name__)
 
 
-@click.group("compile", short_help="Compile smart contracts written in a high level language to TEAL.")
+@click.group("compile", short_help="Compile smart contracts written in a high-level language to TEAL.")
 @click.option(
     "-v",
     "--version",
@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
     help=(
         "The compiler version to pin to, for example, 1.0.0. "
         "If no version is specified, AlgoKit checks if the compiler is installed and runs the installed version. "
-        "If the compiler is not installed, AlgoKit runs the latest version."
+        "If the compiler is not installed, AlgoKit runs the latest version. "
         "If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. "
         "Otherwise, AlgoKit runs the specified version."
     ),
 )
 @click.pass_context
 def compile_group(context: click.Context, version: str | None) -> None:
-    """Compile smart contracts written in a high level language to TEAL."""
+    """Compile smart contracts written in a high-level language to TEAL."""
     context.ensure_object(dict)
     context.obj["version"] = version
 

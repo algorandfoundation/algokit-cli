@@ -289,7 +289,7 @@ algokit bootstrap poetry [OPTIONS]
 
 ## compile
 
-Compile smart contracts written in a high level language to TEAL.
+Compile smart contracts written in a high-level language to TEAL.
 
 ```shell
 algokit compile [OPTIONS] COMMAND [ARGS]...
@@ -299,11 +299,11 @@ algokit compile [OPTIONS] COMMAND [ARGS]...
 
 
 ### -v, --version <version>
-The compiler version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the compiler is installed and runs the installed version. If the compiler is not installed, AlgoKit runs the latest version.If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
+The compiler version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the compiler is installed and runs the installed version. If the compiler is not installed, AlgoKit runs the latest version. If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
 
 ### py
 
-Compile Python contract(s) to TEAL using the PuyaPy compiler.
+Compile Algorand Python contract(s) to TEAL using the PuyaPy compiler.
 
 ```shell
 algokit compile py [OPTIONS] [PUYAPY_ARGS]...
@@ -317,7 +317,7 @@ Optional argument(s)
 
 ### python
 
-Compile Python contract(s) to TEAL using the PuyaPy compiler.
+Compile Algorand Python contract(s) to TEAL using the PuyaPy compiler.
 
 ```shell
 algokit compile python [OPTIONS] [PUYAPY_ARGS]...
