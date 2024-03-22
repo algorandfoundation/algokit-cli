@@ -112,7 +112,7 @@ def test_generate_client_python(
         version = "==" + options.split()[-1]
     else:
         version = ""
-    assert len(proc_mock.called) == 3
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
     assert (
         proc_mock.called[2].command
         == f"pipx run {PYTHON_PYPI_PACKAGE}{version} -a {application_json} -o {expected_output_path}".split()
@@ -142,7 +142,7 @@ def test_generate_client_python_arc32_filename(
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
 
-    assert len(proc_mock.called) == 3
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
     assert (
         proc_mock.called[2].command
         == f"pipx run {PYTHON_PYPI_PACKAGE} -a {arc32_json} " f"-o {expected_output_path}".split()
@@ -179,7 +179,7 @@ def test_generate_client_typescript(
         version = options.split()[-1]
     else:
         version = "latest"
-    assert len(proc_mock.called) == 2
+    assert len(proc_mock.called) == 2  # noqa: PLR2004
     assert (
         proc_mock.called[1].command
         == f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE}@{version} generate "

@@ -114,7 +114,7 @@ def get_candidate_pipx_commands() -> Iterator[list[str]]:
         yield [python_path, "-m", "pipx"]
 
 
-def get_valid_npx_command(error_message: str, npx: bool) -> list[str]:
+def get_valid_npx_command(error_message: str, npx: bool) -> list[str]:  # noqa: FBT001
     command = "npx" if npx else "npm"
     path = shutil.which(command)
     if not path:
