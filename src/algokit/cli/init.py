@@ -181,15 +181,14 @@ def _validate_dir_name(context: click.Context, param: click.Parameter, value: st
     return value
 
 
-def _prevent_workspace_nesting(*, workspace_path: Path | None, use_workspace: bool) -> None:
+def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Path, use_workspace: bool) -> None:
     if not workspace_path:
         return
 
-    parent_workspace_path = get_workspace_project_path(workspace_path.parent)
-    if parent_workspace_path and use_workspace and workspace_path != parent_workspace_path:
+    if use_workspace and workspace_path != project_path.parent:
         logger.error(
             "Error: Workspace nesting detected. Please run 'init' from the workspace root: "
-            f"'{parent_workspace_path}'. For more info, refer to "
+            f"'{workspace_path}'. For more info, refer to "
             "https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md"
         )
         _fail_and_bail()
@@ -339,7 +338,7 @@ def init_command(  # noqa: PLR0913, PLR0915
         directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
     )
     workspace_path = get_workspace_project_path(project_path)
-    _prevent_workspace_nesting(workspace_path=workspace_path, use_workspace=use_workspace)
+    _prevent_workspace_nesting(workspace_path=workspace_path, project_path=project_path, use_workspace=use_workspace)
 
     logger.debug(f"project path = {project_path}")
     directory_name = project_path.name

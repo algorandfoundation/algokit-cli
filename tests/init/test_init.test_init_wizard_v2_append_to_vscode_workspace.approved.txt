@@ -2,12 +2,6 @@ DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template
 DEBUG: Attempting to load project config from {current_working_directory}/myapp2/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: Attempting to load project config from /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-140/cwd94/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-140/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: project path = {current_working_directory}/myapp2
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Workspace structure detected! Moving the project to be instantiated into {current_working_directory}/projects

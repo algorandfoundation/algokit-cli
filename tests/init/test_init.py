@@ -884,13 +884,19 @@ def test_init_wizard_v2_workspace_nesting(
     project_c_result = invoke(
         "init -t puya --no-git --defaults --name myapp3 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter' --no-workspace",
-        cwd=cwd,
+        cwd=cwd / "myapp" / "projects",
+    )
+    project_d_result = invoke(
+        "init -t puya --no-git --defaults --name myapp4 "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
+        cwd=cwd / "myapp",
     )
 
     # Assert
     assert project_a_result.exit_code == 0
     assert project_b_result.exit_code == 1
     assert project_c_result.exit_code == 0
+    assert project_d_result.exit_code == 0
 
 
 def test_init_wizard_v2_github_folder_with_workspace(
@@ -1039,6 +1045,4 @@ def test_init_wizard_v2_append_to_vscode_workspace(
         assert workspace_data["folders"][-1]["path"] == expected_path
     if expect_warning:
         # This assumes the existence of a function `verify` to check for warnings in the output
-        verify(
-            project_b_result.output,
-        )
+        verify(project_b_result.output)
