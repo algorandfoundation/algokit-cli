@@ -2,7 +2,6 @@ import abc
 import json
 import logging
 import re
-import shutil
 from pathlib import Path
 from typing import ClassVar
 
@@ -96,7 +95,6 @@ class ClientGenerator(abc.ABC):
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
-
     def generate(self, app_spec: Path, output: Path) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
         cmd = [
@@ -125,14 +123,18 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         return _snake_case(contract_name)
 
     def find_valid_generate_command(self, version: str | None) -> list[str]:
-        return self._find_generate_command_at_version(
-            version) if version is not None else self._find_generate_command()
+        return self._find_generate_command_at_version(version) if version is not None else self._find_generate_command()
 
     def _find_generate_command_at_version(self, version: str) -> list[str]:
         """
         Find python generator command with a specific version.
         If the python generator version isn't installed, install it with pipx run.
         """
+        pipx_command = find_valid_pipx_command(
+            "Unable to find pipx install so that the `algokit-client-generator` can be installed; "
+            "please install pipx via https://pypa.github.io/pipx/ "
+            "and then try `algokit generate client ...` again."
+        )
         client_generator_intalation_command = ["pipx", "list"]
         try:
             result = proc.run(client_generator_intalation_command)
@@ -148,11 +150,6 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             pass
         except ValueError:
             pass
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that the `algokit-client-generator` can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit generate client ...` again."
-        )
 
         return [
             *pipx_command,
@@ -190,7 +187,6 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
 
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):
-
     def generate(self, app_spec: Path, output: Path) -> None:
         cmd = [*self.command, "generate", "-a", str(app_spec), "-o", str(output)]
         logger.info(
@@ -208,8 +204,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             raise click.exceptions.Exit(run_result.exit_code)
 
     def find_valid_generate_command(self, version: str | None) -> list[str]:
-        return self._find_generate_command_at_version(
-            version) if version is not None else self._find_generate_command()
+        return self._find_generate_command_at_version(version) if version is not None else self._find_generate_command()
 
     def _find_generate_command_at_version(self, version: str) -> list[str]:
         """
@@ -220,12 +215,14 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         npx_command = get_valid_npx_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
-            "and then try `algokit generate client ...` again.", npx=True
+            "and then try `algokit generate client ...` again.",
+            npx=True,
         )
         npm_command = get_valid_npx_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
-            "and then try `algokit generate client ...` again.", npx=False
+            "and then try `algokit generate client ...` again.",
+            npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:
@@ -261,12 +258,14 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         npx_command = get_valid_npx_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
-            "and then try `algokit generate client ...` again.", npx=True
+            "and then try `algokit generate client ...` again.",
+            npx=True,
         )
         npm_command = get_valid_npx_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
-            "and then try `algokit generate client ...` again.", npx=False
+            "and then try `algokit generate client ...` again.",
+            npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:

@@ -1,1 +1,1 @@
-Error: Typescript generator requires Node.js and npx to be installed.
+Error: Unable to find npx install so that the `algokit-client-generator` can be installed; please install npx via https://www.npmjs.com/package/npx and then try `algokit generate client ...` again.

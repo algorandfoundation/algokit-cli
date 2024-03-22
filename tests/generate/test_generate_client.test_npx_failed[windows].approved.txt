@@ -1,7 +1,10 @@
+DEBUG: Running '/bin/npm list' in '{current_working_directory}'
+DEBUG: /bin/npm: STDOUT
+DEBUG: /bin/npm: STDERR
 Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to client.ts
-DEBUG: Running 'npx.cmd --yes {typed_client_package}@^2.5.0 generate -a {current_working_directory}/application.json -o client.ts' in '{current_working_directory}'
-DEBUG: npx.cmd: STDOUT
-DEBUG: npx.cmd: STDERR
+DEBUG: Running '/bin/npx --yes {typed_client_package}@latest generate -a {current_working_directory}/application.json -o client.ts' in '{current_working_directory}'
+DEBUG: /bin/npx: STDOUT
+DEBUG: /bin/npx: STDERR
 STDOUT
 STDERR
 Client generation failed for {current_working_directory}/application.json.
