@@ -56,21 +56,11 @@ def _find_puyapy_command() -> list[str]:
         "please install pipx via https://pypa.github.io/pipx/ "
         "and then try `algokit compile py ...` again."
     )
-    _install_puya_with_pipx(pipx_command)
-    return ["puyapy"]
-
-
-def _install_puya_with_pipx(pipx_command: list[str]) -> None:
-    run(
-        [
-            *pipx_command,
-            "install",
-            "puya",
-        ],
-        bad_return_code_error_message=(
-            "Unable to install puya via pipx; please install puya manually and try `algokit compile py ...` again."
-        ),
-    )
+    return [
+        *pipx_command,
+        "run",
+        "puya",
+    ]
 
 
 def _get_candidates_puyapy_commands() -> Iterator[list[str]]:
