@@ -114,8 +114,8 @@ def get_candidate_pipx_commands() -> Iterator[list[str]]:
         yield [python_path, "-m", "pipx"]
 
 
-def get_valid_npx_command(error_message: str, npx: bool) -> list[str]:  # noqa: FBT001
-    command = "npx" if npx else "npm"
+def get_valid_npm_command(error_message: str, is_npx: bool) -> list[str]:  # noqa: FBT001
+    command = "npx" if is_npx else "npm"
     path = shutil.which(command)
     if not path:
         raise click.ClickException(error_message)
@@ -129,7 +129,6 @@ def get_valid_npx_command(error_message: str, npx: bool) -> list[str]:  # noqa: 
             try:
                 if not npm_dir.exists():
                     npm_dir.mkdir(parents=True)
-                return [f"{command}.cmd"]
             except OSError as ex:
                 raise click.ClickException(
                     f"Failed to create the `npm` directory in {appdata_dir_path}.\n"
@@ -137,7 +136,8 @@ def get_valid_npx_command(error_message: str, npx: bool) -> list[str]:  # noqa: 
                     "in the above path, otherwise an ENOENT 4058 error will occur.\n"
                     "Please create this directory manually and try again."
                 ) from ex
-    return [path]
+        return [f"{command}.cmd"]
+    return [command]
 
 
 def get_python_paths() -> Iterator[str]:

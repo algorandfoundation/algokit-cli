@@ -5,7 +5,7 @@ DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
 Generating Python client code for application specified in {current_working_directory}/application.json and writing to client.py
-DEBUG: Running 'pipx run algokit-client-generator -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
+DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
 STDOUT

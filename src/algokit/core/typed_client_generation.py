@@ -9,7 +9,7 @@ from typing import ClassVar
 import click
 
 from algokit.core import proc
-from algokit.core.utils import extract_version_triple, find_valid_pipx_command, get_valid_npx_command
+from algokit.core.utils import extract_version_triple, find_valid_pipx_command, get_valid_npm_command
 
 logger = logging.getLogger(__name__)
 
@@ -152,11 +152,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         except ValueError:
             pass
 
-        return [
-            *pipx_command,
-            "run",
-            f"algokit-client-generator=={version}",
-        ]
+        return [*pipx_command, "run", f"--spec=algokit-client-generator=={version}", "algokitgen-py"]
 
     def _find_generate_command(self) -> list[str]:
         """
@@ -183,7 +179,8 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         return [
             *pipx_command,
             "run",
-            "algokit-client-generator",
+            "--spec=algokit-client-generator",
+            "algokitgen-py",
         ]
 
 
@@ -213,17 +210,17 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         If the typescript generator version isn't installed, run it with npx with the given version.
         If the typescript generator version is installed, run it with npx with the given version.
         """
-        npx_command = get_valid_npx_command(
+        npx_command = get_valid_npm_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
-            npx=True,
+            is_npx=True,
         )
-        npm_command = get_valid_npx_command(
+        npm_command = get_valid_npm_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
             "and then try `algokit generate client ...` again.",
-            npx=False,
+            is_npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:
@@ -256,17 +253,17 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         If the typescript generator isn't installed, install the latest version with npx.
         IF it is installed, use whatever version is installed.
         """
-        npx_command = get_valid_npx_command(
+        npx_command = get_valid_npm_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
-            npx=True,
+            is_npx=True,
         )
-        npm_command = get_valid_npx_command(
+        npm_command = get_valid_npm_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
             "and then try `algokit generate client ...` again.",
-            npx=False,
+            is_npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:

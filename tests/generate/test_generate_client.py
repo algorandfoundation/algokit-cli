@@ -31,6 +31,20 @@ def _get_npx_command() -> str:
     return "npx" if not is_windows() else "npx.cmd"
 
 
+def _get_python_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
+    return (
+        f"pipx run --spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''} "
+        f"algokitgen-py -a {application_json} -o {expected_output_path}"
+    )
+
+
+def _get_typescript_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
+    return (
+        f"{_get_npx_command()} --yes {TYPESCRIPT_NPX_PACKAGE}{f'@{version}' if version is not None else ''} "
+        f"generate -a {application_json} -o {expected_output_path}"
+    )
+
+
 @pytest.fixture()
 def cwd(tmp_path_factory: TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
@@ -109,22 +123,22 @@ def test_generate_client_python(
         options=NamerFactory.with_parameters(*options.split()),
     )
     if "--version" in options or "-v" in options:
-        version = "==" + options.split()[-1]
+        version = options.split()[-1]
     else:
-        version = ""
+        version = None
     assert len(proc_mock.called) == 3  # noqa: PLR2004
     assert (
         proc_mock.called[2].command
-        == f"pipx run {PYTHON_PYPI_PACKAGE}{version} -a {application_json} -o {expected_output_path}".split()
+        == _get_python_generate_command(version, application_json, expected_output_path).split()
     )
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_pipx_missing(application_json: Path, which_mock: WhichMock) -> None:
-    which_mock.remove("pipx")
+def test_pipx_missing(application_json: Path, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
     result = invoke(f"generate client -o client.py -l python {application_json.name}", cwd=application_json.parent)
 
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     verify(_normalize_output(result.output))
 
 
@@ -143,10 +157,7 @@ def test_generate_client_python_arc32_filename(
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
 
     assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert (
-        proc_mock.called[2].command
-        == f"pipx run {PYTHON_PYPI_PACKAGE} -a {arc32_json} " f"-o {expected_output_path}".split()
-    )
+    assert proc_mock.called[2].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
 
 
 @pytest.mark.usefixtures("mock_platform_system")
@@ -182,8 +193,7 @@ def test_generate_client_typescript(
     assert len(proc_mock.called) == 2  # noqa: PLR2004
     assert (
         proc_mock.called[1].command
-        == f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE}@{version} generate "
-        f"-a {application_json} -o {expected_output_path}".split()
+        == _get_typescript_generate_command(version, application_json, expected_output_path).split()
     )
 
 
@@ -202,9 +212,7 @@ def test_npx_failed(
     application_json: Path,
     request: pytest.FixtureRequest,
 ) -> None:
-    proc_mock.should_bad_exit_on(
-        f"/bin/npx --yes {TYPESCRIPT_NPX_PACKAGE}@latest " f"generate -a {application_json} -o client.ts"
-    )
+    proc_mock.should_bad_exit_on(_get_typescript_generate_command("latest", application_json, Path("client.ts")))
     result = invoke(f"generate client -o client.ts {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == -1

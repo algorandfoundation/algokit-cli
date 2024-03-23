@@ -1,9 +1,9 @@
-DEBUG: Running '/bin/npm list' in '{current_working_directory}'
-DEBUG: /bin/npm: STDOUT
-DEBUG: /bin/npm: STDERR
+DEBUG: Running 'npm list' in '{current_working_directory}'
+DEBUG: npm: STDOUT
+DEBUG: npm: STDERR
 Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to HelloWorldAppClient.ts
-DEBUG: Running '/bin/npx --yes {typed_client_package}@latest generate -a {current_working_directory}/application.json -o HelloWorldAppClient.ts' in '{current_working_directory}'
-DEBUG: /bin/npx: STDOUT
-DEBUG: /bin/npx: STDERR
+DEBUG: Running 'npx --yes {typed_client_package}@latest generate -a {current_working_directory}/application.json -o HelloWorldAppClient.ts' in '{current_working_directory}'
+DEBUG: npx: STDOUT
+DEBUG: npx: STDERR
 STDOUT
 STDERR
