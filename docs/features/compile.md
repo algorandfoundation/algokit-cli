@@ -6,7 +6,7 @@ When running the compile command, AlgoKit will take care of working out which co
 
 ## Prerequisites
 
-This command dynamically loads the appropriate compiler using [pipx](https://pipx.pypa.io/stable/). As such pipx is required when using this command.
+See [Compile Python - Prerequisites](#prerequisites-1) for details.
 
 ## What is Algorand Python & PuyaPy?
 
@@ -57,6 +57,12 @@ The command `algokit compile python` or `algokit compile py` will run the [PuyaP
 All arguments supplied to the command are passed directly to PuyaPy and as such this command supports all options of the specific PuyaPy compiler version being used.
 
 Any errors detected by PuyaPy during the compilation process will be printed to the output.
+
+#### Prerequisites
+
+PuyaPy requires Python 3.12+, so please ensure your Python version satisfies this requirement.
+
+This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically loaded using [pipx](https://pipx.pypa.io/stable/). In this scenario pipx is also required.
 
 #### Examples
 
