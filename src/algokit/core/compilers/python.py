@@ -33,7 +33,8 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
     return [
         *pipx_command,
         "run",
-        f"puya=={version}",
+        f"--spec=puya=={version}",
+        "puyapy",
     ]
 
 
@@ -59,7 +60,8 @@ def _find_puyapy_command() -> list[str]:
     return [
         *pipx_command,
         "run",
-        "puya",
+        "--spec=puya",
+        "puyapy",
     ]
 
 
