@@ -168,7 +168,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
     def find_generate_command(self, version: str | None) -> list[str]:
         """
-        Find python generator command.
+        Find Python generator command.
         If a matching version is installed at a project level, use that.
         If a matching version is installed at a global level, use that.
         Otherwise, run the matching version via pipx.
@@ -184,9 +184,9 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             "and then try `algokit generate client ...` again."
         )
 
-        project_result = self.find_global_generate_command(pipx_command, version)
-        if project_result is not None:
-            return project_result
+        global_result = self.find_global_generate_command(pipx_command, version)
+        if global_result is not None:
+            return global_result
 
         # when not installed, run via pipx
         return [
@@ -214,92 +214,67 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             )
             raise click.exceptions.Exit(run_result.exit_code)
 
-    def find_generate_command(self, version: str | None) -> list[str]:
-        return self._find_generate_command_at_version(version) if version is not None else self._find_generate_command()
-
-    def _find_generate_command_at_version(self, version: str) -> list[str]:
-        """
-        Find the typescript generator command with a specific version.
-        If the typescript generator version isn't installed, run it with npx with the given version.
-        If the typescript generator version is installed, run it with npx with the given version.
-        """
-        npx_command = get_npm_command(
-            "Unable to find npx install so that the `algokit-client-generator` can be installed; "
-            "please install npx via https://www.npmjs.com/package/npx "
-            "and then try `algokit generate client ...` again.",
-            is_npx=True,
-        )
-        npm_command = get_npm_command(
-            "Unable to find npm install so that the `algokit-client-generator` can be installed; "
-            "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
-            "and then try `algokit generate client ...` again.",
-        )
-        client_generator_installation_command = [*npm_command, "list"]
+    def find_project_generate_command(
+        self, npm_command: list[str], npx_command: list[str], version: str | None
+    ) -> list[str] | None:
         try:
-            result = proc.run(client_generator_installation_command)
+            # TODO: NC - Confirm that we don't need version in this scenario.
+            result = proc.run([*npm_command, "ls"])
             if result.exit_code == 0:
+                generate_command = [*npx_command, TYPESCRIPT_NPM_PACKAGE]
                 for line in result.output.splitlines():
                     if TYPESCRIPT_NPM_PACKAGE in line:
-                        typescript_client_generator_version_result = line
-                        installed_version = extract_version_triple(typescript_client_generator_version_result)
-                        if extract_version_triple(version) == installed_version:
-                            return [
-                                *npx_command,
-                                "--yes",
-                                f"{TYPESCRIPT_NPM_PACKAGE}@{installed_version}",
-                            ]
+                        if version is not None:
+                            installed_version = extract_version_triple(line)
+                            if extract_version_triple(version) == installed_version:
+                                return generate_command
+                        else:
+                            return generate_command
         except OSError:
             pass
         except ValueError:
             pass
 
-        return [
-            *npx_command,
-            "--yes",
-            f"{TYPESCRIPT_NPM_PACKAGE}@{extract_version_triple(version)}",
-        ]
+        return None
 
-    def _find_generate_command(self) -> list[str]:
+    def find_global_generate_command(
+        self, npm_command: list[str], npx_command: list[str], version: str | None
+    ) -> list[str] | None:
+        return self.find_project_generate_command([*npm_command, "--global"], npx_command, version)
+
+    def find_generate_command(self, version: str | None) -> list[str]:
         """
-        Find the typescript generator command.
-        If the typescript generator isn't installed, install the latest version with npx.
-        IF it is installed, use whatever version is installed.
+        Find TypeScript generator command.
+        If a matching version is installed at a project level, use that.
+        If a matching version is installed at a global level, use that.
+        Otherwise, run the matching version via npx.
         """
+
+        npm_command = get_npm_command(
+            "Unable to find npm install so that the `algokit-client-generator` can be installed; "
+            "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
+            "and then try `algokit generate client ...` again.",
+        )
         npx_command = get_npm_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
             is_npx=True,
         )
-        npm_command = get_npm_command(
-            "Unable to find npm install so that the `algokit-client-generator` can be installed; "
-            "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
-            "and then try `algokit generate client ...` again.",
-        )
-        client_generator_installation_command = [*npm_command, "list"]
-        try:
-            result = proc.run(client_generator_installation_command)
-            typescript_client_generator_version_result = ""
-            if result.exit_code == 0:
-                for line in result.output.splitlines():
-                    if TYPESCRIPT_NPM_PACKAGE in line:
-                        typescript_client_generator_version_result = line
-                        break
 
-        except OSError:
-            pass
-        else:
-            if typescript_client_generator_version_result != "":
-                return [
-                    *npx_command,
-                    "--yes",
-                    f"{TYPESCRIPT_NPM_PACKAGE}@{extract_version_triple(typescript_client_generator_version_result)}",
-                ]
+        project_result = self.find_project_generate_command(npm_command, npx_command, version)
+        if project_result is not None:
+            return project_result
 
+        global_result = self.find_global_generate_command(npm_command, npx_command, version)
+        if global_result is not None:
+            return global_result
+
+        # when not installed, run via npx
         return [
             *npx_command,
             "--yes",
-            f"{TYPESCRIPT_NPM_PACKAGE}@latest",
+            f"{TYPESCRIPT_NPM_PACKAGE}@{version if version is not None else 'latest'}",
         ]
 
     @property

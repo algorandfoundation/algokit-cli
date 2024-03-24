@@ -1,4 +1,7 @@
-DEBUG: Running 'npm.cmd list' in '{current_working_directory}'
+DEBUG: Running 'npm.cmd ls' in '{current_working_directory}'
+DEBUG: npm.cmd: STDOUT
+DEBUG: npm.cmd: STDERR
+DEBUG: Running 'npm.cmd --global ls' in '{current_working_directory}'
 DEBUG: npm.cmd: STDOUT
 DEBUG: npm.cmd: STDERR
 Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to HelloWorldAppClient.ts

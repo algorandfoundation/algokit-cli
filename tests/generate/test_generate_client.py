@@ -31,6 +31,10 @@ def _get_npx_command() -> str:
     return "npx" if not is_windows() else "npx.cmd"
 
 
+def _get_npm_command() -> str:
+    return "npm" if not is_windows() else "npm.cmd"
+
+
 def _get_python_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
     return (
         f"pipx run --spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''} "
@@ -40,7 +44,7 @@ def _get_python_generate_command(version: str | None, application_json: Path, ex
 
 def _get_typescript_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
     return (
-        f"{_get_npx_command()} --yes {TYPESCRIPT_NPM_PACKAGE}{f'@{version}' if version is not None else ''} "
+        f"{_get_npx_command()} --yes {TYPESCRIPT_NPM_PACKAGE}{f'@{version}' if version is not None else 'latest'} "
         f"generate -a {application_json} -o {expected_output_path}"
     )
 
@@ -181,7 +185,12 @@ def test_generate_client_typescript(
     expected_output_path: Path,
     request: pytest.FixtureRequest,
 ) -> None:
+    npm_command = _get_npm_command()
+    proc_mock.should_bad_exit_on([npm_command, "ls"])
+    proc_mock.should_bad_exit_on([npm_command, "ls", "--global"])
+
     result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
+
     assert result.exit_code == 0
     verify(
         _normalize_output(result.output),
@@ -189,9 +198,9 @@ def test_generate_client_typescript(
         options=NamerFactory.with_parameters(*options.split()),
     )
     version = options.split()[-1] if "--version" in options or "-v" in options else "latest"
-    assert len(proc_mock.called) == 2  # noqa: PLR2004
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
     assert (
-        proc_mock.called[1].command
+        proc_mock.called[2].command
         == _get_typescript_generate_command(version, application_json, expected_output_path).split()
     )
 
