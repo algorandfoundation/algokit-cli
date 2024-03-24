@@ -6,7 +6,7 @@ import pytest
 from _pytest.tmpdir import TempPathFactory
 from algokit.core.typed_client_generation import (
     PYTHON_PYPI_PACKAGE,
-    TYPESCRIPT_NPX_PACKAGE,
+    TYPESCRIPT_NPM_PACKAGE,
     _snake_case,
 )
 from algokit.core.utils import is_windows
@@ -24,7 +24,7 @@ DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "latest"
 
 
 def _normalize_output(output: str) -> str:
-    return output.replace("\\", "/").replace(TYPESCRIPT_NPX_PACKAGE, "{typed_client_package}")
+    return output.replace("\\", "/").replace(TYPESCRIPT_NPM_PACKAGE, "{typed_client_package}")
 
 
 def _get_npx_command() -> str:
@@ -40,7 +40,7 @@ def _get_python_generate_command(version: str | None, application_json: Path, ex
 
 def _get_typescript_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
     return (
-        f"{_get_npx_command()} --yes {TYPESCRIPT_NPX_PACKAGE}{f'@{version}' if version is not None else ''} "
+        f"{_get_npx_command()} --yes {TYPESCRIPT_NPM_PACKAGE}{f'@{version}' if version is not None else ''} "
         f"generate -a {application_json} -o {expected_output_path}"
     )
 
@@ -114,27 +114,27 @@ def test_generate_client_python(
     expected_output_path: Path,
     request: pytest.FixtureRequest,
 ) -> None:
-    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
+    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
 
+    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
     assert result.exit_code == 0
     verify(
         _normalize_output(result.output),
         namer=PyTestNamer(request),
         options=NamerFactory.with_parameters(*options.split()),
     )
-    if "--version" in options or "-v" in options:
-        version = options.split()[-1]
-    else:
-        version = None
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
+    version = options.split()[-1] if "--version" in options or "-v" in options else None
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
     assert (
-        proc_mock.called[2].command
+        proc_mock.called[3].command
         == _get_python_generate_command(version, application_json, expected_output_path).split()
     )
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_pipx_missing(application_json: Path, mocker: MockerFixture) -> None:
+def test_pipx_missing(application_json: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
     result = invoke(f"generate client -o client.py -l python {application_json.name}", cwd=application_json.parent)
 
@@ -151,13 +151,15 @@ def test_pipx_missing(application_json: Path, mocker: MockerFixture) -> None:
 def test_generate_client_python_arc32_filename(
     proc_mock: ProcMock, arc32_json: Path, options: str, expected_output_path: Path
 ) -> None:
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
+    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+
     result = invoke(f"generate client {options} {arc32_json.name}", cwd=arc32_json.parent)
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert proc_mock.called[2].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
 
 
 @pytest.mark.usefixtures("mock_platform_system")
@@ -186,10 +188,7 @@ def test_generate_client_typescript(
         namer=PyTestNamer(request),
         options=NamerFactory.with_parameters(*options.split()),
     )
-    if "--version" in options or "-v" in options:
-        version = options.split()[-1]
-    else:
-        version = "latest"
+    version = options.split()[-1] if "--version" in options or "-v" in options else "latest"
     assert len(proc_mock.called) == 2  # noqa: PLR2004
     assert (
         proc_mock.called[1].command

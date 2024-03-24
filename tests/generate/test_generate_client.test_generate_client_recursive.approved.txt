@@ -1,24 +1,21 @@
-DEBUG: Running 'pipx list' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
-DEBUG: Running 'pipx --version' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 Generating Python client code for application specified in {current_working_directory}/dir1/application.json and writing to {current_working_directory}/dir1/output.py
-DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/dir1/application.json -o {current_working_directory}/dir1/output.py' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: Running 'poetry run algokitgen-py -a {current_working_directory}/dir1/application.json -o {current_working_directory}/dir1/output.py' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 STDOUT
 STDERR
 Generating Python client code for application specified in {current_working_directory}/dir2/application.json and writing to {current_working_directory}/dir2/output.py
-DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/dir2/application.json -o {current_working_directory}/dir2/output.py' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: Running 'poetry run algokitgen-py -a {current_working_directory}/dir2/application.json -o {current_working_directory}/dir2/output.py' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 STDOUT
 STDERR
 Generating Python client code for application specified in {current_working_directory}/dir2/sub_dir/application.json and writing to {current_working_directory}/dir2/sub_dir/output.py
-DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/dir2/sub_dir/application.json -o {current_working_directory}/dir2/sub_dir/output.py' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: Running 'poetry run algokitgen-py -a {current_working_directory}/dir2/sub_dir/application.json -o {current_working_directory}/dir2/sub_dir/output.py' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 STDOUT
 STDERR

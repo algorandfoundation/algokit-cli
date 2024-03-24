@@ -9,12 +9,14 @@ from typing import ClassVar
 import click
 
 from algokit.core import proc
-from algokit.core.utils import extract_version_triple, find_valid_pipx_command, get_valid_npm_command
+from algokit.core.utils import extract_version_triple, find_valid_pipx_command, get_npm_command
 
 logger = logging.getLogger(__name__)
 
-TYPESCRIPT_NPX_PACKAGE = "@algorandfoundation/algokit-client-generator"
+TYPESCRIPT_NPM_PACKAGE = "@algorandfoundation/algokit-client-generator"
+TYPESCRIPT_GENERATE_COMMAND = "algokitgen-ts"
 PYTHON_PYPI_PACKAGE = "algokit-client-generator"
+PYTHON_GENERATE_COMMAND = "algokitgen-py"
 
 
 def _snake_case(s: str) -> str:
@@ -33,7 +35,7 @@ class ClientGenerator(abc.ABC):
     _by_extension: ClassVar[dict[str, type["ClientGenerator"]]] = {}
 
     def __init__(self, version: str | None) -> None:
-        self.command = self.find_valid_generate_command(version)
+        self.command = self.find_generate_command(version)
 
     def __init_subclass__(cls, language: str, extension: str) -> None:
         cls.language = language
@@ -47,11 +49,11 @@ class ClientGenerator(abc.ABC):
 
     @classmethod
     def create_for_language(cls, language: str, version: str | None) -> "ClientGenerator":
-        return cls._by_language[language](version=version)
+        return cls._by_language[language](version)
 
     @classmethod
     def create_for_extension(cls, extension: str, version: str | None) -> "ClientGenerator":
-        return cls._by_extension[extension](version=version)
+        return cls._by_extension[extension](version)
 
     def resolve_output_path(self, app_spec: Path, output_path_pattern: str | None) -> Path | None:
         try:
@@ -80,15 +82,7 @@ class ClientGenerator(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def find_valid_generate_command(self, version: str | None) -> list[str]:
-        ...
-
-    @abc.abstractmethod
-    def _find_generate_command_at_version(self, version: str) -> list[str]:
-        ...
-
-    @abc.abstractmethod
-    def _find_generate_command(self) -> list[str]:
+    def find_generate_command(self, version: str | None) -> list[str]:
         ...
 
     def format_contract_name(self, contract_name: str) -> str:
@@ -123,64 +117,83 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
     def format_contract_name(self, contract_name: str) -> str:
         return _snake_case(contract_name)
 
-    def find_valid_generate_command(self, version: str | None) -> list[str]:
-        return self._find_generate_command_at_version(version) if version is not None else self._find_generate_command()
-
-    def _find_generate_command_at_version(self, version: str) -> list[str]:
+    def find_project_generate_command(self, version: str | None) -> list[str] | None:
         """
-        Find python generator command with a specific version.
-        If the python generator version isn't installed, install it with pipx run.
+        Try find the generate command in the project.
         """
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that the `algokit-client-generator` can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit generate client ...` again."
-        )
-        client_generator_intalation_command = ["pipx", "list"]
         try:
-            result = proc.run(client_generator_intalation_command)
+            # Use the tree output as it puts the package info on the first line of the output
+            result = proc.run(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
             if result.exit_code == 0:
-                installed_version = None
-                for line in result.output.splitlines():
-                    if PYTHON_PYPI_PACKAGE in line:
-                        installed_version = extract_version_triple(line)
-                        break
-                if extract_version_triple(version) == installed_version:
-                    return ["algokitgen-py"]
+                generate_command = ["poetry", "run", PYTHON_GENERATE_COMMAND]
+                if version is not None:
+                    installed_version = None
+                    lines = result.output.splitlines()
+                    if len(lines) > 0:
+                        installed_version = extract_version_triple(lines[0])
+                        if extract_version_triple(version) == installed_version:
+                            return generate_command
+                else:
+                    return generate_command
         except OSError:
             pass
         except ValueError:
             pass
 
-        return [*pipx_command, "run", f"--spec=algokit-client-generator=={version}", "algokitgen-py"]
+        return None
 
-    def _find_generate_command(self) -> list[str]:
+    def find_global_generate_command(self, pipx_command: list[str], version: str | None) -> list[str] | None:
         """
-        Find python generator command.
-        If python generator isn't installed, install the latest version with pipx.
-        If it is installed, use whatever version is installed.
+        Try find the generate command installed globally.
         """
-        client_generator_intalation_command = ["pipx", "list"]
         try:
-            result = proc.run(client_generator_intalation_command)
+            result = proc.run([*pipx_command, "list", "--short"])
             if result.exit_code == 0:
+                generate_command = [PYTHON_GENERATE_COMMAND]
                 for line in result.output.splitlines():
                     if PYTHON_PYPI_PACKAGE in line:
-                        return ["algokitgen-py"]
-
+                        if version is not None:
+                            installed_version = None
+                            installed_version = extract_version_triple(line)
+                            if extract_version_triple(version) == installed_version:
+                                return generate_command
+                        else:
+                            return generate_command
         except OSError:
             pass
+        except ValueError:
+            pass
+
+        return None
+
+    def find_generate_command(self, version: str | None) -> list[str]:
+        """
+        Find python generator command.
+        If a matching version is installed at a project level, use that.
+        If a matching version is installed at a global level, use that.
+        Otherwise, run the matching version via pipx.
+        """
+
+        project_result = self.find_project_generate_command(version)
+        if project_result is not None:
+            return project_result
 
         pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that the `algokit-client-generator` can be installed; "
+            f"Unable to find pipx install so that the `{PYTHON_PYPI_PACKAGE}` can be installed; "
             "please install pipx via https://pypa.github.io/pipx/ "
             "and then try `algokit generate client ...` again."
         )
+
+        project_result = self.find_global_generate_command(pipx_command, version)
+        if project_result is not None:
+            return project_result
+
+        # when not installed, run via pipx
         return [
             *pipx_command,
             "run",
-            "--spec=algokit-client-generator",
-            "algokitgen-py",
+            f"--spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''}",
+            PYTHON_GENERATE_COMMAND,
         ]
 
 
@@ -201,7 +214,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             )
             raise click.exceptions.Exit(run_result.exit_code)
 
-    def find_valid_generate_command(self, version: str | None) -> list[str]:
+    def find_generate_command(self, version: str | None) -> list[str]:
         return self._find_generate_command_at_version(version) if version is not None else self._find_generate_command()
 
     def _find_generate_command_at_version(self, version: str) -> list[str]:
@@ -210,31 +223,30 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         If the typescript generator version isn't installed, run it with npx with the given version.
         If the typescript generator version is installed, run it with npx with the given version.
         """
-        npx_command = get_valid_npm_command(
+        npx_command = get_npm_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
             is_npx=True,
         )
-        npm_command = get_valid_npm_command(
+        npm_command = get_npm_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
             "and then try `algokit generate client ...` again.",
-            is_npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:
             result = proc.run(client_generator_installation_command)
             if result.exit_code == 0:
                 for line in result.output.splitlines():
-                    if TYPESCRIPT_NPX_PACKAGE in line:
+                    if TYPESCRIPT_NPM_PACKAGE in line:
                         typescript_client_generator_version_result = line
                         installed_version = extract_version_triple(typescript_client_generator_version_result)
                         if extract_version_triple(version) == installed_version:
                             return [
                                 *npx_command,
                                 "--yes",
-                                f"{TYPESCRIPT_NPX_PACKAGE}@{installed_version}",
+                                f"{TYPESCRIPT_NPM_PACKAGE}@{installed_version}",
                             ]
         except OSError:
             pass
@@ -244,7 +256,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         return [
             *npx_command,
             "--yes",
-            f"{TYPESCRIPT_NPX_PACKAGE}@{extract_version_triple(version)}",
+            f"{TYPESCRIPT_NPM_PACKAGE}@{extract_version_triple(version)}",
         ]
 
     def _find_generate_command(self) -> list[str]:
@@ -253,17 +265,16 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         If the typescript generator isn't installed, install the latest version with npx.
         IF it is installed, use whatever version is installed.
         """
-        npx_command = get_valid_npm_command(
+        npx_command = get_npm_command(
             "Unable to find npx install so that the `algokit-client-generator` can be installed; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
             is_npx=True,
         )
-        npm_command = get_valid_npm_command(
+        npm_command = get_npm_command(
             "Unable to find npm install so that the `algokit-client-generator` can be installed; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
             "and then try `algokit generate client ...` again.",
-            is_npx=False,
         )
         client_generator_installation_command = [*npm_command, "list"]
         try:
@@ -271,7 +282,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             typescript_client_generator_version_result = ""
             if result.exit_code == 0:
                 for line in result.output.splitlines():
-                    if TYPESCRIPT_NPX_PACKAGE in line:
+                    if TYPESCRIPT_NPM_PACKAGE in line:
                         typescript_client_generator_version_result = line
                         break
 
@@ -282,13 +293,13 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 return [
                     *npx_command,
                     "--yes",
-                    f"{TYPESCRIPT_NPX_PACKAGE}@{extract_version_triple(typescript_client_generator_version_result)}",
+                    f"{TYPESCRIPT_NPM_PACKAGE}@{extract_version_triple(typescript_client_generator_version_result)}",
                 ]
 
         return [
             *npx_command,
             "--yes",
-            f"{TYPESCRIPT_NPX_PACKAGE}@latest",
+            f"{TYPESCRIPT_NPM_PACKAGE}@latest",
         ]
 
     @property

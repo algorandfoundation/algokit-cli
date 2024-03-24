@@ -1,4 +1,4 @@
-DEBUG: Running 'pipx list' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 Error: Unable to find pipx install so that the `algokit-client-generator` can be installed; please install pipx via https://pypa.github.io/pipx/ and then try `algokit generate client ...` again.
