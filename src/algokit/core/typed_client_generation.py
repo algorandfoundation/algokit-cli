@@ -2,7 +2,6 @@ import abc
 import json
 import logging
 import re
-import shutil  # noqa: F401
 from pathlib import Path
 from typing import ClassVar
 

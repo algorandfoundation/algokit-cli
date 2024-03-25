@@ -554,7 +554,7 @@ Programming language of the generated client code
 
 
 ### -v, --version <version>
-Version of the client code to generate, if not specified, the latest version will be used
+The client generator version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. If the client generator is not installed, AlgoKit runs the latest version. If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
 
 ### Arguments
 

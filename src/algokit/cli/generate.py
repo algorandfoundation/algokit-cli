@@ -130,7 +130,11 @@ def generate_group() -> None:
     "-v",
     "version",
     default=None,
-    help="Version of the client code to generate, if not specified, the latest version will be used",
+    help="The client generator version to pin to, for example, 1.0.0. "
+    "If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. "
+    "If the client generator is not installed, AlgoKit runs the latest version. "
+    "If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. "
+    "Otherwise, AlgoKit runs the specified version.",
 )
 def generate_client(
     output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None
