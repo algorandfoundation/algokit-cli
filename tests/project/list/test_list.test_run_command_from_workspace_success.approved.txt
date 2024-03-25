@@ -1,0 +1,21 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+ℹ️  project1
+ℹ️  project2
+ℹ️  project3
+ℹ️  project4
+ℹ️  project5
+ℹ️  project6
+ℹ️  project7
+ℹ️  project8
+ℹ️  project9
+ℹ️  project10
+ℹ️  project11
+ℹ️  project12
+ℹ️  project13
+ℹ️  project14
+ℹ️  project15
+ℹ️  project16
+ℹ️  project17
+ℹ️  project18
+ℹ️  project19
+ℹ️  project20

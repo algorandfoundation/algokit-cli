@@ -1,0 +1,9 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+Using deploy command: <sys.executable> -c print(' test_command_invocation ')
+Loading deployment environment variables...
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running '<sys.executable> -c print(' test_command_invocation ')' in '{current_working_directory}'
+<sys.executable>: test_command_invocation

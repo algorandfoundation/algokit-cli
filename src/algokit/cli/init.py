@@ -12,14 +12,20 @@ import prompt_toolkit.document
 import questionary
 
 from algokit.core import proc, questionary_extensions
-from algokit.core.bootstrap import (
+from algokit.core.conf import get_algokit_config
+from algokit.core.init import (
+    append_project_to_vscode_workspace,
+    get_git_user_info,
+    is_valid_project_dir_name,
+    resolve_vscode_workspace_file,
+)
+from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
+from algokit.core.project import ProjectType, get_workspace_project_path
+from algokit.core.project.bootstrap import (
     MAX_BOOTSTRAP_DEPTH,
     bootstrap_any_including_subdirs,
     project_minimum_algokit_version_check,
 )
-from algokit.core.conf import get_algokit_config
-from algokit.core.init import ProjectType, get_git_user_info, is_valid_project_dir_name
-from algokit.core.log_handlers import EXTRA_EXCLUDE_FROM_CONSOLE
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
 from algokit.core.utils import get_python_paths
 
@@ -77,7 +83,7 @@ class TemplateKey(str, Enum):
     """
 
     BASE = "base"
-    PUYA = "puya"
+    PUYA = "python"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
@@ -123,26 +129,32 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
+            branch="feat/orchestration",
         ),
         TemplateKey.PUYA: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-puya-template",
+            url="gh:algorandfoundation/algokit-python-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
+            branch="feat/orchestration",
         ),
         TemplateKey.REACT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
+            branch="feat/orchestration",
         ),
         TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
+            branch="feat/orchestration",
         ),
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Official template for starter or production Beaker applications.",
+            branch="feat/orchestration",
         ),
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
+            branch="feat/orchestration",
         ),
         TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
@@ -158,7 +170,7 @@ _unofficial_template_warning = (
 )
 
 
-def validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
+def _validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
     if value is not None and not is_valid_project_dir_name(value):
         raise click.BadParameter(
             "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
@@ -169,6 +181,19 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     return value
 
 
+def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Path, use_workspace: bool) -> None:
+    if not workspace_path:
+        return
+
+    if use_workspace and workspace_path != project_path.parent:
+        logger.error(
+            "Error: Workspace nesting detected. Please run 'init' from the workspace root: "
+            f"'{workspace_path}'. For more info, refer to "
+            "https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md"
+        )
+        _fail_and_bail()
+
+
 @click.command("init", short_help="Initializes a new project from a template; run from project parent directory.")
 @click.option(
     "directory_name",
@@ -176,7 +201,7 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "-n",
     type=str,
     help="Name of the project / directory / repository to create.",
-    callback=validate_dir_name,
+    callback=_validate_dir_name,
 )
 @click.option(
     "template_name",
@@ -236,7 +261,11 @@ def validate_dir_name(context: click.Context, param: click.Parameter, value: str
     "--workspace/--no-workspace",
     is_flag=True,
     default=True,
-    help="Whether to prefer structuring standalone projects as part of a workspace.",
+    help=(
+        "Whether to prefer structuring standalone projects as part of a workspace. "
+        "An AlgoKit workspace is a conventional project structure that allows managing "
+        "multiple standalone projects in a monorepo."
+    ),
 )
 @click.option(
     "answers",
@@ -305,11 +334,14 @@ def init_command(  # noqa: PLR0913
 
     # allow skipping prompt if the template is the base template to avoid redundant
     # 're-using existing directory' warning in fullstack template init
-    root_project_path = _get_project_path(
+    project_path = _get_project_path(
         directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
     )
-    logger.debug(f"project path = {root_project_path}")
-    directory_name = root_project_path.name
+    workspace_path = get_workspace_project_path(project_path)
+    _prevent_workspace_nesting(workspace_path=workspace_path, project_path=project_path, use_workspace=use_workspace)
+
+    logger.debug(f"project path = {project_path}")
+    directory_name = project_path.name
     # provide the directory name as an answer to the template, if not explicitly overridden by user
     answers_dict.setdefault("project_name", directory_name)
 
@@ -320,8 +352,9 @@ def init_command(  # noqa: PLR0913
         answers_dict.setdefault("python_path", "no_system_python_available")
 
     project_path = _resolve_workspace_project_path(
-        template_source=template, project_path=root_project_path, use_workspace=use_workspace
+        template_source=template, project_path=project_path, use_workspace=use_workspace
     )
+    answers_dict.setdefault("use_workspace", "yes" if use_workspace else "no")
 
     logger.info(f"Starting template copy and render at {project_path}...")
     # copier is lazy imported for two reasons
@@ -349,13 +382,12 @@ def init_command(  # noqa: PLR0913
 
     logger.info("Template render complete!")
 
-    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
+    # reload workspace path cause it might have been just introduced with new project instance
+    workspace_path = get_workspace_project_path(project_path)
 
-    _maybe_git_init(
-        root_project_path,
-        use_git=use_git,
-        commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
-    )
+    _maybe_move_github_folder(project_path=project_path, use_workspace=use_workspace)
+
+    _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
     logger.info(
         f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
@@ -370,19 +402,30 @@ def init_command(  # noqa: PLR0913
     readme_path = next(project_path.glob("README*"), None)
 
     # Check if a .workspace file exists
-    workspace_file = next(project_path.glob("*.code-workspace"), None)
+    vscode_workspace_file = resolve_vscode_workspace_file(workspace_path or project_path)
 
-    if open_ide and (project_path / ".vscode").is_dir() and (code_cmd := shutil.which("code")):
-        target_path = str(project_path)
+    if vscode_workspace_file:
+        append_project_to_vscode_workspace(project_path=project_path, workspace_path=vscode_workspace_file)
+
+    # Below must be ensured to run after all required filesystem changes are applied to ensure first commit captures
+    # all the changes introduced by init invocation
+    _maybe_git_init(
+        workspace_path or project_path,
+        use_git=use_git,
+        commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
+    )
+
+    if (
+        open_ide
+        and ((project_path / ".vscode").is_dir() or vscode_workspace_file)
+        and (code_cmd := shutil.which("code"))
+    ):
+        target_path = str(vscode_workspace_file if vscode_workspace_file else project_path)
 
         logger.info(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-
-        if workspace_file:
-            logger.info(f"Detected VSCode workspace file. Opening workspace: {workspace_file}")
-            target_path = str(workspace_file)
 
         code_cmd_and_args = [code_cmd, target_path]
 
@@ -425,6 +468,52 @@ def _maybe_bootstrap(
 def _maybe_git_init(project_path: Path, *, use_git: bool | None, commit_message: str) -> None:
     if _should_attempt_git_init(use_git_option=use_git, project_path=project_path):
         _git_init(project_path, commit_message=commit_message)
+
+
+def _maybe_move_github_folder(*, project_path: Path, use_workspace: bool) -> None:
+    """Move contents of .github folder from project_path to the root of the workspace if exists
+    and the workspace is used.
+
+    Args:
+        project_path: The path to the project directory.
+        use_workspace: A flag to indicate if the project is initialized with workspace flag
+    """
+
+    source_dir = project_path / ".github"
+
+    if (
+        not use_workspace
+        or not source_dir.exists()
+        or not (workspace_root := get_workspace_project_path(project_path.parent))
+    ):
+        return
+
+    target_dir = workspace_root / ".github"
+
+    for source_file in source_dir.rglob("*"):
+        if source_file.is_file():
+            target_file = target_dir / source_file.relative_to(source_dir)
+
+            if target_file.exists():
+                logger.debug(f"Skipping move of {source_file.name} to {target_file} (duplicate exists)")
+                continue
+
+            try:
+                target_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(source_file), str(target_file))
+            except shutil.Error as e:
+                logger.debug(f"Skipping move of {source_file} to {target_file}: {e}")
+
+    if any(p.is_file() for p in source_dir.rglob("*")):
+        click.secho(
+            "Failed to move all files within your project's .github folder to the workspace root. "
+            "Please review any files that remain in your project's .github folder and manually include "
+            "in the root .github directory as required.",
+            fg="yellow",
+        )
+    else:
+        shutil.rmtree(source_dir)
+        logger.debug(f"No files found in .github folder after merge. Removing `.github` directory at {source_dir}...")
 
 
 def _fail_and_bail() -> NoReturn:
@@ -649,18 +738,20 @@ def _resolve_workspace_project_path(
     *, template_source: TemplateSource, project_path: Path, use_workspace: bool = True
 ) -> Path:
     blessed_template = _get_blessed_templates()
+
+    # If its already a Base template, do not modify project path
     if template_source == blessed_template[TemplateKey.BASE]:
         return project_path
 
     cwd = Path.cwd()
     is_standalone = template_source != blessed_template[TemplateKey.FULLSTACK]
-    config = get_algokit_config(cwd)
+    config = get_algokit_config(project_dir=cwd)
 
     # 1. If standalone project (not fullstack) and use_workspace is True, bootstrap algokit-base-template
     if config is None and is_standalone and use_workspace:
-        _instantiate_base_template(project_path)
+        _init_base_template(target_path=project_path, is_blessed=template_source in blessed_template.values())
 
-        config = get_algokit_config(project_path)
+        config = get_algokit_config(project_dir=project_path)
         if not config:
             logger.error("Failed to instantiate workspace structure for standalone project")
             _fail_and_bail()
@@ -688,16 +779,25 @@ def _resolve_workspace_project_path(
     return project_path
 
 
-def _instantiate_base_template(target_path: Path) -> None:
+def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
     """
     Instantiate the base template for a standalone project.
     Sets up the common workspace structure for standalone projects.
+
+    Args:
+        target_path: The path to the project directory.
+        is_blessed: Whether the template is a blessed template.
     """
 
     # Instantiate the base template
     blessed_templates = _get_blessed_templates()
     base_template = blessed_templates[TemplateKey.BASE]
-    base_template_answers = {"use_default_readme": "yes", "project_name": target_path.name}
+    base_template_answers = {
+        "use_default_readme": "yes",
+        "project_name": target_path.name,
+        "projects_root_path": "projects",
+        "include_github_workflow_template": not is_blessed,
+    }
     from copier.main import Worker
 
     with Worker(
@@ -705,7 +805,7 @@ def _instantiate_base_template(target_path: Path) -> None:
         dst_path=target_path,
         data=base_template_answers,
         quiet=True,
-        vcs_ref=base_template.commit,
+        vcs_ref=base_template.branch or base_template.commit,
         unsafe=True,
     ) as copier_worker:
         copier_worker.run_copy()

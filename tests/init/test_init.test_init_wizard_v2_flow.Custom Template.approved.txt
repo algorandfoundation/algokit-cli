@@ -24,16 +24,27 @@ Valid examples:
 
 ? Custom template URL: 
 DEBUG: template source = gh:robdmoore/copier-helloworld
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/myapp/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Workspace structure is ready! The project is to be placed under {current_working_directory}/myapp/projects/myapp
 Starting template copy and render at {current_working_directory}/myapp/projects/myapp...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = https://github.com/robdmoore/copier-helloworld.git
 Template render complete!
-DEBUG: Attempting to load project config from {current_working_directory}/myapp/projects/myapp/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/myapp/projects/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐

@@ -1,0 +1,7 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+Error: Failed to resolve command path, 'gm' wasn't found

@@ -1,22 +1,28 @@
 import codecs
 import platform
 import re
+import shutil
 import socket
 import sys
 import threading
 import time
 from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
+from os import environ
 from pathlib import Path
 from shutil import which
 from typing import Any
 
 import click
+import dotenv
 
 from algokit.core import proc
 
 CLEAR_LINE = "\033[K"
 SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+# From _WIN_DEFAULT_PATHEXT from shutils
+WIN_DEFAULT_PATHEXT = ".COM;.EXE;.BAT;.CMD;.VBS;.JS;.WS;.MSC"
 
 
 def extract_version_triple(version_str: str) -> str:
@@ -60,12 +66,14 @@ def animate(name: str, stop_event: threading.Event) -> None:
             except Exception:
                 text = frame
             output = f"\r{text} {name}"
-            sys.stdout.write(output)
-            sys.stdout.write(CLEAR_LINE)
-            sys.stdout.flush()
+            sys.stdout.buffer.write(output.encode("utf-8"))
+            sys.stdout.buffer.write(CLEAR_LINE.encode("utf-8"))
+            sys.stdout.buffer.flush()
             time.sleep(0.001 * spinner["interval"])  # type: ignore  # noqa: PGH003
 
-    sys.stdout.write("\r ")
+    sys.stdout.buffer.write(b"\r")
+    sys.stdout.buffer.write(b"\n")
+    sys.stdout.buffer.flush()
 
 
 def run_with_animation(
@@ -161,3 +169,83 @@ def is_binary_mode() -> bool:
 
 def is_windows() -> bool:
     return platform.system() == "Windows"
+
+
+def split_command_string(command: str) -> list[str]:
+    """
+    Parses a command string into a list of arguments, handling both shell and non-shell commands
+    """
+
+    if platform.system() == "Windows":
+        import mslex
+
+        return mslex.split(command)
+    else:
+        import shlex
+
+        return shlex.split(command)
+
+
+def resolve_command_path(
+    command: list[str],
+) -> list[str]:
+    """
+    Encapsulates custom command resolution, promotes reusability
+
+    Args:
+        command (list[str]): The command to resolve
+        allow_chained_commands (bool): Whether to allow chained commands (e.g. "&&" or "||")
+
+    Returns:
+        list[str]: The resolved command
+    """
+
+    cmd, *args = command
+
+    # No resolution needed if the command already has a path or is not Windows-specific
+    if Path(cmd).name != cmd:
+        return command
+
+    # Windows-specific handling if 'shutil.which' fails:
+    if is_windows():
+        for ext in environ.get("PATHEXT", WIN_DEFAULT_PATHEXT).split(";"):
+            potential_path = shutil.which(cmd + ext)
+            if potential_path:
+                return [potential_path, *args]
+
+    # If resolves directly, return
+    if resolved_cmd := shutil.which(cmd):
+        return [resolved_cmd, *args]
+
+    # Command not found with any extension
+    raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
+
+
+def load_env_file(path: Path) -> dict[str, str | None]:
+    """Load the general .env configuration.
+
+    Args:
+        path (Path): Path to the .env file or directory containing the .env file.
+
+    Returns:
+        dict[str, str | None]: Dictionary with .env configurations.
+    """
+
+    # Check if the path is a file, if yes, use it directly
+    if path.is_file():
+        env_path = path
+    else:
+        # Assume the default .env file name in the given directory
+        env_path = path / ".env"
+
+    if env_path.exists():
+        return dotenv.dotenv_values(env_path, verbose=True)
+    return {}
+
+
+def alphanumeric_sort_key(s: str) -> list[int | str]:
+    """
+    Generate a key for sorting strings that contain both text and numbers.
+    For instance, ensures that "name_digit_1" comes before "name_digit_2".
+    """
+    return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]
