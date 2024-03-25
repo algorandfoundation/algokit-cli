@@ -56,6 +56,7 @@
     - [Options](#options-9)
     - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
+    - [-v, --version ](#-v---version--1)
     - [Arguments](#arguments-4)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
@@ -517,6 +518,10 @@ Programming language of the generated client code
 
     python | typescript
 
+
+
+### -v, --version <version>
+The client generator version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. If the client generator is not installed, AlgoKit runs the latest version. If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
 
 ### Arguments
 

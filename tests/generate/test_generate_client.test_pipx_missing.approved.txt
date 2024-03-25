@@ -2,4 +2,4 @@ DEBUG: Searching for project installed client generator
 DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
 DEBUG: poetry: STDERR
-Error: No app specs found
+Error: Unable to find pipx install so that the `algokit-client-generator` can be run; please install pipx via https://pypa.github.io/pipx/ and then try `algokit generate client ...` again.

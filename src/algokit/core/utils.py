@@ -1,4 +1,5 @@
 import codecs
+import os
 import platform
 import re
 import shutil
@@ -118,6 +119,32 @@ def get_candidate_pipx_commands() -> Iterator[list[str]]:
     # this won't work if pipx is installed in its own venv but worth a shot
     for python_path in get_python_paths():
         yield [python_path, "-m", "pipx"]
+
+
+def get_npm_command(error_message: str, *, is_npx: bool = False) -> list[str]:
+    command = "npx" if is_npx else "npm"
+    path = shutil.which(command)
+    if not path:
+        raise click.ClickException(error_message)
+        # Create the npm directory inside %APPDATA% if it doesn't exist, as npx on windows needs this.
+        # See https://github.com/npm/cli/issues/7089 for more details.
+    if is_windows():
+        appdata_dir = os.getenv("APPDATA")
+        if appdata_dir is not None:
+            appdata_dir_path = Path(appdata_dir).expanduser()
+            npm_dir = appdata_dir_path / "npm"
+            try:
+                if not npm_dir.exists():
+                    npm_dir.mkdir(parents=True)
+            except OSError as ex:
+                raise click.ClickException(
+                    f"Failed to create the `npm` directory in {appdata_dir_path}.\n"
+                    "This command uses `npx`, which requires the `npm` directory to exist "
+                    "in the above path, otherwise an ENOENT 4058 error will occur.\n"
+                    "Please create this directory manually and try again."
+                ) from ex
+        return [f"{command}.cmd"]
+    return [command]
 
 
 def get_python_paths() -> Iterator[str]:

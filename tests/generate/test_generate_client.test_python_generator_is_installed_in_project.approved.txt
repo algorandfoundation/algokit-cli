@@ -1,0 +1,10 @@
+DEBUG: Searching for project installed client generator
+DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
+DEBUG: poetry: algokit-client-generator 1.1.2 Algorand typed client Generator
+DEBUG: poetry: └── algokit-utils 2.2.1
+Generating Python client code for application specified in {current_working_directory}/application.json and writing to client.py
+DEBUG: Running 'poetry run algokitgen-py -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+STDOUT
+STDERR

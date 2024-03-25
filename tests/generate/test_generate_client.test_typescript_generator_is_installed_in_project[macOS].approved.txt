@@ -1,0 +1,11 @@
+DEBUG: Searching for project installed client generator
+DEBUG: Running 'npm ls' in '{current_working_directory}'
+DEBUG: npm: /Users/user/my-project
+DEBUG: npm: ├── test@1.2.3
+DEBUG: npm: └── @algorandfoundation/algokit-client-generator@1.1.2
+Generating TypeScript client code for application specified in {current_working_directory}/application.json and writing to client.py
+DEBUG: Running 'npx @algorandfoundation/algokit-client-generator generate -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
+DEBUG: npx: STDOUT
+DEBUG: npx: STDERR
+STDOUT
+STDERR
