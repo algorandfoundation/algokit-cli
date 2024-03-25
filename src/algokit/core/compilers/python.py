@@ -13,7 +13,7 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
     Find puyapy command with a specific version.
     If the puya version isn't installed, install it with pipx run.
     """
-    for puyapy_command in _get_candidates_puyapy_commands():
+    for puyapy_command in _get_candidate_puyapy_commands():
         try:
             puyapy_version_result = run([*puyapy_command, "--version"])
         except OSError:
@@ -25,9 +25,9 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that the `PuyaPy` compiler can be installed; "
+        "Unable to find pipx install so that the `PuyaPy` compiler can be run; "
         "please install pipx via https://pypa.github.io/pipx/ "
-        "and then try `algokit compile py ...` again."
+        "and then try `algokit compile python ...` again."
     )
 
     return [
@@ -43,7 +43,7 @@ def _find_puyapy_command() -> list[str]:
     Find puyapy command.
     If puya isn't installed, install the latest version with pipx.
     """
-    for puyapy_command in _get_candidates_puyapy_commands():
+    for puyapy_command in _get_candidate_puyapy_commands():
         try:
             puyapy_help_result = run([*puyapy_command, "-h"])
         except OSError:
@@ -53,9 +53,9 @@ def _find_puyapy_command() -> list[str]:
                 return puyapy_command
 
     pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that the `PuyaPy` compiler can be installed; "
+        "Unable to find pipx install so that the `PuyaPy` compiler can be run; "
         "please install pipx via https://pypa.github.io/pipx/ "
-        "and then try `algokit compile py ...` again."
+        "and then try `algokit compile python ...` again."
     )
     return [
         *pipx_command,
@@ -65,7 +65,7 @@ def _find_puyapy_command() -> list[str]:
     ]
 
 
-def _get_candidates_puyapy_commands() -> Iterator[list[str]]:
+def _get_candidate_puyapy_commands() -> Iterator[list[str]]:
     # when puya is installed at the project level
     yield ["poetry", "run", "puyapy"]
     # when puya is installed at the global level
