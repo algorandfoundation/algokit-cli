@@ -20,7 +20,7 @@ $ ~ algokit init
 ? Name of project / directory to create the project in:  my-cool-app
 ```
 
-Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `puya`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
+Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `python`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
 
 If you want to accept the default for each option simply hit [enter] or alternatively to speed things up you can run `algokit init --defaults` and they will be auto-accepted.
 
@@ -155,7 +155,7 @@ By combining a number of options, it is possible to initialize a new project wit
 
 ```
 
-$ ~ algokit init -n my-smart-contract -t puya --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
+$ ~ algokit init -n my-smart-contract -t python --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️ https://github.com/algorandfoundation/algokit-beaker-default-template

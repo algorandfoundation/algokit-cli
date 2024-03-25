@@ -83,7 +83,7 @@ class TemplateKey(str, Enum):
     """
 
     BASE = "base"
-    PUYA = "puya"
+    PUYA = "python"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
@@ -277,7 +277,7 @@ def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Pat
     default=[],
     metavar="<key> <value>",
 )
-def init_command(  # noqa: PLR0913, PLR0915
+def init_command(  # noqa: PLR0913
     *,
     directory_name: str | None,
     template_name: str | None,

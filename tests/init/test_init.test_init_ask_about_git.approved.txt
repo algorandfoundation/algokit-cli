@@ -26,6 +26,7 @@ DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit bootstrap all` in {current_working_directory}/myapp
+🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
 ? Would you like to initialise a git repository and perform an initial commit? (Y/n)
@@ -39,4 +40,3 @@ DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised w
 DEBUG: git: 1 file changed, 1 insertion(+)
 DEBUG: git: create mode 100644 myapp/helloworld.txt
 🎉 Performed initial git commit successfully! 🎉
-🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
