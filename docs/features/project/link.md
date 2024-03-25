@@ -22,6 +22,8 @@ This command must be invoked from the root of a standalone 'frontend' typed proj
 
 - `--fail-fast`, `-f`: Exit immediately if at least one client generation process fails. This is useful for CI/CD pipelines where you want to ensure all clients are correctly generated before proceeding.
 
+- `--version`, `-v`: Allows specifying the version of the client generator to use when generating client code for contract projects. This can be particularly useful for ensuring consistency across different environments or when a specific version of the client generator includes features or fixes that are necessary for your project.
+
 ## How It Works
 
 Below is a visual representation of the `algokit project link` command in action:

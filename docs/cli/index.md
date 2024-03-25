@@ -118,6 +118,7 @@
     - [-l, --language ](#-l---language--1)
     - [-a, --all](#-a---all)
     - [-f, --fail-fast](#-f---fail-fast)
+    - [-v, --version ](#-v---version--2)
     - [list](#list)
     - [Arguments](#arguments-7)
     - [WORKSPACE_PATH](#workspace_path)
@@ -874,6 +875,10 @@ Link all contract projects with the frontend project Option is mutually exclusiv
 
 ### -f, --fail-fast
 Exit immediately if at least one client generation process fails
+
+
+### -v, --version <version>
+The client generator version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. If the client generator is not installed, AlgoKit runs the latest version. If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
 
 ### list
 

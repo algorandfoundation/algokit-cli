@@ -66,7 +66,14 @@ def _get_contract_projects() -> list[ContractArtifacts]:
         return []
 
 
-def _link_projects(*, frontend_clients_path: Path, contract_project_root: Path, language: str, fail_fast: bool) -> None:
+def _link_projects(
+    *,
+    frontend_clients_path: Path,
+    contract_project_root: Path,
+    language: str,
+    fail_fast: bool,
+    version: str | None = None,
+) -> None:
     """Links projects by generating client code.
 
     Args:
@@ -74,9 +81,10 @@ def _link_projects(*, frontend_clients_path: Path, contract_project_root: Path, 
         contract_project_root (Path): The root path of the contract project.
         language (str): The programming language of the generated client code.
         fail_fast (bool): Whether to exit immediately if a client generation process fails.
+        version (str | None): Version to pin the client generator to (Defaults to latest - None).
     """
     output_path_pattern = f"{frontend_clients_path}/{{contract_name}}.{'ts' if language == 'typescript' else 'py'}"
-    generator = ClientGenerator.create_for_language(language, version=None)
+    generator = ClientGenerator.create_for_language(language, version=version)
     app_specs = list(contract_project_root.rglob("application.json")) + list(
         contract_project_root.rglob("*.arc32.json")
     )
@@ -182,12 +190,19 @@ def _select_contract_projects_to_link(
     type=click.BOOL,
     required=False,
 )
+@click.option(
+    "--version",
+    "-v",
+    "version",
+    default=None,
+    help="The client generator version to pin to, for example, 1.0.0. "
+    "If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. "
+    "If the client generator is not installed, AlgoKit runs the latest version. "
+    "If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. "
+    "Otherwise, AlgoKit runs the specified version.",
+)
 def link_command(
-    *,
-    project_names: tuple[str] | None,
-    language: str,
-    link_all: bool,
-    fail_fast: bool,
+    *, project_names: tuple[str] | None, language: str, link_all: bool, fail_fast: bool, version: str | None
 ) -> None:
     """Automatically invoke 'algokit generate client' on contract projects available in the workspace.
     Must be invoked from the root of a standalone 'frontend' typed project."""
@@ -227,6 +242,7 @@ def link_command(
             contract_project_root=contract_project.cwd,
             language=language,
             fail_fast=fail_fast,
+            version=version,
         )
 
         logger.info(f"✅ {iteration}/{total}: Finished processing {contract_project.project_name}")
