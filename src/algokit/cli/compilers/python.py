@@ -1,4 +1,5 @@
 import logging
+import os
 from collections.abc import Callable
 from typing import Any
 
@@ -21,6 +22,7 @@ def invoke_puyapy(context: click.Context, puyapy_args: list[str]) -> None:
             *puyapy_command,
             *puyapy_args,
         ],
+        env=(dict(os.environ) | {"NO_COLOR": "1"}) if context.color is False else None,
     )
     click.echo(run_result.output)
 
