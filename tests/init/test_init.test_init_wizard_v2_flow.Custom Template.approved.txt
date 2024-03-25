@@ -22,7 +22,7 @@ Valid examples:
  - ~/path/to/git/repo
  - ~/path/to/git/repo.bundle
 
-? Custom template URL: 
+? Custom template URL:
 DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.

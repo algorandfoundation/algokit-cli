@@ -6,7 +6,10 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from tests.compile.conftest import INVALID_PUYA_CONTRACT_FILE_CONTENT, VALID_PUYA_CONTRACT_FILE_CONTENT
+from tests.compile.conftest import (
+    INVALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT,
+    VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT,
+)
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
@@ -116,7 +119,7 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
     os.environ["NO_COLOR"] = "1"
 
     contract_path = cwd / "contract.py"
-    contract_path.write_text(VALID_PUYA_CONTRACT_FILE_CONTENT)
+    contract_path.write_text(VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT)
 
     result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
@@ -130,7 +133,7 @@ def test_invalid_contract(cwd: Path, output_path: Path) -> None:
     os.environ["NO_COLOR"] = "1"
 
     contract_path = cwd / "contract.py"
-    contract_path.write_text(INVALID_PUYA_CONTRACT_FILE_CONTENT)
+    contract_path.write_text(INVALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT)
     result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
 
     # Only check for the exit code and the error message from AlgoKit CLI

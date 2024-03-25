@@ -85,7 +85,7 @@ def which_mock(mocker: MockerFixture) -> WhichMock:
 class ExtendedTemplateKey(str, Enum):
     # Include all keys from TemplateKey and add new ones
     BASE = "base"
-    PUYA = "python"
+    PYTHON = "python"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
@@ -123,9 +123,9 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
             url="gh:robdmoore/copier-helloworld",
             description="Does nothing helpful. fullstack",
         ),
-        ExtendedTemplateKey.PUYA: BlessedTemplateSource(
+        ExtendedTemplateKey.PYTHON: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",
-            description="Does nothing helpful. puya",
+            description="Does nothing helpful. python",
         ),
         ExtendedTemplateKey.REACT: BlessedTemplateSource(
             url="gh:robdmoore/copier-helloworld",

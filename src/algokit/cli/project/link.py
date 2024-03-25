@@ -81,7 +81,7 @@ def _link_projects(
         contract_project_root (Path): The root path of the contract project.
         language (str): The programming language of the generated client code.
         fail_fast (bool): Whether to exit immediately if a client generation process fails.
-        version (str | None): Version to pin the client generator to (Defaults to latest - None).
+        version (str | None): Version to pin the client generator to (Defaults to None).
     """
     output_path_pattern = f"{frontend_clients_path}/{{contract_name}}.{'ts' if language == 'typescript' else 'py'}"
     generator = ClientGenerator.create_for_language(language, version=version)

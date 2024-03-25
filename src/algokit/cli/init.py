@@ -68,8 +68,6 @@ class TemplatePresetType(str, Enum):
 class ContractLanguage(Enum):
     """
     For programming languages that have corresponding smart contract languages
-    python -> puya
-    typescript -> tealscript
     """
 
     PYTHON = "Python 🐍"
@@ -83,7 +81,7 @@ class TemplateKey(str, Enum):
     """
 
     BASE = "base"
-    PUYA = "python"
+    PYTHON = "python"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
@@ -117,7 +115,7 @@ class BlessedTemplateSource(TemplateSource):
 
 
 LANGUAGE_TO_TEMPLATE_MAP = {
-    ContractLanguage.PYTHON: TemplateKey.PUYA,
+    ContractLanguage.PYTHON: TemplateKey.PYTHON,
     ContractLanguage.TYPESCRIPT: TemplateKey.TEALSCRIPT,
     ContractLanguage.PYTEAL: TemplateKey.BEAKER,
 }
@@ -131,9 +129,9 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
             description="Official starter template for TEALScript applications.",
             branch="feat/orchestration",
         ),
-        TemplateKey.PUYA: BlessedTemplateSource(
+        TemplateKey.PYTHON: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-python-template",
-            description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
+            description="Official starter template for Algorand Python applications",
             branch="feat/orchestration",
         ),
         TemplateKey.REACT: BlessedTemplateSource(
@@ -570,7 +568,7 @@ def _get_project_path(*, directory_name_option: str | None = None, force: bool =
         directory_name_option
         if directory_name_option is not None
         else questionary_extensions.prompt_text(
-            "Name of project / directory to create the project in: ",
+            "Name of project / directory to create the project in:",
             validators=[questionary_extensions.NonEmptyValidator(), DirectoryNameValidator(base_path)],
         )
     ).strip()
@@ -660,7 +658,7 @@ def _get_template_interactive() -> TemplateSource:
         raise click.ClickException("No template selected. Please try again.")
 
     # Map the template string directly to the TemplateSource
-    # This is needed to be able to reuse fullstack to work with beaker, puya, and tealscript templates
+    # This is needed to be able to reuse fullstack to work with beaker, python, and tealscript templates
     blessed_templates = _get_blessed_templates()
     if template in blessed_templates:
         selected_template_source = blessed_templates[template]
@@ -687,7 +685,7 @@ def _get_template_interactive() -> TemplateSource:
         " - ~/path/to/git/repo\n"
         " - ~/path/to/git/repo.bundle\n"
     )
-    template_url = questionary_extensions.prompt_text("Custom template URL: ", validators=[GitRepoValidator()]).strip()
+    template_url = questionary_extensions.prompt_text("Custom template URL:", validators=[GitRepoValidator()]).strip()
     if not template_url:
         # re-prompt if empty response
         return _get_template_interactive()

@@ -1,4 +1,4 @@
-VALID_PUYA_CONTRACT_FILE_CONTENT = """
+VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT = """
 from puyapy import Contract, Txn, log
 
 
@@ -12,7 +12,7 @@ class HelloWorldContract(Contract):
         return True
 """
 
-INVALID_PUYA_CONTRACT_FILE_CONTENT = """
+INVALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT = """
 from puyapy import Contract, Txn, log
 
 
