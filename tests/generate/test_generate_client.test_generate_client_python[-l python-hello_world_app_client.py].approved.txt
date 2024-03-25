@@ -9,7 +9,7 @@ DEBUG: Searching for globally installed client generator
 DEBUG: Running 'pipx list --short' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
-DEBUG: No installed client generator found, run latest client generator via pipx
+DEBUG: No matching installed client generator found, run client generator via pipx
 Generating Python client code for application specified in {current_working_directory}/application.json and writing to hello_world_app_client.py
 DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/application.json -o hello_world_app_client.py' in '{current_working_directory}'
 DEBUG: pipx: STDOUT

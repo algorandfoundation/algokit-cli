@@ -1,17 +1,18 @@
 DEBUG: Searching for project installed client generator
 DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
-DEBUG: poetry: STDOUT
-DEBUG: poetry: STDERR
+DEBUG: poetry: algokit-client-generator 1.1.2 Algorand typed client Generator
+DEBUG: poetry: └── algokit-utils 2.2.1
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
 DEBUG: Searching for globally installed client generator
 DEBUG: Running 'pipx list --short' in '{current_working_directory}'
-DEBUG: pipx: STDOUT
-DEBUG: pipx: STDERR
+DEBUG: pipx: algokit 1.13.0
+DEBUG: pipx: poetry 1.6.1
+DEBUG: pipx: algokit-client-generator 1.1.2
 DEBUG: No matching installed client generator found, run client generator via pipx
 Generating Python client code for application specified in {current_working_directory}/application.json and writing to client.py
-DEBUG: Running 'pipx run --spec=algokit-client-generator algokitgen-py -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
+DEBUG: Running 'pipx run --spec=algokit-client-generator==1.2.0 algokitgen-py -a {current_working_directory}/application.json -o client.py' in '{current_working_directory}'
 DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
 STDOUT

@@ -191,7 +191,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             return global_result
 
         # when not installed, run via pipx
-        logger.debug("No installed client generator found, run latest client generator via pipx")
+        logger.debug("No matching installed client generator found, run client generator via pipx")
         return [
             *pipx_command,
             "run",
@@ -275,7 +275,7 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             return global_result
 
         # when not installed, run via npx
-        logger.debug("No installed client generator found, run latest client generator via npx")
+        logger.debug("No matching installed client generator found, run client generator via npx")
         return [
             *npx_command,
             "--yes",

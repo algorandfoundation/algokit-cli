@@ -137,6 +137,52 @@ def test_generate_client_python(
 
 
 @pytest.mark.usefixtures("proc_mock")
+def test_python_generator_is_installed_in_project(application_json: Path, proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        ["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"],
+        output=[f"{PYTHON_PYPI_PACKAGE} 1.1.2 Algorand typed client Generator", "└── algokit-utils 2.2.1"],
+    )
+
+    result = invoke(f"generate client -o client.py -l python {application_json.name}", cwd=application_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output))
+
+
+@pytest.mark.usefixtures("proc_mock")
+def test_python_generator_is_installed_globally(application_json: Path, proc_mock: ProcMock) -> None:
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
+    proc_mock.set_output(
+        ["pipx", "list", "--short"],
+        output=["algokit 1.13.0", "poetry 1.6.1", f"{PYTHON_PYPI_PACKAGE} 1.1.2"],
+    )
+
+    result = invoke(f"generate client -o client.py -l python {application_json.name}", cwd=application_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output))
+
+
+@pytest.mark.usefixtures("proc_mock")
+def test_python_generator_version_is_not_installed_anywhere(application_json: Path, proc_mock: ProcMock) -> None:
+    proc_mock.set_output(
+        ["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"],
+        output=[f"{PYTHON_PYPI_PACKAGE} 1.1.2 Algorand typed client Generator", "└── algokit-utils 2.2.1"],
+    )
+    proc_mock.set_output(
+        ["pipx", "list", "--short"],
+        output=["algokit 1.13.0", "poetry 1.6.1", f"{PYTHON_PYPI_PACKAGE} 1.1.2"],
+    )
+
+    result = invoke(
+        f"generate client --version 1.2.0 -o client.py -l python {application_json.name}", cwd=application_json.parent
+    )
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output))
+
+
+@pytest.mark.usefixtures("proc_mock")
 def test_pipx_missing(application_json: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
@@ -203,6 +249,59 @@ def test_generate_client_typescript(
         proc_mock.called[2].command
         == _get_typescript_generate_command(version, application_json, expected_output_path).split()
     )
+
+
+@pytest.mark.usefixtures("mock_platform_system")
+def test_typescript_generator_is_installed_in_project(
+    application_json: Path, proc_mock: ProcMock, request: pytest.FixtureRequest
+) -> None:
+    proc_mock.set_output(
+        [_get_npm_command(), "ls"],
+        output=["/Users/user/my-project", "├── test@1.2.3", f"└── {TYPESCRIPT_NPM_PACKAGE}@1.1.2"],
+    )
+
+    result = invoke(f"generate client -o client.py -l typescript {application_json.name}", cwd=application_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), namer=PyTestNamer(request))
+
+
+@pytest.mark.usefixtures("mock_platform_system")
+def test_typescript_generator_is_installed_globally(
+    application_json: Path, proc_mock: ProcMock, request: pytest.FixtureRequest
+) -> None:
+    proc_mock.should_bad_exit_on([_get_npm_command(), "ls"])
+    proc_mock.set_output(
+        [_get_npm_command(), "--global", "ls"],
+        output=["/Users/user/.nvm/versions/node/v20.11.0/lib", "├── test@1.2.3", f"└── {TYPESCRIPT_NPM_PACKAGE}@1.1.2"],
+    )
+
+    result = invoke(f"generate client -o client.py -l typescript {application_json.name}", cwd=application_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), namer=PyTestNamer(request))
+
+
+@pytest.mark.usefixtures("mock_platform_system")
+def test_typescript_generator_version_is_not_installed_anywhere(
+    application_json: Path, proc_mock: ProcMock, request: pytest.FixtureRequest
+) -> None:
+    proc_mock.set_output(
+        [_get_npm_command(), "ls"],
+        output=["/Users/user/my-project", "├── test@1.2.3", f"└── {TYPESCRIPT_NPM_PACKAGE}@1.1.2"],
+    )
+    proc_mock.set_output(
+        [_get_npm_command(), "--global", "ls"],
+        output=["/Users/user/.nvm/versions/node/v20.11.0/lib", "├── test@1.2.3", f"└── {TYPESCRIPT_NPM_PACKAGE}@1.1.2"],
+    )
+
+    result = invoke(
+        f"generate client --version 1.2.0 -o client.py -l typescript {application_json.name}",
+        cwd=application_json.parent,
+    )
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), namer=PyTestNamer(request))
 
 
 @pytest.mark.usefixtures("proc_mock")
