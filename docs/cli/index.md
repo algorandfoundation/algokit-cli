@@ -531,7 +531,7 @@ Name of an official template to use. To choose interactively, run this command w
 
 * **Options**
 
-    tealscript | puya | react | fullstack | beaker | base | playground
+    tealscript | python | react | fullstack | beaker | base | playground
 
 
 

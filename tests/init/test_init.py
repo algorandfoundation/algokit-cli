@@ -85,7 +85,7 @@ def which_mock(mocker: MockerFixture) -> WhichMock:
 class ExtendedTemplateKey(str, Enum):
     # Include all keys from TemplateKey and add new ones
     BASE = "base"
-    PUYA = "puya"
+    PUYA = "python"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
@@ -872,22 +872,22 @@ def test_init_wizard_v2_workspace_nesting(
 
     # Act
     project_a_result = invoke(
-        "init -t puya --no-git --defaults --name myapp "
+        "init -t python --no-git --defaults --name myapp "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
     project_b_result = invoke(
-        "init -t puya --no-git --defaults --name myapp2 "
+        "init -t python --no-git --defaults --name myapp2 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
         cwd=cwd / "myapp" / "projects",
     )
     project_c_result = invoke(
-        "init -t puya --no-git --defaults --name myapp3 "
+        "init -t python --no-git --defaults --name myapp3 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter' --no-workspace",
         cwd=cwd / "myapp" / "projects",
     )
     project_d_result = invoke(
-        "init -t puya --no-git --defaults --name myapp4 "
+        "init -t python --no-git --defaults --name myapp4 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
         cwd=cwd / "myapp",
     )
