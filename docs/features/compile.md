@@ -1,8 +1,8 @@
 # AlgoKit Compile
 
-The AlgoKit Compile feature enables you to compile smart contracts (apps) and smart signatures (logic signatures) written in a supported high-level language to TEAL, for deployment on the Algorand Virtual Machine (AVM).
+The AlgoKit Compile feature enables you to compile smart contracts (apps) and smart signatures (logic signatures) written in a supported high-level language to a format deployable on the Algorand Virtual Machine (AVM).
 
-When running the compile command, AlgoKit will take care of working out which compiler you need and dynamically resolve it. Additionally, AlgoKit will detect if an appropriate compiler version is already installed globally on your machine or is included in your project and utilize that.
+When running the compile command, AlgoKit will take care of working out which compiler you need and dynamically resolve it. Additionally, AlgoKit will detect if a matching compiler version is already installed globally on your machine or is included in your project and use that.
 
 ## Prerequisites
 
@@ -12,11 +12,11 @@ See [Compile Python - Prerequisites](#prerequisites-1) for details.
 
 Algorand Python is a semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
 
-This is done by compiling Algorand Python using the PuyaPy compiler, which takes Algorand Python and outputs valid, optimised TEAL code with execution semantics that match the given Python code.
+Algorand Python can be deployed to Algorand by using the PuyaPy optimising compiler, which takes Algorand Python and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/generate.md#1-typed-clients), will result in AVM bytecode execution semantics that match the given Python code.
 
-If you want to know more, check out the [PuyaPy docs](https://github.com/algorandfoundation/puya/blob/main/docs/index.md).
+If you want to learn more, check out the [PuyaPy docs](https://github.com/algorandfoundation/puya/blob/main/docs/index.md).
 
-The below example is a valid Algorand Python smart contract.
+Below is an example Algorand Python smart contract.
 
 ```py
 from puyapy import ARC4Contract, arc4
@@ -27,7 +27,7 @@ class HelloWorldContract(ARC4Contract):
         return "Hello, " + name
 ```
 
-For more complex examples, check out the [examples](https://github.com/algorandfoundation/puya/tree/main/examples) in the [PuyaPy repo](https://github.com/algorandfoundation/puya).
+For more complex examples, see the [examples](https://github.com/algorandfoundation/puya/tree/main/examples) in the [PuyaPy repo](https://github.com/algorandfoundation/puya).
 
 ## Usage
 
@@ -36,7 +36,8 @@ Available commands and possible usage are as follows:
 ```
 Usage: algokit compile [OPTIONS] COMMAND [ARGS]...
 
-  Compile smart contracts written in a high-level language to TEAL.
+  Compile smart contracts and smart signatures written in a supported high-level language to a format deployable on
+  the Algorand Virtual Machine (AVM).
 
 Options:
   -v, --version TEXT  The compiler version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks
@@ -46,15 +47,15 @@ Options:
   -h, --help          Show this message and exit.
 
 Commands:
-  py      Compile Python contract(s) to TEAL using the PuyaPy compiler.
-  python  Compile Python contract(s) to TEAL using the PuyaPy compiler.
+  py      Compile Algorand Python contract(s) using the PuyaPy compiler.
+  python  Compile Algorand Python contract(s) using the PuyaPy compiler.
 ```
 
 ### Compile Python
 
 The command `algokit compile python` or `algokit compile py` will run the [PuyaPy](https://github.com/algorandfoundation/puya) compiler against the supplied Algorand Python smart contract.
 
-All arguments supplied to the command are passed directly to PuyaPy and as such this command supports all options of the specific PuyaPy compiler version being used.
+All arguments supplied to the command are passed directly to PuyaPy, therefore this command supports all options supported by the PuyaPy compiler.
 
 Any errors detected by PuyaPy during the compilation process will be printed to the output.
 
@@ -62,7 +63,7 @@ Any errors detected by PuyaPy during the compilation process will be printed to 
 
 PuyaPy requires Python 3.12+, so please ensure your Python version satisfies this requirement.
 
-This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically loaded using [pipx](https://pipx.pypa.io/stable/). In this scenario pipx is also required.
+This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically run using [pipx](https://pipx.pypa.io/stable/). In this case pipx is also required.
 
 #### Examples
 
@@ -72,7 +73,7 @@ To see a list of the supported PuyaPy options, run the following:
 algokit compile python -h
 ```
 
-To check which version of the PuyaPy compiler is being used, run the following:
+To determine the version of the PuyaPy compiler in use, execute the following command:
 
 ```shell
 algokit compile python --version

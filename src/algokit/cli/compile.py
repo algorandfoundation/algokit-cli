@@ -7,7 +7,13 @@ from algokit.cli.compilers.python import py, python
 logger = logging.getLogger(__name__)
 
 
-@click.group("compile", short_help="Compile smart contracts written in a high-level language to TEAL.")
+@click.group(
+    "compile",
+    short_help=(
+        "Compile smart contracts and smart signatures written in a supported high-level language "
+        "to a format deployable on the Algorand Virtual Machine (AVM)."
+    ),
+)
 @click.option(
     "-v",
     "--version",
@@ -24,7 +30,10 @@ logger = logging.getLogger(__name__)
 )
 @click.pass_context
 def compile_group(context: click.Context, version: str | None) -> None:
-    """Compile smart contracts written in a high-level language to TEAL."""
+    """
+    Compile smart contracts and smart signatures written in a supported high-level language
+    to a format deployable on the Algorand Virtual Machine (AVM).
+    """
     context.ensure_object(dict)
     context.obj["version"] = version
 

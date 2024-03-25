@@ -44,7 +44,7 @@ def common_puyapy_command_options(function: _AnyCallable) -> click.Command:
             "ignore_unknown_options": True,
         },
         add_help_option=False,
-        help="Compile Algorand Python contract(s) to TEAL using the PuyaPy compiler.",
+        help="Compile Algorand Python contract(s) using the PuyaPy compiler.",
     )(function)
 
 

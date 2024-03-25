@@ -16,7 +16,9 @@ Options:
 Commands:
   bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
                project root directory.
-  compile      Compile smart contracts written in a high-level language to TEAL.
+  compile      Compile smart contracts and smart signatures written in a
+               supported high-level language to a format deployable on the
+               Algorand Virtual Machine (AVM).
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
   deploy       Deploy smart contracts from AlgoKit compliant repository.
