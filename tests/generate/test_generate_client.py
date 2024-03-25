@@ -20,7 +20,6 @@ from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
 DirWithAppSpecFactory = Callable[[Path, str], Path]
-DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "latest"
 
 
 def _normalize_output(output: str) -> str:
