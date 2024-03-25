@@ -31,7 +31,7 @@ There are two tokens available for use with the `-o`, `--output` [option](../cli
 
 If you want to ensure typed client output stability across different environments and additionally protect yourself from any potential breaking changes introduced in the client generator packages, you can specify a version you'd like to pin to.
 
-To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`
+To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
 
 ### Usage
 

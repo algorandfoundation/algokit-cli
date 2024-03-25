@@ -173,6 +173,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         Otherwise, run the matching version via pipx.
         """
 
+        logger.debug("Searching for project installed client generator")
         project_result = self.find_project_generate_command(version)
         if project_result is not None:
             return project_result
@@ -183,11 +184,13 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             "and then try `algokit generate client ...` again."
         )
 
+        logger.debug("Searching for globally installed client generator")
         global_result = self.find_global_generate_command(pipx_command, version)
         if global_result is not None:
             return global_result
 
         # when not installed, run via pipx
+        logger.debug("No installed client generator found, run latest client generator via pipx")
         return [
             *pipx_command,
             "run",
@@ -217,7 +220,6 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         self, npm_command: list[str], npx_command: list[str], version: str | None
     ) -> list[str] | None:
         try:
-            # TODO: NC - Confirm that we don't need version in this scenario.
             result = proc.run([*npm_command, "ls"])
             if result.exit_code == 0:
                 generate_command = [*npx_command, TYPESCRIPT_NPM_PACKAGE]
@@ -261,15 +263,18 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
             is_npx=True,
         )
 
+        logger.debug("Searching for project installed client generator")
         project_result = self.find_project_generate_command(npm_command, npx_command, version)
         if project_result is not None:
             return project_result
 
+        logger.debug("Searching for globally installed client generator")
         global_result = self.find_global_generate_command(npm_command, npx_command, version)
         if global_result is not None:
             return global_result
 
         # when not installed, run via npx
+        logger.debug("No installed client generator found, run latest client generator via npx")
         return [
             *npx_command,
             "--yes",
