@@ -83,7 +83,7 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
+The key required dependency is Python 3.10+, but some of the installation options below will install that for you. We recommend using Python 3.12+, as the `algokit compile python` command requires this version.
 
 AlgoKit also has some runtime dependencies that also need to be available for particular commands.
 
@@ -126,10 +126,12 @@ AlgoKit can be installed using OS specific package managers, or using the python
       > **App Installer python.exe** or **App Installer python3.exe**.
 
    3. Install pipx:
+
       ```
       pip install --user pipx
       python -m pipx ensurepath
       ```
+
    4. Restart the terminal to ensure pipx is available on the path
    5. Install AlgoKit via pipx: `pipx install algokit`
    6. Restart the terminal to ensure AlgoKit is available on the path

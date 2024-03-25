@@ -15,6 +15,17 @@ PARENT_DIRECTORY = Path(__file__).parent
 GIT_BUNDLE_PATH = PARENT_DIRECTORY / "copier-helloworld.bundle"
 
 
+def _remove_project_paths(output: str) -> str:
+    lines = [
+        "DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml"
+        if "DEBUG: Attempting to load project config from " in line
+        else line
+        for line in output.splitlines()
+    ]
+
+    return "\n".join(lines)
+
+
 def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens: str) -> Scrubber:
     default_tokens = {"test_parent_directory": str(PARENT_DIRECTORY)}
     tokens = default_tokens | extra_tokens
@@ -24,6 +35,7 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
         TokenScrubber(tokens=tokens),
         TokenScrubber(tokens={"test_parent_directory": str(PARENT_DIRECTORY).replace("\\", "/")}),
         lambda t: t.replace("{test_parent_directory}\\", "{test_parent_directory}/"),
+        _remove_project_paths,
     )
 
 

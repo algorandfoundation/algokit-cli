@@ -1,0 +1,12 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Checking {current_working_directory} for bootstrapping needs
+DEBUG: Running `algokit bootstrap env`
+DEBUG: {current_working_directory}/.env doesn't exist yet
+DEBUG: {current_working_directory}/.env.template exists
+Copying {current_working_directory}/.env.template to {current_working_directory}/.env and prompting for empty values
+DEBUG: Skipping {current_working_directory}/.env
+DEBUG: Skipping {current_working_directory}/.env.template
+Finished bootstrapping {current_working_directory}

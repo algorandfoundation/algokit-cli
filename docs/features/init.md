@@ -20,7 +20,7 @@ $ ~ algokit init
 ? Name of project / directory to create the project in:  my-cool-app
 ```
 
-Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `puya`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
+Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `python`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
 
 If you want to accept the default for each option simply hit [enter] or alternatively to speed things up you can run `algokit init --defaults` and they will be auto-accepted.
 
@@ -41,6 +41,26 @@ To mark your project as `workspace` fill in the following in your `.algokit.toml
 type = 'workspace' # type specifying if the project is a workspace or standalone
 projects_root_path = 'projects' # path to the root folder containing all sub-projects in the workspace
 ```
+
+#### VSCode optimizations
+
+AlgoKit has a set of minor optimizations for VSCode users that are useful to be aware of:
+
+- Templates created with the `--workspace` flag automatically include a VSCode code-workspace file. New projects added to an AlgoKit workspace are also integrated into an existing VSCode workspace.
+- Using the `--ide` flag with `init` triggers automatic prompts to open the project and, if available, the code workspace in VSCode.
+
+#### Handling of the `.github` Folder
+
+A key aspect of using the `--workspace` flag is how the `.github` folder is managed. This folder, which contains GitHub-specific configurations such as workflows and issue templates, is moved from the project directory to the root of the workspace. This move is necessary because GitHub does not recognize workflows located in subdirectories.
+
+Here's a simplified overview of what happens:
+
+1. If a `.github` folder is found in your project, its contents are transferred to the workspace's root `.github` folder.
+2. Files with matching names in the destination are not overwritten; they're skipped.
+3. The original `.github` folder is removed if it's left empty after the move.
+4. A notification is displayed, advising you to review the moved `.github` contents to ensure everything is in order.
+
+This process ensures that your GitHub configurations are properly recognized at the workspace level, allowing you to utilize GitHub Actions and other features seamlessly across your projects.
 
 ### Standalone Projects
 
@@ -135,7 +155,7 @@ By combining a number of options, it is possible to initialize a new project wit
 
 ```
 
-$ ~ algokit init -n my-smart-contract -t puya --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
+$ ~ algokit init -n my-smart-contract -t python --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️ https://github.com/algorandfoundation/algokit-beaker-default-template
@@ -146,15 +166,3 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 ```
 
 For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#init).
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```

@@ -1,0 +1,2 @@
+ℹ️  Project: contract_project, Command name: hello, Command(s): command_a
+ℹ️  Project: frontend_project, Command name: hello, Command(s): command_b

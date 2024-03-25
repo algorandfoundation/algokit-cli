@@ -4,7 +4,7 @@
   "EndpointAddress": "0.0.0.0:8080",
   "DNSBootstrapID": "",
   "IncomingConnectionsLimit": 0,
-  "Archival": false,
+  "Archival": true,
   "isIndexerActive": false,
   "EnableDeveloperAPI": true
 }
