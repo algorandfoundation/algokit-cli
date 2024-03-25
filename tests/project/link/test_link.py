@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
@@ -20,6 +21,17 @@ def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock.add("npx")
     mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which
     return which_mock
+
+
+@pytest.fixture(autouse=True)
+def client_generator_mock(mocker: MockerFixture) -> MagicMock:
+    """
+    Fixture to mock 'shutil.which' with predefined responses.
+    """
+
+    client_gen_mock = MagicMock()
+    mocker.patch("src.algokit.cli.generate.ClientGenerator.create_for_language", return_value=client_gen_mock)
+    return client_gen_mock
 
 
 def _format_output(output: str, replacements: list[tuple[str, str]]) -> str:
@@ -146,7 +158,7 @@ def _cwd_with_workspace(
 
 
 def test_link_command_by_name_success(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
     Verifies 'project list' command success for a specific project name.
@@ -155,40 +167,53 @@ def test_link_command_by_name_success(
     result = invoke("project link --project-name contract_project_3", cwd=cwd_with_workspace / "projects" / "project1")
 
     assert result.exit_code == 0
+    client_generator_mock.resolve_output_path.assert_called_once()
+    client_generator_mock.generate.assert_called_once()
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
 def test_link_command_all_success(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
     Confirms 'project list' command lists all projects successfully.
     """
-    cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=5)
+    contract_projects_count = 4
+    frontend_projects_count = 1
+    cwd_with_workspace = _cwd_with_workspace(
+        tmp_path_factory, which_mock, proc_mock, num_projects=contract_projects_count + frontend_projects_count
+    )
     result = invoke("project link --all", cwd=cwd_with_workspace / "projects" / "project1")
 
     assert result.exit_code == 0
+    assert client_generator_mock.resolve_output_path.call_count == contract_projects_count
+    assert client_generator_mock.generate.call_count == contract_projects_count
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
 def test_link_command_multiple_names_success(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
     Ensures 'project list' command success for multiple specified project names.
     """
-    cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=5)
+    projects_count = 5
+    cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=projects_count)
     result = invoke(
         "project link --project-name contract_project_3 --project-name contract_project_5",
         cwd=cwd_with_workspace / "projects" / "project1",
     )
 
     assert result.exit_code == 0
+
+    expected_call_count = 2
+    assert client_generator_mock.resolve_output_path.call_count == expected_call_count
+    assert client_generator_mock.generate.call_count == expected_call_count
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
 def test_link_command_multiple_names_no_specs_success(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
     Ensures 'project list' command success for multiple specified project names.
@@ -202,11 +227,15 @@ def test_link_command_multiple_names_no_specs_success(
     )
 
     assert result.exit_code == 0
+    assert client_generator_mock.resolve_output_path.call_count == 0
+    assert client_generator_mock.generate.call_count == 0
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
 def test_link_command_name_not_found(
-    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory,
+    which_mock: WhichMock,
+    proc_mock: ProcMock,
 ) -> None:
     """
     Test to ensure the 'project list' command executes successfully within a workspace containing multiple projects.
