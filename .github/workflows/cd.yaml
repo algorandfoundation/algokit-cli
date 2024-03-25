@@ -33,7 +33,7 @@ jobs:
     needs: ci-check-python
 
   release:
-    name: Release Library
+    name: Release wheels to pypi
     needs: ci-build-python
     runs-on: ubuntu-latest
 
@@ -127,7 +127,7 @@ jobs:
     secrets: inherit
 
   cd-publish-release-packages:
-    name: Publish Release Packages
+    name: Release binaries via distribution channels
     needs: build-and-upload-binaries
     if: ${{ github.ref_name == 'main' && inputs.production_release == 'true' }} # Might want to adjust this to publish (pre-release) on merge as well.
     uses: ./.github/workflows/publish-release-packages.yaml

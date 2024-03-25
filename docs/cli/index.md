@@ -7,55 +7,84 @@
     - [-v, --verbose](#-v---verbose)
     - [--color, --no-color](#--color---no-color)
     - [--skip-version-check](#--skip-version-check)
+  - [bootstrap](#bootstrap)
+    - [Options](#options-1)
+    - [--force](#--force)
+    - [all](#all)
+    - [Options](#options-2)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
+    - [env](#env)
+    - [Options](#options-3)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
+    - [npm](#npm)
+    - [poetry](#poetry)
+  - [compile](#compile)
+    - [Options](#options-4)
+    - [-v, --version ](#-v---version-)
+    - [py](#py)
+    - [Arguments](#arguments)
+    - [PUYAPY_ARGS](#puyapy_args)
+    - [python](#python)
+    - [Arguments](#arguments-1)
+    - [PUYAPY_ARGS](#puyapy_args-1)
   - [completions](#completions)
     - [install](#install)
-    - [Options](#options-1)
+    - [Options](#options-5)
     - [--shell ](#--shell-)
     - [uninstall](#uninstall)
-    - [Options](#options-2)
+    - [Options](#options-6)
     - [--shell ](#--shell--1)
   - [config](#config)
     - [version-prompt](#version-prompt)
-    - [Arguments](#arguments)
+    - [Arguments](#arguments-2)
     - [ENABLE](#enable)
+  - [deploy](#deploy)
+    - [Options](#options-7)
+    - [-C, --command ](#-c---command-)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
+    - [-P, --path ](#-p---path-)
+    - [--deployer ](#--deployer-)
+    - [--dispenser ](#--dispenser-)
+    - [Arguments](#arguments-3)
+    - [ENVIRONMENT_NAME](#environment_name)
   - [dispenser](#dispenser)
     - [fund](#fund)
-    - [Options](#options-3)
+    - [Options](#options-8)
     - [-r, --receiver ](#-r---receiver-)
     - [-a, --amount ](#-a---amount-)
     - [--whole-units](#--whole-units)
     - [limit](#limit)
-    - [Options](#options-4)
+    - [Options](#options-9)
     - [--whole-units](#--whole-units-1)
     - [login](#login)
-    - [Options](#options-5)
+    - [Options](#options-10)
     - [--ci](#--ci)
     - [-o, --output ](#-o---output-)
     - [-f, --file ](#-f---file-)
     - [logout](#logout)
     - [refund](#refund)
-    - [Options](#options-6)
+    - [Options](#options-11)
     - [-t, --txID ](#-t---txid-)
   - [doctor](#doctor)
-    - [Options](#options-7)
+    - [Options](#options-12)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
-    - [Arguments](#arguments-1)
+    - [Arguments](#arguments-4)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
-    - [Options](#options-8)
+    - [Options](#options-13)
     - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
-    - [Arguments](#arguments-2)
+    - [Arguments](#arguments-5)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
-    - [Options](#options-9)
+    - [Options](#options-14)
     - [--console](#--console)
-    - [Arguments](#arguments-3)
+    - [Arguments](#arguments-6)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
-    - [Options](#options-10)
+    - [Options](#options-15)
     - [-n, --name ](#-n---name-)
     - [-t, --template ](#-t---template-)
     - [--template-url ](#--template-url-)
@@ -71,14 +100,14 @@
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-11)
+    - [Options](#options-16)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-12)
+    - [Options](#options-17)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
-    - [Options](#options-13)
+    - [Options](#options-18)
     - [-n, --name ](#-n---name--1)
     - [status](#status)
     - [stop](#stop)
@@ -120,7 +149,7 @@
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-7)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
     - [Options](#options-20)
@@ -141,20 +170,20 @@
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-22)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-8)
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-23)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-9)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
     - [Options](#options-24)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-10)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
     - [Options](#options-25)
@@ -183,20 +212,20 @@
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-10)
+    - [Arguments](#arguments-11)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-29)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
-    - [Arguments](#arguments-11)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-12)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-13)
     - [ALIAS](#alias)
     - [Options](#options-30)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-13)
+    - [Arguments](#arguments-14)
     - [ALIAS](#alias-1)
     - [Options](#options-31)
     - [-f, --force](#-f---force-3)
@@ -228,6 +257,108 @@ Force enable or disable of console output styling.
 
 ### --skip-version-check
 Skip version checking and prompting.
+
+## bootstrap
+
+Expedited initial setup for any developer by installing and configuring dependencies and other
+key development environment setup activities.
+
+```shell
+algokit bootstrap [OPTIONS] COMMAND [ARGS]...
+```
+
+### Options
+
+
+### --force
+Continue even if minimum AlgoKit version is not met
+
+### all
+
+Runs all bootstrap sub-commands in the current directory and immediate sub directories.
+
+```shell
+algokit bootstrap all [OPTIONS]
+```
+
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+### env
+
+Copies .env.template file to .env in the current working directory and prompts for any unspecified values.
+
+```shell
+algokit bootstrap env [OPTIONS]
+```
+
+### Options
+
+
+### --interactive, --non-interactive, --ci
+Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive
+
+### npm
+
+Runs npm install in the current working directory to install Node.js dependencies.
+
+```shell
+algokit bootstrap npm [OPTIONS]
+```
+
+### poetry
+
+Installs Python Poetry (if not present) and runs poetry install in the current working directory to install Python dependencies.
+
+```shell
+algokit bootstrap poetry [OPTIONS]
+```
+
+## compile
+
+Compile smart contracts and smart signatures written in a supported high-level language
+to a format deployable on the Algorand Virtual Machine (AVM).
+
+```shell
+algokit compile [OPTIONS] COMMAND [ARGS]...
+```
+
+### Options
+
+
+### -v, --version <version>
+The compiler version to pin to, for example, 1.0.0. If no version is specified, AlgoKit checks if the compiler is installed and runs the installed version. If the compiler is not installed, AlgoKit runs the latest version. If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. Otherwise, AlgoKit runs the specified version.
+
+### py
+
+Compile Algorand Python contract(s) using the PuyaPy compiler.
+
+```shell
+algokit compile py [OPTIONS] [PUYAPY_ARGS]...
+```
+
+### Arguments
+
+
+### PUYAPY_ARGS
+Optional argument(s)
+
+### python
+
+Compile Algorand Python contract(s) using the PuyaPy compiler.
+
+```shell
+algokit compile python [OPTIONS] [PUYAPY_ARGS]...
+```
+
+### Arguments
+
+
+### PUYAPY_ARGS
+Optional argument(s)
 
 ## completions
 
