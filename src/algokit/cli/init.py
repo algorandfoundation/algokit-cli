@@ -132,7 +132,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
             branch="feat/orchestration",
         ),
         TemplateKey.PUYA: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-puya-template",
+            url="gh:algorandfoundation/algokit-python-template",
             description="Official starter template for Puya applications (Dev Preview, not recommended for production)",
             branch="feat/orchestration",
         ),
