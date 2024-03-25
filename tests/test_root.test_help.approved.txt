@@ -14,6 +14,9 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
+  compile      Compile smart contracts and smart signatures written in a
+               supported high-level language to a format deployable on the
+               Algorand Virtual Machine (AVM).
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
   dispenser    Interact with the AlgoKit TestNet Dispenser.
