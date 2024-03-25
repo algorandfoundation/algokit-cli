@@ -94,7 +94,7 @@ def _load_commands_from_standalone(
         env_file = Path(raw_env_file) if raw_env_file else None
 
         if not raw_commands:
-            logger.warning(f"Command '{name}' has no custom commands to execute, skipping...")
+            logger.debug(f"Command '{name}' has no custom commands to execute, skipping...")
             continue
 
         commands.append(

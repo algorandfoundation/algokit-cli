@@ -389,12 +389,6 @@ def init_command(  # noqa: PLR0913, PLR0915
 
     _maybe_bootstrap(project_path, run_bootstrap=run_bootstrap, use_defaults=use_defaults, use_workspace=use_workspace)
 
-    _maybe_git_init(
-        workspace_path or project_path,
-        use_git=use_git,
-        commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
-    )
-
     logger.info(
         f"🙌 Project initialized at `{directory_name}`! For template specific next steps, "
         "consult the documentation of your selected template 🧐"
@@ -410,23 +404,28 @@ def init_command(  # noqa: PLR0913, PLR0915
     # Check if a .workspace file exists
     vscode_workspace_file = resolve_vscode_workspace_file(workspace_path or project_path)
 
+    if vscode_workspace_file:
+        append_project_to_vscode_workspace(project_path=project_path, workspace_path=vscode_workspace_file)
+
+    # Below must be ensured to run after all required filesystem changes are applied to ensure first commit captures
+    # all the changes introduced by init invocation
+    _maybe_git_init(
+        workspace_path or project_path,
+        use_git=use_git,
+        commit_message=f"Project initialised with AlgoKit CLI using template: {expanded_template_url}",
+    )
+
     if (
         open_ide
         and ((project_path / ".vscode").is_dir() or vscode_workspace_file)
         and (code_cmd := shutil.which("code"))
     ):
-        target_path = str(project_path)
+        target_path = str(vscode_workspace_file if vscode_workspace_file else project_path)
 
         logger.info(
             "VSCode configuration detected in project directory, and 'code' command is available on path, "
             "attempting to launch VSCode"
         )
-
-        if vscode_workspace_file:
-            logger.info("Attempting to append project to VSCode workspace.")
-            append_project_to_vscode_workspace(project_path=project_path, workspace_path=vscode_workspace_file)
-            logger.info(f"Detected VSCode workspace file. Opening workspace: {vscode_workspace_file}")
-            target_path = str(vscode_workspace_file)
 
         code_cmd_and_args = [code_cmd, target_path]
 
