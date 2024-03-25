@@ -24,7 +24,7 @@ DEFAULT_TYPESCRIPT_NPX_PACKAGE_VERSION = "latest"
 
 
 def _normalize_output(output: str) -> str:
-    return output.replace("\\", "/").replace(TYPESCRIPT_NPM_PACKAGE, "{typed_client_package}")
+    return output.replace("\\", "/")
 
 
 def _get_npx_command() -> str:

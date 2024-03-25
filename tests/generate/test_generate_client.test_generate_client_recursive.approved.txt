@@ -1,3 +1,4 @@
+DEBUG: Searching for project installed client generator
 DEBUG: Running 'poetry show algokit-client-generator --tree' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
 DEBUG: poetry: STDERR

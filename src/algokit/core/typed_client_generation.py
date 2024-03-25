@@ -2,6 +2,7 @@ import abc
 import json
 import logging
 import re
+import shutil  # noqa: F401
 from pathlib import Path
 from typing import ClassVar
 
@@ -179,7 +180,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             return project_result
 
         pipx_command = find_valid_pipx_command(
-            f"Unable to find pipx install so that the `{PYTHON_PYPI_PACKAGE}` can be installed; "
+            f"Unable to find pipx install so that the `{PYTHON_PYPI_PACKAGE}` can be run; "
             "please install pipx via https://pypa.github.io/pipx/ "
             "and then try `algokit generate client ...` again."
         )
@@ -252,12 +253,12 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         """
 
         npm_command = get_npm_command(
-            "Unable to find npm install so that the `algokit-client-generator` can be installed; "
+            f"Unable to find npm install so that the `{TYPESCRIPT_NPM_PACKAGE}` can be run; "
             "please install npm via https://docs.npmjs.com/downloading-and-installing-node-js-and-npm "
             "and then try `algokit generate client ...` again.",
         )
         npx_command = get_npm_command(
-            "Unable to find npx install so that the `algokit-client-generator` can be installed; "
+            f"Unable to find npx install so that the `{TYPESCRIPT_NPM_PACKAGE}` can be run; "
             "please install npx via https://www.npmjs.com/package/npx "
             "and then try `algokit generate client ...` again.",
             is_npx=True,
