@@ -118,12 +118,13 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
 def test_valid_contract(cwd: Path, output_path: Path) -> None:
     subprocess.run([sys.executable, "-m", "venv", ".venv"], check=True, cwd=cwd)
     venv_path = cwd / ".venv"
+    venv_bin = f"{venv_path / 'bin'}" if not is_windows() else f"{venv_path / 'Scripts'}"
     puyapy_env = {
         # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
         "NO_COLOR": "1",
         "VIRTUAL_ENV": str(venv_path),
         "PYTHONHOME": "",
-        "PATH": f"{venv_path / "Scripts" if is_windows() else 'bin' }:{os.environ['PATH']}",
+        "PATH": f"{venv_bin}:{os.environ['PATH']}",
     }
 
     subprocess.run(["pip", "install", "algorand-python"], check=True, cwd=cwd, env=dict(os.environ) | puyapy_env)
