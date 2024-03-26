@@ -44,7 +44,6 @@ AlgoKit helps you develop Algorand solutions:
 - **Getting Started**: AlgoKit helps you get started quickly when building new solutions:
   - [**AlgoKit Templates**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
 - **Development**: AlgoKit provides SDKs, tools and libraries that help you quickly and effectively build high quality Algorand solutions:
-
   - **AlgoKit Utils** ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test, build and deploy Algorand solutions quickly and easily
     - [algosdk](https://developer.algorand.org/docs/sdks/) ([Python](https://github.com/algorand/py-algorand-sdk#readme) | [TypeScript](https://github.com/algorand/js-algorand-sdk#readme)) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
   - [**Algorand Python**](https://github.com/algorandfoundation/puya): A semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
@@ -62,7 +61,7 @@ AlgoKit comes with out-of-the-box [Continuous Integration / Continuous Deploymen
 The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
 - Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
-- Building, testing, deploying and calling [Algorand PyTEAL](https://github.com/algorand/pyteal) / [Beaker](https://beaker.algo.xyz/) smart contracts
+- Building, testing, deploying and calling [Algorand Python](https://github.com/algorandfoundation/puya) / [TEALScript](https://github.com/algorandfoundation/TEALScript) smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
 
