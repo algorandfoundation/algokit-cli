@@ -275,7 +275,7 @@ def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Pat
     default=[],
     metavar="<key> <value>",
 )
-def init_command(  # noqa: PLR0913
+def init_command(  # noqa: PLR0913, C901, PLR0915
     *,
     directory_name: str | None,
     template_name: str | None,
@@ -332,11 +332,14 @@ def init_command(  # noqa: PLR0913
 
     # allow skipping prompt if the template is the base template to avoid redundant
     # 're-using existing directory' warning in fullstack template init
-    project_path = _get_project_path(
+    project_path, overwrite_existing_dir = _get_project_path(
         directory_name_option=directory_name, force=template == _get_blessed_templates()[TemplateKey.BASE]
     )
     workspace_path = get_workspace_project_path(project_path)
-    _prevent_workspace_nesting(workspace_path=workspace_path, project_path=project_path, use_workspace=use_workspace)
+    if not overwrite_existing_dir:
+        _prevent_workspace_nesting(
+            workspace_path=workspace_path, project_path=project_path, use_workspace=use_workspace
+        )
 
     logger.debug(f"project path = {project_path}")
     directory_name = project_path.name
@@ -550,7 +553,7 @@ class DirectoryNameValidator(questionary.Validator):
             )
 
 
-def _get_project_path(*, directory_name_option: str | None = None, force: bool = False) -> Path:
+def _get_project_path(*, directory_name_option: str | None = None, force: bool = False) -> tuple[Path, bool]:
     """
     Determines the project path based on the provided directory name option.
 
@@ -560,10 +563,11 @@ def _get_project_path(*, directory_name_option: str | None = None, force: bool =
         force: A flag to auto accept warning prompts.
 
     Returns:
-        The path to the project directory.
+        The path to the project directory and a flag to indicate if the user agreed to overwrite the directory.
     """
 
     base_path = Path.cwd()
+    overwrite_existing_dir = force
     directory_name = (
         directory_name_option
         if directory_name_option is not None
@@ -583,10 +587,11 @@ def _get_project_path(*, directory_name_option: str | None = None, force: bool =
             "Re-using existing directory, this is not recommended because if project "
             "generation fails, then we can't automatically cleanup."
         )
-        if not questionary_extensions.prompt_confirm("Continue anyway?", default=False):
+        overwrite_existing_dir = questionary_extensions.prompt_confirm("Continue anyway?", default=False)
+        if not overwrite_existing_dir:
             return _get_project_path() if directory_name_option is None else _fail_and_bail()
 
-    return project_path
+    return project_path, overwrite_existing_dir
 
 
 def _get_template(
