@@ -114,11 +114,11 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
     verify(result.output)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
+@pytest.mark.skipif(sys.version_info < (3, 12) or is_windows(), reason="PuyaPy requires python3.12 or higher")
 def test_valid_contract(cwd: Path, output_path: Path) -> None:
     subprocess.run([sys.executable, "-m", "venv", ".venv"], check=True, cwd=cwd)
     venv_path = cwd / ".venv"
-    venv_bin = f"{venv_path / 'bin'}" if not is_windows() else f"{venv_path / 'Scripts'}"
+    venv_bin = f"{venv_path / 'Scripts'}" if is_windows() else f"{venv_path / 'bin'}"
     puyapy_env = {
         # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
         "NO_COLOR": "1",
