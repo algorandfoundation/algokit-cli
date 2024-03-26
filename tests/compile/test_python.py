@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from algokit.core.utils import is_windows
 from pytest_mock import MockerFixture
 
 from tests.compile.conftest import (
@@ -122,8 +123,9 @@ def test_valid_contract(cwd: Path, output_path: Path) -> None:
         "NO_COLOR": "1",
         "VIRTUAL_ENV": str(venv_path),
         "PYTHONHOME": "",
-        "PATH": f"{venv_path / 'bin'}:{os.environ['PATH']}",
+        "PATH": f"{venv_path / "Scripts" if is_windows() else 'bin' }:{os.environ['PATH']}",
     }
+
     subprocess.run(["pip", "install", "algorand-python"], check=True, cwd=cwd, env=dict(os.environ) | puyapy_env)
 
     contract_path = cwd / "contract.py"
