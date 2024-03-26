@@ -425,7 +425,7 @@ services:
 
   indexer-db:
     container_name: "{name}_postgres"
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     ports:
       - 5443:5432
     user: postgres
