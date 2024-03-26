@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -114,14 +115,23 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
 
 @pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_valid_contract(cwd: Path, output_path: Path) -> None:
-    # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
-    logger.debug(f"sys.version_info {sys.version_info}")
-    os.environ["NO_COLOR"] = "1"
+    subprocess.run([sys.executable, "-m", "venv", ".venv"], check=True, cwd=cwd)
+    venv_path = cwd / ".venv"
+    puyapy_env = {
+        # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
+        "NO_COLOR": "1",
+        "VIRTUAL_ENV": str(venv_path),
+        "PYTHONHOME": "",
+        "PATH": f"{venv_path / 'bin'}:{os.environ['PATH']}",
+    }
+    subprocess.run(["pip", "install", "algorand-python"], check=True, cwd=cwd, env=dict(os.environ) | puyapy_env)
 
     contract_path = cwd / "contract.py"
     contract_path.write_text(VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT)
 
-    result = invoke(f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}")
+    result = invoke(
+        f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}", env=puyapy_env
+    )
 
     # Only check for the exit code, don't check the results from PuyaPy
     assert result.exit_code == 0

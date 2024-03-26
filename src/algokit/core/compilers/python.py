@@ -11,7 +11,7 @@ def find_valid_puyapy_command(version: str | None) -> list[str]:
 def _find_puyapy_command_at_version(version: str) -> list[str]:
     """
     Find puyapy command with a specific version.
-    If the puya version isn't installed, install it with pipx run.
+    If the puyapy version isn't installed, install it with pipx run.
     """
     for puyapy_command in _get_candidate_puyapy_commands():
         try:
@@ -33,7 +33,7 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
     return [
         *pipx_command,
         "run",
-        f"--spec=puya=={version}",
+        f"--spec=puyapy=={version}",
         "puyapy",
     ]
 
@@ -41,7 +41,7 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
 def _find_puyapy_command() -> list[str]:
     """
     Find puyapy command.
-    If puya isn't installed, install the latest version with pipx.
+    If puyapy isn't installed, install the latest version with pipx.
     """
     for puyapy_command in _get_candidate_puyapy_commands():
         try:
@@ -60,13 +60,13 @@ def _find_puyapy_command() -> list[str]:
     return [
         *pipx_command,
         "run",
-        "--spec=puya",
+        "--spec=puyapy",
         "puyapy",
     ]
 
 
 def _get_candidate_puyapy_commands() -> Iterator[list[str]]:
-    # when puya is installed at the project level
+    # when puyapy is installed at the project level
     yield ["poetry", "run", "puyapy"]
-    # when puya is installed at the global level
+    # when puyapy is installed at the global level
     yield ["puyapy"]

@@ -28,7 +28,7 @@ jobs:
 
       - name: Install PuyaPy
         if: ${{ matrix.python == '3.12' }}
-        run: pipx install puya
+        run: pipx install puyapy
 
       - name: pytest
         shell: bash

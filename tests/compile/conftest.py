@@ -1,5 +1,5 @@
 VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT = """
-from puyapy import Contract, Txn, log
+from algopy import Contract, Txn, log
 
 
 class HelloWorldContract(Contract):
@@ -13,7 +13,7 @@ class HelloWorldContract(Contract):
 """
 
 INVALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT = """
-from puyapy import Contract, Txn, log
+from algopy import Contract, Txn, log
 
 
 class HelloWorldContract(Contract):
