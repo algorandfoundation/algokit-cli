@@ -1,11 +1,9 @@
 import logging
 import os
-import subprocess
 import sys
 from pathlib import Path
 
 import pytest
-from algokit.core.utils import is_windows
 from pytest_mock import MockerFixture
 
 from tests.compile.conftest import (
@@ -116,27 +114,13 @@ def test_puyapy_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
     verify(result.output)
 
 
-# TODO: NC - Temporarily disable this test on windows
-@pytest.mark.skipif(sys.version_info < (3, 12) or is_windows(), reason="PuyaPy requires python3.12 or higher")
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="PuyaPy requires python3.12 or higher")
 def test_valid_contract(cwd: Path, output_path: Path) -> None:
-    subprocess.run([sys.executable, "-m", "venv", ".venv"], check=True, cwd=cwd)
-    venv_path = cwd / ".venv"
-
-    puyapy_env = {
-        # Set NO_COLOR to 1 to avoid requirements for colorama on Windows
-        "NO_COLOR": "1",
-        "VIRTUAL_ENV": str(venv_path),
-        "PYTHONHOME": "",
-        "PATH": (f"{venv_path / 'Scripts'};" if is_windows() else f"{venv_path / 'bin'}:" f"{os.environ['PATH']}"),
-    }
-
-    subprocess.run(["pip", "install", "algorand-python"], check=True, cwd=cwd, env=dict(os.environ) | puyapy_env)
-
     contract_path = cwd / "contract.py"
     contract_path.write_text(VALID_ALGORAND_PYTHON_CONTRACT_FILE_CONTENT)
 
     result = invoke(
-        f"compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}", env=puyapy_env
+        f"--no-color compile python {_normalize_path(contract_path)} --out-dir {_normalize_path(output_path)}"
     )
 
     # Only check for the exit code, don't check the results from PuyaPy

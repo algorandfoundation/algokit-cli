@@ -50,3 +50,4 @@ Executed `algokit bootstrap all` in {current_working_directory}/myapp/projects/m
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/robdmoore/copier-helloworld
+DEBUG: Appended project {current_working_directory}/myapp/projects/myapp to workspace {current_working_directory}/myapp/myapp.code-workspace.

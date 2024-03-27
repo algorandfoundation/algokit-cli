@@ -945,10 +945,9 @@ def test_init_wizard_v2_github_folder_with_workspace_partial(
     # Assert
     cwd /= "myapp"
     assert result.exit_code == 0
-    assert (cwd / "projects/myapp/.github/workflows/cd.yaml").read_text() != ""
-    assert (cwd / ".github/workflows/cd.yaml").read_text() == ""
+    assert not (cwd / "projects/myapp/.github/workflows/production-beaker-cd.yaml").exists()
+    assert (cwd / ".github/workflows/myapp-cd.yaml").read_text() != ""
     assert cwd.glob(".github/workflows/*.yaml")
-    assert len(list(cwd.glob("projects/myapp/.github/workflows/*.yaml"))) == 1
 
 
 def test_init_wizard_v2_github_folder_no_workspace(
