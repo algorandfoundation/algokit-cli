@@ -19,7 +19,7 @@ If you want to learn more, check out the [PuyaPy docs](https://github.com/algora
 Below is an example Algorand Python smart contract.
 
 ```py
-from puyapy import ARC4Contract, arc4
+from algopy import ARC4Contract, arc4
 
 class HelloWorldContract(ARC4Contract):
     @arc4.abimethod
