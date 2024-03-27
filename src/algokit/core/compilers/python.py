@@ -45,7 +45,7 @@ def _find_puyapy_command() -> list[str]:
     """
     for puyapy_command in _get_candidate_puyapy_commands():
         try:
-            puyapy_help_result = run([*puyapy_command, "-h"])
+            puyapy_help_result = run([*puyapy_command, "--version"])
         except OSError:
             pass  # in case of path/permission issues, go to next candidate
         else:
