@@ -33,6 +33,8 @@ If you want to ensure typed client output stability across different environment
 
 To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
 
+Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `poetry` or `npm` respectively) or globally on your system (via `pipx` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
+
 ### Usage
 
 Usage examples of using a generated client are below, typed clients allow your favourite IDE to provide better intellisense to provide better discoverability
