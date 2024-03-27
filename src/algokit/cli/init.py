@@ -127,32 +127,26 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.TEALSCRIPT: BlessedTemplateSource(
             url="gh:algorand-devrel/tealscript-algokit-template",
             description="Official starter template for TEALScript applications.",
-            branch="feat/orchestration",
         ),
         TemplateKey.PYTHON: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-python-template",
             description="Official starter template for Algorand Python applications",
-            branch="feat/orchestration",
         ),
         TemplateKey.REACT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-react-frontend-template",
             description="Official template for React frontend applications (smart contracts not included).",
-            branch="feat/orchestration",
         ),
         TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
-            branch="feat/orchestration",
         ),
         TemplateKey.BEAKER: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-default-template",
             description="Official template for starter or production Beaker applications.",
-            branch="feat/orchestration",
         ),
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
-            branch="feat/orchestration",
         ),
         TemplateKey.PLAYGROUND: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-beaker-playground-template",
