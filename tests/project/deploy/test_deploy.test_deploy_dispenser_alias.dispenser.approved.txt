@@ -1,0 +1,11 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+Using deploy command: /bin/command_a
+Loading deployment environment variables...
+DEBUG: Loaded dispenser alias mnemonic as DISPENSER_MNEMONIC environment variable
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running '/bin/command_a' in '{current_working_directory}'
+/bin/command_a: STDOUT
+/bin/command_a: STDERR

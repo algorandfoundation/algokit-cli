@@ -1,5 +1,6 @@
 import logging
 import shutil
+from functools import cache
 from pathlib import Path
 
 import click
@@ -10,6 +11,7 @@ from algokit.core.typed_client_generation import ClientGenerator
 logger = logging.getLogger(__name__)
 
 
+@cache
 def _load_custom_generate_commands(project_dir: Path) -> dict[str, click.Command]:
     """
     Load custom generate commands from .algokit.toml file.
@@ -125,17 +127,30 @@ def generate_group() -> None:
     type=click.Choice(ClientGenerator.languages()),
     help="Programming language of the generated client code",
 )
-def generate_client(output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None) -> None:
+@click.option(
+    "--version",
+    "-v",
+    "version",
+    default=None,
+    help="The client generator version to pin to, for example, 1.0.0. "
+    "If no version is specified, AlgoKit checks if the client generator is installed and runs the installed version. "
+    "If the client generator is not installed, AlgoKit runs the latest version. "
+    "If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. "
+    "Otherwise, AlgoKit runs the specified version.",
+)
+def generate_client(
+    output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None
+) -> None:
     """Create a typed ApplicationClient from an ARC-32 application.json
 
     Supply the path to an application specification file or a directory to recursively search
     for "application.json" files"""
     if language is not None:
-        generator = ClientGenerator.create_for_language(language)
+        generator = ClientGenerator.create_for_language(language, version)
     elif output_path_pattern is not None:
         extension = Path(output_path_pattern).suffix
         try:
-            generator = ClientGenerator.create_for_extension(extension)
+            generator = ClientGenerator.create_for_extension(extension, version)
         except KeyError as ex:
             raise click.ClickException(
                 "Could not determine language from file extension, Please use the --language option to specify a "

@@ -1,0 +1,7 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from <cwd>/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from <cwd>/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml

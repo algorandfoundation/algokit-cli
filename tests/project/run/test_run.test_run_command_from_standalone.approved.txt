@@ -1,0 +1,5 @@
+Running `hello` command in {current_working_directory}...
+Command Executed: 'command_a'
+Output: STDOUT
+STDERR
+✅ contract_project: 'command_a' executed successfully.

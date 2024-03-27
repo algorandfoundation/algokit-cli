@@ -69,7 +69,7 @@ def load_generators(project_dir: Path) -> list[Generator]:
     :return: Generators.
     """
     # Load and parse the TOML configuration file
-    config = get_algokit_config(project_dir)
+    config = get_algokit_config(project_dir=project_dir)
     generators: list[Generator] = []
 
     if not config:
