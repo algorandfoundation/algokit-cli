@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.0 (2024-03-27)
+
+### Feature
+
+* Algokit-cli v2 ([#462](https://github.com/algorandfoundation/algokit-cli/issues/462)) ([`182c449`](https://github.com/algorandfoundation/algokit-cli/commit/182c449544e4a23e17919e9629dfdc5ddbf399a5))
+* LocalNet should run as an archival node so that you can access all blocks (useful for testing) ([#461](https://github.com/algorandfoundation/algokit-cli/issues/461)) ([`794cccc`](https://github.com/algorandfoundation/algokit-cli/commit/794cccce2bb4aeccfe56813af754406b87ba5112))
+
+### Breaking
+
+* 2.0 release ([`182c449`](https://github.com/algorandfoundation/algokit-cli/commit/182c449544e4a23e17919e9629dfdc5ddbf399a5))
+
 ## v1.13.1 (2024-03-20)
 
 ### Fix
