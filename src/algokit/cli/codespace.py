@@ -23,10 +23,17 @@ def _install_gh() -> None:
         proc.run(["gh", "--version"])
     except Exception:
         logger.info("Installing gh...")
-        if is_windows():
-            proc.run(["winget", "install", "--id", "GitHub.cli", "--silent"])
-        else:
-            _install_gh_webi()
+        try:
+            if is_windows():
+                proc.run(["winget", "install", "--id", "GitHub.cli", "--silent"])
+            else:
+                _install_gh_webi()
+        except Exception as e:
+            logger.error(f"Failed to automatically install gh cli: {e}")
+            logger.error(
+                "Please install `gh cli` manually by following official documentation at https://cli.github.com/"
+            )
+            raise
         logger.info("gh installed successfully!")
 
 
@@ -132,28 +139,34 @@ def _delete_default_named_codespaces(codespaces: list[str], default_name: str) -
 
 @click.group("codespace")
 def codespace_group() -> None:
+    """Manage the AlgoKit LocalNet in GitHub Codespaces."""
     _install_gh()
 
 
 @codespace_group.command("start")
 @click.option(
+    "-m",
     "--machine",
     default="basicLinux32gb",
     required=False,
     help="The GitHub Codespace machine type to use. Defaults to base tier.",
 )
-@click.option("--algod-port", default=4001, required=False, help="The port for the Algorand daemon. Defaults to 4001.")
 @click.option(
-    "--indexer-port", default=8980, required=False, help="The port for the Algorand indexer. Defaults to 8980."
+    "-a", "--algod-port", default=4001, required=False, help="The port for the Algorand daemon. Defaults to 4001."
 )
-@click.option("--kmd-port", default=4002, required=False, help="The port for the Algorand kmd. Defaults to 4002.")
 @click.option(
+    "-i", "--indexer-port", default=8980, required=False, help="The port for the Algorand indexer. Defaults to 8980."
+)
+@click.option("-k", "--kmd-port", default=4002, required=False, help="The port for the Algorand kmd. Defaults to 4002.")
+@click.option(
+    "-n",
     "--codespace-name",
     default=DEFAULT_NAME,
     required=False,
     help="The name of the codespace. Defaults to random name with timestamp.",
 )
 @click.option(
+    "-r",
     "--repo-url",
     required=False,
     default="algorandfoundation/algokit-base-template",
