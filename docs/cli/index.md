@@ -79,32 +79,39 @@
     - [-a, --answer  ](#-a---answer--)
   - [localnet](#localnet)
     - [codespace](#codespace)
+    - [Options](#options-12)
+    - [--machine ](#--machine-)
+    - [--algod-port ](#--algod-port-)
+    - [--indexer-port ](#--indexer-port-)
+    - [--kmd-port ](#--kmd-port-)
+    - [--codespace-name ](#--codespace-name-)
+    - [--repo-url ](#--repo-url-)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-12)
+    - [Options](#options-13)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-13)
+    - [Options](#options-14)
     - [--update, --no-update](#--update---no-update)
     - [start](#start)
-    - [Options](#options-14)
+    - [Options](#options-15)
     - [-n, --name ](#-n---name--1)
     - [status](#status)
     - [stop](#stop)
   - [project](#project)
     - [bootstrap](#bootstrap)
-    - [Options](#options-15)
-    - [--force](#--force)
     - [Options](#options-16)
+    - [--force](#--force)
+    - [Options](#options-17)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [-p, --project-name ](#-p---project-name-)
     - [-t, --type ](#-t---type-)
-    - [Options](#options-17)
+    - [Options](#options-18)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [deploy](#deploy)
-    - [Options](#options-18)
+    - [Options](#options-19)
     - [-C, --command ](#-c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
     - [-P, --path ](#-p---path-)
@@ -114,7 +121,7 @@
     - [Arguments](#arguments-6)
     - [ENVIRONMENT_NAME](#environment_name)
     - [link](#link)
-    - [Options](#options-19)
+    - [Options](#options-20)
     - [-p, --project-name ](#-p---project-name--2)
     - [-l, --language ](#-l---language--1)
     - [-a, --all](#-a---all)
@@ -126,7 +133,7 @@
     - [run](#run)
   - [task](#task)
     - [analyze](#analyze)
-    - [Options](#options-20)
+    - [Options](#options-21)
     - [-r, --recursive](#-r---recursive)
     - [--force](#--force-1)
     - [--diff](#--diff)
@@ -135,11 +142,11 @@
     - [Arguments](#arguments-8)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
-    - [Options](#options-21)
+    - [Options](#options-22)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [--creator ](#--creator-)
     - [-n, --name ](#-n---name--3)
     - [-u, --unit ](#-u---unit-)
@@ -151,37 +158,37 @@
     - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-23)
+    - [Options](#options-24)
     - [-o, --output ](#-o---output--3)
     - [Arguments](#arguments-9)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
     - [Arguments](#arguments-10)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
     - [Arguments](#arguments-11)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
     - [--force](#--force-2)
     - [transfer](#transfer)
-    - [Options](#options-28)
+    - [Options](#options-29)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -189,7 +196,7 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-29)
+    - [Options](#options-30)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
@@ -198,7 +205,7 @@
     - [Arguments](#arguments-12)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-30)
+    - [Options](#options-31)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-1)
@@ -206,11 +213,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-14)
     - [ALIAS](#alias)
-    - [Options](#options-31)
+    - [Options](#options-32)
     - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-15)
     - [ALIAS](#alias-1)
-    - [Options](#options-32)
+    - [Options](#options-33)
     - [-f, --force](#-f---force-3)
 
 # algokit
@@ -639,19 +646,43 @@ algokit localnet [OPTIONS] COMMAND [ARGS]...
 
 ### codespace
 
-Manage the AlgoKit LocalNet in GitHub Codespaces.
-
 ```shell
 algokit localnet codespace [OPTIONS] COMMAND [ARGS]...
 ```
 
 #### start
 
-Logic to start LocalNet in a GitHub Codespace.
+Start the AlgoKit LocalNet in a GitHub Codespace.
 
 ```shell
 algokit localnet codespace start [OPTIONS]
 ```
+
+### Options
+
+
+### --machine <machine>
+The GitHub Codespace machine type to use. Defaults to base tier.
+
+
+### --algod-port <algod_port>
+The port for the Algorand daemon. Defaults to 4001.
+
+
+### --indexer-port <indexer_port>
+The port for the Algorand indexer. Defaults to 8980.
+
+
+### --kmd-port <kmd_port>
+The port for the Algorand kmd. Defaults to 4002.
+
+
+### --codespace-name <codespace_name>
+The name of the codespace. Defaults to random name with timestamp.
+
+
+### --repo-url <repo_url>
+The URL of the repository. Defaults to algokit base template repo.
 
 ### console
 
