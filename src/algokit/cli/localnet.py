@@ -2,6 +2,7 @@ import logging
 
 import click
 
+from algokit.cli.codespace import codespace_group
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
@@ -20,7 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 @click.group("localnet", short_help="Manage the AlgoKit LocalNet.")
-def localnet_group() -> None:
+@click.pass_context
+def localnet_group(ctx: click.Context) -> None:
+    if ctx.invoked_subcommand and "codespace" in ctx.invoked_subcommand or not ctx.invoked_subcommand:
+        return
+
     try:
         compose_version_result = proc.run(DOCKER_COMPOSE_VERSION_COMMAND)
     except OSError as ex:
@@ -226,3 +231,6 @@ def localnet_explore(context: click.Context) -> None:
 def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
     sandbox = ComposeSandbox()
     sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
+
+
+localnet_group.add_command(codespace_group)
