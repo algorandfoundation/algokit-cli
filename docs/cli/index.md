@@ -80,12 +80,12 @@
   - [localnet](#localnet)
     - [codespace](#codespace)
     - [Options](#options-12)
-    - [--machine ](#--machine-)
-    - [--algod-port ](#--algod-port-)
-    - [--indexer-port ](#--indexer-port-)
-    - [--kmd-port ](#--kmd-port-)
-    - [--codespace-name ](#--codespace-name-)
-    - [--repo-url ](#--repo-url-)
+    - [-m, --machine ](#-m---machine-)
+    - [-a, --algod-port ](#-a---algod-port-)
+    - [-i, --indexer-port ](#-i---indexer-port-)
+    - [-k, --kmd-port ](#-k---kmd-port-)
+    - [-n, --codespace-name ](#-n---codespace-name-)
+    - [-r, --repo-url ](#-r---repo-url-)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
@@ -646,6 +646,8 @@ algokit localnet [OPTIONS] COMMAND [ARGS]...
 
 ### codespace
 
+Manage the AlgoKit LocalNet in GitHub Codespaces.
+
 ```shell
 algokit localnet codespace [OPTIONS] COMMAND [ARGS]...
 ```
@@ -661,27 +663,27 @@ algokit localnet codespace start [OPTIONS]
 ### Options
 
 
-### --machine <machine>
+### -m, --machine <machine>
 The GitHub Codespace machine type to use. Defaults to base tier.
 
 
-### --algod-port <algod_port>
+### -a, --algod-port <algod_port>
 The port for the Algorand daemon. Defaults to 4001.
 
 
-### --indexer-port <indexer_port>
+### -i, --indexer-port <indexer_port>
 The port for the Algorand indexer. Defaults to 8980.
 
 
-### --kmd-port <kmd_port>
+### -k, --kmd-port <kmd_port>
 The port for the Algorand kmd. Defaults to 4002.
 
 
-### --codespace-name <codespace_name>
+### -n, --codespace-name <codespace_name>
 The name of the codespace. Defaults to random name with timestamp.
 
 
-### --repo-url <repo_url>
+### -r, --repo-url <repo_url>
 The URL of the repository. Defaults to algokit base template repo.
 
 ### console
