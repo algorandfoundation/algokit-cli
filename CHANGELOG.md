@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.1 (2024-03-29)
+
+### Documentation
+
+* Few tweaks post release ([#465](https://github.com/algorandfoundation/algokit-cli/issues/465)) ([`a4a5645`](https://github.com/algorandfoundation/algokit-cli/commit/a4a5645c11790eba1162f7d80ade26fe40f83944))
+
 ## v2.0.0 (2024-03-27)
 
 ### Feature
