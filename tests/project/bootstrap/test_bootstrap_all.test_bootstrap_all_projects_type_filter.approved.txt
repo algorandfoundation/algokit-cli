@@ -19,11 +19,11 @@ DEBUG: Skipping {current_working_directory}/artifacts/project_3/.env.template
 DEBUG: Skipping {current_working_directory}/artifacts/project_3/poetry.toml
 DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_4/.algokit.toml
 DEBUG: Checking {current_working_directory}/artifacts/project_4 for bootstrapping needs
-DEBUG: Running `algokit bootstrap env`
+DEBUG: Running `algokit project bootstrap env`
 DEBUG: {current_working_directory}/artifacts/project_4/.env doesn't exist yet
 DEBUG: {current_working_directory}/artifacts/project_4/.env.template exists
 Copying {current_working_directory}/artifacts/project_4/.env.template to {current_working_directory}/artifacts/project_4/.env and prompting for empty values
-DEBUG: Running `algokit bootstrap npm`
+DEBUG: Running `algokit project bootstrap npm`
 Installing npm dependencies
 DEBUG: Running 'npm install' in '{current_working_directory}/artifacts/project_4'
 npm: STDOUT

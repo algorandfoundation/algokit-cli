@@ -22,15 +22,15 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
     if next(project_dir.glob(ENV_TEMPLATE_PATTERN), None):
-        logger.debug("Running `algokit bootstrap env`")
+        logger.debug("Running `algokit project bootstrap env`")
         bootstrap_env(project_dir, ci_mode=ci_mode)
 
     if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
-        logger.debug("Running `algokit bootstrap poetry`")
+        logger.debug("Running `algokit project bootstrap poetry`")
         bootstrap_poetry(project_dir)
 
     if package_json_path.exists():
-        logger.debug("Running `algokit bootstrap npm`")
+        logger.debug("Running `algokit project bootstrap npm`")
         bootstrap_npm(project_dir)
 
 
@@ -147,18 +147,18 @@ def bootstrap_poetry(project_dir: Path) -> None:
         ):
             raise click.ClickException(
                 "Unable to install poetry via pipx; please install poetry "
-                "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
+                "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             )
         pipx_command = find_valid_pipx_command(
             "Unable to find pipx install so that poetry can be installed; "
             "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit bootstrap poetry` again."
+            "and then try `algokit project bootstrap poetry` again."
         )
         proc.run(
             [*pipx_command, "install", "poetry"],
             bad_return_code_error_message=(
                 "Unable to install poetry via pipx; please install poetry "
-                "manually via https://python-poetry.org/docs/ and try `algokit bootstrap poetry` again."
+                "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             ),
         )
 
@@ -170,7 +170,7 @@ def bootstrap_poetry(project_dir: Path) -> None:
             raise click.ClickException(
                 "Unable to access Poetry on PATH after installing it via pipx; "
                 "check pipx installations are on your path by running `pipx ensurepath` "
-                "and try `algokit bootstrap poetry` again."
+                "and try `algokit project bootstrap poetry` again."
             ) from e
         raise  # unexpected error, we already ran without IOError before
 

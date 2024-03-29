@@ -6,8 +6,8 @@ Usage: algokit init [OPTIONS]
   Templates can be default templates shipped with AlgoKit, or custom templates
   in public Git repositories.
 
-  Includes ability to initialise Git repository, run algokit bootstrap and
-  automatically open Visual Studio Code.
+  Includes ability to initialise Git repository, run algokit project bootstrap
+  and automatically open Visual Studio Code.
 
   This should be run in the parent directory that you want the project folder
   created in.
@@ -40,9 +40,9 @@ Options:
                                   creation.
   --defaults                      Automatically choose default answers without
                                   asking when creating this template.
-  --bootstrap / --no-bootstrap    Whether to run `algokit bootstrap` to install
-                                  and configure the new project's dependencies
-                                  locally.
+  --bootstrap / --no-bootstrap    Whether to run `algokit project bootstrap` to
+                                  install and configure the new project's
+                                  dependencies locally.
   --ide / --no-ide                Whether to open an IDE for you if the IDE and
                                   IDE config are detected. Supported IDEs: VS
                                   Code.

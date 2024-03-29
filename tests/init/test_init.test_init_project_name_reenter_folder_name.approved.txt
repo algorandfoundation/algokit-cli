@@ -28,5 +28,5 @@ DEBUG: Attempting to load project config from {current_working_directory}/.algok
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-Executed `algokit bootstrap all` in {current_working_directory}/FAKE_PROJECT_2
+Executed `algokit project bootstrap all` in {current_working_directory}/FAKE_PROJECT_2
 🙌 Project initialized at `FAKE_PROJECT_2`! For template specific next steps, consult the documentation of your selected template 🧐
