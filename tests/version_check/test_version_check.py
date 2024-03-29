@@ -160,6 +160,6 @@ def test_version_prompt_according_to_distribution_method(
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("2.0.0", encoding="utf-8")
 
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
     assert result.exit_code == 0
     assert message in result.output

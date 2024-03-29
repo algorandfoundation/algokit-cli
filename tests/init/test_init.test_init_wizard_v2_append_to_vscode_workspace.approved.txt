@@ -13,7 +13,7 @@ DEBUG: Attempting to load project config from {current_working_directory}/projec
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Attempting to load project config from {current_working_directory}/projects/myapp2/.algokit.toml
-Executed `algokit bootstrap all` in {current_working_directory}/projects/myapp2
+Executed `algokit project bootstrap all` in {current_working_directory}/projects/myapp2
 🙌 Project initialized at `myapp2`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template

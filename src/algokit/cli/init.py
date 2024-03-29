@@ -239,7 +239,7 @@ def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Pat
     "--bootstrap/--no-bootstrap",
     is_flag=True,
     default=None,
-    help="Whether to run `algokit bootstrap` to install and configure the new project's dependencies locally.",
+    help="Whether to run `algokit project bootstrap` to install and configure the new project's dependencies locally.",
 )
 @click.option(
     "open_ide",
@@ -290,7 +290,7 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
     Templates can be default templates shipped with AlgoKit, or custom
     templates in public Git repositories.
 
-    Includes ability to initialise Git repository, run algokit bootstrap and
+    Includes ability to initialise Git repository, run algokit project bootstrap and
     automatically open Visual Studio Code.
 
     This should be run in the parent directory that you want the project folder
@@ -438,7 +438,7 @@ def _maybe_bootstrap(
     if run_bootstrap is None:
         # if user didn't specify a bootstrap option, then assume yes if using defaults, otherwise prompt
         run_bootstrap = use_defaults or questionary_extensions.prompt_confirm(
-            "Do you want to run `algokit bootstrap` for this new project? "
+            "Do you want to run `algokit project bootstrap` for this new project? "
             "This will install and configure dependencies allowing it to be run immediately.",
             default=True,
         )
@@ -455,7 +455,7 @@ def _maybe_bootstrap(
             logger.error(f"Received an error while attempting bootstrap: {e}")
             logger.exception(
                 "Bootstrap failed. Once any errors above are resolved, "
-                f"you can run `algokit bootstrap` in {project_path}",
+                f"you can run `algokit project bootstrap` in {project_path}",
                 exc_info=e,
             )
 

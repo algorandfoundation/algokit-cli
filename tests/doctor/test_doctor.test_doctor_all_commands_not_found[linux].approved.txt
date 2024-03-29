@@ -32,11 +32,11 @@ pipx: Command not found!
   install via https://pypa.github.io/pipx/
 poetry: Command not found!
   Poetry is required for some Python-based templates;
-  install via `algokit bootstrap` within project directory, or via:
+  install via `algokit project bootstrap` within project directory, or via:
   https://python-poetry.org/docs/#installation
 node: Command not found!
   Node.js is required for some Node.js-based templates;
-  install via `algokit bootstrap` within project directory, or via:
+  install via `algokit project bootstrap` within project directory, or via:
   https://nodejs.dev/en/learn/how-to-install-nodejs/
 npm: Command not found!
 

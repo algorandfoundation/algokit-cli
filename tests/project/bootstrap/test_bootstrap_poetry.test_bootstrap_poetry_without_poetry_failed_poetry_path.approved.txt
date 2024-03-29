@@ -11,4 +11,4 @@ DEBUG: pipx: STDOUT
 DEBUG: pipx: STDERR
 Installing Python dependencies and setting up Python virtual environment via Poetry
 DEBUG: Running 'poetry install' in '{current_working_directory}'
-Error: Unable to access Poetry on PATH after installing it via pipx; check pipx installations are on your path by running `pipx ensurepath` and try `algokit bootstrap poetry` again.
+Error: Unable to access Poetry on PATH after installing it via pipx; check pipx installations are on your path by running `pipx ensurepath` and try `algokit project bootstrap poetry` again.

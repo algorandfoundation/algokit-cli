@@ -85,7 +85,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["poetry", "--version"],
             missing_help=[
                 "Poetry is required for some Python-based templates;",
-                "install via `algokit bootstrap` within project directory, or via:",
+                "install via `algokit project bootstrap` within project directory, or via:",
                 "https://python-poetry.org/docs/#installation",
             ],
         ),
@@ -93,7 +93,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["node", "--version"],
             missing_help=[
                 "Node.js is required for some Node.js-based templates;",
-                "install via `algokit bootstrap` within project directory, or via:",
+                "install via `algokit project bootstrap` within project directory, or via:",
                 "https://nodejs.dev/en/learn/how-to-install-nodejs/",
             ],
         ),

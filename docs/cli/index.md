@@ -560,7 +560,7 @@ for template specific questions to be used in template rendering.
 Templates can be default templates shipped with AlgoKit, or custom
 templates in public Git repositories.
 
-Includes ability to initialise Git repository, run algokit bootstrap and
+Includes ability to initialise Git repository, run algokit project bootstrap and
 automatically open Visual Studio Code.
 
 This should be run in the parent directory that you want the project folder
@@ -614,7 +614,7 @@ Automatically choose default answers without asking when creating this template.
 
 
 ### --bootstrap, --no-bootstrap
-Whether to run algokit bootstrap to install and configure the new project's dependencies locally.
+Whether to run algokit project bootstrap to install and configure the new project's dependencies locally.
 
 
 ### --ide, --no-ide
