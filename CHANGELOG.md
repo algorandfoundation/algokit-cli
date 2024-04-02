@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.2 (2024-04-02)
+
+### Fix
+
+* Pin pyyaml-include transitive dep ([#472](https://github.com/algorandfoundation/algokit-cli/issues/472)) ([`970536c`](https://github.com/algorandfoundation/algokit-cli/commit/970536cb7246fcaf6b84aacda95a74f8ff9bc285))
+
+### Documentation
+
+* Adding node.js to prerequisites for installation as FYI ([`8147173`](https://github.com/algorandfoundation/algokit-cli/commit/8147173ba827ac3be4c4dec28a97abc16abbd2cf))
+
 ## v2.0.1 (2024-03-29)
 
 ### Documentation
