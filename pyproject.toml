@@ -25,9 +25,7 @@ multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 aiohttp = "3.9.3"
 jsondiff = "^2.0.0"
-# Pinning to fix transient dependency 
-# issues reported in https://github.com/algorandfoundation/algokit-cli/issues/471
-# TODO: refine further
+# Pinning to fix copier transitive dependency, remove this once https://github.com/copier-org/copier/issues/1568 is fixed.
 pyyaml-include = "1.4.1"
 
 [tool.poetry.group.dev.dependencies]
