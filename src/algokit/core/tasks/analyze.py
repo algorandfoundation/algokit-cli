@@ -85,7 +85,7 @@ def prepare_artifacts_folders(output_dir: Path | None) -> None:
     TEALER_DOT_FILES_ROOT.mkdir(parents=True, exist_ok=True)
 
 
-def install_tealer_if_needed() -> None:
+def ensure_tealer_installed() -> None:
     """
     Install tealer if it's not already installed.
     """

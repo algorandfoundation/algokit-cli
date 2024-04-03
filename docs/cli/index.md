@@ -86,6 +86,7 @@
     - [-k, --kmd-port ](#-k---kmd-port-)
     - [-n, --codespace-name ](#-n---codespace-name-)
     - [-r, --repo-url ](#-r---repo-url-)
+    - [-f, --force](#-f---force)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
@@ -201,24 +202,24 @@
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
-    - [-f, --force](#-f---force)
+    - [-f, --force](#-f---force-1)
     - [Arguments](#arguments-12)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-31)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
-    - [-f, --force](#-f---force-1)
+    - [-f, --force](#-f---force-2)
     - [Arguments](#arguments-13)
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-14)
     - [ALIAS](#alias)
     - [Options](#options-32)
-    - [-f, --force](#-f---force-2)
+    - [-f, --force](#-f---force-3)
     - [Arguments](#arguments-15)
     - [ALIAS](#alias-1)
     - [Options](#options-33)
-    - [-f, --force](#-f---force-3)
+    - [-f, --force](#-f---force-4)
 
 # algokit
 
@@ -649,15 +650,7 @@ algokit localnet [OPTIONS] COMMAND [ARGS]...
 Manage the AlgoKit LocalNet in GitHub Codespaces.
 
 ```shell
-algokit localnet codespace [OPTIONS] COMMAND [ARGS]...
-```
-
-#### start
-
-Start the AlgoKit LocalNet in a GitHub Codespace.
-
-```shell
-algokit localnet codespace start [OPTIONS]
+algokit localnet codespace [OPTIONS]
 ```
 
 ### Options
@@ -665,6 +658,12 @@ algokit localnet codespace start [OPTIONS]
 
 ### -m, --machine <machine>
 The GitHub Codespace machine type to use. Defaults to base tier.
+
+
+* **Options**
+
+    basicLinux32gb | standardLinux32gb | premiumLinux | largePremiumLinux
+
 
 
 ### -a, --algod-port <algod_port>
@@ -685,6 +684,10 @@ The name of the codespace. Defaults to random name with timestamp.
 
 ### -r, --repo-url <repo_url>
 The URL of the repository. Defaults to algokit base template repo.
+
+
+### -f, --force
+Force delete stale codespaces and skip confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 ### console
 

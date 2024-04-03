@@ -1,0 +1,7 @@
+DEBUG: Running 'gh --version' in '{current_working_directory}'
+Installing gh...
+DEBUG: HTTP Request: GET https://webi.sh/gh "HTTP/1.1 200 OK"
+DEBUG: Running '{cwd}/webi_dummy_installer.sh' in '{current_working_directory}'
+DEBUG: {cwd}/webi_dummy_installer.sh: STDOUT
+DEBUG: {cwd}/webi_dummy_installer.sh: STDERR
+gh installed successfully!

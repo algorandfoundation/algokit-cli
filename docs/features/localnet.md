@@ -6,6 +6,8 @@ AlgoKit LocalNet uses Docker images that are optimised for a great dev experienc
 
 The philosophy we take with AlgoKit LocalNet is that you should treat it as an ephemeral network. This means assume it could be reset at any time - don't store data on there that you can't recover / recreate. We have optimised the AlgoKit LocalNet experience to minimise situations where the network will get reset to improve the experience, but it can and will still happen in a number of situations.
 
+> For details on executing `algokit localnet` without `docker` refer to the [codespaces](#codespaces) section.
+
 ## Prerequisites
 
 AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system.
@@ -24,7 +26,7 @@ The AlgoKit LocalNet is built with 30,000 participation keys generated and after
 
 We rely on the official Algorand docker images for Indexer, Conduit and Algod, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Apple Silicon).
 
-## Functionality
+## Docker-based LocalNet
 
 ### Creating / Starting the LocalNet
 
@@ -120,3 +122,24 @@ AlgoKit Utils provides methods to help you do this:
 - Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
 
 For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#localnet).
+
+## GitHub Codespaces-based LocalNet
+
+The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by deferring the functionality to [gh](https://github.com/cli/gh) cli. This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
+
+To run the LocalNet in a GitHub Codespace, you can use the `algokit localnet codespace` command.
+By default without `--force` flag it will prompt user to delete stale codespaces created earlier (if any). Upon termination it will also prompt the user whether to delete the codespace that was used prior to termination.
+
+### Options
+
+- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespace documentation](https://docs.github.com/en/codespaces/overview/machine-types) for more details.
+- `-a`, `--algod-port`: Sets the port for the Algorand daemon. Defaults to `4001`.
+- `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
+- `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
+- `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
+- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up algokit cli during container start. You can use any custom repo as a base, ensure to duplicate the reference `.devcontainer.json` in your repository **otherwise there will be no ports to forward from the codespace**.
+- `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
+
+For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
+
+> Tip: By specifying alternative port values it is possible to have several localnets running locally where one is using default ports via `algokit localnet start` with Docker and the other relies on port forwarding via `algokit localnet codespace`.

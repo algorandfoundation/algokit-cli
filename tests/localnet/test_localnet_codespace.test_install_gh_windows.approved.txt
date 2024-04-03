@@ -1,0 +1,4 @@
+DEBUG: Running 'gh --version' in '{current_working_directory}'
+Installing gh...
+DEBUG: Running 'winget install --id GitHub.cli --silent' in '{current_working_directory}'
+gh installed successfully!

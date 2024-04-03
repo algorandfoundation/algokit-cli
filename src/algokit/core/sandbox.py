@@ -15,7 +15,7 @@ from algokit.core.proc import RunResult, run, run_interactive
 logger = logging.getLogger(__name__)
 
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
-DEFAULT_NAME = "sandbox"
+SANDBOX_BASE_NAME = "sandbox"
 
 
 class ComposeFileStatus(enum.Enum):
@@ -25,8 +25,8 @@ class ComposeFileStatus(enum.Enum):
 
 
 class ComposeSandbox:
-    def __init__(self, name: str = DEFAULT_NAME) -> None:
-        self.name = DEFAULT_NAME if name == DEFAULT_NAME else f"{DEFAULT_NAME}_{name}"
+    def __init__(self, name: str = SANDBOX_BASE_NAME) -> None:
+        self.name = SANDBOX_BASE_NAME if name == SANDBOX_BASE_NAME else f"{SANDBOX_BASE_NAME}_{name}"
         self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
@@ -66,7 +66,9 @@ class ComposeSandbox:
                 config_file = item.get("ConfigFiles").split(",")[0]
                 full_name = Path(config_file).parent.name
                 name = (
-                    full_name.replace(f"{DEFAULT_NAME}_", "") if full_name.startswith(f"{DEFAULT_NAME}_") else full_name
+                    full_name.replace(f"{SANDBOX_BASE_NAME}_", "")
+                    if full_name.startswith(f"{SANDBOX_BASE_NAME}_")
+                    else full_name
                 )
                 return cls(name)
             return None

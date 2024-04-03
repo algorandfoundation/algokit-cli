@@ -2,14 +2,14 @@ import logging
 
 import click
 
-from algokit.cli.codespace import codespace_group
+from algokit.cli.codespace import codespace_command
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
 from algokit.core.sandbox import (
-    DEFAULT_NAME,
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
+    SANDBOX_BASE_NAME,
     ComposeFileStatus,
     ComposeSandbox,
     fetch_algod_status_data,
@@ -74,7 +74,7 @@ def localnet_group(ctx: click.Context) -> None:
 )
 def start_localnet(name: str | None) -> None:
     sandbox = ComposeSandbox.from_environment()
-    full_name = f"{DEFAULT_NAME}_{name}" if name is not None else DEFAULT_NAME
+    full_name = f"{SANDBOX_BASE_NAME}_{name}" if name is not None else SANDBOX_BASE_NAME
     if sandbox is not None and full_name != sandbox.name:
         logger.debug("LocalNet is already running.")
         if click.confirm("This will stop any running AlgoKit LocalNet instance. Are you sure?", default=True):
@@ -130,7 +130,7 @@ def reset_localnet(*, update: bool) -> None:
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Existing LocalNet not found; creating from scratch...")
         sandbox.write_compose_file()
-    elif sandbox.name == DEFAULT_NAME:
+    elif sandbox.name == SANDBOX_BASE_NAME:
         sandbox.down()
         if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
             logger.info("LocalNet definition is out of date; updating it to latest")
@@ -233,4 +233,4 @@ def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
     sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
 
 
-localnet_group.add_command(codespace_group)
+localnet_group.add_command(codespace_command)

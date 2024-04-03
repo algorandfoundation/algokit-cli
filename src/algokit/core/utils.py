@@ -1,4 +1,3 @@
-import codecs
 import os
 import platform
 import re
@@ -8,7 +7,7 @@ import sys
 import threading
 import time
 from collections.abc import Callable, Iterator
-from concurrent.futures import ThreadPoolExecutor
+from itertools import cycle
 from os import environ
 from pathlib import Path
 from shutil import which
@@ -53,48 +52,37 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 
 
 def animate(name: str, stop_event: threading.Event) -> None:
-    spinner = {
-        "interval": 100,
-        "frames": SPINNER_FRAMES,
-    }
+    """Displays an animated spinner in the console."""
 
-    while not stop_event.is_set():
-        for frame in spinner["frames"]:  # type: ignore  # noqa: PGH003
-            if stop_event.is_set():
-                break
-            try:
-                text = codecs.decode(frame, "utf-8")
-            except Exception:
-                text = frame
-            output = f"\r{text} {name}"
-            sys.stdout.buffer.write(output.encode("utf-8"))
-            sys.stdout.buffer.write(CLEAR_LINE.encode("utf-8"))
-            sys.stdout.buffer.flush()
-            time.sleep(0.001 * spinner["interval"])  # type: ignore  # noqa: PGH003
+    for frame in cycle(SPINNER_FRAMES):
+        if stop_event.is_set():
+            break
+        text = f"\r{frame} {name}"
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        time.sleep(0.3)
 
-    sys.stdout.buffer.write(b"\r")
-    sys.stdout.buffer.write(b"\n")
-    sys.stdout.buffer.flush()
+    sys.stdout.write("\r" + CLEAR_LINE)  # Clear the animation line
+    sys.stdout.flush()
 
 
 def run_with_animation(
     target_function: Callable[..., Any], animation_text: str = "Loading", *args: Any, **kwargs: Any
 ) -> Any:  # noqa: ANN401
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        stop_event = threading.Event()
-        animation_future = executor.submit(animate, animation_text, stop_event)
-        function_future = executor.submit(target_function, *args, **kwargs)
+    """Executes a function while displaying an animation, handling termination."""
+    stop_event = threading.Event()
+    animation_thread = threading.Thread(target=animate, args=(animation_text, stop_event), daemon=True)
+    animation_thread.start()
 
-        try:
-            result = function_future.result()
-        except Exception as e:
-            stop_event.set()
-            animation_future.result()
-            raise e
-        else:
-            stop_event.set()
-            animation_future.result()
-            return result
+    try:
+        result: Any = target_function(*args, **kwargs)
+    except Exception:
+        raise  # Re-raise to propagate the exception
+    finally:
+        stop_event.set()
+        animation_thread.join()  # Wait for animation to finish
+
+    return result
 
 
 def find_valid_pipx_command(error_message: str) -> list[str]:
