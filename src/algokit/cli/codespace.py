@@ -87,8 +87,11 @@ def codespace_command(  # noqa: PLR0913
     codespaces = get_gh_codespaces_list()
 
     # Delete existing codespaces with the default name
-    if force or questionary_extensions.prompt_confirm(
-        f"Delete stale codespaces with `{CODESPACE_NAME_PREFIX}*` name prefix?", default=True
+    if codespaces and (
+        force
+        or questionary_extensions.prompt_confirm(
+            f"Delete stale codespaces with `{CODESPACE_NAME_PREFIX}*` name prefix?", default=True
+        )
     ):
         _delete_default_named_codespaces(codespaces, CODESPACE_NAME_PREFIX)
 
@@ -108,17 +111,17 @@ def codespace_command(  # noqa: PLR0913
         ],
         pass_stdin=True,
     )
+    run_with_animation(
+        time.sleep,
+        "Provisioning a new codespace instance...",
+        CODESPACE_CREATE_TIMEOUT,
+    )
 
     codespace_data: dict[str, Any] | None = None
     try:
         logger.info(f"Waiting for codespace {codespace_name} to be ready...")
         codespace_ready = False
         while not codespace_ready:
-            run_with_animation(
-                time.sleep,
-                "Provisioning a new codespace instance...",
-                CODESPACE_CREATE_TIMEOUT,
-            )
             status_result = proc.run(
                 ["gh", "codespace", "list", "--json", "displayName", "--json", "state", "--json", "name"],
                 pass_stdin=True,
