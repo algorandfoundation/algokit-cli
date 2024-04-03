@@ -360,8 +360,7 @@ If no argument is provided then outputs current setting.
 Also see --skip-version-check which can be used to disable check for a single command.
 
 ```shell
-algokit config version-prompt [OPTIONS]
-                              [[enable|disable]]
+algokit config version-prompt [OPTIONS] [[enable|disable]]
 ```
 
 ### Arguments
@@ -486,8 +485,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 Explore the specified network in the browser using Dappflow.
 
 ```shell
-algokit explore [OPTIONS]
-                [[localnet|testnet|mainnet]]
+algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
 ```
 
 ### Arguments
@@ -512,8 +510,7 @@ Supply the path to an application specification file or a directory to recursive
 for "application.json" files
 
 ```shell
-algokit generate client [OPTIONS]
-                        APP_SPEC_PATH_OR_DIR
+algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
 ```
 
 ### Options
@@ -792,8 +789,7 @@ Expedited initial setup for any developer by installing and configuring dependen
 key development environment setup activities.
 
 ```shell
-algokit project bootstrap [OPTIONS] COMMAND
-                          [ARGS]...
+algokit project bootstrap [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### Options
@@ -857,8 +853,7 @@ algokit project bootstrap npm [OPTIONS]
 Installs Python Poetry (if not present) and runs poetry install in the current working directory to install Python dependencies.
 
 ```shell
-algokit project bootstrap poetry 
-    [OPTIONS]
+algokit project bootstrap poetry [OPTIONS]
 ```
 
 ### deploy
@@ -866,8 +861,7 @@ algokit project bootstrap poetry
 Deploy smart contracts from AlgoKit compliant repository.
 
 ```shell
-algokit project deploy [OPTIONS]
-                       [ENVIRONMENT_NAME]
+algokit project deploy [OPTIONS] [ENVIRONMENT_NAME]
 ```
 
 ### Options
