@@ -12,15 +12,15 @@ from tests.utils.proc_mock import ProcMock
 
 def test_install_gh_already_installed(mocker: MockerFixture, proc_mock: ProcMock) -> None:
     proc_mock.set_output(["gh", "--version"], ["some version"])
-    mocker.patch("algokit.cli.codespace.login_to_gh", return_value=False)
+    mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
     result = invoke("localnet codespace")
     assert result.exit_code == 0
 
 
 def test_install_gh_not_installed_failed_install(mocker: MockerFixture, proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on(["gh", "--version"])
-    mocker.patch("algokit.cli.codespace.login_to_gh", return_value=False)
-    mocker.patch("algokit.core.codespace.install_gh_via_webi", side_effect=RuntimeError("Failed to install gh"))
+    mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
+    mocker.patch("algokit.core.codespace.install_github_cli_via_webi", side_effect=RuntimeError("Failed to install gh"))
     mocker.patch("algokit.core.codespace.is_windows", side_effect=RuntimeError("Failed to install gh"))
     result = invoke("localnet codespace")
     assert result.exit_code == 1
@@ -33,7 +33,7 @@ def test_install_gh_windows(mocker: MockerFixture, proc_mock: ProcMock) -> None:
         ["gh", "--version"],
     )
     proc_mock.set_output(["winget", "install", "--id", "GitHub.cli", "--silent"], [])
-    mocker.patch("algokit.cli.codespace.login_to_gh", return_value=False)
+    mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
     result = invoke("localnet codespace")
     assert result.exit_code == 0
 
@@ -51,7 +51,7 @@ def test_install_gh_unix(
         ["gh", "--version"],
     )
     httpx_mock.add_response(url="https://webi.sh/gh", text="")
-    mocker.patch("algokit.cli.codespace.login_to_gh", return_value=False)
+    mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
 
     temp_file_mock = mocker.MagicMock()
     temp_file_mock.__enter__.return_value.name = str(cwd / "webi_dummy_installer.sh")
@@ -105,8 +105,8 @@ def test_invalid_scope_auth(
             """
         ],
     )
-    mocker.patch("algokit.cli.codespace.forward_codespace_ports", return_value=None)
-    mocker.patch("algokit.cli.codespace.run_with_animation")
+    mocker.patch("algokit.cli.codespace.forward_ports_for_codespace", return_value=None)
+    mocker.patch("algokit.core.codespace.run_with_animation")
 
     result = invoke("localnet codespace -n sandbox")
     assert result.exit_code == 0

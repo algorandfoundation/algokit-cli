@@ -60,7 +60,7 @@ def animate(name: str, stop_event: threading.Event) -> None:
         text = f"\r{frame} {name}"
         sys.stdout.write(text)
         sys.stdout.flush()
-        time.sleep(0.3)
+        time.sleep(0.1)
 
     sys.stdout.write("\r" + CLEAR_LINE)  # Clear the animation line
     sys.stdout.flush()
