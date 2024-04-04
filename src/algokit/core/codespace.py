@@ -54,13 +54,30 @@ def install_gh_via_webi() -> None:
 @cache
 def gh_is_authenticated() -> bool:
     """
-    Checks if the user is authenticated with GitHub CLI.
+    Checks if the user is authenticated with GitHub CLI and has the 'codespace' scope.
     """
     try:
         result = proc.run(["gh", "auth", "status"])
-        return "Logged in to" in result.output
+
+        # Normalize output for easier parsing
+        normalized_output = " ".join(result.output.splitlines()).lower()
+
+        # Check for authentication and 'codespace' scope
+        authenticated = "logged in" in normalized_output
+        has_codespace_scope = "codespace" in normalized_output
+
+        if not authenticated:
+            logger.error("GitHub CLI authentication check failed. Please login with `gh auth login -s codespace`.")
+        if not has_codespace_scope:
+            logger.error(
+                "Required 'codespace' scope is missing. "
+                "Please ensure you have the 'codespace' scope by running "
+                "`gh auth refresh-token -s codespace`."
+            )
+
+        return authenticated and has_codespace_scope
     except subprocess.CalledProcessError:
-        logger.error("GitHub CLI authentication check failed. Please login with `gh auth login`.")
+        logger.error("GitHub CLI authentication check failed. Please login with `gh auth login -s codespace`.")
         return False
 
 

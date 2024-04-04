@@ -1,0 +1,23 @@
+DEBUG: Running 'gh --version' in '{current_working_directory}'
+DEBUG: gh: STDOUT
+DEBUG: gh: STDERR
+DEBUG: Running 'gh auth status' in '{current_working_directory}'
+DEBUG: gh: 
+DEBUG: gh: ✓ Logged in to github.com account aorumbayev (keyring)
+DEBUG: gh: - Active account: true
+DEBUG: gh: - Git operations protocol: https
+DEBUG: gh: - Token: gho_************************************
+DEBUG: gh: - Token scopes: 'read:org', 'repo', 'workflow'
+ERROR: Required 'codespace' scope is missing. Please ensure you have the 'codespace' scope by running `gh auth refresh-token -s codespace`.
+DEBUG: Running 'gh auth login -s codespace' in '{current_working_directory}'
+Logged in to GitHub Codespace
+DEBUG: Running 'gh codespace create --repo algorandfoundation/algokit-base-template --display-name sandbox --machine basicLinux32gb' in '{current_working_directory}'
+Waiting for codespace sandbox to be ready...
+DEBUG: Running 'gh codespace list --json displayName --json state --json name' in '{current_working_directory}'
+DEBUG: gh: 
+DEBUG: gh: [{"displayName":"sandbox","state":"Available","name":"sandbox"}]
+DEBUG: gh: 
+Codespace sandbox is now ready.
+WARNING: Keep the tab open during the LocalNet session. Terminating the session will delete the codespace instance.
+LocalNet started in GitHub Codespace
+Exiting...
