@@ -89,9 +89,9 @@ AlgoKit also has some runtime dependencies that also need to be available for pa
 > **Note**
 > You can still install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
-- Git - Git is used when creating and updating projects from templates
-- Docker - Docker Compose (and by association, Docker) is used to run the AlgoKit LocalNet environment, we require Docker Compose 2.5.0+
-- (Optional) Node.js - Node.js is used for frontend templates, or if you want to build contracts using TEALScript
+- **Git**: Essential for creating and updating projects from templates. Installation guide available at [Git Installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+- **Docker**: Necessary for running the AlgoKit LocalNet environment. Docker Compose version 2.5.0 or higher is required. See [Docker Installation](https://docs.docker.com/get-docker/).
+- **Node.js**: For those working on frontend templates or building contracts using TEALScript. **Minimum required versions are Node.js `v18` and npm `v9`**. Instructions can be found at [Node.js Installation](https://nodejs.org/en/download/).
 
 ## Cross-platform installation
 
