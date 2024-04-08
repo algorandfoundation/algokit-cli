@@ -98,7 +98,7 @@ def codespace_command(  # noqa: PLR0913
 
         logger.info(f"Codespace {codespace_name} is now ready.")
         logger.warning(
-            "Keep the tab open during the LocalNet session. "
+            "Keep the terminal open during the LocalNet session. "
             "Terminating the session will delete the codespace instance."
         )
         forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port)

@@ -125,21 +125,21 @@ For more details about the `AlgoKit localnet` command, please refer to the [Algo
 
 ## GitHub Codespaces-based LocalNet
 
-The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by deferring the functionality to [gh](https://github.com/cli/gh) cli. This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
+The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by utilizing the [GitHub CLI](https://github.com/cli/gh). This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
 
 To run the LocalNet in a GitHub Codespace, you can use the `algokit localnet codespace` command.
-By default without `--force` flag it will prompt user to delete stale codespaces created earlier (if any). Upon termination it will also prompt the user whether to delete the codespace that was used prior to termination.
+By default without `--force` flag it will prompt you to delete stale codespaces created earlier (if any). Upon termination it will also prompt the user to delete the codespace that was used prior to termination.
 
 ### Options
 
-- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespace documentation](https://docs.github.com/en/codespaces/overview/machine-types) for more details.
+- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/overview/machine-types) for more details.
 - `-a`, `--algod-port`: Sets the port for the Algorand daemon. Defaults to `4001`.
 - `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
 - `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
 - `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
-- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up algokit cli during container start. You can use any custom repo as a base, ensure to duplicate the reference `.devcontainer.json` in your repository **otherwise there will be no ports to forward from the codespace**.
+- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**. 
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
 
-> Tip: By specifying alternative port values it is possible to have several localnets running locally where one is using default ports via `algokit localnet start` with Docker and the other relies on port forwarding via `algokit localnet codespace`.
+> Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker and the other relies on port forwarding via `algokit localnet codespace`.
