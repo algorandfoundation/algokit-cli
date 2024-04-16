@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.3 (2024-04-16)
+
+### Fix
+
+* Remove deprecated version from localnet compose file ([#476](https://github.com/algorandfoundation/algokit-cli/issues/476)) ([`4a3b1f0`](https://github.com/algorandfoundation/algokit-cli/commit/4a3b1f0c2dec5d03d12b42617ff546bd94d1da57))
+
+### Documentation
+
+* Minor refinements in npm min version spec ([#474](https://github.com/algorandfoundation/algokit-cli/issues/474)) ([`a887430`](https://github.com/algorandfoundation/algokit-cli/commit/a8874304319efc3449336a4bbb817471613d6743))
+
 ## v2.0.2 (2024-04-02)
 
 ### Fix
