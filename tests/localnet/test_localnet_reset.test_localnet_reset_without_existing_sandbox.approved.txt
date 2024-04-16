@@ -18,7 +18,6 @@ Started; execute `algokit explore` to explore LocalNet in a web user interface.
 ----
 {app_config}/sandbox/docker-compose.yml:
 ----
-version: "3"
 name: "algokit_sandbox"
 
 services:
