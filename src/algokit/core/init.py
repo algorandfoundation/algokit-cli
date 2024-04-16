@@ -5,7 +5,9 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, cast
 
-from copier.main import MISSING, AnswersMap, Question, Worker  # type: ignore[import]
+from copier.main import Worker
+from copier.types import MISSING
+from copier.user_data import AnswersMap, Question
 
 from algokit.core.project import get_project_dir_names_from_workspace
 
