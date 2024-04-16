@@ -24,7 +24,6 @@ WARNING: AlgoKit LocalNet failed to return a successful health check
 ----
 {app_config}/sandbox/docker-compose.yml:
 ----
-version: "3"
 name: "algokit_sandbox"
 
 services:

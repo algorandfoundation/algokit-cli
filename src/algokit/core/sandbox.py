@@ -384,8 +384,7 @@ def get_docker_compose_yml(
     kmd_port: int = 4002,
     tealdbg_port: int = 9392,
 ) -> str:
-    return f"""version: "3"
-name: "{name}"
+    return f"""name: "{name}"
 
 services:
   algod:
