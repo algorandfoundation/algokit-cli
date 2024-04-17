@@ -357,7 +357,7 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
     # 2. the import fails if git is not installed (which we check above)
     # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
     #       to their repo to include py.typed file
-    from copier.main import Worker  # type: ignore[import]
+    from copier.main import Worker
 
     from algokit.core.init import populate_default_answers
 
@@ -518,7 +518,7 @@ def _fail_and_bail() -> NoReturn:
 
 def _repo_url_is_valid(url: str) -> bool:
     """Check the repo URL is valid according to copier"""
-    from copier.vcs import get_repo  # type: ignore[import]
+    from copier.vcs import get_repo
 
     if not url:
         return False
