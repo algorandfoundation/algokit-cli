@@ -4,7 +4,7 @@ import platform
 import sys
 
 import click
-import pyclip  # type: ignore[import]
+import pyclip  # type: ignore[import-untyped]
 
 from algokit.core.conf import get_current_package_version
 from algokit.core.doctor import DoctorResult, check_dependency

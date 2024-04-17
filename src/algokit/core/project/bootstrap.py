@@ -92,9 +92,10 @@ def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:
         logger.info(f"Copying {env_template_path} to {env_path} and prompting for empty values")
 
         # find all empty values in .env file and prompt the user for a value
-        with Path(env_template_path).open(encoding="utf-8") as env_template_file, env_path.open(
-            mode="w", encoding="utf-8"
-        ) as env_file:
+        with (
+            Path(env_template_path).open(encoding="utf-8") as env_template_file,
+            env_path.open(mode="w", encoding="utf-8") as env_file,
+        ):
             comment_lines: list[str] = []
             for line in env_template_file:
                 # strip newline character(s) from end of line for simpler handling
