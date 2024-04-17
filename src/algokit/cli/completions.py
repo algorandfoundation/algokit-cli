@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 import click.shell_completion
-import shellingham  # type: ignore[import]
+import shellingham  # type: ignore[import-untyped]
 
 from algokit.core.atomic_write import atomic_write
 from algokit.core.conf import get_app_config_dir
@@ -152,7 +152,7 @@ def _get_home_based_path(path: Path) -> Path:
 
 def _get_current_shell() -> str:
     try:
-        shell_name, *_ = shellingham.detect_shell()  # type: tuple[str, str]
+        shell_name, *_ = shellingham.detect_shell()
     except Exception as ex:
         logger.debug("Could not determine current shell", exc_info=ex)
         logger.warning("Could not determine current shell. Try specifying a supported shell with --shell")
@@ -161,4 +161,4 @@ def _get_current_shell() -> str:
     if shell_name not in SUPPORTED_SHELLS:
         logger.warning(f"{shell_name} is not a supported shell. 😢")
         raise click.exceptions.Exit(code=1)
-    return shell_name
+    return str(shell_name)

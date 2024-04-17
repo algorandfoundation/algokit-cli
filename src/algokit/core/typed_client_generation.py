@@ -73,17 +73,14 @@ class ClientGenerator(abc.ABC):
         return output_path
 
     @abc.abstractmethod
-    def generate(self, app_spec: Path, output: Path) -> None:
-        ...
+    def generate(self, app_spec: Path, output: Path) -> None: ...
 
     @property
     @abc.abstractmethod
-    def default_output_pattern(self) -> str:
-        ...
+    def default_output_pattern(self) -> str: ...
 
     @abc.abstractmethod
-    def find_generate_command(self, version: str | None) -> list[str]:
-        ...
+    def find_generate_command(self, version: str | None) -> list[str]: ...
 
     def format_contract_name(self, contract_name: str) -> str:
         return contract_name

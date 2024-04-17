@@ -61,7 +61,7 @@ package_unix = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filt
 package_windows = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config;multiformats_config/ --add-data ./src/algokit/resources;algokit/resources/"
 [tool.ruff]
 line-length = 120
-select = [
+lint.select = [
   # all possible codes as of this ruff version are listed here,
   # ones we don't want/need are commented out to make it clear
   # which have been omitted on purpose vs which ones get added
@@ -111,7 +111,7 @@ select = [
   # "NPY",  # NumPy-specific rules
   "RUF",    # Ruff-specific rules
 ]
-ignore = [
+lint.ignore = [
   "ANN101", # no type for self
   "ANN102", # no type for cls
   "RET505", # allow else after return
@@ -143,14 +143,14 @@ exclude = [
     "docs/sphinx",
 ]
 # Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Assume Python 3.10.
 target-version = "py310"
 
 [tool.ruff.per-file-ignores]
 "tests/**/test_*.py" = ["PLR0913"] # too many args
 
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 suppress-none-returning = true
 
