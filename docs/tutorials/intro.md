@@ -98,7 +98,9 @@ Upon execution, the walkthrough will guide you through the key components of you
 
 Once the `Algorand Python` based project is created, you can get started by building and deploying your first smart contract. There are a few possible ways to do so as demonstrated on the following video.
 
-![AlgoKit Playground Demo](https://ipfs.algonode.xyz/ipfs/Qma6gNqxsSFc9Jbh8kBTZyVLv5gqFj1xnrsjoeT6MAAwCw/)
+<video src="https://ipfs.algonode.xyz/ipfs/Qma6gNqxsSFc9Jbh8kBTZyVLv5gqFj1xnrsjoeT6MAAwCw/" controls>
+  Your browser does not support the video tag.
+</video>
 
 The App ID of the deployed contract and its Algorand address is displayed, followed by the message returned from the smart contract call (`Hello, Beaker`).
 
