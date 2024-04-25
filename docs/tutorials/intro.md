@@ -34,7 +34,7 @@ After the installation completes, **restart the terminal**.
 
 For more detailed installation documentation, see the [official installation guide](https://github.com/algorandfoundation/algokit-cli#install).
 
-> Please note, `pipx` is only one of the supported installation methods. You can also install AlgoKit via `brew`, `choco` and _soon_ `winget` and `snap` as pre-build binaries. Refer to the official installation guide.
+> Please note, `pipx` is only one of the supported installation methods. You can also install AlgoKit via `brew` and _soon_ `winget` and `snap` as pre-build binaries. Refer to the official installation guide.
 
 ## Verify the Installation ✔
 
