@@ -15,8 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-14 is the Apple Silicon M1 runner
-        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
+        # macos-latest is the Apple Silicon M1 runner (mac os 14)
+        # macos-latest-large is the Intel Mac runner (mac os 14)
+        # See https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+        os: [ubuntu-20.04, windows-latest, macos-latest-large, macos-latest]
 
     steps:
       - name: Checkout source code
