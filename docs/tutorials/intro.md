@@ -72,7 +72,7 @@ algokit init
 
 This will launch a guided menu system to create a specific project tailored to your needs. The templates are basic starter applications for various Algorand development scenarios. To read more about templates checkout AlgoKit detailed documentation.
 
-For now we'll use the `python` template, which is a lightweight starting point for learning Algorand smart contract development using Python. You can initialise a project using this template by running:
+For now we'll use the `python` template, which is a lightweight starting point for learning Algorand smart contract development using Algorand Python. You can initialize a project using this template by running:
 
 ```shell
 algokit init -t python --no-workspace -a preset_name "starter"
@@ -80,19 +80,19 @@ algokit init -t python --no-workspace -a preset_name "starter"
 
 Next, you will be prompted for the name of your project. Finally, select the default value for the rest of the prompts (enter).
 
-Once finished, (if you have it installed) VS Code should automatically be opened with the initialised project and you will be prompted to install appropriate VS Code extensions. This starter app will contain one smart contract (built using the [Algorand Python](https://algorandfoundation.github.io/puya/) language) named `contract.py`, in the `smart_contracts/hello_world` folder, with one method (`hello`) that takes a `String` and returns a `String`. Notice that within the contract folder, there is a `deploy_config.py`, this defined the parameters for deployment of your smart contract to the select target chain (Algorand TestNet, Algorand MainNet, Algorand LocalNet or else).
+Once finished, (if you have it installed) VS Code should automatically be opened with the initialised project and you will be prompted to install appropriate VS Code extensions. This starter app will contain one smart contract (built using the [Algorand Python](https://algorandfoundation.github.io/puya/) language) named `contract.py`, in the `smart_contracts/hello_world` folder, with one method (`hello`) that takes a `String` and returns a `String`. Notice that within the contract folder, there is a `deploy_config.py` which defines the parameters for deployment of your smart contract to the target chain (Algorand TestNet, Algorand MainNet, Algorand LocalNet or else).
 
 ![AlgoKit Playground Contract](../imgs/algokitplayground.png)
 
 ## AlgoKit Project structure 🏗
 
-Since you have just instantiated an official AlgoKit template, each official smart contract template includes an interactive codespace walkthrough powered by [CodeTours](https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour).
+Since you have just instantiated an official AlgoKit template, each official smart contract template includes an interactive codespace walkthrough powered by [CodeTour](https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour).
 
 To start the interactive walkthrough, install the extension and click on the green play button in the left bottom corner of the `Explorer` pane as demonstrated on the screenshot below (See `Getting Started with Your AlgoKit Project`).
 
 ![CodeTour Play Button](../imgs/algokitcodetour.png)
 
-Upon execution, the walkthrough will guide you through the key components of your fresh AlgoKit project instance, which is an important prerequisite to learn before running and deploying your first smart contract. Certainly, not because its hard to learn, but because it will save you a lot of time and efforts if you set the right foundation first.
+Upon execution, the walkthrough will guide you through the key components of your fresh AlgoKit project, which is an important prerequisite to learn before running and deploying your first smart contract. Certainly, not because its hard to learn, but because it will save you a lot of time and effort having the correct foundations.
 
 ## Run the Demo Application 🏃‍♂️
 
@@ -106,38 +106,38 @@ The App ID of the deployed contract and its Algorand address is displayed, follo
 2. Build the smart contract. Notice how a folder named `artifacts` is created with the TEAL and JSON files for the smart contract.
 3. Deploy and call the `HelloWorld` smart contract (from `contract.py` file).
 
-After execution, the `App ID` of of the deployed contract and its Algorand address are displayed, followed by the message returned from the smart contract call (`Hello, world`).
+After execution, the `App ID` of the deployed contract and its Algorand address are displayed, followed by the message returned from the smart contract call (`Hello, world`).
 
 At this point you have deployed a simple contract to a LocalNet Algorand network (running in your Docker environment) and called it successfully!
 
-Additionally, you can find the native TEAL smart contract code and the appropriate smart contract manifest JSON files have been output to the `artifacts` folder. Note that in this example, TEAL code is compiled using `PuyaPy` compiler, which is what `Algorand Python` relies on to represent your Python smart contract code in TEAL ([Transaction Execution Approval Language](https://developer.algorand.org/docs/get-details/dapps/avm/teal/)).
+Additionally, you can find the native TEAL smart contract code and the appropriate smart contract manifest JSON files have been output to the `artifacts` folder. Note that in this example, TEAL code is compiled using the `PuyaPy` compiler, which is what `Algorand Python` relies on to compile your Python smart contract code to TEAL ([Transaction Execution Approval Language](https://developer.algorand.org/docs/get-details/dapps/avm/teal/)).
 
 ### Using AlgoKit CLI to build and deploy contracts 🛠️
 
-When using official AlgoKit templates via `algokit init`, in addition to integration with VSCode and JetBrains IDEs, you can manage your projects using the AlgoKit CLI at the convienence of your terminal.
+When using official AlgoKit templates via `algokit init`, you can manage your projects using the AlgoKit CLI at the convenience of your terminal.
 
-For example, to achieve the same results as in the demo earlier, build and deploy the `HelloWorld` contract from the `contract.py` file, you can run the following command from the terminal:
+For example, to achieve the same results as in the demo earlier, build and deploy the `HelloWorld` contract from the `contract.py` file by running the following command from the terminal:
 
 ```shell
 algokit project run build
 ```
 
-Which will recompile your python contracts from `contract.py` into TEAL and related contract artifacts.
+This command will recompile your python contracts from `contract.py` and produce the necessary artefacts for deploying your contract.
 
 ```shell
 algokit project deploy localnet
 ```
 
-This will then execute the deploy script to LocalNet instance and display the same output as in the earlier demo.
+This will then deploy to your LocalNet instance and display the same output as in the earlier demo.
 
 ## Next steps 🚶‍♂️
 
-We have only covered a tiny fraction of capabilities of the AlgoKit CLI and its related ecosystem of templates and utilities for efficient developer experience.
+We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and its related ecosystem of templates and utilities for an efficient developer experience.
 
-- To get the most out of `AlgoKit`, we recommend to get started with learning more about AlgoKit and what you can do with it by checkout our extensive [AlgoKit CLI documentation](../algokit.md).
-- Explore the `README.md` files at the roots of projects created via `algokit init`. All official AlgoKit templates include detailed quick started guides, various presets and degrees of customizability, as well as an interactive reviews of the codebase.
+- To get the most out of `AlgoKit`, we recommend to get started with learning more about AlgoKit and what you can do with it by checking out our extensive [AlgoKit CLI documentation](../algokit.md).
+- Explore the `README.md` files at the root of any project created via `algokit init`. All official AlgoKit templates include detailed quick started guides, an interactive code tour and various presets which can be customized to your needs.
 - To learn more about `Algorand Python`, take a look at the [documentation](https://algorandfoundation.github.io/puya/).
-- To learn more about commands demonstrated in this tutorial, refer to [`init`](../features/init.md) and [`project`](../features/project.md) to get a comprehensive understanding of their further capabilities.
+- To learn more about the commands demonstrated in this tutorial, refer to [`init`](../features/init.md) and [`project`](../features/project.md) to get a comprehensive understanding of their further capabilities.
 - If you'd like to structure your `AlgoKit Project` as a monorepo, refer to `workspace` mode as described in [`init`](../features/init.md#workspaces-vs-standalone-projects).
-- If you'd like to **create your own** `AlgoKit` template, refer to the [dedicated tutorials](./algokit-template.md).
+- If you'd like to **create your own** `AlgoKit` template, refer to the [template tutorial](./algokit-template.md).
 - More information on Algorand smart contracts is also available in the [smart contract documentation](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/).
