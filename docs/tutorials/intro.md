@@ -106,7 +106,7 @@ Deployed app in txid SBNIJYZUOXVPXDFJHAVDDCO5TQ4WZ7P37QOOQM6CSVSMIURETHNQ
 Hello, Beaker
 ```
 
-The App ID of of the deployed contract and its Algorand address is displayed, followed by the message returned from the smart contract call (`Hello, Beaker`).
+The App ID of the deployed contract and its Algorand address is displayed, followed by the message returned from the smart contract call (`Hello, Beaker`).
 
 At this point you have deployed a simple contract to an Algorand network and called it successfully!
 
