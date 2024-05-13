@@ -47,7 +47,7 @@ algokit --version
 Output similar to the following should be displayed:
 
 ```shell
-algokit, version 2.0.3
+algokit, version 2.0.3 # or higher
 ```
 
 ## Start a LocalNet 🌐
@@ -75,7 +75,7 @@ This will launch a guided menu system to create a specific project tailored to y
 For now we'll use the `python` template, which is a lightweight starting point for learning Algorand smart contract development using Algorand Python. You can initialize a project using this template by running:
 
 ```shell
-algokit init -t python --no-workspace -a preset_name "starter"
+algokit init -t python -a preset_name "starter"
 ```
 
 Next, you will be prompted for the name of your project. Finally, select the default value for the rest of the prompts (enter).
@@ -86,7 +86,31 @@ Once finished, (if you have it installed) VS Code should automatically be opened
 
 ## AlgoKit Project structure 🏗
 
-Since you have just instantiated an official AlgoKit template, each official smart contract template includes an interactive codespace walkthrough powered by [CodeTour](https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour).
+The structure of your fresh algokit project instance will look similar to below:
+
+```bash
+.
+├── .algokit.toml # Configuration for AlgoKit projects in the workspace.
+├── README.md # Quick start guide for the AlgoKit Workspace.
+├── {your_workspace|project_name}.code-workspace
+└── projects
+    └── {your_project_name} # Root directory for the smart contract project. To add more projects into your algokit workspace run 'algokit init' from the root of your workspace repository.
+        ├── README.md # Quick start on Algorand Python smart contract template based project.
+        ├── .algokit # Hidden folder for AlgoKit AVM debugger and custom generators.
+        ├── .algokit.toml # Project-specific commands and custom generator references.
+        ├── poetry.lock
+        ├── poetry.toml # Dependency definitions for {your_project_name}.
+        ├── pyproject.toml # Project definitions for {your_project_name}.
+        └── smart_contracts
+            ├── README.md # Guide for adding new smart contracts.
+            ├── ...
+            ├── hello_world # Contract logic for 'hello_world'.
+            │   ├── contract.py # Contract logic.
+            │   └── deploy_config.py # Deployment logic for 'hello_world'.
+            └── helpers # Helper functions for contract build and deployment.
+```
+
+Additionally, each official smart contract template includes an interactive codespace walkthrough powered by [CodeTour](https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour).
 
 To start the interactive walkthrough, install the extension and click on the green play button in the left bottom corner of the `Explorer` pane as demonstrated on the screenshot below (See `Getting Started with Your AlgoKit Project`).
 
@@ -130,6 +154,8 @@ algokit project deploy localnet
 
 This will then deploy to your LocalNet instance and display the same output as in the earlier demo.
 
+> Please note, as highlighted in the [structure](#algokit-project-structure) section above, the `project run ...` commands are defined in the respective `.algokit.toml` file under `[project]` sections.
+
 ## Next steps 🚶‍♂️
 
 We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and its related ecosystem of templates and utilities for an efficient developer experience.
@@ -138,6 +164,6 @@ We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and 
 - Explore the `README.md` files at the root of any project created via `algokit init`. All official AlgoKit templates include detailed quick started guides, an interactive code tour and various presets which can be customized to your needs.
 - To learn more about `Algorand Python`, take a look at the [documentation](https://algorandfoundation.github.io/puya/).
 - To learn more about the commands demonstrated in this tutorial, refer to [`init`](../features/init.md) and [`project`](../features/project.md) to get a comprehensive understanding of their further capabilities.
-- If you'd like to structure your `AlgoKit Project` as a monorepo, refer to `workspace` mode as described in [`init`](../features/init.md#workspaces-vs-standalone-projects).
+- If you'd like to learn more on structuring your `AlgoKit Project` as a monorepo, refer to `workspace` mode as described in [`init`](../features/init.md#workspaces-vs-standalone-projects). You can also pass the `--no-workspace` flag to setup a standalone algokit project, if preferred.
 - If you'd like to **create your own** `AlgoKit` template, refer to the [template tutorial](./algokit-template.md).
 - More information on Algorand smart contracts is also available in the [smart contract documentation](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/).
