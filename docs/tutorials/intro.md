@@ -10,6 +10,8 @@ If you prefer videos, take a look at this 10 minute guide to getting started.
 
 Detailed video guides for both [Windows](https://www.youtube.com/embed/22RvINnZsRo) and [Mac](https://www.youtube.com/embed/zsurtpCGmgE) are also available.
 
+> Please note, the videos above are to be refreshed to cover v2.0 features. For now, its best to follow the instructions below to get started.
+
 ## Prequisites ✅
 
 This guide presents installing AlgoKit using an OS agnostic procedure. For OS specific instructions take a look that the [AlgoKit install](https://github.com/algorandfoundation/algokit-cli/blob/main/README.md#install) guide.
