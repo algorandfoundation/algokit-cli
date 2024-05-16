@@ -247,6 +247,6 @@ Per the above output, the doctor command output is a helpful tool if you need to
 
 ## Troubleshooting
 
-| Issue Description                                                                       | OS(s)     | Steps to miitigate                                                                                                                                                                          |
+| Issue Description                                                                       | OS(s)     | Steps to mitigate                                                                                                                                                                          |
 | --------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | SSL module not available in Python installation, causing `pipx install algokit` to fail | Debian 12 | Run `pipx install algokit --python $(which python3)` to explicitly use the Python 3 version with SSL support. Ensure that latest pip version is installed, update `python` alias if needed. |
