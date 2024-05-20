@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.4 (2024-05-20)
+
+### Fix
+
+* Task transfer on rekeyed account and update dependencies ([#498](https://github.com/algorandfoundation/algokit-cli/issues/498)) ([`8592cbf`](https://github.com/algorandfoundation/algokit-cli/commit/8592cbff4b9c45b4394eb853761255a8d11b7510))
+
+### Documentation
+
+* Add troubleshooting section ([#496](https://github.com/algorandfoundation/algokit-cli/issues/496)) ([`ef1a504`](https://github.com/algorandfoundation/algokit-cli/commit/ef1a5046a7b3ba6ddf22e65a4b1fe7868196e625))
+* Refine quick start ([#487](https://github.com/algorandfoundation/algokit-cli/issues/487)) ([`1964dec`](https://github.com/algorandfoundation/algokit-cli/commit/1964decd340a7847005cab4be408f6273fd5cb53))
+* Remove spelling mistake in intro.md instalation docs ([#491](https://github.com/algorandfoundation/algokit-cli/issues/491)) ([`70c55e0`](https://github.com/algorandfoundation/algokit-cli/commit/70c55e050caf4309c76ae5aae1dd7a284db93382))
+
 ## v2.0.3 (2024-04-16)
 
 ### Fix
