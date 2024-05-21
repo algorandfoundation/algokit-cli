@@ -197,7 +197,7 @@ class ComposeSandbox:
             data = httpx.get(url=url)
             return str(data.json()["digest"])
         except Exception as err:
-            logger.debug(f"Error checking indexer status: {err}", exc_info=True)
+            logger.debug(f"Error checking image status: {err}", exc_info=True)
             return None
 
     def is_image_up_to_date(self, image_name: str) -> bool:
@@ -227,7 +227,7 @@ DEFAULT_WAIT_FOR_ALGOD = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 INDEXER_IMAGE = "algorand/indexer:latest"
-ALGORAND_IMAGE = "algorand/algod:latest"
+ALGORAND_IMAGE = "algorand/algod:3.23.1-stable"
 CONDUIT_IMAGE = "algorand/conduit:latest"
 
 
