@@ -9,9 +9,9 @@ DEBUG: The sandbox_test directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
 DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Running 'docker image inspect algorand/algod:3.23.1-stable --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
 DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/3.23.1-stable "HTTP/1.1 200 OK"
+DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 The named LocalNet configuration has been created in {app_config}/sandbox_test. 
 You can edit the configuration by changing those files. Running `algokit localnet reset` will ensure the configuration is applied
@@ -32,7 +32,7 @@ name: "algokit_sandbox_test"
 services:
   algod:
     container_name: "algokit_sandbox_test_algod"
-    image: algorand/algod:3.23.1-stable
+    image: algorand/algod:latest
     ports:
       - 4001:8080
       - 4002:7833
