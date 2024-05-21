@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.5 (2024-05-21)
+
+### Fix
+
+* Pin localnet algod container to fix conduit issue in latest algod ([#502](https://github.com/algorandfoundation/algokit-cli/issues/502)) ([`6e760e9`](https://github.com/algorandfoundation/algokit-cli/commit/6e760e9c887187f053ea6a11b969ddc8cda3fb6a))
+
 ## v2.0.4 (2024-05-20)
 
 ### Fix
