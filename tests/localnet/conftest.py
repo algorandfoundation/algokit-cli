@@ -40,7 +40,7 @@ def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     )
 
     httpx_mock.add_response(
-        url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
+        url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/3.23.1-stable",
         json={
             "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         },

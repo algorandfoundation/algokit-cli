@@ -23,7 +23,7 @@ name: "algokit_sandbox"
 services:
   algod:
     container_name: "algokit_sandbox_algod"
-    image: algorand/algod:latest
+    image: algorand/algod:3.23.1-stable
     ports:
       - 4001:8080
       - 4002:7833
