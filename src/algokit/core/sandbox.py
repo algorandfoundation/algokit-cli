@@ -227,7 +227,7 @@ DEFAULT_WAIT_FOR_ALGOD = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 INDEXER_IMAGE = "algorand/indexer:latest"
-ALGORAND_IMAGE = "algorand/algod:3.23.1-stable"
+ALGORAND_IMAGE = "algorand/algod:latest"
 CONDUIT_IMAGE = "algorand/conduit:latest"
 
 
@@ -262,7 +262,6 @@ def get_config_json() -> str:
 def get_algod_network_template() -> str:
     return """{
     "Genesis": {
-      "ConsensusProtocol": "future",
       "NetworkName": "followermodenet",
       "RewardsPoolBalance": 0,
       "FirstPartKeyRound": 0,
