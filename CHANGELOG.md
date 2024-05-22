@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.0.6 (2024-05-22)
+
+### Fix
+
+* Remove ConsensusProtocol = future; unpin algod ([#505](https://github.com/algorandfoundation/algokit-cli/issues/505)) ([`55fbda5`](https://github.com/algorandfoundation/algokit-cli/commit/55fbda511310c094675dca7ff45131006083df66))
+
 ## v2.0.5 (2024-05-21)
 
 ### Fix
