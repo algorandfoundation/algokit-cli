@@ -6,9 +6,10 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 
 For details on how to use individual features see the following
 
-- [Bootstrap](./features/bootstrap.md) - Bootstrap AlgoKit project dependencies
+- [Bootstrap](./features/project/bootstrap.md) - Bootstrap AlgoKit project dependencies
+- [Compile](./features/compile.md) - Compile Algorand Python code
 - [Completions](./features/completions.md) - Install shell completions for AlgoKit
-- [Deploy](./features/deploy.md) - Deploy your smart contracts effortlessly to various networks
+- [Deploy](./features/project/deploy.md) - Deploy your smart contracts effortlessly to various networks
 - [Dispenser](./features/dispenser.md) - Fund your TestNet account with ALGOs from the AlgoKit TestNet Dispenser
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
 - [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
@@ -16,7 +17,8 @@ For details on how to use individual features see the following
 - [Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
 - [Init](./features/init.md) - Quickly initialize new projects using official Algorand Templates or community provided templates
 - [LocalNet](./features/localnet.md) - Manage a locally sandboxed private Algorand network
-- [Tasks](./features/tasks.md) - Perform a variety of useful operations on Algorand blockchain
+- [Project](./features/project.md) - Manage an AlgoKit project workspace on your file system
+- [Tasks](./features/tasks.md) - Perform a variety of useful operations on the Algorand blockchain
 
 ## Common AlgoKit CLI options
 
