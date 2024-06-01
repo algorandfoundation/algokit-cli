@@ -11,6 +11,7 @@ from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
     DOCKER_COMPOSE_MINIMUM_VERSION,
     DOCKER_COMPOSE_VERSION_COMMAND,
+    get_container_engine,
 )
 from algokit.core.utils import is_windows as get_is_windows
 from algokit.core.version_prompt import get_latest_github_version
@@ -42,18 +43,19 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     potential issues."""
     os_type = platform.system()
     is_windows = get_is_windows()
+    container_engine = get_container_engine()
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
         "AlgoKit": _get_algokit_version_output(),
         "AlgoKit Python": DoctorResult(ok=True, output=f"{sys.version} (location: {sys.prefix})"),
         "OS": DoctorResult(ok=True, output=platform.platform()),
-        "docker": check_dependency(
-            ["docker", "--version"],
+        container_engine: check_dependency(
+            [container_engine, "--version"],
             missing_help=[
-                "Docker required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/"
+                f"`{container_engine}` required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/"
             ],
         ),
-        "docker compose": check_dependency(
+        f"{container_engine} compose": check_dependency(
             DOCKER_COMPOSE_VERSION_COMMAND,
             minimum_version=DOCKER_COMPOSE_MINIMUM_VERSION,
             minimum_version_help=[

@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
 SANDBOX_BASE_NAME = "sandbox"
+CONTAINER_ENGINE_CONFIG_FILE = get_app_config_dir() / "active-container-engine"
+
+
+class ContainerEngine(str, enum.Enum):
+    DOCKER = "docker"
+    PODMAN = "podman"
 
 
 class ComposeFileStatus(enum.Enum):
@@ -515,4 +521,20 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         return {"Status": "Error"}
 
 
-DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+def load_container_engine() -> ContainerEngine:
+    if CONTAINER_ENGINE_CONFIG_FILE.exists():
+        return ContainerEngine(CONTAINER_ENGINE_CONFIG_FILE.read_text().strip())
+    return ContainerEngine.DOCKER
+
+
+def save_container_engine(engine: str) -> None:
+    if engine not in ContainerEngine:
+        raise ValueError(f"Invalid container engine: {engine}")
+    CONTAINER_ENGINE_CONFIG_FILE.write_text(engine)
+
+
+def get_container_engine() -> ContainerEngine:
+    return load_container_engine()
+
+
+DOCKER_COMPOSE_VERSION_COMMAND = [get_container_engine(), "compose", "version", "--format", "json"]

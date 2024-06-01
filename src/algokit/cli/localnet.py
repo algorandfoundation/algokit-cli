@@ -1,6 +1,7 @@
 import logging
 
 import click
+import questionary
 
 from algokit.cli.codespace import codespace_command
 from algokit.cli.explore import explore_command
@@ -12,8 +13,11 @@ from algokit.core.sandbox import (
     SANDBOX_BASE_NAME,
     ComposeFileStatus,
     ComposeSandbox,
+    ContainerEngine,
     fetch_algod_status_data,
     fetch_indexer_status_data,
+    get_container_engine,
+    save_container_engine,
 )
 from algokit.core.utils import extract_version_triple, is_minimum_version
 
@@ -59,7 +63,36 @@ def localnet_group(ctx: click.Context) -> None:
                 "Please update your Docker install"
             )
 
-    proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+    proc.run(
+        [get_container_engine(), "version"],
+        bad_return_code_error_message="Docker engine isn't running; please start it.",
+    )
+
+
+@localnet_group.command("config", short_help="Configure the container engine for AlgoKit LocalNet.")
+@click.argument("engine", required=False, type=click.Choice(["docker", "podman"]))
+def config_command(engine: str | None) -> None:
+    """Configure the container engine for AlgoKit LocalNet."""
+    if engine is None:
+        engine = (
+            questionary.select(
+                "Which container engine do you prefer?",
+                choices=[
+                    "Docker (Active)" if get_container_engine() == ContainerEngine.DOCKER else "Docker",
+                    "Podman (Active)" if get_container_engine() == ContainerEngine.PODMAN else "Podman",
+                ],
+            )
+            .ask()
+            .split()[0]
+            .lower()
+        )
+    else:
+        save_container_engine(engine)
+
+    logger.info(f"Container engine set to {engine}")
+
+
+localnet_group.add_command(config_command)
 
 
 @localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
