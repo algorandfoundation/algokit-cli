@@ -18,6 +18,6 @@ DEBUG: gh:
 DEBUG: gh: [{"displayName":"sandbox","state":"Available","name":"sandbox"}]
 DEBUG: gh: 
 Codespace sandbox is now ready.
-WARNING: Keep the tab open during the LocalNet session. Terminating the session will delete the codespace instance.
+WARNING: Keep the terminal open during the LocalNet session. Terminating the session will delete the codespace instance.
 LocalNet started in GitHub Codespace
 Exiting...
