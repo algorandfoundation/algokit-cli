@@ -21,7 +21,7 @@ Before proceeding, ensure you have the following components installed:
 - [Python 3.10](https://www.python.org/downloads/) or higher
 - [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
 - [git](https://github.com/git-guides/install-git#install-git)
-- [Docker](https://docs.docker.com/desktop/install/mac-install/)
+- [Docker](https://docs.docker.com/desktop/install/mac-install/) (or [Podman](https://podman.io/getting-started/installation/), see [details](../features/localnet.md#podman-support))
 - [VSCode](https://code.visualstudio.com/download)
 
 ## Install AlgoKit 🛠

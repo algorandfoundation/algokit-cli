@@ -5,6 +5,7 @@ Options:
 
 Commands:
   codespace  Manage the AlgoKit LocalNet in GitHub Codespaces.
+  config     Configure the container engine for AlgoKit LocalNet.
   console    Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash
              console so you can execute multiple goal commands and/or interact
              with a filesystem.

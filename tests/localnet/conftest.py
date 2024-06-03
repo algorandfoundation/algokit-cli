@@ -21,15 +21,15 @@ def _health_success(httpx_mock: HTTPXMock) -> None:
 
 @pytest.fixture()
 def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
-    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.set_output(
         ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
-        ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
+        ["tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
     )
 
     proc_mock.set_output(
         ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
-        ["sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
+        ["tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
     )
 
     httpx_mock.add_response(

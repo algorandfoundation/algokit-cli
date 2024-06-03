@@ -9,8 +9,8 @@ import pyclip  # type: ignore[import-untyped]
 from algokit.core.conf import get_current_package_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
-    DOCKER_COMPOSE_MINIMUM_VERSION,
-    DOCKER_COMPOSE_VERSION_COMMAND,
+    COMPOSE_MINIMUM_VERSION,
+    COMPOSE_VERSION_COMMAND,
     get_container_engine,
 )
 from algokit.core.utils import is_windows as get_is_windows
@@ -44,6 +44,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     os_type = platform.system()
     is_windows = get_is_windows()
     container_engine = get_container_engine()
+    docs_url = f"https://{container_engine}.io"
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
         "AlgoKit": _get_algokit_version_output(),
@@ -51,16 +52,15 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         "OS": DoctorResult(ok=True, output=platform.platform()),
         container_engine: check_dependency(
             [container_engine, "--version"],
-            missing_help=[
-                f"`{container_engine}` required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/"
-            ],
+            missing_help=[f"`{container_engine}` required to run `algokit localnet` command; install via {docs_url}"],
         ),
         f"{container_engine} compose": check_dependency(
-            DOCKER_COMPOSE_VERSION_COMMAND,
-            minimum_version=DOCKER_COMPOSE_MINIMUM_VERSION,
+            COMPOSE_VERSION_COMMAND,
+            minimum_version=COMPOSE_MINIMUM_VERSION,
             minimum_version_help=[
-                f"Docker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to run `algokit localnet` command;",
-                "install via https://docs.docker.com/compose/install/",
+                f"{container_engine.capitalize()} Compose {COMPOSE_MINIMUM_VERSION} required to",
+                "run `algokit localnet` command;",
+                f"install via {docs_url}",
             ],
         ),
         "git": check_dependency(
@@ -106,7 +106,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     elif os_type == "Darwin":
         service_outputs["brew"] = check_dependency(["brew", "--version"])
 
-    critical_services = ["docker", "docker compose", "git"]
+    critical_services = [container_engine, f"{container_engine} compose", "git"]
     # Print the status details
     for key, value in service_outputs.items():
         if value.ok:

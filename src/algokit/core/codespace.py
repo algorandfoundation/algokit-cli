@@ -7,6 +7,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+import click
 import httpx
 
 from algokit.core import proc, questionary_extensions
@@ -144,7 +145,7 @@ def list_github_codespaces() -> list[str]:
 
 
 def forward_ports_for_codespace(
-    codespace_name: str, algod_port: int, kmd_port: int, indexer_port: int, max_retries: int = 5
+    codespace_name: str, algod_port: int, kmd_port: int, indexer_port: int, max_retries: int = 3
 ) -> None:
     """
     Forwards specified ports for a GitHub Codespace with retries.
@@ -165,7 +166,14 @@ def forward_ports_for_codespace(
                 time.sleep, f"Retrying ({attempt - 1} attempts left)...", CODESPACE_PORT_FORWARD_RETRY_SECONDS
             )
     else:
-        raise Exception("All port forwarding attempts failed.")
+        if click.confirm("Port forwarding failed! Retry on next available ports?"):
+            return forward_ports_for_codespace(
+                codespace_name, algod_port + 1, kmd_port + 1, indexer_port + 1, max_retries
+            )
+
+        raise Exception(
+            "Port forwarding failed! Make sure you are not already running a localnet container on those ports."
+        )
 
 
 def delete_codespaces_with_prefix(codespaces: list[str], default_name: str) -> None:

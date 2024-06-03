@@ -18,6 +18,10 @@ If you are on Windows then you will need WSL 2 installed first, for which you ca
 
 Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.docker.com/desktop/install/windows-install/) for Docker can be used instead of the WSL 2 backend.
 
+### Podman support
+
+If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure `podman` first. Then you can set the default container engine to use by executing `algokit localnet config podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
+
 ## Known issues
 
 The AlgoKit LocalNet is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the LocalNet to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
@@ -26,7 +30,17 @@ The AlgoKit LocalNet is built with 30,000 participation keys generated and after
 
 We rely on the official Algorand docker images for Indexer, Conduit and Algod, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Apple Silicon).
 
-## Docker-based LocalNet
+## Container-based LocalNet
+
+AlgoKit cli supports both [Docker](https://www.docker.com/) and [Podman](https://podman.io/) as container engines. While `docker` is used by default, executing the:
+
+```
+algokit localnet config
+# or
+algokit localnet config podman|docker
+```
+
+Will set the default container engine to use when executing `localnet` related commands via `subprocess`.
 
 ### Creating / Starting the LocalNet
 
@@ -137,9 +151,9 @@ By default without `--force` flag it will prompt you to delete stale codespaces 
 - `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
 - `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
 - `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
-- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**. 
+- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**.
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
 
-> Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker and the other relies on port forwarding via `algokit localnet codespace`.
+> Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker | Podman and the other relies on port forwarding via `algokit localnet codespace`.

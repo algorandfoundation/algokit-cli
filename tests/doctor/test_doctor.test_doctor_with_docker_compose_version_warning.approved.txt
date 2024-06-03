@@ -27,8 +27,9 @@ AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Darwin-other-system-info
 docker: 20.10.21
 docker compose: 2.1.3
-  Docker Compose 2.5.0 required to run `algokit localnet` command;
-  install via https://docs.docker.com/compose/install/
+  Docker Compose 2.5.0 required to
+  run `algokit localnet` command;
+  install via https://docker.io
 git: 2.37.1
 python: 3.10.0 (location: /usr/local/bin/python)
 python3: 3.11.0 (location: /usr/local/bin/python3)
