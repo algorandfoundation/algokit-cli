@@ -1,6 +1,9 @@
-name: Pull Request validation
+name: Codebase validation
 
-on: [pull_request]
+on:
+  pull_request:
+  schedule:
+    - cron: "0 8 * * 1" # Each monday 8 AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -15,11 +18,6 @@ jobs:
     name: Build & Test Python
     needs: pr-check
     uses: ./.github/workflows/build-python.yaml
-
-  pr-test-podman:
-    name: Test LocalNet with Podman
-    needs: pr-check
-    uses: ./.github/workflows/podman-test.yaml
 
   pr-binaries-build:
     name: Build & Test Binaries

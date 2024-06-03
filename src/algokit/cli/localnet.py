@@ -8,7 +8,6 @@ from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
 from algokit.core.sandbox import (
-    COMPOSE_MINIMUM_VERSION,
     COMPOSE_VERSION_COMMAND,
     SANDBOX_BASE_NAME,
     ComposeFileStatus,
@@ -17,6 +16,7 @@ from algokit.core.sandbox import (
     fetch_algod_status_data,
     fetch_indexer_status_data,
     get_container_engine,
+    get_min_compose_version,
     save_container_engine,
 )
 from algokit.core.utils import extract_version_triple, is_minimum_version
@@ -43,20 +43,21 @@ def localnet_group(ctx: click.Context) -> None:
             "Container engine compose not found; please install Docker Compose or Podman Compose and add to path."
         )
 
+    compose_minimum_version = get_min_compose_version()
     try:
         compose_version_str = extract_version_triple(compose_version_result.output)
-        compose_version_ok = is_minimum_version(compose_version_str, COMPOSE_MINIMUM_VERSION)
+        compose_version_ok = is_minimum_version(compose_version_str, compose_minimum_version)
     except Exception:
         logger.warning(
             "Unable to extract compose version from output: \n"
             + compose_version_result.output
-            + f"\nPlease ensure a minimum of compose v{COMPOSE_MINIMUM_VERSION} is used",
+            + f"\nPlease ensure a minimum of compose v{compose_minimum_version} is used",
             exc_info=True,
         )
     else:
         if not compose_version_ok:
             raise click.ClickException(
-                f"Minimum compose version supported: v{COMPOSE_MINIMUM_VERSION}, "
+                f"Minimum compose version supported: v{compose_minimum_version}, "
                 f"installed = v{compose_version_str}\n"
                 "Please update your compose install"
             )
@@ -95,11 +96,14 @@ def config_command(*, engine: str | None, force: bool) -> None:
         engine = engine.split()[0].lower()
 
     sandbox = ComposeSandbox.from_environment()
-    has_active_instance = sandbox is not None and click.confirm(
-        f"Detected active localnet instance, would you like to restart it with '{engine}'?",
-        default=True,
+    has_active_instance = sandbox is not None and (
+        force
+        or click.confirm(
+            f"Detected active localnet instance, would you like to restart it with '{engine}'?",
+            default=True,
+        )
     )
-    if sandbox and (has_active_instance or force):
+    if sandbox and has_active_instance:
         sandbox.down()
         save_container_engine(engine)
         sandbox.write_compose_file()

@@ -9,9 +9,9 @@ import pyclip  # type: ignore[import-untyped]
 from algokit.core.conf import get_current_package_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
-    COMPOSE_MINIMUM_VERSION,
     COMPOSE_VERSION_COMMAND,
     get_container_engine,
+    get_min_compose_version,
 )
 from algokit.core.utils import is_windows as get_is_windows
 from algokit.core.version_prompt import get_latest_github_version
@@ -45,6 +45,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     is_windows = get_is_windows()
     container_engine = get_container_engine()
     docs_url = f"https://{container_engine}.io"
+    compose_minimum_version = get_min_compose_version()
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
         "AlgoKit": _get_algokit_version_output(),
@@ -56,9 +57,9 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         ),
         f"{container_engine} compose": check_dependency(
             COMPOSE_VERSION_COMMAND,
-            minimum_version=COMPOSE_MINIMUM_VERSION,
+            minimum_version=compose_minimum_version,
             minimum_version_help=[
-                f"{container_engine.capitalize()} Compose {COMPOSE_MINIMUM_VERSION} required to",
+                f"{container_engine.capitalize()} Compose {compose_minimum_version} required to",
                 "run `algokit localnet` command;",
                 f"install via {docs_url}",
             ],

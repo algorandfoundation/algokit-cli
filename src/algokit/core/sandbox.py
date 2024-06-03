@@ -15,7 +15,10 @@ from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
 
-COMPOSE_MINIMUM_VERSION = "2.5.0"
+DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
+PODMAN_COMPOSE_MINIMUM_VERSION = "1.0.6"
+
+
 SANDBOX_BASE_NAME = "sandbox"
 CONTAINER_ENGINE_CONFIG_FILE = get_app_config_dir() / "active-container-engine"
 
@@ -32,6 +35,13 @@ class ComposeFileStatus(enum.Enum):
     MISSING = enum.auto()
     UP_TO_DATE = enum.auto()
     OUT_OF_DATE = enum.auto()
+
+
+def get_min_compose_version() -> str:
+    container_engine = get_container_engine()
+    return (
+        DOCKER_COMPOSE_MINIMUM_VERSION if container_engine == ContainerEngine.DOCKER else PODMAN_COMPOSE_MINIMUM_VERSION
+    )
 
 
 class ComposeSandbox:
@@ -155,7 +165,8 @@ class ComposeSandbox:
     def up(self) -> None:
         logger.info("Starting AlgoKit LocalNet now...")
         self._run_compose_command(
-            "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start LocalNet"
+            f"up --detach --quiet-pull{' --wait' if get_container_engine() == ContainerEngine.DOCKER else ''}",
+            bad_return_code_error_message="Failed to start LocalNet",
         )
         logger.debug("AlgoKit LocalNet started, waiting for health check")
         if _wait_for_algod():
