@@ -16,6 +16,11 @@ jobs:
     needs: pr-check
     uses: ./.github/workflows/build-python.yaml
 
+  pr-test-podman:
+    name: Test LocalNet with Podman
+    needs: pr-check
+    uses: ./.github/workflows/podman-test.yaml
+
   pr-binaries-build:
     name: Build & Test Binaries
     needs: pr-check
