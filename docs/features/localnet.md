@@ -142,7 +142,7 @@ For more details about the `AlgoKit localnet` command, please refer to the [Algo
 The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by utilizing the [GitHub CLI](https://github.com/cli/gh). This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
 
 To run the LocalNet in a GitHub Codespace, you can use the `algokit localnet codespace` command.
-By default without `--force` flag it will prompt you to delete stale codespaces created earlier (if any). Upon termination it will also prompt the user to delete the codespace that was used prior to termination.
+By default without `--force` flag it will prompt you to delete stale codespaces created earlier (if any). Upon termination it will also prompt to delete the codespace that was used prior to termination.
 
 Running an interactive session ensures that you have control over the lifecycle of your Codespace, preventing unnecessary usage and potential costs. GitHub Codespaces offers a free tier with certain limits, which you can review in the [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/overview#pricing).
 
