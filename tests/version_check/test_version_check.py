@@ -4,7 +4,7 @@ from time import time
 
 import pytest
 from algokit.core.conf import PACKAGE_NAME
-from algokit.core.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
+from algokit.core.config_commands.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -28,8 +28,12 @@ def make_scrubber(app_dir_mock: AppDirs) -> Scrubber:
 
 @pytest.fixture(autouse=True)
 def _setup(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
-    mocker.patch("algokit.core.version_prompt.get_app_config_dir").return_value = app_dir_mock.app_config_dir
-    mocker.patch("algokit.core.version_prompt.get_app_state_dir").return_value = app_dir_mock.app_state_dir
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_app_config_dir"
+    ).return_value = app_dir_mock.app_config_dir
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_app_state_dir"
+    ).return_value = app_dir_mock.app_state_dir
     # make bootstrap env a no-op
     mocker.patch("algokit.cli.project.bootstrap.bootstrap_env")
 
@@ -75,7 +79,9 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 def test_version_check_only_warns_if_newer_version_is_found(
     app_dir_mock: AppDirs, mocker: MockerFixture, current_version: str, latest_version: str, *, warning_expected: bool
 ) -> None:
-    mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = current_version
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_current_package_version"
+    ).return_value = current_version
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text(latest_version, encoding="utf-8")
     result = invoke("project bootstrap env", skip_version_check=False)
@@ -154,9 +160,9 @@ def test_version_check_enable_version_check(app_dir_mock: AppDirs) -> None:
 def test_version_prompt_according_to_distribution_method(
     mocker: MockerFixture, app_dir_mock: AppDirs, method: str, message: str
 ) -> None:
-    mocker.patch("algokit.core.version_prompt._get_distribution_method").return_value = method
-    mocker.patch("algokit.core.version_prompt.is_binary_mode").return_value = True
-    mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = "1.0.0"
+    mocker.patch("algokit.core.config_commands.version_prompt._get_distribution_method").return_value = method
+    mocker.patch("algokit.core.config_commands.version_prompt.is_binary_mode").return_value = True
+    mocker.patch("algokit.core.config_commands.version_prompt.get_current_package_version").return_value = "1.0.0"
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("2.0.0", encoding="utf-8")
 

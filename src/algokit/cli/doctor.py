@@ -7,14 +7,13 @@ import click
 import pyclip  # type: ignore[import-untyped]
 
 from algokit.core.conf import get_current_package_version
+from algokit.core.config_commands.version_prompt import get_latest_github_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
     COMPOSE_VERSION_COMMAND,
-    get_container_engine,
     get_min_compose_version,
 )
 from algokit.core.utils import is_windows as get_is_windows
-from algokit.core.version_prompt import get_latest_github_version
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +40,8 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
 
     Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
     potential issues."""
+    from algokit.core.config_commands.container_engine import get_container_engine
+
     os_type = platform.system()
     is_windows = get_is_windows()
     container_engine = get_container_engine()

@@ -1,6 +1,6 @@
-DEBUG: Running 'docker version' in '{current_working_directory}'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
-DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
-DEBUG: docker: []
+DEBUG: Running '{container_engine} version' in '{current_working_directory}'
+DEBUG: {container_engine}: STDOUT
+DEBUG: {container_engine}: STDERR
+DEBUG: Running '{container_engine} compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
+DEBUG: {container_engine}: []
 Error: LocalNet definition is out of date; please run `algokit localnet reset` first!

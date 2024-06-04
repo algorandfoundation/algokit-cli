@@ -3,13 +3,14 @@ import logging
 import click
 
 from algokit.core import proc
+from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.goal import (
     get_volume_mount_path_docker,
     get_volume_mount_path_local,
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import SANDBOX_BASE_NAME, ComposeFileStatus, ComposeSandbox, get_container_engine
+from algokit.core.sandbox import SANDBOX_BASE_NAME, ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 

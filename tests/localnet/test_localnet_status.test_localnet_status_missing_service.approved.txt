@@ -6,7 +6,7 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
 # container engine
-Name: docker (change with `algokit localnet config`)
+Name: docker (change with `algokit config container-engine`)
 DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'
 DEBUG: docker: [{"ID": "00e93d3db91d964d1b2bcf444c938140dc6b43398380374eaac8510f45381973", "Name": "algokit_algod", "Command": "start.sh", "Project": "algokit_sandbox", "Service": "algod", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"}, {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"}]}, {"ID": "9e66aca1cd3542446e7b88f0701122a90f388308f7de0b57b6e2d843b3da9026", "Name": "algokit_postgres", "Command": "docker-entrypoint.sh postgres", "Project": "algokit_sandbox", "Service": "indexer-db", "State": "running", "Health": "", "ExitCode": 0, "Publishers": [{"URL": "", "TargetPort": 5432, "PublishedPort": 0, "Protocol": "tcp"}]}]
 Error: LocalNet has not been initialized yet, please run 'algokit localnet start'

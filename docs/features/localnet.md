@@ -20,7 +20,7 @@ Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.d
 
 ### Podman support
 
-If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure `podman` first. Then you can set the default container engine to use by executing `algokit localnet config podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
+If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure `podman` first. Then you can set the default container engine to use by executing `algokit config container-engine podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
 
 ## Known issues
 
@@ -35,9 +35,9 @@ We rely on the official Algorand docker images for Indexer, Conduit and Algod, w
 AlgoKit cli supports both [Docker](https://www.docker.com/) and [Podman](https://podman.io/) as container engines. While `docker` is used by default, executing the:
 
 ```
-algokit localnet config
+algokit config container-engine
 # or
-algokit localnet config podman|docker
+algokit config container-engine podman|docker
 ```
 
 Will set the default container engine to use when executing `localnet` related commands via `subprocess`.

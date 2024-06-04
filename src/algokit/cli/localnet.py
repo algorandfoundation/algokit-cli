@@ -7,6 +7,7 @@ from algokit.cli.codespace import codespace_command
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
+from algokit.core.config_commands.container_engine import get_container_engine, save_container_engine
 from algokit.core.sandbox import (
     COMPOSE_VERSION_COMMAND,
     SANDBOX_BASE_NAME,
@@ -15,9 +16,7 @@ from algokit.core.sandbox import (
     ContainerEngine,
     fetch_algod_status_data,
     fetch_indexer_status_data,
-    get_container_engine,
     get_min_compose_version,
-    save_container_engine,
 )
 from algokit.core.utils import extract_version_triple, is_minimum_version
 
@@ -221,7 +220,9 @@ def localnet_status() -> None:
         sandbox = ComposeSandbox()
 
     logger.info("# container engine")
-    logger.info("Name: " + click.style(get_container_engine(), bold=True) + " (change with `algokit localnet config`)")
+    logger.info(
+        "Name: " + click.style(get_container_engine(), bold=True) + " (change with `algokit config container-engine`)"
+    )
 
     ps = sandbox.ps()
     ps_by_name = {stats["Service"]: stats for stats in ps}

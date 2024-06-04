@@ -16,7 +16,7 @@ DUMMY_CONTRACT_TEAL = """\n#pragma version 8\nint 1\nreturn\n"""
 
 
 def _normalize_output(output: str) -> str:
-    return output.replace("\\", "/")
+    return output.replace("\\", "/").replace("docker", "{container_engine}").replace("podman", "{container_engine}")
 
 
 @pytest.fixture()

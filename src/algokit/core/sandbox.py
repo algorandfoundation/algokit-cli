@@ -11,6 +11,7 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
+from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
@@ -557,18 +558,6 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
     except Exception as err:
         logger.debug(f"Error checking indexer status: {err}", exc_info=True)
         return {"Status": "Error"}
-
-
-def save_container_engine(engine: str) -> None:
-    if engine not in ContainerEngine:
-        raise ValueError(f"Invalid container engine: {engine}")
-    CONTAINER_ENGINE_CONFIG_FILE.write_text(engine)
-
-
-def get_container_engine() -> str:
-    if CONTAINER_ENGINE_CONFIG_FILE.exists():
-        return CONTAINER_ENGINE_CONFIG_FILE.read_text().strip()
-    return str(ContainerEngine.DOCKER)
 
 
 COMPOSE_VERSION_COMMAND = [get_container_engine(), "compose", "version", "--format", "json"]

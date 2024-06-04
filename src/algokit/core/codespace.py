@@ -7,7 +7,6 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-import click
 import httpx
 
 from algokit.core import proc, questionary_extensions
@@ -23,6 +22,20 @@ CODESPACE_CREATE_RETRY_TIMEOUT = 10
 CODESPACE_CONTAINER_AVAILABLE = "Available"
 CODESPACE_TOO_MANY_ERROR_MSG = "too many codespaces"
 CODESPACE_LOADING_MSG = "Provisioning a new codespace instance..."
+
+
+def _is_port_in_use(port: int) -> bool:
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", port)) == 0
+
+
+def _find_next_available_port(start_port: int, ignore_ports: list[int]) -> int:
+    port = start_port
+    while _is_port_in_use(port) or port in ignore_ports:
+        port += 1
+    return port
 
 
 def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, log_level: int = logging.INFO) -> bool:
@@ -156,6 +169,32 @@ def forward_ports_for_codespace(
         (indexer_port, 8980),
     ]
 
+    occupied_ports = [port for port in [algod_port, kmd_port, indexer_port] if _is_port_in_use(port)]
+
+    if occupied_ports:
+        logger.warning(f"Ports {', '.join(map(str, occupied_ports))} are already in use!")
+        if questionary_extensions.prompt_confirm("Retry on next available ports?", default=True):
+            logger.warning(
+                "NOTE: Ensure to update the port numbers in your Algorand related configuration files (if any)."
+            )
+            next_algod_port = _find_next_available_port(algod_port, occupied_ports)
+            next_kmd_port = _find_next_available_port(kmd_port, [next_algod_port, *occupied_ports])
+            next_indexer_port = _find_next_available_port(
+                indexer_port, [next_algod_port, next_kmd_port, *occupied_ports]
+            )
+            logger.info(
+                f"Retrying with ports {next_algod_port} (was {algod_port}), "
+                f"{next_kmd_port} (was {kmd_port}), {next_indexer_port} (was {indexer_port})"
+            )
+            return forward_ports_for_codespace(
+                codespace_name,
+                next_algod_port if algod_port in occupied_ports else algod_port,
+                next_kmd_port if kmd_port in occupied_ports else kmd_port,
+                next_indexer_port if indexer_port in occupied_ports else indexer_port,
+                max_retries,
+            )
+        return None
+
     for attempt in reversed(range(1, max_retries + 1)):
         if _try_forward_ports_once(ports, codespace_name):
             logger.info("Port forwarding successful.")
@@ -166,11 +205,6 @@ def forward_ports_for_codespace(
                 time.sleep, f"Retrying ({attempt - 1} attempts left)...", CODESPACE_PORT_FORWARD_RETRY_SECONDS
             )
     else:
-        if click.confirm("Port forwarding failed! Retry on next available ports?"):
-            return forward_ports_for_codespace(
-                codespace_name, algod_port + 1, kmd_port + 1, indexer_port + 1, max_retries
-            )
-
         raise Exception(
             "Port forwarding failed! Make sure you are not already running a localnet container on those ports."
         )
