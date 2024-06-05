@@ -60,8 +60,8 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             COMPOSE_VERSION_COMMAND,
             minimum_version=compose_minimum_version,
             minimum_version_help=[
-                f"{container_engine.capitalize()} Compose {compose_minimum_version} required to",
-                f"run `algokit localnet` command; install via {docs_url}",
+                f"{container_engine.capitalize()} Compose {compose_minimum_version} required to run `algokit localnet` command;",  # noqa: E501
+                f"install via {docs_url}",
             ],
         ),
         "git": check_dependency(
