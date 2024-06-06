@@ -91,7 +91,7 @@
     - [-k, --kmd-port ](#-k---kmd-port-)
     - [-n, --codespace-name ](#-n---codespace-name-)
     - [-r, --repo-url ](#-r---repo-url-)
-    - [-t, --idle-timeout ](#-t---idle-timeout-)
+    - [-t, --timeout ](#-t---timeout-)
     - [-f, --force](#-f---force-1)
     - [config](#config-1)
     - [Options](#options-14)
@@ -717,12 +717,12 @@ The name of the codespace. Defaults to 'algokit-localnet_timestamp'.
 The URL of the repository. Defaults to algokit base template repo.
 
 
-### -t, --idle-timeout <idle_timeout>
-The timeout for the codespace to be idle. Defaults to 30 minutes.
+### -t, --timeout <timeout_hours>
+Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to prevent accidental spending over GitHub Codespaces quota. Defaults to 1 hour.
 
 
 ### -f, --force
-Force delete stale codespaces and skip confirmation prompts. Defaults to explicitly prompting for confirmation.
+Force delete previously used codespaces with {CODESPACE_NAME_PREFIX}\* name prefix and skip prompts. Defaults to explicitly prompting for confirmation.
 
 ### config
 

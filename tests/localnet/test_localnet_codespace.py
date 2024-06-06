@@ -38,7 +38,9 @@ def test_install_gh_windows(
     proc_mock.should_fail_on(
         ["gh", "--version"],
     )
-    proc_mock.set_output(["powershell", "--version"], ["PowerShell 7.2.1"])
+    proc_mock.set_output(
+        ["powershell", "-command", "(Get-Variable PSVersionTable -ValueOnly).PSVersion"], ["PowerShell 7.2.1"]
+    )
     proc_mock.set_output(
         [
             "powershell",
@@ -125,9 +127,12 @@ def test_invalid_scope_auth(
             """
         ],
     )
+    proc_mock.set_output(
+        ["gh", "codespace", "delete", "--codespace", "sandbox", "--force"], ["Deleted unused codespace"]
+    )
     mocker.patch("algokit.cli.codespace.forward_ports_for_codespace", return_value=None)
     mocker.patch("algokit.core.codespace.run_with_animation")
 
-    result = invoke("localnet codespace -n sandbox")
+    result = invoke("localnet codespace -n sandbox --force")
     assert result.exit_code == 0
     verify(result.output)

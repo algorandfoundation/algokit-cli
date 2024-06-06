@@ -1,5 +1,6 @@
 import logging
-import time
+import subprocess
+from time import time
 from typing import Any
 
 import click
@@ -20,14 +21,14 @@ from algokit.core.codespace import (
 logger = logging.getLogger(__name__)
 
 # https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces
-MIN_GH_IDLE_TIMEOUT_MIN = 5
-MAX_GH_IDLE_TIMEOUT_MIN = 240
+MIN_GH_PORT_FORWARD_TIMEOUT_MIN = 1
+MAX_GH_PORT_FORWARD_TIMEOUT_MIN = 24
 
 
 def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: int) -> int:
-    if value < MIN_GH_IDLE_TIMEOUT_MIN or value > MAX_GH_IDLE_TIMEOUT_MIN:
+    if value < MIN_GH_PORT_FORWARD_TIMEOUT_MIN or value > MAX_GH_PORT_FORWARD_TIMEOUT_MIN:
         raise click.BadParameter(
-            f"Idle timeout must be between {MIN_GH_IDLE_TIMEOUT_MIN} and {MAX_GH_IDLE_TIMEOUT_MIN} minutes."
+            f"Timeout must be between {MIN_GH_PORT_FORWARD_TIMEOUT_MIN} and {MAX_GH_PORT_FORWARD_TIMEOUT_MIN} hours."
         )
     return value
 
@@ -66,11 +67,13 @@ def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: 
 )
 @click.option(
     "-t",
-    "--idle-timeout",
-    default=30,
+    "--timeout",
+    "timeout_hours",
+    default=1,
     required=False,
     callback=_validate_idle_timeout,
-    help="The timeout for the codespace to be idle. Defaults to 30 minutes.",
+    help="Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to "
+    "prevent accidental spending over GitHub Codespaces quota. Defaults to 1 hour.",
 )
 @click.option(
     "--force",
@@ -80,7 +83,7 @@ def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: 
     default=False,
     type=click.BOOL,
     help=(
-        "Force delete stale codespaces and skip confirmation prompts. "
+        "Force delete previously used codespaces with `{CODESPACE_NAME_PREFIX}*` name prefix and skip prompts. "
         "Defaults to explicitly prompting for confirmation."
     ),
 )
@@ -92,7 +95,7 @@ def codespace_command(  # noqa: PLR0913
     kmd_port: int,
     codespace_name: str,
     repo_url: str,
-    idle_timeout: int,
+    timeout_hours: int,
     force: bool,
 ) -> None:
     """Manage the AlgoKit LocalNet in GitHub Codespaces."""
@@ -107,14 +110,14 @@ def codespace_command(  # noqa: PLR0913
     if codespaces and (
         force
         or questionary_extensions.prompt_confirm(
-            f"Delete stale codespaces with `{CODESPACE_NAME_PREFIX}*` name prefix?", default=True
+            f"Delete previously used codespaces with `{CODESPACE_NAME_PREFIX}*` name prefix?", default=True
         )
     ):
         delete_codespaces_with_prefix(codespaces, CODESPACE_NAME_PREFIX)
 
     # Create a new codespace
-    codespace_name = codespace_name or f"{CODESPACE_NAME_PREFIX}_{int(time.time())}"
-    create_codespace(repo_url, codespace_name, machine, idle_timeout)
+    codespace_name = codespace_name or f"{CODESPACE_NAME_PREFIX}_{int(time())}"
+    create_codespace(repo_url, codespace_name, machine)
 
     codespace_data: dict[str, Any] | None = None
 
@@ -129,13 +132,17 @@ def codespace_command(  # noqa: PLR0913
             "Keep the terminal open during the LocalNet session. "
             "Terminating the session will delete the codespace instance."
         )
-        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port)
+
+        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, timeout_hours * 60 * 60)
         logger.info("LocalNet started in GitHub Codespace")
+
+    except subprocess.TimeoutExpired:
+        logger.warning("Timeout reached. Shutting down the codespace...")
     except KeyboardInterrupt:
-        logger.warning("Termination in progress...")
-        if codespace_data:
-            delete_codespace(codespace_data=codespace_data, force=force)
+        logger.warning("Keyboard interrupt received. Shutting down the codespace...")
     except Exception as e:
         logger.error(e)
     finally:
         logger.info("Exiting...")
+        if codespace_data:
+            delete_codespace(codespace_data=codespace_data, force=force)

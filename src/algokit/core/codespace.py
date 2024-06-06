@@ -3,6 +3,7 @@ import logging
 import subprocess
 import tempfile
 import time
+from datetime import datetime
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -39,7 +40,7 @@ def _find_next_available_port(start_port: int, ignore_ports: list[int]) -> int:
     return port
 
 
-def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, log_level: int = logging.INFO) -> bool:
+def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, timeout: int) -> bool:
     command = [
         "gh",
         "codespace",
@@ -51,8 +52,16 @@ def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, l
     ]
 
     try:
-        response = proc.run(command, pass_stdin=True, stdout_log_level=log_level)
+        logger.info(
+            f"WARNING: This codespace port-forwarding attempt will auto shut down at "
+            f"{datetime.fromtimestamp(time.time() + timeout).astimezone().strftime('%Y-%m-%d %H:%M:%S %Z')}."
+            " It will also shut down after 30 minutes of inactivity (see https://docs.github.com/en/codespaces/overview#pricing)."
+        )
+        response = proc.run_interactive(command, timeout=timeout)
         return response.exit_code == 0
+    except subprocess.TimeoutExpired as e:
+        logger.debug(f"Timed out trying to forward ports for codespace {codespace_name} {e}")
+        raise e
     except Exception as e:
         logger.error(f"Port forwarding attempt failed with error: {e}")
         return False
@@ -73,7 +82,11 @@ def _run_powershell_script(script_path: Path) -> None:
     """
     Runs the PowerShell script.
     """
-    _ensure_command_available("powershell", "PowerShell is required but not found on this Windows system.")
+    _ensure_command_available(
+        ["powershell", "-command", "(Get-Variable PSVersionTable -ValueOnly).PSVersion"],
+        "PowerShell is required but not found on this system. Refer to `https://aka.ms/install-powershell` "
+        "for details.",
+    )
     proc.run(["powershell", "-File", str(script_path)])
 
 
@@ -85,12 +98,12 @@ def _run_unix_script(script_path: Path) -> None:
     proc.run([shell, str(script_path)])
 
 
-def _ensure_command_available(command: str, error_message: str) -> None:
+def _ensure_command_available(command: list[str], error_message: str) -> None:
     """
     Ensures that the specified command is available on the system.
     """
     try:
-        proc.run([command, "--version"])
+        proc.run(command)
     except Exception as e:
         raise RuntimeError(error_message) from e
 
@@ -100,10 +113,19 @@ def _find_available_shell() -> str:
     Finds an available shell (bash or zsh) on the system.
     """
     try:
-        _ensure_command_available("bash", "")
+        _ensure_command_available(
+            ["bash", "--version"],
+            "Bash is required but not found on this system. Checking whether zsh is available...",
+        )
         return "bash"
     except RuntimeError:
-        _ensure_command_available("zsh", "Neither Bash nor Zsh is found on this Linux system.")
+        _ensure_command_available(
+            ["zsh", "--version"],
+            "Neither Bash nor Zsh is found on this Linux system. "
+            "Please make sure to install one of them before running "
+            "`algokit localnet codespace`.",
+        )
+
         return "zsh"
 
 
@@ -210,8 +232,8 @@ def list_github_codespaces() -> list[str]:
     return [line.split("\t")[0] for line in result.output.splitlines()]
 
 
-def forward_ports_for_codespace(
-    codespace_name: str, algod_port: int, kmd_port: int, indexer_port: int, max_retries: int = 3
+def forward_ports_for_codespace(  # noqa: PLR0913
+    codespace_name: str, algod_port: int, kmd_port: int, indexer_port: int, max_retries: int = 3, timeout: int = 3600
 ) -> None:
     """
     Forwards specified ports for a GitHub Codespace with retries.
@@ -249,7 +271,7 @@ def forward_ports_for_codespace(
         return None
 
     for attempt in reversed(range(1, max_retries + 1)):
-        if _try_forward_ports_once(ports, codespace_name):
+        if _try_forward_ports_once(ports, codespace_name, timeout):
             logger.info("Port forwarding successful.")
             break
         logger.error("Port forwarding failed!")
@@ -329,7 +351,7 @@ def delete_codespace(*, codespace_data: dict[str, Any], force: bool) -> None:
         )
 
 
-def create_codespace(repo_url: str, codespace_name: str, machine: str, idle_timeout: int) -> None:
+def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
     """
     Creates a GitHub Codespace with the specified repository, display name, and machine type.
 
@@ -337,22 +359,9 @@ def create_codespace(repo_url: str, codespace_name: str, machine: str, idle_time
         repo_url (str): The URL of the repository for the codespace.
         codespace_name (str): The display name for the codespace.
         machine (str): The machine type for the codespace.
-        idle_timeout (int): The timeout for the codespace to be idle.
     """
     response = proc.run(
-        [
-            "gh",
-            "codespace",
-            "create",
-            "--repo",
-            repo_url,
-            "--display-name",
-            codespace_name,
-            "--machine",
-            machine,
-            "--idle-timeout",
-            f"{idle_timeout}m",
-        ],
+        ["gh", "codespace", "create", "--repo", repo_url, "--display-name", codespace_name, "--machine", machine],
         pass_stdin=True,
     )
     if response.exit_code != 0 and CODESPACE_TOO_MANY_ERROR_MSG in response.output.lower():
