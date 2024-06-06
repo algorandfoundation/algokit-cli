@@ -1,4 +1,9 @@
 DEBUG: Running 'gh --version' in '{current_working_directory}'
 Installing gh...
-DEBUG: Running 'winget install --id GitHub.cli --silent' in '{current_working_directory}'
+DEBUG: HTTP Request: GET https://webi.ms/gh "HTTP/1.1 200 OK"
+DEBUG: Running 'powershell --version' in '{current_working_directory}'
+DEBUG: powershell: PowerShell 7.2.1
+DEBUG: Running 'powershell -File {dummy_script_path}' in '{current_working_directory}'
+DEBUG: powershell: installed gh!
 gh installed successfully!
+WARNING: Restart your terminal to activate the `gh` CLI and re-run `algokit localnet codespace` to get started...

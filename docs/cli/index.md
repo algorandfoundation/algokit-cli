@@ -91,6 +91,7 @@
     - [-k, --kmd-port ](#-k---kmd-port-)
     - [-n, --codespace-name ](#-n---codespace-name-)
     - [-r, --repo-url ](#-r---repo-url-)
+    - [-t, --idle-timeout ](#-t---idle-timeout-)
     - [-f, --force](#-f---force-1)
     - [config](#config-1)
     - [Options](#options-14)
@@ -709,11 +710,15 @@ The port for the Algorand kmd. Defaults to 4002.
 
 
 ### -n, --codespace-name <codespace_name>
-The name of the codespace. Defaults to random name with timestamp.
+The name of the codespace. Defaults to 'algokit-localnet_timestamp'.
 
 
 ### -r, --repo-url <repo_url>
 The URL of the repository. Defaults to algokit base template repo.
+
+
+### -t, --idle-timeout <idle_timeout>
+The timeout for the codespace to be idle. Defaults to 30 minutes.
 
 
 ### -f, --force

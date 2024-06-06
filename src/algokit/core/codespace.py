@@ -7,6 +7,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+import click
 import httpx
 
 from algokit.core import proc, questionary_extensions
@@ -57,19 +58,65 @@ def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, l
         return False
 
 
+def _write_temp_script(script_content: str, script_extension: str) -> Path:
+    """
+    Writes the script content to a temporary file and returns the file path.
+    """
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{script_extension}", mode="w") as tmp_file:
+        script_path = Path(tmp_file.name)
+        script_path.write_text(script_content)
+        script_path.chmod(0o755)
+    return script_path
+
+
+def _run_powershell_script(script_path: Path) -> None:
+    """
+    Runs the PowerShell script.
+    """
+    _ensure_command_available("powershell", "PowerShell is required but not found on this Windows system.")
+    proc.run(["powershell", "-File", str(script_path)])
+
+
+def _run_unix_script(script_path: Path) -> None:
+    """
+    Runs the Unix shell script.
+    """
+    shell = _find_available_shell()
+    proc.run([shell, str(script_path)])
+
+
+def _ensure_command_available(command: str, error_message: str) -> None:
+    """
+    Ensures that the specified command is available on the system.
+    """
+    try:
+        proc.run([command, "--version"])
+    except Exception as e:
+        raise RuntimeError(error_message) from e
+
+
+def _find_available_shell() -> str:
+    """
+    Finds an available shell (bash or zsh) on the system.
+    """
+    try:
+        _ensure_command_available("bash", "")
+        return "bash"
+    except RuntimeError:
+        _ensure_command_available("zsh", "Neither Bash nor Zsh is found on this Linux system.")
+        return "zsh"
+
+
 def ensure_github_cli_installed() -> None:
     """
     Ensures GitHub CLI (`gh`) is installed, installing it if necessary.
     """
     try:
         proc.run(["gh", "--version"])
-    except Exception:
+    except Exception as err:
         logger.info("Installing gh...")
         try:
-            if is_windows():
-                proc.run(["winget", "install", "--id", "GitHub.cli", "--silent"])
-            else:
-                install_github_cli_via_webi()
+            install_github_cli_via_webi()
         except Exception as e:
             logger.error(f"Failed to automatically install gh cli: {e}")
             logger.error(
@@ -77,20 +124,26 @@ def ensure_github_cli_installed() -> None:
             )
             raise
         logger.info("gh installed successfully!")
+        logger.warning(
+            "Restart your terminal to activate the `gh` CLI and re-run `algokit localnet codespace` to get started..."
+        )
+        raise click.exceptions.Exit(code=0) from err
 
 
 def install_github_cli_via_webi() -> None:
     """
     Installs `gh` using the `webi.sh` script.
     """
-    response = httpx.get(GH_WEBI_INSTALLER_URL)
+    response = httpx.get(f'https://webi.{"ms" if is_windows() else "sh"}/gh')
     response.raise_for_status()
 
-    with tempfile.NamedTemporaryFile(delete=True, mode="w") as tmp_file:
-        tmp_file.write(response.text)
-        script_path = tmp_file.name
-        Path(script_path).chmod(0o755)
-        proc.run([script_path])
+    script_extension = "ps1" if is_windows() else "sh"
+    script_path = _write_temp_script(response.text, script_extension)
+
+    if is_windows():
+        _run_powershell_script(script_path)
+    else:
+        _run_unix_script(script_path)
 
 
 @cache
@@ -276,7 +329,7 @@ def delete_codespace(*, codespace_data: dict[str, Any], force: bool) -> None:
         )
 
 
-def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
+def create_codespace(repo_url: str, codespace_name: str, machine: str, idle_timeout: int) -> None:
     """
     Creates a GitHub Codespace with the specified repository, display name, and machine type.
 
@@ -284,6 +337,7 @@ def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
         repo_url (str): The URL of the repository for the codespace.
         codespace_name (str): The display name for the codespace.
         machine (str): The machine type for the codespace.
+        idle_timeout (int): The timeout for the codespace to be idle.
     """
     response = proc.run(
         [
@@ -296,6 +350,8 @@ def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
             codespace_name,
             "--machine",
             machine,
+            "--idle-timeout",
+            f"{idle_timeout}m",
         ],
         pass_stdin=True,
     )

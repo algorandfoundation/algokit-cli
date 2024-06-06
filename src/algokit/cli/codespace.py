@@ -19,6 +19,18 @@ from algokit.core.codespace import (
 
 logger = logging.getLogger(__name__)
 
+# https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces
+MIN_GH_IDLE_TIMEOUT_MIN = 5
+MAX_GH_IDLE_TIMEOUT_MIN = 240
+
+
+def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: int) -> int:
+    if value < MIN_GH_IDLE_TIMEOUT_MIN or value > MAX_GH_IDLE_TIMEOUT_MIN:
+        raise click.BadParameter(
+            f"Idle timeout must be between {MIN_GH_IDLE_TIMEOUT_MIN} and {MAX_GH_IDLE_TIMEOUT_MIN} minutes."
+        )
+    return value
+
 
 @click.command("codespace")
 @click.option(
@@ -43,7 +55,7 @@ logger = logging.getLogger(__name__)
     "--codespace-name",
     default="",
     required=False,
-    help="The name of the codespace. Defaults to random name with timestamp.",
+    help=f"The name of the codespace. Defaults to '{CODESPACE_NAME_PREFIX}_timestamp'.",
 )
 @click.option(
     "-r",
@@ -51,6 +63,14 @@ logger = logging.getLogger(__name__)
     required=False,
     default="algorandfoundation/algokit-base-template",
     help="The URL of the repository. Defaults to algokit base template repo.",
+)
+@click.option(
+    "-t",
+    "--idle-timeout",
+    default=30,
+    required=False,
+    callback=_validate_idle_timeout,
+    help="The timeout for the codespace to be idle. Defaults to 30 minutes.",
 )
 @click.option(
     "--force",
@@ -65,7 +85,15 @@ logger = logging.getLogger(__name__)
     ),
 )
 def codespace_command(  # noqa: PLR0913
-    *, machine: str, algod_port: int, indexer_port: int, kmd_port: int, codespace_name: str, repo_url: str, force: bool
+    *,
+    machine: str,
+    algod_port: int,
+    indexer_port: int,
+    kmd_port: int,
+    codespace_name: str,
+    repo_url: str,
+    idle_timeout: int,
+    force: bool,
 ) -> None:
     """Manage the AlgoKit LocalNet in GitHub Codespaces."""
     ensure_github_cli_installed()
@@ -86,7 +114,7 @@ def codespace_command(  # noqa: PLR0913
 
     # Create a new codespace
     codespace_name = codespace_name or f"{CODESPACE_NAME_PREFIX}_{int(time.time())}"
-    create_codespace(repo_url, codespace_name, machine)
+    create_codespace(repo_url, codespace_name, machine, idle_timeout)
 
     codespace_data: dict[str, Any] | None = None
 

@@ -153,6 +153,7 @@ Running an interactive session ensures that you have control over the lifecycle 
 - `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
 - `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
 - `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
+- `-t`, `--idle-timeout`: The timeout for the codespace to be idle. [Defaults to 30 minutes](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces).
 - `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**.
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 

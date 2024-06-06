@@ -28,16 +28,34 @@ def test_install_gh_not_installed_failed_install(mocker: MockerFixture, proc_moc
 
 
 @pytest.mark.mock_platform_system("Windows")
-def test_install_gh_windows(mocker: MockerFixture, proc_mock: ProcMock) -> None:
+def test_install_gh_windows(
+    mocker: MockerFixture, proc_mock: ProcMock, tmp_path_factory: pytest.TempPathFactory
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    dummy_script_path = cwd / "webi_dummy_installer.ps1"
+    dummy_script_path.touch()
+
     proc_mock.should_fail_on(
         ["gh", "--version"],
     )
-    proc_mock.set_output(["winget", "install", "--id", "GitHub.cli", "--silent"], [])
+    proc_mock.set_output(["powershell", "--version"], ["PowerShell 7.2.1"])
+    proc_mock.set_output(
+        [
+            "powershell",
+            "-File",
+            str(dummy_script_path),
+        ],
+        ["installed gh!"],
+    )
     mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
+    temp_file_mock = mocker.MagicMock()
+    temp_file_mock.__enter__.return_value.name = str(dummy_script_path)
+    mocker.patch("tempfile.NamedTemporaryFile", return_value=temp_file_mock)
+
     result = invoke("localnet codespace")
     assert result.exit_code == 0
 
-    verify(result.output)
+    verify(result.output.replace(str(dummy_script_path), "{dummy_script_path}"))
 
 
 @pytest.mark.skipif(platform.system().lower() == "windows", reason="Test only runs on Unix systems")
@@ -47,9 +65,11 @@ def test_install_gh_unix(
     cwd = tmp_path_factory.mktemp("cwd")
     dummy_script_path = cwd / "webi_dummy_installer.sh"
     dummy_script_path.touch()
+    proc_mock.set_output(["bash", "--version"], ["GNU bash, version 3.2.57(1)-release"])
     proc_mock.should_fail_on(
         ["gh", "--version"],
     )
+    proc_mock.set_output(["bash", str(dummy_script_path)], ["installed gh!"])
     httpx_mock.add_response(url="https://webi.sh/gh", text="")
     mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
 
