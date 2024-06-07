@@ -23,7 +23,7 @@ from algokit.core.codespace import (
 logger = logging.getLogger(__name__)
 
 
-def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: int) -> int:
+def _validate_run_timeout(_ctx: click.Context, _param: click.Parameter, value: int) -> int:
     if value < CODESPACE_FORWARD_TIMEOUT_MIN or value > CODESPACE_FORWARD_TIMEOUT_MAX:
         raise click.BadParameter(
             f"Timeout must be between {CODESPACE_FORWARD_TIMEOUT_MIN} and {CODESPACE_FORWARD_TIMEOUT_MAX} minutes."
@@ -69,7 +69,7 @@ def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: 
     "timeout_minutes",
     default=240,
     required=False,
-    callback=_validate_idle_timeout,
+    callback=_validate_run_timeout,
     help="Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to "
     "prevent accidental spending over GitHub Codespaces quota. Defaults to 4 hours.",
 )

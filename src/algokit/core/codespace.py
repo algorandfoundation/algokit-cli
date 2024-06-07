@@ -57,7 +57,7 @@ def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, t
 
     try:
         logger.info(
-            f"WARNING: This codespace port-forwarding attempt will auto shut down at "
+            f"NOTE: This codespace port-forwarding attempt will auto shut down at "
             f"{datetime.fromtimestamp(time.time() + timeout).astimezone().strftime('%Y-%m-%d %H:%M:%S %Z')}."
             "  See https://docs.github.com/en/codespaces/overview#pricing for more details."
         )
