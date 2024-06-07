@@ -7,6 +7,8 @@ import click
 
 from algokit.core import questionary_extensions
 from algokit.core.codespace import (
+    CODESPACE_FORWARD_TIMEOUT_MAX,
+    CODESPACE_FORWARD_TIMEOUT_MIN,
     CODESPACE_NAME_PREFIX,
     authenticate_with_github,
     create_codespace,
@@ -20,15 +22,11 @@ from algokit.core.codespace import (
 
 logger = logging.getLogger(__name__)
 
-# https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces
-MIN_GH_PORT_FORWARD_TIMEOUT_MIN = 1
-MAX_GH_PORT_FORWARD_TIMEOUT_MIN = 24
-
 
 def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: int) -> int:
-    if value < MIN_GH_PORT_FORWARD_TIMEOUT_MIN or value > MAX_GH_PORT_FORWARD_TIMEOUT_MIN:
+    if value < CODESPACE_FORWARD_TIMEOUT_MIN or value > CODESPACE_FORWARD_TIMEOUT_MAX:
         raise click.BadParameter(
-            f"Timeout must be between {MIN_GH_PORT_FORWARD_TIMEOUT_MIN} and {MAX_GH_PORT_FORWARD_TIMEOUT_MIN} hours."
+            f"Timeout must be between {CODESPACE_FORWARD_TIMEOUT_MIN} and {CODESPACE_FORWARD_TIMEOUT_MAX} minutes."
         )
     return value
 
@@ -68,12 +66,12 @@ def _validate_idle_timeout(_ctx: click.Context, _param: click.Parameter, value: 
 @click.option(
     "-t",
     "--timeout",
-    "timeout_hours",
-    default=1,
+    "timeout_minutes",
+    default=240,
     required=False,
     callback=_validate_idle_timeout,
     help="Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to "
-    "prevent accidental spending over GitHub Codespaces quota. Defaults to 1 hour.",
+    "prevent accidental spending over GitHub Codespaces quota. Defaults to 4 hours.",
 )
 @click.option(
     "--force",
@@ -95,7 +93,7 @@ def codespace_command(  # noqa: PLR0913
     kmd_port: int,
     codespace_name: str,
     repo_url: str,
-    timeout_hours: int,
+    timeout_minutes: int,
     force: bool,
 ) -> None:
     """Manage the AlgoKit LocalNet in GitHub Codespaces."""
@@ -133,7 +131,7 @@ def codespace_command(  # noqa: PLR0913
             "Terminating the session will delete the codespace instance."
         )
 
-        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, timeout_hours * 60 * 60)
+        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, timeout_minutes * 60)
         logger.info("LocalNet started in GitHub Codespace")
 
     except subprocess.TimeoutExpired:

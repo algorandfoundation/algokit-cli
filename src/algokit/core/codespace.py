@@ -25,6 +25,10 @@ CODESPACE_CONTAINER_AVAILABLE = "Available"
 CODESPACE_TOO_MANY_ERROR_MSG = "too many codespaces"
 CODESPACE_LOADING_MSG = "Provisioning a new codespace instance..."
 
+# https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces
+CODESPACE_FORWARD_TIMEOUT_MIN = 1
+CODESPACE_FORWARD_TIMEOUT_MAX = 240
+
 
 def _is_port_in_use(port: int) -> bool:
     import socket
@@ -55,7 +59,7 @@ def _try_forward_ports_once(ports: list[tuple[int, int]], codespace_name: str, t
         logger.info(
             f"WARNING: This codespace port-forwarding attempt will auto shut down at "
             f"{datetime.fromtimestamp(time.time() + timeout).astimezone().strftime('%Y-%m-%d %H:%M:%S %Z')}."
-            " It will also shut down after 30 minutes of inactivity (see https://docs.github.com/en/codespaces/overview#pricing)."
+            "  See https://docs.github.com/en/codespaces/overview#pricing for more details."
         )
         response = proc.run_interactive(command, timeout=timeout)
         return response.exit_code == 0
@@ -233,7 +237,12 @@ def list_github_codespaces() -> list[str]:
 
 
 def forward_ports_for_codespace(  # noqa: PLR0913
-    codespace_name: str, algod_port: int, kmd_port: int, indexer_port: int, max_retries: int = 3, timeout: int = 3600
+    codespace_name: str,
+    algod_port: int,
+    kmd_port: int,
+    indexer_port: int,
+    max_retries: int = 3,
+    timeout: int = CODESPACE_FORWARD_TIMEOUT_MAX,
 ) -> None:
     """
     Forwards specified ports for a GitHub Codespace with retries.
@@ -270,8 +279,12 @@ def forward_ports_for_codespace(  # noqa: PLR0913
             )
         return None
 
+    initial_timestamp = time.time()
     for attempt in reversed(range(1, max_retries + 1)):
-        if _try_forward_ports_once(ports, codespace_name, timeout):
+        new_timeout = timeout - (time.time() - initial_timestamp)
+        if new_timeout < 0:
+            raise subprocess.TimeoutExpired(cmd="gh codespace ports forward", timeout=timeout)
+        if _try_forward_ports_once(ports, codespace_name, int(new_timeout)):
             logger.info("Port forwarding successful.")
             break
         logger.error("Port forwarding failed!")
@@ -361,7 +374,19 @@ def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
         machine (str): The machine type for the codespace.
     """
     response = proc.run(
-        ["gh", "codespace", "create", "--repo", repo_url, "--display-name", codespace_name, "--machine", machine],
+        [
+            "gh",
+            "codespace",
+            "create",
+            "--repo",
+            repo_url,
+            "--display-name",
+            codespace_name,
+            "--machine",
+            machine,
+            "--idle-timeout",
+            f"{CODESPACE_FORWARD_TIMEOUT_MAX}m",
+        ],
         pass_stdin=True,
     )
     if response.exit_code != 0 and CODESPACE_TOO_MANY_ERROR_MSG in response.output.lower():

@@ -4,6 +4,8 @@ import shutil
 from pathlib import Path, PurePath
 
 from algokit.core.conf import get_app_config_dir
+from algokit.core.config_commands.container_engine import get_container_engine
+from algokit.core.sandbox import ContainerEngine
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +15,11 @@ def get_volume_mount_path_docker() -> Path:
 
 
 def get_volume_mount_path_local(directory_name: str) -> Path:
-    return get_app_config_dir().joinpath(directory_name, "goal_mount")
+    path = get_app_config_dir().joinpath(directory_name, "goal_mount")
+    if get_container_engine() == ContainerEngine.PODMAN:
+        # Pre create the directory to avoid permission issues
+        path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 filename_pattern = re.compile(r"^[\w\-\.]+\.\w+$")
