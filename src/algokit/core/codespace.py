@@ -241,8 +241,8 @@ def forward_ports_for_codespace(  # noqa: PLR0913
     algod_port: int,
     kmd_port: int,
     indexer_port: int,
-    max_retries: int = 3,
-    timeout: int = CODESPACE_FORWARD_TIMEOUT_MAX,
+    max_retries: int,
+    timeout: int,
 ) -> None:
     """
     Forwards specified ports for a GitHub Codespace with retries.
@@ -276,6 +276,7 @@ def forward_ports_for_codespace(  # noqa: PLR0913
                 next_kmd_port if kmd_port in occupied_ports else kmd_port,
                 next_indexer_port if indexer_port in occupied_ports else indexer_port,
                 max_retries,
+                timeout,
             )
         return None
 

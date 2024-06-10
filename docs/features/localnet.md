@@ -10,7 +10,7 @@ The philosophy we take with AlgoKit LocalNet is that you should treat it as an e
 
 ## Prerequisites
 
-AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system.
+AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system. Alternatively, you can use Podman as a replacement for Docker see [Podman support](#podman-support).
 
 You can install Docker by following the [official installation instructions](https://docs.docker.com/get-docker/). Most of the time this will also install Docker Compose, but if not you can [follow the instructions](https://docs.docker.com/compose/install/) for that too.
 
@@ -20,7 +20,7 @@ Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.d
 
 ### Podman support
 
-If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure `podman` first. Then you can set the default container engine to use by executing `algokit config container-engine podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
+If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure Podman first. Then you can set the default container engine that AlgoKit will use, by running: `algokit config container-engine podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
 
 ## Known issues
 
@@ -32,7 +32,7 @@ We rely on the official Algorand docker images for Indexer, Conduit and Algod, w
 
 ## Container-based LocalNet
 
-AlgoKit cli supports both [Docker](https://www.docker.com/) and [Podman](https://podman.io/) as container engines. While `docker` is used by default, executing the:
+AlgoKit cli supports both [Docker](https://www.docker.com/) and [Podman](https://podman.io/) as container engines. While `docker` is used by default, executing the below:
 
 ```
 algokit config container-engine

@@ -718,7 +718,7 @@ The URL of the repository. Defaults to algokit base template repo.
 
 
 ### -t, --timeout <timeout_minutes>
-Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to prevent accidental spending over GitHub Codespaces quota. Defaults to 4 hours.
+Default max runtime timeout in minutes. Upon hitting the timeout a codespace will be shutdown to prevent accidental spending over GitHub Codespaces quota. Defaults to 4 hours.
 
 
 ### -f, --force

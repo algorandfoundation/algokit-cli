@@ -70,7 +70,7 @@ def _validate_run_timeout(_ctx: click.Context, _param: click.Parameter, value: i
     default=240,
     required=False,
     callback=_validate_run_timeout,
-    help="Default max runtime timeout in hours. Upon hitting the timeout a codespace will be shutdown to "
+    help="Default max runtime timeout in minutes. Upon hitting the timeout a codespace will be shutdown to "
     "prevent accidental spending over GitHub Codespaces quota. Defaults to 4 hours.",
 )
 @click.option(
@@ -131,7 +131,7 @@ def codespace_command(  # noqa: PLR0913
             "Terminating the session will delete the codespace instance."
         )
 
-        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, timeout_minutes * 60)
+        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, 3, timeout_minutes * 60)
         logger.info("LocalNet started in GitHub Codespace")
 
     except subprocess.TimeoutExpired:
