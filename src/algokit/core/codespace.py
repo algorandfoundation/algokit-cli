@@ -241,8 +241,9 @@ def forward_ports_for_codespace(  # noqa: PLR0913
     algod_port: int,
     kmd_port: int,
     indexer_port: int,
-    max_retries: int,
-    timeout: int,
+    *,
+    max_retries: int = 3,
+    timeout: int = CODESPACE_FORWARD_TIMEOUT_MAX * 60,
 ) -> None:
     """
     Forwards specified ports for a GitHub Codespace with retries.
@@ -275,8 +276,8 @@ def forward_ports_for_codespace(  # noqa: PLR0913
                 next_algod_port if algod_port in occupied_ports else algod_port,
                 next_kmd_port if kmd_port in occupied_ports else kmd_port,
                 next_indexer_port if indexer_port in occupied_ports else indexer_port,
-                max_retries,
-                timeout,
+                max_retries=max_retries,
+                timeout=timeout,
             )
         return None
 
@@ -365,7 +366,7 @@ def delete_codespace(*, codespace_data: dict[str, Any], force: bool) -> None:
         )
 
 
-def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
+def create_codespace(repo_url: str, codespace_name: str, machine: str, timeout: int) -> None:
     """
     Creates a GitHub Codespace with the specified repository, display name, and machine type.
 
@@ -386,7 +387,7 @@ def create_codespace(repo_url: str, codespace_name: str, machine: str) -> None:
             "--machine",
             machine,
             "--idle-timeout",
-            f"{CODESPACE_FORWARD_TIMEOUT_MAX}m",
+            f"{timeout}m",
         ],
         pass_stdin=True,
     )

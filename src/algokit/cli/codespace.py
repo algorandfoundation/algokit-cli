@@ -115,7 +115,18 @@ def codespace_command(  # noqa: PLR0913
 
     # Create a new codespace
     codespace_name = codespace_name or f"{CODESPACE_NAME_PREFIX}_{int(time())}"
-    create_codespace(repo_url, codespace_name, machine)
+    # Add a 5 minute timeout buffer, so the codespace doesn't terminate before the port forwarding
+    codespace_timeout = (
+        (timeout_minutes + 5)
+        if (timeout_minutes + 5) < CODESPACE_FORWARD_TIMEOUT_MAX
+        else CODESPACE_FORWARD_TIMEOUT_MAX
+    )
+    create_codespace(
+        repo_url,
+        codespace_name,
+        machine,
+        codespace_timeout,
+    )
 
     codespace_data: dict[str, Any] | None = None
 
@@ -131,7 +142,9 @@ def codespace_command(  # noqa: PLR0913
             "Terminating the session will delete the codespace instance."
         )
 
-        forward_ports_for_codespace(codespace_data["name"], algod_port, kmd_port, indexer_port, 3, timeout_minutes * 60)
+        forward_ports_for_codespace(
+            codespace_data["name"], algod_port, kmd_port, indexer_port, timeout=timeout_minutes * 60
+        )
         logger.info("LocalNet started in GitHub Codespace")
 
     except subprocess.TimeoutExpired:
