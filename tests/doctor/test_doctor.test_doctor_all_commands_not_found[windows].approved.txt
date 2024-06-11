@@ -23,7 +23,7 @@ AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Windows-other-system-info
 docker: Command not found!
-  Docker required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/
+  `docker` required to run `algokit localnet` command; install via https://docker.io
 docker compose: Command not found!
 git: Command not found!
   Git required to `run algokit init`; install via `choco install git` if using Chocolatey, 

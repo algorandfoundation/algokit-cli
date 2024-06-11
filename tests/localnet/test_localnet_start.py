@@ -21,15 +21,15 @@ from tests.utils.proc_mock import ProcMock
 
 @pytest.fixture()
 def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
-    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.set_output(
         ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
-        ["sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
+        ["tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
     )
 
     proc_mock.set_output(
         ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
-        ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
+        ["tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
     )
 
     httpx_mock.add_response(
@@ -49,7 +49,7 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 @pytest.fixture()
 def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
-    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.should_fail_on(["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg])
     proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
 

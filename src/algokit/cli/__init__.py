@@ -15,8 +15,8 @@ from algokit.cli.project.bootstrap import bootstrap_group
 from algokit.cli.project.deploy import deploy_command
 from algokit.cli.task import task_group
 from algokit.core.conf import PACKAGE_NAME
+from algokit.core.config_commands.version_prompt import do_version_prompt, skip_version_check_option
 from algokit.core.log_handlers import color_option, verbose_option
-from algokit.core.version_prompt import do_version_prompt, skip_version_check_option
 
 HIDDEN_COMMANDS: dict[str, click.Command] = {"deploy": deploy_command, "bootstrap": bootstrap_group}
 

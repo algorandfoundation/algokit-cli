@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 import json
 import logging
+import re
 import time
 from pathlib import Path
 from typing import Any, cast
@@ -10,12 +11,25 @@ from typing import Any, cast
 import httpx
 
 from algokit.core.conf import get_app_config_dir
+from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.proc import RunResult, run, run_interactive
 
 logger = logging.getLogger(__name__)
 
 DOCKER_COMPOSE_MINIMUM_VERSION = "2.5.0"
-DEFAULT_NAME = "sandbox"
+PODMAN_COMPOSE_MINIMUM_VERSION = "1.0.6"
+
+
+SANDBOX_BASE_NAME = "sandbox"
+CONTAINER_ENGINE_CONFIG_FILE = get_app_config_dir() / "active-container-engine"
+
+
+class ContainerEngine(str, enum.Enum):
+    DOCKER = "docker"
+    PODMAN = "podman"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class ComposeFileStatus(enum.Enum):
@@ -24,9 +38,16 @@ class ComposeFileStatus(enum.Enum):
     OUT_OF_DATE = enum.auto()
 
 
+def get_min_compose_version() -> str:
+    container_engine = get_container_engine()
+    return (
+        DOCKER_COMPOSE_MINIMUM_VERSION if container_engine == ContainerEngine.DOCKER else PODMAN_COMPOSE_MINIMUM_VERSION
+    )
+
+
 class ComposeSandbox:
-    def __init__(self, name: str = DEFAULT_NAME) -> None:
-        self.name = DEFAULT_NAME if name == DEFAULT_NAME else f"{DEFAULT_NAME}_{name}"
+    def __init__(self, name: str = SANDBOX_BASE_NAME) -> None:
+        self.name = SANDBOX_BASE_NAME if name == SANDBOX_BASE_NAME else f"{SANDBOX_BASE_NAME}_{name}"
         self.directory = get_app_config_dir() / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
@@ -54,25 +75,53 @@ class ComposeSandbox:
 
     @classmethod
     def from_environment(cls) -> ComposeSandbox | None:
-        run_results = run(
-            ["docker", "compose", "ls", "--format", "json", "--filter", "name=algokit_sandbox*"],
-            bad_return_code_error_message="Failed to list running LocalNet",
-        )
-        if run_results.exit_code != 0:
-            return None
         try:
-            data = json.loads(run_results.output)
-            for item in data:
-                config_file = item.get("ConfigFiles").split(",")[0]
-                full_name = Path(config_file).parent.name
-                name = (
-                    full_name.replace(f"{DEFAULT_NAME}_", "") if full_name.startswith(f"{DEFAULT_NAME}_") else full_name
-                )
-                return cls(name)
-            return None
+            run_results = run(
+                [get_container_engine(), "compose", "ls", "--format", "json", "--filter", "name=algokit_sandbox*"],
+                bad_return_code_error_message="Failed to list running LocalNet",
+            )
+            if run_results.exit_code != 0:
+                return None
         except Exception as err:
+            logger.debug(f"Error checking for existing sandbox: {err}", exc_info=True)
+            return None
+
+        try:
+            json_lines = cls._extract_json_lines(run_results.output)
+            if not json_lines:
+                return None
+
+            data = json.loads(json_lines[0])
+            return cls._create_instance_from_data(data)
+        except (json.JSONDecodeError, KeyError, IndexError) as err:
             logger.info(f"Error checking config file: {err}", exc_info=True)
             return None
+
+    @staticmethod
+    def _extract_json_lines(output: str) -> list[str]:
+        valid_json_lines = []
+        for line in output.splitlines():
+            # strip ANSI color codes
+            parsed_line = re.sub(r"\x1b\[[0-9;]*[a-zA-Z]", "", line)
+            try:
+                json.loads(parsed_line)
+                valid_json_lines.append(parsed_line)
+            except json.JSONDecodeError:
+                continue
+        return valid_json_lines
+
+    @classmethod
+    def _create_instance_from_data(cls, data: list[dict[str, Any]]) -> ComposeSandbox | None:
+        for item in data:
+            config_file = item.get("ConfigFiles", "").split(",")[0]
+            full_name = Path(config_file).parent.name
+            name = (
+                full_name.replace(f"{SANDBOX_BASE_NAME}_", "")
+                if full_name.startswith(f"{SANDBOX_BASE_NAME}_")
+                else full_name
+            )
+            return cls(name)
+        return None
 
     def compose_file_status(self) -> ComposeFileStatus:
         try:
@@ -108,7 +157,7 @@ class ComposeSandbox:
         bad_return_code_error_message: str | None = None,
     ) -> RunResult:
         return run(
-            ["docker", "compose", *compose_args.split()],
+            [get_container_engine(), "compose", *compose_args.split()],
             cwd=self.directory,
             stdout_log_level=stdout_log_level,
             bad_return_code_error_message=bad_return_code_error_message,
@@ -117,7 +166,8 @@ class ComposeSandbox:
     def up(self) -> None:
         logger.info("Starting AlgoKit LocalNet now...")
         self._run_compose_command(
-            "up --detach --quiet-pull --wait", bad_return_code_error_message="Failed to start LocalNet"
+            f"up --detach --quiet-pull{' --wait' if get_container_engine() == ContainerEngine.DOCKER else ''}",
+            bad_return_code_error_message="Failed to start LocalNet",
         )
         logger.debug("AlgoKit LocalNet started, waiting for health check")
         if _wait_for_algod():
@@ -147,7 +197,7 @@ class ComposeSandbox:
         if tail is not None:
             compose_args += ["--tail", tail]
         run_interactive(
-            ["docker", "compose", *compose_args],
+            [get_container_engine(), "compose", *compose_args],
             cwd=self.directory,
             bad_return_code_error_message="Failed to get logs, are the containers running?",
         )
@@ -164,26 +214,23 @@ class ComposeSandbox:
             data = json.loads(run_results.output)
         # `docker compose ps --format json` on version >= 2.21.0 outputs seperate JSON objects, each on a new line
         else:
-            data = [json.loads(line) for line in run_results.output.splitlines() if line]
+            json_lines = self._extract_json_lines(run_results.output)
+            data = [json.loads(line) for line in json_lines]
 
         assert isinstance(data, list)
         return cast(list[dict[str, Any]], data)
 
-    def _get_local_image_version(self, image_name: str) -> str | None:
+    def _get_local_image_versions(self, image_name: str) -> list[str]:
         """
-        Get the local version of a Docker image
+        Get the local versions of a Docker image. Note that a single image may be pulled from multiple repo digests.
         """
         try:
-            arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
-            local_version = run(
-                ["docker", "image", "inspect", image_name, "--format", arg],
-                cwd=self.directory,
-                bad_return_code_error_message="Failed to get image inspect",
-            )
-
-            return local_version.output.strip()
-        except Exception:
-            return None
+            arg = "{{range .RepoDigests}}{{println .}}{{end}}"
+            local_versions_output = run([get_container_engine(), "image", "inspect", image_name, "--format", arg])
+            return [line.split("@")[1] if "@" in line else line for line in local_versions_output.output.splitlines()]
+        except Exception as e:
+            logger.debug(f"Failed to get local image versions: {e}", exc_info=True)
+            return []
 
     def _get_latest_image_version(self, image_name: str) -> str | None:
         """
@@ -201,9 +248,9 @@ class ComposeSandbox:
             return None
 
     def is_image_up_to_date(self, image_name: str) -> bool:
-        local_version = self._get_local_image_version(image_name)
+        local_versions = self._get_local_image_versions(image_name)
         latest_version = self._get_latest_image_version(image_name)
-        return local_version is None or latest_version is None or local_version == latest_version
+        return latest_version is None or latest_version in local_versions
 
     def check_docker_compose_for_new_image_versions(self) -> None:
         is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)
@@ -513,4 +560,4 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         return {"Status": "Error"}
 
 
-DOCKER_COMPOSE_VERSION_COMMAND = ["docker", "compose", "version", "--format", "json"]
+COMPOSE_VERSION_COMMAND = [get_container_engine(), "compose", "version", "--format", "json"]

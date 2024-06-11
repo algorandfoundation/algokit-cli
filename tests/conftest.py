@@ -225,6 +225,7 @@ def dummy_algokit_template_with_python_task(tmp_path_factory: pytest.TempPathFac
 
 
 @pytest.fixture(autouse=True)
-def _clear_caches() -> None:
+def _clear_caches(mocker: MockerFixture) -> None:
     get_project_dir_names_from_workspace.cache_clear()
     get_project_configs.cache_clear()
+    mocker.patch("algokit.core.config_commands.container_engine.get_container_engine", return_value="docker")
