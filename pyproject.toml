@@ -17,7 +17,7 @@ shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
-keyring = "24.3.0"
+keyring = "25.2.1"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
 algokit-utils = "^2.3.0"
