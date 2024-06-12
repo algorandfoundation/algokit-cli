@@ -32,7 +32,7 @@ class DeployConfig:
     environment_secrets: list[str] | None = None
 
 
-def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:
+def load_deploy_config(name: str | None, project_dir: Path) -> DeployConfig:  # noqa: C901
     """
     Load the deploy command for the given network/environment from .algokit.toml file.
     :param name: Network or environment name.
