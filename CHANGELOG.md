@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.0 (2024-06-12)
+
+### Feature
+
+* GitHub Codespaces support in LocalNet command group ([#456](https://github.com/algorandfoundation/algokit-cli/issues/456)) ([`7eeaead`](https://github.com/algorandfoundation/algokit-cli/commit/7eeaeadc577dd12fa93c87cae18da497770d6f35))
+
+### Documentation
+
+* Updated docs to include updated links for project features ([`7c56b18`](https://github.com/algorandfoundation/algokit-cli/commit/7c56b181d984f3301e2abc59ea91128f2845ec66))
+
 ## v2.0.6 (2024-05-22)
 
 ### Fix
