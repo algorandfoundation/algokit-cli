@@ -53,6 +53,9 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 
 def animate(name: str, stop_event: threading.Event) -> None:
     """Displays an animated spinner in the console."""
+    # Ensure sys.stdout uses UTF-8 encoding
+    if sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)  # noqa: SIM115, PTH123
 
     for frame in cycle(SPINNER_FRAMES):
         if stop_event.is_set():
@@ -264,8 +267,3 @@ def alphanumeric_sort_key(s: str) -> list[int | str]:
     For instance, ensures that "name_digit_1" comes before "name_digit_2".
     """
     return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]
-
-
-def enable_utf8_on_windows() -> None:
-    if is_windows():
-        os.environ["PYTHONUTF8"] = "1"
