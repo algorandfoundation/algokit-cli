@@ -264,3 +264,8 @@ def alphanumeric_sort_key(s: str) -> list[int | str]:
     For instance, ensures that "name_digit_1" comes before "name_digit_2".
     """
     return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]
+
+
+def enable_utf8_on_windows() -> None:
+    if is_windows():
+        os.environ["PYTHONUTF8"] = "1"
