@@ -53,6 +53,9 @@ def is_network_available(host: str = "8.8.8.8", port: int = 53, timeout: float =
 
 def animate(name: str, stop_event: threading.Event) -> None:
     """Displays an animated spinner in the console."""
+    # Ensure sys.stdout uses UTF-8 encoding
+    if sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout = open(sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1)  # noqa: SIM115, PTH123
 
     for frame in cycle(SPINNER_FRAMES):
         if stop_event.is_set():
