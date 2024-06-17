@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.1 (2024-06-17)
+
+### Fix
+
+* Ensure utf-8 is used as part of cli animate method invocation (windows compatibility) ([#518](https://github.com/algorandfoundation/algokit-cli/issues/518)) ([`ba9e090`](https://github.com/algorandfoundation/algokit-cli/commit/ba9e0902880298beb6a883096d26b25e77d31422))
+
 ## v2.1.0 (2024-06-12)
 
 ### Feature
