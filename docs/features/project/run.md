@@ -137,4 +137,4 @@ Now if project_a and project_b are both defined as standalone projects, the orde
 
 ## Further Reading
 
-For in-depth details, visit the [run](https://github.com/algorandfoundation/algokit-cli/blob/feat/command_orchestration/docs/features/project/run.md) section in the AlgoKit CLI reference documentation.
+To learn more about the `algokit project run` command, please refer to [run](../../cli/index.md#run) in the AlgoKit CLI reference documentation.
