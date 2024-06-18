@@ -64,4 +64,4 @@ This command will generate TypeScript clients for all contract projects and plac
 
 ## Further Reading
 
-For more details on configuring your projects for optimal use with the `algokit project link` command, refer to the documentation on [AlgoKit Project Configuration](docs/features/project/config.md) and [AlgoKit Frontend Projects](docs/features/project/frontend.md).
+To learn more about the `algokit project link` command, please refer to [link](../../cli/index.md#link) in the AlgoKit CLI reference documentation.

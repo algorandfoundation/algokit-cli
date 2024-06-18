@@ -40,4 +40,4 @@ This message indicates that either the current directory does not contain a `.al
 
 ## Further Reading
 
-For more information on working with AlgoKit workspaces and projects, refer to the [AlgoKit Project Run](docs/features/project/run.md) and [AlgoKit Project Bootstrap](docs/features/project/bootstrap.md) documentation.
+To learn more about the `algokit project list` command, please refer to [list](../../cli/index.md#list) in the AlgoKit CLI reference documentation.
