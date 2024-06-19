@@ -9,6 +9,7 @@ from algokit.core.sandbox import (
     get_algod_network_template,
     get_config_json,
     get_docker_compose_yml,
+    get_proxy_config,
 )
 from pytest_httpx import HTTPXMock
 
@@ -142,6 +143,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
+    (app_dir_mock.app_config_dir / "sandbox" / "nginx.conf").write_text(get_proxy_config())
 
     result = invoke("localnet start")
 
