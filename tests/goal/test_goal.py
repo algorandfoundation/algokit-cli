@@ -3,7 +3,13 @@ from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
-from algokit.core.sandbox import ALGOD_HEALTH_URL, get_algod_network_template, get_config_json, get_docker_compose_yml
+from algokit.core.sandbox import (
+    ALGOD_HEALTH_URL,
+    get_algod_network_template,
+    get_config_json,
+    get_docker_compose_yml,
+    get_proxy_config,
+)
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
@@ -43,6 +49,7 @@ def _setup_latest_dummy_compose(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
+    (app_dir_mock.app_config_dir / "sandbox" / "nginx.conf").write_text(get_proxy_config())
 
 
 @pytest.fixture()

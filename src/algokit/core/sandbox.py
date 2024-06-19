@@ -56,6 +56,7 @@ class ComposeSandbox:
         self._latest_yaml = get_docker_compose_yml(name=f"algokit_{self.name}")
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
+        self._latest_proxy_config = get_proxy_config()
 
     @property
     def compose_file_path(self) -> Path:
@@ -72,6 +73,10 @@ class ComposeSandbox:
     @property
     def algod_network_template_file_path(self) -> Path:
         return self.directory / "algod_network_template.json"
+
+    @property
+    def proxy_config_file_path(self) -> Path:
+        return self.directory / "nginx.conf"
 
     @classmethod
     def from_environment(cls) -> ComposeSandbox | None:
@@ -128,6 +133,8 @@ class ComposeSandbox:
             compose_content = self.compose_file_path.read_text()
             config_content = self.algod_config_file_path.read_text()
             algod_network_template_content = self.algod_network_template_file_path.read_text()
+            proxy_config_content = self.proxy_config_file_path.read_text()
+
         except FileNotFoundError:
             # treat as out of date if compose file exists but algod config doesn't
             # so that existing setups aren't suddenly reset
@@ -139,6 +146,7 @@ class ComposeSandbox:
                 compose_content == self._latest_yaml
                 and config_content == self._latest_config_json
                 and algod_network_template_content == self._latest_algod_network_template
+                and proxy_config_content == self._latest_proxy_config
             ):
                 return ComposeFileStatus.UP_TO_DATE
             else:
@@ -149,6 +157,7 @@ class ComposeSandbox:
         self.compose_file_path.write_text(self._latest_yaml)
         self.algod_config_file_path.write_text(self._latest_config_json)
         self.algod_network_template_file_path.write_text(self._latest_algod_network_template)
+        self.proxy_config_file_path.write_text(self._latest_proxy_config)
 
     def _run_compose_command(
         self,
@@ -424,6 +433,74 @@ exporter:
 """
 
 
+def get_proxy_config(algod_port: int = DEFAULT_ALGOD_PORT, kmd_port: int = 4002) -> str:
+    return f"""worker_processes 1;
+
+events {{
+  worker_connections 1024;
+}}
+
+http {{
+  access_log off;
+
+  map $request_method$http_access_control_request_private_network $cors_allow_private_network {{
+    "OPTIONStrue" "true";
+    default "";
+  }}
+
+  add_header Access-Control-Allow-Private-Network $cors_allow_private_network;
+
+  upstream algod_api {{
+    zone upstreams 64K;
+    server algod:8080 max_fails=1 fail_timeout=2s;
+    keepalive 2;
+  }}
+
+  upstream kmd_api {{
+    zone upstreams 64K;
+    server algod:7833 max_fails=1 fail_timeout=2s;
+    keepalive 2;
+  }}
+
+  upstream indexer_api {{
+    zone upstreams 64K;
+    server indexer:8980 max_fails=1 fail_timeout=2s;
+    keepalive 2;
+  }}
+
+  server {{
+    listen {algod_port};
+
+    location / {{
+      proxy_set_header Host $host;
+      proxy_pass http://algod_api;
+      proxy_pass_header Server;
+    }}
+  }}
+
+  server {{
+    listen {kmd_port};
+
+    location / {{
+      proxy_set_header Host $host;
+      proxy_pass http://kmd_api;
+      proxy_pass_header Server;
+    }}
+  }}
+
+  server {{
+    listen 8980;
+
+    location / {{
+      proxy_set_header Host $host;
+      proxy_pass http://indexer_api;
+      proxy_pass_header Server;
+    }}
+  }}
+}}
+    """
+
+
 def get_docker_compose_yml(
     name: str = "algokit_sandbox",
     algod_port: int = DEFAULT_ALGOD_PORT,
@@ -437,8 +514,8 @@ services:
     container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
-      - {algod_port}:8080
-      - {kmd_port}:7833
+      - 8080
+      - 7833
       - {tealdbg_port}:9392
     environment:
       START_KMD: 1
@@ -483,13 +560,29 @@ services:
     container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
     ports:
-      - "8980:8980"
+      - 8980
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
+
+  proxy:
+    container_name: "{name}_proxy"
+    image: nginx:1.27.0-alpine
+    restart: unless-stopped
+    ports:
+      - {algod_port}:{algod_port}
+      - {kmd_port}:{kmd_port}
+      - 8980:8980
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - algod
+      - indexer
 """  # noqa: E501
 
 
