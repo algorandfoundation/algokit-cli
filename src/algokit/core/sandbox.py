@@ -443,6 +443,9 @@ events {{
 http {{
   access_log off;
 
+  resolver 127.0.0.11 ipv6=off valid=10s;
+  resolver_timeout 5s;
+
   map $request_method$http_access_control_request_private_network $cors_allow_private_network {{
     "OPTIONStrue" "true";
     default "";
@@ -450,31 +453,14 @@ http {{
 
   add_header Access-Control-Allow-Private-Network $cors_allow_private_network;
 
-  upstream algod_api {{
-    zone upstreams 64K;
-    server algod:8080 max_fails=1 fail_timeout=2s;
-    keepalive 2;
-  }}
-
-  upstream kmd_api {{
-    zone upstreams 64K;
-    server algod:7833 max_fails=1 fail_timeout=2s;
-    keepalive 2;
-  }}
-
-  upstream indexer_api {{
-    zone upstreams 64K;
-    server indexer:8980 max_fails=1 fail_timeout=2s;
-    keepalive 2;
-  }}
-
   server {{
     listen {algod_port};
 
     location / {{
       proxy_set_header Host $host;
-      proxy_pass http://algod_api;
       proxy_pass_header Server;
+      set $target http://algod:8080;
+      proxy_pass $target;
     }}
   }}
 
@@ -483,8 +469,9 @@ http {{
 
     location / {{
       proxy_set_header Host $host;
-      proxy_pass http://kmd_api;
       proxy_pass_header Server;
+      set $target http://algod:7833;
+      proxy_pass $target;
     }}
   }}
 
@@ -493,8 +480,9 @@ http {{
 
     location / {{
       proxy_set_header Host $host;
-      proxy_pass http://indexer_api;
       proxy_pass_header Server;
+      set $target http://indexer:8980;
+      proxy_pass $target;
     }}
   }}
 }}
@@ -514,8 +502,6 @@ services:
     container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
-      - 8080
-      - 7833
       - {tealdbg_port}:9392
     environment:
       START_KMD: 1
@@ -559,8 +545,6 @@ services:
   indexer:
     container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
-    ports:
-      - 8980
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
@@ -635,7 +619,7 @@ def fetch_indexer_status_data(service_info: dict[str, Any]) -> dict[str, Any]:
         if not any(item["PublishedPort"] == DEFAULT_INDEXER_PORT for item in service_info["Publishers"]):
             return {"Status": "Error"}
 
-        results["Port"] = service_info["Publishers"][0]["PublishedPort"]
+        results["Port"] = DEFAULT_INDEXER_PORT
         # container specific response
         health_url = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_INDEXER_PORT}/health"
         http_response = httpx.get(health_url, timeout=5)

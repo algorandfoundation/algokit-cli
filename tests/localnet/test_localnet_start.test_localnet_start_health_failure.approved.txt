@@ -30,8 +30,6 @@ services:
     container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
-      - 8080
-      - 7833
       - 9392:9392
     environment:
       START_KMD: 1
@@ -75,8 +73,6 @@ services:
   indexer:
     container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
-    ports:
-      - 8980
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:

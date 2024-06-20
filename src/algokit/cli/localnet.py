@@ -210,7 +210,7 @@ def reset_localnet(*, update: bool) -> None:
     sandbox.up()
 
 
-SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer")
+SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer", "proxy")
 
 
 @localnet_group.command("status", short_help="Check the status of the AlgoKit LocalNet.")
@@ -237,10 +237,10 @@ def localnet_status() -> None:
     }
     # fill out remaining output_by_name["algod"] values
     if output_by_name["algod"]["Status"] == "Running":
-        output_by_name["algod"].update(fetch_algod_status_data(ps_by_name["algod"]))
+        output_by_name["algod"].update(fetch_algod_status_data(ps_by_name["proxy"]))
     # fill out remaining output_by_name["indexer"] values
     if output_by_name["indexer"]["Status"] == "Running":
-        output_by_name["indexer"].update(fetch_indexer_status_data(ps_by_name["indexer"]))
+        output_by_name["indexer"].update(fetch_indexer_status_data(ps_by_name["proxy"]))
 
     # Print the status details
     for service_name, service_info in output_by_name.items():
