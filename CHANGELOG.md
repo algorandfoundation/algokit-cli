@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.2 (2024-06-20)
+
+### Fix
+
+* Localnet status and proxy dns issue ([#525](https://github.com/algorandfoundation/algokit-cli/issues/525)) ([`a0c5bc6`](https://github.com/algorandfoundation/algokit-cli/commit/a0c5bc69e71fc64864f9f10ddd92f8c967f03416))
+* Add localnet proxy to add Access-Control-Allow-Private-Network header ([#523](https://github.com/algorandfoundation/algokit-cli/issues/523)) ([`2267e9e`](https://github.com/algorandfoundation/algokit-cli/commit/2267e9e2ff2b707dc246021578b8dbc6bd43a021))
+
+### Documentation
+
+* Moving descriptions of workspace vs standalone to project.md ([#522](https://github.com/algorandfoundation/algokit-cli/issues/522)) ([`946c53a`](https://github.com/algorandfoundation/algokit-cli/commit/946c53a3d90fad983a21856c0cad969f37d90e6f))
+* Minor revamp in project/config docs ([#521](https://github.com/algorandfoundation/algokit-cli/issues/521)) ([`872f6b1`](https://github.com/algorandfoundation/algokit-cli/commit/872f6b1dd01f843255fa2b76cb7e857c23aee4aa))
+
 ## v2.1.1 (2024-06-17)
 
 ### Fix
