@@ -457,7 +457,10 @@ http {{
     listen {algod_port};
 
     location / {{
+      proxy_http_version 1.1;
+      proxy_read_timeout 120s;
       proxy_set_header Host $host;
+      proxy_set_header Connection "";
       proxy_pass_header Server;
       set $target http://algod:8080;
       proxy_pass $target;
@@ -468,7 +471,9 @@ http {{
     listen {kmd_port};
 
     location / {{
+      proxy_http_version 1.1;
       proxy_set_header Host $host;
+      proxy_set_header Connection "";
       proxy_pass_header Server;
       set $target http://algod:7833;
       proxy_pass $target;
@@ -479,7 +484,9 @@ http {{
     listen 8980;
 
     location / {{
+      proxy_http_version 1.1;
       proxy_set_header Host $host;
+      proxy_set_header Connection "";
       proxy_pass_header Server;
       set $target http://indexer:8980;
       proxy_pass $target;
@@ -502,6 +509,7 @@ services:
     container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
+      - 7833
       - {tealdbg_port}:9392
     environment:
       START_KMD: 1
