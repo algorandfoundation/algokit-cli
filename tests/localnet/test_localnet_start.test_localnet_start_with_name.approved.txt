@@ -34,6 +34,7 @@ services:
     container_name: "algokit_sandbox_test_algod"
     image: algorand/algod:latest
     ports:
+      - 7833
       - 9392:9392
     environment:
       START_KMD: 1
