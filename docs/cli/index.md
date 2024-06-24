@@ -513,7 +513,7 @@ Copy the contents of the doctor message (in Markdown format) in your clipboard.
 
 ## explore
 
-Explore the specified network in the browser using Dappflow.
+Explore the specified network using lora.
 
 ```shell
 algokit explore [OPTIONS] [[localnet|testnet|mainnet]]
@@ -754,7 +754,7 @@ algokit localnet console [OPTIONS]
 
 ### explore
 
-Explore the AlgoKit LocalNet using Dappflow
+Explore the AlgoKit LocalNet using lora.
 
 ```shell
 algokit localnet explore [OPTIONS]
@@ -762,7 +762,7 @@ algokit localnet explore [OPTIONS]
 
 ### logs
 
-See the output of the Docker containers
+See the output of the Docker containers.
 
 ```shell
 algokit localnet logs [OPTIONS]

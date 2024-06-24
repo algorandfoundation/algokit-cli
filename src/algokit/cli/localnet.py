@@ -265,7 +265,7 @@ def localnet_console(context: click.Context) -> None:
     context.invoke(goal_command, console=True)
 
 
-@localnet_group.command("explore", short_help="Explore the AlgoKit LocalNet using Dappflow")
+@localnet_group.command("explore", short_help="Explore the AlgoKit LocalNet using lora.")
 @click.pass_context
 def localnet_explore(context: click.Context) -> None:
     context.invoke(explore_command)
@@ -273,7 +273,7 @@ def localnet_explore(context: click.Context) -> None:
 
 @localnet_group.command(
     "logs",
-    short_help="See the output of the Docker containers",
+    short_help="See the output of the Docker containers.",
 )
 @click.option(
     "--follow/-f",
