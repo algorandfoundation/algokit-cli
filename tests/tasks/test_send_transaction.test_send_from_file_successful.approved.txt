@@ -1,80 +1,80 @@
 
 Sending transaction 1/20
 Transaction successfully sent with txid: dummy_tx_id_0
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_0/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_0
 
 Sending transaction 2/20
 Transaction successfully sent with txid: dummy_tx_id_1
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_1/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_1
 
 Sending transaction 3/20
 Transaction successfully sent with txid: dummy_tx_id_2
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_2/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_2
 
 Sending transaction 4/20
 Transaction successfully sent with txid: dummy_tx_id_3
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_3/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_3
 
 Sending transaction 5/20
 Transaction successfully sent with txid: dummy_tx_id_4
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_4/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_4
 
 Sending transaction 6/20
 Transaction successfully sent with txid: dummy_tx_id_5
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_5/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_5
 
 Sending transaction 7/20
 Transaction successfully sent with txid: dummy_tx_id_6
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_6/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_6
 
 Sending transaction 8/20
 Transaction successfully sent with txid: dummy_tx_id_7
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_7/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_7
 
 Sending transaction 9/20
 Transaction successfully sent with txid: dummy_tx_id_8
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_8/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_8
 
 Sending transaction 10/20
 Transaction successfully sent with txid: dummy_tx_id_9
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_9/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_9
 
 Sending transaction 11/20
 Transaction successfully sent with txid: dummy_tx_id_10
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_10/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_10
 
 Sending transaction 12/20
 Transaction successfully sent with txid: dummy_tx_id_11
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_11/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_11
 
 Sending transaction 13/20
 Transaction successfully sent with txid: dummy_tx_id_12
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_12/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_12
 
 Sending transaction 14/20
 Transaction successfully sent with txid: dummy_tx_id_13
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_13/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_13
 
 Sending transaction 15/20
 Transaction successfully sent with txid: dummy_tx_id_14
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_14/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_14
 
 Sending transaction 16/20
 Transaction successfully sent with txid: dummy_tx_id_15
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_15/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_15
 
 Sending transaction 17/20
 Transaction successfully sent with txid: dummy_tx_id_16
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_16/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_16
 
 Sending transaction 18/20
 Transaction successfully sent with txid: dummy_tx_id_17
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_17/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_17
 
 Sending transaction 19/20
 Transaction successfully sent with txid: dummy_tx_id_18
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_18/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_18
 
 Sending transaction 20/20
 Transaction successfully sent with txid: dummy_tx_id_19
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id_19/
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id_19
