@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.3 (2024-06-25)
+
+### Fix
+
+* Some localnet proxy tweaks ([#526](https://github.com/algorandfoundation/algokit-cli/issues/526)) ([`2c7999d`](https://github.com/algorandfoundation/algokit-cli/commit/2c7999daefc5071dd89a6dcdc2f0a3f7f3ef819b))
+
 ## v2.1.2 (2024-06-20)
 
 ### Fix
