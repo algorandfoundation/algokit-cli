@@ -12,7 +12,7 @@ For details on how to use individual features see the following
 - [Deploy](./features/project/deploy.md) - Deploy your smart contracts effortlessly to various networks
 - [Dispenser](./features/dispenser.md) - Fund your TestNet account with ALGOs from the AlgoKit TestNet Dispenser
 - [Doctor](./features/doctor.md) - Check AlgoKit installation and dependencies
-- [Explore](./features/explore.md) - Explore Algorand Blockchains using Dappflow
+- [Explore](./features/explore.md) - Explore Algorand Blockchains using lora
 - [Generate](./features/generate.md) - Generate code for an Algorand project
 - [Goal](./features/goal.md) - Run the Algorand goal CLI against the AlgoKit Sandbox
 - [Init](./features/init.md) - Quickly initialize new projects using official Algorand Templates or community provided templates

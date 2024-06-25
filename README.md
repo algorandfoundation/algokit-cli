@@ -40,7 +40,7 @@ AlgoKit helps you develop Algorand solutions:
 - **Interaction**: AlgoKit exposes a number of interaction methods, namely:
   - [**AlgoKit CLI**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
   - [VS Code](https://code.visualstudio.com/): All AlgoKit project templates include VS Code configurations so you have a smooth out-of-the-box development experience using VS Code
-  - [Dappflow](https://dappflow.org/): AlgoKit has integrations with Dappflow; a web-based user interface that let's you visualise an Algorand network and deploy and call smart contracts via a graphical user interface
+  - [lora](https://lora.algokit.io/): AlgoKit has integrations with lora; a web-based user interface that let's you visualise and interact with an Algorand network
 - **Getting Started**: AlgoKit helps you get started quickly when building new solutions:
   - [**AlgoKit Templates**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
 - **Development**: AlgoKit provides SDKs, tools and libraries that help you quickly and effectively build high quality Algorand solutions:
@@ -247,6 +247,6 @@ Per the above output, the doctor command output is a helpful tool if you need to
 
 ## Troubleshooting
 
-| Issue Description                                                                       | OS(s)     | Steps to mitigate                                                                                                                                                                          |
+| Issue Description                                                                       | OS(s)     | Steps to mitigate                                                                                                                                                                           |
 | --------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | SSL module not available in Python installation, causing `pipx install algokit` to fail | Debian 12 | Run `pipx install algokit --python $(which python3)` to explicitly use the Python 3 version with SSL support. Ensure that latest pip version is installed, update `python` alias if needed. |

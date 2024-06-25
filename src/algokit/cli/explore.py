@@ -75,14 +75,26 @@ NETWORKS: dict[str, NetworkConfiguration] = {
 }
 
 
+# lora doesn't currently support custom networks, so use Dappflow for now.
 def get_dappflow_url(network: NetworkConfiguration) -> str:
     query_string = urlencode(network)
     return f"https://app.dappflow.org/setup-config?{query_string}"
 
 
-@click.command("explore", help="Explore the specified network in the browser using Dappflow.")
+def get_algokit_url(network: str) -> str:
+    return f"https://explore.algokit.io/{network}"
+
+
+def get_explore_url(network: str) -> str:
+    if network == "localnet" and NETWORKS[network].get("algod_url") != DEFAULT_ALGOD_SERVER:
+        return get_dappflow_url(NETWORKS[network])
+
+    return get_algokit_url(network)
+
+
+@click.command("explore", help="Explore the specified network using lora.")
 @click.argument("network", type=click.Choice(list(NETWORKS)), default="localnet", required=False)
 def explore_command(network: str) -> None:
-    url = get_dappflow_url(NETWORKS[network])
-    logger.info(f"Opening {network} in https://app.dappflow.org using default browser")
+    url = get_explore_url(network)
+    logger.info(f"Opening {network} explorer in your default browser")
     click.launch(url)
