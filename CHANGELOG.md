@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.1.4 (2024-06-27)
+
+### Fix
+
+* Filter null values from asset metadata ([#529](https://github.com/algorandfoundation/algokit-cli/issues/529)) ([`05411d6`](https://github.com/algorandfoundation/algokit-cli/commit/05411d638c0ef7600df3428a5da74f8666d226a7))
+
 ## v2.1.3 (2024-06-25)
 
 ### Fix
