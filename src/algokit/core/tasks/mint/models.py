@@ -66,7 +66,7 @@ class TokenMetadata:
         file_path = Path(tempfile.mkstemp()[1])
         try:
             with file_path.open("w") as file:
-                json.dump(asdict(self), file)
+                file.write(self.to_json(None))
             return file_path
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
