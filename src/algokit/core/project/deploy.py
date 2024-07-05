@@ -26,10 +26,10 @@ class _KnownEnvironments:
     TESTNET = "testnet"
 
 
-_mainnet_algod_config = get_algonode_config("mainnet", config="algod", token=DEFAULT_ALGOD_TOKEN)
-_testnet_algod_config = get_algonode_config("testnet", config="algod", token=DEFAULT_ALGOD_TOKEN)
-_mainnet_indexer_config = get_algonode_config("mainnet", config="indexer", token=DEFAULT_INDEXER_TOKEN)
-_testnet_indexer_config = get_algonode_config("testnet", config="indexer", token=DEFAULT_INDEXER_TOKEN)
+DEFAULT_MAINNET_ALGOD_SERVER = get_algonode_config("mainnet", config="algod", token="").server
+DEFAULT_TESTNET_ALGOD_SERVER = get_algonode_config("testnet", config="algod", token="").server
+DEFAULT_MAINNET_INDEXER_SERVER = get_algonode_config("mainnet", config="indexer", token="").server
+DEFAULT_TESTNET_INDEXER_SERVER = get_algonode_config("testnet", config="indexer", token="").server
 
 
 _ENVIRONMENT_CONFIG: dict[str, dict[str, str | None]] = {
@@ -43,12 +43,12 @@ _ENVIRONMENT_CONFIG: dict[str, dict[str, str | None]] = {
         "INDEXER_PORT": str(DEFAULT_INDEXER_PORT),
     },
     _KnownEnvironments.MAINNET: {
-        "ALGOD_SERVER": _mainnet_algod_config.server,
-        "INDEXER_SERVER": _mainnet_indexer_config.server,
+        "ALGOD_SERVER": DEFAULT_MAINNET_ALGOD_SERVER,
+        "INDEXER_SERVER": DEFAULT_MAINNET_INDEXER_SERVER,
     },
     _KnownEnvironments.TESTNET: {
-        "ALGOD_SERVER": _testnet_algod_config.server,
-        "INDEXER_SERVER": _testnet_indexer_config.server,
+        "ALGOD_SERVER": DEFAULT_TESTNET_ALGOD_SERVER,
+        "INDEXER_SERVER": DEFAULT_TESTNET_INDEXER_SERVER,
     },
 }
 

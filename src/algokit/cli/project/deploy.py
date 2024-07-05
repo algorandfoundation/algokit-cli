@@ -100,7 +100,7 @@ def _execute_deploy_command(  # noqa: PLR0913
         else:
             msg = (
                 f"Deploy command for '{environment_name}' is not specified in '{ALGOKIT_CONFIG}' file, "
-                "and no generic command."
+                "and no generic command available."
             )
         raise click.ClickException(msg)
     resolved_command = resolve_command_path(config.command)

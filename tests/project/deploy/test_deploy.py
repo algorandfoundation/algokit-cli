@@ -182,7 +182,7 @@ def test_command_bad_exit_code(proc_mock: ProcMock, tmp_path: Path, which_mock: 
 
 def test_algokit_env_name_missing(tmp_path_factory: TempPathFactory, which_mock: WhichMock) -> None:
     config_with_override = """
-[project.deploy.localnet]
+[project.deploy.customnet]
 command = "command_a"
     """.strip()
     cwd = tmp_path_factory.mktemp("cwd")
@@ -190,7 +190,7 @@ command = "command_a"
     (cwd / ".env").touch()
 
     which_mock.add("command_a")
-    result = invoke(["project", "deploy", "localnet"], cwd=cwd)
+    result = invoke(["project", "deploy", "customnet"], cwd=cwd)
 
     assert result.exit_code == 1
     verify(result.output)

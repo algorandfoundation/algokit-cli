@@ -4,6 +4,7 @@ DEBUG: Loading deploy command from project config
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 Using deploy command: /bin/command_a
 Loading deployment environment variables...
+DEBUG: Using default environment config for algod and indexer for network localnet
 Deploying smart contracts from AlgoKit compliant repository 🚀
 DEBUG: Running '/bin/command_a' in '{current_working_directory}'
 /bin/command_a: picked localnet
