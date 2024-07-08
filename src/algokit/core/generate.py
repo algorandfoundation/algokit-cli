@@ -49,7 +49,11 @@ def run_generator(answers: dict, path: Path) -> None:
     from copier.main import Worker
 
     cwd = Path.cwd()
+    expected_answers_file = cwd / ".algokit" / ".copier-answers.yml"
+    relative_answers_file = expected_answers_file.relative_to(cwd) if expected_answers_file.exists() else None
+
     with Worker(
+        answers_file=relative_answers_file,
         src_path=str(path),
         dst_path=cwd,
         data=answers_dict,
