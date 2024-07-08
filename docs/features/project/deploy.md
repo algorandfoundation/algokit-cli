@@ -48,6 +48,32 @@ The logic for loading environment variables is as follows:
 - If a `.env` file exists, the environment variables contained in it are loaded first.
 - If a `.env.[network_name]` file exists, the environment variables in it are loaded, overriding any previously loaded values from the `.env` file for the same variables.
 
+### Default Network Configurations
+
+The `deploy` command assumes default configurations for `mainnet`, `localnet`, and `testnet` environments. If you're deploying to one of these networks and haven't provided specific environment variables, AlgoKit will use these default values:
+
+- **Localnet**:
+
+  - `ALGOD_TOKEN`: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - `ALGOD_SERVER`: "http://localhost"
+  - `ALGOD_PORT`: "4001"
+  - `INDEXER_TOKEN`: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - `INDEXER_SERVER`: "http://localhost"
+  - `INDEXER_PORT`: "8980"
+
+- **Mainnet**:
+
+  - `ALGOD_SERVER`: "https://mainnet-api.algonode.cloud"
+  - `INDEXER_SERVER`: "https://mainnet-idx.algonode.cloud"
+
+- **Testnet**:
+  - `ALGOD_SERVER`: "https://testnet-api.algonode.cloud"
+  - `INDEXER_SERVER`: "https://testnet-idx.algonode.cloud"
+
+These default values are used when no specific `.env.[network_name]` file is present and the corresponding environment variables are not set. This feature simplifies the deployment process for these common networks, reducing the need for manual configuration in many cases.
+
+If you need to override these defaults or add additional configuration for these networks, you can still do so by creating the appropriate `.env.[network_name]` file or setting the environment variables explicitly or via generic `.env` file.
+
 ## AlgoKit Configuration File
 
 AlgoKit uses a configuration file called `.algokit.toml` in the root of your project. The configuration file can be created using the `algokit init` command. This file will define the deployment commands for the various network environments that you want to target.
