@@ -24,7 +24,3 @@ DEBUG: No .algokit.toml file found in the project directory.
 Your selected template comes from:
 ➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
 Your template includes a README.md file, you might want to review that as a next step.
-----
-.env.template:
-----
-# this file should contain environment variables common to all environments/networks

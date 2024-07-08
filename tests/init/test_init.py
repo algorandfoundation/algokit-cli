@@ -14,7 +14,6 @@ from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
 
-from tests import get_combined_verify_output
 from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
@@ -616,11 +615,8 @@ def test_init_with_any_template_url_get_community_warning(
             Path("myapp") / "smart_contracts",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
     verify(
-        get_combined_verify_output(
-            result.output, additional_name=".env.template", additional_output=env_template_file_contents
-        ),
+        result.output,
         scrubber=make_output_scrubber(),
     )
 
@@ -643,11 +639,8 @@ def test_init_with_any_template_url_get_community_warning_with_unsafe_tag(tmp_pa
             Path("myapp") / "smart_contracts",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
     verify(
-        get_combined_verify_output(
-            result.output, additional_name=".env.template", additional_output=env_template_file_contents
-        ),
+        result.output,
         scrubber=make_output_scrubber(),
     )
 
@@ -700,11 +693,8 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
             Path("myapp") / "smart_contracts",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
     verify(
-        get_combined_verify_output(
-            result.output, additional_name=".env.template", additional_output=env_template_file_contents
-        ),
+        result.output,
         scrubber=make_output_scrubber(),
     )
 
@@ -751,15 +741,11 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
             Path("myapp"),
             Path("myapp") / "README.md",
             Path("myapp") / "smart_contracts",
-            Path("myapp") / ".env.template",
         }
     )
-    env_template_file_contents = (cwd / "myapp" / ".env.template").read_text()
 
     verify(
-        get_combined_verify_output(
-            result.output, additional_name=".env.template", additional_output=env_template_file_contents
-        ),
+        result.output,
         scrubber=make_output_scrubber(),
     )
 
