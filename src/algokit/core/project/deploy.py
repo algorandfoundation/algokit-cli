@@ -4,11 +4,53 @@ from pathlib import Path
 
 import click
 import dotenv
+from algokit_utils import get_algonode_config
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
+from algokit.core.sandbox import (
+    DEFAULT_ALGOD_PORT,
+    DEFAULT_ALGOD_SERVER,
+    DEFAULT_ALGOD_TOKEN,
+    DEFAULT_INDEXER_PORT,
+    DEFAULT_INDEXER_SERVER,
+    DEFAULT_INDEXER_TOKEN,
+)
 from algokit.core.utils import load_env_file, split_command_string
 
 logger = logging.getLogger(__name__)
+
+
+class _KnownEnvironments:
+    LOCALNET = "localnet"
+    MAINNET = "mainnet"
+    TESTNET = "testnet"
+
+
+DEFAULT_MAINNET_ALGOD_SERVER = get_algonode_config("mainnet", config="algod", token="").server
+DEFAULT_TESTNET_ALGOD_SERVER = get_algonode_config("testnet", config="algod", token="").server
+DEFAULT_MAINNET_INDEXER_SERVER = get_algonode_config("mainnet", config="indexer", token="").server
+DEFAULT_TESTNET_INDEXER_SERVER = get_algonode_config("testnet", config="indexer", token="").server
+
+
+_ENVIRONMENT_CONFIG: dict[str, dict[str, str | None]] = {
+    _KnownEnvironments.LOCALNET: {
+        # this file should contain environment variables specific to algokit localnet
+        "ALGOD_TOKEN": str(DEFAULT_ALGOD_TOKEN),
+        "ALGOD_SERVER": str(DEFAULT_ALGOD_SERVER),
+        "ALGOD_PORT": str(DEFAULT_ALGOD_PORT),
+        "INDEXER_TOKEN": str(DEFAULT_INDEXER_TOKEN),
+        "INDEXER_SERVER": str(DEFAULT_INDEXER_SERVER),
+        "INDEXER_PORT": str(DEFAULT_INDEXER_PORT),
+    },
+    _KnownEnvironments.MAINNET: {
+        "ALGOD_SERVER": DEFAULT_MAINNET_ALGOD_SERVER,
+        "INDEXER_SERVER": DEFAULT_MAINNET_INDEXER_SERVER,
+    },
+    _KnownEnvironments.TESTNET: {
+        "ALGOD_SERVER": DEFAULT_TESTNET_ALGOD_SERVER,
+        "INDEXER_SERVER": DEFAULT_TESTNET_INDEXER_SERVER,
+    },
+}
 
 
 def load_deploy_env_files(name: str | None, project_dir: Path) -> dict[str, str | None]:
@@ -20,9 +62,14 @@ def load_deploy_env_files(name: str | None, project_dir: Path) -> dict[str, str 
     result = load_env_file(project_dir)
     if name is not None:
         specific_env_path = project_dir / f".env.{name}"
-        if not specific_env_path.exists():
+        if specific_env_path.exists():
+            result |= dotenv.dotenv_values(specific_env_path, verbose=True)
+
+        if name in _ENVIRONMENT_CONFIG:
+            logger.debug(f"Using default environment config for algod and indexer for network {name}")
+            result |= _ENVIRONMENT_CONFIG[name]
+        elif not specific_env_path.exists():
             raise click.ClickException(f"No such file: {specific_env_path}")
-        result |= dotenv.dotenv_values(specific_env_path, verbose=True)
     return result
 
 

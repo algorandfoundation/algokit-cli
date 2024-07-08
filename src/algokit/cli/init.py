@@ -361,9 +361,11 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
 
     from algokit.core.init import populate_default_answers
 
+    answers_file = project_path / ".algokit" / ".copier-answers.yml"
     with Worker(
         src_path=template.url,
         dst_path=project_path,
+        answers_file=answers_file if answers_file.exists() else None,
         data=answers_dict,
         quiet=True,
         vcs_ref=template.branch or template.commit,
