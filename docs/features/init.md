@@ -101,7 +101,7 @@ If you want to create a community template, you can use the [AlgoKit guidelines 
 
 Answers to specific template prompts can be provided with the `--answer {key} {value}` option, which can be used multiple times for each prompt. Quotes can be used for values with spaces e.g. `--answer author_name "Algorand Foundation"`.
 
-To find out the key for a specific answer you can either look at `.copier-answers.yml` in the root folder of a project created via `algokit init` or in the `copier.yaml` file of a template repo e.g. for the [beaker template](https://github.com/algorandfoundation/algokit-beaker-default-template/blob/main/copier.yaml).
+To find out the key for a specific answer you can either look at `.algokit/.copier-answers.yml` in the root folder of a project created via `algokit init` or in the `copier.yaml` file of a template repo e.g. for the [beaker template](https://github.com/algorandfoundation/algokit-beaker-default-template/blob/main/copier.yaml).
 
 ## Non-interactive project initialization
 
