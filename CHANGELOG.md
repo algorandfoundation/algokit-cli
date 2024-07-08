@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.0 (2024-07-08)
+
+### Feature
+
+* Adding default algorand network configs to use when no .env.{network} found ([#533](https://github.com/algorandfoundation/algokit-cli/issues/533)) ([`a726756`](https://github.com/algorandfoundation/algokit-cli/commit/a726756b2f96557a8e54e1f89c4926dc206265d3))
+
+### Fix
+
+* Given that .copier-answers.yml is now expected at .algokit folder, improve defaults lookup ([#535](https://github.com/algorandfoundation/algokit-cli/issues/535)) ([`5d319d3`](https://github.com/algorandfoundation/algokit-cli/commit/5d319d323a5a38e77d65895048e6a2a30e8b64d8))
+
 ## v2.1.4 (2024-06-27)
 
 ### Fix
