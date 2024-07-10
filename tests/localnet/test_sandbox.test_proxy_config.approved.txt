@@ -9,6 +9,7 @@ http {
 
   resolver 127.0.0.11 ipv6=off valid=10s;
   resolver_timeout 5s;
+  client_max_body_size 0;
 
   map $request_method$http_access_control_request_private_network $cors_allow_private_network {
     "OPTIONStrue" "true";
