@@ -80,6 +80,8 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 # Install
 
+> **Note** Refer to [Troubleshooting](#troubleshooting) for more details on mitigation of known edge cases when installing AlgoKit.
+
 ## Prerequisites
 
 The key required dependency is Python 3.10+, but some of the installation options below will install that for you. We recommend using Python 3.12+, as the `algokit compile python` command requires this version.
@@ -247,6 +249,8 @@ Per the above output, the doctor command output is a helpful tool if you need to
 
 ## Troubleshooting
 
-| Issue Description                                                                       | OS(s)     | Steps to mitigate                                                                                                                                                                           |
-| --------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SSL module not available in Python installation, causing `pipx install algokit` to fail | Debian 12 | Run `pipx install algokit --python $(which python3)` to explicitly use the Python 3 version with SSL support. Ensure that latest pip version is installed, update `python` alias if needed. |
+This section addresses specific edge cases and issues that some users might encounter when interacting with the CLI. The following table provides solutions to known edge cases:
+
+| Issue Description                                                                                                                                   | OS(s) with observed behaviour | Steps to mitigate                                                                                                                                                                                                                                                                                                                      | References                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| This scenario may arise if installed `python` was build without `--with-ssl` flag enabled, causing pip to fail when trying to install dependencies. | Debian 12                     | Run `sudo apt-get install -y libssl-dev` to install the required openssl dependency. Afterwards, ensure to reinstall python with `--with-ssl` flag enabled. This includes options like [building python from source code](https://medium.com/@enahwe/how-to-06bc8a042345) or using tools like [pyenv](https://github.com/pyenv/pyenv). | https://github.com/actions/setup-python/issues/93 |
