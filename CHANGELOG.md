@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.1 (2024-07-23)
+
+### Documentation
+
+* Extra notes on edge case with python installation on debian ([#539](https://github.com/algorandfoundation/algokit-cli/issues/539)) ([`f358e24`](https://github.com/algorandfoundation/algokit-cli/commit/f358e24122df759585034c7e3541f5a8f4c446f1))
+
 ## v2.2.0 (2024-07-08)
 
 ### Feature
