@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" IgnorableNamespaces="uap uap3 uap10 desktop rescap">
-  <Identity Name="algokit" Publisher="CN=NeilTest, O=NeilTest, C=US" Version="0.0.1.0" ProcessorArchitecture="x64" />
+  <Identity Name="algokit" Publisher="CN=Algorand Foundation, O=Algorand Foundation, L=Singapore, C=SG" Version="0.0.1.0" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>AlgoKit</DisplayName>
     <PublisherDisplayName>Algorand Foundation</PublisherDisplayName>
