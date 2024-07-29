@@ -3,6 +3,7 @@ import math
 from pathlib import Path
 
 import click
+from algokit_utils import Account
 from algosdk.error import AlgodHTTPError
 from algosdk.util import algos_to_microalgos
 
@@ -93,6 +94,24 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
         )
 
 
+def _get_creator_account(context: click.Context, param: click.Parameter, value: str) -> str:  # noqa: ARG001
+    """
+    Validate the creator account by checking if it is a valid Algorand address.
+
+    Args:
+        context (click.Context): The click context.
+        param (click.Parameter): The click parameter.
+        value (str): The value of the parameter.
+
+    Returns:
+        Account: An account object with the address and private key.
+    """
+    if "account" not in context.params:
+        account = get_account_with_private_key(value)
+        context.params["account"] = account
+    return value
+
+
 @click.command(
     name="mint",
     help="Mint new fungible or non-fungible assets on Algorand.",
@@ -103,6 +122,7 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
     prompt="Provide the address or alias of the asset creator",
     help="Address or alias of the asset creator.",
     type=click.STRING,
+    callback=_get_creator_account,
 )
 @click.option(
     "-n",
@@ -189,7 +209,7 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
 )
 def mint(  # noqa: PLR0913
     *,
-    creator: str,
+    creator: str,  # noqa: ARG001
     asset_name: str,
     unit_name: str,
     total: int,
@@ -199,11 +219,12 @@ def mint(  # noqa: PLR0913
     mutable: bool,
     non_fungible: bool,
     network: AlgorandNetwork,
+    account: Account | None,
 ) -> None:
     if non_fungible:
         _validate_supply(total, decimals)
-
-    creator_account = get_account_with_private_key(creator)
+    if account is not None:
+        creator_account = account
 
     pinata_jwt = get_pinata_jwt()
     if not pinata_jwt:
