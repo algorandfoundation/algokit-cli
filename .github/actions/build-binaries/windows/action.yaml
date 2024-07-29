@@ -40,7 +40,7 @@ runs:
     - name: Add metadata to binary
       shell: bash
       run: |
-        echo winget > ${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method
+        echo winget > '${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method'
 
     - name: Sign executable
       if: ${{ inputs.production_release == 'true' }}
