@@ -4,29 +4,87 @@ inputs:
   package_name:
     description: "The name of the package"
     required: true
+  version:
+    description: "The version to use for this artifact"
   artifacts_dir:
     description: "The directory to write artifacts you want to publish"
     required: true
-  version:
-    description: "The version to use for this artifact"
+  production_release:
+    description: "Flag to determine if this is a production release"
+    required: true
+  azure_tenant_id:
+    description: "The Microsoft Entra tenant (directory) ID."
+    required: true
+  azure_client_id:
+    description: "The client (application) ID of an App Registration in the tenant."
+    required: true
+  azure_client_secret:
+    description: "A client secret that was generated for the App Registration."
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Configure build environment
+      shell: bash
+      run: |
+        echo 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64' >> $GITHUB_PATH
+        echo 'BINARY_BUILD_DIR=dist\algokit' >> $GITHUB_ENV
+        echo 'WINGET_INSTALLER=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix' >> $GITHUB_ENV
+
     - name: Build binary
       shell: bash
       run: |
         poetry run poe package_windows
 
-    - name: Package binary artifact
+    - name: Add metadata to binary
+      shell: bash
+      run: |
+        echo winget > '${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method'
+
+    - name: Sign executable
+      if: ${{ inputs.production_release == 'true' }}
+      uses: azure/trusted-signing-action@v0.3.20
+      with:
+        azure-tenant-id: ${{ inputs.azure_tenant_id }}
+        azure-client-id: ${{ inputs.azure_client_id }}
+        azure-client-secret: ${{ inputs.azure_client_secret }}
+        endpoint: https://weu.codesigning.azure.net/
+        trusted-signing-account-name: algokit-signing
+        certificate-profile-name: algokit
+        files-folder: ${{ env.BINARY_BUILD_DIR }}
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+
+    - name: Build winget installer
       shell: pwsh
       run: |
-        Set-Location -Path dist\algokit\
-        tar -zcf ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz *
-        Set-Location -Path ..\..
+        & .\scripts\winget\build-installer.ps1 `
+          -binaryDir '${{ env.BINARY_BUILD_DIR }}' `
+          -releaseVersion '${{ inputs.version }}' `
+          -outputFile '${{ env.WINGET_INSTALLER }}'
 
-    - name: Upload binary artifact
+    - name: Sign winget installer
+      if: ${{ inputs.production_release == 'true' }}
+      uses: azure/trusted-signing-action@v0.3.20
+      with:
+        azure-tenant-id: ${{ inputs.azure_tenant_id }}
+        azure-client-id: ${{ inputs.azure_client_id }}
+        azure-client-secret: ${{ inputs.azure_client_secret }}
+        endpoint: https://weu.codesigning.azure.net/
+        trusted-signing-account-name: algokit-signing
+        certificate-profile-name: algokit
+        files-folder: ${{ env.WINGET_INSTALLER }}
+        files-folder-filter: msix
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
+
+    - name: Upload winget artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.package_name }}
-        path: ${{ inputs.artifacts_dir }}\${{ inputs.package_name }}.tar.gz
+        name: ${{ inputs.package_name }}-winget
+        path: ${{ env.WINGET_INSTALLER }}
+        if-no-files-found: error

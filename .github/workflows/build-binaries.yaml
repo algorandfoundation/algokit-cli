@@ -66,6 +66,10 @@ jobs:
           package_name: ${{ env.PACKAGE_NAME }}
           version: ${{ env.RELEASE_VERSION }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+          production_release: ${{ inputs.production_release }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Build linux binary
         if: ${{ runner.os == 'Linux' }}
