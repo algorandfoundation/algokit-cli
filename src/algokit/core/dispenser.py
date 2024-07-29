@@ -11,7 +11,7 @@ from typing import Any, ClassVar
 import httpx
 import jwt
 import keyring
-from auth0.authentication.token_verifier import (
+from auth0.authentication.token_verifier import (  # type: ignore[import-untyped]
     AsymmetricSignatureVerifier,
     TokenVerifier,
 )

@@ -222,7 +222,3 @@ This should dynamically load and display your generator as an optional `cli` com
 Creating custom templates in AlgoKit is a powerful way to streamline your development workflow for Algorand smart contracts, whether you are using Python or TypeScript. Leveraging Copier and Jinja for templating, and incorporating best practices for modularity, documentation, and coding standards, can result in robust, flexible, and user-friendly templates that can be a valuable asset to both your own projects and the broader Algorand community.
 
 Happy coding!
-
-```
-
-```

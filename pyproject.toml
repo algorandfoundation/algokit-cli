@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "1.12.1"
+version = "2.2.1"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -10,27 +10,26 @@ readme = "README.md"
 python = ">=3.10,<3.13"
 click = "^8.1.3"
 httpx = "^0.23.1"
-copier = "^9.0.0"
+copier = "^9.2.0"
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
-shellingham = "^1.5.0.post1"
-algokit-client-generator = "^1.1.1"
+shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
 keyring = "24.3.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
-algokit-utils = "^2.2.1"
+algokit-utils = "^2.3.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
-aiohttp = "3.9.2"
+aiohttp = "3.9.5"
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.3.0"}
 pytest = "^7.2.0"
-ruff = "^0.1.6"
+ruff = ">=0.1.6,<0.5.0"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -42,7 +41,7 @@ pre-commit = "^2.20.0"
 sphinx = "^6.0.0"
 sphinx-click = "^4.4.0"
 sphinxnotes-markdown-builder = "^0.5.6"
-poethepoet = "^0.17.1"
+poethepoet = ">=0.17.1,<0.27.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
 
@@ -59,10 +58,10 @@ docs_toc = "gfm-toc docs/cli/index.md -e 3"
 docs_title = {shell = "(echo \"# AlgoKit CLI Reference Documentation\\n\\n\"; cat docs/cli/index.md) > docs/cli/temp.md && mv docs/cli/temp.md docs/cli/index.md"}
 docs = ["docs_generate", "docs_toc", "docs_title"]
 package_unix = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config:multiformats_config/' --add-data './src/algokit/resources:algokit/resources/'"
-package_windows = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config;multiformats_config/ --add-data ./src/algokit/resources;algokit/resources/"
+package_windows = { cmd = "scripts/package_windows.bat" }
 [tool.ruff]
 line-length = 120
-select = [
+lint.select = [
   # all possible codes as of this ruff version are listed here,
   # ones we don't want/need are commented out to make it clear
   # which have been omitted on purpose vs which ones get added
@@ -112,7 +111,7 @@ select = [
   # "NPY",  # NumPy-specific rules
   "RUF",    # Ruff-specific rules
 ]
-ignore = [
+lint.ignore = [
   "ANN101", # no type for self
   "ANN102", # no type for cls
   "RET505", # allow else after return
@@ -144,14 +143,14 @@ exclude = [
     "docs/sphinx",
 ]
 # Allow unused variables when underscore-prefixed.
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # Assume Python 3.10.
 target-version = "py310"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/**/test_*.py" = ["PLR0913"] # too many args
 
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 suppress-none-returning = true
 

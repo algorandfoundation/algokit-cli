@@ -40,15 +40,14 @@ AlgoKit helps you develop Algorand solutions:
 - **Interaction**: AlgoKit exposes a number of interaction methods, namely:
   - [**AlgoKit CLI**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md): A Command Line Interface (CLI) so you can quickly access AlgoKit capabilities
   - [VS Code](https://code.visualstudio.com/): All AlgoKit project templates include VS Code configurations so you have a smooth out-of-the-box development experience using VS Code
-  - [Dappflow](https://dappflow.org/): AlgoKit has integrations with Dappflow; a web-based user interface that let's you visualise an Algorand network and deploy and call smart contracts via a graphical user interface
+  - [lora](https://lora.algokit.io/): AlgoKit has integrations with lora; a web-based user interface that let's you visualise and interact with an Algorand network
 - **Getting Started**: AlgoKit helps you get started quickly when building new solutions:
   - [**AlgoKit Templates**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
 - **Development**: AlgoKit provides SDKs, tools and libraries that help you quickly and effectively build high quality Algorand solutions:
   - **AlgoKit Utils** ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test, build and deploy Algorand solutions quickly and easily
     - [algosdk](https://developer.algorand.org/docs/sdks/) ([Python](https://github.com/algorand/py-algorand-sdk#readme) | [TypeScript](https://github.com/algorand/js-algorand-sdk#readme)) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
-  - [**Beaker**](https://beaker.algo.xyz/): A productive Python framework for building Smart Contracts on Algorand.
-    - [PyTEAL](https://pyteal.readthedocs.io/en/stable/): The Python language bindings for Algorand Smart Contracts, which Beaker wraps
-    - [TEAL](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/): Transaction Execution Approval Language (TEAL) is the assembly-like language interpreted by the Algorand Virtual Machine (AVM) running within an Algorand node, which Beaker exports
+  - [**Algorand Python**](https://github.com/algorandfoundation/puya): A semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
+  - [**TEALScript**](https://github.com/algorandfoundation/TEALScript): A subset of TypeScript that can be used to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
   - [**AlgoKit LocalNet**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
 
 ### Operate
@@ -62,7 +61,7 @@ AlgoKit comes with out-of-the-box [Continuous Integration / Continuous Deploymen
 The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
 - Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
-- Building, testing, deploying and calling [Algorand PyTEAL](https://github.com/algorand/pyteal) / [Beaker](https://beaker.algo.xyz/) smart contracts
+- Building, testing, deploying and calling [Algorand Python](https://github.com/algorandfoundation/puya) / [TEALScript](https://github.com/algorandfoundation/TEALScript) smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
 
@@ -81,17 +80,20 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 # Install
 
+> **Note** Refer to [Troubleshooting](#troubleshooting) for more details on mitigation of known edge cases when installing AlgoKit.
+
 ## Prerequisites
 
-The key required dependency is Python 3.10+, but some of the installation options below will install that for you.
+The key required dependency is Python 3.10+, but some of the installation options below will install that for you. We recommend using Python 3.12+, as the `algokit compile python` command requires this version.
 
 AlgoKit also has some runtime dependencies that also need to be available for particular commands.
 
 > **Note**
 > You can still install and use AlgoKit without these dependencies and AlgoKit will tell you if you are missing one for a given command.
 
-- Git - Git is used when creating and updating projects from templates
-- Docker - Docker Compose (and by association, Docker) is used to run the AlgoKit LocalNet environment, we require Docker Compose 2.5.0+
+- **Git**: Essential for creating and updating projects from templates. Installation guide available at [Git Installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+- **Docker**: Necessary for running the AlgoKit LocalNet environment. Docker Compose version 2.5.0 or higher is required. See [Docker Installation](https://docs.docker.com/get-docker/).
+- **Node.js**: For those working on frontend templates or building contracts using TEALScript. **Minimum required versions are Node.js `v18` and npm `v9`**. Instructions can be found at [Node.js Installation](https://nodejs.org/en/download/).
 
 ## Cross-platform installation
 
@@ -126,10 +128,12 @@ AlgoKit can be installed using OS specific package managers, or using the python
       > **App Installer python.exe** or **App Installer python3.exe**.
 
    3. Install pipx:
+
       ```
       pip install --user pipx
       python -m pipx ensurepath
       ```
+
    4. Restart the terminal to ensure pipx is available on the path
    5. Install AlgoKit via pipx: `pipx install algokit`
    6. Restart the terminal to ensure AlgoKit is available on the path
@@ -242,3 +246,11 @@ Please include this output, if you want to populate this message in your clipboa
 ```
 
 Per the above output, the doctor command output is a helpful tool if you need to ask for support or [raise an issue](https://github.com/algorandfoundation/algokit-cli/issues/new).
+
+## Troubleshooting
+
+This section addresses specific edge cases and issues that some users might encounter when interacting with the CLI. The following table provides solutions to known edge cases:
+
+| Issue Description                                                                                                                                   | OS(s) with observed behaviour | Steps to mitigate                                                                                                                                                                                                                                                                                                                      | References                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| This scenario may arise if installed `python` was build without `--with-ssl` flag enabled, causing pip to fail when trying to install dependencies. | Debian 12                     | Run `sudo apt-get install -y libssl-dev` to install the required openssl dependency. Afterwards, ensure to reinstall python with `--with-ssl` flag enabled. This includes options like [building python from source code](https://medium.com/@enahwe/how-to-06bc8a042345) or using tools like [pyenv](https://github.com/pyenv/pyenv). | https://github.com/actions/setup-python/issues/93 |

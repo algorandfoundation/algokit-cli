@@ -21,7 +21,7 @@ AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
 OS: Linux-other-system-info
 docker: Command not found!
-  Docker required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/
+  `docker` required to run `algokit localnet` command; install via https://docker.io
 docker compose: Command not found!
 git: Command not found!
   Git required to run `algokit init`; install via https://github.com/git-guides/install-git
@@ -32,11 +32,11 @@ pipx: Command not found!
   install via https://pypa.github.io/pipx/
 poetry: Command not found!
   Poetry is required for some Python-based templates;
-  install via `algokit bootstrap` within project directory, or via:
+  install via `algokit project bootstrap` within project directory, or via:
   https://python-poetry.org/docs/#installation
 node: Command not found!
   Node.js is required for some Node.js-based templates;
-  install via `algokit bootstrap` within project directory, or via:
+  install via `algokit project bootstrap` within project directory, or via:
   https://nodejs.dev/en/learn/how-to-install-nodejs/
 npm: Command not found!
 

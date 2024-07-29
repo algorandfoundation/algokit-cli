@@ -22,5 +22,5 @@ DEBUG: Asset config params: {
 }
 
 Successfully minted the asset!
-Browse your asset at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/asset/123/
-Check transaction status at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/transaction/dummy_tx_id/
+Browse your asset at: https://explore.algokit.io/localnet/asset/123
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id

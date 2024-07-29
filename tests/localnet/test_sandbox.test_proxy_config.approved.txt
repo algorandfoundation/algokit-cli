@@ -1,0 +1,61 @@
+worker_processes 1;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  access_log off;
+
+  resolver 127.0.0.11 ipv6=off valid=10s;
+  resolver_timeout 5s;
+  client_max_body_size 0;
+
+  map $request_method$http_access_control_request_private_network $cors_allow_private_network {
+    "OPTIONStrue" "true";
+    default "";
+  }
+
+  add_header Access-Control-Allow-Private-Network $cors_allow_private_network;
+
+  server {
+    listen 4001;
+
+    location / {
+      proxy_http_version 1.1;
+      proxy_read_timeout 120s;
+      proxy_set_header Host $host;
+      proxy_set_header Connection "";
+      proxy_pass_header Server;
+      set $target http://algod:8080;
+      proxy_pass $target;
+    }
+  }
+
+  server {
+    listen 4002;
+
+    location / {
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header Connection "";
+      proxy_pass_header Server;
+      set $target http://algod:7833;
+      proxy_pass $target;
+    }
+  }
+
+  server {
+    listen 8980;
+
+    location / {
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header Connection "";
+      proxy_pass_header Server;
+      set $target http://indexer:8980;
+      proxy_pass $target;
+    }
+  }
+}
+    

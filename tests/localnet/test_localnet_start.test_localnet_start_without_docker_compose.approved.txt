@@ -1,5 +1,4 @@
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
-Error: Docker Compose not found; please install Docker Compose and add to path.
-See https://docs.docker.com/compose/install/ for more information.
+Error: Container engine compose not found; please install Docker Compose or Podman Compose and add to path.

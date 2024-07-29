@@ -44,9 +44,11 @@ def _disable_animation(mocker: MockerFixture) -> None:
 def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]:
     cwd = tmp_path_factory.mktemp("cwd", numbered=True)
 
-    with patch("algokit.core.tasks.analyze.TEALER_REPORTS_ROOT", return_value=cwd), patch(
-        "algokit.core.tasks.analyze.TEALER_SNAPSHOTS_ROOT", return_value=cwd
-    ), patch("algokit.core.tasks.analyze.TEALER_DOT_FILES_ROOT", return_value=cwd):
+    with (
+        patch("algokit.core.tasks.analyze.TEALER_REPORTS_ROOT", return_value=cwd),
+        patch("algokit.core.tasks.analyze.TEALER_SNAPSHOTS_ROOT", return_value=cwd),
+        patch("algokit.core.tasks.analyze.TEALER_DOT_FILES_ROOT", return_value=cwd),
+    ):
         yield cwd
 
 

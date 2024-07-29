@@ -1,4 +1,3 @@
-version: "3"
 name: "algokit_sandbox"
 
 services:
@@ -6,8 +5,7 @@ services:
     container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
-      - 4001:8080
-      - 4002:7833
+      - 7833
       - 9392:9392
     environment:
       START_KMD: 1
@@ -39,7 +37,7 @@ services:
 
   indexer-db:
     container_name: "algokit_sandbox_postgres"
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     ports:
       - 5443:5432
     user: postgres
@@ -51,11 +49,25 @@ services:
   indexer:
     container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
-    ports:
-      - "8980:8980"
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
+
+  proxy:
+    container_name: "algokit_sandbox_proxy"
+    image: nginx:1.27.0-alpine
+    restart: unless-stopped
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 8980:8980
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - algod
+      - indexer

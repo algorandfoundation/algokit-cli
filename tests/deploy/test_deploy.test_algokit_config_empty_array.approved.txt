@@ -1,4 +1,0 @@
-DEBUG: Deploying from project directory: {current_working_directory}
-DEBUG: Loading deploy command from project config
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-Error: No generic deploy command specified in '.algokit.toml' file.

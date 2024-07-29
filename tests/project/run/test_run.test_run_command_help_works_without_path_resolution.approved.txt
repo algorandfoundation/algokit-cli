@@ -1,0 +1,9 @@
+Usage: algokit project run [OPTIONS] COMMAND [ARGS]...
+
+  Define custom commands and manage their execution in you projects.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  hello  Run all "hello" commands in the workspace project.

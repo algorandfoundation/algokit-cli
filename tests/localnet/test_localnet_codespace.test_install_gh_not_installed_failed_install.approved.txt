@@ -1,0 +1,4 @@
+DEBUG: Running 'gh --version' in '{current_working_directory}'
+Installing gh...
+ERROR: Failed to automatically install gh cli: Failed to install gh
+ERROR: Please install `gh cli` manually by following official documentation at https://cli.github.com/

@@ -248,6 +248,8 @@ def test_completions_install_handles_unsupported_bash_gracefully(mocker: MockerF
     result = context.run_command("install", "bash")
 
     # Assert
-    assert result.exit_code == 1
-    assert not context.source_path.exists()
-    verify(result.output)
+    # NOTE: shellingham no longer throws an error when shell is not supported.
+    # However, it still prints the error message to stderr.
+    # Then it proceeds to try to install the completion script regardless.
+    assert "Shell completion is not supported for Bash" in result.output
+    assert context.source_path.exists()

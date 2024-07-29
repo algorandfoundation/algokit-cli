@@ -8,13 +8,10 @@ The `algokit generate client` [command](../cli/index.md#client) can be used to g
 
 ### Prerequisites
 
-To generate Python clients AlgoKit itself is the only dependency.
+To generate Python clients an installation of pip and pipx is required.
 To generate TypeScript clients an installation of Node.js and npx is also required.
 
-Each generated client will also have a dependency on `algokit-utils` libraries for the target language:
-
-- Python clients require: `algokit-utils@^1.2`
-- TypeScript clients require: `@algorandfoundation/algokit-utils@^2.0`
+Each generated client will also have a dependency on `algokit-utils` libraries for the target language.
 
 ### Input file / directory
 
@@ -29,6 +26,14 @@ There are two tokens available for use with the `-o`, `--output` [option](../cli
 
 - `{contract_name}`: This will resolve to a name based on the ARC-0032 contract name, formatted appropriately for the target language.
 - `{app_spec_dir}`: This will resolve to the parent directory of the `application.json` or `*.arc32.json` file which can be useful to output a client relative to its source file.
+
+### Version Pinning
+
+If you want to ensure typed client output stability across different environments and additionally protect yourself from any potential breaking changes introduced in the client generator packages, you can specify a version you'd like to pin to.
+
+To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
+
+Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `poetry` or `npm` respectively) or globally on your system (via `pipx` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
 
 ### Usage
 

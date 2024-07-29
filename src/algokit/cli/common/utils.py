@@ -100,26 +100,4 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
         ValueError: If the network or explorer type is invalid.
     """
 
-    base_urls: dict[str, dict[str, str]] = {
-        "testnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://testnet.explorer.perawallet.app/tx/",
-            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/asset/",
-            ExplorerEntityType.ADDRESS.value: "https://testnet.explorer.perawallet.app/address/",
-        },
-        "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://explorer.perawallet.app/tx/",
-            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/asset/",
-            ExplorerEntityType.ADDRESS.value: "https://explorer.perawallet.app/tx/address/",
-        },
-    }
-
-    if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/{entity_type.value}/{identifier}/"
-
-    if network not in base_urls:
-        raise ValueError(f"Invalid network: {network}")
-
-    if entity_type.value not in base_urls[network]:
-        raise ValueError(f"Invalid explorer type: {entity_type}")
-
-    return base_urls[network][entity_type.value] + str(identifier)
+    return f"https://explore.algokit.io/{network}/{entity_type.value}/{identifier}"

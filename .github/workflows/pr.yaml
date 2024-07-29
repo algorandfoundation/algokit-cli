@@ -1,6 +1,9 @@
-name: Pull Request validation
+name: Codebase validation
 
-on: [pull_request]
+on:
+  pull_request:
+  schedule:
+    - cron: "0 8 * * 1" # Each monday 8 AM UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

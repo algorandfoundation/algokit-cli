@@ -10,11 +10,11 @@ DEBUG: Running 'docker compose down' in '{app_config}/sandbox'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 LocalNet definition is out of date; updating it to latest
-DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
-DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox'
-DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
@@ -26,7 +26,6 @@ DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 
 {app_config}/sandbox/docker-compose.yml
-version: "3"
 name: "algokit_sandbox"
 
 services:
@@ -34,8 +33,7 @@ services:
     container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
-      - 4001:8080
-      - 4002:7833
+      - 7833
       - 9392:9392
     environment:
       START_KMD: 1
@@ -67,7 +65,7 @@ services:
 
   indexer-db:
     container_name: "algokit_sandbox_postgres"
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     ports:
       - 5443:5432
     user: postgres
@@ -79,8 +77,6 @@ services:
   indexer:
     container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
-    ports:
-      - "8980:8980"
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
@@ -88,5 +84,21 @@ services:
     depends_on:
       - conduit
 
+  proxy:
+    container_name: "algokit_sandbox_proxy"
+    image: nginx:1.27.0-alpine
+    restart: unless-stopped
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 8980:8980
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - algod
+      - indexer
+
 {app_config}/sandbox/algod_config.json
-{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":false, "isIndexerActive":false, "EnableDeveloperAPI":true}
+{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true}
