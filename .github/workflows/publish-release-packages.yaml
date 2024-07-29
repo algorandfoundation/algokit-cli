@@ -131,7 +131,7 @@ jobs:
       - name: Publish to winget
         shell: pwsh
         env:
-          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
+          WINGET_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |
           echo 'Publishing to winget'
           # The below can be uncommented after we've manually created the first release on winget
