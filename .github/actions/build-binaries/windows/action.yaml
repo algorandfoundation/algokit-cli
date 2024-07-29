@@ -12,14 +12,14 @@ inputs:
   production_release:
     description: "Flag to determine if this is a production release"
     required: true
-  code_signing_cert:
-    description: "The base64 encoded code signing certificate"
+  azure_tenant_id:
+    description: "The Microsoft Entra tenant (directory) ID."
     required: true
-  code_signing_cert_sha1_hash:
-    description: "The SHA1 hash of the code signing certificate"
+  azure_client_id:
+    description: "The client (application) ID of an App Registration in the tenant."
     required: true
-  code_signing_cert_password:
-    description: "The password for the code signing certificate"
+  azure_client_secret:
+    description: "A client secret that was generated for the App Registration."
     required: true
 
 runs:
@@ -42,28 +42,21 @@ runs:
       run: |
         echo winget > ${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method
 
-    # We only sign the release artifacts, as each signing request will use up the HSM quota
-    - name: Download signing certificate
-      if: ${{ inputs.production_release == 'true' }}
-      run: |
-        signing_cert="${{ runner.temp }}\code_signing_cert.pfx"
-        echo "SIGNING_CERT=${signing_cert}" >> $GITHUB_ENV
-        echo '${{ inputs.code_signing_cert }}' | base64 -d > $signing_cert
-      shell: bash
-
-    - name: Import signing certificate
-      if: ${{ inputs.production_release == 'true' }}
-      shell: pwsh
-      run: |
-        Import-PfxCertificate -FilePath ${{ env.SIGNING_CERT }} -Password (ConvertTo-SecureString -String ${{ inputs.code_signing_cert_password }} -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My | Out-Null
-
     - name: Sign executable
       if: ${{ inputs.production_release == 'true' }}
-      shell: pwsh
-      run: |
-        $executablePath = '${{ env.BINARY_BUILD_DIR }}\algokit.exe'
-        signtool sign /sha1 ${{ inputs.code_signing_cert_sha1_hash }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 $executablePath
-        # signtool verify /v /pa $executablePath
+      uses: azure/trusted-signing-action@v0.3.20
+      with:
+        azure-tenant-id: ${{ inputs.azure_tenant_id }}
+        azure-client-id: ${{ inputs.azure_client_id }}
+        azure-client-secret: ${{ inputs.azure_client_secret }}
+        endpoint: https://weu.codesigning.azure.net/
+        trusted-signing-account-name: algokit-signing
+        certificate-profile-name: algokit
+        files-folder: ${{ env.BINARY_BUILD_DIR }}
+        files-folder-filter: exe
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
 
     - name: Build winget installer
       shell: pwsh
@@ -75,18 +68,19 @@ runs:
 
     - name: Sign winget installer
       if: ${{ inputs.production_release == 'true' }}
-      shell: pwsh
-      run: |
-        signtool sign /sha1 ${{ inputs.code_signing_cert_sha1_hash }} /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 ${{ env.WINGET_INSTALLER }}
-        # signtool verify /v /pa ${{ env.WINGET_INSTALLER }}
-
-    - name: Remove signing certificate
-      if: ${{ inputs.production_release == 'true' }}
-      shell: pwsh
-      run: |
-        $cert = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object { $_.Thumbprint -eq '${{ inputs.code_signing_cert_sha1_hash }}' }
-        Remove-Item -Path $cert.PSPath
-        Remove-Item -Path ${{ env.SIGNING_CERT }}
+      uses: azure/trusted-signing-action@v0.3.20
+      with:
+        azure-tenant-id: ${{ inputs.azure_tenant_id }}
+        azure-client-id: ${{ inputs.azure_client_id }}
+        azure-client-secret: ${{ inputs.azure_client_secret }}
+        endpoint: https://weu.codesigning.azure.net/
+        trusted-signing-account-name: algokit-signing
+        certificate-profile-name: algokit
+        files-folder: ${{ env.WINGET_INSTALLER }}
+        files-folder-filter: msix
+        file-digest: SHA256
+        timestamp-rfc3161: http://timestamp.acs.microsoft.com
+        timestamp-digest: SHA256
 
     - name: Upload winget artifact
       uses: actions/upload-artifact@v4
