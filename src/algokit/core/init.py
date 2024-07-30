@@ -68,9 +68,7 @@ def is_valid_project_dir_name(value: str) -> bool:
     algokit_project_names = get_project_dir_names_from_workspace()
     if value in algokit_project_names:
         return False
-    if not re.match(r"^[\w\-.]+$", value):
-        return False
-    return True
+    return re.match("^[\\w\\-.]+$", value) is not None
 
 
 def resolve_vscode_workspace_file(project_root: Path | None) -> Path | None:
