@@ -33,7 +33,7 @@ Copy-Item -Path "$installerContentDir\assets\*" -Destination $assetsDir -Recurse
 # Add manifest file
 $version = if ($releaseVersion) { 
   # Strip the pre-release meta, as it's not valid
-  $releaseVersion -replace '-\w+|\+.+$', ''
+  $releaseVersion -replace '-\w+(\.\d+)?|\+.+$', ''
 }
 else {
   '0.0.1'
