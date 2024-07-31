@@ -116,6 +116,30 @@ def _get_creator_account(context: click.Context, param: click.Parameter, value: 
     return value
 
 
+def _validate_supply_for_nft(context: click.Context, param: click.Parameter, value: bool) -> bool:  # noqa: ARG001 FBT001
+    """
+    Validate the total supply and decimal places for NFTs.
+
+    Args:
+        context (click.Context): The click context.
+        param (click.Parameter): The click parameter.
+        value (bool): The value of the parameter.
+
+    Returns:
+        bool: The value of the parameter if it passes the validation.
+    """
+
+    if value:
+        try:
+            total = context.params.get("total")
+            decimals = context.params.get("decimals")
+            if total is not None and decimals is not None:
+                 _validate_supply(total, decimals)
+        except click.ClickException as ex:
+            raise ex
+    return value
+
+
 @click.command(
     name="mint",
     help="Mint new fungible or non-fungible assets on Algorand. hiiiiiii",
@@ -167,6 +191,16 @@ def _get_creator_account(context: click.Context, param: click.Parameter, value: 
     help="Number of decimals. Defaults to 0.",
 )
 @click.option(
+    "--nft/--ft",
+    "non_fungible",
+    type=click.BOOL,
+    prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
+    default=False,
+    callback=_validate_supply_for_nft,
+    help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+    definitions of pure or fractional NFTs as per ARC3 standard.""",
+)
+@click.option(
     "-i",
     "--image",
     "image_path",
@@ -194,15 +228,6 @@ def _get_creator_account(context: click.Context, param: click.Parameter, value: 
     help="Whether the asset should be mutable or immutable. Refers to `ARC19` by default.",
 )
 @click.option(
-    "--nft/--ft",
-    "non_fungible",
-    type=click.BOOL,
-    prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
-    default=False,
-    help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
-    definitions of pure or fractional NFTs as per ARC3 standard.""",
-)
-@click.option(
     "-n",
     "--network",
     type=click.Choice(AlgorandNetwork.to_list()),
@@ -221,12 +246,9 @@ def mint(  # noqa: PLR0913
     image_path: Path,
     token_metadata_path: Path | None,
     mutable: bool,
-    non_fungible: bool,
     network: AlgorandNetwork,
     account: Account | None,
 ) -> None:
-    if non_fungible:
-        _validate_supply(total, decimals)
     if account is not None:
         creator_account = account
 
@@ -251,12 +273,13 @@ def mint(  # noqa: PLR0913
             client=client,
             jwt=pinata_jwt,
             creator_account=creator_account,
+            asset_name=asset_name,
+            unit_name=unit_name,
+            total=total,
             token_metadata=token_metadata,
             image_path=image_path,
-            unit_name=unit_name,
-            asset_name=asset_name,
             mutable=mutable,
-            total=total,
+            decimals=decimals,
         )
 
         click.echo("\nSuccessfully minted the asset!")
