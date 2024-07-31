@@ -106,15 +106,19 @@ def _get_creator_account(context: click.Context, param: click.Parameter, value: 
     Returns:
         Account: An account object with the address and private key.
     """
+
     if "account" not in context.params:
-        account = get_account_with_private_key(value)
-        context.params["account"] = account
+        try:
+            account = get_account_with_private_key(value)
+            context.params["account"] = account
+        except Exception as ex:
+            raise click.BadParameter(str(ex)) from ex
     return value
 
 
 @click.command(
     name="mint",
-    help="Mint new fungible or non-fungible assets on Algorand.",
+    help="Mint new fungible or non-fungible assets on Algorand. hiiiiiii",
 )
 @click.option(
     "--creator",
