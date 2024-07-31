@@ -142,7 +142,7 @@ def _validate_supply_for_nft(context: click.Context, param: click.Parameter, val
 
 @click.command(
     name="mint",
-    help="Mint new fungible or non-fungible assets on Algorand. hiiiiiii",
+    help="Mint new fungible or non-fungible assets on Algorand.",
 )
 @click.option(
     "--creator",
