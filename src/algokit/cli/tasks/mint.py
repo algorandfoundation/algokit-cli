@@ -134,7 +134,7 @@ def _validate_supply_for_nft(context: click.Context, param: click.Parameter, val
             total = context.params.get("total")
             decimals = context.params.get("decimals")
             if total is not None and decimals is not None:
-                 _validate_supply(total, decimals)
+                _validate_supply(total, decimals)
         except click.ClickException as ex:
             raise ex
     return value
@@ -248,7 +248,7 @@ def mint(  # noqa: PLR0913
     mutable: bool,
     network: AlgorandNetwork,
     account: Account | None,
-    non_fungible: bool,   # noqa: ARG001
+    non_fungible: bool,  # noqa: ARG001
 ) -> None:
     if account is not None:
         creator_account = account
