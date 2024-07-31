@@ -248,6 +248,7 @@ def mint(  # noqa: PLR0913
     mutable: bool,
     network: AlgorandNetwork,
     account: Account | None,
+    non_fungible: bool,   # noqa: ARG001
 ) -> None:
     if account is not None:
         creator_account = account
