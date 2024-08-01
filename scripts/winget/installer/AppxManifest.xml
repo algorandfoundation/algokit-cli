@@ -14,7 +14,7 @@
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22000.0" />
   </Dependencies>
   <Applications>
-    <Application Id="algokit" Executable="algokit.exe" EntryPoint="Windows.FullTrustApplication" DisplayVersion="0.0.1">
+    <Application Id="algokit" Executable="algokit.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements BackgroundColor="transparent" DisplayName="Algorand AlgoKit CLI" Square150x150Logo="assets\Square150x150Logo.png" Square44x44Logo="assets\Square44x44Logo.png" Description="The Algorand AlgoKit CLI is the one-stop shop tool for developers building on the Algorand network.">
         <uap:DefaultTile ShortName="AlgoKit" Square71x71Logo="assets\Square70x70Logo.png" />
       </uap:VisualElements>
