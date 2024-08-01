@@ -12,7 +12,7 @@ on:
       release_version_tag:
         required: false
         type: string
-        default: "v2.2.0"
+        default: "v2.2.2"
 
 jobs:
   build-binaries:
@@ -28,7 +28,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.release_version_tag }}
+          # ref: ${{ inputs.release_version_tag }}
           fetch-depth: "1"
 
       - name: Set up Python
