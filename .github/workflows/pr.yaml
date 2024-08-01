@@ -1,9 +1,9 @@
 name: Codebase validation
 
 on:
-  pull_request:
-  schedule:
-    - cron: "0 8 * * 1" # Each monday 8 AM UTC
+  push:
+    branches:
+      - winget-patch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -24,6 +24,6 @@ jobs:
     needs: pr-check
     uses: ./.github/workflows/build-binaries.yaml
     with:
-      production_release: "false"
+      production_release: "true"
       python_version: "3.12"
     secrets: inherit

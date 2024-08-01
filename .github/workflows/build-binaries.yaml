@@ -9,6 +9,10 @@ on:
       python_version:
         required: true
         type: string
+      release_version_tag:
+        required: false
+        type: string
+        default: "v2.2.0"
 
 jobs:
   build-binaries:
@@ -18,13 +22,14 @@ jobs:
         # macos-14 is the Apple Silicon M1 runner (mac os 14)
         # macos-13 is the last available Intel Mac runner (mac os 13)
         # See https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-        os: [ubuntu-20.04, windows-latest, macos-13, macos-14]
+        os: [windows-latest]
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ inputs.production_release == 'true' && '0' || '1' }}
+          ref: ${{ inputs.release_version_tag }}
+          fetch-depth: "1"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,7 +47,7 @@ jobs:
         continue-on-error: true
         if: ${{ inputs.production_release == 'true' }}
         run: |
-          echo "RELEASE_VERSION_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
+          echo "RELEASE_VERSION_TAG=${{ inputs.release_version_tag }}" >> $GITHUB_ENV
 
       - name: Configure build environment
         shell: bash
@@ -114,12 +119,12 @@ jobs:
           $adjusted = '${{ env.ARTIFACTS_DIR }}' -replace '\\','/'
           echo "ARTIFACTS_DIR=$adjusted" >> $env:GITHUB_ENV
 
-      - name: Append artifacts to release
-        if: ${{ inputs.production_release == 'true' }}
-        uses: softprops/action-gh-release@v1
-        with:
-          fail_on_unmatched_files: true
-          files: |
-            ${{ env.ARTIFACTS_DIR }}/*.*
-          tag_name: ${{ env.RELEASE_VERSION_TAG }}
-          prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
+      # - name: Append artifacts to release
+      #   if: ${{ inputs.production_release == 'true' }}
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     fail_on_unmatched_files: true
+      #     files: |
+      #       ${{ env.ARTIFACTS_DIR }}/*.*
+      #     tag_name: ${{ env.RELEASE_VERSION_TAG }}
+      #     prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
