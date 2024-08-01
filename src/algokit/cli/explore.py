@@ -117,7 +117,7 @@ def explore_command(network: str) -> None:
     logger.info(f"Opening {network} explorer in your default browser")
     if _is_wsl():
         logger.warning(
-            "WSL detected. Make sure that wslu is installed in order for the cli to open browsers in host OS. "
+            "WSL is detected. Make sure that `wslu` is installed in order for the cli to open a browser url in the host OS. "
             "Installation instructions: https://wslutiliti.es/wslu/install.html"
         )
     click.launch(url)
