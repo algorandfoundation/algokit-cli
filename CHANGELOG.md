@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.2.3 (2024-08-02)
+
+### Fix
+
+* Add warning for cases when `algokit explore` is used within wsl ([#549](https://github.com/algorandfoundation/algokit-cli/issues/549)) ([`3e2d017`](https://github.com/algorandfoundation/algokit-cli/commit/3e2d0170bcc8870dda3d62141b93866fe8bcad1d))
+* Build binaries with the correct version information ([#550](https://github.com/algorandfoundation/algokit-cli/issues/550)) ([`0725d8f`](https://github.com/algorandfoundation/algokit-cli/commit/0725d8f16c5999f706de486852c96a2f0d16603e))
+
 ## v2.2.2 (2024-07-29)
 
 
