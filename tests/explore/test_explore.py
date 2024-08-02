@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
@@ -17,3 +19,15 @@ def test_explore(command: str, mocker: MockerFixture) -> None:
         get_combined_verify_output(result.output, "launch args", launch_mock.call_args),
         options=NamerFactory.with_parameters(command or "localnet"),
     )
+
+
+def test_explore_wsl_exception(mocker: MockerFixture, caplog: pytest.LogCaptureFixture) -> None:
+    command = "localnet"
+    mocker.patch("algokit.cli.explore.is_wsl", return_value=True)
+    mocker.patch("webbrowser.open", side_effect=Exception("Test Exception"))
+
+    with caplog.at_level(logging.WARNING):
+        result = invoke(f"explore {command}")
+
+    assert result.exit_code == 0
+    assert any("Unable to open browser from WSL" in message for message in caplog.messages)

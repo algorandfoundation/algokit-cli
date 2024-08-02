@@ -1,30 +1,14 @@
-import functools
 import logging
 import os
-import platform
 from typing import TypedDict
 from urllib.parse import urlencode
 
 import click
 
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+from algokit.core.utils import is_wsl
 
 logger = logging.getLogger(__name__)
-
-
-@functools.cache
-def _is_wsl(v: str = platform.uname().release) -> int:
-    """
-    detects if Python is running in WSL
-    https://github.com/scivision/detect-windows-subsystem-for-linux
-    """
-
-    if v.endswith("-Microsoft"):
-        return 1
-    elif v.endswith("microsoft-standard-WSL2"):
-        return 2
-
-    return 0
 
 
 class NetworkConfigurationRequired(TypedDict):
@@ -115,9 +99,19 @@ def get_explore_url(network: str) -> str:
 def explore_command(network: str) -> None:
     url = get_explore_url(network)
     logger.info(f"Opening {network} explorer in your default browser")
-    if _is_wsl():
-        logger.warning(
-            "WSL is detected. Make sure `wslu` is installed for the CLI to open browsers in host OS. "
-            "Installation instructions: https://wslutiliti.es/wslu/install.html"
+
+    if is_wsl():
+        import webbrowser
+
+        warning = (
+            "Unable to open browser from WSL environment.\n"
+            "Ensure 'wslu' is installed: (https://wslutiliti.es/wslu/install.html),\n"
+            f"or open the URL manually: '{url}'."
         )
-    click.launch(url)
+        try:
+            if not webbrowser.open(url):
+                logger.warning(warning)
+        except Exception as e:
+            logger.warning(warning, exc_info=e)
+    else:
+        click.launch(url)
