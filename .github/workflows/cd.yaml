@@ -139,9 +139,12 @@ jobs:
 
   cd-publish-release-packages:
     name: Release binaries via distribution channels
-    needs: build-and-upload-binaries
+    needs:
+      - release
+      - build-and-upload-binaries
     if: ${{ github.ref_name == 'main' && inputs.production_release == 'true' }} # Might want to adjust this to publish (pre-release) on merge as well.
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
       artifactName: algokit-cli
+      release_version: ${{ needs.release.outputs.release_version }}
     secrets: inherit
