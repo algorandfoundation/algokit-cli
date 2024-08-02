@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 import click
 
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+from algokit.core.utils import is_wsl
 
 logger = logging.getLogger(__name__)
 
@@ -98,4 +99,19 @@ def get_explore_url(network: str) -> str:
 def explore_command(network: str) -> None:
     url = get_explore_url(network)
     logger.info(f"Opening {network} explorer in your default browser")
-    click.launch(url)
+
+    if is_wsl():
+        import webbrowser
+
+        warning = (
+            "Unable to open browser from WSL environment.\n"
+            "Ensure 'wslu' is installed: (https://wslutiliti.es/wslu/install.html),\n"
+            f"or open the URL manually: '{url}'."
+        )
+        try:
+            if not webbrowser.open(url):
+                logger.warning(warning)
+        except Exception as e:
+            logger.warning(warning, exc_info=e)
+    else:
+        click.launch(url)
