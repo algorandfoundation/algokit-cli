@@ -138,7 +138,7 @@ jobs:
       - name: Publish to winget
         shell: pwsh
         env:
-          WINGET_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
         run: |
           echo 'Publishing to winget'
           & .\scripts\winget\update-package.ps1 `
