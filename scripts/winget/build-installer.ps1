@@ -38,7 +38,7 @@ $version = if ($releaseVersion) {
 else {
   '0.0.1'
 } 
-(Get-Content (Resolve-Path "$installerContentDir\AppxManifest.xml")).Replace('0.0.1.0', $("$version.0")) | Set-Content (Join-Path $buildDir AppxManifest.xml)
+(Get-Content (Resolve-Path "$installerContentDir\AppxManifest.xml")).Replace('"0.0.1.0"', "`"$version.0`"") | Set-Content (Join-Path $buildDir AppxManifest.xml)
 
 # Generate pri resource map for installer assets
 $priConfig = (Resolve-Path "$installerContentDir\priconfig.xml")
