@@ -87,6 +87,11 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
     """
 
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
+        token_metadata_path = context.params.get("token_metadata_path")
+        if token_metadata_path is not None:
+            token_metadata = TokenMetadata.from_json_file(token_metadata_path, None, None)
+            if token_metadata.name != value:
+                raise click.BadParameter("Token name in metadata JSON must match CLI argument providing token name!")
         return value
     else:
         raise click.BadParameter(
@@ -94,13 +99,12 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
         )
 
 
-def _get_creator_account(context: click.Context, param: click.Parameter, value: str) -> str:  # noqa: ARG001
+def _get_creator_account(context: click.Context, _: click.Parameter, value: str) -> str:
     """
     Validate the creator account by checking if it is a valid Algorand address.
 
     Args:
         context (click.Context): The click context.
-        param (click.Parameter): The click parameter.
         value (str): The value of the parameter.
 
     Returns:
@@ -116,13 +120,12 @@ def _get_creator_account(context: click.Context, param: click.Parameter, value: 
     return value
 
 
-def _validate_supply_for_nft(context: click.Context, param: click.Parameter, value: bool) -> bool:  # noqa: ARG001 FBT001
+def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: bool) -> bool:  # noqa: FBT001
     """
     Validate the total supply and decimal places for NFTs.
 
     Args:
         context (click.Context): The click context.
-        param (click.Parameter): The click parameter.
         value (bool): The value of the parameter.
 
     Returns:
@@ -137,6 +140,25 @@ def _validate_supply_for_nft(context: click.Context, param: click.Parameter, val
                 _validate_supply(total, decimals)
         except click.ClickException as ex:
             raise ex
+    return value
+
+
+def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -> int:
+    """
+    Validate the number of decimal places for the token.
+
+    Args:
+        context (click.Context): The click context.
+        value (int): The value of the parameter.
+
+    Returns:
+        int: The value of the parameter if it passes the validation.
+    """
+    token_metadata_path = context.params.get("token_metadata_path")
+    if token_metadata_path is not None:
+        token_metadata = TokenMetadata.from_json_file(token_metadata_path, None, None)
+        if token_metadata.decimals != value:
+            raise click.BadParameter("Token metadata JSON and CLI arguments providing decimals amount must be equal!")
     return value
 
 
@@ -186,6 +208,7 @@ def _validate_supply_for_nft(context: click.Context, param: click.Parameter, val
     "--decimals",
     type=click.INT,
     required=False,
+    callback=_validate_decimals,
     default=0,
     prompt="Provide the number of decimals",
     help="Number of decimals. Defaults to 0.",
@@ -247,12 +270,9 @@ def mint(  # noqa: PLR0913
     token_metadata_path: Path | None,
     mutable: bool,
     network: AlgorandNetwork,
-    account: Account | None,
+    account: Account,
     non_fungible: bool,  # noqa: ARG001
 ) -> None:
-    if account is not None:
-        creator_account = account
-
     pinata_jwt = get_pinata_jwt()
     if not pinata_jwt:
         raise click.ClickException("You are not logged in! Please login using `algokit task ipfs login`.")
@@ -260,27 +280,22 @@ def mint(  # noqa: PLR0913
     client = load_algod_client(network)
     validate_balance(
         client,
-        creator_account,
+        account,
         0,
         algos_to_microalgos(ASSET_MINTING_MBR),  # type: ignore[no-untyped-call]
     )
 
-    token_metadata = TokenMetadata.from_json_file(token_metadata_path)
-    if not token_metadata_path:
-        token_metadata.name = asset_name
-        token_metadata.decimals = decimals
+    token_metadata = TokenMetadata.from_json_file(token_metadata_path, asset_name, decimals)
     try:
         asset_id, txn_id = mint_token(
             client=client,
             jwt=pinata_jwt,
-            creator_account=creator_account,
-            asset_name=asset_name,
+            creator_account=account,
             unit_name=unit_name,
             total=total,
             token_metadata=token_metadata,
             image_path=image_path,
             mutable=mutable,
-            decimals=decimals,
         )
 
         click.echo("\nSuccessfully minted the asset!")

@@ -1,7 +1,10 @@
 import json
 import re
+from pathlib import Path
 
+import click
 import pytest
+from algokit.cli.tasks.mint import _validate_asset_name, _validate_decimals
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
@@ -166,18 +169,10 @@ def test_mint_token_no_pinata_jwt_error(
     verify(result.output)
 
 
-def test_mint_token_acfg_token_metadata_mismatch(
-    mocker: MockerFixture,
+def test_mint_token_acfg_token_metadata_mismatch_on_name(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
-    # Arrange
-    is_mutable = True
     cwd = tmp_path_factory.mktemp("cwd")
-    account = ""
-    prompt_input = None
-    account = DUMMY_ACCOUNT.address
-    prompt_input = from_private_key(DUMMY_ACCOUNT.private_key)  # type: ignore[no-untyped-call]
-    (cwd / "image.png").touch()
     (cwd / "metadata.json").write_text(
         """
         {
@@ -194,25 +189,43 @@ def test_mint_token_acfg_token_metadata_mismatch(
         }
         """
     )
+    context = click.Context(click.Command("test"))
+    context.params["token_metadata_path"] = Path(cwd / "metadata.json")
+    param = click.Option(["--name"])
+    value = "test"
 
-    mocker.patch(
-        "algokit.cli.tasks.mint.get_pinata_jwt",
-        return_value="dummy_key",
-    )
-    mocker.patch(
-        "algokit.cli.tasks.mint.validate_balance",
-    )
-    algod_mock = mocker.MagicMock()
-    mocker.patch("algokit.cli.tasks.mint.load_algod_client", return_value=algod_mock)
+    with pytest.raises(
+        click.BadParameter, match="Token name in metadata JSON must match CLI argument providing token name!"
+    ):
+        _validate_asset_name(context, param, value)
 
-    # Act
-    result = invoke(
-        f"""task mint --creator {account} --name test --unit tst --total 1 --decimals 0
-        --image image.png --metadata metadata.json -n localnet --{'mutable' if is_mutable else "immutable"} --nft""",
-        input=prompt_input,
-        cwd=cwd,
-    )
 
-    # Assert
-    assert result.exit_code == 1
-    verify(result.output)
+def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
+    tmp_path_factory: pytest.TempPathFactory,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "metadata.json").write_text(
+        """
+        {
+        "name": "test2",
+        "decimals": 2,
+        "description": "Stars",
+        "properties": {
+            "author": "Al",
+            "traits": {
+            "position": "center",
+            "colors": 4
+            }
+        }
+        }
+        """
+    )
+    context = click.Context(click.Command("test"))
+    context.params["token_metadata_path"] = Path(cwd / "metadata.json")
+    param = click.Option(["--decimals"])
+    value = 0
+
+    with pytest.raises(
+        click.BadParameter, match="Token metadata JSON and CLI arguments providing decimals amount must be equal!"
+    ):
+        _validate_decimals(context, param, value)

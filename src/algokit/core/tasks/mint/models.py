@@ -28,7 +28,7 @@ class Localization:
 
 @dataclass
 class TokenMetadata:
-    name: str | None = None
+    name: str
     description: str | None = None
     properties: Properties | None = None
     decimals: int | None = None
@@ -74,13 +74,20 @@ class TokenMetadata:
             raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
     @classmethod
-    def from_json_file(cls: type["TokenMetadata"], file_path: Path | None) -> "TokenMetadata":
+    def from_json_file(cls, file_path: Path | None, name: str | None, decimals: int | None) -> "TokenMetadata":
         if not file_path:
-            return cls()
+            if name is not None:
+                return cls(name=name, decimals=decimals)
+            else:
+                raise ValueError("file_path or name must be provided")
 
         try:
             with file_path.open() as file:
                 data = json.load(file)
+                if name is not None:
+                    data["name"] = name
+                if decimals is not None:
+                    data["decimals"] = decimals
             return cls(**data)
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
