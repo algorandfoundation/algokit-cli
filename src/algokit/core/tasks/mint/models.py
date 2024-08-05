@@ -74,20 +74,15 @@ class TokenMetadata:
             raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
     @classmethod
-    def from_json_file(cls, file_path: Path | None, name: str | None, decimals: int | None) -> "TokenMetadata":
+    def from_json_file(cls, file_path: Path | None, name: str, decimals: int | None = 0) -> "TokenMetadata":
         if not file_path:
-            if name is not None:
-                return cls(name=name, decimals=decimals)
-            else:
-                raise ValueError("file_path or name must be provided")
+            return cls(name=name, decimals=decimals)
 
         try:
             with file_path.open() as file:
                 data = json.load(file)
-                if name is not None:
-                    data["name"] = name
-                if decimals is not None:
-                    data["decimals"] = decimals
+                data["name"] = name
+                data["decimals"] = decimals
             return cls(**data)
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err

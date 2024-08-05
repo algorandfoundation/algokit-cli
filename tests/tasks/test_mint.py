@@ -226,6 +226,6 @@ def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
     value = 0
 
     with pytest.raises(
-        click.BadParameter, match="Token metadata JSON and CLI arguments providing decimals amount must be equal!"
+        click.BadParameter, match="The value for decimals in the metadata JSON must match the decimals argument"
     ):
         _validate_decimals(context, param, value)

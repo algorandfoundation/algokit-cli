@@ -1,3 +1,4 @@
+import json
 import logging
 import math
 from pathlib import Path
@@ -89,9 +90,13 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
         token_metadata_path = context.params.get("token_metadata_path")
         if token_metadata_path is not None:
-            token_metadata = TokenMetadata.from_json_file(token_metadata_path, None, None)
-            if token_metadata.name != value:
-                raise click.BadParameter("Token name in metadata JSON must match CLI argument providing token name!")
+            with Path(token_metadata_path).open("r") as metadata_file:
+                data = json.load(metadata_file)
+                token_name = data.get("name")
+                if token_name is not None and token_name != value:
+                    raise click.BadParameter(
+                        "Token name in metadata JSON must match CLI argument providing token name!"
+                    )
         return value
     else:
         raise click.BadParameter(
@@ -156,9 +161,13 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     """
     token_metadata_path = context.params.get("token_metadata_path")
     if token_metadata_path is not None:
-        token_metadata = TokenMetadata.from_json_file(token_metadata_path, None, None)
-        if token_metadata.decimals != value:
-            raise click.BadParameter("Token metadata JSON and CLI arguments providing decimals amount must be equal!")
+        with Path(token_metadata_path).open("r") as metadata_file:
+            data = json.load(metadata_file)
+            token_decimals = data.get("decimals")
+            if token_decimals is not None and token_decimals != value:
+                raise click.BadParameter(
+                    "The value for decimals in the metadata JSON must match the decimals argument."
+                )
     return value
 
 
