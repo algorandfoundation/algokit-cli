@@ -17,19 +17,19 @@ shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
-keyring = "25.2.1"
+keyring = "25.3.0"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
 algokit-utils = "^2.3.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
-aiohttp = "3.9.5"
+aiohttp = "3.10.1"
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.9.0"}
 pytest = "^7.2.0"
-ruff = ">=0.1.6,<0.5.0"
+ruff = ">=0.1.6,<0.6.0"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -41,7 +41,7 @@ pre-commit = "^2.20.0"
 sphinx = "^6.0.0"
 sphinx-click = "^4.4.0"
 sphinxnotes-markdown-builder = "^0.5.6"
-poethepoet = ">=0.17.1,<0.27.0"
+poethepoet = ">=0.17.1,<0.28.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
 
