@@ -13,6 +13,7 @@ from algokit.cli.common.utils import get_explorer_url
 from algokit.cli.tasks.utils import (
     get_account_with_private_key,
     load_algod_client,
+    run_callback_once,
     validate_balance,
 )
 from algokit.core.tasks.ipfs import (
@@ -86,7 +87,6 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
     Returns:
         str: The value of the parameter if it passes the validation.
     """
-
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
         token_metadata_path = context.params.get("token_metadata_path")
         if token_metadata_path is not None:
@@ -97,6 +97,7 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
                     raise click.BadParameter(
                         "Token name in metadata JSON must match CLI argument providing token name!"
                     )
+        # todo: prompt if metadata is not provided
         return value
     else:
         raise click.BadParameter(
@@ -104,7 +105,7 @@ def _validate_asset_name(context: click.Context, param: click.Parameter, value: 
         )
 
 
-def _get_creator_account(context: click.Context, _: click.Parameter, value: str) -> str:
+def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> Account:
     """
     Validate the creator account by checking if it is a valid Algorand address.
 
@@ -115,14 +116,11 @@ def _get_creator_account(context: click.Context, _: click.Parameter, value: str)
     Returns:
         Account: An account object with the address and private key.
     """
-
-    if "account" not in context.params:
-        try:
-            account = get_account_with_private_key(value)
-            context.params["account"] = account
-        except Exception as ex:
-            raise click.BadParameter(str(ex)) from ex
-    return value
+    try:
+        
+        return get_account_with_private_key(value)
+    except Exception as ex:
+        raise click.BadParameter(str(ex)) from ex
 
 
 def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: bool) -> bool:  # noqa: FBT001
@@ -136,7 +134,6 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     Returns:
         bool: The value of the parameter if it passes the validation.
     """
-
     if value:
         try:
             total = context.params.get("total")
@@ -181,16 +178,15 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     prompt="Provide the address or alias of the asset creator",
     help="Address or alias of the asset creator.",
     type=click.STRING,
-    callback=_get_creator_account,
+    callback=run_callback_once(callback=_get_creator_account),
 )
 @click.option(
-    "-n",
     "--name",
     "asset_name",
     type=click.STRING,
-    required=True,
-    callback=_validate_asset_name,
+    required=False,
     prompt="Provide the asset name",
+    callback=run_callback_once(callback=_validate_asset_name),
     help="Asset name.",
 )
 @click.option(
@@ -199,7 +195,7 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     "unit_name",
     type=click.STRING,
     required=True,
-    callback=_validate_unit_name,
+    callback=run_callback_once(_validate_unit_name),
     prompt="Provide the unit name",
     help="Unit name of the asset.",
 )
@@ -228,7 +224,7 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     type=click.BOOL,
     prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
     default=False,
-    callback=_validate_supply_for_nft,
+    callback=run_callback_once(_validate_supply_for_nft),
     help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
     definitions of pure or fractional NFTs as per ARC3 standard.""",
 )
@@ -270,7 +266,7 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
 )
 def mint(  # noqa: PLR0913
     *,
-    creator: str,  # noqa: ARG001
+    creator: Account,
     asset_name: str,
     unit_name: str,
     total: int,
@@ -279,7 +275,6 @@ def mint(  # noqa: PLR0913
     token_metadata_path: Path | None,
     mutable: bool,
     network: AlgorandNetwork,
-    account: Account,
     non_fungible: bool,  # noqa: ARG001
 ) -> None:
     pinata_jwt = get_pinata_jwt()
@@ -289,7 +284,7 @@ def mint(  # noqa: PLR0913
     client = load_algod_client(network)
     validate_balance(
         client,
-        account,
+        creator,
         0,
         algos_to_microalgos(ASSET_MINTING_MBR),  # type: ignore[no-untyped-call]
     )
@@ -299,7 +294,7 @@ def mint(  # noqa: PLR0913
         asset_id, txn_id = mint_token(
             client=client,
             jwt=pinata_jwt,
-            creator_account=account,
+            creator_account=creator,
             unit_name=unit_name,
             total=total,
             token_metadata=token_metadata,
