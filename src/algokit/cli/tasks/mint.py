@@ -117,7 +117,6 @@ def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> A
         Account: An account object with the address and private key.
     """
     try:
-        
         return get_account_with_private_key(value)
     except Exception as ex:
         raise click.BadParameter(str(ex)) from ex
