@@ -160,7 +160,7 @@
     - [mint](#mint)
     - [Options](#options-25)
     - [--creator ](#--creator-)
-    - [-n, --name ](#-n---name--3)
+    - [--name ](#--name-)
     - [-u, --unit ](#-u---unit-)
     - [-t, --total ](#-t---total-)
     - [-d, --decimals ](#-d---decimals-)
@@ -1111,8 +1111,8 @@ algokit task mint [OPTIONS]
 **Required** Address or alias of the asset creator.
 
 
-### -n, --name <asset_name>
-**Required** Asset name.
+### --name <asset_name>
+Asset name.
 
 
 ### -u, --unit <unit_name>
