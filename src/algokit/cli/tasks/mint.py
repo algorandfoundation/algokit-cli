@@ -229,7 +229,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     required=False,
     callback=_get_and_validate_decimals,
     help="Number of decimals. Defaults to 0.",
-    is_eager=True, # This option needs to be evaluated before nft option. 
+    is_eager=True,  # This option needs to be evaluated before nft option.
 )
 @click.option(
     "--nft/--ft",
