@@ -146,13 +146,11 @@ def mint_token(  # noqa: PLR0913
     client: algod.AlgodClient,
     jwt: str,
     creator_account: Account,
-    asset_name: str,
     unit_name: str,
     total: int,
     token_metadata: TokenMetadata,
     mutable: bool,
     image_path: pathlib.Path | None = None,
-    decimals: int | None = 0,
 ) -> tuple[int, str]:
     """
     Mint new token on the Algorand blockchain.
@@ -180,12 +178,6 @@ def mint_token(  # noqa: PLR0913
         ValueError: If the decimals in the metadata JSON does not match the provided decimals amount.
     """
 
-    if not token_metadata.name or token_metadata.name != asset_name:
-        raise ValueError("Token name in metadata JSON must match CLI argument providing token name!")
-
-    if token_metadata.decimals and token_metadata.decimals != decimals:
-        raise ValueError("Token metadata JSON and CLI arguments providing decimals amount must be equal!")
-
     if image_path:
         token_metadata.image_integrity = _file_integrity(image_path)
         token_metadata.image_mimetype = _file_mimetype(image_path)
@@ -205,11 +197,11 @@ def mint_token(  # noqa: PLR0913
         sp=client.suggested_params(),
         reserve=_reserve_address_from_cid(metadata_cid) if mutable else "",
         unit_name=unit_name,
-        asset_name=asset_name,
+        asset_name=token_metadata.name,
         url=_create_url_from_cid(metadata_cid) + "#arc3" if mutable else "ipfs://" + metadata_cid + "#arc3",
         manager=creator_account.address if mutable else "",
         total=total,
-        decimals=decimals,
+        decimals=token_metadata.decimals,
     )
 
     logger.debug(f"Asset config params: {asset_config_params.to_json()}")
