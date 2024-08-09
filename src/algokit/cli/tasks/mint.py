@@ -98,11 +98,14 @@ def _get_and_validate_asset_name(context: click.Context, param: click.Parameter,
 
     if value is None:
         if token_name is None:
-            value = click.prompt("Provide the asset name")
+            value = click.prompt("Provide the asset name", type=str)
         else:
             value = token_name
     elif token_name is not None and token_name != value:
         raise click.BadParameter("Token name in metadata JSON must match CLI argument providing token name!")
+
+    if value is None:
+        raise click.BadParameter("Asset name cannot be None")
 
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
         return value
@@ -150,9 +153,7 @@ def _get_and_validate_decimals(context: click.Context, _: click.Parameter, value
 
     if value is None:
         if token_decimals is None:
-            decimals: int = click.prompt(
-                "Provide the asset decimals", type=int, default=0
-            )  # callabck=_get_and_validate_decimals
+            decimals: int = click.prompt("Provide the asset decimals", type=int, default=0)
             return decimals
         return int(token_decimals)
     else:
@@ -194,6 +195,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     help="Address or alias of the asset creator.",
     type=click.STRING,
     callback=run_callback_once(callback=_get_creator_account),
+    is_eager=True,
 )
 @click.option(
     "--name",
@@ -202,6 +204,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     required=False,
     callback=_get_and_validate_asset_name,
     help="Asset name.",
+    is_eager=True,
 )
 @click.option(
     "-u",
@@ -212,6 +215,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     callback=run_callback_once(_validate_unit_name),
     prompt="Provide the unit name",
     help="Unit name of the asset.",
+    is_eager=True,
 )
 @click.option(
     "-t",
@@ -221,6 +225,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     default=1,
     prompt="Provide the total supply",
     help="Total supply of the asset. Defaults to 1.",
+    is_eager=True,
 )
 @click.option(
     "-d",
