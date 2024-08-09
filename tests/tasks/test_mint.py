@@ -83,6 +83,65 @@ def test_mint_token_successful(
     verify(result.output, options=NamerFactory.with_parameters(account_type, is_mutable, network))
 
 
+@pytest.mark.parametrize("decimals", ["decimals_given_params", "no_decimals_given"])
+def test_mint_token_successful_on_decimals(
+    *,
+    mocker: MockerFixture,
+    tmp_path_factory: pytest.TempPathFactory,
+    mock_keyring: dict[str, str | int],
+    decimals: str,
+) -> None:
+    # Arrange
+    cwd = tmp_path_factory.mktemp("cwd")
+    if decimals == "no_decimals_given":
+        include_decimals_argument = False
+        prompt_input = "2"
+    elif decimals == "decimals_given_params":
+        include_decimals_argument = True
+        prompt_input = None
+
+    account = "my_alias"
+    mock_keyring[account] = json.dumps(
+        {"alias": account, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+    )
+    mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([account])
+
+    (cwd / "image.png").touch()
+
+    mocker.patch(
+        "algokit.core.tasks.mint.mint.upload_to_pinata",
+        side_effect=[
+            "bafkreifax6dswcxk4us2am3jxhd3swxew32oreaxzol7dnnqzhieepqg2y",
+            "bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe",
+        ],
+    )
+    mocker.patch("algokit.core.tasks.mint.mint.wait_for_confirmation", return_value={"asset-index": 123})
+    mocker.patch(
+        "algokit.cli.tasks.mint.get_pinata_jwt",
+        return_value="dummy_key",
+    )
+    mocker.patch(
+        "algokit.cli.tasks.mint.validate_balance",
+    )
+    algod_mock = mocker.MagicMock()
+    algod_mock.send_transaction.return_value = "dummy_tx_id"
+    algod_mock.suggested_params.return_value = DUMMY_SUGGESTED_PARAMS
+    mocker.patch("algokit.cli.tasks.mint.load_algod_client", return_value=algod_mock)
+
+    # Act
+    result = invoke(
+        f"""task mint --creator {account} --name test --unit tst --total 100
+        {'--decimals 2 ' if include_decimals_argument else ''}
+        --image image.png -n localnet --mutable --nft""",
+        input=prompt_input,
+        cwd=cwd,
+    )
+
+    # Assert
+    assert result.exit_code == 0
+    verify(result.output, options=NamerFactory.with_parameters(decimals))
+
+
 def test_mint_token_pure_fractional_nft_ft_validation(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> None:
@@ -189,15 +248,15 @@ def test_mint_token_acfg_token_metadata_mismatch_on_name(
         }
         """
     )
-    context = click.Context(click.Command("test"))
+    context = click.Context(click.Command("mint"))
     context.params["token_metadata_path"] = Path(cwd / "metadata.json")
     param = click.Option(["--name"])
-    value = "test"
+    name = "test"
 
     with pytest.raises(
         click.BadParameter, match="Token name in metadata JSON must match CLI argument providing token name!"
     ):
-        _get_and_validate_asset_name(context, param, value)
+        _get_and_validate_asset_name(context, param, name)
 
 
 def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
@@ -220,12 +279,12 @@ def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
         }
         """
     )
-    context = click.Context(click.Command("test"))
+    context = click.Context(click.Command("mint"))
     context.params["token_metadata_path"] = Path(cwd / "metadata.json")
     param = click.Option(["--decimals"])
-    value = 0
+    decimals = 0
 
     with pytest.raises(
         click.BadParameter, match="The value for decimals in the metadata JSON must match the decimals argument"
     ):
-        _get_and_validate_decimals(context, param, value)
+        _get_and_validate_decimals(context, param, decimals)
