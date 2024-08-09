@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 import pytest
-from algokit.cli.tasks.mint import _validate_asset_name, _validate_decimals
+from algokit.cli.tasks.mint import _get_and_validate_asset_name, _get_and_validate_decimals
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
@@ -197,7 +197,7 @@ def test_mint_token_acfg_token_metadata_mismatch_on_name(
     with pytest.raises(
         click.BadParameter, match="Token name in metadata JSON must match CLI argument providing token name!"
     ):
-        _validate_asset_name(context, param, value)
+        _get_and_validate_asset_name(context, param, value)
 
 
 def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
@@ -228,4 +228,4 @@ def test_mint_token_acfg_token_metadata_mismatch_on_decimals(
     with pytest.raises(
         click.BadParameter, match="The value for decimals in the metadata JSON must match the decimals argument"
     ):
-        _validate_decimals(context, param, value)
+        _get_and_validate_decimals(context, param, value)

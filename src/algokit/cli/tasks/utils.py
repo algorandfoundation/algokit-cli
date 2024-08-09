@@ -303,6 +303,14 @@ def get_account_info(algod_client: algosdk.v2client.algod.AlgodClient, account_a
 
 
 def run_callback_once(callback: Callable) -> Callable:
+    """
+    Click option callbacks run twice, first to validate the prompt input,
+    and then independently from that is used to validate the value passed to the option.
+
+    In cases where the callback is expensive or has side effects(like prompting the user),
+    it's better to run it only once.
+    """
+
     @wraps(callback)
     def wrapper(context: click.Context, param: click.Parameter, value: Any) -> Any:  # noqa: ANN401
         if context.obj is None:

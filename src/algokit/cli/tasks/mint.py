@@ -75,29 +75,36 @@ def _validate_unit_name(context: click.Context, param: click.Parameter, value: s
         )
 
 
-def _validate_asset_name(context: click.Context, param: click.Parameter, value: str) -> str:
+def _get_and_validate_asset_name(context: click.Context, param: click.Parameter, value: str | None) -> str:
     """
     Validate the asset name by checking if its byte length is less than or equal to a predefined maximum value.
+    If the asset name is not provided, it prompts the user for the name or retrieves it from a metadata file.
 
     Args:
         context (click.Context): The click context.
         param (click.Parameter): The click parameter.
-        value (str): The value of the parameter.
+        value (str|None): The value of the parameter.
 
     Returns:
         str: The value of the parameter if it passes the validation.
     """
+    token_metadata_path = context.params.get("token_metadata_path")
+    token_name = None
+
+    if token_metadata_path is not None:
+        with Path(token_metadata_path).open("r") as metadata_file:
+            data = json.load(metadata_file)
+            token_name = data.get("name")
+
+    if value is None:
+        if token_name is None:
+            value = click.prompt("Provide the asset name")
+        else:
+            value = token_name
+    elif token_name is not None and token_name != value:
+        raise click.BadParameter("Token name in metadata JSON must match CLI argument providing token name!")
+
     if len(value.encode("utf-8")) <= MAX_ASSET_NAME_BYTE_LENGTH:
-        token_metadata_path = context.params.get("token_metadata_path")
-        if token_metadata_path is not None:
-            with Path(token_metadata_path).open("r") as metadata_file:
-                data = json.load(metadata_file)
-                token_name = data.get("name")
-                if token_name is not None and token_name != value:
-                    raise click.BadParameter(
-                        "Token name in metadata JSON must match CLI argument providing token name!"
-                    )
-        # todo: prompt if metadata is not provided
         return value
     else:
         raise click.BadParameter(
@@ -122,6 +129,38 @@ def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> A
         raise click.BadParameter(str(ex)) from ex
 
 
+def _get_and_validate_decimals(context: click.Context, _: click.Parameter, value: int | None) -> int:
+    """
+    Validate the number of decimal places for the token.
+    If decimals is not provieded, it prompts the user for the decimals or retrieves it from a metadata file.
+
+    Args:
+        context (click.Context): The click context.
+        value (int|None): The value of the parameter.
+
+    Returns:
+        int: The value of the parameter if it passes the validation.
+    """
+    token_metadata_path = context.params.get("token_metadata_path")
+    token_decimals = None
+    if token_metadata_path is not None:
+        with Path(token_metadata_path).open("r") as metadata_file:
+            data = json.load(metadata_file)
+            token_decimals = data.get("decimals")
+
+    if value is None:
+        if token_decimals is None:
+            decimals: int = click.prompt(
+                "Provide the asset decimals", type=int, default=0
+            )  # callabck=_get_and_validate_decimals
+            return decimals
+        return int(token_decimals)
+    else:
+        if token_decimals is not None and token_decimals != value:
+            raise click.BadParameter("The value for decimals in the metadata JSON must match the decimals argument.")
+        return value
+
+
 def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: bool) -> bool:  # noqa: FBT001
     """
     Validate the total supply and decimal places for NFTs.
@@ -144,29 +183,6 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     return value
 
 
-def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -> int:
-    """
-    Validate the number of decimal places for the token.
-
-    Args:
-        context (click.Context): The click context.
-        value (int): The value of the parameter.
-
-    Returns:
-        int: The value of the parameter if it passes the validation.
-    """
-    token_metadata_path = context.params.get("token_metadata_path")
-    if token_metadata_path is not None:
-        with Path(token_metadata_path).open("r") as metadata_file:
-            data = json.load(metadata_file)
-            token_decimals = data.get("decimals")
-            if token_decimals is not None and token_decimals != value:
-                raise click.BadParameter(
-                    "The value for decimals in the metadata JSON must match the decimals argument."
-                )
-    return value
-
-
 @click.command(
     name="mint",
     help="Mint new fungible or non-fungible assets on Algorand.",
@@ -184,8 +200,7 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     "asset_name",
     type=click.STRING,
     required=False,
-    prompt="Provide the asset name",
-    callback=run_callback_once(callback=_validate_asset_name),
+    callback=_get_and_validate_asset_name,
     help="Asset name.",
 )
 @click.option(
@@ -212,10 +227,9 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     "--decimals",
     type=click.INT,
     required=False,
-    callback=_validate_decimals,
-    default=0,
-    prompt="Provide the number of decimals",
+    callback=_get_and_validate_decimals,
     help="Number of decimals. Defaults to 0.",
+    is_eager=True, # This option needs to be evaluated before nft option. 
 )
 @click.option(
     "--nft/--ft",
@@ -223,7 +237,7 @@ def _validate_decimals(context: click.Context, _: click.Parameter, value: int) -
     type=click.BOOL,
     prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
     default=False,
-    callback=run_callback_once(_validate_supply_for_nft),
+    callback=_validate_supply_for_nft,
     help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
     definitions of pure or fractional NFTs as per ARC3 standard.""",
 )
