@@ -78,7 +78,7 @@ def _validate_unit_name(context: click.Context, param: click.Parameter, value: s
 def _get_and_validate_asset_name(context: click.Context, param: click.Parameter, value: str | None) -> str:
     """
     Validate the asset name by checking if its byte length is less than or equal to a predefined maximum value.
-    If the asset name is not provided, it prompts the user for the name or retrieves it from a metadata file.
+    If asset name has not been supplied in the metadata file or via an argument a prompt is displayed.
 
     Args:
         context (click.Context): The click context.
@@ -135,7 +135,7 @@ def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> A
 def _get_and_validate_decimals(context: click.Context, _: click.Parameter, value: int | None) -> int:
     """
     Validate the number of decimal places for the token.
-    If decimals is not provieded, it prompts the user for the decimals or retrieves it from a metadata file.
+    If decimals has not been supplied in the metadata file or via an argument a prompt is displayed.
 
     Args:
         context (click.Context): The click context.
@@ -194,7 +194,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     prompt="Provide the address or alias of the asset creator",
     help="Address or alias of the asset creator.",
     type=click.STRING,
-    callback=run_callback_once(callback=_get_creator_account),
+    callback=run_callback_once(_get_creator_account),
     is_eager=True,
 )
 @click.option(

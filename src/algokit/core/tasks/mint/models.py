@@ -29,9 +29,9 @@ class Localization:
 @dataclass
 class TokenMetadata:
     name: str
+    decimals: int
     description: str | None = None
     properties: Properties | None = None
-    decimals: int | None = None
     image: str | None = None
     image_integrity: str | None = None
     image_mimetype: str | None = None
@@ -74,7 +74,7 @@ class TokenMetadata:
             raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
     @classmethod
-    def from_json_file(cls, file_path: Path | None, name: str, decimals: int | None = 0) -> "TokenMetadata":
+    def from_json_file(cls, file_path: Path | None, name: str, decimals: int = 0) -> "TokenMetadata":
         if not file_path:
             return cls(name=name, decimals=decimals)
 
@@ -103,7 +103,7 @@ class AssetConfigTxnParams:
     freeze: str | None = ""
     clawback: str | None = ""
     note: str | None = ""
-    decimals: int | None = 0
+    decimals: int = 0
     default_frozen: bool = False
     lease: str | None = ""
     rekey_to: str | None = ""
