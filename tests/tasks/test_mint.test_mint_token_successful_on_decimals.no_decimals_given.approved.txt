@@ -1,0 +1,26 @@
+Provide the asset decimals [0]: 2
+Uploading image to pinata...
+Image uploaded to pinata: ipfs://bafkreifax6dswcxk4us2am3jxhd3swxew32oreaxzol7dnnqzhieepqg2y
+Uploading metadata to pinata...
+Metadata uploaded to pinata: bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe
+DEBUG: Asset config params: {
+    "sender": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
+    "unit_name": "tst",
+    "asset_name": "test",
+    "url": "template-ipfs://{ipfscid:1:raw:reserve:sha2-256}#arc3",
+    "manager": "MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
+    "reserve": "WNQLRZXLXINUJI6X5EOBU5K5FJ6VOERJ4SVGZTMZGLHA25KSLVY55WGVYQ",
+    "total": 100,
+    "freeze": "",
+    "clawback": "",
+    "note": "",
+    "decimals": 2,
+    "default_frozen": false,
+    "lease": "",
+    "rekey_to": "",
+    "strict_empty_address_check": false
+}
+
+Successfully minted the asset!
+Browse your asset at: https://explore.algokit.io/localnet/asset/123
+Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id

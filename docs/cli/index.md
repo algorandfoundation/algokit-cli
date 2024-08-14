@@ -160,14 +160,14 @@
     - [mint](#mint)
     - [Options](#options-25)
     - [--creator ](#--creator-)
-    - [-n, --name ](#-n---name--3)
+    - [--name ](#--name-)
     - [-u, --unit ](#-u---unit-)
     - [-t, --total ](#-t---total-)
     - [-d, --decimals ](#-d---decimals-)
+    - [--nft, --ft](#--nft---ft)
     - [-i, --image ](#-i---image-)
     - [-m, --metadata ](#-m---metadata-)
     - [--mutable, --immutable](#--mutable---immutable)
-    - [--nft, --ft](#--nft---ft)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-26)
@@ -1111,8 +1111,8 @@ algokit task mint [OPTIONS]
 **Required** Address or alias of the asset creator.
 
 
-### -n, --name <asset_name>
-**Required** Asset name.
+### --name <asset_name>
+Asset name.
 
 
 ### -u, --unit <unit_name>
@@ -1127,6 +1127,11 @@ Total supply of the asset. Defaults to 1.
 Number of decimals. Defaults to 0.
 
 
+### --nft, --ft
+Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
+definitions of pure or fractional NFTs as per ARC3 standard.
+
+
 ### -i, --image <image_path>
 **Required** Path to the asset image file to be uploaded to IPFS.
 
@@ -1139,11 +1144,6 @@ For more details refer to [https://arc.algorand.foundation/ARCs/arc-0003#json-me
 
 ### --mutable, --immutable
 Whether the asset should be mutable or immutable. Refers to ARC19 by default.
-
-
-### --nft, --ft
-Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
-definitions of pure or fractional NFTs as per ARC3 standard.
 
 
 ### -n, --network <network>
