@@ -5,21 +5,18 @@ set -e
 
 # Check if the correct number of arguments are passed
 if [ "$#" -ne 4 ]; then
-  echo "Usage: $0 <destination_directory> <release_tag> <artifact_path> <grade>"
+  echo "Usage: $0 <destination_directory> <release_version> <artifact_path> <grade>"
   exit 1
 fi
 
 # Assign arguments to variables
 DESTINATION_DIR="$1"
-RELEASE_TAG="$2"
+RELEASE_VERSION="$2"
 ARTIFACT_PATH="$3"
 GRADE="$4"
 
 # Ensure the destination directory exists
 mkdir -p "${DESTINATION_DIR}/snap"
-
-# Extract version from RELEASE_TAG, assuming it's in the format "vX.Y.Z"
-VERSION="${RELEASE_TAG#v}"
 
 # Use the provided ARTIFACT_PATH
 SOURCE="$ARTIFACT_PATH"
@@ -27,7 +24,7 @@ SOURCE="$ARTIFACT_PATH"
 # Create the snapcraft.yaml file
 cat > "${DESTINATION_DIR}/snap/snapcraft.yaml" <<EOF
 name: algokit
-version: "$VERSION"
+version: "$RELEASE_VERSION"
 summary: The AlgoKit CLI is the one-stop shop tool for developers building on Algorand
 description: |
   AlgoKit gets developers of all levels up and running with a familiar, 

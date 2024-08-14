@@ -189,6 +189,14 @@ def is_windows() -> bool:
     return platform.system() == "Windows"
 
 
+def is_wsl() -> bool:
+    """
+    detects if Python is running in WSL
+    https://github.com/scivision/detect-windows-subsystem-for-linux
+    """
+    return platform.uname().release.endswith(("-Microsoft", "microsoft-standard-WSL2"))
+
+
 def split_command_string(command: str) -> list[str]:
     """
     Parses a command string into a list of arguments, handling both shell and non-shell commands

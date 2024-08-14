@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "algokit"
-version = "2.2.1"
+version = "2.2.3"
 description = "Algorand development kit command-line interface"
 authors = ["Algorand Foundation <contact@algorand.foundation>"]
 license = "MIT"
@@ -17,7 +17,7 @@ shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
-keyring = "24.3.0"
+keyring = "25.2.1"
 pyjwt = "^2.8.0"
 auth0-python = "^4.4.0"
 algokit-utils = "^2.3.0"
@@ -27,7 +27,7 @@ aiohttp = "3.9.5"
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = {version = "^6.3.0"}
+pyinstaller = {version = "^6.9.0"}
 pytest = "^7.2.0"
 ruff = ">=0.1.6,<0.5.0"
 pip-audit = "^2.4.7"

@@ -36,7 +36,8 @@ jobs:
     name: Release wheels to pypi
     needs: ci-build-python
     runs-on: ubuntu-latest
-
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.RELEASE_VERSION }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,8 +73,9 @@ jobs:
             --define=prerelease_tag=beta+${{ steps.get_branch.outputs.branch }} \
             --define=branch=${{ steps.get_branch.outputs.branch }} \
             publish
-          gh release edit --prerelease "$(git describe $(git rev-list --tags --max-count=1))"
-        # --define=upload_to_repository=true \
+          release_version_tag="$(git describe $(git rev-list --tags --max-count=1))"
+          gh release edit --prerelease $release_version_tag
+          echo "RELEASE_VERSION=${release_version_tag:1}" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
@@ -87,8 +89,9 @@ jobs:
             --prerelease \
             --define=branch=main \
             publish
-          gh release edit --prerelease "v$(poetry run semantic-release print-version --current)"
-        # --define=upload_to_repository=true \
+          release_version="$(poetry run semantic-release print-version --current)"
+          gh release edit --prerelease "v$release_version"
+          echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
@@ -104,10 +107,17 @@ jobs:
             --define=upload_to_repository=true \
             --define=branch=main \
             publish
+          release_version="$(poetry run semantic-release print-version --current)"
+          echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY_USERNAME: __token__
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
+
+      - name: Get release version
+        shell: bash
+        run: echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+        id: get_release_version
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -122,15 +132,19 @@ jobs:
     uses: ./.github/workflows/build-binaries.yaml
     needs: release
     with:
-      production_release: "true"
+      production_release: ${{ inputs.production_release }}
       python_version: "3.12"
+      release_version: ${{ needs.release.outputs.release_version }}
     secrets: inherit
 
   cd-publish-release-packages:
     name: Release binaries via distribution channels
-    needs: build-and-upload-binaries
+    needs:
+      - release
+      - build-and-upload-binaries
     if: ${{ github.ref_name == 'main' && inputs.production_release == 'true' }} # Might want to adjust this to publish (pre-release) on merge as well.
     uses: ./.github/workflows/publish-release-packages.yaml
     with:
       artifactName: algokit-cli
+      release_version: ${{ needs.release.outputs.release_version }}
     secrets: inherit
