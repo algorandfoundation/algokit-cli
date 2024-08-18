@@ -41,13 +41,14 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
 
     for custom_command in custom_commands:
         # Define the base command function
-        def base_command(
+        def base_command(  # noqa: PLR0913
             *,
-            args: list[str],
             custom_command: ProjectCommand | WorkspaceProjectCommand = custom_command,
             project_names: tuple[str] | None = None,
             list_projects: bool = False,
             project_type: str | None = None,
+            concurrent: bool = True,
+            extra_args: tuple[str] | None = None,
         ) -> None:
             """
             Executes a base command function with optional parameters for listing projects or specifying project names.
@@ -57,32 +58,35 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             within a workspace.
 
             Args:
-                args (list[str]): The command arguments to be passed to the custom command.
+                extra_args (list[str]): The command arguments to be passed to the custom command.
                 custom_command (ProjectCommand | WorkspaceProjectCommand): The custom command to be executed.
                 project_names (list[str] | None): Optional. A list of project names to execute the command on.
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
                 with a workspace command.
                 project_type (str | None): Optional. Only execute commands in projects of specified type.
-
+                concurrent (bool): Whether to execute wokspace commands concurrently. Defaults to True.
             Returns:
                 None
             """
-            if args:
-                logger.warning("Ignoring unrecognized arguments: %s.", " ".join(args))
-
             if list_projects and isinstance(custom_command, WorkspaceProjectCommand):
                 for command in custom_command.commands:
                     cmds = " && ".join(" ".join(cmd) for cmd in command.commands)
                     logger.info(f"ℹ️  Project: {command.project_name}, Command name: {command.name}, Command(s): {cmds}")  # noqa: RUF001
                 return
 
-            run_command(command=custom_command) if isinstance(
+            run_command(command=custom_command, extra_args=extra_args) if isinstance(
                 custom_command, ProjectCommand
-            ) else run_workspace_command(custom_command, list(project_names or []), project_type)
+            ) else run_workspace_command(
+                workspace_command=custom_command,
+                project_names=list(project_names or []),
+                project_type=project_type,
+                concurrent=concurrent,
+                extra_args=extra_args,
+            )
 
         # Check if the command is a WorkspaceProjectCommand and conditionally decorate
         is_workspace_command = isinstance(custom_command, WorkspaceProjectCommand)
-        command = click.argument("args", nargs=-1, type=click.UNPROCESSED, required=False)(base_command)
+        command = click.argument("extra_args", nargs=-1, type=click.UNPROCESSED, required=False)(base_command)
         if is_workspace_command:
             command = click.option(
                 "project_names",
@@ -117,6 +121,15 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 required=False,
                 default=None,
                 help="Limit execution to specific project types if executing from workspace. (Optional)",
+            )(command)
+            command = click.option(
+                "concurrent",
+                "--concurrent/--sequential",
+                "-c/-s",
+                help="Execute workspace commands concurrently",
+                default=True,
+                is_flag=True,
+                required=False,
             )(command)
 
         # Apply the click.command decorator with common options

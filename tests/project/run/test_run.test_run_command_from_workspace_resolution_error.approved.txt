@@ -1,4 +1,4 @@
-Detected execution order, running commands sequentially
+Running commands sequentially.
 ⏳ frontend_project: 'hello' command in progress...
 ERROR: 'hello' failed executing: 'failthiscommand'
 ERROR: ❌ frontend_project: Failed to resolve command path, 'failthiscommand' wasn't found

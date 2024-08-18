@@ -1,7 +1,7 @@
 import dataclasses
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -162,12 +162,13 @@ def _load_commands_from_workspace(
     return list(workspace_commands.values())
 
 
-def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> None:
+def run_command(*, command: ProjectCommand, from_workspace: bool = False, extra_args: tuple[str] | None = None) -> None:
     """Executes a specified project command.
 
     Args:
         command (ProjectCommand): The project command to be executed.
         from_workspace (bool): Indicates whether the command is being executed from a workspace context.
+        extra_args (tuple[str] | None): Optional; additional arguments to pass to the command.
 
     Raises:
         click.ClickException: If the command execution fails.
@@ -186,6 +187,8 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
     for index, cmd in enumerate(command.commands):
         try:
             resolved_command = resolve_command_path(cmd)
+            if index == len(command.commands) - 1 and extra_args:
+                resolved_command.extend(extra_args)
         except click.ClickException as e:
             logger.error(f"'{command.name}' failed executing: '{' '.join(cmd)}'")
             raise e
@@ -213,9 +216,12 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False) -> Non
 
 
 def run_workspace_command(
+    *,
     workspace_command: WorkspaceProjectCommand,
     project_names: list[str] | None = None,
     project_type: str | None = None,
+    concurrent: bool = True,
+    extra_args: tuple[str] | None = None,
 ) -> None:
     """Executes a workspace command, potentially limited to specified projects.
 
@@ -223,50 +229,47 @@ def run_workspace_command(
         workspace_command (WorkspaceProjectCommand): The workspace command to be executed.
         project_names (list[str] | None): Optional; specifies a subset of projects to execute the command for.
         project_type (str | None): Optional; specifies a subset of project types to execute the command for.
+        concurrent (bool): Whether to execute commands concurrently. Defaults to True.
+        extra_args (tuple[str] | None): Optional; additional arguments to pass to the command.
     """
 
     def _execute_command(cmd: ProjectCommand) -> None:
         """Helper function to execute a single project command within the workspace context."""
         logger.info(f"⏳ {cmd.project_name}: '{cmd.name}' command in progress...")
         try:
-            run_command(command=cmd, from_workspace=True)
+            run_command(command=cmd, from_workspace=True, extra_args=extra_args)
             executed_commands = " && ".join(" ".join(command) for command in cmd.commands)
             logger.info(f"✅ {cmd.project_name}: '{executed_commands}' executed successfully.")
         except Exception as e:
             logger.error(f"❌ {cmd.project_name}: {e}")
             raise click.ClickException(f"failed to execute '{cmd.name}' command in '{cmd.project_name}'") from e
 
-    if workspace_command.execution_order:
-        logger.info("Detected execution order, running commands sequentially")
-        order_map = {name: i for i, name in enumerate(workspace_command.execution_order)}
-        sorted_commands = sorted(
-            workspace_command.commands, key=lambda c: order_map.get(c.project_name, len(order_map))
+    def _filter_command(cmd: ProjectCommand) -> bool:
+        return (not project_names or cmd.project_name in project_names) and (
+            not project_type or project_type == cmd.project_type
         )
 
-        if project_names:
-            existing_projects = {cmd.project_name for cmd in workspace_command.commands}
-            missing_projects = set(project_names) - existing_projects
-            if missing_projects:
-                logger.warning(f"Missing projects: {', '.join(missing_projects)}. Proceeding with available ones.")
+    is_sequential = workspace_command.execution_order or not concurrent
+    logger.info(f"Running commands {'sequentially' if is_sequential else 'concurrently'}.")
 
-        for cmd in sorted_commands:
-            if (
-                project_names
-                and cmd.project_name not in project_names
-                or (project_type and project_type != cmd.project_type)
-            ):
-                continue
+    filtered_commands = list(filter(_filter_command, workspace_command.commands))
+
+    if project_names:
+        existing_projects = {cmd.project_name for cmd in filtered_commands}
+        missing_projects = set(project_names) - existing_projects
+        if missing_projects:
+            logger.warning(f"Missing projects: {', '.join(missing_projects)}. Proceeding with available ones.")
+
+    if is_sequential:
+        if workspace_command.execution_order:
+            order_map = {name: i for i, name in enumerate(workspace_command.execution_order)}
+            filtered_commands.sort(key=lambda c: order_map.get(c.project_name, len(order_map)))
+
+        for cmd in filtered_commands:
             _execute_command(cmd)
     else:
         with ThreadPoolExecutor() as executor:
-            futures = {
-                executor.submit(_execute_command, cmd): cmd
-                for cmd in workspace_command.commands
-                if (not project_names or cmd.project_name in project_names)
-                and (not project_type or project_type == cmd.project_type)
-            }
-            for future in as_completed(futures):
-                future.result()
+            list(executor.map(_execute_command, filtered_commands))
 
 
 def load_commands(project_dir: Path) -> list[ProjectCommand] | list[WorkspaceProjectCommand] | None:

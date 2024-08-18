@@ -10,6 +10,20 @@ $ algokit project run [OPTIONS] COMMAND [ARGS]
 
 This command executes a custom command defined in the `.algokit.toml` file of the current project or workspace.
 
+### Options
+
+- `-l, --list`: List all projects associated with the workspace command. (Optional)
+- `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
+- `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
+- `-c, --concurrent / -s, --sequential`: Execute workspace commands concurrently (default) or sequentially. (Optional)
+- `[ARGS]...`: Additional arguments to pass to the custom command. These will be appended to the end of the command specified in the `.algokit.toml` file.
+
+To get detailed help on the above options, execute:
+
+```bash
+algokit project run {name_of_your_command} --help
+```
+
 ### Workspace vs Standalone Projects
 
 AlgoKit supports two main types of project structures: Workspaces and Standalone Projects. This flexibility caters to the diverse needs of developers, whether managing multiple related projects or focusing on a single application.
@@ -113,27 +127,46 @@ Executing `algokit project run hello` from the root of the workspace will concur
 
 Executing `algokit project run hello` from the root of `project_(a|b)` will execute `echo hello` in the `project_(a|b)` directory.
 
-### Controlling order of execution
+### Controlling Execution Order
 
-To control order of execution, simply define the order for a particular command as follows:
+Customize command execution in workspaces for precise control:
 
-```yaml
-# ... other non [project.run] related metadata
-[project]
-type = 'workspace'
-projects_root_path = 'projects'
+1. Define order in `.algokit.toml`:
 
-[project.run]
-hello = ['project_a', 'project_b']
-# ... other non [project.run] related metadata
+   ```yaml
+   [project]
+   type = 'workspace'
+   projects_root_path = 'projects'
+
+   [project.run]
+   hello = ['project_a', 'project_b']
+   ```
+
+2. Execution behavior:
+
+   - Invalid project names are skipped
+   - Partial project lists: Specified projects run first, others follow
+
+3. Control concurrency:
+   ```sh
+   $ algokit project run hello {-s|--sequential}/{-c|--concurrent}
+   ```
+   - Default: Concurrent
+   - Sequential: Enforced when order is specified
+
+> Note: Explicit order always triggers sequential execution.
+
+### Passing Extra Arguments
+
+You can pass additional arguments to the custom command. These extra arguments will be appended to the end of the command specified in your `.algokit.toml` file.
+
+Example:
+
+```sh
+$ algokit project run hello -- world
 ```
 
-Now if project_a and project_b are both defined as standalone projects, the order of execution will be respected. Additional behaviour can be described as follows:
-
-- Providing invalid project names will skip the execution of the command for the invalid project names.
-- If only a subset of projects declaring this command are specified, the order of execution will be respected for the subset of projects first before the rest of the projects are executed in non-deterministic order.
-
-> Please note, when enabling explicit order of execution all commands will always run sequentially.
+In this example, if the `hello` command in `.algokit.toml` is defined as `echo "Hello"`, the actual command executed will be `echo "Hello" world`.
 
 ## Further Reading
 

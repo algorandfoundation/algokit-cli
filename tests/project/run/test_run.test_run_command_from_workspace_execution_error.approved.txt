@@ -1,4 +1,4 @@
-Detected execution order, running commands sequentially
+Running commands sequentially.
 ⏳ frontend_project: 'hello' command in progress...
 ERROR: 
 ····················· project run 'hello' command output: ······················

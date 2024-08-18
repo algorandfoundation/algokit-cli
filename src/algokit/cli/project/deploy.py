@@ -88,6 +88,7 @@ def _execute_deploy_command(  # noqa: PLR0913
     interactive: bool,
     deployer_alias: str | None,
     dispenser_alias: str | None,
+    extra_args: tuple[str],
 ) -> None:
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
@@ -103,7 +104,7 @@ def _execute_deploy_command(  # noqa: PLR0913
                 "and no generic command available."
             )
         raise click.ClickException(msg)
-    resolved_command = resolve_command_path(config.command)
+    resolved_command = resolve_command_path(config.command + list(extra_args))
     logger.info(f"Using deploy command: {' '.join(resolved_command)}")
     logger.info("Loading deployment environment variables...")
     config_dotenv = load_deploy_env_files(environment_name, path)
@@ -209,6 +210,11 @@ class CommandParamType(click.types.StringParamType):
         "command",
     ],
 )
+@click.argument(
+    "extra_args",
+    nargs=-1,
+    type=click.UNPROCESSED,
+)
 @click.pass_context
 def deploy_command(  # noqa: PLR0913
     ctx: click.Context,
@@ -220,6 +226,7 @@ def deploy_command(  # noqa: PLR0913
     deployer_alias: str | None,
     dispenser_alias: str | None,
     project_names: tuple[str],
+    extra_args: tuple[str],
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
 
@@ -272,6 +279,7 @@ def deploy_command(  # noqa: PLR0913
                 interactive=interactive,
                 deployer_alias=deployer_alias,
                 dispenser_alias=dispenser_alias,
+                extra_args=extra_args,
             )
     else:
         _execute_deploy_command(
@@ -281,4 +289,5 @@ def deploy_command(  # noqa: PLR0913
             interactive=interactive,
             deployer_alias=deployer_alias,
             dispenser_alias=dispenser_alias,
+            extra_args=extra_args,
         )
