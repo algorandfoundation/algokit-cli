@@ -132,6 +132,7 @@
     - [-p, --project-name ](#-p---project-name--1)
     - [Arguments](#arguments-8)
     - [ENVIRONMENT_NAME](#environment_name)
+    - [EXTRA_ARGS](#extra_args)
     - [link](#link)
     - [Options](#options-22)
     - [-p, --project-name ](#-p---project-name--2)
@@ -916,7 +917,7 @@ algokit project bootstrap poetry [OPTIONS]
 Deploy smart contracts from AlgoKit compliant repository.
 
 ```shell
-algokit project deploy [OPTIONS] [ENVIRONMENT_NAME]
+algokit project deploy [OPTIONS] [ENVIRONMENT_NAME] [EXTRA_ARGS]...
 ```
 
 ### Options
@@ -950,6 +951,10 @@ Specify the project directory. If not provided, current working directory will b
 
 ### ENVIRONMENT_NAME
 Optional argument
+
+
+### EXTRA_ARGS
+Optional argument(s)
 
 ### link
 
