@@ -15,7 +15,7 @@ This command executes a custom command defined in the `.algokit.toml` file of th
 - `-l, --list`: List all projects associated with the workspace command. (Optional)
 - `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
 - `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
-- `-c, --concurrent / -s, --sequential`: Execute workspace commands concurrently (default) or sequentially. (Optional)
+- `-s, --sequential`: Execute workspace commands sequentially, for cases where you do not have a preference on the execution order, but want to disable concurrency. (Optional, defaults to concurrent)
 - `[ARGS]...`: Additional arguments to pass to the custom command. These will be appended to the end of the command specified in the `.algokit.toml` file.
 
 To get detailed help on the above options, execute:
@@ -129,7 +129,7 @@ Executing `algokit project run hello` from the root of `project_(a|b)` will exec
 
 ### Controlling Execution Order
 
-Customize command execution in workspaces for precise control:
+Customize the execution order of commands in workspaces for precise control:
 
 1. Define order in `.algokit.toml`:
 
@@ -143,18 +143,29 @@ Customize command execution in workspaces for precise control:
    ```
 
 2. Execution behavior:
-
+   - Projects are executed in the specified order
    - Invalid project names are skipped
    - Partial project lists: Specified projects run first, others follow
 
-3. Control concurrency:
-   ```sh
-   $ algokit project run hello {-s|--sequential}/{-c|--concurrent}
-   ```
-   - Default: Concurrent
-   - Sequential: Enforced when order is specified
-
 > Note: Explicit order always triggers sequential execution.
+
+### Controlling Concurrency
+
+You can control whether commands are executed concurrently or sequentially:
+
+1. Use command-line options:
+
+   ```sh
+   $ algokit project run hello -s  # or --sequential
+   $ algokit project run hello -c  # or --concurrent
+   ```
+
+2. Behavior:
+   - Default: Concurrent execution
+   - Sequential: Use `-s` or `--sequential` flag
+   - Concurrent: Use `-c` or `--concurrent` flag or omit the flag (defaults to concurrent)
+
+> Note: When an explicit order is specified in `.algokit.toml`, execution is always sequential regardless of these flags.
 
 ### Passing Extra Arguments
 

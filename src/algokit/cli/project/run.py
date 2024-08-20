@@ -47,7 +47,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             project_names: tuple[str] | None = None,
             list_projects: bool = False,
             project_type: str | None = None,
-            concurrent: bool = True,
+            sequential: bool = False,
             extra_args: tuple[str] | None = None,
         ) -> None:
             """
@@ -64,7 +64,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
                 with a workspace command.
                 project_type (str | None): Optional. Only execute commands in projects of specified type.
-                concurrent (bool): Whether to execute wokspace commands concurrently. Defaults to True.
+                sequential (bool): Whether to execute wokspace commands sequentially. Defaults to False.
             Returns:
                 None
             """
@@ -80,7 +80,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 workspace_command=custom_command,
                 project_names=list(project_names or []),
                 project_type=project_type,
-                concurrent=concurrent,
+                sequential=sequential,
                 extra_args=extra_args,
             )
 
@@ -123,11 +123,11 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
                 help="Limit execution to specific project types if executing from workspace. (Optional)",
             )(command)
             command = click.option(
-                "concurrent",
-                "--concurrent/--sequential",
-                "-c/-s",
-                help="Execute workspace commands concurrently",
-                default=True,
+                "sequential",
+                "--sequential/--concurrent",
+                "-s/-c",
+                help="Execute workspace commands sequentially. Defaults to concurrent.",
+                default=False,
                 is_flag=True,
                 required=False,
             )(command)

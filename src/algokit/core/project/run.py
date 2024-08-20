@@ -220,7 +220,7 @@ def run_workspace_command(
     workspace_command: WorkspaceProjectCommand,
     project_names: list[str] | None = None,
     project_type: str | None = None,
-    concurrent: bool = True,
+    sequential: bool = False,
     extra_args: tuple[str] | None = None,
 ) -> None:
     """Executes a workspace command, potentially limited to specified projects.
@@ -229,7 +229,7 @@ def run_workspace_command(
         workspace_command (WorkspaceProjectCommand): The workspace command to be executed.
         project_names (list[str] | None): Optional; specifies a subset of projects to execute the command for.
         project_type (str | None): Optional; specifies a subset of project types to execute the command for.
-        concurrent (bool): Whether to execute commands concurrently. Defaults to True.
+        sequential (bool): Whether to execute commands sequentially. Defaults to False.
         extra_args (tuple[str] | None): Optional; additional arguments to pass to the command.
     """
 
@@ -249,7 +249,7 @@ def run_workspace_command(
             not project_type or project_type == cmd.project_type
         )
 
-    is_sequential = workspace_command.execution_order or not concurrent
+    is_sequential = workspace_command.execution_order or sequential
     logger.info(f"Running commands {'sequentially' if is_sequential else 'concurrently'}.")
 
     filtered_commands = list(filter(_filter_command, workspace_command.commands))
