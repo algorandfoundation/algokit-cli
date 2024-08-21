@@ -468,3 +468,42 @@ environment_secrets = [
     assert passed_env_vars[env_var_name] == from_private_key(dummy_account_pk)  # type: ignore[no-untyped-call]
 
     verify(result.output, options=NamerFactory.with_parameters(alias))
+
+
+def test_deploy_with_extra_args(tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock) -> None:
+    config_with_deploy = """
+[project.deploy]
+command = "command_a"
+    """.strip()
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ALGOKIT_CONFIG).write_text(config_with_deploy, encoding="utf-8")
+    (cwd / ".env").touch()
+
+    cmd_resolved = which_mock.add("command_a")
+    proc_mock.set_output([cmd_resolved], ["command executed"])
+
+    extra_args = ["--arg1 value1 --arg2 value2"]
+    result = invoke(["project", "deploy", "localnet", "--", *extra_args], cwd=cwd)
+
+    assert result.exit_code == 0
+    assert proc_mock.called[0].command == [cmd_resolved, *extra_args]
+    verify(result.output)
+
+
+def test_deploy_with_extra_args_and_custom_command(
+    tmp_path_factory: TempPathFactory, proc_mock: ProcMock, which_mock: WhichMock
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / ".env").touch()
+
+    custom_command = "custom_command"
+    cmd_resolved = which_mock.add(custom_command)
+    proc_mock.set_output([cmd_resolved], ["custom command executed"])
+
+    extra_args = ["--custom-arg1 custom-value1 --custom-arg2 custom-value2"]
+    result = invoke(["project", "deploy", "localnet", "--command", custom_command, "--", *extra_args], cwd=cwd)
+
+    assert result.exit_code == 0
+    assert proc_mock.called[0].command == [cmd_resolved, *extra_args]
+    verify(result.output)

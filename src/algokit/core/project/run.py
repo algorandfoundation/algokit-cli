@@ -211,6 +211,8 @@ def run_command(*, command: ProjectCommand, from_workspace: bool = False, extra_
         if is_verbose:
             log_msg = f"Command Executed: '{' '.join(cmd)}'\nOutput: {result.output}\n"
             if index == len(command.commands) - 1:
+                if extra_args:
+                    log_msg += f"Extra Args: '{' '.join(extra_args)}'\n"
                 log_msg += f"✅ {command.project_name}: '{' '.join(cmd)}' executed successfully."
             logger.info(log_msg)
 
@@ -239,6 +241,8 @@ def run_workspace_command(
         try:
             run_command(command=cmd, from_workspace=True, extra_args=extra_args)
             executed_commands = " && ".join(" ".join(command) for command in cmd.commands)
+            if extra_args:
+                executed_commands += f" {' '.join(extra_args)}"
             logger.info(f"✅ {cmd.project_name}: '{executed_commands}' executed successfully.")
         except Exception as e:
             logger.error(f"❌ {cmd.project_name}: {e}")

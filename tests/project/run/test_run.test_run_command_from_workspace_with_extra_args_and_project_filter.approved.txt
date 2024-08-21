@@ -1,0 +1,3 @@
+Running commands sequentially.
+⏳ contract_project: 'hello' command in progress...
+✅ contract_project: 'command_a extra args' executed successfully.

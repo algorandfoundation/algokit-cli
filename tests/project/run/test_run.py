@@ -477,3 +477,126 @@ def test_run_command_help_works_without_path_resolution(
     verify(_format_output(result.output))
 
     assert invoke("project run hello", cwd=cwd).exit_code == 1
+
+
+def test_run_command_from_workspace_with_sequential_flag(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    projects = []
+    for i in range(1, 6):
+        projects.append(
+            {
+                "dir": f"project{i}",
+                "type": "contract",
+                "name": f"contract_project_{i}",
+                "command": f"hello{i}",
+                "description": "Prints hello",
+            }
+        )
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+        mock_command=True,
+        which_mock=which_mock,
+        proc_mock=proc_mock,
+    )
+
+    result = invoke("project run hello --sequential", cwd=cwd)
+    assert result.exit_code == 0
+    order_of_execution = [line for line in result.output.split("\n") if line.startswith("✅")]
+    for i in range(5):
+        assert f"contract_project_{i + 1}" in order_of_execution[i]
+
+
+def test_run_command_from_workspace_with_order_and_sequential_flag(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    projects = []
+    for i in range(1, 6):
+        projects.append(
+            {
+                "dir": f"project{i}",
+                "type": "contract",
+                "name": f"contract_project_{i}",
+                "command": f"hello{i}",
+                "description": "Prints hello",
+            }
+        )
+    _create_workspace_project(
+        workspace_dir=cwd,
+        projects=projects,
+        mock_command=True,
+        which_mock=which_mock,
+        proc_mock=proc_mock,
+        custom_project_order=["contract_project_4"],
+    )
+
+    result = invoke("project run hello --sequential", cwd=cwd)
+    assert result.exit_code == 0
+    order_of_execution = [line for line in result.output.split("\n") if line.startswith("✅")]
+    assert "contract_project_4" in order_of_execution[0]
+
+
+def test_run_command_from_standalone_with_extra_args(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    """
+    Verifies successful command execution within a standalone project with extra arguments.
+    """
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    cwd.mkdir()
+
+    which_mock.add("echo")
+    proc_mock.set_output(["echo", "Hello", "extra", "args"], ["Hello extra args"])
+    _create_project_config(cwd, "contract", "contract_project", "echo Hello", "Prints hello with extra args")
+
+    result = invoke("project run hello -- extra args", cwd=cwd)
+
+    assert result.exit_code == 0
+    verify(_format_output(result.output))
+    assert "Hello extra args" in result.output
+
+
+def test_run_command_from_workspace_with_extra_args(
+    tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
+) -> None:
+    """
+    Verifies successful command execution within a workspace project with extra arguments.
+    """
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    projects = [
+        {
+            "dir": "project1",
+            "type": "contract",
+            "name": "contract_project",
+            "command": "echo Hello",
+            "description": "Prints hello with extra args",
+        },
+    ]
+    _create_workspace_project(
+        workspace_dir=cwd, projects=projects, mock_command=True, which_mock=which_mock, proc_mock=proc_mock
+    )
+
+    which_mock.add("echo")
+    proc_mock.set_output(["echo", "Hello", "extra", "args"], ["Hello extra args"])
+
+    result = invoke("project run hello -- extra args", cwd=cwd)
+
+    assert result.exit_code == 0
+    verify(_format_output(result.output))
+    assert "Hello extra args" in result.output
+
+
+def test_run_command_from_workspace_with_extra_args_and_project_filter(cwd_with_workspace_sequential: Path) -> None:
+    """
+    Verifies successful command execution within a workspace project with extra arguments and project filtering.
+    """
+    result = invoke(
+        "project run hello --project-name 'contract_project' -- extra args", cwd=cwd_with_workspace_sequential
+    )
+
+    assert result.exit_code == 0
+    verify(_format_output(result.output))
+    assert "frontend_project" not in result.output
