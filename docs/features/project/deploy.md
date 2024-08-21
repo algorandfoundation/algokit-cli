@@ -199,20 +199,8 @@ In this example, `my_contract_name` is an extra argument that can be utilized un
 ## Example of a Full Deployment
 
 ```sh
-$ algokit project deploy testnet --custom-deploy-command="your-custom-command" --skip-tests
-```
-
-This example shows how to deploy smart contracts to the testnet using a custom deploy command and passing an extra argument `--skip-tests`.
-
-// ... rest of the existing content ...
-
-````
-
-## Example of a Full Deployment
-
-```sh
 $ algokit project deploy testnet --custom-deploy-command="your-custom-command"
-````
+```
 
 This example shows how to deploy smart contracts to the testnet using a custom deploy command. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.
 
