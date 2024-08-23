@@ -56,7 +56,7 @@ def test_algokit_init_and_project_run(tmp_path_factory: pytest.TempPathFactory) 
     # Run algokit project run build
     build_cwd = cwd / "playground"
     build_cwd.mkdir(exist_ok=True)
-    build_command = command_str_to_list("algokit -v project run build")
+    build_command = command_str_to_list("algokit -v project run build -- hello_world")
     build_result = subprocess.run(build_command, capture_output=True, text=True, check=False, cwd=build_cwd)
     logger.info(f"Command {build_command} returned {build_result.stdout}")
     assert build_result.returncode == 0, f"Build command failed with {build_result.stderr}"
