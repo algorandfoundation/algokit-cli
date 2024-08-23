@@ -20,7 +20,7 @@ $ ~ algokit init
 ? Name of project / directory to create the project in:  my-cool-app
 ```
 
-Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `python`, `fullstack`, `react`, `beaker` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
+Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `python`, `fullstack`, `react`, `python` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
 
 If you want to accept the default for each option simply hit [enter] or alternatively to speed things up you can run `algokit init --defaults` and they will be auto-accepted.
 
@@ -60,7 +60,7 @@ Copying /Users/algokit/algokit-init/my-smart-contract/smart_contracts/.env.templ
 🎉 Performed initial git commit successfully! 🎉
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️ https://github.com/algorandfoundation/algokit-beaker-default-template
+➡️ https://github.com/algorandfoundation/algokit-python-template
 As a suggestion, if you wanted to open the project in VS Code you could execute:
 
 > cd my-smart-contract && code .
@@ -79,11 +79,11 @@ There are a number of options that can be used to provide answers to the templat
 
 As well as the official Algorand templates shown when running the init command, community templates can also be provided by providing a URL via the prompt or the `--template-url` option.
 
-e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-beaker-default-template` (that being the url of the official beaker template, the same as `algokit init -t beaker`).
+e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-python-template` (that being the url of the official python template, the same as `algokit init -t python`).
 
 The `--template-url` option can be combined with `--template-url-ref` to specify a specific commit, branch or tag
 
-e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-beaker-default-template --template-url-ref 9985005b7389c90c6afed685d75bb8e7608b2a96`
+e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-python-template --template-url-ref 0232bb68a2f5628e910ee52f62bf13ded93fe672`
 
 If the URL is not an official template there is a potential security risk and so to continue you must either acknowledge this prompt, or if you are in a non-interactive environment you can pass the `--UNSAFE-SECURITY-accept-template-url` option (but we generally don't recommend this option so users can review the warning message first) e.g.
 
@@ -101,18 +101,18 @@ If you want to create a community template, you can use the [AlgoKit guidelines 
 
 Answers to specific template prompts can be provided with the `--answer {key} {value}` option, which can be used multiple times for each prompt. Quotes can be used for values with spaces e.g. `--answer author_name "Algorand Foundation"`.
 
-To find out the key for a specific answer you can either look at `.algokit/.copier-answers.yml` in the root folder of a project created via `algokit init` or in the `copier.yaml` file of a template repo e.g. for the [beaker template](https://github.com/algorandfoundation/algokit-beaker-default-template/blob/main/copier.yaml).
+To find out the key for a specific answer you can either look at `.algokit/.copier-answers.yml` in the root folder of a project created via `algokit init` or in the `copier.yaml` file of a template repo e.g. for the [python template](https://github.com/algorandfoundation/algokit-python-template/blob/main/copier.yaml).
 
 ## Non-interactive project initialization
 
-By combining a number of options, it is possible to initialize a new project without any interaction. For example, to create a project named `my-smart-contract` using the `beaker` template with no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values, you could execute the following:
+By combining a number of options, it is possible to initialize a new project without any interaction. For example, to create a project named `my-smart-contract` using the `python` template with no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values, you could execute the following:
 
 ```
 
 $ ~ algokit init -n my-smart-contract -t python --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️ https://github.com/algorandfoundation/algokit-beaker-default-template
+➡️ https://github.com/algorandfoundation/algokit-python-template
 As a suggestion, if you wanted to open the project in VS Code you could execute:
 
 > cd my-smart-contract && code .
