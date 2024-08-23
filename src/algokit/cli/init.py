@@ -72,7 +72,6 @@ class ContractLanguage(Enum):
 
     PYTHON = "Python 🐍"
     TYPESCRIPT = "TypeScript 📘"
-    PYTEAL = "PyTeal 🔧"
 
 
 class TemplateKey(str, Enum):
@@ -117,7 +116,6 @@ class BlessedTemplateSource(TemplateSource):
 LANGUAGE_TO_TEMPLATE_MAP = {
     ContractLanguage.PYTHON: TemplateKey.PYTHON,
     ContractLanguage.TYPESCRIPT: TemplateKey.TEALSCRIPT,
-    ContractLanguage.PYTEAL: TemplateKey.BEAKER,
 }
 
 
@@ -139,10 +137,6 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.FULLSTACK: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-fullstack-template",
             description="Official template for starter or production fullstack applications.",
-        ),
-        TemplateKey.BEAKER: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Official template for starter or production Beaker applications.",
         ),
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",

@@ -43,7 +43,7 @@ of available operations and parameters.
 #### Python
 
 ```python
-# A similar working example can be seen in the beaker_production template, when using Python deployment
+# A similar working example can be seen in the algokit python template, when using Python deployment
 from smart_contracts.artifacts.HelloWorldApp.client import (
     HelloWorldAppClient,
 )
@@ -66,7 +66,7 @@ response = app_client.hello(name="World")
 #### TypeScript
 
 ```typescript
-// A similar working example can be seen in the beaker_production template, when using TypeScript deployment
+// A similar working example can be seen in the algokit python template with typescript deployer, when using TypeScript deployment
 import { HelloWorldAppClient } from "./artifacts/HelloWorldApp/client";
 
 const appClient = new HelloWorldAppClient(
@@ -104,7 +104,7 @@ Custom generate commands are defined in the `.algokit.toml` file within the proj
 
 ### Understanding `Generators`
 
-A `generator` is essentially a compact, self-sufficient `copier` template. This template can optionally be defined within the primary `algokit templates` to offer supplementary functionality after a project is initialized from the template. For instance, the official [`algokit-beaker-default-template`](https://github.com/algorandfoundation/algokit-beaker-default-template/tree/main/template_content) provides a generator within the `.algokit/generators` directory. This generator can be employed for executing extra tasks on AlgoKit projects that have been initiated from this template, such as adding new smart contracts to an existing project. For a comprehensive explanation, please refer to the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md).
+A `generator` is essentially a compact, self-sufficient `copier` template. This template can optionally be defined within the primary `algokit templates` to offer supplementary functionality after a project is initialized from the template. For instance, the official [`algokit-python-template`](https://github.com/algorandfoundation/algokit-python-template/tree/main/template_content) provides a generator within the `.algokit/generators` directory. This generator can be employed for executing extra tasks on AlgoKit projects that have been initiated from this template, such as adding new smart contracts to an existing project. For a comprehensive explanation, please refer to the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md).
 
 ### Requirements
 
@@ -130,7 +130,7 @@ The custom command employs the `copier` library to duplicate the files from the 
 
 ### Examples
 
-As an example, let's use the `smart-contract` generator from the `algokit-beaker-default-template` to add new contract to an existing project based on that template. The `smart-contract` generator is defined as follows:
+As an example, let's use the `smart-contract` generator from the `algokit-python-template` to add new contract to an existing project based on that template. The `smart-contract` generator is defined as follows:
 
 ```toml
 [algokit]
@@ -176,4 +176,4 @@ $ algokit generate smart-contract -a contract_name "MyCoolContract"
 
 #### Third Party Generators
 
-It is important to understand that by default, AlgoKit will always prompt you before executing a generator to ensure it's from a trusted source. If you are confident about the source of the generator, you can use the `--force` or `-f` option to execute the generator without this confirmation prompt. Be cautious while using this option and ensure the generator is from a trusted source. At the moment, a trusted source for a generator is defined as _a generator that is included in the official AlgoKit templates (e.g. `smart-contract` generator in `algokit-beaker-default-template`)_
+It is important to understand that by default, AlgoKit will always prompt you before executing a generator to ensure it's from a trusted source. If you are confident about the source of the generator, you can use the `--force` or `-f` option to execute the generator without this confirmation prompt. Be cautious while using this option and ensure the generator is from a trusted source. At the moment, a trusted source for a generator is defined as _a generator that is included in the official AlgoKit templates (e.g. `smart-contract` generator in `algokit-python-template`)_
