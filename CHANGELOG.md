@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.0 (2024-08-23)
+
+### Feature
+
+* Explicit sequential execution; extra args param for run/deploy commands ([#557](https://github.com/algorandfoundation/algokit-cli/issues/557)) ([`41f5c7b`](https://github.com/algorandfoundation/algokit-cli/commit/41f5c7b631a90a06d51676efd1f437416c8cb750))
+
 ## v2.2.3 (2024-08-02)
 
 ### Fix
