@@ -75,7 +75,7 @@ def get_project_configs(
         working directory is used.
         lookup_level (int): The number of levels to go up the directory to search for workspace projects
         project_type (str | None): The type of project to filter by. If None, all project types are returned.
-        project_names (list[str] | None): The names of the projects to filter by. If None, all projects are returned.
+        project_names (tuple[str, ...] | None): The names of the projects to filter by. If None, gets all projects.
 
     Returns:
         list[dict[str, Any] | None]: A list of dictionaries, each containing the configuration of an algokit project.

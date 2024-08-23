@@ -1,2 +1,2 @@
-Detected execution order, running commands sequentially
+Running commands sequentially.
 WARNING: Missing projects: contract_project2. Proceeding with available ones.

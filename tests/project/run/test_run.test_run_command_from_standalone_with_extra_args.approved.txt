@@ -1,0 +1,6 @@
+Running `hello` command in {current_working_directory}...
+Command Executed: 'echo Hello'
+Output: STDOUT
+STDERR
+Extra Args: 'extra args'
+✅ contract_project: 'echo Hello' executed successfully.

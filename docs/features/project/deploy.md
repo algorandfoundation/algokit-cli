@@ -7,7 +7,7 @@ Deploy your smart contracts effortlessly to various networks with the algokit pr
 ## Usage
 
 ```sh
-$ algokit project deploy [OPTIONS] [ENVIRONMENT_NAME]
+$ algokit project deploy [OPTIONS] [ENVIRONMENT_NAME] [EXTRA_ARGS]
 ```
 
 This command deploys smart contracts from an AlgoKit compliant repository to the specified network.
@@ -22,6 +22,7 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 - `-p, --project-name`: (Optional) Projects to execute the command on. Defaults to all projects found in
   the current directory. Option is mutually exclusive with `--command`.
 - `-h, --help`: Show this message and exit.
+- `[EXTRA_ARGS]...`: Additional arguments to pass to the deploy command. For instance, `algokit project deploy -- {custom args}`. This will ensure that the extra arguments are passed to the deploy command specified in the `.algokit.toml` file or directly via `--command` option.
 
 ## Environment files
 
@@ -182,6 +183,20 @@ Example:
 ```sh
 $ algokit project deploy testnet --ci
 ```
+
+## Passing Extra Arguments
+
+You can pass additional arguments to the deploy command. These extra arguments will be appended to the end of the deploy command specified in your `.algokit.toml` file or to the command specified directly via `--command` option.
+
+To pass extra arguments, use `--` after the AlgoKit command and options to mark the distinction between arguments used by the CLI and arguments to be passed as extras to the deploy command/script.
+
+Example:
+
+```sh
+$ algokit project deploy testnet -- my_contract_name --some_contract_related_param
+```
+
+In this example, `my_contract_name` and `--some_contract_related_param` are extra arguments that can be utilized by the custom deploy command invocation, for instance, to filter the deployment to a specific contract or modify deployment behavior.
 
 ## Example of a Full Deployment
 
