@@ -22,8 +22,8 @@ def command_str_to_list(command: str) -> list[str]:
         (command_str_to_list("algokit --help"), [0]),
         (command_str_to_list("algokit doctor"), [0]),
         (command_str_to_list("algokit task vanity-address PY"), [0]),
-        (command_str_to_list("algokit -v init --name playground -t python --no-git --no-ide --defaults"), [0]),
-        (command_str_to_list("algokit project run build -- hello_world"), [0]),
+        (command_str_to_list("algokit init --name playground -t python --no-git --no-ide --defaults"), [0]),
+        (command_str_to_list("algokit -v project run build"), [0]),
     ],
 )
 def test_non_interactive_algokit_commands(
