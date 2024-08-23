@@ -124,7 +124,7 @@
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [deploy](#deploy)
     - [Options](#options-21)
-    - [-C, --command ](#-c---command-)
+    - [-C, -c, --command ](#-c--c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-2)
     - [-P, --path ](#-p---path-)
     - [--deployer ](#--deployer-)
@@ -923,7 +923,7 @@ algokit project deploy [OPTIONS] [ENVIRONMENT_NAME] [EXTRA_ARGS]...
 ### Options
 
 
-### -C, --command <command>
+### -C, -c, --command <command>
 Custom deploy command. If not provided, will load the deploy command from .algokit.toml file.
 
 
