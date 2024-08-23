@@ -162,13 +162,15 @@ def _load_commands_from_workspace(
     return list(workspace_commands.values())
 
 
-def run_command(*, command: ProjectCommand, from_workspace: bool = False, extra_args: tuple[str] | None = None) -> None:
+def run_command(
+    *, command: ProjectCommand, from_workspace: bool = False, extra_args: tuple[str, ...] | None = None
+) -> None:
     """Executes a specified project command.
 
     Args:
         command (ProjectCommand): The project command to be executed.
         from_workspace (bool): Indicates whether the command is being executed from a workspace context.
-        extra_args (tuple[str] | None): Optional; additional arguments to pass to the command.
+        extra_args (tuple[str, ...] | None): Optional; additional arguments to pass to the command.
 
     Raises:
         click.ClickException: If the command execution fails.
@@ -223,7 +225,7 @@ def run_workspace_command(
     project_names: list[str] | None = None,
     project_type: str | None = None,
     sequential: bool = False,
-    extra_args: tuple[str] | None = None,
+    extra_args: tuple[str, ...] | None = None,
 ) -> None:
     """Executes a workspace command, potentially limited to specified projects.
 
@@ -232,14 +234,14 @@ def run_workspace_command(
         project_names (list[str] | None): Optional; specifies a subset of projects to execute the command for.
         project_type (str | None): Optional; specifies a subset of project types to execute the command for.
         sequential (bool): Whether to execute commands sequentially. Defaults to False.
-        extra_args (tuple[str] | None): Optional; additional arguments to pass to the command.
+        extra_args (tuple[str, ...] | None): Optional; additional arguments to pass to the command.
     """
 
     def _execute_command(cmd: ProjectCommand) -> None:
         """Helper function to execute a single project command within the workspace context."""
         logger.info(f"⏳ {cmd.project_name}: '{cmd.name}' command in progress...")
         try:
-            run_command(command=cmd, from_workspace=True, extra_args=extra_args)
+            run_command(command=cmd, from_workspace=True, extra_args=extra_args or ())
             executed_commands = " && ".join(" ".join(command) for command in cmd.commands)
             if extra_args:
                 executed_commands += f" {' '.join(extra_args)}"

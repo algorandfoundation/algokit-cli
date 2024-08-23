@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 from algosdk.mnemonic import from_private_key
 
-from algokit.cli.common.utils import MutuallyExclusiveOption
+from algokit.cli.common.utils import MutuallyExclusiveOption, sanitize_extra_args
 from algokit.core import proc
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 from algokit.core.project import ProjectType, get_project_configs
@@ -88,7 +88,7 @@ def _execute_deploy_command(  # noqa: PLR0913
     interactive: bool,
     deployer_alias: str | None,
     dispenser_alias: str | None,
-    extra_args: tuple[str],
+    extra_args: tuple[str, ...],
 ) -> None:
     logger.debug(f"Deploying from project directory: {path}")
     logger.debug("Loading deploy command from project config")
@@ -132,7 +132,7 @@ def _execute_deploy_command(  # noqa: PLR0913
             raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
 
 
-class CommandParamType(click.types.StringParamType):
+class _CommandParamType(click.types.StringParamType):
     name = "command"
 
     def convert(
@@ -149,12 +149,47 @@ class CommandParamType(click.types.StringParamType):
             raise click.BadParameter(str(ex), param=param, ctx=ctx) from ex
 
 
-@click.command("deploy")
-@click.argument("environment_name", default=None, required=False)
+class _DeployCommand(click.Command):
+    def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
+        # Join all args into a single string
+        full_command = " ".join(args)
+
+        try:
+            separator_index = full_command.find("-- ")
+            if separator_index == -1:
+                raise ValueError("No separator found")
+            main_args = args[:separator_index]
+            extra_args = args[separator_index + 1 :]
+        except Exception:
+            main_args = args
+            extra_args = []
+
+        # Ensure we have at least one argument for environment_name if extra_args exist
+        if extra_args and len(main_args) == 0:
+            main_args.insert(0, "")
+
+        # Reconstruct args list
+        args = main_args + (["--"] if extra_args else []) + extra_args
+
+        return super().parse_args(ctx, args)
+
+
+@click.command(
+    "deploy",
+    context_settings={"ignore_unknown_options": True},
+    cls=_DeployCommand,
+)
+@click.argument(
+    "environment_name",
+    default=None,
+    required=False,
+    callback=lambda _, __, value: None if value == "" else value,
+)
 @click.option(
     "--command",
     "-C",
-    type=CommandParamType(),
+    "-c",
+    type=_CommandParamType(),
     default=None,
     help=("Custom deploy command. If not provided, will load the deploy command " "from .algokit.toml file."),
     required=False,
@@ -213,7 +248,7 @@ class CommandParamType(click.types.StringParamType):
 @click.argument(
     "extra_args",
     nargs=-1,
-    type=click.UNPROCESSED,
+    required=False,
 )
 @click.pass_context
 def deploy_command(  # noqa: PLR0913
@@ -225,10 +260,11 @@ def deploy_command(  # noqa: PLR0913
     path: Path,
     deployer_alias: str | None,
     dispenser_alias: str | None,
-    project_names: tuple[str],
-    extra_args: tuple[str],
+    project_names: tuple[str, ...],
+    extra_args: tuple[str, ...],
 ) -> None:
     """Deploy smart contracts from AlgoKit compliant repository."""
+    extra_args = sanitize_extra_args(extra_args)
 
     if ctx.parent and ctx.parent.command.name == "algokit":
         click.secho(

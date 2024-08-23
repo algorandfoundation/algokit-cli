@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from algokit.cli.common.utils import MutuallyExclusiveOption
+from algokit.cli.common.utils import MutuallyExclusiveOption, sanitize_extra_args
 from algokit.core.project import ProjectType
 from algokit.core.project.run import (
     ProjectCommand,
@@ -48,7 +48,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             list_projects: bool = False,
             project_type: str | None = None,
             sequential: bool = False,
-            extra_args: tuple[str] | None = None,
+            extra_args: tuple[str, ...] | None = None,
         ) -> None:
             """
             Executes a base command function with optional parameters for listing projects or specifying project names.
@@ -58,7 +58,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             within a workspace.
 
             Args:
-                extra_args (list[str]): The command arguments to be passed to the custom command.
+                extra_args (tuple[str, ...]): The command arguments to be passed to the custom command.
                 custom_command (ProjectCommand | WorkspaceProjectCommand): The custom command to be executed.
                 project_names (list[str] | None): Optional. A list of project names to execute the command on.
                 list_projects (bool): Optional. A flag indicating whether to list projects associated
@@ -68,6 +68,7 @@ def _load_project_commands(project_dir: Path) -> dict[str, click.Command]:
             Returns:
                 None
             """
+            extra_args = sanitize_extra_args(extra_args or ())
             if list_projects and isinstance(custom_command, WorkspaceProjectCommand):
                 for command in custom_command.commands:
                     cmds = " && ".join(" ".join(cmd) for cmd in command.commands)

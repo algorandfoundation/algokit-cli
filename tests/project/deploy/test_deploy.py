@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from algokit.cli.common.utils import sanitize_extra_args
 from algokit.core.conf import ALGOKIT_CONFIG
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk.account import generate_account
@@ -484,10 +485,10 @@ command = "command_a"
     proc_mock.set_output([cmd_resolved], ["command executed"])
 
     extra_args = ["--arg1 value1 --arg2 value2"]
-    result = invoke(["project", "deploy", "localnet", "--", *extra_args], cwd=cwd)
+    result = invoke(["project", "deploy", "--", *extra_args], cwd=cwd)
 
     assert result.exit_code == 0
-    assert proc_mock.called[0].command == [cmd_resolved, *extra_args]
+    assert proc_mock.called[0].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
     verify(result.output)
 
 
@@ -505,5 +506,5 @@ def test_deploy_with_extra_args_and_custom_command(
     result = invoke(["project", "deploy", "localnet", "--command", custom_command, "--", *extra_args], cwd=cwd)
 
     assert result.exit_code == 0
-    assert proc_mock.called[0].command == [cmd_resolved, *extra_args]
+    assert proc_mock.called[0].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
     verify(result.output)

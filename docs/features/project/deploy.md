@@ -186,7 +186,9 @@ $ algokit project deploy testnet --ci
 
 ## Passing Extra Arguments
 
-You can pass additional arguments to the deploy command. These extra arguments will be appended to the end of the deploy command specified in your `.algokit.toml` file or to the command specifified directly via `--command` option. Declare after `--` to mark distinction between arguments used by cli vs arguments to be passed as extras to the deploy command/script defined.
+You can pass additional arguments to the deploy command. These extra arguments will be appended to the end of the deploy command specified in your `.algokit.toml` file or to the command specified directly via `--command` option.
+
+To pass extra arguments, use `--` after the AlgoKit command and options to mark the distinction between arguments used by the CLI and arguments to be passed as extras to the deploy command/script.
 
 Example:
 
@@ -194,7 +196,7 @@ Example:
 $ algokit project deploy testnet -- my_contract_name --some_contract_related_param
 ```
 
-In this example, `my_contract_name` is an extra argument that can be utilized under custom deploy command invocation to filter the deployment to a specific contract.
+In this example, `my_contract_name` and `--some_contract_related_param` are extra arguments that can be utilized by the custom deploy command invocation, for instance, to filter the deployment to a specific contract or modify deployment behavior.
 
 ## Example of a Full Deployment
 
