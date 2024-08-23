@@ -19,16 +19,18 @@ def command_str_to_list(command: str) -> list[str]:
 @pytest.mark.parametrize(
     ("command", "exit_codes"),
     [
-        (command_str_to_list("--help"), [0]),
-        (command_str_to_list("doctor"), [0]),
-        (command_str_to_list("task vanity-address PY"), [0]),
+        (command_str_to_list("algokit --help"), [0]),
+        (command_str_to_list("algokit doctor"), [0]),
+        (command_str_to_list("algokit task vanity-address PY"), [0]),
+        (command_str_to_list("algokit -v init --name playground -t python --no-git --no-ide"), [0]),
+        (command_str_to_list("cd playground && algokit project run build -- hello_world"), [0]),
     ],
 )
 def test_non_interactive_algokit_commands(
     command: list[str], exit_codes: list[int], tmp_path_factory: pytest.TempPathFactory
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    execution_result = subprocess.run([algokit, *command], capture_output=True, text=True, check=False, cwd=cwd)
+    execution_result = subprocess.run(command, capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {command} returned {execution_result.stdout}")
 
     # Parts of doctor will fail in CI on macOS and windows on github actions since docker isn't available by default
