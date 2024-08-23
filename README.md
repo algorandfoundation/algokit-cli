@@ -1,5 +1,5 @@
 <div align="center">
-<a href="https://github.com/algorandfoundation/algokit-cli"><img src="https://bafybeihfrtfg4vcufkcqmrtslkhx737ppz2fgn2lnctsd6waduqhhhibye.ipfs.nftstorage.link/" width=60%></a>
+<a href="https://github.com/algorandfoundation/algokit-cli"><img src="https://ipfs.algonode.xyz/ipfs/QmZqt55wHXrZzhBihSVzXDvwp9rguvLAvFhUm1qJR6GYeQ" width=60%></a>
 </div>
 
 <p align="center">
