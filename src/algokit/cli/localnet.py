@@ -186,10 +186,10 @@ def reset_localnet(*, update: bool) -> None:
         sandbox.write_compose_file()
     elif sandbox.name == SANDBOX_BASE_NAME:
         sandbox.down()
-        if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
-            logger.info("LocalNet definition is out of date; updating it to latest")
-            sandbox.write_compose_file()
         if update:
+            if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
+                logger.info("LocalNet definition is out of date; updating it to latest")
+                sandbox.write_compose_file()
             sandbox.pull()
         else:
             sandbox.check_docker_compose_for_new_image_versions()
