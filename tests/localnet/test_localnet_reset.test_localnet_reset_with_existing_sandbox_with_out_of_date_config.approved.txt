@@ -9,6 +9,7 @@ Cleaning up the running AlgoKit LocalNet...
 DEBUG: Running 'docker compose down' in '{app_config}/sandbox'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
+Syncing LocalNet configuration
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
 DEBUG: docker: tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
@@ -25,6 +26,79 @@ DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 
 {app_config}/sandbox/docker-compose.yml
-out of date config
+name: "algokit_sandbox"
+
+services:
+  algod:
+    container_name: "algokit_sandbox_algod"
+    image: algorand/algod:latest
+    ports:
+      - 7833
+      - 9392:9392
+    environment:
+      START_KMD: 1
+      KMD_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      ADMIN_TOKEN: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      GOSSIP_PORT: 10000
+    init: true
+    volumes:
+      - type: bind
+        source: ./algod_config.json
+        target: /etc/algorand/config.json
+      - type: bind
+        source: ./algod_network_template.json
+        target: /etc/algorand/template.json
+      - ./goal_mount:/root/goal_mount
+
+  conduit:
+    container_name: "algokit_sandbox_conduit"
+    image: algorand/conduit:latest
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./conduit.yml
+        target: /etc/algorand/conduit.yml
+    depends_on:
+      - indexer-db
+      - algod
+
+  indexer-db:
+    container_name: "algokit_sandbox_postgres"
+    image: postgres:16-alpine
+    ports:
+      - 5443:5432
+    user: postgres
+    environment:
+      POSTGRES_USER: algorand
+      POSTGRES_PASSWORD: algorand
+      POSTGRES_DB: indexerdb
+
+  indexer:
+    container_name: "algokit_sandbox_indexer"
+    image: algorand/indexer:latest
+    restart: unless-stopped
+    command: daemon --enable-all-parameters
+    environment:
+      INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
+    depends_on:
+      - conduit
+
+  proxy:
+    container_name: "algokit_sandbox_proxy"
+    image: nginx:1.27.0-alpine
+    restart: unless-stopped
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 8980:8980
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - algod
+      - indexer
+
 {app_config}/sandbox/algod_config.json
-out of date config
+{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true}
