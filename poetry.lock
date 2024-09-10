@@ -257,24 +257,6 @@ tests-mypy = ["mypy (>=1.6)", "pytest-mypy-plugins"]
 tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "pytest (>=4.3.0)", "pytest-xdist[psutil]"]
 
 [[package]]
-name = "auth0-python"
-version = "4.7.1"
-description = ""
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "auth0_python-4.7.1-py3-none-any.whl", hash = "sha256:5bdbefd582171f398c2b686a19fb5e241a2fa267929519a0c02e33e5932fa7b8"},
-    {file = "auth0_python-4.7.1.tar.gz", hash = "sha256:5cf8be11aa807d54e19271a990eb92bea1863824e4863c7fc8493c6f15a597f1"},
-]
-
-[package.dependencies]
-aiohttp = ">=3.8.5,<4.0.0"
-cryptography = ">=42.0.4,<43.0.0"
-pyjwt = ">=2.8.0,<3.0.0"
-requests = ">=2.31.0,<3.0.0"
-urllib3 = ">=2.0.7,<3.0.0"
-
-[[package]]
 name = "babel"
 version = "2.15.0"
 description = "Internationalization utilities"
@@ -3520,4 +3502,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "6c2aa0b9cb3b1ec24c384644222c03c52f2efb14cd96edd4fbcc523d43f0bb5d"
+content-hash = "a89886e70d3bd194cabdc0c77ddc71408fe6ea02b2afa0bd430797ba10d9c2d3"
