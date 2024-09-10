@@ -23,7 +23,6 @@ cryptography = "^43.0.1" # pyjwt has a weak dependency on cryptography
 algokit-utils = "^2.3.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
-aiohttp = "3.9.5"
 jsondiff = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
