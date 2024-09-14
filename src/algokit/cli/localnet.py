@@ -1,4 +1,6 @@
 import logging
+import os
+from pathlib import Path
 
 import click
 import questionary
@@ -126,7 +128,26 @@ localnet_group.add_command(config_command)
     "AlgoKit will not manage the configuration of named LocalNet instances, "
     "allowing developers to configure it in any way they need.",
 )
-def start_localnet(name: str | None) -> None:
+@click.option(
+    "--config-dir",
+    "-P",
+    "config_path",
+    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
+    default=lambda: os.environ.get("ALGOKIT_LOCALNET_CONFIG_DIR", None),
+    required=False,
+    help="Specify the custom localnet configuration directory.",
+)
+@click.option(
+    "--dev/--no-dev",
+    "-d",
+    "algod_dev_mode",
+    is_flag=True,
+    required=False,
+    default=True,
+    type=click.BOOL,
+    help=("Control whether to launch 'algod' in developer mode or not. Defaults to 'yes'."),
+)
+def start_localnet(*, name: str | None, config_path: Path | None, algod_dev_mode: bool) -> None:
     sandbox = ComposeSandbox.from_environment()
     full_name = f"{SANDBOX_BASE_NAME}_{name}" if name is not None else SANDBOX_BASE_NAME
     if sandbox is not None and full_name != sandbox.name:
@@ -135,7 +156,7 @@ def start_localnet(name: str | None) -> None:
             sandbox.stop()
         else:
             raise click.ClickException("LocalNet is already running. Please stop it first")
-    sandbox = ComposeSandbox() if name is None else ComposeSandbox(name)
+    sandbox = ComposeSandbox(SANDBOX_BASE_NAME, config_path) if name is None else ComposeSandbox(name, config_path)
     compose_file_status = sandbox.compose_file_status()
     sandbox.check_docker_compose_for_new_image_versions()
     if compose_file_status is ComposeFileStatus.MISSING:
@@ -156,7 +177,16 @@ def start_localnet(name: str | None) -> None:
             "A named LocalNet is running, update checks are disabled. If you wish to synchronize with the latest "
             "version, run `algokit localnet reset --update`"
         )
-    sandbox.up()
+    if sandbox.is_algod_dev_mode() != algod_dev_mode:
+        sandbox.set_algod_dev_mode(dev_mode=algod_dev_mode)
+        if click.confirm(
+            f"Would you like to recreate 'algod' container to apply 'DevMode' flag set to '{algod_dev_mode}'? "
+            "Otherwise, the next `algokit localnet reset` will restart with the new flag",
+            default=True,
+        ):
+            sandbox.recreate_container("algod")
+    else:
+        sandbox.up()
 
 
 @localnet_group.command("stop", short_help="Stop the AlgoKit LocalNet.")
@@ -176,10 +206,19 @@ def stop_localnet() -> None:
     default=False,
     help="Enable or disable updating to the latest available LocalNet version, default: don't update",
 )
-def reset_localnet(*, update: bool) -> None:
+@click.option(
+    "--config-dir",
+    "-P",
+    "config_path",
+    type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
+    default=lambda: os.environ.get("ALGOKIT_LOCALNET_CONFIG_DIR", None),
+    required=False,
+    help="Specify the custom localnet configuration directory.",
+)
+def reset_localnet(*, update: bool, config_path: Path | None) -> None:
     sandbox = ComposeSandbox.from_environment()
     if sandbox is None:
-        sandbox = ComposeSandbox()
+        sandbox = ComposeSandbox(config_path=config_path)
     compose_file_status = sandbox.compose_file_status()
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Existing LocalNet not found; creating from scratch...")

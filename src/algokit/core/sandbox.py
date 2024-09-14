@@ -46,9 +46,9 @@ def get_min_compose_version() -> str:
 
 
 class ComposeSandbox:
-    def __init__(self, name: str = SANDBOX_BASE_NAME) -> None:
+    def __init__(self, name: str = SANDBOX_BASE_NAME, config_path: Path | None = None) -> None:
         self.name = SANDBOX_BASE_NAME if name == SANDBOX_BASE_NAME else f"{SANDBOX_BASE_NAME}_{name}"
-        self.directory = get_app_config_dir() / self.name
+        self.directory = (config_path or get_app_config_dir()) / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
@@ -128,6 +128,17 @@ class ComposeSandbox:
             return cls(name)
         return None
 
+    def set_algod_dev_mode(self, *, dev_mode: bool) -> None:
+        content = self.algod_network_template_file_path.read_text()
+        new_value = "true" if dev_mode else "false"
+        new_content = re.sub(r'"DevMode":\s*(true|false)', f'"DevMode": {new_value}', content)
+        self.algod_network_template_file_path.write_text(new_content)
+
+    def is_algod_dev_mode(self) -> bool:
+        content = self.algod_network_template_file_path.read_text()
+        search = re.search(r'"DevMode":\s*(true|false)', content)
+        return search is not None and search.group(1) == "true"
+
     def compose_file_status(self) -> ComposeFileStatus:
         try:
             compose_content = self.compose_file_path.read_text()
@@ -183,6 +194,21 @@ class ComposeSandbox:
             logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
         else:
             logger.warning("AlgoKit LocalNet failed to return a successful health check")
+
+    def recreate_container(self, container_name: str) -> None:
+        logger.info("Recreating the algod container to apply configuration changes...")
+        self._run_compose_command(
+            f"stop {container_name}",
+            bad_return_code_error_message=f"Failed to remove {container_name} container.",
+        )
+        self._run_compose_command(
+            f"rm -f -v {container_name}",
+            bad_return_code_error_message=f"Failed to remove {container_name} container.",
+        )
+        self._run_compose_command(
+            f"up -d {container_name}",
+            bad_return_code_error_message=f"Failed to recreate {container_name} container.",
+        )
 
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
