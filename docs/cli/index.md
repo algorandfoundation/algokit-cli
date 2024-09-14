@@ -107,9 +107,12 @@
     - [reset](#reset)
     - [Options](#options-16)
     - [--update, --no-update](#--update---no-update)
+    - [-P, --config-dir ](#-p---config-dir-)
     - [start](#start)
     - [Options](#options-17)
     - [-n, --name ](#-n---name--1)
+    - [-P, --config-dir ](#-p---config-dir--1)
+    - [-d, --dev, --no-dev](#-d---dev---no-dev)
     - [status](#status)
     - [stop](#stop)
   - [project](#project)
@@ -799,6 +802,10 @@ algokit localnet reset [OPTIONS]
 ### --update, --no-update
 Enable or disable updating to the latest available LocalNet version, default: don't update
 
+
+### -P, --config-dir <config_path>
+Specify the custom localnet configuration directory.
+
 ### start
 
 Start the AlgoKit LocalNet.
@@ -812,6 +819,14 @@ algokit localnet start [OPTIONS]
 
 ### -n, --name <name>
 Specify a name for a custom LocalNet instance. AlgoKit will not manage the configuration of named LocalNet instances, allowing developers to configure it in any way they need.
+
+
+### -P, --config-dir <config_path>
+Specify the custom localnet configuration directory.
+
+
+### -d, --dev, --no-dev
+Control whether to launch 'algod' in developer mode or not. Defaults to 'yes'.
 
 ### status
 
