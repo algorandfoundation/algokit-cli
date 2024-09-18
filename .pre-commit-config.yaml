@@ -9,8 +9,7 @@ repos:
         types: [python]
         args: [--no-cache]
         require_serial: true
-        additional_dependencies: []
-        minimum_pre_commit_version: "0"
+        exclude: ^src/.*core/_vendor/
       - id: ruff
         name: ruff
         description: "Run 'ruff' for extremely fast Python linting"
@@ -19,9 +18,8 @@ repos:
         "types": [python]
         args: [--fix, --no-cache]
         require_serial: false
-        additional_dependencies: []
-        minimum_pre_commit_version: "0"
         files: "^(src|tests)/"
+        exclude: ^src/.*core/_vendor/
       - id: mypy
         name: mypy
         description: "`mypy` will check Python types for correctness"
@@ -29,6 +27,5 @@ repos:
         language: system
         types_or: [python, pyi]
         require_serial: true
-        additional_dependencies: []
-        minimum_pre_commit_version: "2.9.2"
         files: "^(src|tests)/"
+        exclude: ^src/.*core/_vendor/

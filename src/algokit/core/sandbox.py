@@ -153,10 +153,20 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
+            algod_network_json_content = json.loads(
+                algod_network_template_content.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+            )
+            latest_algod_network_json_content = json.loads(
+                self._latest_algod_network_template.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+            )
+
+            del algod_network_json_content["Genesis"]["DevMode"]
+            del latest_algod_network_json_content["Genesis"]["DevMode"]
+
             if (
                 compose_content == self._latest_yaml
                 and config_content == self._latest_config_json
-                and algod_network_template_content == self._latest_algod_network_template
+                and algod_network_json_content == latest_algod_network_json_content
                 and proxy_config_content == self._latest_proxy_config
             ):
                 return ComposeFileStatus.UP_TO_DATE
@@ -194,21 +204,6 @@ class ComposeSandbox:
             logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
         else:
             logger.warning("AlgoKit LocalNet failed to return a successful health check")
-
-    def recreate_container(self, container_name: str) -> None:
-        logger.info("Recreating the algod container to apply configuration changes...")
-        self._run_compose_command(
-            f"stop {container_name}",
-            bad_return_code_error_message=f"Failed to remove {container_name} container.",
-        )
-        self._run_compose_command(
-            f"rm -f -v {container_name}",
-            bad_return_code_error_message=f"Failed to remove {container_name} container.",
-        )
-        self._run_compose_command(
-            f"up -d {container_name}",
-            bad_return_code_error_message=f"Failed to recreate {container_name} container.",
-        )
 
     def stop(self) -> None:
         logger.info("Stopping AlgoKit LocalNet now...")
