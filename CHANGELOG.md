@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.0 (2024-09-19)
+
+### Feature
+
+* Adding flags to enable dev mode; flags for custom path to localnet config ([#569](https://github.com/algorandfoundation/algokit-cli/issues/569)) ([`09c2c10`](https://github.com/algorandfoundation/algokit-cli/commit/09c2c107d037c40a85c545bce9fc97de79c2c157))
+
 ## v2.3.0 (2024-08-23)
 
 ### Feature
