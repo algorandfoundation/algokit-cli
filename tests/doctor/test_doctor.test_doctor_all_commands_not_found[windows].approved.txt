@@ -26,7 +26,7 @@ docker: Command not found!
   `docker` required to run `algokit localnet` command; install via https://docker.io
 docker compose: Command not found!
 git: Command not found!
-  Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget, 
+  Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget,
   or via https://github.com/git-guides/install-git#install-git-on-windows
 python: Command not found!
 python3: Command not found!

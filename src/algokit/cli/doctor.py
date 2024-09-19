@@ -68,7 +68,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["git", "--version"],
             missing_help=(
                 [
-                    "Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget, ",
+                    "Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget,",
                     "or via https://github.com/git-guides/install-git#install-git-on-windows",
                 ]
                 if is_windows
