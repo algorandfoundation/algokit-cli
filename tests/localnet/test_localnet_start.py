@@ -278,7 +278,7 @@ def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
-@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
 def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPathFactory) -> None:
     custom_config_dir = tmp_path_factory.mktemp("custom_config")
     result = invoke(f"localnet start --config-dir {custom_config_dir}")
@@ -293,7 +293,7 @@ def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPath
     )
 
 
-@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date")
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
 def test_localnet_start_with_no_dev_mode(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start --no-dev")
 
