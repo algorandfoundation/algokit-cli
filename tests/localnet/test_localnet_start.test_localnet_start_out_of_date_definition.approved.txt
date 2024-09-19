@@ -25,3 +25,5 @@ Started; execute `algokit explore` to explore LocalNet in a web user interface.
 out of date config
 {app_config}/sandbox/algod_config.json
 out of date config
+{app_config}/sandbox/algod_network_template.json
+out of date config

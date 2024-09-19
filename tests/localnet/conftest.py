@@ -22,6 +22,7 @@ def _health_success(httpx_mock: HTTPXMock) -> None:
 @pytest.fixture()
 def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     arg = "{{range .RepoDigests}}{{println .}}{{end}}"
+
     proc_mock.set_output(
         ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
         ["tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],

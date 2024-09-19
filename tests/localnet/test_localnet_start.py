@@ -12,6 +12,7 @@ from algokit.core.sandbox import (
     get_proxy_config,
 )
 from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
 
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
@@ -152,10 +153,13 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
-def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
+def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.sandbox.ComposeSandbox.is_algod_dev_mode", return_value=True)
+
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text("out of date config")
+    (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text("out of date config")
 
     result = invoke("localnet start")
 
@@ -168,13 +172,17 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs) -> None:
                 (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
                 "{app_config}/sandbox/algod_config.json",
                 (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").read_text(),
+                "{app_config}/sandbox/algod_network_template.json",
+                (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").read_text(),
             ]
         )
     )
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
-def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: AppDirs) -> None:
+def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: AppDirs, mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.sandbox.ComposeSandbox.is_algod_dev_mode", return_value=True)
+
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("out of date config")
 
@@ -268,3 +276,32 @@ def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
 
     assert result.exit_code == 0
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+
+
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
+def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPathFactory) -> None:
+    custom_config_dir = tmp_path_factory.mktemp("custom_config")
+    config_dir = str(custom_config_dir.absolute()).replace("\\", "/")
+    result = invoke(f"localnet start --config-dir {config_dir}")
+
+    assert result.exit_code == 0
+    assert custom_config_dir.exists()
+    assert (custom_config_dir / "sandbox").exists()
+    assert (custom_config_dir / "sandbox" / "docker-compose.yml").exists()
+    assert (custom_config_dir / "sandbox" / "algod_network_template.json").exists()
+    assert (custom_config_dir / "sandbox" / "algod_config.json").exists()
+    assert (custom_config_dir / "sandbox" / "nginx.conf").exists()
+
+
+@pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
+def test_localnet_start_with_no_dev_mode(app_dir_mock: AppDirs) -> None:
+    result = invoke("localnet start --no-dev")
+
+    assert result.exit_code == 0
+    # Verify that DevMode is set to false in the algod_network_template.json
+    network_template = json.loads(
+        (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json")
+        .read_text()
+        .replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+    )
+    assert not network_template["Genesis"]["DevMode"]

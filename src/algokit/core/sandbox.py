@@ -46,9 +46,9 @@ def get_min_compose_version() -> str:
 
 
 class ComposeSandbox:
-    def __init__(self, name: str = SANDBOX_BASE_NAME) -> None:
+    def __init__(self, name: str = SANDBOX_BASE_NAME, config_path: Path | None = None) -> None:
         self.name = SANDBOX_BASE_NAME if name == SANDBOX_BASE_NAME else f"{SANDBOX_BASE_NAME}_{name}"
-        self.directory = get_app_config_dir() / self.name
+        self.directory = (config_path or get_app_config_dir()) / self.name
         if not self.directory.exists():
             logger.debug(f"The {self.name} directory does not exist yet; creating it")
             self.directory.mkdir()
@@ -128,6 +128,17 @@ class ComposeSandbox:
             return cls(name)
         return None
 
+    def set_algod_dev_mode(self, *, dev_mode: bool) -> None:
+        content = self.algod_network_template_file_path.read_text()
+        new_value = "true" if dev_mode else "false"
+        new_content = re.sub(r'"DevMode":\s*(true|false)', f'"DevMode": {new_value}', content)
+        self.algod_network_template_file_path.write_text(new_content)
+
+    def is_algod_dev_mode(self) -> bool:
+        content = self.algod_network_template_file_path.read_text()
+        search = re.search(r'"DevMode":\s*(true|false)', content)
+        return search is not None and search.group(1) == "true"
+
     def compose_file_status(self) -> ComposeFileStatus:
         try:
             compose_content = self.compose_file_path.read_text()
@@ -142,10 +153,20 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
+            algod_network_json_content = json.loads(
+                algod_network_template_content.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+            )
+            latest_algod_network_json_content = json.loads(
+                self._latest_algod_network_template.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+            )
+
+            del algod_network_json_content["Genesis"]["DevMode"]
+            del latest_algod_network_json_content["Genesis"]["DevMode"]
+
             if (
                 compose_content == self._latest_yaml
                 and config_content == self._latest_config_json
-                and algod_network_template_content == self._latest_algod_network_template
+                and algod_network_json_content == latest_algod_network_json_content
                 and proxy_config_content == self._latest_proxy_config
             ):
                 return ComposeFileStatus.UP_TO_DATE
