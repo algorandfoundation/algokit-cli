@@ -281,7 +281,7 @@ def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
 def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPathFactory) -> None:
     custom_config_dir = tmp_path_factory.mktemp("custom_config")
-    result = invoke(f"localnet start --config-dir {custom_config_dir}")
+    result = invoke(f"localnet start --config-dir {str(custom_config_dir.absolute()).replace("\\", r"\\")}")
 
     print(result.output.splitlines())  # noqa: T201
     assert result.exit_code == 0
