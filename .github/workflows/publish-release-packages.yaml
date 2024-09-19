@@ -26,6 +26,31 @@ on:
         default: true
         type: boolean
         description: "Publish to Winget repository"
+  workflow_dispatch:
+    inputs:
+      artifactName:
+        required: true
+        type: string
+        description: "The github artifact holding the wheel file which will be published"
+      release_version:
+        required: true
+        type: string
+        description: "The release version that will be published (e.g. 0.1.0)"
+      do_brew:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to brew repository"
+      do_snap:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to snap repository"
+      do_winget:
+        required: false
+        default: true
+        type: boolean
+        description: "Publish to Winget repository"
 
 jobs:
   publish-brew:
