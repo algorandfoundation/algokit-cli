@@ -142,7 +142,7 @@ exclude = [
     "node_modules",
     "venv",
     "docs/sphinx",
-    "src/**/core/_vendor",
+    "src/algokit/core/_vendor",
 ]
 # Allow unused variables when underscore-prefixed.
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -165,7 +165,7 @@ markers = [
 addopts = "-m 'not pyinstaller_binary_tests'" # by default, exclude pyinstaller_binary_tests
 [tool.mypy]
 files = ["src", "tests"]
-exclude = ["dist", "*/_vendor/*"]
+exclude = ["dist", "src/algokit/core/_vendor/"]
 python_version = "3.10"
 warn_unused_ignores = true
 warn_redundant_casts = true
