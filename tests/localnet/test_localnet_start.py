@@ -274,7 +274,7 @@ def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
 def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
@@ -283,6 +283,7 @@ def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPath
     custom_config_dir = tmp_path_factory.mktemp("custom_config")
     result = invoke(f"localnet start --config-dir {custom_config_dir}")
 
+    print(result.output.splitlines())  # noqa: T201
     assert result.exit_code == 0
     assert custom_config_dir.exists()
     assert (custom_config_dir / "sandbox").exists()
@@ -297,7 +298,6 @@ def test_localnet_start_with_no_dev_mode(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start --no-dev")
 
     assert result.exit_code == 0
-
     # Verify that DevMode is set to false in the algod_network_template.json
     network_template = json.loads(
         (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json")
