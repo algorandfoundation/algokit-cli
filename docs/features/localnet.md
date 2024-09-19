@@ -187,6 +187,5 @@ Running an interactive session ensures that you have control over the lifecycle 
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
-U
 
 > Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker | Podman and the other relies on port forwarding via `algokit localnet codespace`.
