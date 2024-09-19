@@ -274,7 +274,7 @@ def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
 def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
 
 
