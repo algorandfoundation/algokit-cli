@@ -16,8 +16,8 @@ DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: Command not found
 DEBUG: Running 'npm.cmd --version' in '{current_working_directory}'
 DEBUG: Command not found
-DEBUG: Running 'choco --version' in '{current_working_directory}'
-DEBUG: Command not found
+DEBUG: Running 'winget --version' in '{current_working_directory}'
+DEBUG: winget: v1.8.1911
 timestamp: 1990-12-31T10:09:08
 AlgoKit: 1.2.3
 AlgoKit Python: 3.6.2 (location: /home/me/.local/pipx/venvs/algokit)
@@ -26,7 +26,7 @@ docker: Command not found!
   `docker` required to run `algokit localnet` command; install via https://docker.io
 docker compose: Command not found!
 git: Command not found!
-  Git required to `run algokit init`; install via `choco install git` if using Chocolatey, 
+  Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget, 
   or via https://github.com/git-guides/install-git#install-git-on-windows
 python: Command not found!
 python3: Command not found!
@@ -42,7 +42,7 @@ node: Command not found!
   install via `algokit project bootstrap` within project directory, or via:
   https://nodejs.dev/en/learn/how-to-install-nodejs/
 npm: Command not found!
-chocolatey: Command not found!
+winget: 1.8.1911
 
 If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
 https://github.com/algorandfoundation/algokit-cli/issues/new

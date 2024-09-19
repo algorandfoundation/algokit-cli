@@ -68,7 +68,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["git", "--version"],
             missing_help=(
                 [
-                    "Git required to `run algokit init`; install via `choco install git` if using Chocolatey, ",
+                    "Git required to `run algokit init`; install via `winget install -e --id Git.Git` if using winget, ",
                     "or via https://github.com/git-guides/install-git#install-git-on-windows",
                 ]
                 if is_windows
@@ -103,7 +103,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
         "npm": check_dependency(["npm" if not is_windows else "npm.cmd", "--version"]),
     }
     if is_windows:
-        service_outputs["chocolatey"] = check_dependency(["choco", "--version"])
+        service_outputs["winget"] = check_dependency(["winget", "--version"])
     elif os_type == "Darwin":
         service_outputs["brew"] = check_dependency(["brew", "--version"])
 

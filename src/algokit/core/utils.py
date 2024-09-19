@@ -99,7 +99,7 @@ def find_valid_pipx_command(error_message: str) -> list[str]:
                 return pipx_command
     # If pipx isn't found in global path or python -m pipx then bail out
     #   this is an exceptional circumstance since pipx should always be present with algokit
-    #   since it's installed with brew / choco as a dependency, and otherwise is used to install algokit
+    #   since it's installed with brew / winget as a dependency, and otherwise is used to install algokit
     raise click.ClickException(error_message)
 
 

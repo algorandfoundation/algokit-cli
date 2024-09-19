@@ -43,7 +43,7 @@ def _mock_doctor_dependencies(mocker: MockerFixture) -> None:
 
 @pytest.fixture(autouse=True)
 def _mock_happy_values(proc_mock: ProcMock) -> None:
-    proc_mock.set_output(["choco", "--version"], ["1.2.2"])
+    proc_mock.set_output(["winget", "--version"], ["v1.8.1911"])
     proc_mock.set_output(["brew", "--version"], ["Homebrew 3.6.15", "Homebrew/homebrew-core (blah)"])
     proc_mock.set_output(["docker", "--version"], ["Docker version 20.10.21, build baeda1f"])
     proc_mock.set_output(DOCKER_COMPOSE_VERSION_COMMAND, ['{"version": "v2.12.2"}'])
@@ -138,7 +138,6 @@ def test_doctor_with_docker_compose_version_unparseable(proc_mock: ProcMock) -> 
 
 
 ALL_COMMANDS = [
-    ["choco", "--version"],
     ["brew", "--version"],
     ["docker", "--version"],
     DOCKER_COMPOSE_VERSION_COMMAND,
@@ -236,9 +235,7 @@ def test_new_algokit_version_available(request: pytest.FixtureRequest, mocker: M
 @pytest.mark.mock_platform_system("Windows")
 def test_doctor_with_weird_values_on_windows(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["git", "--version"], ["git version 2.31.0.windows.1"])
-    proc_mock.set_output(
-        ["choco"], ["Chocolatey v0.10.15", "choco: Please run 'choco -?' or 'choco <command> -?' for help menu."]
-    )
+    proc_mock.set_output(["winget"], ["v1.8.1911", "Winget v1.8.1911"])
     proc_mock.should_fail_on(["npm"])
     proc_mock.set_output(["npm.cmd", "--version"], [" 16.17.0 "])
 
