@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.1 (2024-09-19)
+
+### Fix
+
+* Pinning requests dependency ([#575](https://github.com/algorandfoundation/algokit-cli/issues/575)) ([`2fc2dfe`](https://github.com/algorandfoundation/algokit-cli/commit/2fc2dfe71d195aaadd3c0d20017ce3ceb2f0d414))
+
 ## v2.4.0 (2024-09-19)
 
 ### Feature
