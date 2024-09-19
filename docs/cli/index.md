@@ -113,12 +113,13 @@
     - [-n, --name ](#-n---name--1)
     - [-P, --config-dir ](#-p---config-dir--1)
     - [-d, --dev, --no-dev](#-d---dev---no-dev)
+    - [--force](#--force)
     - [status](#status)
     - [stop](#stop)
   - [project](#project)
     - [bootstrap](#bootstrap)
     - [Options](#options-18)
-    - [--force](#--force)
+    - [--force](#--force-1)
     - [Options](#options-19)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [-p, --project-name ](#-p---project-name-)
@@ -151,7 +152,7 @@
     - [analyze](#analyze)
     - [Options](#options-23)
     - [-r, --recursive](#-r---recursive)
-    - [--force](#--force-1)
+    - [--force](#--force-2)
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
@@ -202,7 +203,7 @@
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
-    - [--force](#--force-2)
+    - [--force](#--force-3)
     - [transfer](#transfer)
     - [Options](#options-31)
     - [-s, --sender ](#-s---sender-)
@@ -818,15 +819,19 @@ algokit localnet start [OPTIONS]
 
 
 ### -n, --name <name>
-Specify a name for a custom LocalNet instance. AlgoKit will not manage the configuration of named LocalNet instances, allowing developers to configure it in any way they need.
+Specify a name for a custom LocalNet instance. AlgoKit will not manage the configuration of named LocalNet instances, allowing developers to configure it in any way they need. Defaults to 'sandbox'.
 
 
 ### -P, --config-dir <config_path>
-Specify the custom localnet configuration directory.
+Specify the custom localnet configuration directory. Defaults to '/Users/aorumbayev/.config/algokit'.
 
 
 ### -d, --dev, --no-dev
 Control whether to launch 'algod' in developer mode or not. Defaults to 'yes'.
+
+
+### --force
+Ignore the prompt to stop the LocalNet if it's already running.
 
 ### status
 

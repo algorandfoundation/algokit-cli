@@ -51,6 +51,12 @@ To create / start your AlgoKit LocalNet instance you can run `algokit localnet s
 - Create a new Docker Compose deployment for AlgoKit LocalNet if it doesn't already exist
 - (Re-)Start the containers
 
+You can also specify additional options:
+
+- `--name`: Specify a name for a custom LocalNet instance. This allows you to have multiple LocalNet configurations. Refer to [Named LocalNet Configuration Directory](#named-localnet-configuration-directory) for more details.
+- `--config-dir`: Specify a custom configuration directory for the LocalNet.
+- `--dev/--no-dev`: Control whether to launch 'algod' in developer mode or not. Defaults to 'yes' (developer mode enabled).
+
 If it's the first time running it on your machine then it will download the following images from DockerHub:
 
 - [`algorand/algod`](https://hub.docker.com/r/algorand/algod) (~500 MB)
@@ -82,6 +88,16 @@ When you want more control, named LocalNet instances can be used by running `alg
 Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
 If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
 
+### Specifying a custom LocalNet configuration directory
+
+You can specify a custom LocalNet configuration directory by using the `--config-dir` option or by setting the `ALGOKIT_LOCALNET_CONFIG_DIR` environment variable. This allows you to have multiple LocalNet instances with different configurations in different directories, which is useful in 'CI/CD' scenarios where you can save your custom localnet in your version control and then run `algokit localnet start --config-dir /path/to/custom/config` to use it within your pipeline.
+
+For example, to create a LocalNet instance with a custom configuration directory, you can run:
+
+```
+algokit localnet start --config-dir /path/to/custom/config
+```
+
 ### Named LocalNet Configuration Directory
 
 When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific directory on your system. The location of this directory depends on your operating system:
@@ -92,6 +108,19 @@ When running `algokit localnet start --name {name}`, AlgoKit stores configuratio
 Assuming you have previously used a default LocalNet, the path `./algokit/sandbox/` will exist inside the configuration directory, containing the configuration settings for the default LocalNet instance. Additionally, for each named LocalNet instance you have created, the path `./algokit/sandbox_{name}/` will exist, containing the configuration settings for the respective named LocalNet instances.
 
 It is important to note that only the configuration files for a named LocalNet instance should be changed. Any changes made to the default LocalNet instance will be reverted by AlgoKit.
+
+You can use `--name` flag along with `--config-dir` option to specify a custom path for the LocalNet configuration directory. This allows you to manage multiple LocalNet instances with different configurations in different directories on your system.
+
+### Controlling Algod Developer Mode
+
+By default, AlgoKit LocalNet starts algod in developer mode. This mode enables certain features that are useful for development but may not reflect the behavior of a production network. You can control this setting using the `--dev/--no-dev` flag when starting the LocalNet:
+
+```bash
+algokit localnet start --no-dev  # Starts algod without developer mode
+algokit localnet start --dev     # Starts algod with developer mode (default)
+```
+
+If you change this setting for an existing LocalNet instance, AlgoKit will prompt you to restart the LocalNet to apply the changes.
 
 ### Stopping and Resetting the LocalNet
 
@@ -158,5 +187,6 @@ Running an interactive session ensures that you have control over the lifecycle 
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
+U
 
 > Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker | Podman and the other relies on port forwarding via `algokit localnet codespace`.

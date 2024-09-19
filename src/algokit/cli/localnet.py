@@ -148,7 +148,14 @@ localnet_group.add_command(config_command)
     type=click.BOOL,
     help=("Control whether to launch 'algod' in developer mode or not. Defaults to 'yes'."),
 )
-def start_localnet(*, name: str | None, config_path: Path | None, algod_dev_mode: bool) -> None:
+@click.option(
+    "force",
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Ignore the prompt to stop the LocalNet if it's already running.",
+)
+def start_localnet(*, name: str | None, config_path: Path | None, algod_dev_mode: bool, force: bool) -> None:
     sandbox = ComposeSandbox.from_environment()
     full_name = f"{SANDBOX_BASE_NAME}_{name}" if name is not None else SANDBOX_BASE_NAME
     if sandbox is not None and full_name != sandbox.name:
@@ -180,7 +187,8 @@ def start_localnet(*, name: str | None, config_path: Path | None, algod_dev_mode
         )
     if sandbox.is_algod_dev_mode() != algod_dev_mode:
         sandbox.set_algod_dev_mode(dev_mode=algod_dev_mode)
-        if click.confirm(
+        logger.info(f"Refreshed 'DevMode' flag to '{algod_dev_mode}'")
+        if not force and click.confirm(
             f"Would you like to restart 'LocalNet' to apply 'DevMode' flag set to '{algod_dev_mode}'? "
             "Otherwise, the next `algokit localnet reset` will restart with the new flag",
             default=True,
