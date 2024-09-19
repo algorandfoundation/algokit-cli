@@ -90,7 +90,7 @@ jobs:
           ./scripts/snap/create-snapcraft-yaml.sh ${{ github.workspace }} ${{ inputs.release_version }} ${{ env.BINARY_PATH }} "stable"
 
       - name: Upload snapcraft.yaml as reference artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: snapcraft-yaml
           path: ${{ github.workspace }}/snap/snapcraft.yaml
