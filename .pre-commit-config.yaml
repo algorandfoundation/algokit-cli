@@ -19,7 +19,7 @@ repos:
         args: [--fix, --no-cache]
         require_serial: false
         files: "^(src|tests)/"
-        exclude: ^src/.*core/_vendor/
+        exclude: "^src/algokit/core/_vendor/"
       - id: mypy
         name: mypy
         description: "`mypy` will check Python types for correctness"
@@ -28,4 +28,4 @@ repos:
         types_or: [python, pyi]
         require_serial: true
         files: "^(src|tests)/"
-        exclude: ^src/.*core/_vendor/
+        exclude: "^src/algokit/core/_vendor/"
