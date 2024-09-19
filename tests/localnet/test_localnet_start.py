@@ -284,7 +284,6 @@ def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPath
     config_dir = str(custom_config_dir.absolute()).replace("\\", "/")
     result = invoke(f"localnet start --config-dir {config_dir}")
 
-    print(result.output.splitlines())  # noqa: T201
     assert result.exit_code == 0
     assert custom_config_dir.exists()
     assert (custom_config_dir / "sandbox").exists()
