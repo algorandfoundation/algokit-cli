@@ -9,7 +9,6 @@ from algokit.cli.codespace import codespace_command
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
-from algokit.core.conf import get_app_config_dir
 from algokit.core.config_commands.container_engine import get_container_engine, save_container_engine
 from algokit.core.sandbox import (
     COMPOSE_VERSION_COMMAND,
@@ -136,7 +135,10 @@ localnet_group.add_command(config_command)
     type=click.Path(exists=True, readable=True, file_okay=False, resolve_path=True, path_type=Path),
     default=lambda: os.environ.get("ALGOKIT_LOCALNET_CONFIG_DIR", None),
     required=False,
-    help=f"Specify the custom localnet configuration directory. Defaults to '{get_app_config_dir()}'.",
+    help=(
+        "Specify the custom localnet configuration directory. Defaults to '~/.config' on UNIX and "
+        "'C:\\\\Users\\\\USERNAME\\\\AppData\\\\Roaming' on Windows."
+    ),
 )
 @click.option(
     "--dev/--no-dev",

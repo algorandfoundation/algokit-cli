@@ -823,7 +823,7 @@ Specify a name for a custom LocalNet instance. AlgoKit will not manage the confi
 
 
 ### -P, --config-dir <config_path>
-Specify the custom localnet configuration directory. Defaults to '/Users/aorumbayev/.config/algokit'.
+Specify the custom localnet configuration directory. Defaults to '~/.config' on UNIX and 'C:\\Users\\USERNAME\\AppData\\Roaming' on Windows.
 
 
 ### -d, --dev, --no-dev
