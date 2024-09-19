@@ -57,6 +57,12 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ inputs.do_brew }}
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.ALGOKIT_GH_BOT_ID }}
+          private-key: ${{ secrets.ALGOKIT_GH_BOT_SK }}
+
       - name: Checkout source code
         uses: actions/checkout@v4
 
@@ -76,7 +82,7 @@ jobs:
       - name: Update homebrew cask
         run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos_arm64-brew.tar.gz" "dist/algokit*-macos_x64-brew.tar.gz" "algorandfoundation/homebrew-tap"
         env:
-          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          TAP_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   publish-winget:
     runs-on: windows-latest
