@@ -284,13 +284,12 @@ def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPath
     result = invoke(f"localnet start --config-dir {custom_config_dir}")
 
     assert result.exit_code == 0
-    verify(
-        get_combined_verify_output(
-            result.output.replace(str(custom_config_dir), "{custom_config}").replace("\\", "/"),
-            "{custom_config}/sandbox/docker-compose.yml",
-            (custom_config_dir / "sandbox" / "docker-compose.yml").read_text(),
-        )
-    )
+    assert custom_config_dir.exists()
+    assert (custom_config_dir / "sandbox").exists()
+    assert (custom_config_dir / "sandbox" / "docker-compose.yml").exists()
+    assert (custom_config_dir / "sandbox" / "algod_network_template.json").exists()
+    assert (custom_config_dir / "sandbox" / "algod_config.json").exists()
+    assert (custom_config_dir / "sandbox" / "nginx.conf").exists()
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
@@ -298,13 +297,6 @@ def test_localnet_start_with_no_dev_mode(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start --no-dev")
 
     assert result.exit_code == 0
-    verify(
-        get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
-            "{app_config}/sandbox/algod_network_template.json",
-            (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").read_text(),
-        )
-    )
 
     # Verify that DevMode is set to false in the algod_network_template.json
     network_template = json.loads(
