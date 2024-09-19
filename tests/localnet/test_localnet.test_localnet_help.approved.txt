@@ -4,12 +4,14 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  console  Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash
-           console so you can execute multiple goal commands and/or interact
-           with a filesystem.
-  explore  Explore the AlgoKit LocalNet using Dappflow
-  logs     See the output of the Docker containers
-  reset    Reset the AlgoKit LocalNet.
-  start    Start the AlgoKit LocalNet.
-  status   Check the status of the AlgoKit LocalNet.
-  stop     Stop the AlgoKit LocalNet.
+  codespace  Manage the AlgoKit LocalNet in GitHub Codespaces.
+  config     Configure the container engine for AlgoKit LocalNet.
+  console    Run the Algorand goal CLI against the AlgoKit LocalNet via a Bash
+             console so you can execute multiple goal commands and/or interact
+             with a filesystem.
+  explore    Explore the AlgoKit LocalNet using lora.
+  logs       See the output of the Docker containers.
+  reset      Reset the AlgoKit LocalNet.
+  start      Start the AlgoKit LocalNet.
+  status     Check the status of the AlgoKit LocalNet.
+  stop       Stop the AlgoKit LocalNet.

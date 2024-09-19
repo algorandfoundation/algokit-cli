@@ -6,11 +6,11 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox_test", "Status": "running", "ConfigFiles": "sandbox_test/docker-compose.yml"}]
 DEBUG: The sandbox_test directory does not exist yet; creating it
-DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
-DEBUG: docker: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
-DEBUG: Running 'docker image inspect algorand/algod:latest --format {{index (split (index .RepoDigests 0) "@") 1}}' in '{app_config}/sandbox_test'
-DEBUG: docker: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 DEBUG: HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 The named LocalNet configuration has been created in {app_config}/sandbox_test. 
@@ -27,7 +27,6 @@ Started; execute `algokit explore` to explore LocalNet in a web user interface.
 ----
 {app_config}/sandbox_test/docker-compose.yml:
 ----
-version: "3"
 name: "algokit_sandbox_test"
 
 services:
@@ -35,8 +34,7 @@ services:
     container_name: "algokit_sandbox_test_algod"
     image: algorand/algod:latest
     ports:
-      - 4001:8080
-      - 4002:7833
+      - 7833
       - 9392:9392
     environment:
       START_KMD: 1
@@ -68,7 +66,7 @@ services:
 
   indexer-db:
     container_name: "algokit_sandbox_test_postgres"
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     ports:
       - 5443:5432
     user: postgres
@@ -80,11 +78,25 @@ services:
   indexer:
     container_name: "algokit_sandbox_test_indexer"
     image: algorand/indexer:latest
-    ports:
-      - "8980:8980"
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
+
+  proxy:
+    container_name: "algokit_sandbox_test_proxy"
+    image: nginx:1.27.0-alpine
+    restart: unless-stopped
+    ports:
+      - 4001:4001
+      - 4002:4002
+      - 8980:8980
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - algod
+      - indexer

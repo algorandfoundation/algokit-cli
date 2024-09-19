@@ -1,0 +1,10 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Deploying from project directory: {current_working_directory}
+DEBUG: Loading deploy command from project config
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+Using deploy command: /bin/command_c
+Loading deployment environment variables...
+DEBUG: Using default environment config for algod and indexer for network testnet
+Deploying smart contracts from AlgoKit compliant repository 🚀
+DEBUG: Running '/bin/command_c' in '{current_working_directory}'
+/bin/command_c: picked testnet

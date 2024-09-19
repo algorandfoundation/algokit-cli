@@ -4,6 +4,9 @@ import logging
 import os
 import stat
 import sys
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
 import algosdk
 import algosdk.encoding
@@ -297,3 +300,27 @@ def get_account_info(algod_client: algosdk.v2client.algod.AlgodClient, account_a
     account_info = algod_client.account_info(account_address)
     assert isinstance(account_info, dict)
     return account_info
+
+
+def run_callback_once(callback: Callable) -> Callable:
+    """
+    Click option callbacks run twice, first to validate the prompt input,
+    and then independently from that is used to validate the value passed to the option.
+
+    In cases where the callback is expensive or has side effects(like prompting the user),
+    it's better to run it only once.
+    """
+
+    @wraps(callback)
+    def wrapper(context: click.Context, param: click.Parameter, value: Any) -> Any:  # noqa: ANN401
+        if context.obj is None:
+            context.obj = {}
+
+        key = f"{param.name}_callback_result"
+        if key not in context.obj:
+            result = callback(context, param, value)
+            context.obj[key] = result
+            return result
+        return context.obj[key]
+
+    return wrapper

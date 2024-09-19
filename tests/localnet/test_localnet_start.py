@@ -9,6 +9,7 @@ from algokit.core.sandbox import (
     get_algod_network_template,
     get_config_json,
     get_docker_compose_yml,
+    get_proxy_config,
 )
 from pytest_httpx import HTTPXMock
 
@@ -21,15 +22,15 @@ from tests.utils.proc_mock import ProcMock
 
 @pytest.fixture()
 def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
-    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.set_output(
         ["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg],
-        ["sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
+        ["tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n"],
     )
 
     proc_mock.set_output(
         ["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg],
-        ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
+        ["tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"],
     )
 
     httpx_mock.add_response(
@@ -49,7 +50,7 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 @pytest.fixture()
 def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
-    arg = '{{index (split (index .RepoDigests 0) "@") 1}}'
+    arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.should_fail_on(["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg])
     proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
 
@@ -142,6 +143,7 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
+    (app_dir_mock.app_config_dir / "sandbox" / "nginx.conf").write_text(get_proxy_config())
 
     result = invoke("localnet start")
 

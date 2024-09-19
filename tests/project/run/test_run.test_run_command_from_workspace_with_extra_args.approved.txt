@@ -1,0 +1,3 @@
+Running commands sequentially.
+⏳ contract_project: 'hello' command in progress...
+✅ contract_project: 'echo Hello extra args' executed successfully.

@@ -3,13 +3,14 @@ import logging
 import click
 
 from algokit.core import proc
+from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.goal import (
     get_volume_mount_path_docker,
     get_volume_mount_path_local,
     post_process,
     preprocess_command_args,
 )
-from algokit.core.sandbox import DEFAULT_NAME, ComposeFileStatus, ComposeSandbox
+from algokit.core.sandbox import SANDBOX_BASE_NAME, ComposeFileStatus, ComposeSandbox
 
 logger = logging.getLogger(__name__)
 
@@ -35,28 +36,35 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
     Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
     """
     goal_args = list(goal_args)
+    container_engine = get_container_engine()
     try:
-        proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+        proc.run(
+            [container_engine, "version"],
+            bad_return_code_error_message=f"{container_engine} engine isn't running; please start it.",
+        )
     except OSError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
+        docs_url = (
+            "https://www.docker.com/get-started/" if container_engine == "docker" else "https://podman.io/get-started"
+        )
         raise click.ClickException(
-            "Docker not found; please install Docker and add to path.\n"
-            "See https://docs.docker.com/get-docker/ for more information."
+            f"{container_engine} not found; please install {container_engine} and add to path.\n"
+            f"See {docs_url} for more information."
         ) from ex
 
     sandbox = ComposeSandbox.from_environment()
     if sandbox is None:
         sandbox = ComposeSandbox()
 
-    if sandbox.name != DEFAULT_NAME:
+    if sandbox.name != SANDBOX_BASE_NAME:
         logger.info("A named LocalNet is running, goal command will be executed against the named LocalNet")
 
     volume_mount_path_local = get_volume_mount_path_local(directory_name=sandbox.name)
     volume_mount_path_docker = get_volume_mount_path_docker()
 
     compose_file_status = sandbox.compose_file_status()
-    if compose_file_status is not ComposeFileStatus.UP_TO_DATE and sandbox.name == DEFAULT_NAME:
+    if compose_file_status is not ComposeFileStatus.UP_TO_DATE and sandbox.name == SANDBOX_BASE_NAME:
         raise click.ClickException("LocalNet definition is out of date; please run `algokit localnet reset` first!")
     ps_result = sandbox.ps("algod")
     match ps_result:
@@ -70,9 +78,9 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         if goal_args:
             logger.warning("--console opens an interactive shell, remaining arguments are being ignored")
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
-        result = proc.run_interactive(f"docker exec -it -w /root algokit_{sandbox.name}_algod bash".split())
+        result = proc.run_interactive(f"{container_engine} exec -it -w /root algokit_{sandbox.name}_algod bash".split())
     else:
-        cmd = f"docker exec --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()
+        cmd = f"{container_engine} exec --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()
         input_files, output_files, goal_args = preprocess_command_args(
             goal_args, volume_mount_path_local, volume_mount_path_docker
         )

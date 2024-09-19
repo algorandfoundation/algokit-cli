@@ -3,7 +3,7 @@
 This README serves as a guide on how to create custom templates for AlgoKit, a tool for initializing Algorand smart contract projects.
 Creating templates in AlgoKit involves the use of various configuration files and a templating engine to generate project structures that are tailored to your needs.
 This guide will cover the key concepts and best practices for creating templates in AlgoKit.
-We will also refer to the official [`algokit-beaker-default-template`](https://github.com/algorandfoundation/algokit-beaker-default-template) as an example.
+We will also refer to the official [`algokit-python-template`](https://github.com/algorandfoundation/algokit-python-template) as an example.
 
 ## Table of Contents
 
@@ -26,7 +26,7 @@ We will also refer to the official [`algokit-beaker-default-template`](https://g
 
 For users who are keen on getting started with creating AlgoKit templates, you can follow these quick steps:
 
-1. Click on `Use this template`->`Create a new repository` on [algokit-beaker-default-template](https://github.com/algorandfoundation/algokit-beaker-default-template) Github page. This will create a new reference repository with clean git history, allowing you to start modifying and transforming the base beaker template into your own custom template.
+1. Click on `Use this template`->`Create a new repository` on [algokit-python-template](https://github.com/algorandfoundation/algokit-python-template) Github page. This will create a new reference repository with clean git history, allowing you to start modifying and transforming the base python template into your own custom template.
 2. Modify the cloned template according to your specific needs. You can refer to the remainder of this tutorial for an understanding of expected behaviors from the AlgoKit side, Copier - the templating framework, and key concepts related to the default files you will encounter in the reference template.
 
 ## Overview of AlgoKit Templates
@@ -47,7 +47,7 @@ AlgoKit provides the `algokit init` command to initialize a new project using a 
 
 This file is the AlgoKit configuration file for this project which can be used to specify the minimum version of the AlgoKit. This is essential to ensure that projects created with your template are always compatible with the version of AlgoKit they are using.
 
-Example from `algokit-beaker-default-template`:
+Example from `algokit-python-template`:
 
 ```toml
 [algokit]
@@ -61,7 +61,7 @@ This specifies that the template requires at least version `v1.1.0-beta.4` of Al
 Python projects in AlgoKit can leverage a wide range of tools for dependency management and project configuration. While Poetry and the `pyproject.toml` file are common choices, they are not the only options.
 If you opt to use Poetry, you'll rely on the pyproject.toml file to define the project's metadata and dependencies. This configuration file can utilize the Jinja templating syntax for customization.
 
-Example snippet from `algokit-beaker-default-template`:
+Example snippet from `algokit-python-template`:
 
 ```toml
 [tool.poetry]
@@ -71,11 +71,7 @@ description = "Algorand smart contracts"
 authors = ["{{ author_name }} <{{ author_email }}>"]
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-beaker-pyteal = "^1.0.0"
-algokit-utils = "^1.3"
-python-dotenv = "^1.0.0"
+...
 ```
 
 This example shows how project metadata and dependencies are defined in `pyproject.toml`, using Jinja syntax to allow placeholders for project metadata.
@@ -176,7 +172,7 @@ python_path:
 
 After mastering the use of `copier` and building your templates based on the official AlgoKit template repositories, you can enhance your proficiency by learning to define `custom generators`. Essentially, generators are smaller-scope `copier` templates designed to provide additional functionality after a project has been initialized from the template.
 
-For example, the official [`algokit-beaker-default-template`](https://github.com/algorandfoundation/algokit-beaker-default-template/tree/main/template_content) incorporates a generator in the `.algokit/generators` directory. This generator can be utilized to execute auxiliary tasks on AlgoKit projects that are initiated from this template, like adding new smart contracts to an existing project. For a comprehensive understanding, please consult the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md) and [`algokit generate documentation`](../features/generate.md).
+For example, the official [`algokit-python-template`](https://github.com/algorandfoundation/algokit-python-template/tree/main/template_content) incorporates a generator in the `.algokit/generators` directory. This generator can be utilized to execute auxiliary tasks on AlgoKit projects that are initiated from this template, like adding new smart contracts to an existing project. For a comprehensive understanding, please consult the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md) and [`algokit generate documentation`](../features/generate.md).
 
 #### How to Create a Generator
 
@@ -222,7 +218,3 @@ This should dynamically load and display your generator as an optional `cli` com
 Creating custom templates in AlgoKit is a powerful way to streamline your development workflow for Algorand smart contracts, whether you are using Python or TypeScript. Leveraging Copier and Jinja for templating, and incorporating best practices for modularity, documentation, and coding standards, can result in robust, flexible, and user-friendly templates that can be a valuable asset to both your own projects and the broader Algorand community.
 
 Happy coding!
-
-```
-
-```

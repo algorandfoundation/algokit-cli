@@ -14,17 +14,18 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  bootstrap    Bootstrap local dependencies in an AlgoKit project; run from
-               project root directory.
+  compile      Compile smart contracts and smart signatures written in a
+               supported high-level language to a format deployable on the
+               Algorand Virtual Machine (AVM).
   completions  Install and Uninstall AlgoKit shell integrations.
   config       Configure AlgoKit settings.
-  deploy       Deploy smart contracts from AlgoKit compliant repository.
   dispenser    Interact with the AlgoKit TestNet Dispenser.
   doctor       Diagnose potential environment issues that may affect AlgoKit.
-  explore      Explore the specified network in the browser using Dappflow.
+  explore      Explore the specified network using lora.
   generate     Generate code for an Algorand project.
   goal         Run the Algorand goal CLI against the AlgoKit LocalNet.
   init         Initializes a new project from a template; run from project
                parent directory.
   localnet     Manage the AlgoKit LocalNet.
+  project      Provides a suite of commands for managing your AlgoKit project.
   task         Collection of useful tasks to help you develop on Algorand.

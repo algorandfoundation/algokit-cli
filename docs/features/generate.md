@@ -8,13 +8,10 @@ The `algokit generate client` [command](../cli/index.md#client) can be used to g
 
 ### Prerequisites
 
-To generate Python clients AlgoKit itself is the only dependency.
+To generate Python clients an installation of pip and pipx is required.
 To generate TypeScript clients an installation of Node.js and npx is also required.
 
-Each generated client will also have a dependency on `algokit-utils` libraries for the target language:
-
-- Python clients require: `algokit-utils@^1.2`
-- TypeScript clients require: `@algorandfoundation/algokit-utils@^2.0`
+Each generated client will also have a dependency on `algokit-utils` libraries for the target language.
 
 ### Input file / directory
 
@@ -30,6 +27,14 @@ There are two tokens available for use with the `-o`, `--output` [option](../cli
 - `{contract_name}`: This will resolve to a name based on the ARC-0032 contract name, formatted appropriately for the target language.
 - `{app_spec_dir}`: This will resolve to the parent directory of the `application.json` or `*.arc32.json` file which can be useful to output a client relative to its source file.
 
+### Version Pinning
+
+If you want to ensure typed client output stability across different environments and additionally protect yourself from any potential breaking changes introduced in the client generator packages, you can specify a version you'd like to pin to.
+
+To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
+
+Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `poetry` or `npm` respectively) or globally on your system (via `pipx` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
+
 ### Usage
 
 Usage examples of using a generated client are below, typed clients allow your favourite IDE to provide better intellisense to provide better discoverability
@@ -38,7 +43,7 @@ of available operations and parameters.
 #### Python
 
 ```python
-# A similar working example can be seen in the beaker_production template, when using Python deployment
+# A similar working example can be seen in the algokit python template, when using Python deployment
 from smart_contracts.artifacts.HelloWorldApp.client import (
     HelloWorldAppClient,
 )
@@ -61,7 +66,7 @@ response = app_client.hello(name="World")
 #### TypeScript
 
 ```typescript
-// A similar working example can be seen in the beaker_production template, when using TypeScript deployment
+// A similar working example can be seen in the algokit python template with typescript deployer, when using TypeScript deployment
 import { HelloWorldAppClient } from "./artifacts/HelloWorldApp/client";
 
 const appClient = new HelloWorldAppClient(
@@ -99,7 +104,7 @@ Custom generate commands are defined in the `.algokit.toml` file within the proj
 
 ### Understanding `Generators`
 
-A `generator` is essentially a compact, self-sufficient `copier` template. This template can optionally be defined within the primary `algokit templates` to offer supplementary functionality after a project is initialized from the template. For instance, the official [`algokit-beaker-default-template`](https://github.com/algorandfoundation/algokit-beaker-default-template/tree/main/template_content) provides a generator within the `.algokit/generators` directory. This generator can be employed for executing extra tasks on AlgoKit projects that have been initiated from this template, such as adding new smart contracts to an existing project. For a comprehensive explanation, please refer to the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md).
+A `generator` is essentially a compact, self-sufficient `copier` template. This template can optionally be defined within the primary `algokit templates` to offer supplementary functionality after a project is initialized from the template. For instance, the official [`algokit-python-template`](https://github.com/algorandfoundation/algokit-python-template/tree/main/template_content) provides a generator within the `.algokit/generators` directory. This generator can be employed for executing extra tasks on AlgoKit projects that have been initiated from this template, such as adding new smart contracts to an existing project. For a comprehensive explanation, please refer to the [`architecture decision record`](../architecture-decisions/2023-07-19_advanced_generate_command.md).
 
 ### Requirements
 
@@ -125,7 +130,7 @@ The custom command employs the `copier` library to duplicate the files from the 
 
 ### Examples
 
-As an example, let's use the `smart-contract` generator from the `algokit-beaker-default-template` to add new contract to an existing project based on that template. The `smart-contract` generator is defined as follows:
+As an example, let's use the `smart-contract` generator from the `algokit-python-template` to add new contract to an existing project based on that template. The `smart-contract` generator is defined as follows:
 
 ```toml
 [algokit]
@@ -171,4 +176,4 @@ $ algokit generate smart-contract -a contract_name "MyCoolContract"
 
 #### Third Party Generators
 
-It is important to understand that by default, AlgoKit will always prompt you before executing a generator to ensure it's from a trusted source. If you are confident about the source of the generator, you can use the `--force` or `-f` option to execute the generator without this confirmation prompt. Be cautious while using this option and ensure the generator is from a trusted source. At the moment, a trusted source for a generator is defined as _a generator that is included in the official AlgoKit templates (e.g. `smart-contract` generator in `algokit-beaker-default-template`)_
+It is important to understand that by default, AlgoKit will always prompt you before executing a generator to ensure it's from a trusted source. If you are confident about the source of the generator, you can use the `--force` or `-f` option to execute the generator without this confirmation prompt. Be cautious while using this option and ensure the generator is from a trusted source. At the moment, a trusted source for a generator is defined as _a generator that is included in the official AlgoKit templates (e.g. `smart-contract` generator in `algokit-python-template`)_

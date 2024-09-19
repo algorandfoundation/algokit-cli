@@ -2,10 +2,12 @@
 
 
 import typing as t
+from pathlib import Path
 
 import click
 
 from algokit.cli.common.constants import ExplorerEntityType
+from algokit.core.utils import is_windows
 
 
 class MutuallyExclusiveOption(click.Option):
@@ -100,26 +102,51 @@ def get_explorer_url(identifier: str | int, network: str, entity_type: ExplorerE
         ValueError: If the network or explorer type is invalid.
     """
 
-    base_urls: dict[str, dict[str, str]] = {
-        "testnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://testnet.explorer.perawallet.app/tx/",
-            ExplorerEntityType.ASSET.value: "https://testnet.explorer.perawallet.app/asset/",
-            ExplorerEntityType.ADDRESS.value: "https://testnet.explorer.perawallet.app/address/",
-        },
-        "mainnet": {
-            ExplorerEntityType.TRANSACTION.value: "https://explorer.perawallet.app/tx/",
-            ExplorerEntityType.ASSET.value: "https://explorer.perawallet.app/asset/",
-            ExplorerEntityType.ADDRESS.value: "https://explorer.perawallet.app/tx/address/",
-        },
-    }
+    return f"https://explore.algokit.io/{network}/{entity_type.value}/{identifier}"
 
-    if network == "localnet":
-        return f"https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/{entity_type.value}/{identifier}/"
 
-    if network not in base_urls:
-        raise ValueError(f"Invalid network: {network}")
+def sanitize_extra_args(extra_args: t.Sequence[str]) -> tuple[str, ...]:
+    """
+    Sanitizes and formats extra arguments for command execution across different OSes.
 
-    if entity_type.value not in base_urls[network]:
-        raise ValueError(f"Invalid explorer type: {entity_type}")
+    Args:
+        extra_args (t.Sequence[str]): A sequence of extra arguments to sanitize.
 
-    return base_urls[network][entity_type.value] + str(identifier)
+    Returns:
+        tuple[str, ...]: A sanitized list of extra arguments.
+
+    Examples:
+        >>> sanitize_extra_args(["arg1", "arg with spaces", "--flag=value"])
+        ['arg1', 'arg with spaces', '--flag=value']
+        >>> sanitize_extra_args(("--extra bla bla bla",))
+        ['--extra', 'bla', 'bla', 'bla']
+        >>> sanitize_extra_args(["--complex='quoted value'", "--multi word"])
+        ["--complex='quoted value'", '--multi', 'word']
+        >>> sanitize_extra_args([r"C:\\Program Files\\My App", "%PATH%"])
+        ['C:\\Program Files\\My App', '%PATH%']
+    """
+
+    lex = __import__("mslex" if is_windows() else "shlex")
+
+    def sanitize_arg(arg: str) -> str:
+        # Normalize path separators
+        arg = str(Path(arg))
+
+        # Handle environment variables
+        if arg.startswith("%") and arg.endswith("%"):
+            return arg  # Keep Windows-style env vars as-is
+        elif arg.startswith("$"):
+            return arg  # Keep Unix-style env vars as-is
+
+        # Escape special characters and handle Unicode
+        return lex.quote(arg)  # type: ignore[no-any-return]
+
+    sanitized_args: tuple[str, ...] = ()
+    for arg in extra_args:
+        # Split the argument if it contains multiple space-separated values
+        split_args = lex.split(arg)
+        for split_arg in split_args:
+            sanitized_arg = sanitize_arg(split_arg)
+            sanitized_args += (sanitized_arg,)
+
+    return sanitized_args

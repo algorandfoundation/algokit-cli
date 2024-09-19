@@ -2,6 +2,183 @@
 
 <!--next-version-placeholder-->
 
+## v2.3.0 (2024-08-23)
+
+### Feature
+
+* Explicit sequential execution; extra args param for run/deploy commands ([#557](https://github.com/algorandfoundation/algokit-cli/issues/557)) ([`41f5c7b`](https://github.com/algorandfoundation/algokit-cli/commit/41f5c7b631a90a06d51676efd1f437416c8cb750))
+
+## v2.2.3 (2024-08-02)
+
+### Fix
+
+* Add warning for cases when `algokit explore` is used within wsl ([#549](https://github.com/algorandfoundation/algokit-cli/issues/549)) ([`3e2d017`](https://github.com/algorandfoundation/algokit-cli/commit/3e2d0170bcc8870dda3d62141b93866fe8bcad1d))
+* Build binaries with the correct version information ([#550](https://github.com/algorandfoundation/algokit-cli/issues/550)) ([`0725d8f`](https://github.com/algorandfoundation/algokit-cli/commit/0725d8f16c5999f706de486852c96a2f0d16603e))
+
+## v2.2.2 (2024-07-29)
+
+
+
+## v2.2.1 (2024-07-23)
+
+### Documentation
+
+* Extra notes on edge case with python installation on debian ([#539](https://github.com/algorandfoundation/algokit-cli/issues/539)) ([`f358e24`](https://github.com/algorandfoundation/algokit-cli/commit/f358e24122df759585034c7e3541f5a8f4c446f1))
+
+## v2.2.0 (2024-07-08)
+
+### Feature
+
+* Adding default algorand network configs to use when no .env.{network} found ([#533](https://github.com/algorandfoundation/algokit-cli/issues/533)) ([`a726756`](https://github.com/algorandfoundation/algokit-cli/commit/a726756b2f96557a8e54e1f89c4926dc206265d3))
+
+### Fix
+
+* Given that .copier-answers.yml is now expected at .algokit folder, improve defaults lookup ([#535](https://github.com/algorandfoundation/algokit-cli/issues/535)) ([`5d319d3`](https://github.com/algorandfoundation/algokit-cli/commit/5d319d323a5a38e77d65895048e6a2a30e8b64d8))
+
+## v2.1.4 (2024-06-27)
+
+### Fix
+
+* Filter null values from asset metadata ([#529](https://github.com/algorandfoundation/algokit-cli/issues/529)) ([`05411d6`](https://github.com/algorandfoundation/algokit-cli/commit/05411d638c0ef7600df3428a5da74f8666d226a7))
+
+## v2.1.3 (2024-06-25)
+
+### Fix
+
+* Some localnet proxy tweaks ([#526](https://github.com/algorandfoundation/algokit-cli/issues/526)) ([`2c7999d`](https://github.com/algorandfoundation/algokit-cli/commit/2c7999daefc5071dd89a6dcdc2f0a3f7f3ef819b))
+
+## v2.1.2 (2024-06-20)
+
+### Fix
+
+* Localnet status and proxy dns issue ([#525](https://github.com/algorandfoundation/algokit-cli/issues/525)) ([`a0c5bc6`](https://github.com/algorandfoundation/algokit-cli/commit/a0c5bc69e71fc64864f9f10ddd92f8c967f03416))
+* Add localnet proxy to add Access-Control-Allow-Private-Network header ([#523](https://github.com/algorandfoundation/algokit-cli/issues/523)) ([`2267e9e`](https://github.com/algorandfoundation/algokit-cli/commit/2267e9e2ff2b707dc246021578b8dbc6bd43a021))
+
+### Documentation
+
+* Moving descriptions of workspace vs standalone to project.md ([#522](https://github.com/algorandfoundation/algokit-cli/issues/522)) ([`946c53a`](https://github.com/algorandfoundation/algokit-cli/commit/946c53a3d90fad983a21856c0cad969f37d90e6f))
+* Minor revamp in project/config docs ([#521](https://github.com/algorandfoundation/algokit-cli/issues/521)) ([`872f6b1`](https://github.com/algorandfoundation/algokit-cli/commit/872f6b1dd01f843255fa2b76cb7e857c23aee4aa))
+
+## v2.1.1 (2024-06-17)
+
+### Fix
+
+* Ensure utf-8 is used as part of cli animate method invocation (windows compatibility) ([#518](https://github.com/algorandfoundation/algokit-cli/issues/518)) ([`ba9e090`](https://github.com/algorandfoundation/algokit-cli/commit/ba9e0902880298beb6a883096d26b25e77d31422))
+
+## v2.1.0 (2024-06-12)
+
+### Feature
+
+* GitHub Codespaces support in LocalNet command group ([#456](https://github.com/algorandfoundation/algokit-cli/issues/456)) ([`7eeaead`](https://github.com/algorandfoundation/algokit-cli/commit/7eeaeadc577dd12fa93c87cae18da497770d6f35))
+
+### Documentation
+
+* Updated docs to include updated links for project features ([`7c56b18`](https://github.com/algorandfoundation/algokit-cli/commit/7c56b181d984f3301e2abc59ea91128f2845ec66))
+
+## v2.0.6 (2024-05-22)
+
+### Fix
+
+* Remove ConsensusProtocol = future; unpin algod ([#505](https://github.com/algorandfoundation/algokit-cli/issues/505)) ([`55fbda5`](https://github.com/algorandfoundation/algokit-cli/commit/55fbda511310c094675dca7ff45131006083df66))
+
+## v2.0.5 (2024-05-21)
+
+### Fix
+
+* Pin localnet algod container to fix conduit issue in latest algod ([#502](https://github.com/algorandfoundation/algokit-cli/issues/502)) ([`6e760e9`](https://github.com/algorandfoundation/algokit-cli/commit/6e760e9c887187f053ea6a11b969ddc8cda3fb6a))
+
+## v2.0.4 (2024-05-20)
+
+### Fix
+
+* Task transfer on rekeyed account and update dependencies ([#498](https://github.com/algorandfoundation/algokit-cli/issues/498)) ([`8592cbf`](https://github.com/algorandfoundation/algokit-cli/commit/8592cbff4b9c45b4394eb853761255a8d11b7510))
+
+### Documentation
+
+* Add troubleshooting section ([#496](https://github.com/algorandfoundation/algokit-cli/issues/496)) ([`ef1a504`](https://github.com/algorandfoundation/algokit-cli/commit/ef1a5046a7b3ba6ddf22e65a4b1fe7868196e625))
+* Refine quick start ([#487](https://github.com/algorandfoundation/algokit-cli/issues/487)) ([`1964dec`](https://github.com/algorandfoundation/algokit-cli/commit/1964decd340a7847005cab4be408f6273fd5cb53))
+* Remove spelling mistake in intro.md instalation docs ([#491](https://github.com/algorandfoundation/algokit-cli/issues/491)) ([`70c55e0`](https://github.com/algorandfoundation/algokit-cli/commit/70c55e050caf4309c76ae5aae1dd7a284db93382))
+
+## v2.0.3 (2024-04-16)
+
+### Fix
+
+* Remove deprecated version from localnet compose file ([#476](https://github.com/algorandfoundation/algokit-cli/issues/476)) ([`4a3b1f0`](https://github.com/algorandfoundation/algokit-cli/commit/4a3b1f0c2dec5d03d12b42617ff546bd94d1da57))
+
+### Documentation
+
+* Minor refinements in npm min version spec ([#474](https://github.com/algorandfoundation/algokit-cli/issues/474)) ([`a887430`](https://github.com/algorandfoundation/algokit-cli/commit/a8874304319efc3449336a4bbb817471613d6743))
+
+## v2.0.2 (2024-04-02)
+
+### Fix
+
+* Pin pyyaml-include transitive dep ([#472](https://github.com/algorandfoundation/algokit-cli/issues/472)) ([`970536c`](https://github.com/algorandfoundation/algokit-cli/commit/970536cb7246fcaf6b84aacda95a74f8ff9bc285))
+
+### Documentation
+
+* Adding node.js to prerequisites for installation as FYI ([`8147173`](https://github.com/algorandfoundation/algokit-cli/commit/8147173ba827ac3be4c4dec28a97abc16abbd2cf))
+
+## v2.0.1 (2024-03-29)
+
+### Documentation
+
+* Few tweaks post release ([#465](https://github.com/algorandfoundation/algokit-cli/issues/465)) ([`a4a5645`](https://github.com/algorandfoundation/algokit-cli/commit/a4a5645c11790eba1162f7d80ade26fe40f83944))
+
+## v2.0.0 (2024-03-27)
+
+### Feature
+
+* Algokit-cli v2 ([#462](https://github.com/algorandfoundation/algokit-cli/issues/462)) ([`182c449`](https://github.com/algorandfoundation/algokit-cli/commit/182c449544e4a23e17919e9629dfdc5ddbf399a5))
+* LocalNet should run as an archival node so that you can access all blocks (useful for testing) ([#461](https://github.com/algorandfoundation/algokit-cli/issues/461)) ([`794cccc`](https://github.com/algorandfoundation/algokit-cli/commit/794cccce2bb4aeccfe56813af754406b87ba5112))
+
+### Breaking
+
+* 2.0 release ([`182c449`](https://github.com/algorandfoundation/algokit-cli/commit/182c449544e4a23e17919e9629dfdc5ddbf399a5))
+
+## v1.13.1 (2024-03-20)
+
+### Fix
+
+* Create the npm dir in the app data directory on windows, as npx needs it ([#458](https://github.com/algorandfoundation/algokit-cli/issues/458)) ([`3195a1c`](https://github.com/algorandfoundation/algokit-cli/commit/3195a1c8cd21835d04a472d0d156ca08ef9030ec))
+
+## v1.13.0 (2024-03-13)
+
+### Feature
+
+* Add command to compile python to TEAL with Puyapy ([`1030799`](https://github.com/algorandfoundation/algokit-cli/commit/10307990a07fd3fa8ba60f6886f5b4be722dc065))
+
+### Fix
+
+* Adjust how we run npx, so it supports all windows versions ([#454](https://github.com/algorandfoundation/algokit-cli/issues/454)) ([`a997953`](https://github.com/algorandfoundation/algokit-cli/commit/a997953871251b0f1dfed3ad6e2cb8901c2c5cd3))
+
+### Documentation
+
+* Ref commit for snapcraft ([#452](https://github.com/algorandfoundation/algokit-cli/issues/452)) ([`0ab21bc`](https://github.com/algorandfoundation/algokit-cli/commit/0ab21bcd2b7a6d188791a3480eab7fe1b885667d))
+* Update playground init docs ([#451](https://github.com/algorandfoundation/algokit-cli/issues/451)) ([`1a15d5d`](https://github.com/algorandfoundation/algokit-cli/commit/1a15d5def4e610f0b10a41918f5d4055dea19efc))
+* Change last name in 2023-07-19_advanced_generate_command.md ([#448](https://github.com/algorandfoundation/algokit-cli/issues/448)) ([`8df02df`](https://github.com/algorandfoundation/algokit-cli/commit/8df02df981c0b68cfea2a4dc4698759d5e393974))
+
+## v1.12.3 (2024-03-06)
+
+### Fix
+
+* Path resolution to ensure git is initialized at workspace level ([#447](https://github.com/algorandfoundation/algokit-cli/issues/447)) ([`4fa1eaf`](https://github.com/algorandfoundation/algokit-cli/commit/4fa1eafe604129bb0595d0774ee4eb1484d3c13b))
+
+### Documentation
+
+* Updating dockerhub links on localnet docs ([#445](https://github.com/algorandfoundation/algokit-cli/issues/445)) ([`9d4df31`](https://github.com/algorandfoundation/algokit-cli/commit/9d4df31abe1de07909c7d03de1dc2dcc4334d7dc))
+
+## v1.12.2 (2024-03-01)
+
+### Fix
+
+* Algod container proper SIGTERM handling ([#438](https://github.com/algorandfoundation/algokit-cli/issues/438)) ([`1a654ca`](https://github.com/algorandfoundation/algokit-cli/commit/1a654ca6b1519beda0a1d23fefb9673591cd5eea))
+
+### Documentation
+
+* Update named localnet documents on config file locations ([#444](https://github.com/algorandfoundation/algokit-cli/issues/444)) ([`643ab01`](https://github.com/algorandfoundation/algokit-cli/commit/643ab011bae488d24c18e8351e29de439a31c24e))
+* Minor patch in the badge ([#440](https://github.com/algorandfoundation/algokit-cli/issues/440)) ([`7d82db0`](https://github.com/algorandfoundation/algokit-cli/commit/7d82db08a127ef486f31687affca184f1229039b))
+
 ## v1.12.1 (2024-02-26)
 
 

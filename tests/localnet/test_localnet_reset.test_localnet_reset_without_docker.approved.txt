@@ -1,3 +1,2 @@
 DEBUG: Running 'docker compose version --format json' in '{current_working_directory}'
-Error: Docker not found; please install Docker and add to path.
-See https://docs.docker.com/get-docker/ for more information.
+Error: Container engine not found; please install Docker or Podman and add to path.

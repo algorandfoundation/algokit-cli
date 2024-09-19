@@ -5,6 +5,8 @@ DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
+# container engine
+Name: docker (change with `algokit config container-engine`)
 DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'
 DEBUG: docker: []
 Error: LocalNet has not been initialized yet, please run 'algokit localnet start'

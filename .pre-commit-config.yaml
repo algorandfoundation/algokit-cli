@@ -7,17 +7,17 @@ repos:
         entry: poetry run ruff format
         language: system
         types: [python]
-        args: []
+        args: [--no-cache]
         require_serial: true
         additional_dependencies: []
         minimum_pre_commit_version: "0"
       - id: ruff
         name: ruff
         description: "Run 'ruff' for extremely fast Python linting"
-        entry: poetry run ruff
+        entry: poetry run ruff check
         language: system
         "types": [python]
-        args: [--fix]
+        args: [--fix, --no-cache]
         require_serial: false
         additional_dependencies: []
         minimum_pre_commit_version: "0"

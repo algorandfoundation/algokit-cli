@@ -4,15 +4,16 @@ import platform
 import sys
 
 import click
-import pyclip  # type: ignore[import]
+import pyclip  # type: ignore[import-untyped]
 
 from algokit.core.conf import get_current_package_version
+from algokit.core.config_commands.version_prompt import get_latest_github_version
 from algokit.core.doctor import DoctorResult, check_dependency
 from algokit.core.sandbox import (
-    DOCKER_COMPOSE_MINIMUM_VERSION,
-    DOCKER_COMPOSE_VERSION_COMMAND,
+    COMPOSE_VERSION_COMMAND,
+    get_min_compose_version,
 )
-from algokit.core.version_prompt import get_latest_github_version
+from algokit.core.utils import is_windows as get_is_windows
 
 logger = logging.getLogger(__name__)
 
@@ -39,25 +40,28 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
 
     Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
     potential issues."""
+    from algokit.core.config_commands.container_engine import get_container_engine
+
     os_type = platform.system()
-    is_windows = os_type == "Windows"
+    is_windows = get_is_windows()
+    container_engine = get_container_engine()
+    docs_url = f"https://{container_engine}.io"
+    compose_minimum_version = get_min_compose_version()
     service_outputs = {
         "timestamp": DoctorResult(ok=True, output=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()),
         "AlgoKit": _get_algokit_version_output(),
         "AlgoKit Python": DoctorResult(ok=True, output=f"{sys.version} (location: {sys.prefix})"),
         "OS": DoctorResult(ok=True, output=platform.platform()),
-        "docker": check_dependency(
-            ["docker", "--version"],
-            missing_help=[
-                "Docker required to run `algokit localnet` command; install via https://docs.docker.com/get-docker/"
-            ],
+        container_engine: check_dependency(
+            [container_engine, "--version"],
+            missing_help=[f"`{container_engine}` required to run `algokit localnet` command; install via {docs_url}"],
         ),
-        "docker compose": check_dependency(
-            DOCKER_COMPOSE_VERSION_COMMAND,
-            minimum_version=DOCKER_COMPOSE_MINIMUM_VERSION,
+        f"{container_engine} compose": check_dependency(
+            COMPOSE_VERSION_COMMAND,
+            minimum_version=compose_minimum_version,
             minimum_version_help=[
-                f"Docker Compose {DOCKER_COMPOSE_MINIMUM_VERSION} required to run `algokit localnet` command;",
-                "install via https://docs.docker.com/compose/install/",
+                f"{container_engine.capitalize()} Compose {compose_minimum_version} required to run `algokit localnet` command;",  # noqa: E501
+                f"install via {docs_url}",
             ],
         ),
         "git": check_dependency(
@@ -84,7 +88,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["poetry", "--version"],
             missing_help=[
                 "Poetry is required for some Python-based templates;",
-                "install via `algokit bootstrap` within project directory, or via:",
+                "install via `algokit project bootstrap` within project directory, or via:",
                 "https://python-poetry.org/docs/#installation",
             ],
         ),
@@ -92,7 +96,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             ["node", "--version"],
             missing_help=[
                 "Node.js is required for some Node.js-based templates;",
-                "install via `algokit bootstrap` within project directory, or via:",
+                "install via `algokit project bootstrap` within project directory, or via:",
                 "https://nodejs.dev/en/learn/how-to-install-nodejs/",
             ],
         ),
@@ -103,7 +107,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     elif os_type == "Darwin":
         service_outputs["brew"] = check_dependency(["brew", "--version"])
 
-    critical_services = ["docker", "docker compose", "git"]
+    critical_services = [container_engine, f"{container_engine} compose", "git"]
     # Print the status details
     for key, value in service_outputs.items():
         if value.ok:

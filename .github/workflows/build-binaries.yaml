@@ -9,20 +9,25 @@ on:
       python_version:
         required: true
         type: string
+      release_version:
+        required: false
+        type: string
 
 jobs:
   build-binaries:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-14 is the Apple Silicon M1 runner
-        os: [ubuntu-20.04, windows-latest, macos-latest, macos-14]
+        # macos-14 is the Apple Silicon M1 runner (mac os 14)
+        # macos-13 is the last available Intel Mac runner (mac os 13)
+        # See https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+        os: [ubuntu-20.04, windows-latest, macos-13, macos-14]
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: ${{ inputs.production_release == 'true' && '0' || '1' }}
+          ref: ${{ inputs.release_version != '' && format('v{0}', inputs.release_version) || '' }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,23 +40,12 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Set release version
-        shell: bash
-        continue-on-error: true
-        if: ${{ inputs.production_release == 'true' }}
-        run: |
-          echo "RELEASE_VERSION_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))" >> $GITHUB_ENV
-
       - name: Configure build environment
         shell: bash
         run: |
           artifacts_dir="${{ github.workspace }}${{ runner.os == 'Windows' && '\dist\artifacts' || '/dist/artifacts' }}"
           mkdir -p $artifacts_dir
-          if [ -n "${RELEASE_VERSION_TAG}" ]; then
-            release_version="${RELEASE_VERSION_TAG:1}"
-            package_name_version="-${release_version}"
-            echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
-          fi
+          package_name_version="${{ inputs.release_version != '' && format('-{0}', inputs.release_version) || '' }}"
           package_name="algokit${package_name_version}-${{ runner.os }}_${{ runner.arch }}"
           echo "PACKAGE_NAME=`echo $package_name | tr '[:upper:]' '[:lower:]'`" >> $GITHUB_ENV
           echo "ARTIFACTS_DIR=${artifacts_dir}" >> $GITHUB_ENV
@@ -62,24 +56,40 @@ jobs:
         uses: ./.github/actions/build-binaries/windows
         with:
           package_name: ${{ env.PACKAGE_NAME }}
-          version: ${{ env.RELEASE_VERSION }}
+          version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+          production_release: ${{ inputs.production_release }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Build linux binary
         if: ${{ runner.os == 'Linux' }}
         uses: ./.github/actions/build-binaries/linux
         with:
           package_name: ${{ env.PACKAGE_NAME }}
-          version: ${{ env.RELEASE_VERSION }}
+          version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+
+      - name: Install Apple Developer Id Cert
+        if: runner.os == 'macOS'
+        uses: ./.github/actions/install-apple-dev-id-cert
+        with:
+          cert_data: ${{ secrets.APPLE_CERT_DATA }}
+          cert_password: ${{ secrets.APPLE_CERT_PASSWORD }}
 
       - name: Build macOS binary
         if: ${{ runner.os == 'macOS' }}
         uses: ./.github/actions/build-binaries/macos
         with:
           package_name: ${{ env.PACKAGE_NAME }}
-          version: ${{ env.RELEASE_VERSION }}
+          version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
+          apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+          apple_bundle_id: ${{ inputs.production_release == 'true' && vars.APPLE_BUNDLE_ID || format('beta.{0}', vars.APPLE_BUNDLE_ID) }}
+          apple_cert_id: ${{ secrets.APPLE_CERT_ID }}
+          apple_notary_user: ${{ secrets.APPLE_NOTARY_USER }}
+          apple_notary_password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
 
       - name: Add binary to path
         run: |
@@ -115,5 +125,5 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             ${{ env.ARTIFACTS_DIR }}/*.*
-          tag_name: ${{ env.RELEASE_VERSION_TAG }}
-          prerelease: ${{ contains(env.RELEASE_VERSION_TAG, 'beta') }}
+          tag_name: ${{ format('v{0}', inputs.release_version) }}
+          prerelease: ${{ contains(inputs.release_version, 'beta') }}

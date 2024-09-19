@@ -19,16 +19,22 @@ def command_str_to_list(command: str) -> list[str]:
 @pytest.mark.parametrize(
     ("command", "exit_codes"),
     [
-        (command_str_to_list("--help"), [0]),
-        (command_str_to_list("doctor"), [0]),
-        (command_str_to_list("task vanity-address PY"), [0]),
+        (command_str_to_list("algokit --help"), [0]),
+        (command_str_to_list("algokit doctor"), [0]),
+        (command_str_to_list("algokit task vanity-address PY"), [0]),
     ],
 )
 def test_non_interactive_algokit_commands(
     command: list[str], exit_codes: list[int], tmp_path_factory: pytest.TempPathFactory
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
-    execution_result = subprocess.run([algokit, *command], capture_output=True, text=True, check=False, cwd=cwd)
+
+    # Create a 'playground' directory
+    if "build" in command:
+        cwd = cwd / "playground"
+        cwd.mkdir(exist_ok=True)
+
+    execution_result = subprocess.run(command, capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {command} returned {execution_result.stdout}")
 
     # Parts of doctor will fail in CI on macOS and windows on github actions since docker isn't available by default
@@ -38,7 +44,25 @@ def test_non_interactive_algokit_commands(
     assert execution_result.returncode in exit_codes, f"Command {command} failed with {execution_result.stderr}"
 
 
-def test_algokit_init(
+def test_algokit_init_and_project_run(tmp_path_factory: pytest.TempPathFactory) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+
+    # Run algokit init
+    init_command = command_str_to_list("algokit init --name playground -t python --no-git --no-ide --defaults")
+    init_result = subprocess.run(init_command, capture_output=True, text=True, check=False, cwd=cwd)
+    logger.info(f"Command {init_command} returned {init_result.stdout}")
+    assert init_result.returncode == 0, f"Init command failed with {init_result.stderr}"
+
+    # Run algokit project run build
+    build_cwd = cwd / "playground"
+    build_cwd.mkdir(exist_ok=True)
+    build_command = command_str_to_list("algokit -v project run build -- hello_world")
+    build_result = subprocess.run(build_command, capture_output=True, text=True, check=False, cwd=build_cwd)
+    logger.info(f"Command {build_command} returned {build_result.stdout}")
+    assert build_result.returncode == 0, f"Build command failed with {build_result.stderr}"
+
+
+def test_algokit_init_with_template_url(
     dummy_algokit_template_with_python_task: dict[str, Path],
 ) -> None:
     # TODO: revisit to improve

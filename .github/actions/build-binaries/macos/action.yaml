@@ -9,6 +9,21 @@ inputs:
     required: true
   version:
     description: "The version to use for this artifact"
+  apple_team_id:
+    description: "The Apple Team ID"
+    required: true
+  apple_bundle_id:
+    description: "The bundle ID to be used for packaging and notarisation"
+    required: true
+  apple_cert_id:
+    description: "The Apple Developer ID certificate ID"
+    required: true
+  apple_notary_user:
+    description: "The Apple user to notarise the package"
+    require: true
+  apple_notary_password:
+    description: "The Apple password to notarise the package"
+    require: true
 
 runs:
   using: "composite"
@@ -16,17 +31,44 @@ runs:
     - name: Build binary
       shell: bash
       run: |
-        poetry run poe package_unix
+        export APPLE_CERT_ID="${{ inputs.apple_cert_id }}"
+        export APPLE_BUNDLE_ID="${{ inputs.apple_bundle_id }}"
+        poetry run poe package_mac
+      env:
+        APPLE_CERT_ID: ${{ inputs.apple_cert_id }}
+        APPLE_BUNDLE_ID: ${{ inputs.apple_bundle_id }}
+
+    - name: Add metadata to binary
+      shell: bash
+      run: |
+        echo brew > ${{ github.workspace }}/dist/algokit/_internal/algokit/resources/distribution-method
+
+    # Workaround an issue with PyInstaller where Python.framework was incorrectly signed during the build
+    - name: Codesign python.framework
+      shell: bash
+      run: |
+        codesign --force --sign "${{ inputs.apple_cert_id }}" --timestamp "${{ github.workspace }}/dist/algokit/_internal/Python.framework"
+
+    - name: Notarize
+      uses: lando/notarize-action@v2
+      with:
+        appstore-connect-team-id: ${{ inputs.apple_team_id }}
+        appstore-connect-username: ${{ inputs.apple_notary_user }}
+        appstore-connect-password: ${{ inputs.apple_notary_password }}
+        primary-bundle-id: ${{ inputs.apple_bundle_id }}
+        product-path: "${{ github.workspace }}/dist/algokit"
+        tool: notarytool
+        verbose: true
 
     - name: Package binary artifact
       shell: bash
       run: |
         cd dist/algokit/
-        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz *
+        tar -zcf ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz *
         cd ../..
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.package_name }}
-        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}.tar.gz
+        path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz

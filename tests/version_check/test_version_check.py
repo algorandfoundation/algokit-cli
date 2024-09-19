@@ -4,7 +4,7 @@ from time import time
 
 import pytest
 from algokit.core.conf import PACKAGE_NAME
-from algokit.core.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
+from algokit.core.config_commands.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -28,17 +28,21 @@ def make_scrubber(app_dir_mock: AppDirs) -> Scrubber:
 
 @pytest.fixture(autouse=True)
 def _setup(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
-    mocker.patch("algokit.core.version_prompt.get_app_config_dir").return_value = app_dir_mock.app_config_dir
-    mocker.patch("algokit.core.version_prompt.get_app_state_dir").return_value = app_dir_mock.app_state_dir
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_app_config_dir"
+    ).return_value = app_dir_mock.app_config_dir
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_app_state_dir"
+    ).return_value = app_dir_mock.app_state_dir
     # make bootstrap env a no-op
-    mocker.patch("algokit.cli.bootstrap.bootstrap_env")
+    mocker.patch("algokit.cli.project.bootstrap.bootstrap_env")
 
 
 def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=LATEST_URL, json={"tag_name": f"v{NEW_VERSION}"})
 
     # bootstrap env is a nice simple command we can use to test the version check side effects
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
@@ -75,10 +79,12 @@ def test_version_check_queries_github_when_no_cache(app_dir_mock: AppDirs, httpx
 def test_version_check_only_warns_if_newer_version_is_found(
     app_dir_mock: AppDirs, mocker: MockerFixture, current_version: str, latest_version: str, *, warning_expected: bool
 ) -> None:
-    mocker.patch("algokit.core.version_prompt.get_current_package_version").return_value = current_version
+    mocker.patch(
+        "algokit.core.config_commands.version_prompt.get_current_package_version"
+    ).return_value = current_version
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text(latest_version, encoding="utf-8")
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
 
     if warning_expected:
         assert f"version {latest_version} is available" in result.output
@@ -89,7 +95,7 @@ def test_version_check_only_warns_if_newer_version_is_found(
 def test_version_check_uses_cache(app_dir_mock: AppDirs) -> None:
     version_cache = app_dir_mock.app_state_dir / "last-version-check"
     version_cache.write_text("1234.56.78", encoding="utf-8")
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
@@ -102,7 +108,7 @@ def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDi
     modified_time = time() - VERSION_CHECK_INTERVAL - 1
     os.utime(version_cache, (modified_time, modified_time))
 
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
@@ -110,14 +116,14 @@ def test_version_check_queries_github_when_cache_out_of_date(app_dir_mock: AppDi
 
 def test_version_check_respects_disable_config(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "disable-version-prompt").touch()
-    result = invoke("bootstrap env", skip_version_check=False)
+    result = invoke("project bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
 
 
 def test_version_check_respects_skip_option(app_dir_mock: AppDirs) -> None:
-    result = invoke("--skip-version-check bootstrap env", skip_version_check=False)
+    result = invoke("--skip-version-check project bootstrap env", skip_version_check=False)
 
     assert result.exit_code == 0
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
@@ -140,3 +146,26 @@ def test_version_check_enable_version_check(app_dir_mock: AppDirs) -> None:
     assert result.exit_code == 0
     assert not disable_version_check_path.exists()
     verify(result.output, scrubber=make_scrubber(app_dir_mock))
+
+
+@pytest.mark.parametrize(
+    ("method", "message"),
+    [
+        ("snap", "snap refresh algokit"),
+        ("brew", "brew upgrade algokit"),
+        ("winget", "winget upgrade algokit"),
+        (None, "the tool used to install AlgoKit"),
+    ],
+)
+def test_version_prompt_according_to_distribution_method(
+    mocker: MockerFixture, app_dir_mock: AppDirs, method: str, message: str
+) -> None:
+    mocker.patch("algokit.core.config_commands.version_prompt._get_distribution_method").return_value = method
+    mocker.patch("algokit.core.config_commands.version_prompt.is_binary_mode").return_value = True
+    mocker.patch("algokit.core.config_commands.version_prompt.get_current_package_version").return_value = "1.0.0"
+    version_cache = app_dir_mock.app_state_dir / "last-version-check"
+    version_cache.write_text("2.0.0", encoding="utf-8")
+
+    result = invoke("project bootstrap env", skip_version_check=False)
+    assert result.exit_code == 0
+    assert message in result.output

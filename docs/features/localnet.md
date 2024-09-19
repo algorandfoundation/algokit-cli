@@ -6,9 +6,11 @@ AlgoKit LocalNet uses Docker images that are optimised for a great dev experienc
 
 The philosophy we take with AlgoKit LocalNet is that you should treat it as an ephemeral network. This means assume it could be reset at any time - don't store data on there that you can't recover / recreate. We have optimised the AlgoKit LocalNet experience to minimise situations where the network will get reset to improve the experience, but it can and will still happen in a number of situations.
 
+> For details on executing `algokit localnet` without `docker` or `podman` refer to the [codespaces](#codespaces) section.
+
 ## Prerequisites
 
-AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system.
+AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system. Alternatively, you can use Podman as a replacement for Docker see [Podman support](#podman-support).
 
 You can install Docker by following the [official installation instructions](https://docs.docker.com/get-docker/). Most of the time this will also install Docker Compose, but if not you can [follow the instructions](https://docs.docker.com/compose/install/) for that too.
 
@@ -16,15 +18,29 @@ If you are on Windows then you will need WSL 2 installed first, for which you ca
 
 Alternatively, the Windows 10/11 Pro+ supported [Hyper-V backend](https://docs.docker.com/desktop/install/windows-install/) for Docker can be used instead of the WSL 2 backend.
 
+### Podman support
+
+If you prefer to use [Podman](https://podman.io/) as your container engine, make sure to install and configure Podman first. Then you can set the default container engine that AlgoKit will use, by running: `algokit config container-engine podman`. See [Container-based LocalNet](#container-based-localnet) for more details.
+
 ## Known issues
 
 The AlgoKit LocalNet is built with 30,000 participation keys generated and after 30,000 rounds is reached it will no longer be able to add rounds. At this point you can simply reset the LocalNet to continue development. Participation keys are slow to generate hence why they are pre-generated to improve experience.
 
 ## Supported operating environments
 
-We publish DockerHub images for `arm64` and `amd64`, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Mac M1).
+We rely on the official Algorand docker images for Indexer, Conduit and Algod, which means that AlgoKit LocalNet is supported on Windows, Linux and Mac on Intel and AMD chipsets (including Apple Silicon).
 
-## Functionality
+## Container-based LocalNet
+
+AlgoKit cli supports both [Docker](https://www.docker.com/) and [Podman](https://podman.io/) as container engines. While `docker` is used by default, executing the below:
+
+```
+algokit config container-engine
+# or
+algokit config container-engine podman|docker
+```
+
+Will set the default container engine to use when executing `localnet` related commands via `subprocess`.
 
 ### Creating / Starting the LocalNet
 
@@ -37,8 +53,9 @@ To create / start your AlgoKit LocalNet instance you can run `algokit localnet s
 
 If it's the first time running it on your machine then it will download the following images from DockerHub:
 
-- [`makerxau/algorand-sandbox-dev`](https://hub.docker.com/r/makerxau/algorand-sandbox-dev) (~150-200 MB)
-- [`makerxau/algorand-indexer-dev`](https://hub.docker.com/r/makerxau/algorand-indexer-dev) (~25 MB)
+- [`algorand/algod`](https://hub.docker.com/r/algorand/algod) (~500 MB)
+- [`algorand/indexer`](https://hub.docker.com/r/algorand/indexer) (~96 MB)
+- [`algorand/conduit`](https://hub.docker.com/r/algorand/conduit) (~98 MB)
 - [`postgres:13-alpine`](https://hub.docker.com/_/postgres) (~80 MB)
 
 Once they have downloaded, it won't try and re-download images unless you perform a `algokit localnet reset`.
@@ -64,6 +81,17 @@ When you want more control, named LocalNet instances can be used by running `alg
 
 Once you have a named LocalNet running, the AlgoKit LocalNet commands will target this instance.
 If at any point you'd like to switch back to the default LocalNet, simply run `algokit localnet start`.
+
+### Named LocalNet Configuration Directory
+
+When running `algokit localnet start --name {name}`, AlgoKit stores configuration files in a specific directory on your system. The location of this directory depends on your operating system:
+
+- **Windows**: We use the value of the `APPDATA` environment variable to determine the directory to store the configuration files. This is usually `C:\Users\USERNAME\AppData\Roaming`.
+- **Linux or Mac**: We use the value of the `XDG_CONFIG_HOME` environment variable to determine the directory to store the configuration files. If `XDG_CONFIG_HOME` is not set, the default location is `~/.config`.
+
+Assuming you have previously used a default LocalNet, the path `./algokit/sandbox/` will exist inside the configuration directory, containing the configuration settings for the default LocalNet instance. Additionally, for each named LocalNet instance you have created, the path `./algokit/sandbox_{name}/` will exist, containing the configuration settings for the respective named LocalNet instances.
+
+It is important to note that only the configuration files for a named LocalNet instance should be changed. Any changes made to the default LocalNet instance will be reverted by AlgoKit.
 
 ### Stopping and Resetting the LocalNet
 
@@ -108,3 +136,27 @@ AlgoKit Utils provides methods to help you do this:
 - Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
 
 For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#localnet).
+
+## GitHub Codespaces-based LocalNet
+
+The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by utilizing the [GitHub CLI](https://github.com/cli/gh). This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
+
+To run the LocalNet in a GitHub Codespace, you can use the `algokit localnet codespace` command.
+By default without `--force` flag it will prompt you to delete stale codespaces created earlier (if any). Upon termination it will also prompt to delete the codespace that was used prior to termination.
+
+Running an interactive session ensures that you have control over the lifecycle of your Codespace, preventing unnecessary usage and potential costs. GitHub Codespaces offers a free tier with certain limits, which you can review in the [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/overview#pricing).
+
+### Options
+
+- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/overview/machine-types) for more details.
+- `-a`, `--algod-port`: Sets the port for the Algorand daemon. Defaults to `4001`.
+- `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
+- `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
+- `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
+- `-t`, `--timeout`: Max duration for running the port forwarding process. Defaults to 1 hour. This timeout ensures the codespace **will automatically shut down** after the specified duration to prevent accidental overspending of free quota on GitHub Codespaces. [More details](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces).
+- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**.
+- `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
+
+For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#codespace).
+
+> Tip: By specifying alternative port values it is possible to have several LocalNet instances running where one is using default ports via `algokit localnet start` with Docker | Podman and the other relies on port forwarding via `algokit localnet codespace`.

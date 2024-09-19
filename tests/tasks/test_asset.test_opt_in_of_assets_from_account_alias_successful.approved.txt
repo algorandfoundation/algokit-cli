@@ -1,3 +1,3 @@
 Performing opt-in. This may take a few seconds...
 Successfully performed opt-in.
-Check opt-in status for asset 123 at: https://app.dappflow.org/setnetwork?name=sandbox&redirect=explorer/asset/dummy_txn_id/
+Check opt-in status for asset 123 at: https://explore.algokit.io/localnet/asset/dummy_txn_id

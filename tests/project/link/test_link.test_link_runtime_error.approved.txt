@@ -1,0 +1,2 @@
+ERROR: Couldn't parse contract name from /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-353/cwd5/algokit_project/projects/project3/dist/application.json
+Error: Couldn't parse contract name from /private/var/folders/t6/57q65mk543l7xw6_bdgx1bmc0000gn/T/pytest-of-aorumbayev/pytest-353/cwd5/algokit_project/projects/project3/dist/application.json

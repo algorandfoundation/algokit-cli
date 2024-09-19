@@ -1,0 +1,5 @@
+DEBUG: Running 'poetry run puyapy --version' in '{current_working_directory}'
+DEBUG: poetry: puyapy 1.0.0
+DEBUG: Running 'poetry run puyapy {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
+DEBUG: poetry: Done
+Done

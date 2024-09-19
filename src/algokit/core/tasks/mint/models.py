@@ -28,10 +28,10 @@ class Localization:
 
 @dataclass
 class TokenMetadata:
-    name: str | None = None
+    name: str
+    decimals: int
     description: str | None = None
     properties: Properties | None = None
-    decimals: int | None = None
     image: str | None = None
     image_integrity: str | None = None
     image_mimetype: str | None = None
@@ -66,7 +66,7 @@ class TokenMetadata:
         file_path = Path(tempfile.mkstemp()[1])
         try:
             with file_path.open("w") as file:
-                json.dump(asdict(self), file)
+                file.write(self.to_json(None))
             return file_path
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
@@ -74,13 +74,15 @@ class TokenMetadata:
             raise ValueError(f"Failed to decode JSON from file {file_path}: {err}") from err
 
     @classmethod
-    def from_json_file(cls: type["TokenMetadata"], file_path: Path | None) -> "TokenMetadata":
+    def from_json_file(cls, file_path: Path | None, name: str, decimals: int = 0) -> "TokenMetadata":
         if not file_path:
-            return cls()
+            return cls(name=name, decimals=decimals)
 
         try:
             with file_path.open() as file:
                 data = json.load(file)
+                data["name"] = name
+                data["decimals"] = decimals
             return cls(**data)
         except FileNotFoundError as err:
             raise ValueError(f"No such file or directory: '{file_path}'") from err
@@ -101,7 +103,7 @@ class AssetConfigTxnParams:
     freeze: str | None = ""
     clawback: str | None = ""
     note: str | None = ""
-    decimals: int | None = 0
+    decimals: int = 0
     default_frozen: bool = False
     lease: str | None = ""
     rekey_to: str | None = ""

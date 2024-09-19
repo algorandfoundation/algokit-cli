@@ -1,0 +1,10 @@
+Running commands sequentially.
+⏳ frontend_project: 'hello' command in progress...
+ERROR: 
+····················· project run 'hello' command output: ······················
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+Exception
+
+ERROR: ❌ frontend_project: 'hello' failed executing '<sys.executable> -c raise Exception()' with exit code = 1
+Error: failed to execute 'hello' command in 'frontend_project'

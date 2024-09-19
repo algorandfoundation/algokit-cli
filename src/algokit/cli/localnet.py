@@ -1,18 +1,22 @@
 import logging
 
 import click
+import questionary
 
+from algokit.cli.codespace import codespace_command
 from algokit.cli.explore import explore_command
 from algokit.cli.goal import goal_command
 from algokit.core import proc
+from algokit.core.config_commands.container_engine import get_container_engine, save_container_engine
 from algokit.core.sandbox import (
-    DEFAULT_NAME,
-    DOCKER_COMPOSE_MINIMUM_VERSION,
-    DOCKER_COMPOSE_VERSION_COMMAND,
+    COMPOSE_VERSION_COMMAND,
+    SANDBOX_BASE_NAME,
     ComposeFileStatus,
     ComposeSandbox,
+    ContainerEngine,
     fetch_algod_status_data,
     fetch_indexer_status_data,
+    get_min_compose_version,
 )
 from algokit.core.utils import extract_version_triple, is_minimum_version
 
@@ -20,41 +24,96 @@ logger = logging.getLogger(__name__)
 
 
 @click.group("localnet", short_help="Manage the AlgoKit LocalNet.")
-def localnet_group() -> None:
+@click.pass_context
+def localnet_group(ctx: click.Context) -> None:
+    if ctx.invoked_subcommand and "codespace" in ctx.invoked_subcommand or not ctx.invoked_subcommand:
+        return
+
     try:
-        compose_version_result = proc.run(DOCKER_COMPOSE_VERSION_COMMAND)
+        compose_version_result = proc.run(COMPOSE_VERSION_COMMAND)
     except OSError as ex:
         # an IOError (such as PermissionError or FileNotFoundError) will only occur if "docker"
         # isn't an executable in the user's path, which means docker isn't installed
         raise click.ClickException(
-            "Docker not found; please install Docker and add to path.\n"
-            "See https://docs.docker.com/get-docker/ for more information."
+            "Container engine not found; please install Docker or Podman and add to path."
         ) from ex
     if compose_version_result.exit_code != 0:
         raise click.ClickException(
-            "Docker Compose not found; please install Docker Compose and add to path.\n"
-            "See https://docs.docker.com/compose/install/ for more information."
+            "Container engine compose not found; please install Docker Compose or Podman Compose and add to path."
         )
 
+    compose_minimum_version = get_min_compose_version()
     try:
         compose_version_str = extract_version_triple(compose_version_result.output)
-        compose_version_ok = is_minimum_version(compose_version_str, DOCKER_COMPOSE_MINIMUM_VERSION)
+        compose_version_ok = is_minimum_version(compose_version_str, compose_minimum_version)
     except Exception:
         logger.warning(
-            "Unable to extract docker compose version from output: \n"
+            "Unable to extract compose version from output: \n"
             + compose_version_result.output
-            + f"\nPlease ensure a minimum of compose v{DOCKER_COMPOSE_MINIMUM_VERSION} is used",
+            + f"\nPlease ensure a minimum of compose v{compose_minimum_version} is used",
             exc_info=True,
         )
     else:
         if not compose_version_ok:
             raise click.ClickException(
-                f"Minimum docker compose version supported: v{DOCKER_COMPOSE_MINIMUM_VERSION}, "
+                f"Minimum compose version supported: v{compose_minimum_version}, "
                 f"installed = v{compose_version_str}\n"
-                "Please update your Docker install"
+                "Please update your compose install"
             )
 
-    proc.run(["docker", "version"], bad_return_code_error_message="Docker engine isn't running; please start it.")
+    if ctx.invoked_subcommand and ctx.invoked_subcommand == "config":
+        return
+
+    proc.run(
+        [get_container_engine(), "version"],
+        bad_return_code_error_message="Container engine isn't running; please start it.",
+    )
+
+
+@localnet_group.command("config", short_help="Configure the container engine for AlgoKit LocalNet.")
+@click.argument("engine", required=False, type=click.Choice(["docker", "podman"]))
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    required=False,
+    default=False,
+    type=click.BOOL,
+    help=("Skip confirmation prompts. " "Defaults to 'yes' to all prompts."),
+)
+def config_command(*, engine: str | None, force: bool) -> None:
+    """Set the default container engine for use by AlgoKit CLI to run LocalNet images."""
+    if engine is None:
+        current_engine = get_container_engine()
+        choices = [
+            f"Docker {'(Active)' if current_engine == ContainerEngine.DOCKER else ''}".strip(),
+            f"Podman {'(Active)' if current_engine == ContainerEngine.PODMAN else ''}".strip(),
+        ]
+        engine = questionary.select("Which container engine do you prefer?", choices=choices).ask()
+        if engine is None:
+            raise click.ClickException("No valid container engine selected. Aborting...")
+        engine = engine.split()[0].lower()
+
+    sandbox = ComposeSandbox.from_environment()
+    has_active_instance = sandbox is not None and (
+        force
+        or click.confirm(
+            f"Detected active localnet instance, would you like to restart it with '{engine}'?",
+            default=True,
+        )
+    )
+    if sandbox and has_active_instance:
+        sandbox.down()
+        save_container_engine(engine)
+        sandbox.write_compose_file()
+        sandbox.up()
+    else:
+        save_container_engine(engine)
+
+    logger.info(f"Container engine set to `{engine}`")
+
+
+localnet_group.add_command(config_command)
 
 
 @localnet_group.command("start", short_help="Start the AlgoKit LocalNet.")
@@ -69,7 +128,7 @@ def localnet_group() -> None:
 )
 def start_localnet(name: str | None) -> None:
     sandbox = ComposeSandbox.from_environment()
-    full_name = f"{DEFAULT_NAME}_{name}" if name is not None else DEFAULT_NAME
+    full_name = f"{SANDBOX_BASE_NAME}_{name}" if name is not None else SANDBOX_BASE_NAME
     if sandbox is not None and full_name != sandbox.name:
         logger.debug("LocalNet is already running.")
         if click.confirm("This will stop any running AlgoKit LocalNet instance. Are you sure?", default=True):
@@ -125,10 +184,10 @@ def reset_localnet(*, update: bool) -> None:
     if compose_file_status is ComposeFileStatus.MISSING:
         logger.debug("Existing LocalNet not found; creating from scratch...")
         sandbox.write_compose_file()
-    elif sandbox.name == DEFAULT_NAME:
+    elif sandbox.name == SANDBOX_BASE_NAME:
         sandbox.down()
         if compose_file_status is not ComposeFileStatus.UP_TO_DATE:
-            logger.info("LocalNet definition is out of date; updating it to latest")
+            logger.info("Syncing LocalNet configuration")
             sandbox.write_compose_file()
         if update:
             sandbox.pull()
@@ -151,7 +210,7 @@ def reset_localnet(*, update: bool) -> None:
     sandbox.up()
 
 
-SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer")
+SERVICE_NAMES = ("algod", "conduit", "indexer-db", "indexer", "proxy")
 
 
 @localnet_group.command("status", short_help="Check the status of the AlgoKit LocalNet.")
@@ -159,6 +218,12 @@ def localnet_status() -> None:
     sandbox = ComposeSandbox.from_environment()
     if sandbox is None:
         sandbox = ComposeSandbox()
+
+    logger.info("# container engine")
+    logger.info(
+        "Name: " + click.style(get_container_engine(), bold=True) + " (change with `algokit config container-engine`)"
+    )
+
     ps = sandbox.ps()
     ps_by_name = {stats["Service"]: stats for stats in ps}
     # if any of the required containers does not exist (ie it's not just stopped but hasn't even been created),
@@ -172,10 +237,10 @@ def localnet_status() -> None:
     }
     # fill out remaining output_by_name["algod"] values
     if output_by_name["algod"]["Status"] == "Running":
-        output_by_name["algod"].update(fetch_algod_status_data(ps_by_name["algod"]))
+        output_by_name["algod"].update(fetch_algod_status_data(ps_by_name["proxy"]))
     # fill out remaining output_by_name["indexer"] values
     if output_by_name["indexer"]["Status"] == "Running":
-        output_by_name["indexer"].update(fetch_indexer_status_data(ps_by_name["indexer"]))
+        output_by_name["indexer"].update(fetch_indexer_status_data(ps_by_name["proxy"]))
 
     # Print the status details
     for service_name, service_info in output_by_name.items():
@@ -200,7 +265,7 @@ def localnet_console(context: click.Context) -> None:
     context.invoke(goal_command, console=True)
 
 
-@localnet_group.command("explore", short_help="Explore the AlgoKit LocalNet using Dappflow")
+@localnet_group.command("explore", short_help="Explore the AlgoKit LocalNet using lora.")
 @click.pass_context
 def localnet_explore(context: click.Context) -> None:
     context.invoke(explore_command)
@@ -208,7 +273,7 @@ def localnet_explore(context: click.Context) -> None:
 
 @localnet_group.command(
     "logs",
-    short_help="See the output of the Docker containers",
+    short_help="See the output of the Docker containers.",
 )
 @click.option(
     "--follow/-f",
@@ -226,3 +291,6 @@ def localnet_explore(context: click.Context) -> None:
 def localnet_logs(ctx: click.Context, *, follow: bool, tail: str) -> None:
     sandbox = ComposeSandbox()
     sandbox.logs(follow=follow, no_color=ctx.color is False, tail=tail)
+
+
+localnet_group.add_command(codespace_command)

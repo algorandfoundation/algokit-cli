@@ -1,0 +1,35 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No 'min_version' specified in .algokit.toml file.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: Skipping {current_working_directory}/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Checking {current_working_directory}/artifacts for bootstrapping needs
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_1/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_1/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_1/.env.template
+DEBUG: Skipping {current_working_directory}/artifacts/project_1/poetry.toml
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_2/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_2/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_2/.env.template
+DEBUG: Skipping {current_working_directory}/artifacts/project_2/poetry.toml
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_3/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_3/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_3/.env.template
+DEBUG: Skipping {current_working_directory}/artifacts/project_3/poetry.toml
+DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_4/.algokit.toml
+DEBUG: Checking {current_working_directory}/artifacts/project_4 for bootstrapping needs
+DEBUG: Running `algokit project bootstrap env`
+DEBUG: {current_working_directory}/artifacts/project_4/.env doesn't exist yet
+DEBUG: {current_working_directory}/artifacts/project_4/.env.template exists
+Copying {current_working_directory}/artifacts/project_4/.env.template to {current_working_directory}/artifacts/project_4/.env and prompting for empty values
+DEBUG: Running `algokit project bootstrap npm`
+Installing npm dependencies
+DEBUG: Running 'npm install' in '{current_working_directory}/artifacts/project_4'
+npm: STDOUT
+npm: STDERR
+DEBUG: Skipping {current_working_directory}/artifacts/project_4/.algokit.toml
+DEBUG: Skipping {current_working_directory}/artifacts/project_4/.env
+DEBUG: Skipping {current_working_directory}/artifacts/project_4/.env.template
+DEBUG: Skipping {current_working_directory}/artifacts/project_4/package.json
+Finished bootstrapping {current_working_directory}

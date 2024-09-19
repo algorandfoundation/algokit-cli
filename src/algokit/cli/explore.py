@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 import click
 
 from algokit.core.sandbox import DEFAULT_ALGOD_PORT, DEFAULT_ALGOD_SERVER, DEFAULT_ALGOD_TOKEN, DEFAULT_INDEXER_PORT
+from algokit.core.utils import is_wsl
 
 logger = logging.getLogger(__name__)
 
@@ -75,14 +76,42 @@ NETWORKS: dict[str, NetworkConfiguration] = {
 }
 
 
-def get_dappflow_url(network: NetworkConfiguration) -> str:
-    query_string = urlencode(network)
-    return f"https://app.dappflow.org/setup-config?{query_string}"
+def get_algokit_url(network: str) -> str:
+    return f"https://explore.algokit.io/{network}"
 
 
-@click.command("explore", help="Explore the specified network in the browser using Dappflow.")
+def get_explore_url(network: str) -> str:
+    if network == "localnet" and NETWORKS[network].get("algod_url") != DEFAULT_ALGOD_SERVER:
+        query_string = urlencode(
+            [
+                (key, value)
+                for key, value in NETWORKS[network].items()
+                if key in ["algod_url", "algod_port", "indexer_url", "indexer_port", "kmd_url", "kmd_port"]
+            ]
+        )
+        return f"{get_algokit_url(network)}?{query_string}"
+
+    return get_algokit_url(network)
+
+
+@click.command("explore", help="Explore the specified network using lora.")
 @click.argument("network", type=click.Choice(list(NETWORKS)), default="localnet", required=False)
 def explore_command(network: str) -> None:
-    url = get_dappflow_url(NETWORKS[network])
-    logger.info(f"Opening {network} in https://app.dappflow.org using default browser")
-    click.launch(url)
+    url = get_explore_url(network)
+    logger.info(f"Opening {network} explorer in your default browser")
+
+    if is_wsl():
+        import webbrowser
+
+        warning = (
+            "Unable to open browser from WSL environment.\n"
+            "Ensure 'wslu' is installed: (https://wslutiliti.es/wslu/install.html),\n"
+            f"or open the URL manually: '{url}'."
+        )
+        try:
+            if not webbrowser.open(url):
+                logger.warning(warning)
+        except Exception as e:
+            logger.warning(warning, exc_info=e)
+    else:
+        click.launch(url)

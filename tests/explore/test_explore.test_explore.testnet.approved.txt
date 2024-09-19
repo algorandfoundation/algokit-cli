@@ -1,5 +1,5 @@
-Opening testnet in https://app.dappflow.org using default browser
+Opening testnet explorer in your default browser
 ----
 launch args:
 ----
-call('https://app.dappflow.org/setup-config?algod_url=https%3A%2F%2Ftestnet-api.algonode.cloud&indexer_url=https%3A%2F%2Ftestnet-idx.algonode.cloud')
+call('https://explore.algokit.io/testnet')

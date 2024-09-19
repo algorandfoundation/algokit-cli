@@ -4,6 +4,12 @@ WARNING: Community templates have not been reviewed, and can execute arbitrary c
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 ? Continue anyway? (y/N)
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
@@ -11,9 +17,16 @@ Starting template copy and render at {current_working_directory}/myapp...
 No git tags found in template; using HEAD as ref
 DEBUG: final clone URL = {test_parent_directory}/copier-helloworld.bundle
 Template render complete!
-DEBUG: Attempting to load project config from {current_working_directory}/myapp/.algokit.toml
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-Executed `algokit bootstrap all` in {current_working_directory}/myapp
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+Executed `algokit project bootstrap all` in {current_working_directory}/myapp
+🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 DEBUG: Running 'git rev-parse --show-toplevel' in '{current_working_directory}/myapp'
 DEBUG: git: fatal: not a git repository (or any of the parent directories): .git
 DEBUG: Running 'git init' in '{current_working_directory}/myapp'
@@ -26,4 +39,3 @@ DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised w
 DEBUG: git: 1 file changed, 1 insertion(+)
 DEBUG: git: create mode 100644 myapp/helloworld.txt
 🎉 Performed initial git commit successfully! 🎉
-🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐

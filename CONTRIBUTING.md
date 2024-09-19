@@ -21,7 +21,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
      - If you're not using PyCharm, then run `poetry install` in the repository root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
    - Via AlgoKit CLI:
 
-     - [Install AlgoKit CLI](./README.md#install) and run `algokit bootstrap poetry` in the root directory
+     - [Install AlgoKit CLI](./README.md#install) and run `algokit project bootstrap poetry` in the root directory
      - Install `tealer` - by running `pipx install tealer==0.1.2`. This is a prerequisite to running `pytest`, tealer is a third party tool for static analysis of TEAL code, algokit uses it in `task analyse` command. AlgoKit uses `pytest-xdist` to speed up the test suite execution by running tests in parallel, this requires `tealer` to be installed globally to avoid race conditions.
 
 3. Install pre-commit hooks (optional but recommended):
@@ -34,9 +34,9 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 
    - VS Code
 
-     1. Open the repository root in VS Code
-     2. Install recommended extensions
-     3. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
+     1. Open the repository root in VS Code.
+     2. Install recommended extensions.
+     3. Hit F5 (or whatever you have debug mapped to) and it should start running with breakpoint debugging.
 
         > **Note**
         > The first time you run, VS Code may prompt you to select the Python Interpreter, or if you are having issues running you may need to select it via the `Python: Select Interpreter` pallette command. You should select the Python Interpreter with the ./.venv path)

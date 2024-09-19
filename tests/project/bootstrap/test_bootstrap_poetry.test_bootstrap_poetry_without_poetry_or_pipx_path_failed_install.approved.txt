@@ -1,0 +1,13 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+Poetry not found; attempting to install it...
+? We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies? (Y/n)
+DEBUG: Running 'pipx --version' in '{current_working_directory}'
+DEBUG: Running '{python_base_executable} -m pipx --version' in '{current_working_directory}'
+DEBUG: {python_base_executable}: STDOUT
+DEBUG: {python_base_executable}: STDERR
+DEBUG: Running '{python_base_executable} -m pipx install poetry' in '{current_working_directory}'
+DEBUG: {python_base_executable}: STDOUT
+DEBUG: {python_base_executable}: STDERR
+Error: Unable to install poetry via pipx; please install poetry manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again.
