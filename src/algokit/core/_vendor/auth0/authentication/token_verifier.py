@@ -3,7 +3,6 @@ Commit ref: https://github.com/auth0/auth0-python/commit/423f9b35faf0b673bfb2cd6
 File ref: https://github.com/auth0/auth0-python/blob/master/auth0/authentication/token_verifier.py
 """
 
-
 from __future__ import annotations
 
 import json
