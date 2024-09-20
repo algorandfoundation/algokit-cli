@@ -2,6 +2,9 @@ name: Codebase validation
 
 on:
   pull_request:
+    paths-ignore:
+      - "README.md"
+
   schedule:
     - cron: "0 8 * * 1" # Each monday 8 AM UTC
 
