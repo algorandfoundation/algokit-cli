@@ -97,7 +97,7 @@ cask "$package_name" do
   sha256 arm:   "$arm_sha256",
          intel: "$intel_sha256"
 
-  url "$repo/releases/download/v#{version}/algokit-#{version}-macos_#{arch}.tar.gz"
+  url "$repo/releases/download/v#{version}/algokit-#{version}-macos_#{arch}-brew.tar.gz"
   name "$package_name"
   desc "$desc"
   homepage "$homepage"
