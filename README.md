@@ -181,8 +181,10 @@ Some useful commands for updating or removing AlgoKit in the future.
 2. Install using snap
 
    ```shell
-   snap install algokit --classic
+   sudo snap install algokit --classic
    ```
+
+   > For detailed guidelines per each supported linux distro, refer to [Snap Store](https://snapcraft.io/algokit).
 
 3. [Verify installation](#verify-installation)
 
