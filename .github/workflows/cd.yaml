@@ -9,6 +9,12 @@ on:
       - "**.md"
       - ".vscode/**"
       - ".idea/**"
+      - ".gitignore"
+      - ".editorconfig"
+      - ".pre-commit-config.yaml"
+      - ".github/**"
+      - "tests/**"
+      - "scripts/**"
   workflow_dispatch:
     inputs:
       production_release:
