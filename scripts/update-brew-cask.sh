@@ -92,7 +92,7 @@ create_cask() {
 cat << EOF > $cask_file
 cask "$package_name" do
   arch arm: "arm64", intel: "x64"
-  
+
   version "$version"
   sha256 arm:   "$arm_sha256",
          intel: "$intel_sha256"
