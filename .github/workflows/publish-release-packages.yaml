@@ -62,6 +62,7 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_ID }}
           private-key: ${{ secrets.BOT_SK }}
+          repositories: algorandfoundation/homebrew-tap
 
       - name: Checkout source code
         uses: actions/checkout@v4
