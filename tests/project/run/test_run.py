@@ -29,7 +29,9 @@ def _format_output(output: str) -> str:
     Returns:
         str: The processed output with specified lines stripped.
     """
-    output = "\n".join([line for line in output.split("\n") if not line.startswith("DEBUG")])
+    output = "\n".join(
+        [line for line in output.split("\n") if not line.startswith("DEBUG") and line.strip() != "raise Exception()"]
+    )
     return output.replace(PYTHON_EXECUTABLE_ESCAPED, "<sys.executable>").replace("\\", r"\\")
 
 
