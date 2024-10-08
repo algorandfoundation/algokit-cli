@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python: ["3.10", "3.11", "3.12"]
+        python: ["3.10", "3.11", "3.12", "3.13.0-rc.3"] # TODO: change to 3.13 once its out of rc
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
