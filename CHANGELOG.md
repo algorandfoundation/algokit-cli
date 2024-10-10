@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.2 (2024-10-10)
+
+### Documentation
+
+* More details on snap install in README.md ([#577](https://github.com/algorandfoundation/algokit-cli/issues/577)) ([`44f900f`](https://github.com/algorandfoundation/algokit-cli/commit/44f900ffdf7a9021aa2ddcf97a45a384852ce6f8))
+
 ## v2.4.1 (2024-09-19)
 
 ### Fix
