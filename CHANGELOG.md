@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.4.3 (2024-10-29)
+
+### Fix
+
+* Edge cases for running interactive goal commands with --tty flag ([#589](https://github.com/algorandfoundation/algokit-cli/issues/589)) ([`e280a7f`](https://github.com/algorandfoundation/algokit-cli/commit/e280a7f9e6208b4a15f384809a2f0c8607ed9fb7))
+
 ## v2.4.2 (2024-10-10)
 
 ### Documentation
