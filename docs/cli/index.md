@@ -67,6 +67,7 @@
   - [goal](#goal)
     - [Options](#options-11)
     - [--console](#--console)
+    - [--interactive](#--interactive)
     - [Arguments](#arguments-6)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
@@ -590,6 +591,10 @@ algokit goal [OPTIONS] [GOAL_ARGS]...
 
 ### --console
 Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.
+
+
+### --interactive
+Force running the goal command in interactive mode.
 
 ### Arguments
 

@@ -28,8 +28,14 @@ logger = logging.getLogger(__name__)
     help="Open a Bash console so you can execute multiple goal commands and/or interact with a filesystem.",
     default=False,
 )
+@click.option(
+    "--interactive",
+    is_flag=True,
+    help="Force running the goal command in interactive mode.",
+    default=False,
+)
 @click.argument("goal_args", nargs=-1, type=click.UNPROCESSED)
-def goal_command(*, console: bool, goal_args: list[str]) -> None:
+def goal_command(*, console: bool, interactive: bool, goal_args: list[str]) -> None:  # noqa: C901, PLR0912
     """
     Run the Algorand goal CLI against the AlgoKit LocalNet.
 
@@ -80,17 +86,28 @@ def goal_command(*, console: bool, goal_args: list[str]) -> None:
         logger.info("Opening Bash console on the algod node; execute `exit` to return to original console")
         result = proc.run_interactive(f"{container_engine} exec -it -w /root algokit_{sandbox.name}_algod bash".split())
     else:
-        cmd = f"{container_engine} exec --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()
+        cmd = f"{container_engine} exec {'--tty' if interactive else ''} --interactive --workdir /root algokit_{sandbox.name}_algod goal".split()  # noqa: E501
         input_files, output_files, goal_args = preprocess_command_args(
             goal_args, volume_mount_path_local, volume_mount_path_docker
         )
         cmd = cmd + goal_args
-        result = proc.run(
-            cmd,
-            stdout_log_level=logging.INFO,
-            prefix_process=False,
-            pass_stdin=True,
-        )
+
+        if interactive:
+            result = proc.run_interactive(cmd)
+        else:
+            # Try non-interactive first, fallback to interactive if it fails with input-related error
+            result = proc.run(
+                cmd,
+                stdout_log_level=logging.INFO,
+                prefix_process=False,
+                pass_stdin=True,
+            )
+            if result.exit_code != 0 and "inappropriate ioctl" in (result.output or ""):
+                # Fallback to interactive mode if we detect TTY-related errors
+                logger.debug("Command failed with TTY error, retrying in interactive mode")
+                cmd.insert(2, "--tty")
+                result = proc.run_interactive(cmd)
+
         post_process(input_files, output_files, volume_mount_path_local)
 
     if result.exit_code != 0:
