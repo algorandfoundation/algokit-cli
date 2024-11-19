@@ -141,7 +141,7 @@ def generate_group() -> None:
 def generate_client(
     output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None
 ) -> None:
-    """Create a typed ApplicationClient from an ARC-32 application.json
+    """Create a typed ApplicationClient from an ARC-32/56 application.json
 
     Supply the path to an application specification file or a directory to recursively search
     for "application.json" files"""
@@ -164,7 +164,7 @@ def generate_client(
     if not app_spec_path_or_dir.is_dir():
         app_specs = [app_spec_path_or_dir]
     else:
-        patterns = ["application.json", "*.arc32.json"]
+        patterns = ["application.json", "*.arc32.json", "*.arc56.json"]
 
         app_specs = []
         for pattern in patterns:

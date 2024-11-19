@@ -76,6 +76,11 @@ def arc32_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> P
     return dir_with_app_spec_factory(cwd, "app.arc32.json")
 
 
+@pytest.fixture()
+def arc56_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
+    return dir_with_app_spec_factory(cwd, "app.arc56.json")
+
+
 @pytest.fixture(autouse=True)
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
@@ -209,6 +214,26 @@ def test_generate_client_python_arc32_filename(
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
     assert len(proc_mock.called) == 4  # noqa: PLR2004
     assert proc_mock.called[3].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
+
+
+@pytest.mark.parametrize(
+    ("options", "expected_output_path"),
+    [
+        ("-o client.py", "client.py"),
+    ],
+)
+def test_generate_client_python_arc56_filename(
+    proc_mock: ProcMock, arc56_json: Path, options: str, expected_output_path: Path
+) -> None:
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
+    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+
+    result = invoke(f"generate client {options} {arc56_json.name}", cwd=arc56_json.parent)
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
 
 @pytest.mark.usefixtures("mock_platform_system")
