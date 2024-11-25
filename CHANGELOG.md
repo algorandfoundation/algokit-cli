@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.5.0 (2024-11-25)
+
+### Feature
+
+* Add support for ARC56 typed client generation ([#595](https://github.com/algorandfoundation/algokit-cli/issues/595)) ([`72807c3`](https://github.com/algorandfoundation/algokit-cli/commit/72807c3b7e8114528e026a0fa34b8ba07a49fc8a))
+
+### Documentation
+
+* Adding extra troubleshooting case; extra prereq for winget installation ([#591](https://github.com/algorandfoundation/algokit-cli/issues/591)) ([`84d7690`](https://github.com/algorandfoundation/algokit-cli/commit/84d769014bf71ddd798cace122bad141b1429416))
+
 ## v2.4.3 (2024-10-29)
 
 ### Fix
