@@ -58,7 +58,10 @@ class ClientGenerator(abc.ABC):
     def resolve_output_path(self, app_spec: Path, output_path_pattern: str | None) -> Path | None:
         try:
             application_json = json.loads(app_spec.read_text())
-            contract_name: str = application_json["contract"]["name"]
+            try:
+                contract_name: str = application_json["name"]  # ARC-56
+            except KeyError:
+                contract_name = application_json["contract"]["name"]  # ARC-32
         except Exception:
             logger.error(f"Couldn't parse contract name from {app_spec}", exc_info=True)
             return None

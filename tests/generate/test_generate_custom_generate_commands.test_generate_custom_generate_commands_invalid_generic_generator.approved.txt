@@ -9,4 +9,4 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  client  Create a typed ApplicationClient from an ARC-32 application.json
+  client  Create a typed ApplicationClient from an ARC-32/56 application.json

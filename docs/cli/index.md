@@ -541,7 +541,7 @@ algokit generate [OPTIONS] COMMAND [ARGS]...
 
 ### client
 
-Create a typed ApplicationClient from an ARC-32 application.json
+Create a typed ApplicationClient from an ARC-32/56 application.json
 
 Supply the path to an application specification file or a directory to recursively search
 for "application.json" files
