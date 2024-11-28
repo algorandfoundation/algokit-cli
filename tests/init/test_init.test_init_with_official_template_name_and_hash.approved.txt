@@ -1,6 +1,6 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template@96fc7fd766fac607cdf5d69ee6e85ade04dddd47
+DEBUG: template source = gh:algorandfoundation/algokit-python-template@f97be2c0e3975adfaeb16ef07a2b4bd6ce2afcff
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
@@ -11,18 +11,16 @@ DEBUG: project path = {current_working_directory}/myapp
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Starting template copy and render at {current_working_directory}/myapp...
-DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
+DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-python-template.git
 Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit project bootstrap all` in {current_working_directory}/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+➡️  https://github.com/algorandfoundation/algokit-python-template
 Your template includes a README.md file, you might want to review that as a next step.

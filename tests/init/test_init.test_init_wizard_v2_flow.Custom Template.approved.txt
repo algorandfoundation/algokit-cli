@@ -23,7 +23,7 @@ Valid examples:
  - ~/path/to/git/repo.bundle
 
 ? Custom template URL:
-DEBUG: template source = gh:robdmoore/copier-helloworld
+DEBUG: template source = gh:algorandfoundation/algokit-base-template
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
@@ -36,18 +36,13 @@ DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Workspace structure is ready! The project is to be placed under {current_working_directory}/myapp/projects/myapp
 Starting template copy and render at {current_working_directory}/myapp/projects/myapp...
-No git tags found in template; using HEAD as ref
-DEBUG: final clone URL = https://github.com/robdmoore/copier-helloworld.git
+DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-base-template.git
 Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
-DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit project bootstrap all` in {current_working_directory}/myapp/projects/myapp
 🙌 Project initialized at `myapp`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️  https://github.com/robdmoore/copier-helloworld
-DEBUG: Appended project {current_working_directory}/myapp/projects/myapp to workspace {current_working_directory}/myapp/myapp.code-workspace.
+➡️  https://github.com/algorandfoundation/algokit-base-template
+DEBUG: Project {current_working_directory}/myapp/projects/myapp is already in workspace {current_working_directory}/myapp/projects/myapp/myapp.code-workspace, not appending.
+Your template includes a README.md file, you might want to review that as a next step.

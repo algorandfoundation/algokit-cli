@@ -89,9 +89,8 @@ class ExtendedTemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
-    BEAKER = "beaker"
     PLAYGROUND = "playground"
-    BEAKER_WITH_VERSION = "beaker_with_version"
+    PYTHON_WITH_VERSION = "python_with_version"
     SIMPLE = "simple"
 
 
@@ -107,28 +106,24 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
 
     blessed_templates = {
         ExtendedTemplateKey.SIMPLE: BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
+            url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful. simple",
         ),
-        ExtendedTemplateKey.BEAKER: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            description="Provides a good starting point to build Beaker smart contracts productively.",
-        ),
-        ExtendedTemplateKey.BEAKER_WITH_VERSION: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-default-template",
-            commit="96fc7fd766fac607cdf5d69ee6e85ade04dddd47",
-            description="Provides a good starting point to build Beaker smart contracts productively, but pinned.",
+        ExtendedTemplateKey.PYTHON_WITH_VERSION: BlessedTemplateSource(
+            url="gh:algorandfoundation/algokit-python-template",
+            commit="f97be2c0e3975adfaeb16ef07a2b4bd6ce2afcff",
+            description="Provides a good starting point to build python smart contracts productively, but pinned.",
         ),
         ExtendedTemplateKey.FULLSTACK: BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
+            url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful. fullstack",
         ),
         ExtendedTemplateKey.PYTHON: BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
+            url="gh:algorandfoundation/algokit-python-template",
             description="Does nothing helpful. python",
         ),
         ExtendedTemplateKey.REACT: BlessedTemplateSource(
-            url="gh:robdmoore/copier-helloworld",
+            url="gh:algorandfoundation/algokit-base-template",
             description="Does nothing helpful. react",
         ),
         ExtendedTemplateKey.BASE: BlessedTemplateSource(
@@ -568,7 +563,7 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
         "init --name myapp --no-git --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template "
+        "--template-url gh:algorandfoundation/algokit-python-template "
         f"--template-url-ref {ref} "
         "--UNSAFE-SECURITY-accept-template-url --no-workspace",
         cwd=cwd,
@@ -586,7 +581,7 @@ def test_init_blessed_template_url_get_community_warning(
     mock_questionary_input.send_text("N")  # community warning
     result = invoke(
         "init --name myapp --no-git "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults "
+        "--template-url gh:algorandfoundation/algokit-python-template --defaults "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -680,7 +675,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --no-bootstrap --template base --defaults --no-workspace "
+        "init --name myapp --no-git --no-bootstrap --template python --defaults --no-workspace "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -690,9 +685,8 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     assert paths.issuperset(
         {
             Path("myapp"),
-            Path("myapp") / ".algokit.toml",
             Path("myapp") / "README.md",
-            Path("myapp") / "projects",
+            Path("myapp") / "smart_contracts",
         }
     )
     verify(
@@ -705,7 +699,7 @@ def test_init_with_official_template_name_and_hash(tmp_path_factory: TempPathFac
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --template beaker_with_version"
+        "init --name myapp --no-git --template python_with_version"
         " --defaults -a run_poetry_install False -a author_name None -a author_email None --no-workspace ",
         cwd=cwd,
     )
@@ -727,7 +721,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
 
     result = invoke(
         (
-            "init --name myapp --no-git --no-bootstrap --template base --defaults --no-workspace "
+            "init --name myapp --no-git --no-bootstrap --template python --defaults --no-workspace "
             "-a author_name None -a author_email None "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
             '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '
@@ -741,9 +735,8 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     assert paths.issuperset(
         {
             Path("myapp"),
-            Path("myapp") / ".algokit.toml",
             Path("myapp") / "README.md",
-            Path("myapp") / "projects",
+            Path("myapp") / "smart_contracts",
         }
     )
 
@@ -824,7 +817,7 @@ def test_init_template_with_python_task_works(dummy_algokit_template_with_python
         ],
         [
             MockQuestionaryAnswer("Custom Template", [MockPipeInput.UP, MockPipeInput.ENTER]),
-            "gh:robdmoore/copier-helloworld\n",  # custom template URL
+            "gh:algorandfoundation/algokit-base-template\n",  # custom template URL
         ],
     ],
 )
@@ -899,8 +892,7 @@ def test_init_wizard_v2_github_folder_with_workspace(
 
     # Act
     result = invoke(
-        "init --name myapp --no-git --defaults --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-python-template "
+        "init -t python --no-git --defaults --name myapp "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
@@ -926,8 +918,7 @@ def test_init_wizard_v2_github_folder_with_workspace_partial(
 
     # Act
     result = invoke(
-        "init --name myapp --no-git --defaults --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-python-template "
+        "init -t python --no-git --defaults --name myapp "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         input="y\n",
         cwd=cwd,
@@ -936,7 +927,7 @@ def test_init_wizard_v2_github_folder_with_workspace_partial(
     # Assert
     cwd /= "myapp"
     assert result.exit_code == 0
-    assert not (cwd / "projects/myapp/.github/workflows/production-python-cd.yaml").exists()
+    assert not (cwd / "projects/myapp/.github/workflows/cd.yaml").exists()
     assert (cwd / ".github/workflows/myapp-cd.yaml").read_text() != ""
     assert cwd.glob(".github/workflows/*.yaml")
 
@@ -952,9 +943,8 @@ def test_init_wizard_v2_github_folder_no_workspace(
 
     # Act
     result = invoke(
-        "init --name myapp --no-git --defaults --no-bootstrap --no-workspace "
-        "--template-url gh:algorandfoundation/algokit-python-template "
-        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
+        "init -t python --no-git --defaults --name myapp "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production' --no-workspace",
         cwd=cwd,
     )
 
