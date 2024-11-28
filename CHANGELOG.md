@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.5.1 (2024-11-28)
+
+### Fix
+
+* Duplicate code-workspace declarations ([#596](https://github.com/algorandfoundation/algokit-cli/issues/596)) ([`505c6c6`](https://github.com/algorandfoundation/algokit-cli/commit/505c6c624d869d4bef9adaa973dad7d735b7bae0))
+
 ## v2.5.0 (2024-11-25)
 
 ### Feature
