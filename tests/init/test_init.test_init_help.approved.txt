@@ -22,7 +22,7 @@ Usage: algokit init [OPTIONS]
 Options:
   -n, --name TEXT                 Name of the project / directory / repository
                                   to create.
-  -t, --template [simple|beaker|beaker_with_version|fullstack|python|react|base]
+  -t, --template [simple|python_with_version|fullstack|python|react|base]
                                   Name of an official template to use. To choose
                                   interactively, run this command with no
                                   arguments.

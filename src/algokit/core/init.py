@@ -89,20 +89,26 @@ def append_project_to_vscode_workspace(project_path: Path, workspace_path: Path)
 
     try:
         workspace = _load_vscode_workspace(workspace_path)
-        # Convert paths to POSIX format for consistent handling, and ensure relative paths are correctly interpreted
-        processed_project_path = project_path.relative_to(workspace_path.parent).as_posix()
-        # Normalize the new project path for comparison, ensuring it does not end with a slash unless it's the root
-        normalized_project_path = processed_project_path if processed_project_path != "." else "./"
 
-        # Normalize existing paths in the workspace for comparison
-        existing_paths = [
-            folder.get("path", "").rstrip("/").replace("\\", "/") for folder in workspace.get("folders", [])
-        ]
-        # Ensure the normalized new path is not already in the workspace
-        if normalized_project_path not in existing_paths:
-            workspace.setdefault("folders", []).append({"path": processed_project_path})
+        # Compute the project path relative to the workspace root
+        processed_project_path = project_path.relative_to(workspace_path.parent)
+        project_abs_path = (workspace_path.parent / processed_project_path).resolve(strict=False)
+
+        # Gather existing paths as absolute paths
+        existing_abs_paths = []
+        for folder in workspace.get("folders", []):
+            folder_path = Path(folder.get("path", "").replace("\\", "/"))
+            existing_abs_path = (workspace_path.parent / folder_path).resolve(strict=False)
+            existing_abs_paths.append(existing_abs_path)
+
+        # Check if the project path is already in the workspace
+        if project_abs_path not in existing_abs_paths:
+            workspace.setdefault("folders", []).append({"path": str(processed_project_path).replace("\\", "/")})
             _save_vscode_workspace(workspace_path, workspace)
-        logger.debug(f"Appended project {project_path} to workspace {workspace_path}.")
+            logger.debug(f"Appended project {project_path} to workspace {workspace_path}.")
+        else:
+            logger.debug(f"Project {project_path} is already in workspace {workspace_path}, not appending.")
+
     except json.JSONDecodeError as json_err:
         logger.warning(f"Invalid JSON format in the workspace file {workspace_path}. {json_err}")
     except Exception as e:
