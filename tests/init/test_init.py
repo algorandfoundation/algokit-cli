@@ -602,7 +602,7 @@ def test_init_with_any_template_url_get_community_warning(
     mock_questionary_input.send_text("Y")
     result = invoke(
         "init --name myapp --no-git --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults --no-workspace "
+        "--template-url gh:algorandfoundation/algokit-python-template --defaults --no-workspace "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -626,7 +626,7 @@ def test_init_with_any_template_url_get_community_warning_with_unsafe_tag(tmp_pa
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
         "init --name myapp --no-git --no-bootstrap "
-        "--template-url gh:algorandfoundation/algokit-beaker-default-template --defaults --no-workspace "
+        "--template-url gh:algorandfoundation/algokit-python-template --defaults --no-workspace "
         "-a author_name None -a author_email None --UNSAFE-SECURITY-accept-template-url",
         cwd=cwd,
     )
@@ -680,7 +680,7 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "init --name myapp --no-git --no-bootstrap --template beaker --defaults --no-workspace "
+        "init --name myapp --no-git --no-bootstrap --template base --defaults --no-workspace "
         "-a author_name None -a author_email None ",
         cwd=cwd,
     )
@@ -690,8 +690,9 @@ def test_init_with_official_template_name(tmp_path_factory: TempPathFactory) -> 
     assert paths.issuperset(
         {
             Path("myapp"),
+            Path("myapp") / ".algokit.toml",
             Path("myapp") / "README.md",
-            Path("myapp") / "smart_contracts",
+            Path("myapp") / "projects",
         }
     )
     verify(
@@ -726,7 +727,7 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
 
     result = invoke(
         (
-            "init --name myapp --no-git --no-bootstrap --template beaker --defaults --no-workspace "
+            "init --name myapp --no-git --no-bootstrap --template base --defaults --no-workspace "
             "-a author_name None -a author_email None "
             '-a algod_token "abcdefghijklmnopqrstuvwxyz" -a algod_server http://mylocalserver -a algod_port 1234 '
             '-a indexer_token "zyxwvutsrqponmlkjihgfedcba" -a indexer_server http://myotherserver -a indexer_port 6789 '
@@ -740,8 +741,9 @@ def test_init_with_custom_env(tmp_path_factory: TempPathFactory) -> None:
     assert paths.issuperset(
         {
             Path("myapp"),
+            Path("myapp") / ".algokit.toml",
             Path("myapp") / "README.md",
-            Path("myapp") / "smart_contracts",
+            Path("myapp") / "projects",
         }
     )
 
@@ -897,7 +899,8 @@ def test_init_wizard_v2_github_folder_with_workspace(
 
     # Act
     result = invoke(
-        "init -t beaker --no-git --defaults --name myapp "
+        "init --name myapp --no-git --defaults --no-bootstrap "
+        "--template-url gh:algorandfoundation/algokit-python-template "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
@@ -923,7 +926,8 @@ def test_init_wizard_v2_github_folder_with_workspace_partial(
 
     # Act
     result = invoke(
-        "init -t beaker --no-git --defaults --name myapp "
+        "init --name myapp --no-git --defaults --no-bootstrap "
+        "--template-url gh:algorandfoundation/algokit-python-template "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         input="y\n",
         cwd=cwd,
@@ -932,7 +936,7 @@ def test_init_wizard_v2_github_folder_with_workspace_partial(
     # Assert
     cwd /= "myapp"
     assert result.exit_code == 0
-    assert not (cwd / "projects/myapp/.github/workflows/production-beaker-cd.yaml").exists()
+    assert not (cwd / "projects/myapp/.github/workflows/production-python-cd.yaml").exists()
     assert (cwd / ".github/workflows/myapp-cd.yaml").read_text() != ""
     assert cwd.glob(".github/workflows/*.yaml")
 
@@ -948,8 +952,9 @@ def test_init_wizard_v2_github_folder_no_workspace(
 
     # Act
     result = invoke(
-        "init -t beaker --no-git --defaults --name myapp "
-        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production' --no-workspace",
+        "init --name myapp --no-git --defaults --no-bootstrap --no-workspace "
+        "--template-url gh:algorandfoundation/algokit-python-template "
+        "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
 
@@ -1009,7 +1014,7 @@ def test_init_wizard_v2_append_to_vscode_workspace(
 
     # Act
     project_a_result = invoke(
-        "init -t beaker --no-git --defaults --name myapp "
+        "init -t python --no-git --defaults --name myapp "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'production'",
         cwd=cwd,
     )
@@ -1018,7 +1023,7 @@ def test_init_wizard_v2_append_to_vscode_workspace(
         workspace_file.write_text(workspace_content)
 
     project_b_result = invoke(
-        "init -t beaker --no-git --defaults --name myapp2 "
+        "init -t python --no-git --defaults --name myapp2 "
         "--UNSAFE-SECURITY-accept-template-url -a preset_name 'starter'",
         cwd=cwd / "myapp",
     )

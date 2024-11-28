@@ -1,4 +1,4 @@
-DEBUG: template source = gh:algorandfoundation/algokit-beaker-default-template
+DEBUG: template source = gh:robdmoore/copier-helloworld
 DEBUG: Attempting to load project config from {current_working_directory}/myapp2/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
@@ -6,18 +6,21 @@ DEBUG: project path = {current_working_directory}/myapp2
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Workspace structure detected! Moving the project to be instantiated into {current_working_directory}/projects
 Starting template copy and render at {current_working_directory}/projects/myapp2...
-DEBUG: final clone URL = https://github.com/algorandfoundation/algokit-beaker-default-template.git
+No git tags found in template; using HEAD as ref
+DEBUG: final clone URL = https://github.com/robdmoore/copier-helloworld.git
 Template render complete!
 DEBUG: Attempting to load project config from {current_working_directory}/projects/myapp2/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/projects/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Attempting to load project config from {current_working_directory}/projects/myapp2/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
 Executed `algokit project bootstrap all` in {current_working_directory}/projects/myapp2
 🙌 Project initialized at `myapp2`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
-➡️  https://github.com/algorandfoundation/algokit-beaker-default-template
+➡️  https://github.com/robdmoore/copier-helloworld
 WARNING: Invalid JSON format in the workspace file {current_working_directory}/myapp.code-workspace. Expecting value: line 1 column 1 (char 0)
 VSCode configuration detected in project directory, and 'code' command is available on path, attempting to launch VSCode
-DEBUG: Running '/bin/code {current_working_directory}/myapp.code-workspace {current_working_directory}/projects/myapp2/README.md' in '{current_working_directory}'
+DEBUG: Running '/bin/code {current_working_directory}/myapp.code-workspace' in '{current_working_directory}'
 DEBUG: /bin/code: Launch project
