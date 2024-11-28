@@ -8,6 +8,7 @@ from pathlib import Path
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from algokit.core.init import append_project_to_vscode_workspace
 from approvaltests.namer import NamerFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
 from approvaltests.scrubbers.scrubbers import Scrubber
@@ -1031,3 +1032,94 @@ def test_init_wizard_v2_append_to_vscode_workspace(
     if expect_warning:
         # This assumes the existence of a function `verify` to check for warnings in the output
         verify(project_b_result.output)
+
+
+@pytest.mark.parametrize(
+    ("initial_workspace", "project_path", "expected_workspace", "should_append"),
+    [
+        # Test case 1: Different representations of root path
+        (
+            {"folders": [{"path": "./"}]},
+            ".",
+            {"folders": [{"path": "./"}]},
+            False,
+        ),
+        # Test case 2: Normalized paths
+        (
+            {"folders": [{"path": "projects/app1"}]},
+            "projects/app1",
+            {"folders": [{"path": "projects/app1"}]},
+            False,
+        ),
+        # Test case 3: Different path separators
+        (
+            {"folders": [{"path": "projects\\app1"}]},
+            "projects/app1",
+            {"folders": [{"path": "projects\\app1"}]},
+            False,
+        ),
+        # Test case 4: Relative paths
+        (
+            {"folders": [{"path": "./projects/app1"}]},
+            "projects/app1",
+            {"folders": [{"path": "./projects/app1"}]},
+            False,
+        ),
+        # Test case 5: New unique path
+        (
+            {"folders": [{"path": "projects/app1"}]},
+            "projects/app2",
+            {"folders": [{"path": "projects/app1"}, {"path": "projects/app2"}]},
+            True,
+        ),
+        # Test case 6: Empty workspace
+        (
+            {"folders": []},
+            "projects/app1",
+            {"folders": [{"path": "projects/app1"}]},
+            True,
+        ),
+        # Test case 7: Path with trailing slash
+        (
+            {"folders": [{"path": "projects/app1/"}]},
+            "projects/app1",
+            {"folders": [{"path": "projects/app1/"}]},
+            False,
+        ),
+    ],
+)
+def test_append_to_workspace_path_normalization(
+    *,
+    tmp_path_factory: pytest.TempPathFactory,
+    initial_workspace: dict,
+    project_path: str,
+    expected_workspace: dict,
+    should_append: bool,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test various path normalization scenarios when appending to workspace."""
+
+    # Arrange
+    tmp_path = tmp_path_factory.mktemp("workspace")
+    workspace_file = tmp_path / "test.code-workspace"
+    with workspace_file.open("w") as f:
+        json.dump(initial_workspace, f)
+
+    project_path_obj = tmp_path / project_path
+    project_path_obj.mkdir(parents=True, exist_ok=True)
+
+    # Act
+    append_project_to_vscode_workspace(project_path_obj, workspace_file)
+
+    # Assert
+    with workspace_file.open("r") as f:
+        actual_workspace = json.load(f)
+
+    assert actual_workspace == expected_workspace
+
+    # Check logging
+    debug_messages = [r.message for r in caplog.records if r.levelname == "DEBUG"]
+    if should_append:
+        assert any("Appended project" in msg for msg in debug_messages)
+    else:
+        assert any("already in workspace" in msg for msg in debug_messages)
