@@ -103,7 +103,7 @@ def append_project_to_vscode_workspace(project_path: Path, workspace_path: Path)
 
         # Check if the project path is already in the workspace
         if project_abs_path not in existing_abs_paths:
-            workspace.setdefault("folders", []).append({"path": str(processed_project_path)})
+            workspace.setdefault("folders", []).append({"path": str(processed_project_path).replace("\\", "/")})
             _save_vscode_workspace(workspace_path, workspace)
             logger.debug(f"Appended project {project_path} to workspace {workspace_path}.")
         else:
