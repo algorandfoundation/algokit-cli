@@ -255,7 +255,7 @@ def test_generate_client_python_multiple_app_specs_in_directory(
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
 
-    result = invoke(f"generate client {options} {arc56_json.parent}", cwd=arc56_json.parent)
+    result = invoke(f"generate client {options} .", cwd=arc56_json.parent)
 
     # Confirm multiple app specs are in the input directory
     assert arc32_json.parent == arc56_json.parent
