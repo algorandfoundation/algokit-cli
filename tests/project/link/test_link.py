@@ -1,9 +1,10 @@
 import shutil
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from algokit.core.typed_client_generation import AppSpecsNotFoundError
 from pytest_mock import MockerFixture
 
 from tests.utils.approvals import verify
@@ -31,6 +32,7 @@ def client_generator_mock(mocker: MockerFixture) -> MagicMock:
 
     client_gen_mock = MagicMock()
     mocker.patch("src.algokit.cli.generate.ClientGenerator.create_for_language", return_value=client_gen_mock)
+    client_gen_mock.generate_all.return_value = None
     return client_gen_mock
 
 
@@ -161,14 +163,13 @@ def test_link_command_by_name_success(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
-    Verifies 'project list' command success for a specific project name.
+    Verifies 'project link' command success for a specific project name.
     """
     cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=5)
     result = invoke("project link --project-name contract_project_3", cwd=cwd_with_workspace / "projects" / "project1")
 
     assert result.exit_code == 0
-    client_generator_mock.resolve_output_path.assert_called_once()
-    client_generator_mock.generate.assert_called_once()
+    client_generator_mock.generate_all.assert_called_once()
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
@@ -176,7 +177,7 @@ def test_link_command_all_success(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
-    Confirms 'project list' command lists all projects successfully.
+    Confirms 'project link' command links all projects successfully.
     """
     contract_projects_count = 4
     frontend_projects_count = 1
@@ -186,8 +187,8 @@ def test_link_command_all_success(
     result = invoke("project link --all", cwd=cwd_with_workspace / "projects" / "project1")
 
     assert result.exit_code == 0
-    assert client_generator_mock.resolve_output_path.call_count == contract_projects_count
-    assert client_generator_mock.generate.call_count == contract_projects_count
+    assert client_generator_mock.generate_all.call_count == contract_projects_count
+
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
@@ -195,7 +196,7 @@ def test_link_command_multiple_names_success(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
-    Ensures 'project list' command success for multiple specified project names.
+    Ensures 'project link' command success for multiple specified project names.
     """
     projects_count = 5
     cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=projects_count)
@@ -207,8 +208,7 @@ def test_link_command_multiple_names_success(
     assert result.exit_code == 0
 
     expected_call_count = 2
-    assert client_generator_mock.resolve_output_path.call_count == expected_call_count
-    assert client_generator_mock.generate.call_count == expected_call_count
+    assert client_generator_mock.generate_all.call_count == expected_call_count
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
@@ -216,19 +216,21 @@ def test_link_command_multiple_names_no_specs_success(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock, client_generator_mock: MagicMock
 ) -> None:
     """
-    Ensures 'project list' command success for multiple specified project names.
+    Ensures 'project link' command success for multiple specified project names.
     """
     cwd_with_workspace = _cwd_with_workspace(
         tmp_path_factory, which_mock, proc_mock, num_projects=5, with_app_spec=False
     )
+    client_generator_mock.generate_all.side_effect = Mock(side_effect=AppSpecsNotFoundError())
+
     result = invoke(
         "project link --project-name contract_project_3 --project-name contract_project_5",
         cwd=cwd_with_workspace / "projects" / "project1",
     )
 
     assert result.exit_code == 0
-    assert client_generator_mock.resolve_output_path.call_count == 0
-    assert client_generator_mock.generate.call_count == 0
+    assert client_generator_mock.generate_all.call_count == 2  # noqa: PLR2004
+
     verify(_format_output(result.output, [(str(cwd_with_workspace), "<cwd>")]))
 
 
@@ -238,15 +240,7 @@ def test_link_command_name_not_found(
     proc_mock: ProcMock,
 ) -> None:
     """
-    Test to ensure the 'project list' command executes successfully within a workspace containing multiple projects.
-
-    This test simulates a workspace environment with 20 projects and verifies that the
-    command lists all projects without errors.
-
-    Args:
-        tmp_path_factory (TempPathFactory): A fixture to create temporary directories.
-        which_mock (WhichMock): A mock for the 'which' command.
-        proc_mock (ProcMock): A mock for process execution.
+    Ensures 'project link' command success for project that does not exist.
     """
     cwd_with_workspace = _cwd_with_workspace(tmp_path_factory, which_mock, proc_mock, num_projects=5)
     result = invoke(
@@ -262,15 +256,7 @@ def test_link_command_empty_folder(
     tmp_path_factory: TempPathFactory,
 ) -> None:
     """
-    Test to ensure the 'project list' command executes successfully within a workspace containing multiple projects.
-
-    This test simulates a workspace environment with 20 projects and verifies that the
-    command lists all projects without errors.
-
-    Args:
-        tmp_path_factory (TempPathFactory): A fixture to create temporary directories.
-        which_mock (WhichMock): A mock for the 'which' command.
-        proc_mock (ProcMock): A mock for process execution.
+    Ensures 'project link' command success for empty folder.
     """
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke("project link --all", cwd=cwd)

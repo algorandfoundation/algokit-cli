@@ -1,7 +1,6 @@
 import logging
 import typing
 from dataclasses import dataclass
-from itertools import chain
 from pathlib import Path
 
 import click
@@ -11,7 +10,7 @@ from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.core import questionary_extensions
 from algokit.core.conf import get_algokit_config
 from algokit.core.project import ProjectType, get_project_configs
-from algokit.core.typed_client_generation import ClientGenerator
+from algokit.core.typed_client_generation import AppSpecsNotFoundError, ClientGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -86,25 +85,19 @@ def _link_projects(
     """
     output_path_pattern = f"{frontend_clients_path}/{{contract_name}}.{'ts' if language == 'typescript' else 'py'}"
     generator = ClientGenerator.create_for_language(language, version=version)
-    file_patterns = ["application.json", "*.arc32.json", "*.arc56.json"]
-    app_specs = list(chain.from_iterable(contract_project_root.rglob(pattern) for pattern in file_patterns))
-    if not app_specs:
+
+    try:
+        generator.generate_all(
+            contract_project_root,
+            output_path_pattern,
+            raise_on_failure=fail_fast,
+        )
+    except AppSpecsNotFoundError:
         click.secho(
             f"WARNING: No application.json | *.arc32.json | *.arc56.json files found in {contract_project_root}. "
             "Skipping...",
             fg="yellow",
         )
-        return
-
-    for app_spec in app_specs:
-        output_path = generator.resolve_output_path(app_spec, output_path_pattern)
-        if output_path is None:
-            if fail_fast:
-                raise click.ClickException(f"Error generating client for {app_spec}")
-
-            logger.warning(f"Error generating client for {app_spec}")
-            continue
-        generator.generate(app_spec, output_path)
 
 
 def _prompt_contract_project() -> ContractArtifacts | None:

@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 
 from algokit.core.generate import load_generators, run_generator
-from algokit.core.typed_client_generation import ClientGenerator
+from algokit.core.typed_client_generation import AppSpecsNotFoundError, ClientGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -161,20 +161,11 @@ def generate_client(
             "One of --language or --output is required to determine the client language to generate"
         )
 
-    if not app_spec_path_or_dir.is_dir():
-        app_specs = [app_spec_path_or_dir]
-    else:
-        patterns = ["application.json", "*.arc32.json", "*.arc56.json"]
-
-        app_specs = []
-        for pattern in patterns:
-            app_specs.extend(app_spec_path_or_dir.rglob(pattern))
-
-        app_specs = list(set(app_specs))
-        app_specs.sort()
-        if not app_specs:
-            raise click.ClickException("No app specs found")
-    for app_spec in app_specs:
-        output_path = generator.resolve_output_path(app_spec, output_path_pattern)
-        if output_path is not None:
-            generator.generate(app_spec, output_path)
+    try:
+        generator.generate_all(
+            app_spec_path_or_dir,
+            output_path_pattern,
+            raise_on_failure=False,
+        )
+    except AppSpecsNotFoundError as ex:
+        raise click.ClickException("No app specs found") from ex

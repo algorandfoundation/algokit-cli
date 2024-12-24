@@ -55,9 +55,8 @@ def cwd(tmp_path_factory: TempPathFactory) -> Path:
 
 @pytest.fixture()
 def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
-    app_spec_example_path = Path(__file__).parent / "application.json"
-
     def factory(app_spec_dir: Path, app_spec_file_name: str) -> Path:
+        app_spec_example_path = Path(__file__).parent / app_spec_file_name
         app_spec_dir.mkdir(exist_ok=True, parents=True)
         app_spec_path = app_spec_dir / app_spec_file_name
         shutil.copy(app_spec_example_path, app_spec_path)
@@ -223,7 +222,10 @@ def test_generate_client_python_arc32_filename(
     ],
 )
 def test_generate_client_python_arc56_filename(
-    proc_mock: ProcMock, arc56_json: Path, options: str, expected_output_path: Path
+    proc_mock: ProcMock,
+    arc56_json: Path,
+    options: str,
+    expected_output_path: Path,
 ) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
@@ -232,6 +234,36 @@ def test_generate_client_python_arc56_filename(
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
+
+
+@pytest.mark.parametrize(
+    ("options", "expected_output_path"),
+    [
+        ("-o client.py", "client.py"),
+    ],
+)
+def test_generate_client_python_multiple_app_specs_in_directory(
+    proc_mock: ProcMock,
+    arc56_json: Path,
+    arc32_json: Path,
+    application_json: Path,
+    options: str,
+    expected_output_path: Path,
+) -> None:
+    proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
+    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+
+    result = invoke(f"generate client {options} {arc56_json.parent}", cwd=arc56_json.parent)
+
+    # Confirm multiple app specs are in the input directory
+    assert arc32_json.parent == arc56_json.parent
+    assert application_json.parent == arc56_json.parent
+
+    assert result.exit_code == 0
+    verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
+    # only a single generate call is made for the arc56 app spec
     assert len(proc_mock.called) == 4  # noqa: PLR2004
     assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
