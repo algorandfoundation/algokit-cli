@@ -1,8 +1,11 @@
 import abc
+import enum
 import json
 import logging
 import re
 import shutil  # noqa: F401
+from functools import reduce
+from itertools import chain
 from pathlib import Path
 from typing import ClassVar
 
@@ -24,6 +27,15 @@ def _snake_case(s: str) -> str:
     s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
     s = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", s)
     return re.sub(r"[-\s]", "_", s).lower()
+
+
+class AppSpecType(enum.Enum):
+    ARC32 = "arc32"
+    ARC56 = "arc56"
+
+
+class AppSpecsNotFoundError(Exception):
+    pass
 
 
 class ClientGenerator(abc.ABC):
@@ -55,13 +67,15 @@ class ClientGenerator(abc.ABC):
     def create_for_extension(cls, extension: str, version: str | None) -> "ClientGenerator":
         return cls._by_extension[extension](version)
 
-    def resolve_output_path(self, app_spec: Path, output_path_pattern: str | None) -> Path | None:
+    def resolve_output_path(self, app_spec: Path, output_path_pattern: str | None) -> tuple[Path, AppSpecType] | None:
         try:
             application_json = json.loads(app_spec.read_text())
             try:
                 contract_name: str = application_json["name"]  # ARC-56
+                app_spec_type: AppSpecType = AppSpecType.ARC56
             except KeyError:
                 contract_name = application_json["contract"]["name"]  # ARC-32
+                app_spec_type = AppSpecType.ARC32
         except Exception:
             logger.error(f"Couldn't parse contract name from {app_spec}", exc_info=True)
             return None
@@ -73,7 +87,7 @@ class ClientGenerator(abc.ABC):
         if output_path.exists() and not output_path.is_file():
             logger.error(f"Could not output to {output_path} as it already exists and is a directory")
             return None
-        return output_path
+        return (output_path, app_spec_type)
 
     @abc.abstractmethod
     def generate(self, app_spec: Path, output: Path) -> None: ...
@@ -87,6 +101,43 @@ class ClientGenerator(abc.ABC):
 
     def format_contract_name(self, contract_name: str) -> str:
         return contract_name
+
+    def generate_all(
+        self,
+        app_spec_path_or_dir: Path,
+        output_path_pattern: str | None,
+        *,
+        raise_on_path_resolution_failure: bool,
+    ) -> None:
+        if not app_spec_path_or_dir.is_dir():
+            app_specs = [app_spec_path_or_dir]
+        else:
+            file_patterns = ["application.json", "*.arc32.json", "*.arc56.json"]
+            app_specs = list(set(chain.from_iterable(app_spec_path_or_dir.rglob(pattern) for pattern in file_patterns)))
+            app_specs.sort()
+            if not app_specs:
+                raise AppSpecsNotFoundError
+
+        def accumulate_items_to_generate(
+            acc: dict[Path, tuple[Path, AppSpecType]], app_spec: Path
+        ) -> dict[Path, tuple[Path, AppSpecType]]:
+            output_path_result = self.resolve_output_path(app_spec, output_path_pattern)
+            if output_path_result is None:
+                if raise_on_path_resolution_failure:
+                    raise click.ClickException(f"Error generating client for {app_spec}")
+                return acc
+            (output_path, app_spec_type) = output_path_result
+            if output_path in acc:
+                # ARC-56 app specs take precedence over ARC-32 app specs
+                if acc[output_path][1] == AppSpecType.ARC32 and app_spec_type == AppSpecType.ARC56:
+                    acc[output_path] = (app_spec, app_spec_type)
+            else:
+                acc[output_path] = (app_spec, app_spec_type)
+            return acc
+
+        items_to_generate: dict[Path, tuple[Path, AppSpecType]] = reduce(accumulate_items_to_generate, app_specs, {})
+        for output_path, (app_spec, _) in items_to_generate.items():
+            self.generate(app_spec, output_path)
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
