@@ -165,7 +165,7 @@ def generate_client(
         generator.generate_all(
             app_spec_path_or_dir,
             output_path_pattern,
-            raise_on_failure=False,
+            raise_on_path_resolution_failure=False,
         )
     except AppSpecsNotFoundError as ex:
         raise click.ClickException("No app specs found") from ex

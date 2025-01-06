@@ -90,7 +90,7 @@ def _link_projects(
         generator.generate_all(
             contract_project_root,
             output_path_pattern,
-            raise_on_failure=fail_fast,
+            raise_on_path_resolution_failure=fail_fast,
         )
     except AppSpecsNotFoundError:
         click.secho(

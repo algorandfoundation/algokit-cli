@@ -107,7 +107,7 @@ class ClientGenerator(abc.ABC):
         app_spec_path_or_dir: Path,
         output_path_pattern: str | None,
         *,
-        raise_on_failure: bool,  # TODO: NC - Maybe we should return the error instead?
+        raise_on_path_resolution_failure: bool,
     ) -> None:
         if not app_spec_path_or_dir.is_dir():
             app_specs = [app_spec_path_or_dir]
@@ -123,7 +123,7 @@ class ClientGenerator(abc.ABC):
         ) -> dict[Path, tuple[Path, AppSpecType]]:
             output_path_result = self.resolve_output_path(app_spec, output_path_pattern)
             if output_path_result is None:
-                if raise_on_failure:
+                if raise_on_path_resolution_failure:
                     raise click.ClickException(f"Error generating client for {app_spec}")
                 return acc
             (output_path, app_spec_type) = output_path_result
