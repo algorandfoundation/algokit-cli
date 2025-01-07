@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.5.2 (2025-01-07)
+
+### Fix
+
+* Handle client generation in a dir containing multiple app spec types ([#599](https://github.com/algorandfoundation/algokit-cli/issues/599)) ([`1a479a1`](https://github.com/algorandfoundation/algokit-cli/commit/1a479a1e33ae4ba0e03a12c12210372cb8f59be1))
+
+### Documentation
+
+* Add info about keyring in wsl2 ([#600](https://github.com/algorandfoundation/algokit-cli/issues/600)) ([`5e5df31`](https://github.com/algorandfoundation/algokit-cli/commit/5e5df31c79b99f375726a57780c0732f2bafcf73))
+
 ## v2.5.1 (2024-11-28)
 
 ### Fix
