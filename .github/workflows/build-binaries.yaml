@@ -71,12 +71,12 @@ jobs:
           version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
-      - name: Install Apple Developer Id Cert
-        if: runner.os == 'macOS'
-        uses: ./.github/actions/install-apple-dev-id-cert
-        with:
-          cert_data: ${{ secrets.APPLE_CERT_DATA }}
-          cert_password: ${{ secrets.APPLE_CERT_PASSWORD }}
+      # - name: Install Apple Developer Id Cert
+      #   if: runner.os == 'macOS'
+      #   uses: ./.github/actions/install-apple-dev-id-cert
+      #   with:
+      #     cert_data: ${{ secrets.APPLE_CERT_DATA }}
+      #     cert_password: ${{ secrets.APPLE_CERT_PASSWORD }}
 
       # - name: Build macOS binary
       #   if: ${{ runner.os == 'macOS' }}
