@@ -302,7 +302,7 @@ In order to provide confidence in the correctness of a smart contract it's impor
 There are a few possible approaches that could be taken by AlgoKit to help facilitate this:
 
 1. **Documentation** - Include documentation that recommends this kind of testing and provides examples for how to implement it
-2. **Manual testing** - Encourage a manual testing approach using (for example) the ABI user interface in dAppFlow, by providing an AlgoKit CLI command that sends the user there along with the ABI definition and contract ID resulting in a manual testing experience for the deployed contract with low friction
+2. **Manual testing** - Encourage a manual testing approach using (for example) the App Lab in Lora, by providing an AlgoKit CLI command that sends the user there along with the ABI definition and contract ID resulting in a manual testing experience for the deployed contract with low friction
 3. **Automated integration tests** - Facilitate automated testing by issuing real transactions against a LocalNet and/or TestNet network
 4. **Automated dry run tests** - Facilitate automated testing using the [Dry Run endpoint](https://developer.algorand.org/docs/rest-apis/algod/v2/#post-v2tealdryrun) to simulate what would happen when executing the contract under certain scenarios (e.g. [Graviton](https://github.com/algorand/graviton/blob/main/graviton/README.md))
 5. **TEAL emulator** - Facilitate automated testing against a TEAL emulator (e.g. [Algo Builder Runtime](https://algobuilder.dev/api/runtime/index.html))
@@ -372,4 +372,4 @@ There are a few possible approaches that could be taken by AlgoKit to help facil
 
 Based on all of this the suggested option for AlgoKit v1 is **Automated integration tests** since it conforms to the principles well, has prior art across TypeScript and Python that can be utilised and provides developers with a lot of confidence.
 
-Post v1, it's recommended that dAppFlow integration for exploratory testing and Graviton (or similar) support should be explored to provide a range of options to empower developers with a full suite of techniques they can use.
+Post v1, it's recommended that Lora integration for exploratory testing and Graviton (or similar) support should be explored to provide a range of options to empower developers with a full suite of techniques they can use.
