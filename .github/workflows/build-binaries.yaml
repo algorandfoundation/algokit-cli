@@ -24,6 +24,21 @@ jobs:
         os: [ubuntu-20.04, windows-latest, macos-13, macos-14]
 
     steps:
+      - name: Set signing condition
+        id: signing
+        run: |
+          # Allow signing on:
+          # 1. Main branch non-PR events when production_release is true OR
+          # 2. Main branch CRON triggered events
+          if [[ "${{ github.event_name }}" != "pull_request" && \
+                "${{ github.ref_name }}" == "main" && \
+                ("${{ inputs.production_release }}" == "true" || "${{ github.event_name }}" == "schedule") ]]; then
+            echo "allowed=true" >> $GITHUB_OUTPUT
+          else
+            echo "allowed=false" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
@@ -58,10 +73,10 @@ jobs:
           package_name: ${{ env.PACKAGE_NAME }}
           version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
-          production_release: ${{ inputs.production_release }}
-          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          with_codesign: ${{ steps.signing.outputs.allowed }}
+          azure_tenant_id: ${{ steps.signing.outputs.allowed == 'true' && secrets.AZURE_TENANT_ID || '' }}
+          azure_client_id: ${{ steps.signing.outputs.allowed == 'true' && secrets.AZURE_CLIENT_ID || '' }}
+          azure_client_secret: ${{ steps.signing.outputs.allowed == 'true' && secrets.AZURE_CLIENT_SECRET || '' }}
 
       - name: Build linux binary
         if: ${{ runner.os == 'Linux' }}
@@ -72,7 +87,7 @@ jobs:
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
 
       - name: Install Apple Developer Id Cert
-        if: runner.os == 'macOS'
+        if: ${{ runner.os == 'macOS' && steps.signing.outputs.allowed == 'true' }}
         uses: ./.github/actions/install-apple-dev-id-cert
         with:
           cert_data: ${{ secrets.APPLE_CERT_DATA }}
@@ -85,11 +100,12 @@ jobs:
           package_name: ${{ env.PACKAGE_NAME }}
           version: ${{ inputs.release_version }}
           artifacts_dir: ${{ env.ARTIFACTS_DIR }}
-          apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+          with_codesign: ${{ steps.signing.outputs.allowed }}
+          apple_team_id: ${{ steps.signing.outputs.allowed == 'true' && secrets.APPLE_TEAM_ID || '' }}
           apple_bundle_id: ${{ inputs.production_release == 'true' && vars.APPLE_BUNDLE_ID || format('beta.{0}', vars.APPLE_BUNDLE_ID) }}
-          apple_cert_id: ${{ secrets.APPLE_CERT_ID }}
-          apple_notary_user: ${{ secrets.APPLE_NOTARY_USER }}
-          apple_notary_password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+          apple_cert_id: ${{ steps.signing.outputs.allowed == 'true' && secrets.APPLE_CERT_ID || '' }}
+          apple_notary_user: ${{ steps.signing.outputs.allowed == 'true' && secrets.APPLE_NOTARY_USER || '' }}
+          apple_notary_password: ${{ steps.signing.outputs.allowed == 'true' && secrets.APPLE_NOTARY_PASSWORD || '' }}
 
       - name: Add binary to path
         run: |

@@ -9,8 +9,8 @@ inputs:
   artifacts_dir:
     description: "The directory to write artifacts you want to publish"
     required: true
-  production_release:
-    description: "Flag to determine if this is a production release"
+  with_codesign:
+    description: "Flag to determine if we should sign the binary"
     required: true
   azure_tenant_id:
     description: "The Microsoft Entra tenant (directory) ID."
@@ -43,7 +43,7 @@ runs:
         echo winget > '${{ env.BINARY_BUILD_DIR }}\_internal\algokit\resources\distribution-method'
 
     - name: Sign executable
-      if: ${{ inputs.production_release == 'true' }}
+      if: ${{ inputs.with_codesign == 'true' }}
       uses: azure/trusted-signing-action@v0.3.20
       with:
         azure-tenant-id: ${{ inputs.azure_tenant_id }}
@@ -67,7 +67,7 @@ runs:
           -outputFile '${{ env.WINGET_INSTALLER }}'
 
     - name: Sign winget installer
-      if: ${{ inputs.production_release == 'true' }}
+      if: ${{ inputs.with_codesign == 'true' }}
       uses: azure/trusted-signing-action@v0.3.20
       with:
         azure-tenant-id: ${{ inputs.azure_tenant_id }}
