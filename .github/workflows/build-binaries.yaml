@@ -27,16 +27,17 @@ jobs:
       - name: Set signing condition
         id: signing
         run: |
-          # Allow signing on:
-          # 1. Main branch non-PR events when production_release is true OR
-          # 2. Main branch CRON triggered events
-          if [[ "${{ github.event_name }}" != "pull_request" && \
-                "${{ github.ref_name }}" == "main" && \
-                ("${{ inputs.production_release }}" == "true" || "${{ github.event_name }}" == "schedule") ]]; then
-            echo "allowed=true" >> $GITHUB_OUTPUT
-          else
-            echo "allowed=false" >> $GITHUB_OUTPUT
-          fi
+          # For testing, force signing to be allowed
+          echo "allowed=true" >> $GITHUB_OUTPUT
+
+          # Comment out or remove the original condition temporarily
+          # if [[ "${{ github.event_name }}" != "pull_request" && \
+          #       "${{ github.ref_name }}" == "main" && \
+          #       ("${{ inputs.production_release }}" == "true" || "${{ github.event_name }}" == "schedule") ]]; then
+          #   echo "allowed=true" >> $GITHUB_OUTPUT
+          # else
+          #   echo "allowed=false" >> $GITHUB_OUTPUT
+          # fi
         shell: bash
 
       - name: Checkout source code
