@@ -9,6 +9,9 @@ inputs:
     required: true
   version:
     description: "The version to use for this artifact"
+  with_codesign:
+    description: "Flag to determine if we should sign the binary"
+    required: true
   apple_team_id:
     description: "The Apple Team ID"
     required: true
@@ -20,10 +23,10 @@ inputs:
     required: true
   apple_notary_user:
     description: "The Apple user to notarise the package"
-    require: true
+    required: true
   apple_notary_password:
     description: "The Apple password to notarise the package"
-    require: true
+    required: true
 
 runs:
   using: "composite"
@@ -31,12 +34,12 @@ runs:
     - name: Build binary
       shell: bash
       run: |
-        export APPLE_CERT_ID="${{ inputs.apple_cert_id }}"
-        export APPLE_BUNDLE_ID="${{ inputs.apple_bundle_id }}"
+        export APPLE_CERT_ID="${{ inputs.with_codesign == 'true' && inputs.apple_cert_id || '' }}"
+        export APPLE_BUNDLE_ID="${{ inputs.with_codesign == 'true' && inputs.apple_bundle_id || format('beta.{0}', inputs.apple_bundle_id) }}"
         poetry run poe package_mac
       env:
-        APPLE_CERT_ID: ${{ inputs.apple_cert_id }}
-        APPLE_BUNDLE_ID: ${{ inputs.apple_bundle_id }}
+        APPLE_CERT_ID: ${{ inputs.with_codesign == 'true' && inputs.apple_cert_id || '' }}
+        APPLE_BUNDLE_ID: ${{ inputs.with_codesign == 'true' && inputs.apple_bundle_id || format('beta.{0}', inputs.apple_bundle_id) }}
 
     - name: Add metadata to binary
       shell: bash
@@ -45,11 +48,13 @@ runs:
 
     # Workaround an issue with PyInstaller where Python.framework was incorrectly signed during the build
     - name: Codesign python.framework
+      if: ${{ inputs.with_codesign == 'true' }}
       shell: bash
       run: |
         codesign --force --sign "${{ inputs.apple_cert_id }}" --timestamp "${{ github.workspace }}/dist/algokit/_internal/Python.framework"
 
     - name: Notarize
+      if: ${{ inputs.with_codesign == 'true' }}
       uses: lando/notarize-action@v2
       with:
         appstore-connect-team-id: ${{ inputs.apple_team_id }}
