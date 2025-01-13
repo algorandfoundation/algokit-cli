@@ -70,7 +70,7 @@ SERVER_PORT=4000
 
 ### Bootstrap Node.js project
 
-The command `algokit project bootstrap npm` installs Node.js project dependencies if there is a `package.json` file in the current directory by running `npm install` command to install all node modules specified in that file. If you don't have npm available it will show a clear error message and resolution instructions.
+The command `algokit project bootstrap npm` installs Node.js project dependencies if there is a `package.json` file in the current directory by running `npm install` command to install all node modules specified in that file. However, when running in CI mode **with** present `package-lock.json` file (either by setting the `CI` environment variable or using the `--ci` flag), it will run `npm ci` instead, which provides a cleaner and more deterministic installation. If `package-lock.json` is missing, it will show a clear error message and resolution instructions. If you don't have `npm` available it will show a clear error message and resolution instructions.
 
 Here is an example outcome of running `algokit project bootstrap npm` command:
 

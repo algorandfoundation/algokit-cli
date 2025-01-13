@@ -1,0 +1,4 @@
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+Installing npm dependencies
+Error: Cannot run `npm ci` because `package-lock.json` is missing. Please run `npm install` instead and commit it to your source control.

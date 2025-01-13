@@ -31,7 +31,7 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
 
     if package_json_path.exists():
         logger.debug("Running `algokit project bootstrap npm`")
-        bootstrap_npm(project_dir)
+        bootstrap_npm(project_dir, ci_mode=ci_mode)
 
 
 def bootstrap_any_including_subdirs(  # noqa: PLR0913
@@ -176,13 +176,22 @@ def bootstrap_poetry(project_dir: Path) -> None:
         raise  # unexpected error, we already ran without IOError before
 
 
-def bootstrap_npm(project_dir: Path) -> None:
+def bootstrap_npm(project_dir: Path, *, ci_mode: bool) -> None:
+    def get_install_command(*, ci_mode: bool) -> list[str]:
+        has_package_lock = (project_dir / "package-lock.json").exists()
+        if ci_mode and not has_package_lock:
+            raise click.ClickException(
+                "Cannot run `npm ci` because `package-lock.json` is missing. "
+                "Please run `npm install` instead and commit it to your source control."
+            )
+        return ["ci" if ci_mode else "install"]
+
     package_json_path = project_dir / "package.json"
     if not package_json_path.exists():
         logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of npm")
     else:
         logger.info("Installing npm dependencies")
-        cmd = ["npm" if not is_windows() else "npm.cmd", "install"]
+        cmd = ["npm" if not is_windows() else "npm.cmd", *get_install_command(ci_mode=ci_mode)]
         try:
             proc.run(
                 cmd,

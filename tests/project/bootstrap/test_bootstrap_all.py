@@ -115,7 +115,7 @@ def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.Fi
     (cwd / "package.json").touch()
 
     result = invoke(
-        "project bootstrap all",
+        "project bootstrap all --interactive",
         cwd=cwd,
     )
 
@@ -206,7 +206,7 @@ def test_bootstrap_all_projects_type_filter(tmp_path_factory: TempPathFactory) -
     _setup_standalone_project(cwd, "project_3", "contract")
     _setup_standalone_project(cwd, "project_4", "frontend")
 
-    result = invoke("project bootstrap all --type frontend", cwd=cwd)
+    result = invoke("project bootstrap all --type frontend --interactive", cwd=cwd)
 
     assert result.exit_code == 0
     verify(result.output.replace(".cmd", ""))
