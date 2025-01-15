@@ -43,7 +43,7 @@ def bootstrap_group(ctx: click.Context, *, force: bool) -> None:
 )
 @click.option(
     "--interactive/--non-interactive",
-    " /--ci",  # this aliases --non-interactive to --ci
+    "--no-ci/--ci",  # this aliases --non-interactive to --ci and --interactive to --no-ci
     default=lambda: "CI" not in os.environ,
     help="Enable/disable interactive prompts. If the CI environment variable is set, defaults to non-interactive",
 )
@@ -102,5 +102,11 @@ def poetry() -> None:
 @bootstrap_group.command(
     "npm", short_help="Runs `npm install` in the current working directory to install Node.js dependencies."
 )
-def npm() -> None:
-    bootstrap_npm(Path.cwd())
+@click.option(
+    "--ci/--no-ci",
+    is_flag=True,
+    default=lambda: "CI" in os.environ,
+    help="Run 'npm ci' instead of 'npm install' in CI mode (clean install).",
+)
+def npm(*, ci: bool) -> None:
+    bootstrap_npm(Path.cwd(), ci_mode=ci)

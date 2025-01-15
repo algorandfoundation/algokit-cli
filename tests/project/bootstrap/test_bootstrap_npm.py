@@ -15,7 +15,7 @@ def test_bootstrap_npm_without_npm(
     (cwd / "package.json").touch()
 
     result = invoke(
-        "project bootstrap npm",
+        "project bootstrap npm --no-ci",
         cwd=cwd,
     )
 
@@ -27,7 +27,7 @@ def test_bootstrap_npm_without_npm(
 def test_bootstrap_npm_without_package_file(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     result = invoke(
-        "project bootstrap npm",
+        "project bootstrap npm --no-ci",
         cwd=cwd,
     )
 
@@ -44,7 +44,7 @@ def test_bootstrap_npm_without_npm_and_package_file(
     cwd = tmp_path_factory.mktemp("cwd")
 
     result = invoke(
-        "project bootstrap npm",
+        "project bootstrap npm --no-ci",
         cwd=cwd,
     )
 
@@ -58,9 +58,42 @@ def test_bootstrap_npm_happy_path(tmp_path_factory: TempPathFactory, request: py
     (cwd / "package.json").touch()
 
     result = invoke(
-        "project bootstrap npm",
+        "project bootstrap npm --no-ci",
         cwd=cwd,
     )
 
     assert result.exit_code == 0
+    verify(result.output, namer=PyTestNamer(request))
+
+
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
+def test_bootstrap_npm_ci_mode_with_lock_file(
+    tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "package.json").touch()
+    (cwd / "package-lock.json").touch()
+
+    result = invoke(
+        "project bootstrap npm --ci",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    verify(result.output, namer=PyTestNamer(request))
+
+
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
+def test_bootstrap_npm_ci_mode_without_lock_file(
+    tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd")
+    (cwd / "package.json").touch()
+
+    result = invoke(
+        "project bootstrap npm --ci",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 1  # Should fail when no package-lock.json exists
     verify(result.output, namer=PyTestNamer(request))
