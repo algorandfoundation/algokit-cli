@@ -84,7 +84,6 @@ class TemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
-    BEAKER = "beaker"
     PLAYGROUND = "playground"
 
 
