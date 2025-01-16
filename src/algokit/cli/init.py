@@ -84,7 +84,6 @@ class TemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
-    PLAYGROUND = "playground"
 
 
 @dataclass(kw_only=True)
@@ -140,10 +139,6 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
-        ),
-        TemplateKey.PLAYGROUND: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-playground-template",
-            description="Official template showcasing a number of small example applications and demos.",
         ),
     }
 

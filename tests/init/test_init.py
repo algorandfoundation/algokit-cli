@@ -89,7 +89,6 @@ class ExtendedTemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
-    PLAYGROUND = "playground"
     PYTHON_WITH_VERSION = "python_with_version"
     SIMPLE = "simple"
 
