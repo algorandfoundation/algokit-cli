@@ -4,13 +4,11 @@ DEBUG: Running 'docker version' in '{current_working_directory}'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
-DEBUG: docker: [{"Name": "algokit_sandbox_test", "Status": "running", "ConfigFiles": "sandbox_test/docker-compose.yml"}]
-Cleaning up the running AlgoKit LocalNet...
-DEBUG: Running 'docker compose down' in 'sandbox_test'
-DEBUG: docker: STDOUT
-DEBUG: docker: STDERR
+DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "{app_config}/sandbox/docker-compose.yml"}]
+DEBUG: The sandbox directory does not exist yet; creating it
+DEBUG: Existing LocalNet not found; creating from scratch...
 Starting AlgoKit LocalNet now...
-DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in 'sandbox_test'
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
