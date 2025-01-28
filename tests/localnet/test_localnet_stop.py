@@ -32,7 +32,7 @@ def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
                     {
                         "Name": "algokit_sandbox_test",
                         "Status": "running",
-                        "ConfigFiles": "sandbox_test/docker-compose.yml",
+                        "ConfigFiles": str(app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml"),
                     }
                 ]
             )
