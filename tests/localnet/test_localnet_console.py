@@ -12,6 +12,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
 def test_goal_console(
     mocker: MockerFixture, tmp_path_factory: pytest.TempPathFactory, app_dir_mock: AppDirs, proc_mock: ProcMock
 ) -> None:
@@ -29,20 +30,6 @@ def test_goal_console(
 
     mocker.patch("algokit.core.proc.subprocess_run").return_value = CompletedProcess(
         ["docker", "exec"], 0, "STDOUT+STDERR"
-    )
-    proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_sandbox*",
-        [
-            json.dumps(
-                [
-                    {
-                        "Name": "algokit_sandbox",
-                        "Status": "running",
-                        "ConfigFiles": "test/sandbox_test/docker-compose.yml",
-                    }
-                ]
-            )
-        ],
     )
     proc_mock.set_output(
         cmd=["docker", "compose", "ps", "algod", "--format", "json"],

@@ -6,11 +6,11 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox_test", "Status": "running", "ConfigFiles": "sandbox_test/docker-compose.yml"}]
 Cleaning up the running AlgoKit LocalNet...
-DEBUG: Running 'docker compose down' in '{app_config}/sandbox_test'
+DEBUG: Running 'docker compose down' in 'sandbox_test'
 DEBUG: docker: STDOUT
 DEBUG: docker: STDERR
 Starting AlgoKit LocalNet now...
-DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox_test'
+DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in 'sandbox_test'
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check

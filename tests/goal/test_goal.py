@@ -519,13 +519,13 @@ def test_goal_compose_outdated(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_algod_running_state")
-def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
-    proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_sandbox*",
-        [json.dumps([{"Name": "algokit_test", "Status": "running", "ConfigFiles": "to/test/docker-compose.yml"}])],
-    )
-
+@pytest.mark.usefixtures(
+    "_setup_latest_dummy_compose",
+    "mocked_goal_mount_path",
+    "_mock_proc_with_algod_running_state",
+    "_mock_proc_with_running_localnet",
+)
+def test_goal_simple_args_on_named_localnet(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
