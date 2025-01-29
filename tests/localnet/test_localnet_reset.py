@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml, get_proxy_config
 
@@ -64,8 +66,13 @@ def test_localnet_reset_with_existing_sandbox_with_up_to_date_config(app_dir_moc
     )
 
 
-@pytest.mark.usefixtures("proc_mock", "_health_success", "_mock_proc_with_running_localnet")
-def test_localnet_reset_with_named_sandbox_config(app_dir_mock: AppDirs) -> None:
+@pytest.mark.usefixtures("proc_mock", "_health_success")
+def test_localnet_reset_with_named_sandbox_config(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
+    compose_file_path = str(app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml")
+    proc_mock.set_output(
+        "docker compose ls --format json --filter name=algokit_sandbox*",
+        [json.dumps([{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": compose_file_path}])],
+    )
     (app_dir_mock.app_config_dir / "sandbox_test").mkdir()
     (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").write_text(
         get_docker_compose_yml(name="algokit_sandbox_test")
