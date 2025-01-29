@@ -51,8 +51,8 @@ def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 @pytest.fixture()
 def _mock_proc_with_running_localnet(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
-    app_dir_path = str(app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml")
+    compose_file_path = str(app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml")
     proc_mock.set_output(
         "docker compose ls --format json --filter name=algokit_sandbox*",
-        [json.dumps([{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": app_dir_path}])],
+        [json.dumps([{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": compose_file_path}])],
     )

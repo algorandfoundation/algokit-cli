@@ -39,4 +39,6 @@ def test_goal_console(
     result = invoke("localnet console")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
