@@ -649,7 +649,7 @@ def _get_template_interactive() -> TemplateSource:
         raise click.ClickException("No template selected. Please try again.")
 
     # Map the template string directly to the TemplateSource
-    # This is needed to be able to reuse fullstack to work with beaker, python, and tealscript templates
+    # This is needed to be able to reuse fullstack to work with python and tealscript templates
     blessed_templates = _get_blessed_templates()
     if template in blessed_templates:
         selected_template_source = blessed_templates[template]
