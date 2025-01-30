@@ -641,7 +641,7 @@ Name of an official template to use. To choose interactively, run this command w
 
 * **Options**
 
-    tealscript | python | react | fullstack | base | playground
+    tealscript | python | react | fullstack | base
 
 
 

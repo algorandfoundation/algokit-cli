@@ -84,8 +84,6 @@ class TemplateKey(str, Enum):
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
-    BEAKER = "beaker"
-    PLAYGROUND = "playground"
 
 
 @dataclass(kw_only=True)
@@ -141,10 +139,6 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         TemplateKey.BASE: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-base-template",
             description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
-        ),
-        TemplateKey.PLAYGROUND: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-beaker-playground-template",
-            description="Official template showcasing a number of small example applications and demos.",
         ),
     }
 
@@ -655,7 +649,7 @@ def _get_template_interactive() -> TemplateSource:
         raise click.ClickException("No template selected. Please try again.")
 
     # Map the template string directly to the TemplateSource
-    # This is needed to be able to reuse fullstack to work with beaker, python, and tealscript templates
+    # This is needed to be able to reuse fullstack to work with python and tealscript templates
     blessed_templates = _get_blessed_templates()
     if template in blessed_templates:
         selected_template_source = blessed_templates[template]
