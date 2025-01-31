@@ -37,7 +37,9 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     result = invoke("localnet status")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -65,7 +67,9 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -92,7 +96,9 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -111,7 +117,9 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -138,7 +146,9 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -185,7 +195,9 @@ def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcM
 
     assert result.exit_code == 1
     assert not httpx_mock.get_request()
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -197,7 +209,9 @@ def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet")
@@ -205,7 +219,9 @@ def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("app_dir_mock")

@@ -114,7 +114,9 @@ def test_goal_no_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -131,7 +133,9 @@ def test_goal_console(mocker: MockerFixture, app_dir_mock: AppDirs) -> None:
     result = invoke("goal --console")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures("_setup_latest_dummy_compose", "_mock_proc_with_running_localnet", "_health_success")
@@ -145,7 +149,9 @@ def test_goal_console_algod_not_created(app_dir_mock: AppDirs, proc_mock: ProcMo
     result = invoke("goal --console")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -162,7 +168,9 @@ def test_goal_console_failed(app_dir_mock: AppDirs, mocker: MockerFixture) -> No
     result = invoke("goal --console")
 
     assert result.exit_code == 1
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -176,7 +184,9 @@ def test_goal_simple_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -190,7 +200,9 @@ def test_goal_complex_args(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account export -a RKTAZY2ZLKUJBHDVVA3KKHEDK7PRVGIGOZAUUIZBNK2OEP6KQGEXKKUYUY")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 def test_goal_start_without_docker(proc_mock: ProcMock) -> None:
@@ -245,7 +257,9 @@ def test_goal_simple_args_with_input_file(
     # Check for the result status
     assert result.exit_code == 0
 
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -284,7 +298,9 @@ def test_goal_simple_args_with_output_file(proc_mock: ProcMock, cwd: Path, app_d
     # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "balance_record.json").exists()
 
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -329,7 +345,9 @@ def test_goal_simple_args_with_input_output_files(
 
     # Check if the output file is created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -381,7 +399,9 @@ def test_goal_simple_args_with_multiple_input_output_files(
 
     # Check if the output file is actually created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -399,7 +419,9 @@ def test_goal_simple_args_without_file_error(
     result = invoke("goal clerk compile approval.teal -o approval.compiled", cwd=cwd)
 
     assert result.exit_code == 1
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -519,17 +541,19 @@ def test_goal_compose_outdated(
     verify(_normalize_output(result.output))
 
 
-@pytest.mark.usefixtures("_setup_latest_dummy_compose", "mocked_goal_mount_path", "_mock_proc_with_algod_running_state")
-def test_goal_simple_args_on_named_localnet(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
-    proc_mock.set_output(
-        "docker compose ls --format json --filter name=algokit_sandbox*",
-        [json.dumps([{"Name": "algokit_test", "Status": "running", "ConfigFiles": "to/test/docker-compose.yml"}])],
-    )
-
+@pytest.mark.usefixtures(
+    "_setup_latest_dummy_compose",
+    "mocked_goal_mount_path",
+    "_mock_proc_with_algod_running_state",
+    "_mock_proc_with_running_localnet",
+)
+def test_goal_simple_args_on_named_localnet(app_dir_mock: AppDirs) -> None:
     result = invoke("goal account list")
 
     assert result.exit_code == 0
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )
 
 
 @pytest.mark.usefixtures(
@@ -574,4 +598,6 @@ def test_goal_simple_args_with_input_output_files_with_dot_convention_name(
 
     # Check if the output file is created and copied in cwd in postprocess step
     assert (cwd / "approval.compiled").exists()
-    verify(_normalize_output(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}")))
+    verify(
+        _normalize_output(result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}"))
+    )

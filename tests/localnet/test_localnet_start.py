@@ -63,7 +63,9 @@ def test_localnet_start(app_dir_mock: AppDirs) -> None:
     assert result.exit_code == 0
     verify(
         get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            result.output.replace("\\\\", "\\")
+            .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+            .replace("\\", "/"),
             "{app_config}/sandbox/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
         )
@@ -80,7 +82,7 @@ def test_localnet_start_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) ->
                     {
                         "Name": "algokit_sandbox_test",
                         "Status": "running",
-                        "ConfigFiles": "sandbox_test/docker-compose.yml",
+                        "ConfigFiles": str(app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml"),
                     }
                 ]
             )
@@ -91,7 +93,9 @@ def test_localnet_start_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) ->
     assert result.exit_code == 0
     verify(
         get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            result.output.replace("\\\\", "\\")
+            .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+            .replace("\\", "/"),
             "{app_config}/sandbox_test/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml").read_text(),
         )
@@ -106,7 +110,9 @@ def test_localnet_start_health_failure(app_dir_mock: AppDirs, httpx_mock: HTTPXM
     assert result.exit_code == 0
     verify(
         get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            result.output.replace("\\\\", "\\")
+            .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+            .replace("\\", "/"),
             "{app_config}/sandbox/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
         )
@@ -121,7 +127,9 @@ def test_localnet_start_health_bad_status(app_dir_mock: AppDirs, httpx_mock: HTT
     assert result.exit_code == 0
     verify(
         get_combined_verify_output(
-            result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+            result.output.replace("\\\\", "\\")
+            .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+            .replace("\\", "/"),
             "{app_config}/sandbox/docker-compose.yml",
             (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
         )
@@ -135,7 +143,9 @@ def test_localnet_start_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> N
     result = invoke("localnet start")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
@@ -149,7 +159,9 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
@@ -167,7 +179,9 @@ def test_localnet_start_out_of_date_definition(app_dir_mock: AppDirs, mocker: Mo
     verify(
         "\n".join(
             [
-                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                result.output.replace("\\\\", "\\")
+                .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+                .replace("\\", "/"),
                 "{app_config}/sandbox/docker-compose.yml",
                 (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
                 "{app_config}/sandbox/algod_config.json",
@@ -192,7 +206,9 @@ def test_localnet_start_out_of_date_definition_and_missing_config(app_dir_mock: 
     verify(
         "\n".join(
             [
-                result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"),
+                result.output.replace("\\\\", "\\")
+                .replace(str(app_dir_mock.app_config_dir), "{app_config}")
+                .replace("\\", "/"),
                 "{app_config}/sandbox/docker-compose.yml",
                 (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").read_text(),
             ]
@@ -247,7 +263,9 @@ def test_localnet_start_with_unparseable_docker_compose_version(app_dir_mock: Ap
     result = invoke("localnet start")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")
@@ -257,7 +275,9 @@ def test_localnet_start_with_gitpod_docker_compose_version(app_dir_mock: AppDirs
     result = invoke("localnet start")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_out_of_date", "_mock_proc_with_running_localnet")
@@ -265,7 +285,9 @@ def test_localnet_start_out_date(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures(
@@ -275,7 +297,9 @@ def test_localnet_img_check_cmd_error(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet start")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")

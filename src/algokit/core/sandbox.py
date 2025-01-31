@@ -119,13 +119,15 @@ class ComposeSandbox:
     def _create_instance_from_data(cls, data: list[dict[str, Any]]) -> ComposeSandbox | None:
         for item in data:
             config_file = item.get("ConfigFiles", "").split(",")[0]
-            full_name = Path(config_file).parent.name
+            config_file_path = Path(config_file)
+            full_name = config_file_path.parent.name
             name = (
                 full_name.replace(f"{SANDBOX_BASE_NAME}_", "")
                 if full_name.startswith(f"{SANDBOX_BASE_NAME}_")
                 else full_name
             )
-            return cls(name)
+            config_path = config_file_path.parent.parent
+            return cls(name, config_path)
         return None
 
     def set_algod_dev_mode(self, *, dev_mode: bool) -> None:

@@ -5,6 +5,7 @@ from algokit.core.sandbox import ALGOD_HEALTH_URL, ALGORAND_IMAGE, INDEXER_IMAGE
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
+from tests.utils.app_dir_mock import AppDirs
 from tests.utils.proc_mock import ProcMock
 
 
@@ -49,12 +50,9 @@ def _localnet_up_to_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 
 @pytest.fixture()
-def _mock_proc_with_running_localnet(proc_mock: ProcMock) -> None:
+def _mock_proc_with_running_localnet(proc_mock: ProcMock, app_dir_mock: AppDirs) -> None:
+    compose_file_path = str(app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml")
     proc_mock.set_output(
         "docker compose ls --format json --filter name=algokit_sandbox*",
-        [
-            json.dumps(
-                [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "test/sandbox/docker-compose.yml"}]
-            )
-        ],
+        [json.dumps([{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": compose_file_path}])],
     )

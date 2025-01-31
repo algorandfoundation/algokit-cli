@@ -17,7 +17,9 @@ def test_localnet_stop(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet stop")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
@@ -32,7 +34,7 @@ def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
                     {
                         "Name": "algokit_sandbox_test",
                         "Status": "running",
-                        "ConfigFiles": "sandbox_test/docker-compose.yml",
+                        "ConfigFiles": str(app_dir_mock.app_config_dir / "sandbox_test" / "docker-compose.yml"),
                     }
                 ]
             )
@@ -41,7 +43,9 @@ def test_localnet_stop_with_name(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     result = invoke("localnet stop")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("_mock_proc_with_running_localnet")
@@ -54,7 +58,9 @@ def test_localnet_stop_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> No
     result = invoke("localnet stop")
 
     assert result.exit_code == 1
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet")
@@ -62,7 +68,9 @@ def test_localnet_stop_no_existing_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet stop")
 
     assert result.exit_code == 0
-    verify(result.output.replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/"))
+    verify(
+        result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
+    )
 
 
 @pytest.mark.usefixtures("app_dir_mock")
