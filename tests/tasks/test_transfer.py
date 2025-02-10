@@ -2,6 +2,7 @@ import json
 
 import pytest
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
+from algokit_utils import SendAtomicTransactionComposerResults
 from algosdk import account, mnemonic
 from pytest_mock import MockerFixture
 
@@ -77,7 +78,18 @@ def test_transfer_no_amount() -> None:
 
 def test_transfer_algo_from_address_successful(mocker: MockerFixture) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_payment.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -96,7 +108,18 @@ def test_transfer_algo_from_address_successful(mocker: MockerFixture) -> None:
 
 def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_payment.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -121,7 +144,18 @@ def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring
 
 def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_asset_transfer.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -140,7 +174,18 @@ def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
 
 def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_asset_transfer.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -165,7 +210,18 @@ def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, 
 
 def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_asset", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_asset_transfer.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -190,7 +246,11 @@ def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyrin
 
 def test_transfer_failed(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", side_effect=Exception("dummy error"))
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.new_group.return_value = mocker.MagicMock(
+        add_payment=mocker.MagicMock(side_effect=Exception("dummy error"))
+    )
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -215,7 +275,18 @@ def test_transfer_failed(mocker: MockerFixture, mock_keyring: dict[str, str]) ->
 
 def test_transfer_on_testnet(mocker: MockerFixture) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_payment.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()
@@ -234,7 +305,18 @@ def test_transfer_on_testnet(mocker: MockerFixture) -> None:
 
 def test_transfer_on_mainnet(mocker: MockerFixture) -> None:
     # Arrange
-    mocker.patch("algokit.cli.tasks.transfer.transfer_algos", return_value=TransactionMock())
+    algorand_mock = mocker.MagicMock()
+    composer_mock = mocker.MagicMock()
+    composer_mock.add_payment.return_value = composer_mock
+    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+        group_id="dummy_group_id",
+        confirmations=[],
+        tx_ids=["dummy_txid"],
+        transactions=[],
+        returns=[],
+    )
+    algorand_mock.new_group.return_value = composer_mock
+    mocker.patch("algokit.cli.tasks.transfer.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.transfer.validate_address")
     mocker.patch("algokit.cli.tasks.transfer.validate_balance")
     dummy_sender_pk, dummy_sender_address = _generate_account()

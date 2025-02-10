@@ -1,7 +1,6 @@
 import logging
 
 import click
-from algokit_utils import opt_in, opt_out
 from algosdk import error
 from algosdk.v2client.algod import AlgodClient
 
@@ -14,6 +13,7 @@ from algokit.cli.tasks.utils import (
     validate_account_balance_to_opt_in,
     validate_address,
 )
+from algokit.core.utils import get_algorand_client_for_network
 
 logger = logging.getLogger(__name__)
 
@@ -55,19 +55,24 @@ def opt_in_command(asset_ids: tuple[int], account: str, network: AlgorandNetwork
     opt_in_account = get_account_with_private_key(account)
     validate_address(opt_in_account.address)
     algod_client = load_algod_client(network)
+    algorand = get_algorand_client_for_network(network)
 
     validate_account_balance_to_opt_in(algod_client, opt_in_account, len(asset_ids_list))
     try:
         click.echo("Performing opt-in. This may take a few seconds...")
-        response = opt_in(algod_client=algod_client, account=opt_in_account, asset_ids=asset_ids_list)
+        response = algorand.asset.bulk_opt_in(
+            account=opt_in_account.address,
+            asset_ids=asset_ids_list,
+            signer=opt_in_account.signer,
+        )
         click.echo("Successfully performed opt-in.")
         if len(response) > 1:
             account_url = get_explorer_url(opt_in_account.address, network, ExplorerEntityType.ADDRESS)
             click.echo(f"Check latest transactions on your account at: {account_url}")
         else:
-            for asset_id, txn_id in response.items():
-                explorer_url = get_explorer_url(txn_id, network, ExplorerEntityType.ASSET)
-                click.echo(f"Check opt-in status for asset {asset_id} at: {explorer_url}")
+            for asset_opt_int_result in response:
+                explorer_url = get_explorer_url(asset_opt_int_result.transaction_id, network, ExplorerEntityType.ASSET)
+                click.echo(f"Check opt-in status for asset {asset_opt_int_result.asset_id} at: {explorer_url}")
     except error.AlgodHTTPError as err:
         raise click.ClickException(str(err)) from err
     except ValueError as err:
@@ -106,6 +111,7 @@ def opt_out_command(*, asset_ids: tuple[int], account: str, network: AlgorandNet
     opt_out_account = get_account_with_private_key(account)
     validate_address(opt_out_account.address)
     algod_client = load_algod_client(network)
+    algorand = get_algorand_client_for_network(network)
     asset_ids_list = []
     try:
         asset_ids_list = _get_zero_balanced_assets(
@@ -119,15 +125,21 @@ def opt_out_command(*, asset_ids: tuple[int], account: str, network: AlgorandNet
             raise click.ClickException("No assets to opt-out of.")
 
         click.echo("Performing opt-out. This may take a few seconds...")
-        response = opt_out(algod_client=algod_client, account=opt_out_account, asset_ids=asset_ids_list)
+        response = algorand.asset.bulk_opt_out(
+            account=opt_out_account.address,
+            asset_ids=asset_ids_list,
+            signer=opt_out_account.signer,
+        )
         click.echo("Successfully performed opt-out.")
         if len(response) > 1:
             account_url = get_explorer_url(opt_out_account.address, network, ExplorerEntityType.ADDRESS)
             click.echo(f"Check latest transactions on your account at: {account_url}")
         else:
-            asset_id, txn_id = response.popitem()
-            transaction_url = get_explorer_url(txn_id, network, ExplorerEntityType.TRANSACTION)
-            click.echo(f"Check opt-in status for asset {asset_id} at: {transaction_url}")
+            asset_opt_out_result = response[0]
+            transaction_url = get_explorer_url(
+                asset_opt_out_result.transaction_id, network, ExplorerEntityType.TRANSACTION
+            )
+            click.echo(f"Check opt-in status for asset {asset_opt_out_result.asset_id} at: {transaction_url}")
     except error.AlgodHTTPError as err:
         raise click.ClickException(str(err)) from err
     except ConnectionRefusedError as err:

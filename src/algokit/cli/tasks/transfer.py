@@ -1,15 +1,7 @@
 import logging
-from typing import TYPE_CHECKING
 
 import click
-from algokit_utils import (
-    TransferAssetParameters,
-    TransferParameters,
-    transfer_asset,
-)
-from algokit_utils import (
-    transfer as transfer_algos,
-)
+from algokit_utils import AlgoAmount, AssetTransferParams, PaymentParams, SendAtomicTransactionComposerResults
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import get_explorer_url
@@ -21,9 +13,7 @@ from algokit.cli.tasks.utils import (
     validate_address,
     validate_balance,
 )
-
-if TYPE_CHECKING:
-    from algosdk.transaction import AssetTransferTxn, PaymentTxn
+from algokit.core.utils import get_algorand_client_for_network
 
 logger = logging.getLogger(__name__)
 
@@ -95,29 +85,39 @@ def transfer(  # noqa: PLR0913
     validate_balance(algod_client, receiver_address, asset_id)
 
     # Transfer algos or assets depending on asset_id
-    txn_response: PaymentTxn | AssetTransferTxn | None = None
+    txn_response: SendAtomicTransactionComposerResults | None = None
+    algorand = get_algorand_client_for_network(network)
     try:
         if asset_id == 0:
-            txn_response = transfer_algos(
-                algod_client,
-                TransferParameters(to_address=receiver_address, from_account=sender_account, micro_algos=amount),
+            txn_response = (
+                algorand.new_group()
+                .add_payment(
+                    PaymentParams(
+                        sender=sender_account.address,
+                        receiver=receiver_address,
+                        amount=AlgoAmount(micro_algo=amount),
+                        signer=sender_account.signer,
+                    )
+                )
+                .send()
             )
         else:
-            txn_response = transfer_asset(
-                algod_client,
-                TransferAssetParameters(
-                    from_account=sender_account,
-                    to_address=receiver_address,
-                    amount=amount,
-                    asset_id=asset_id,
-                ),
+            txn_response = (
+                algorand.new_group()
+                .add_asset_transfer(
+                    AssetTransferParams(
+                        sender=sender_account.address,
+                        receiver=receiver_address,
+                        amount=amount,
+                        asset_id=asset_id,
+                        signer=sender_account.signer,
+                    ),
+                )
+                .send()
             )
 
-        if not txn_response:
-            raise click.ClickException("Failed to perform transfer")
-
         txn_url = get_explorer_url(
-            identifier=txn_response.get_txid(),  # type: ignore[no-untyped-call]
+            identifier=txn_response.tx_ids[0],
             network=network,
             entity_type=ExplorerEntityType.TRANSACTION,
         )

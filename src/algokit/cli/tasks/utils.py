@@ -5,19 +5,14 @@ import os
 import stat
 import sys
 from collections.abc import Callable
+from decimal import Decimal
 from functools import wraps
 from typing import Any
 
 import algosdk
 import algosdk.encoding
 import click
-from algokit_utils import (
-    Account,
-    get_algod_client,
-    get_algonode_config,
-    get_default_localnet_config,
-)
-from algosdk.util import algos_to_microalgos, microalgos_to_algos
+from algokit_utils import AlgoAmount, ClientManager, SigningAccount
 
 from algokit.cli.common.constants import AlgorandNetwork
 from algokit.core.tasks.wallet import get_alias
@@ -29,7 +24,7 @@ def _validate_asset_balance(account_info: dict, asset_id: int, decimals: int, am
     asset_record = next((asset for asset in account_info.get("assets", []) if asset["asset-id"] == asset_id), None)
 
     if not asset_record:
-        raise click.ClickException("Account is not opted into the asset")
+        raise click.ClickException("SigningAccount is not opted into the asset")
 
     if amount > 0 and asset_record["amount"] < amount:
         required = amount / 10**decimals
@@ -41,10 +36,10 @@ def _validate_asset_balance(account_info: dict, asset_id: int, decimals: int, am
 
 def _validate_algo_balance(account_info: dict, amount: int) -> None:
     if account_info.get("amount", 0) < amount:
-        required = microalgos_to_algos(amount)  # type: ignore[no-untyped-call]
-        available = microalgos_to_algos(account_info.get("amount", 0))  # type: ignore[no-untyped-call]
+        required = AlgoAmount.from_micro_algo(amount)
+        available = AlgoAmount.from_micro_algo(account_info.get("amount", 0))
         raise click.ClickException(
-            f"Insufficient Algos balance in account, required: {required} Algos, available: {available} Algos"
+            f"Insufficient Algos balance in account, required: {required.algo} Algos, available: {available.algo} Algos"
         )
 
 
@@ -94,12 +89,12 @@ def load_algod_client(network: AlgorandNetwork) -> algosdk.v2client.algod.AlgodC
     """
 
     config_mapping = {
-        AlgorandNetwork.LOCALNET: get_default_localnet_config("algod"),
-        AlgorandNetwork.TESTNET: get_algonode_config("testnet", "algod", ""),
-        AlgorandNetwork.MAINNET: get_algonode_config("mainnet", "algod", ""),
+        AlgorandNetwork.LOCALNET: ClientManager.get_default_localnet_config("algod"),
+        AlgorandNetwork.TESTNET: ClientManager.get_algonode_config("testnet", "algod"),
+        AlgorandNetwork.MAINNET: ClientManager.get_algonode_config("mainnet", "algod"),
     }
     try:
-        return get_algod_client(config_mapping[network])
+        return ClientManager.get_algod_client(config_mapping[network])
     except KeyError as err:
         raise click.ClickException("Invalid network") from err
 
@@ -137,7 +132,7 @@ def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algod
 
 
 def validate_balance(
-    algod_client: algosdk.v2client.algod.AlgodClient, account: Account | str, asset_id: int, amount: int = 0
+    algod_client: algosdk.v2client.algod.AlgodClient, account: SigningAccount | str, asset_id: int, amount: int = 0
 ) -> None:
     """
     Validates the balance of an account before an operation.
@@ -145,14 +140,14 @@ def validate_balance(
     Args:
         algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
         interacting with the Algorand blockchain.
-        account (Account | str): The account object.
+        account (SigningAccount | str): The account object.
         asset_id (int): The ID of the asset to be checked (0 for Algos).
         amount (int): The amount of Algos or asset for the operation. Defaults to 0 implying opt-in check only.
 
     Raises:
         click.ClickException: If any validation check fails.
     """
-    address = account.address if isinstance(account, Account) else account
+    address = account.address if isinstance(account, SigningAccount) else account
     account_info = algod_client.account_info(address)
 
     if not isinstance(account_info, dict):
@@ -183,7 +178,7 @@ def validate_address(address: str) -> None:
         raise click.ClickException(f"`{address}` is an invalid account address")
 
 
-def get_account_with_private_key(address: str) -> Account:
+def get_account_with_private_key(address: str) -> SigningAccount:
     """
     Retrieves an account object with the private key based on the provided address.
 
@@ -191,7 +186,7 @@ def get_account_with_private_key(address: str) -> Account:
         address (str): The address for which to retrieve the account object.
 
     Returns:
-        Account: An account object with the address and private key.
+        SigningAccount: An account object with the address and private key.
 
     Raises:
         click.ClickException: If the address is not valid or if the alias does not exist or does not have a private key.
@@ -202,7 +197,7 @@ def get_account_with_private_key(address: str) -> Account:
     try:
         validate_address(parsed_address)
         pk = get_private_key_from_mnemonic()
-        return Account(address=parsed_address, private_key=pk)
+        return SigningAccount(address=parsed_address, private_key=pk)
     except click.ClickException as ex:
         alias_data = get_alias(parsed_address)
 
@@ -211,7 +206,7 @@ def get_account_with_private_key(address: str) -> Account:
         if not alias_data.private_key:
             raise click.ClickException(f"Alias `{parsed_address}` does not have a private key.") from ex
 
-        return Account(address=alias_data.address, private_key=alias_data.private_key)
+        return SigningAccount(address=alias_data.address, private_key=alias_data.private_key)
 
 
 def get_address(address: str) -> str:
@@ -263,7 +258,7 @@ def stdin_has_content() -> bool:
 
 
 def validate_account_balance_to_opt_in(
-    algod_client: algosdk.v2client.algod.AlgodClient, account: Account, num_assets: int
+    algod_client: algosdk.v2client.algod.AlgodClient, account: SigningAccount, num_assets: int
 ) -> None:
     """
     Validates the balance of an account before opt in operation.
@@ -272,24 +267,24 @@ def validate_account_balance_to_opt_in(
     Args:
         algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
         interacting with the Algorand blockchain.
-        account (Account | str): The account object.
+        account (SigningAccount | str): The account object.
         num_assets (int): The number of the assets for opt in (0 for Algos).
 
     Raises:
         click.ClickException: If there is an insufficient fund in the account or account is not valid.
     """
 
-    address = account.address if isinstance(account, Account) else account
+    address = account.address if isinstance(account, SigningAccount) else account
     account_info = algod_client.account_info(address)
 
     if not isinstance(account_info, dict):
         raise click.ClickException("Invalid account info response")
 
-    required_microalgos = num_assets * algos_to_microalgos(0.1)  # type: ignore[no-untyped-call]
+    required_microalgos = num_assets * AlgoAmount.from_algo(Decimal(0.1)).micro_algo
     available_microalgos = account_info.get("amount", 0)
     if available_microalgos < required_microalgos:
-        required_algo = microalgos_to_algos(required_microalgos)  # type: ignore[no-untyped-call]
-        available_algos = microalgos_to_algos(available_microalgos)  # type: ignore[no-untyped-call]
+        required_algo = AlgoAmount.from_micro_algo(required_microalgos).algo
+        available_algos = AlgoAmount.from_micro_algo(available_microalgos).algo
         raise click.ClickException(
             f"Insufficient Algos balance in account to opt in, required: {required_algo} Algos, available:"
             f" {available_algos} Algos"

@@ -1,4 +1,4 @@
-from algokit_utils import Account
+from algokit_utils import SigningAccount
 from algosdk import transaction
 
 DUMMY_SUGGESTED_PARAMS = transaction.SuggestedParams(  # type: ignore[no-untyped-call]
@@ -11,7 +11,7 @@ DUMMY_SUGGESTED_PARAMS = transaction.SuggestedParams(  # type: ignore[no-untyped
     flat_fee=True,
     consensus_version="https://github.com/algorandfoundation/specs/tree/abd3d4823c6f77349fc04c3af7b1e99fe4df699f",
 )
-DUMMY_ACCOUNT = Account(
+DUMMY_ACCOUNT = SigningAccount(
     private_key="iLsfFiRDwi0ijFdvdyO1PGkYxooOanbJSgpJ4pPKjKZluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAg==",
     address="MW5E55FG7OHV7B2YB5JGFL6ONZSP7ABCMM77CIDGOT2GSBJEYUBOF3UYKA",
 )

@@ -1,12 +1,12 @@
 import json
 import logging
 import math
+from decimal import Decimal
 from pathlib import Path
 
 import click
-from algokit_utils import Account
+from algokit_utils import AlgoAmount, SigningAccount
 from algosdk.error import AlgodHTTPError
-from algosdk.util import algos_to_microalgos
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import get_explorer_url
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 MAX_UNIT_NAME_BYTE_LENGTH = 8
 MAX_ASSET_NAME_BYTE_LENGTH = 32
-ASSET_MINTING_MBR = 0.2  # Algos, 0.1 for base account, 0.1 for asset creation
+ASSET_MINTING_MBR = Decimal(0.2)  # Algos, 0.1 for base account, 0.1 for asset creation
 
 
 def _validate_supply(total: int, decimals: int) -> None:
@@ -115,7 +115,7 @@ def _get_and_validate_asset_name(context: click.Context, param: click.Parameter,
         )
 
 
-def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> Account:
+def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> SigningAccount:
     """
     Validate the creator account by checking if it is a valid Algorand address.
 
@@ -124,7 +124,7 @@ def _get_creator_account(_: click.Context, __: click.Parameter, value: str) -> A
         value (str): The value of the parameter.
 
     Returns:
-        Account: An account object with the address and private key.
+        SigningAccount: An account object with the address and private key.
     """
     try:
         return get_account_with_private_key(value)
@@ -284,7 +284,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
 )
 def mint(  # noqa: PLR0913
     *,
-    creator: Account,
+    creator: SigningAccount,
     asset_name: str,
     unit_name: str,
     total: int,
@@ -304,7 +304,7 @@ def mint(  # noqa: PLR0913
         client,
         creator,
         0,
-        algos_to_microalgos(ASSET_MINTING_MBR),  # type: ignore[no-untyped-call]
+        AlgoAmount.from_algo(ASSET_MINTING_MBR).micro_algo,
     )
 
     token_metadata = TokenMetadata.from_json_file(token_metadata_path, asset_name, decimals)

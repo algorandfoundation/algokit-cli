@@ -9,6 +9,7 @@ runs:
     - if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
       run: |
         pip install poetry
+        pip install poetry-plugin-export
       shell: bash
 
     - if: ${{ runner.os != 'macOS' || runner.arch != 'ARM64' }}
@@ -16,6 +17,7 @@ runs:
         pip install --user pipx
         pipx ensurepath
         pipx install poetry ${{ runner.os == 'macOS' && '--python "$Python_ROOT_DIR/bin/python"' || '' }}
+        pipx inject poetry poetry-plugin-export
       shell: bash
 
     - name: Get full Python version
