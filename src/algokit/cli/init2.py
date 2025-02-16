@@ -86,17 +86,3 @@ def init2_command(
     # Launch cli app here
     app = ProjectWizard()
     app.run()
-    # Get project path
-    base_path = Path.cwd()
-    if directory_name is None:
-        logger.error("Project name is required")
-        _fail_and_bail()
-
-    project_path = base_path / directory_name
-    if project_path.exists():
-        if not project_path.is_dir():
-            logger.error("A file with that name already exists. Please use a different name.")
-            _fail_and_bail()
-        logger.warning("Directory already exists. This is not recommended.")
-
-    logger.info(f"Project will be created at: {project_path}")
