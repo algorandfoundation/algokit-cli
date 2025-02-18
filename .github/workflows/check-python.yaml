@@ -21,15 +21,20 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      # - name: Audit with pip-audit
-      #   run: |
-      #     # audit non dev dependencies, no exclusions
-      #     poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt
-
-      #     # audit all dependencies, with exclusions.
-      #     # If a vulnerability is found in a dev dependency without an available fix,
-      #     # it can be temporarily ignored by adding --ignore-vuln e.g.
-      #     poetry run pip-audit
+      - name: Audit with pip-audit
+        run: |
+          # audit non dev dependencies, no exclusions
+          poetry export --without=dev > requirements.txt
+          poetry run pip-audit -r requirements.txt  --ignore-vuln 'GHSA-79v4-65xg-pq4g'
+          # audit all dependencies, with exclusions.
+          # If a vulnerability is found in a dev dependency without an available fix,
+          # it can be temporarily ignored by adding --ignore-vuln e.g.
+          # TODO: decide on `GHSA-79v4-65xg-pq4g`, see https://osv.dev/vulnerability/GHSA-79v4-65xg-pq4g
+          # The vulnerability is not applicable to the cli case, the only abstraciton leveraged is `RSAPublicKey` in 
+          # vendored src/algokit/core/_vendor/auth0/authentication/token_verifier.py that was added to remove dependency
+          # on auth0 package that caused many adhoc transitive dependency errors in cli. As a result, consequent cryptography
+          # vulnerabilities need to be a) verified for applicability to cli case and ignored if not applicable or b) fixed by
+          # updating the vendored file to use the latest version of `cryptography` that has the fix.
 
       - name: Check formatting with Ruff
         run: |
