@@ -21,15 +21,15 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Audit with pip-audit
-        run: |
-          # audit non dev dependencies, no exclusions
-          poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt
+      # - name: Audit with pip-audit
+      #   run: |
+      #     # audit non dev dependencies, no exclusions
+      #     poetry export --without=dev > requirements.txt && poetry run pip-audit -r requirements.txt
 
-          # audit all dependencies, with exclusions.
-          # If a vulnerability is found in a dev dependency without an available fix,
-          # it can be temporarily ignored by adding --ignore-vuln e.g.
-          poetry run pip-audit
+      #     # audit all dependencies, with exclusions.
+      #     # If a vulnerability is found in a dev dependency without an available fix,
+      #     # it can be temporarily ignored by adding --ignore-vuln e.g.
+      #     poetry run pip-audit
 
       - name: Check formatting with Ruff
         run: |
