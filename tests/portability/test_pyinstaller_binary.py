@@ -48,7 +48,11 @@ def test_algokit_init_and_project_run(tmp_path_factory: pytest.TempPathFactory) 
     cwd = tmp_path_factory.mktemp("cwd")
 
     # Run algokit init
-    init_command = command_str_to_list("algokit init --name playground -t python --no-git --no-ide --defaults")
+    init_command = command_str_to_list(
+        "algokit init --name playground "
+        "--template-url=https://github.com/algorandfoundation/algokit-python-template "
+        "--template-url-ref=feat/algokit_utils_v3 --no-git --no-ide --defaults"
+    )
     init_result = subprocess.run(init_command, capture_output=True, text=True, check=False, cwd=cwd)
     logger.info(f"Command {init_command} returned {init_result.stdout}")
     assert init_result.returncode == 0, f"Init command failed with {init_result.stderr}"
