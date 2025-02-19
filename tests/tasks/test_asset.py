@@ -1,6 +1,7 @@
 import json
 
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
+from algokit_utils import BulkAssetOptInOutResult
 from algosdk import account, mnemonic
 from pytest_mock import MockerFixture
 
@@ -34,7 +35,11 @@ def test_opt_in_invalid_network() -> None:
 
 
 def test_opt_in_to_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_in", return_value={123: "dummy_txn_id"})
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_in.return_value = [
+        BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
+    ]
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
@@ -49,7 +54,11 @@ def test_opt_in_to_assets_from_account_address_successful(mocker: MockerFixture)
 
 
 def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_in", return_value={123: "dummy_txn_id"})
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_in.return_value = [
+        BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
+    ]
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
@@ -70,7 +79,9 @@ def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, m
 
 
 def test_opt_in_to_assets_from_account_address_failed(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_in", side_effect=Exception("dummy error"))
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_in.side_effect = Exception("dummy error")
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     mocker.patch("algokit.cli.tasks.assets.validate_account_balance_to_opt_in")
     dummy_account_pk, dummy_account_address = _generate_account()
@@ -101,7 +112,11 @@ def test_opt_out_invalid_network() -> None:
 
 
 def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_out.return_value = [
+        BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
+    ]
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
     asset_id = 123
@@ -117,8 +132,12 @@ def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture
 def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFixture) -> None:
     dummy_account_info = {"assets": [{"asset-id": 1, "amount": 0}]}
     mocker.patch("algokit.cli.tasks.assets.get_account_info", return_value=dummy_account_info)
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_out.return_value = [
+        BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
+    ]
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
-    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
     dummy_account_pk, dummy_account_address = _generate_account()
     result = invoke(
         f"task opt-out -a {dummy_account_address} --network localnet --all",
@@ -130,7 +149,11 @@ def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFix
 
 
 def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, mock_keyring: dict[str, str]) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out", return_value={123: "dummy_txn_id"})
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_out.return_value = [
+        BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
+    ]
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
 
@@ -150,7 +173,9 @@ def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, 
 
 
 def test_opt_out_assets_from_account_address_failed(mocker: MockerFixture) -> None:
-    mocker.patch("algokit.cli.tasks.assets.opt_out", side_effect=Exception("dummy error"))
+    algorand_mock = mocker.MagicMock()
+    algorand_mock.asset.bulk_opt_out.side_effect = Exception("dummy error")
+    algorand_mock = mocker.patch("algokit.cli.tasks.assets.get_algorand_client_for_network", return_value=algorand_mock)
     mocker.patch("algokit.cli.tasks.assets.validate_address")
     dummy_account_pk, dummy_account_address = _generate_account()
     asset_id = 123

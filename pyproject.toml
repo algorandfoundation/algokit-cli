@@ -18,9 +18,12 @@ tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
 keyring = "25.2.1"
-pyjwt = "^2.8.0"
-cryptography = "^43.0.1" # pyjwt has a weak dependency on cryptography
-algokit-utils = "^2.3.0"
+# pyjwt is locked to version ^2.8.0 because its explicitly
+# vendored from auth0 repo, to reduce depedency on auth0 package that caused many adhoc transitive dependency errors in cli
+# see header in src/algokit/core/_vendor/auth0/authentication/token_verifier.py
+pyjwt = "^2.8.0" 
+cryptography = "^43.0.1" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
+algokit-utils = "^3.0.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 jsondiff = "^2.0.0"
@@ -44,6 +47,7 @@ sphinxnotes-markdown-builder = "^0.5.6"
 poethepoet = ">=0.17.1,<0.27.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
+pytest-sugar = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]

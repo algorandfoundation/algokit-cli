@@ -7,7 +7,7 @@ import pathlib
 import re
 from dataclasses import asdict
 
-from algokit_utils import Account
+from algokit_utils import SigningAccount
 from algosdk import encoding, transaction
 from algosdk.transaction import wait_for_confirmation
 from algosdk.v2client import algod
@@ -145,7 +145,7 @@ def mint_token(  # noqa: PLR0913
     *,
     client: algod.AlgodClient,
     jwt: str,
-    creator_account: Account,
+    creator_account: SigningAccount,
     unit_name: str,
     total: int,
     token_metadata: TokenMetadata,
@@ -158,7 +158,7 @@ def mint_token(  # noqa: PLR0913
     Args:
         client (algod.AlgodClient): An instance of the `algod.AlgodClient` class representing the Algorand node.
         jwt (str): The JWT for accessing the Piñata API.
-        creator_account (Account): An instance of the `Account` class representing the account that
+        creator_account (SigningAccount): An instance of the `SigningAccount` class representing the account that
         will create the token.
         asset_name (str): A string representing the name of the token.
         unit_name (str): A string representing the unit name of the token.

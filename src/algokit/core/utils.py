@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import platform
 import re
@@ -6,17 +8,23 @@ import socket
 import sys
 import threading
 import time
-from collections.abc import Callable, Iterator
+from functools import cache
 from itertools import cycle
 from os import environ
 from pathlib import Path
 from shutil import which
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import click
 import dotenv
+from algokit_utils import AlgorandClient
 
 from algokit.core import proc
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+
+    from algokit.cli.common.constants import AlgorandNetwork
 
 CLEAR_LINE = "\033[K"
 SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
@@ -275,3 +283,18 @@ def alphanumeric_sort_key(s: str) -> list[int | str]:
     For instance, ensures that "name_digit_1" comes before "name_digit_2".
     """
     return [int(text) if text.isdigit() else text.lower() for text in re.split("([0-9]+)", s)]
+
+
+@cache
+def get_algorand_client_for_network(network: AlgorandNetwork) -> AlgorandClient:
+    from algokit.cli.common.constants import AlgorandNetwork
+
+    match network:
+        case AlgorandNetwork.MAINNET:
+            return AlgorandClient.mainnet()
+        case AlgorandNetwork.TESTNET:
+            return AlgorandClient.testnet()
+        case AlgorandNetwork.LOCALNET:
+            return AlgorandClient.default_localnet()
+        case _:
+            raise ValueError(f"Unsupported network: {network}")

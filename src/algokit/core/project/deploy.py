@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 import dotenv
-from algokit_utils import get_algonode_config
+from algokit_utils import ClientManager
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config
 from algokit.core.sandbox import (
@@ -26,10 +26,10 @@ class _KnownEnvironments:
     TESTNET = "testnet"
 
 
-DEFAULT_MAINNET_ALGOD_SERVER = get_algonode_config("mainnet", config="algod", token="").server
-DEFAULT_TESTNET_ALGOD_SERVER = get_algonode_config("testnet", config="algod", token="").server
-DEFAULT_MAINNET_INDEXER_SERVER = get_algonode_config("mainnet", config="indexer", token="").server
-DEFAULT_TESTNET_INDEXER_SERVER = get_algonode_config("testnet", config="indexer", token="").server
+DEFAULT_MAINNET_ALGOD_SERVER = ClientManager.get_algonode_config("mainnet", "algod").server
+DEFAULT_TESTNET_ALGOD_SERVER = ClientManager.get_algonode_config("testnet", "algod").server
+DEFAULT_MAINNET_INDEXER_SERVER = ClientManager.get_algonode_config("mainnet", "indexer").server
+DEFAULT_TESTNET_INDEXER_SERVER = ClientManager.get_algonode_config("testnet", "indexer").server
 
 
 _ENVIRONMENT_CONFIG: dict[str, dict[str, str | None]] = {
