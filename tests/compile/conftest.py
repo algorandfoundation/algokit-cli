@@ -25,3 +25,31 @@ class HelloWorldContract(Contract):
     def clear_state_program(self) -> bool:
         return True
 """
+
+VALID_ALGORAND_TYPESCRIPT_CONTRACT_FILE_CONTENT = """
+import { Contract } from '@algorandfoundation/algorand-typescript'
+
+export class HelloWorld extends Contract {
+  public hello(name: string): string {
+    return `${this.getHello()} ${name}`
+  }
+
+  private getHello() {
+    return 'Hello'
+  }
+}
+"""
+
+INVALID_ALGORAND_TYPESCRIPT_CONTRACT_FILE_CONTENT = """
+import { Contract } from '@algorandfoundation/algorand-typescript'
+
+export class HelloWorld extends ContractInvalid {
+  public hello(name: string): string {
+    return `${this.getHello()} ${name}`
+  }
+
+  private getHello() {
+    return 'Hello'
+  }
+}
+"""

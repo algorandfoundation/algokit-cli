@@ -19,8 +19,10 @@ def _find_puyats_command(version: str | None) -> list[str]:
         except OSError:
             pass  # in case of path/permission issues, go to next candidate
         else:
-            if puyats_help_result.exit_code == 0 and version is not None and (
-                extract_version_triple(version) == extract_version_triple(puyats_help_result.output)
+            if (
+                puyats_help_result.exit_code == 0
+                and version is not None
+                and (extract_version_triple(version) == extract_version_triple(puyats_help_result.output))
             ):
                 return puyats_command
 
@@ -37,7 +39,7 @@ def _find_puyats_command(version: str | None) -> list[str]:
 
 
 def _get_candidate_puyats_commands() -> Iterator[list[str]]:
-    # when puyats is installed at the project level
-    yield ["npm", "run", "@algorandfoundation/puya-ts"]
-    # when puyats is installed at the global level
-    yield ["@algorandfoundation/puya-ts"]
+    # defer to npx as it first checks if puyats is installed at the project level
+    # then the global level, the -y flag is used to automatically answer yes to all prompts if
+    # puyats is not installed
+    yield ["npx", "-y", "@algorandfoundation/puya-ts"]
