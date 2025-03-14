@@ -47,6 +47,7 @@ AlgoKit helps you develop Algorand solutions:
   - **AlgoKit Utils** ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test, build and deploy Algorand solutions quickly and easily
     - [algosdk](https://developer.algorand.org/docs/sdks/) ([Python](https://github.com/algorand/py-algorand-sdk#readme) | [TypeScript](https://github.com/algorand/js-algorand-sdk#readme)) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
   - [**Algorand Python**](https://github.com/algorandfoundation/puya): A semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
+  - [**Algorand TypeScript**](https://github.com/algorandfoundation/puya-ts): A semantically and syntactically compatible, typed TypeScript language that works with standard TypeScript tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
   - [**TEALScript**](https://github.com/algorandfoundation/TEALScript): A subset of TypeScript that can be used to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
   - [**AlgoKit LocalNet**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
 
@@ -61,7 +62,7 @@ AlgoKit comes with out-of-the-box [Continuous Integration / Continuous Deploymen
 The set of capabilities supported by AlgoKit will evolve over time, but currently includes:
 
 - Quickly run, explore and interact with an isolated local Algorand network (LocalNet)
-- Building, testing, deploying and calling [Algorand Python](https://github.com/algorandfoundation/puya) / [TEALScript](https://github.com/algorandfoundation/TEALScript) smart contracts
+- Building, testing, deploying and calling [Algorand Python](https://github.com/algorandfoundation/puya) / [Algorand TypeScript](https://github.com/algorandfoundation/puya-ts) / [TEALScript](https://github.com/algorandfoundation/TEALScript) smart contracts
 
 For a user guide and guidance on how to use AlgoKit, please refer to the [docs](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md).
 
@@ -91,7 +92,7 @@ The key required dependency is Python 3.10+, but some of the installation option
 
 - **Git**: Essential for creating and updating projects from templates. Installation guide available at [Git Installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - **Docker**: Necessary for running the AlgoKit LocalNet environment. Docker Compose version 2.5.0 or higher is required. See [Docker Installation](https://docs.docker.com/get-docker/).
-- **Node.js**: For those working on frontend templates or building contracts using TEALScript. **Minimum required versions are Node.js `v18` and npm `v9`**. Instructions can be found at [Node.js Installation](https://nodejs.org/en/download/).
+- **Node.js**: For those working on frontend templates or building contracts using TypeScript or TEALScript. **Minimum required versions are Node.js `v22` and npm `v10`**. Instructions can be found at [Node.js Installation](https://nodejs.org/en/download/).
 
 > **Note**
 > If you have previously installed AlgoKit using `pipx` and would like to switch to a different installation method, please ensure that

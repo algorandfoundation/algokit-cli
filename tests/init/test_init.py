@@ -86,6 +86,7 @@ class ExtendedTemplateKey(str, Enum):
     # Include all keys from TemplateKey and add new ones
     BASE = "base"
     PYTHON = "python"
+    TYPESCRIPT = "typescript"
     TEALSCRIPT = "tealscript"
     FULLSTACK = "fullstack"
     REACT = "react"
