@@ -136,7 +136,7 @@ After execution, the `App ID` of the deployed contract and its Algorand address 
 
 At this point you have deployed a simple contract to a LocalNet Algorand network (running in your Docker environment) and called it successfully!
 
-Additionally, you can find the native AVM related artifacts and the appropriate smart contract manifest JSON files have been output to the `artifacts` folder. Note that in this example, AVM bytecode is compiled using the `PuyaPy` compiler, which is what `Algorand Python` relies on to compile your Python smart contract code to TEAL ([Transaction Execution Approval Language](https://developer.algorand.org/docs/get-details/dapps/avm/teal/)).
+Additionally, you can find the native AVM related artifacts and the appropriate smart contract manifest JSON files have been output to the `artifacts` folder. Note that in this example, AVM bytecode is compiled using the `PuyaPy` compiler, which is what `Algorand Python` relies on to compile your Python smart contract code to TEAL ([Transaction Execution Approval Language](https://dev.algorand.co/concepts/smart-contracts/languages/teal)).
 
 ### Using AlgoKit CLI to build and deploy contracts 🛠️
 
@@ -168,4 +168,4 @@ We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and 
 - To learn more about the commands demonstrated in this tutorial, refer to [`init`](../features/init.md) and [`project`](../features/project.md) to get a comprehensive understanding of their further capabilities.
 - If you'd like to learn more on structuring your `AlgoKit Project` as a monorepo, refer to `workspace` mode as described in [`init`](../features/init.md#workspaces-vs-standalone-projects). You can also pass the `--no-workspace` flag to setup a standalone algokit project, if preferred.
 - If you'd like to **create your own** `AlgoKit` template, refer to the [template tutorial](./algokit-template.md).
-- More information on Algorand smart contracts is also available in the [smart contract documentation](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/).
+- More information on Algorand smart contracts is also available in the [smart contract documentation](https://dev.algorand.co/concepts/smart-contracts/overview).
