@@ -39,7 +39,7 @@ def goal_command(*, console: bool, interactive: bool, goal_args: list[str]) -> N
     """
     Run the Algorand goal CLI against the AlgoKit LocalNet.
 
-    Look at https://developer.algorand.org/docs/clis/goal/goal/ for more information.
+    Look at https://dev.algorand.co/algokit/algokit-cli/goal for more information.
     """
     goal_args = list(goal_args)
     container_engine = get_container_engine()

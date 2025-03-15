@@ -4,9 +4,9 @@
 
 <p align="center">
     <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md"><img src="https://img.shields.io/badge/docs-repository-00dc94?logo=github&style=flat.svg" /></a>
-    <a target="_blank" href="https://developer.algorand.org/algokit/"><img src="https://img.shields.io/badge/learn-AlgoKit-00dc94?logo=algorand&mac=flat.svg" /></a>
+    <a target="_blank" href="https://dev.algorand.co/algokit/algokit-intro"><img src="https://img.shields.io/badge/learn-AlgoKit-00dc94?logo=algorand&mac=flat.svg" /></a>
     <a target="_blank" href="https://github.com/algorandfoundation/algokit-cli"><img src="https://img.shields.io/github/stars/algorandfoundation/algokit-cli?color=00dc94&logo=star&style=flat" /></a>
-    <a target="_blank" href="https://developer.algorand.org/algokit/"><img  src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Falgorandfoundation%2Falgokit-cli&countColor=%2300dc94&style=flat" /></a>
+    <a target="_blank" href="https://dev.algorand.co/algokit/algokit-intro"><img  src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Falgorandfoundation%2Falgokit-cli&countColor=%2300dc94&style=flat" /></a>
 </p>
 
 ---
@@ -27,7 +27,7 @@ AlgoKit can help you [**learn**](#learn), [**develop**](#develop) and [**operate
 
 ### Learn
 
-There are many learning resources on the [Algorand Developer Portal](https://developer.algorand.org/) and the [AlgoKit landing page](https://developer.algorand.org/algokit) has a range of links to more learning materials. In particular, check out the [quick start tutorial](https://developer.algorand.org/docs/get-started/algokit/) and the [AlgoKit detailed docs page](https://developer.algorand.org/docs/get-details/algokit/).
+There are many learning resources on the [Algorand Developer Portal](https://dev.algorand.co/) and the [AlgoKit landing page](https://dev.algorand.co/algokit/algokit-intro) has a range of links to more learning materials. In particular, check out the [quick start tutorial](https://dev.algorand.co/getting-started/algokit-quick-start/).
 
 If you need help you can access both the [Algorand Discord](https://discord.gg/84AActu3at) (pro-tip: check out the algokit channel!) and the [Algorand Forum](https://forum.algorand.org/).
 
@@ -45,7 +45,7 @@ AlgoKit helps you develop Algorand solutions:
   - [**AlgoKit Templates**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/init.md): Template libraries to get you started faster and quickly set up a productive dev experience
 - **Development**: AlgoKit provides SDKs, tools and libraries that help you quickly and effectively build high quality Algorand solutions:
   - **AlgoKit Utils** ([Python](https://github.com/algorandfoundation/algokit-utils-py#readme) | [TypeScript](https://github.com/algorandfoundation/algokit-utils-ts#readme)): A set of utility libraries so you can develop, test, build and deploy Algorand solutions quickly and easily
-    - [algosdk](https://developer.algorand.org/docs/sdks/) ([Python](https://github.com/algorand/py-algorand-sdk#readme) | [TypeScript](https://github.com/algorand/js-algorand-sdk#readme)) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
+    - [Algorand SDKs](https://dev.algorand.co/reference/sdk/sdk-list/) - The core Algorand SDK providing Algorand protocol API calls, which AlgoKit Utils wraps, but still exposes for advanced scenarios
   - [**Algorand Python**](https://github.com/algorandfoundation/puya): A semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
   - [**TEALScript**](https://github.com/algorandfoundation/TEALScript): A subset of TypeScript that can be used to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
   - [**AlgoKit LocalNet**](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md): A local isolated Algorand network so you can simulate real transactions and workloads on your computer
