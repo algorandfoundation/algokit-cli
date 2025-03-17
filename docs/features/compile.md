@@ -6,7 +6,7 @@ When running the compile command, AlgoKit will take care of working out which co
 
 ## Prerequisites
 
-See [Compile Python - Prerequisites](#prerequisites-1) for details.
+See [Compile Python - Prerequisites](#prerequisites-1) and [Compile TypeScript - Prerequisites](#prerequisites-2) for details.
 
 ## What is Algorand Python & PuyaPy?
 
@@ -29,6 +29,24 @@ class HelloWorldContract(ARC4Contract):
 
 For more complex examples, see the [examples](https://github.com/algorandfoundation/puya/tree/main/examples) in the [PuyaPy repo](https://github.com/algorandfoundation/puya).
 
+## What is Algorand TypeScript & PuyaTs?
+
+Algorand TypeScript is a typed TypeScript language that allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
+
+Algorand TypeScript can be deployed to Algorand by using the PuyaTs optimising compiler, which takes Algorand TypeScript and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/generate.md#1-typed-clients), will result in AVM bytecode execution semantics that match the given TypeScript code.
+
+Below is an example Algorand TypeScript smart contract.
+
+```typescript
+import { Contract } from "@algorandfoundation/puya-sdk";
+
+class HelloWorldContract extends Contract {
+  hello(name: string): string {
+    return "Hello, " + name;
+  }
+}
+```
+
 ## Usage
 
 Available commands and possible usage are as follows:
@@ -47,8 +65,10 @@ Options:
   -h, --help          Show this message and exit.
 
 Commands:
-  py      Compile Algorand Python contract(s) using the PuyaPy compiler.
-  python  Compile Algorand Python contract(s) using the PuyaPy compiler.
+  py         Compile Algorand Python contract(s) using the PuyaPy compiler.
+  python     Compile Algorand Python contract(s) using the PuyaPy compiler.
+  ts         Compile Algorand TypeScript contract(s) using the PuyaTs compiler.
+  typescript Compile Algorand TypeScript contract(s) using the PuyaTs compiler.
 ```
 
 ### Compile Python
@@ -95,4 +115,52 @@ To compile a directory of Algorand Python smart contracts and write the output t
 
 ```shell
 algokit compile python my_contracts
+```
+
+### Compile TypeScript
+
+The command `algokit compile typescript` or `algokit compile ts` will run the PuyaTs compiler against the supplied Algorand TypeScript smart contract.
+
+All arguments supplied to the command are passed directly to PuyaTs, therefore this command supports all options supported by the PuyaTs compiler.
+
+Any errors detected by PuyaTs during the compilation process will be printed to the output.
+
+#### Prerequisites
+
+Node.js and npm are required for the TypeScript compiler. The command will attempt to find a correctly installed PuyaTs compiler in the following order:
+
+1. First, it checks if a matching version is installed at the project level (using `npm ls`).
+2. Next, it checks if a matching version is installed globally (using `npm --global ls`).
+3. If no appropriate match is found, it will run the compiler using npx with the `-y` flag.
+
+#### Examples
+
+To see a list of the supported PuyaTs options, run the following:
+
+```shell
+algokit compile typescript -h
+```
+
+To determine the version of the PuyaTs compiler in use, execute the following command:
+
+```shell
+algokit compile typescript --version
+```
+
+To compile a single Algorand TypeScript smart contract and write the output to a specific location, run the following:
+
+```shell
+algokit compile typescript hello_world/contract.algo.ts --out-dir hello_world/out
+```
+
+To build multiple Algorand TypeScript smart contracts and write the output to a specific location, run the following:
+
+```shell
+algokit compile typescript hello_world/contract.algo.ts calculator/contract.algo.ts --out-dir my_contracts
+```
+
+To compile a directory of Algorand TypeScript smart contracts and write the output to the default location, run the following:
+
+```shell
+algokit compile typescript my_contracts
 ```
