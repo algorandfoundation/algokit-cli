@@ -11,18 +11,18 @@ def find_valid_puyats_command(version: str | None) -> list[str]:
 def _find_puyats_command(version: str | None) -> list[str]:
     """
     Find puyats command.
-    If puyats isn't installed, install the latest version with pipx.
+    If puyats isn't installed, install the latest version with npx.
     """
     for puyats_command in _get_candidate_puyats_commands():
         try:
-            puyats_help_result = run([*puyats_command, "--version"])
+            puyats_version_result = run([*puyats_command, "--version"])
         except OSError:
             pass  # in case of path/permission issues, go to next candidate
         else:
             if (
-                puyats_help_result.exit_code == 0
+                puyats_version_result.exit_code == 0
                 and version is not None
-                and (extract_version_triple(version) == extract_version_triple(puyats_help_result.output))
+                and (extract_version_triple(version) == extract_version_triple(puyats_version_result.output))
             ):
                 return puyats_command
 
