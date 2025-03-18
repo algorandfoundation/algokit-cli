@@ -1,9 +1,10 @@
 from collections.abc import Iterator
 
 from algokit.core.proc import run
-from algokit.core.utils import extract_version_triple, get_npm_command
+from algokit.core.utils import extract_semantic_version, get_npm_command
 
 PUYATS_NPM_PACKAGE = "@algorandfoundation/puya-ts"
+PUYATS_COMPILE_COMMAND = "build"
 
 
 def find_valid_puyats_command(version: str | None) -> list[str]:
@@ -19,15 +20,15 @@ def _find_project_puyats_command(
     try:
         result = run([*npm_command, "ls"])
         if result.exit_code == 0:
-            generate_command = [*npx_command, PUYATS_NPM_PACKAGE]
+            compile_command = [*npx_command, PUYATS_NPM_PACKAGE]
             for line in result.output.splitlines():
                 if PUYATS_NPM_PACKAGE in line:
                     if version is not None:
-                        installed_version = extract_version_triple(line)
-                        if extract_version_triple(version) == installed_version:
-                            return generate_command
+                        installed_version = extract_semantic_version(line)
+                        if version == installed_version:
+                            return compile_command
                     else:
-                        return generate_command
+                        return compile_command
     except OSError:
         pass
     except ValueError:
@@ -70,7 +71,7 @@ def _find_puyats_command(version: str | None) -> list[str]:
         try:
             puyats_version_result = run([*project_result, "--version"])
             if puyats_version_result.exit_code == 0:
-                return project_result
+                return [*project_result, PUYATS_COMPILE_COMMAND]
         except OSError:
             pass  # In case of path/permission issues, continue to the next candidate
 
@@ -80,7 +81,7 @@ def _find_puyats_command(version: str | None) -> list[str]:
         try:
             puyats_version_result = run([*global_result, "--version"])
             if puyats_version_result.exit_code == 0:
-                return global_result
+                return [*global_result, PUYATS_COMPILE_COMMAND]
         except OSError:
             pass  # In case of path/permission issues, fall back to npx
 
@@ -89,6 +90,7 @@ def _find_puyats_command(version: str | None) -> list[str]:
         *npx_command,
         "-y",
         f"{PUYATS_NPM_PACKAGE}{'@' + version if version is not None else ''}",
+        PUYATS_COMPILE_COMMAND,
     ]
 
 

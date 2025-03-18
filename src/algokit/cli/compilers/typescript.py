@@ -7,13 +7,14 @@ import click
 
 from algokit.core.compilers.typescript import find_valid_puyats_command
 from algokit.core.proc import run
+from algokit.core.utils import extract_semantic_version
 
 logger = logging.getLogger(__name__)
 _AnyCallable = Callable[..., Any]
 
 
 def invoke_puyats(context: click.Context, puyats_args: list[str]) -> None:
-    version = str(context.obj["version"]) if context.obj["version"] else None
+    version = extract_semantic_version(str(context.obj["version"])) if context.obj["version"] else None
 
     puyats_command = find_valid_puyats_command(version)
 

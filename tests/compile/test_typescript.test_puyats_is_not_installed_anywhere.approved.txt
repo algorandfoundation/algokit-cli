@@ -4,6 +4,6 @@ DEBUG: npm: STDERR
 DEBUG: Running 'npm --global ls' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
-DEBUG: Running 'npx -y @algorandfoundation/puya-ts {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
+DEBUG: Running 'npx -y @algorandfoundation/puya-ts build {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
 DEBUG: npx: Compilation successful
 Compilation successful

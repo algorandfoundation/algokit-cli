@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import pytest
-from algokit.core.compilers.typescript import PUYATS_NPM_PACKAGE
+from algokit.core.compilers.typescript import PUYATS_COMPILE_COMMAND, PUYATS_NPM_PACKAGE
 from pytest_mock import MockerFixture
 
 from tests.compile.conftest import (
@@ -52,7 +52,9 @@ def test_compile_py_help(mocker: MockerFixture) -> None:
     proc_mock.set_output([_get_npm_command(), "--global", "ls"], ["STDOUT", "STDERR"])
 
     # Mock the help command
-    proc_mock.set_output([_get_npx_command(), "-y", PUYATS_NPM_PACKAGE, "-h"], output=["PuyaTs help"])
+    proc_mock.set_output(
+        [_get_npx_command(), "-y", PUYATS_NPM_PACKAGE, PUYATS_COMPILE_COMMAND, "-h"], output=["PuyaTs help"]
+    )
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
     result = invoke("compile typescript -h")
@@ -70,7 +72,8 @@ def test_puyats_is_not_installed_anywhere(dummy_contract_path: Path, mocker: Moc
 
     # Mock successful npx execution
     proc_mock.set_output(
-        [_get_npx_command(), "-y", PUYATS_NPM_PACKAGE, str(dummy_contract_path)], ["Compilation successful"]
+        [_get_npx_command(), "-y", PUYATS_NPM_PACKAGE, PUYATS_COMPILE_COMMAND, str(dummy_contract_path)],
+        ["Compilation successful"],
     )
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
@@ -95,7 +98,13 @@ def test_specificed_puyats_version_is_not_installed(dummy_contract_path: Path, m
 
     # Mock successful npx execution with version-specific package
     proc_mock.set_output(
-        [_get_npx_command(), "-y", f"{PUYATS_NPM_PACKAGE}@{target_version}", str(dummy_contract_path)],
+        [
+            _get_npx_command(),
+            "-y",
+            f"{PUYATS_NPM_PACKAGE}@{target_version}",
+            PUYATS_COMPILE_COMMAND,
+            str(dummy_contract_path),
+        ],
         ["Compilation successful"],
     )
 
@@ -118,7 +127,10 @@ def test_puyats_is_installed_in_project(dummy_contract_path: Path, mocker: Mocke
     proc_mock.set_output([_get_npx_command(), PUYATS_NPM_PACKAGE, "--version"], [f"puya-ts {version}"])
 
     # Mock successful compile with project installation
-    proc_mock.set_output([_get_npx_command(), PUYATS_NPM_PACKAGE, str(dummy_contract_path)], ["Compilation successful"])
+    proc_mock.set_output(
+        [_get_npx_command(), PUYATS_NPM_PACKAGE, PUYATS_COMPILE_COMMAND, str(dummy_contract_path)],
+        ["Compilation successful"],
+    )
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
@@ -142,7 +154,10 @@ def test_puyats_is_installed_globally(dummy_contract_path: Path, mocker: MockerF
     proc_mock.set_output([_get_npx_command(), PUYATS_NPM_PACKAGE, "--version"], [f"puya-ts {version}"])
 
     # Mock successful compile with global installation
-    proc_mock.set_output([_get_npx_command(), PUYATS_NPM_PACKAGE, str(dummy_contract_path)], ["Compilation successful"])
+    proc_mock.set_output(
+        [_get_npx_command(), PUYATS_NPM_PACKAGE, PUYATS_COMPILE_COMMAND, str(dummy_contract_path)],
+        ["Compilation successful"],
+    )
 
     mocker.patch("algokit.core.proc.Popen").side_effect = proc_mock.popen
 
