@@ -127,7 +127,7 @@ def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
         ),
         TemplateKey.TYPESCRIPT: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-typescript-template",
-            description="Official starter template for Algorand TypeScript applications",
+            description="Official starter template for Algorand TypeScript (Beta) applications",
         ),
         TemplateKey.PYTHON: BlessedTemplateSource(
             url="gh:algorandfoundation/algokit-python-template",
