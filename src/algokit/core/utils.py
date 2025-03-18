@@ -40,6 +40,13 @@ def extract_version_triple(version_str: str) -> str:
     return match.group()
 
 
+def extract_semantic_version(version_str: str) -> str:
+    match = re.search(r"\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?", version_str)
+    if not match:
+        raise ValueError("Unable to parse version number")
+    return match.group()
+
+
 def is_minimum_version(system_version: str, minimum_version: str) -> bool:
     system_version_as_tuple = tuple(map(int, system_version.split(".")))
     minimum_version_as_tuple = tuple(map(int, minimum_version.split(".")))

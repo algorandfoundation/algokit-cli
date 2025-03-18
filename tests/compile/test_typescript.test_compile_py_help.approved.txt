@@ -4,6 +4,6 @@ DEBUG: npm: STDERR
 DEBUG: Running 'npm --global ls' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
-DEBUG: Running 'npx -y @algorandfoundation/puya-ts -h' in '{current_working_directory}'
+DEBUG: Running 'npx -y @algorandfoundation/puya-ts build -h' in '{current_working_directory}'
 DEBUG: npx: PuyaTs help
 PuyaTs help

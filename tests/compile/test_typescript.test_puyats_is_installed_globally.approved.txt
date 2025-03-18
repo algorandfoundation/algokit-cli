@@ -5,6 +5,6 @@ DEBUG: Running 'npm --global ls' in '{current_working_directory}'
 DEBUG: npm: └── @algorandfoundation/puya-ts@1.0.0
 DEBUG: Running 'npx @algorandfoundation/puya-ts --version' in '{current_working_directory}'
 DEBUG: npx: puya-ts 1.0.0
-DEBUG: Running 'npx @algorandfoundation/puya-ts {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
+DEBUG: Running 'npx @algorandfoundation/puya-ts build {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'
 DEBUG: npx: Compilation successful
 Compilation successful
