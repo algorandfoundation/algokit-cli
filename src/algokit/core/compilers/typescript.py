@@ -1,10 +1,7 @@
-from collections.abc import Iterator
-
 from algokit.core.proc import run
 from algokit.core.utils import extract_semantic_version, get_npm_command
 
 PUYATS_NPM_PACKAGE = "@algorandfoundation/puya-ts"
-PUYATS_COMPILE_COMMAND = "build"
 
 
 def find_valid_puyats_command(version: str | None) -> list[str]:
@@ -71,7 +68,7 @@ def _find_puyats_command(version: str | None) -> list[str]:
         try:
             puyats_version_result = run([*project_result, "--version"])
             if puyats_version_result.exit_code == 0:
-                return [*project_result, PUYATS_COMPILE_COMMAND]
+                return [*project_result]
         except OSError:
             pass  # In case of path/permission issues, continue to the next candidate
 
@@ -81,23 +78,9 @@ def _find_puyats_command(version: str | None) -> list[str]:
         try:
             puyats_version_result = run([*global_result, "--version"])
             if puyats_version_result.exit_code == 0:
-                return [*global_result, PUYATS_COMPILE_COMMAND]
+                return [*global_result]
         except OSError:
             pass  # In case of path/permission issues, fall back to npx
 
     # When not installed or available, run via npx
-    return [
-        *npx_command,
-        "-y",
-        f"{PUYATS_NPM_PACKAGE}{'@' + version if version is not None else ''}",
-        PUYATS_COMPILE_COMMAND,
-    ]
-
-
-def _get_candidate_puyats_commands() -> Iterator[list[str]]:
-    # This function is kept for backward compatibility but isn't used in the new implementation
-    npx_command = get_npm_command(
-        "Unable to find `npx` to check for installed PuyaTs; continuing with other options.",
-        is_npx=True,
-    )
-    yield [*npx_command, "-y", PUYATS_NPM_PACKAGE]
+    return [*npx_command, "-y", f"{PUYATS_NPM_PACKAGE}{'@' + version if version is not None else ''}"]
