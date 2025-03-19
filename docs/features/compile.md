@@ -31,7 +31,7 @@ For more complex examples, see the [examples](https://github.com/algorandfoundat
 
 ## What is Algorand TypeScript & PuyaTs?
 
-Algorand TypeScript is a typed TypeScript language that allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
+Algorand TypeScript is a typed TypeScript language that allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM). Algorand TypeScript is currently in beta.
 
 Algorand TypeScript can be deployed to Algorand by using the PuyaTs optimising compiler, which takes Algorand TypeScript and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/generate.md#1-typed-clients), will result in AVM bytecode execution semantics that match the given TypeScript code.
 
