@@ -16,6 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sync winget-pkgs fork
-        run: gh auth refresh -s workflow && gh repo sync algofoundation/winget-pkgs -b master
+        run: gh auth refresh -s workflow --with-token && gh repo sync algofoundation/winget-pkgs -b master
         env:
           GH_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
