@@ -15,12 +15,20 @@ jobs:
   fork-sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: tgymnich/fork-sync@v2.0
+      - name: Checkout source code
+        uses: actions/checkout@v4
         with:
+          repository: "algofoundation/winget-pkgs"
           token: ${{ secrets.WINGET_GITHUB_TOKEN }}
-          repo: "winget-pkgs"
-          owner: algofoundation
-          base: master
-          head: master
-          auto_approve: true
-          ignore_fail: true
+      - name: Add upstream
+        shell: bash
+        run: git remote add upstream https://github.com/microsoft/winget-pkgs.git
+      - name: Add upstream
+        shell: bash
+        run: git pull upstream master
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.WINGET_GITHUB_TOKEN }}
+          repository: "algofoundation/winget-pkgs"
+          branch: master
