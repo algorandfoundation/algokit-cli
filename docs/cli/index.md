@@ -16,6 +16,12 @@
     - [python](#python)
     - [Arguments](#arguments-1)
     - [PUYAPY_ARGS](#puyapy_args-1)
+    - [ts](#ts)
+    - [Arguments](#arguments-2)
+    - [PUYATS_ARGS](#puyats_args)
+    - [typescript](#typescript)
+    - [Arguments](#arguments-3)
+    - [PUYATS_ARGS](#puyats_args-1)
   - [completions](#completions)
     - [install](#install)
     - [Options](#options-2)
@@ -27,10 +33,10 @@
     - [container-engine](#container-engine)
     - [Options](#options-4)
     - [-f, --force](#-f---force)
-    - [Arguments](#arguments-2)
+    - [Arguments](#arguments-4)
     - [ENGINE](#engine)
     - [version-prompt](#version-prompt)
-    - [Arguments](#arguments-3)
+    - [Arguments](#arguments-5)
     - [ENABLE](#enable)
   - [dispenser](#dispenser)
     - [fund](#fund)
@@ -54,7 +60,7 @@
     - [Options](#options-9)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
-    - [Arguments](#arguments-4)
+    - [Arguments](#arguments-6)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
@@ -62,13 +68,13 @@
     - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
     - [-v, --version ](#-v---version--1)
-    - [Arguments](#arguments-5)
+    - [Arguments](#arguments-7)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
   - [goal](#goal)
     - [Options](#options-11)
     - [--console](#--console)
     - [--interactive](#--interactive)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-8)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
     - [Options](#options-12)
@@ -97,7 +103,7 @@
     - [config](#config-1)
     - [Options](#options-14)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-9)
     - [ENGINE](#engine-1)
     - [console](#console)
     - [explore](#explore-1)
@@ -137,7 +143,7 @@
     - [--deployer ](#--deployer-)
     - [--dispenser ](#--dispenser-)
     - [-p, --project-name ](#-p---project-name--1)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-10)
     - [ENVIRONMENT_NAME](#environment_name)
     - [EXTRA_ARGS](#extra_args)
     - [link](#link)
@@ -148,7 +154,7 @@
     - [-f, --fail-fast](#-f---fail-fast)
     - [-v, --version ](#-v---version--2)
     - [list](#list)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-11)
     - [WORKSPACE_PATH](#workspace_path)
     - [run](#run)
   - [task](#task)
@@ -159,7 +165,7 @@
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-10)
+    - [Arguments](#arguments-12)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
     - [Options](#options-25)
@@ -180,20 +186,20 @@
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-27)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-11)
+    - [Arguments](#arguments-13)
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-28)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-12)
+    - [Arguments](#arguments-14)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
     - [Options](#options-29)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-13)
+    - [Arguments](#arguments-15)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
     - [Options](#options-30)
@@ -222,20 +228,20 @@
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force-3)
-    - [Arguments](#arguments-14)
+    - [Arguments](#arguments-16)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-34)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-4)
-    - [Arguments](#arguments-15)
+    - [Arguments](#arguments-17)
     - [ALIAS_NAME](#alias_name)
-    - [Arguments](#arguments-16)
+    - [Arguments](#arguments-18)
     - [ALIAS](#alias)
     - [Options](#options-35)
     - [-f, --force](#-f---force-5)
-    - [Arguments](#arguments-17)
+    - [Arguments](#arguments-19)
     - [ALIAS](#alias-1)
     - [Options](#options-36)
     - [-f, --force](#-f---force-6)
@@ -309,6 +315,34 @@ algokit compile python [OPTIONS] [PUYAPY_ARGS]...
 
 
 ### PUYAPY_ARGS
+Optional argument(s)
+
+### ts
+
+Compile Algorand TypeScript contract(s) using the PuyaTs compiler.
+
+```shell
+algokit compile ts [OPTIONS] [PUYATS_ARGS]...
+```
+
+### Arguments
+
+
+### PUYATS_ARGS
+Optional argument(s)
+
+### typescript
+
+Compile Algorand TypeScript contract(s) using the PuyaTs compiler.
+
+```shell
+algokit compile typescript [OPTIONS] [PUYATS_ARGS]...
+```
+
+### Arguments
+
+
+### PUYATS_ARGS
 Optional argument(s)
 
 ## completions

@@ -12,7 +12,12 @@ from typing import ClassVar
 import click
 
 from algokit.core import proc
-from algokit.core.utils import extract_version_triple, find_valid_pipx_command, get_npm_command
+from algokit.core.utils import (
+    extract_semantic_version,
+    extract_version_triple,
+    find_valid_pipx_command,
+    get_npm_command,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -278,8 +283,8 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 for line in result.output.splitlines():
                     if TYPESCRIPT_NPM_PACKAGE in line:
                         if version is not None:
-                            installed_version = extract_version_triple(line)
-                            if extract_version_triple(version) == installed_version:
+                            installed_version = extract_semantic_version(line)
+                            if extract_semantic_version(version) == installed_version:
                                 return generate_command
                         else:
                             return generate_command

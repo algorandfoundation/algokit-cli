@@ -3,6 +3,7 @@ import logging
 import click
 
 from algokit.cli.compilers.python import py, python
+from algokit.cli.compilers.typescript import ts, typescript
 
 logger = logging.getLogger(__name__)
 
@@ -40,3 +41,5 @@ def compile_group(context: click.Context, version: str | None) -> None:
 
 compile_group.add_command(python, "python")
 compile_group.add_command(py, "py")
+compile_group.add_command(typescript, "typescript")
+compile_group.add_command(ts, "ts")
