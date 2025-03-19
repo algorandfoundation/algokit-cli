@@ -2,6 +2,23 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.0 (2025-03-19)
+
+### Feature
+
+* Add typescript template integration ([#614](https://github.com/algorandfoundation/algokit-cli/issues/614)) ([`7fc345c`](https://github.com/algorandfoundation/algokit-cli/commit/7fc345c783258325de3231de9488191e4b2932aa))
+* Puya-ts support under `compile` command group ([#612](https://github.com/algorandfoundation/algokit-cli/issues/612)) ([`9bd9056`](https://github.com/algorandfoundation/algokit-cli/commit/9bd90560da69cf511b0452d771d53a0c588214c2))
+* Npm runs `ci` instead of `install` when CI flag is present or passed explicitly ([#605](https://github.com/algorandfoundation/algokit-cli/issues/605)) ([`cc8a95d`](https://github.com/algorandfoundation/algokit-cli/commit/cc8a95d529452467d3e2849f9d998ae55178a2b5))
+
+### Fix
+
+* Fix configured localnet ([#610](https://github.com/algorandfoundation/algokit-cli/issues/610)) ([`ba91e82`](https://github.com/algorandfoundation/algokit-cli/commit/ba91e82a226867cb764bf36fc43654924ea5ba4c))
+
+### Documentation
+
+* Removed mentions to dappflow from ADR document. ([#601](https://github.com/algorandfoundation/algokit-cli/issues/601)) ([`6691cc7`](https://github.com/algorandfoundation/algokit-cli/commit/6691cc70e1cbf812e95cbab6b3ce3143a3b6fd77))
+* Update map image ([#602](https://github.com/algorandfoundation/algokit-cli/issues/602)) ([`eb03bf7`](https://github.com/algorandfoundation/algokit-cli/commit/eb03bf7f7541286097627fe424c64070bd59f108))
+
 ## v2.5.2 (2025-01-07)
 
 ### Fix
