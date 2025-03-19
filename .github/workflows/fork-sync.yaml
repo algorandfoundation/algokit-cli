@@ -23,7 +23,7 @@ jobs:
       - name: Add upstream
         shell: bash
         run: git remote add upstream https://github.com/microsoft/winget-pkgs.git
-      - name: Add upstream
+      - name: Pull from upstream
         shell: bash
         run: git pull upstream master
       - name: Push changes
@@ -32,3 +32,4 @@ jobs:
           github_token: ${{ secrets.WINGET_GITHUB_TOKEN }}
           repository: "algofoundation/winget-pkgs"
           branch: master
+          force: true
