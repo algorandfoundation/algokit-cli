@@ -30,4 +30,4 @@ This command will recursively analyze all TEAL files in the `contracts` director
 
 ## Security considerations
 
-This task uses [`tealer`](https://github.com/crytic/tealer), a third-party tool, to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the [guidelines for smart contract development](https://developer.algorand.org/docs/get-details/dapps/smart-contracts/guidelines/). This should not be used as a substitute for an actual audit.
+This task uses [`tealer`](https://github.com/crytic/tealer), a third-party tool, to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the [guidelines for smart contract development](https://dev.algorand.co/docs/concepts/smart-contracts/overview/). This should not be used as a substitute for an actual audit.

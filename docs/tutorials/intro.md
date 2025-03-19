@@ -129,7 +129,7 @@ Once the `Algorand Python` based project is created, you can get started by buil
 The App ID of the deployed contract and its Algorand address is displayed, followed by the message returned from the smart contract call (`Hello, Python`).
 
 1. Start LocalNet
-2. Build the smart contract. Notice how a folder named `artifacts` is created with the [AVM (Algorand Virtual Machine)](https://developer.algorand.org/docs/get-details/dapps/avm/) related artifacts for deploying your smart contract.
+2. Build the smart contract. Notice how a folder named `artifacts` is created with the [AVM (Algorand Virtual Machine)](https://dev.algorand.co/concepts/smart-contracts/avm/) related artifacts for deploying your smart contract.
 3. Deploy and call the `HelloWorld` smart contract (from `contract.py` file).
 
 After execution, the `App ID` of the deployed contract and its Algorand address are displayed, followed by the message returned from the smart contract call (`Hello, world`).
