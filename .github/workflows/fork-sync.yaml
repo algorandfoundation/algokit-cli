@@ -15,21 +15,7 @@ jobs:
   fork-sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          repository: "algofoundation/winget-pkgs"
-          token: ${{ secrets.WINGET_GITHUB_TOKEN }}
-      - name: Add upstream
-        shell: bash
-        run: git remote add upstream https://github.com/microsoft/winget-pkgs.git
-      - name: Pull from upstream
-        shell: bash
-        run: git pull upstream master
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.WINGET_GITHUB_TOKEN }}
-          repository: "algofoundation/winget-pkgs"
-          branch: master
-          force: true
+      - name: Sync winget-pkgs fork
+        run: gh repo sync algofoundation/winget-pkgs -b master
+        env:
+          GH_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
