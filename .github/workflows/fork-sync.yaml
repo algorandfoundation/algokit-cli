@@ -1,0 +1,24 @@
+name: Fork Sync
+
+on:
+  push:
+    branches:
+      - fork-sync
+
+concurrency: release
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  fork-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tgymnich/fork-sync@v2.0
+        with:
+          token: ${{ secrets.WINGET_GITHUB_TOKEN }}
+          repo: "winget-pkgs"
+          owner: algofoundation
+          base: master
+          head: master
