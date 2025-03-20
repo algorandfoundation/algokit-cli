@@ -127,7 +127,9 @@ Any errors detected by PuyaTs during the compilation process will be printed to 
 
 #### Prerequisites
 
-Node.js and npm are required for the TypeScript compiler. The command will attempt to find a correctly installed PuyaTs compiler in the following order:
+PuyaTs requires Node 22+ and NPM 10+, so please ensure your versions satisfy this requirement.
+
+The command will attempt to find a correctly installed PuyaTs compiler in the following order:
 
 1. First, it checks if a matching version is installed at the project level (using `npm ls`).
 2. Next, it checks if a matching version is installed globally (using `npm --global ls`).

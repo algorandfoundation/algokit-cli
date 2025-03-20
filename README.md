@@ -85,14 +85,15 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-The key required dependency is Python 3.10+, but some of the installation options below will install that for you. We recommend using Python 3.12+, as the `algokit compile python` command requires this version.
+The installation pre-requisites change depending on the method you use to install. Please refer to [Installation Methods](#installation-methods).
 
-> **Note**
-> You can still install and use AlgoKit without these dependencies, and AlgoKit will tell you if you are missing one for a given command.
+Depending on the features you choose to leverage from the AlgoKit CLI, additional dependencies may be required.
+The AlgoKit CLI will tell you if you are missing one for a given command. These optional dependencies are:
 
 - **Git**: Essential for creating and updating projects from templates. Installation guide available at [Git Installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - **Docker**: Necessary for running the AlgoKit LocalNet environment. Docker Compose version 2.5.0 or higher is required. See [Docker Installation](https://docs.docker.com/get-docker/).
-- **Node.js**: For those working on frontend templates or building contracts using TypeScript or TEALScript. **Minimum required versions are Node.js `v22` and npm `v10`**. Instructions can be found at [Node.js Installation](https://nodejs.org/en/download/).
+- **Python**: For those installing the AlgoKit CLI via `pipx` or building contracts using Algorand Python. **Minimum required version is Python 3.12+ when working with Algorand Python**. See [Python Installation](https://www.python.org/downloads/).
+- **Node.js**: For those working on frontend templates or building contracts using Algorand TypeScript or TEALScript. **Minimum required versions are Node.js `v22` and npm `v10`**. See [Node.js Installation](https://nodejs.org/en/download/).
 
 > **Note**
 > If you have previously installed AlgoKit using `pipx` and would like to switch to a different installation method, please ensure that
@@ -108,7 +109,7 @@ See below for specific installation instructions.
 - [Windows](#install-algokit-on-windows)
 - [Mac](#install-algokit-on-mac)
 - [Linux](#install-algokit-on-linux)
-- [pipx](#install-algokit-with-pipx-on-any-os)
+- [Universal via pipx](#install-algokit-with-pipx-on-any-os)
 
 ## Install AlgoKit on Windows
 
