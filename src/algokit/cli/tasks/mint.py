@@ -92,7 +92,7 @@ def _get_and_validate_asset_name(context: click.Context, param: click.Parameter,
     token_name = None
 
     if token_metadata_path is not None:
-        with Path(token_metadata_path).open("r") as metadata_file:
+        with Path(token_metadata_path).open(mode="r", encoding="utf-8") as metadata_file:
             data = json.load(metadata_file)
             token_name = data.get("name")
 
@@ -147,7 +147,7 @@ def _get_and_validate_decimals(context: click.Context, _: click.Parameter, value
     token_metadata_path = context.params.get("token_metadata_path")
     token_decimals = None
     if token_metadata_path is not None:
-        with Path(token_metadata_path).open("r") as metadata_file:
+        with Path(token_metadata_path).open(mode="r", encoding="utf-8") as metadata_file:
             data = json.load(metadata_file)
             token_decimals = data.get("decimals")
 

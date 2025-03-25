@@ -117,7 +117,7 @@ def append_project_to_vscode_workspace(project_path: Path, workspace_path: Path)
 
 def _load_vscode_workspace(workspace_path: Path) -> dict[str, Any]:
     """Load the workspace file as a JSON object."""
-    with workspace_path.open("r") as f:
+    with workspace_path.open(mode="r", encoding="utf-8") as f:
         data = json.load(f)
         assert isinstance(data, dict)
         return cast(dict[str, Any], data)
@@ -125,5 +125,5 @@ def _load_vscode_workspace(workspace_path: Path) -> dict[str, Any]:
 
 def _save_vscode_workspace(workspace_path: Path, workspace: dict) -> None:
     """Save the modified workspace back to the file."""
-    with workspace_path.open("w") as f:
+    with workspace_path.open(mode="w", encoding="utf-8") as f:
         json.dump(workspace, f, indent=2)

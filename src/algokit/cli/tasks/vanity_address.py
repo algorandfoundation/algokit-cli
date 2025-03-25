@@ -133,6 +133,6 @@ def vanity_address(  # noqa: PLR0913
     elif output == "alias" and alias:
         _store_vanity_to_alias(alias=alias, vanity_account=vanity_account, force=force)
     elif output == "file" and output_file_path is not None:
-        with output_file_path.open("w") as f:
+        with output_file_path.open(mode="w", encoding="utf-8") as f:
             json.dump(vanity_account.__dict__, f, indent=4)
             click.echo(f"Output written to {output_file_path.absolute()}")

@@ -61,7 +61,7 @@ def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -
             "If needed, clear your terminal history after copying the token!"
         )
     else:
-        with Path.open(Path(output_filename), "w") as token_file:
+        with Path.open(Path(output_filename), mode="w", encoding="utf-8") as token_file:
             token_file.write(token_data["access_token"])
         logger.warning(
             f"Your CI access token has been saved to `{output_filename}`.\n"

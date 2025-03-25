@@ -48,6 +48,7 @@ def run(  # noqa: PLR0913
         cwd=cwd,
         env=env,
         bufsize=1,  # line buffering, works because text=True
+        encoding="utf-8",
     ) as proc:
         assert proc.stdout  # type narrowing
         while exit_code is None:

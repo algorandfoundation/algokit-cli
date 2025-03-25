@@ -239,5 +239,5 @@ def link_command(
             version=version,
         )
 
-        logger.info(f"✅ {iteration}/{total}: Finished processing {contract_project.project_name}")
+        logger.info(f"{iteration}/{total}: Finished processing {contract_project.project_name}")
         iteration += 1

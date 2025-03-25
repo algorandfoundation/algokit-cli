@@ -223,7 +223,7 @@ def analyze(  # noqa: PLR0913, C901
                 if has_diff:
                     raise click.exceptions.Exit(1)
 
-            reports[str(report_output_path.absolute())] = json.load(report_output_path.open())
+            reports[str(report_output_path.absolute())] = json.load(report_output_path.open(encoding="utf-8"))
         except Exception as e:
             if diff_only and old_report:
                 report_output_path.write_text(json.dumps(old_report.model_dump(by_alias=True), indent=2))

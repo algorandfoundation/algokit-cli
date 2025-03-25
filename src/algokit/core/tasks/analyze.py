@@ -65,7 +65,7 @@ def load_tealer_report(file_path: str) -> TealerAnalysisReport:
     Returns:
         TealerAnalysisReport: Parsed tealer analysis report.
     """
-    with Path(file_path).open() as file:
+    with Path(file_path).open(encoding="utf-8") as file:
         data = json.load(file)
     return TealerAnalysisReport(**data)
 
