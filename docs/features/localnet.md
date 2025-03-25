@@ -68,13 +68,13 @@ Once they have downloaded, it won't try and re-download images unless you perfor
 
 Once the LocalNet has started, the following endpoints will be available:
 
-- [algod](https://dev.algorand.co/reference/rest-api/algod/):
+- [algod](https://dev.algorand.co/reference/rest-apis/algod/):
   - address: <http://localhost:4001>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
-- [kmd](https://dev.algorand.co/reference/rest-api/kmd/):
+- [kmd](https://dev.algorand.co/reference/rest-apis/kmd/):
   - address: <http://localhost:4002>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
-- [indexer](https://dev.algorand.co/reference/rest-api/indexer/):
+- [indexer](https://dev.algorand.co/reference/rest-apis/indexer/):
   - address: <http://localhost:8980>
 - tealdbg port:
   - address: <http://localhost:9392>
