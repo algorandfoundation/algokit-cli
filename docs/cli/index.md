@@ -616,7 +616,7 @@ Required argument
 
 Run the Algorand goal CLI against the AlgoKit LocalNet.
 
-Look at [https://developer.algorand.org/docs/clis/goal/goal/](https://developer.algorand.org/docs/clis/goal/goal/) for more information.
+Look at [https://dev.algorand.co/algokit/algokit-cli/goal](https://dev.algorand.co/algokit/algokit-cli/goal) for more information.
 
 ```shell
 algokit goal [OPTIONS] [GOAL_ARGS]...

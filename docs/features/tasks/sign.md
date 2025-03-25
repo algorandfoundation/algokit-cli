@@ -55,7 +55,7 @@ This will write the signed transaction to the specified file.
 
 ## Goal Compatibility
 
-Please note, at the moment this feature only supports [`goal clerk`](https://developer.algorand.org/docs/clis/goal/clerk/clerk/) compatible transaction objects.
+Please note, at the moment this feature only supports [`goal clerk`](https://dev.algorand.co/algokit/algokit-cli/goal/) compatible transaction objects.
 
 When `--output` option is not specified, the signed transaction(s) will be output to the console in a following JSON format:
 

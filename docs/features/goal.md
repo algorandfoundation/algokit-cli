@@ -1,6 +1,6 @@
 # AlgoKit goal
 
-AlgoKit goal command provides the user with a mechanism to run [goal cli](https://developer.algorand.org/docs/clis/goal/goal/) commands against the current [AlgoKit LocalNet](./localnet.md).
+AlgoKit goal command provides the user with a mechanism to run [goal cli](https://dev.algorand.co/algokit/algokit-cli/goal/) commands against the current [AlgoKit LocalNet](./localnet.md).
 
 You can explore all possible goal commands by running `algokit goal` e.g.:
 
