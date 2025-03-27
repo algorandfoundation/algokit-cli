@@ -277,8 +277,10 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
         self, npm_command: list[str], npx_command: list[str], version: str | None
     ) -> list[str] | None:
         try:
-            result = proc.run([*npm_command, "ls"])
-            if result.exit_code == 0:
+            result = proc.run([*npm_command, "ls", "--no-unicode"])
+            # Normally we would check the exit code, however `npm ls` may return a non zero exit code
+            # when certain dependencies are not met. We still want to continue processing.
+            if result.output != "":
                 generate_command = [*npx_command, TYPESCRIPT_NPM_PACKAGE]
                 for line in result.output.splitlines():
                     if TYPESCRIPT_NPM_PACKAGE in line:

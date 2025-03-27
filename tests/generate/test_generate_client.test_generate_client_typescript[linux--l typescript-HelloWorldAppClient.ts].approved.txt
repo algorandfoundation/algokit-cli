@@ -1,9 +1,9 @@
 DEBUG: Searching for project installed client generator
-DEBUG: Running 'npm ls' in '{current_working_directory}'
+DEBUG: Running 'npm ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
 DEBUG: Searching for globally installed client generator
-DEBUG: Running 'npm --global ls' in '{current_working_directory}'
+DEBUG: Running 'npm --global ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
 DEBUG: No matching installed client generator found, run client generator via npx

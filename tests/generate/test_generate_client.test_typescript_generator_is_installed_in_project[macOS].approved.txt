@@ -1,5 +1,5 @@
 DEBUG: Searching for project installed client generator
-DEBUG: Running 'npm ls' in '{current_working_directory}'
+DEBUG: Running 'npm ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: /Users/user/my-project
 DEBUG: npm: ├── test@1.2.3
 DEBUG: npm: └── @algorandfoundation/algokit-client-generator@1.1.2
