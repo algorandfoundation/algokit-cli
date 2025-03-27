@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.1 (2025-03-27)
+
+### Fix
+
+* Handle non zero exit code when running npm ls ([#622](https://github.com/algorandfoundation/algokit-cli/issues/622)) ([`3d6f3c9`](https://github.com/algorandfoundation/algokit-cli/commit/3d6f3c967302398dbbfab41ba96216e412d068a8))
+* Resolve project run issue by forcing utf-8 encoding on windows ([#620](https://github.com/algorandfoundation/algokit-cli/issues/620)) ([`b837417`](https://github.com/algorandfoundation/algokit-cli/commit/b837417e7f6b01c6ea5abda3dc664cd7c4531e85))
+
+### Documentation
+
+* AK-194: Updated dev portal links ([#615](https://github.com/algorandfoundation/algokit-cli/issues/615)) ([`52bb519`](https://github.com/algorandfoundation/algokit-cli/commit/52bb5191fd7153a7f2ec32b6646a33d3deabdec3))
+* Clarify when python is needed ([#617](https://github.com/algorandfoundation/algokit-cli/issues/617)) ([`4661f71`](https://github.com/algorandfoundation/algokit-cli/commit/4661f71a97293f3697476a90fea4054b1f516dec))
+
 ## v2.6.0 (2025-03-19)
 
 ### Feature
