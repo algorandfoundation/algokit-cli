@@ -59,6 +59,7 @@
   - [doctor](#doctor)
     - [Options](#options-9)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
+    - [-v, --verbose](#-v---verbose-1)
   - [explore](#explore)
     - [Arguments](#arguments-6)
     - [NETWORK](#network)
@@ -552,6 +553,10 @@ algokit doctor [OPTIONS]
 
 ### -c, --copy-to-clipboard
 Copy the contents of the doctor message (in Markdown format) in your clipboard.
+
+
+### -v, --verbose
+Show additional information including package dependencies.
 
 ## explore
 

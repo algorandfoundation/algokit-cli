@@ -8,6 +8,8 @@ The AlgoKit Doctor allows you to make sure that your system has the correct depe
 
 Please run this command to if you are facing an issue running AlgoKit. It is recommended to run it before [submitting an issue to AlgoKit](https://github.com/algorandfoundation/algokit-cli/issues/new). You can copy the contents of the Doctor command message (in Markdown format) to your clipboard by providing the `-c` flag to the command as follows `algokit doctor -c`.
 
+You can also use the `--verbose` or `-v` flag to show additional information including package dependencies: `algokit doctor -v`. This can provide additional context when diagnosing issues. Note that it will only work if you have installed `algokit` as a python wheel (for example, via `pipx install algokit`).
+
 # Examples
 
 For example, running `algokit doctor` with all prerequisites installed will result in output similar to the following:
@@ -37,11 +39,13 @@ Please include this output, if you want to populate this message in your clipboa
 The doctor command will indicate if there is any issues to address, for example:
 
 If AlgoKit detects a newer version, this will be indicated next to the AlgoKit version
+
 ```
 AlgoKit: 1.2.3 (latest: 4.5.6)
 ```
 
 If the detected version of docker compose is unsupported, this will be shown:
+
 ```
 docker compose: 2.1.3
   Docker Compose 2.5.0 required to run `algokit localnet command`;

@@ -357,6 +357,9 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
     expected_answers_file = project_path / ".algokit" / ".copier-answers.yml"
     relative_answers_file = expected_answers_file.relative_to(project_path) if expected_answers_file.exists() else None
 
+    # Ensure target directory exists (`copier` >=9.6.0 not creating parent directories during copy automatically)
+    project_path.mkdir(parents=True, exist_ok=True)
+
     with Worker(
         src_path=template.url,
         dst_path=project_path,
