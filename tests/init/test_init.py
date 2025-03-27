@@ -1097,7 +1097,7 @@ def test_append_to_workspace_path_normalization(
     # Arrange
     tmp_path = tmp_path_factory.mktemp("workspace")
     workspace_file = tmp_path / "test.code-workspace"
-    with workspace_file.open("w") as f:
+    with workspace_file.open(mode="w", encoding="utf-8") as f:
         json.dump(initial_workspace, f)
 
     project_path_obj = tmp_path / project_path
@@ -1107,7 +1107,7 @@ def test_append_to_workspace_path_normalization(
     append_project_to_vscode_workspace(project_path_obj, workspace_file)
 
     # Assert
-    with workspace_file.open("r") as f:
+    with workspace_file.open(mode="r", encoding="utf-8") as f:
         actual_workspace = json.load(f)
 
     assert actual_workspace == expected_workspace

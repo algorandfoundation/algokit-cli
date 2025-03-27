@@ -65,7 +65,7 @@ class TokenMetadata:
     def to_file_path(self) -> Path:
         file_path = Path(tempfile.mkstemp()[1])
         try:
-            with file_path.open("w") as file:
+            with file_path.open(mode="w", encoding="utf-8") as file:
                 file.write(self.to_json(None))
             return file_path
         except FileNotFoundError as err:
@@ -79,7 +79,7 @@ class TokenMetadata:
             return cls(name=name, decimals=decimals)
 
         try:
-            with file_path.open() as file:
+            with file_path.open(encoding="utf-8") as file:
                 data = json.load(file)
                 data["name"] = name
                 data["decimals"] = decimals
