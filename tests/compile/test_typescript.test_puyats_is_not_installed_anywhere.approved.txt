@@ -1,7 +1,7 @@
-DEBUG: Running 'npm ls' in '{current_working_directory}'
+DEBUG: Running 'npm ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
-DEBUG: Running 'npm --global ls' in '{current_working_directory}'
+DEBUG: Running 'npm --global ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: STDOUT
 DEBUG: npm: STDERR
 DEBUG: Running 'npx -y @algorandfoundation/puya-ts {current_working_directory}/tests/compile/dummy_contract.py' in '{current_working_directory}'

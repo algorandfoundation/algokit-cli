@@ -1,4 +1,4 @@
-DEBUG: Running 'npm ls' in '{current_working_directory}'
+DEBUG: Running 'npm ls --no-unicode' in '{current_working_directory}'
 DEBUG: npm: └── @algorandfoundation/puya-ts@1.0.0
 DEBUG: Running 'npx @algorandfoundation/puya-ts --version' in '{current_working_directory}'
 DEBUG: npx: puya-ts 1.0.0

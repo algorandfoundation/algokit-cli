@@ -15,8 +15,10 @@ def _find_project_puyats_command(
     Try to find PuyaTs command installed at the project level.
     """
     try:
-        result = run([*npm_command, "ls"])
-        if result.exit_code == 0:
+        result = run([*npm_command, "ls", "--no-unicode"])
+        # Normally we would check the exit code, however `npm ls` may return a non zero exit code
+        # when certain dependencies are not met. We still want to continue processing.
+        if result.output != "":
             compile_command = [*npx_command, PUYATS_NPM_PACKAGE]
             for line in result.output.splitlines():
                 if PUYATS_NPM_PACKAGE in line:
