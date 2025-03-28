@@ -39,6 +39,10 @@ def _mock_doctor_dependencies(mocker: MockerFixture) -> None:
     sys_module = mocker.patch("algokit.cli.doctor.sys")
     sys_module.version = "3.6.2"
     sys_module.prefix = "/home/me/.local/pipx/venvs/algokit"
+    # Mock enable binary mode to ignore outputting package information to
+    # simplify snapshot diffs - otherwise each new run may fail whenever main prod
+    # dependencies are updated
+    mocker.patch("algokit.cli.doctor.is_binary_mode").return_value = True
 
 
 @pytest.fixture(autouse=True)

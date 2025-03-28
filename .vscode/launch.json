@@ -10,8 +10,21 @@
       "cwd": "${workspaceFolder}",
       "request": "launch",
       "module": "debug",
-      "justMyCode": true,
+      "justMyCode": false,
       "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Debug Pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "purpose": ["debug-test"],
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src",
+        "PYTEST_ADDOPTS": "--no-cov"
+      }
     }
   ]
 }

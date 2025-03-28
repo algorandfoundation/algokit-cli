@@ -9,6 +9,7 @@ import pyclip  # type: ignore[import-untyped]
 from algokit.core.conf import get_current_package_version
 from algokit.core.config_commands.version_prompt import get_latest_github_version
 from algokit.core.doctor import DoctorResult, check_dependency
+from algokit.core.log_handlers import CONSOLE_LOG_HANDLER_NAME
 from algokit.core.sandbox import (
     COMPOSE_VERSION_COMMAND,
     get_min_compose_version,
@@ -36,20 +37,19 @@ CRITICAL_COLOR = "red"
     is_flag=True,
     default=False,
 )
-@click.option(
-    "--verbose",
-    "-v",
-    help="Show additional information including package dependencies.",
-    is_flag=True,
-    default=False,
-    hidden=is_binary_mode(),
-)
-def doctor_command(*, copy_to_clipboard: bool, verbose: bool) -> None:  # noqa: C901, PLR0912
+def doctor_command(*, copy_to_clipboard: bool) -> None:  # noqa: C901, PLR0912
     """Diagnose potential environment issues that may affect AlgoKit.
 
     Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
     potential issues."""
     from algokit.core.config_commands.container_engine import get_container_engine
+
+    # Check if we're in verbose mode by examining the console log handler level
+    verbose = False
+    for handler in logging.getLogger().handlers:
+        if handler.name == CONSOLE_LOG_HANDLER_NAME and handler.level <= logging.DEBUG:
+            verbose = True
+            break
 
     os_type = platform.system()
     is_windows = get_is_windows()
