@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.6.2 (2025-03-28)
+
+### Fix
+
+* Raise min required copier version to 3.6.0 ([#623](https://github.com/algorandfoundation/algokit-cli/issues/623)) ([`9ef7b51`](https://github.com/algorandfoundation/algokit-cli/commit/9ef7b51112cdf4e27a4ef89d1df6dedeecf9448e))
+
 ## v2.6.1 (2025-03-27)
 
 ### Fix
