@@ -9,10 +9,12 @@ import pyclip  # type: ignore[import-untyped]
 from algokit.core.conf import get_current_package_version
 from algokit.core.config_commands.version_prompt import get_latest_github_version
 from algokit.core.doctor import DoctorResult, check_dependency
+from algokit.core.log_handlers import CONSOLE_LOG_HANDLER_NAME
 from algokit.core.sandbox import (
     COMPOSE_VERSION_COMMAND,
     get_min_compose_version,
 )
+from algokit.core.utils import is_binary_mode
 from algokit.core.utils import is_windows as get_is_windows
 
 logger = logging.getLogger(__name__)
@@ -35,12 +37,19 @@ CRITICAL_COLOR = "red"
     is_flag=True,
     default=False,
 )
-def doctor_command(*, copy_to_clipboard: bool) -> None:
+def doctor_command(*, copy_to_clipboard: bool) -> None:  # noqa: C901, PLR0912
     """Diagnose potential environment issues that may affect AlgoKit.
 
     Will search the system for AlgoKit dependencies and show their versions, as well as identifying any
     potential issues."""
     from algokit.core.config_commands.container_engine import get_container_engine
+
+    # Check if we're in verbose mode by examining the console log handler level
+    verbose = False
+    for handler in logging.getLogger().handlers:
+        if handler.name == CONSOLE_LOG_HANDLER_NAME and handler.level <= logging.DEBUG:
+            verbose = True
+            break
 
     os_type = platform.system()
     is_windows = get_is_windows()
@@ -119,6 +128,15 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
             msg += f"\n  {ln}"
         logger.info(msg)
 
+    # Get dependencies info if in verbose mode and not running from a binary
+    dependencies = {}
+    if verbose and not is_binary_mode():
+        # Add package dependencies section
+        logger.info("\nCLI package dependencies:")
+        dependencies = _get_production_dependencies()
+        for package, version in dependencies.items():
+            logger.info(f"{package}: {version}")
+
     # print end message anyway
     logger.info(
         "\n"
@@ -128,12 +146,19 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:
     )
 
     if copy_to_clipboard:
-        pyclip.copy(
-            "\n".join(
-                f"* {key}: " + "\n  ".join([value.output, *(value.extra_help or [])])
-                for key, value in service_outputs.items()
-            )
-        )
+        output_lines = []
+
+        # Add service outputs
+        for key, value in service_outputs.items():
+            output_lines.append(f"* {key}: " + "\n  ".join([value.output, *(value.extra_help or [])]))
+
+        # Add package dependencies if verbose
+        if verbose:
+            output_lines.append("\n* Package dependencies:")
+            for package, version in dependencies.items():
+                output_lines.append(f"  * {package}: {version}")
+
+        pyclip.copy("\n".join(output_lines))
 
     if any(not value.ok for value in service_outputs.values()):
         raise click.exceptions.Exit(code=1)
@@ -151,3 +176,28 @@ def _get_algokit_version_output() -> DoctorResult:
     else:
         output = click.style(current, fg=WARNING_COLOR) + f" (latest: {latest})"
     return DoctorResult(ok=True, output=output)
+
+
+def _get_production_dependencies() -> dict[str, str]:
+    """Gets versions of all direct production dependencies."""
+    try:
+        import importlib.metadata
+        import re
+
+        # Get package dependencies from metadata
+        dist = importlib.metadata.distribution("algokit")
+        requires = dist.requires or []
+
+        result = {}
+        for req in requires:
+            if match := re.match(r"^([A-Za-z0-9_\-\.]+)", req):
+                dep = match.group(1)
+                try:
+                    result[dep] = importlib.metadata.version(dep)
+                except importlib.metadata.PackageNotFoundError:
+                    result[dep] = "Not installed"
+
+        return result
+
+    except Exception:
+        return {"Error": "Could not retrieve dependencies"}

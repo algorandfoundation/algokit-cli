@@ -63,12 +63,13 @@ def typescript_test_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     test_dir = tmp_path_factory.mktemp("ts_test", numbered=True)
 
     # Create package.json with required dependencies
+    # TODO: update to use latest versions once they are released out of beta
     package_json_content = """{
         "name": "algokit-test",
         "version": "1.0.0",
         "dependencies": {
-            "@algorandfoundation/puya-ts": "^1.0.0-beta.48",
-            "@algorandfoundation/algorand-typescript": "^1.0.0-beta.25"
+            "@algorandfoundation/puya-ts": "~1.0.0-beta.48 <1.0.0",
+            "@algorandfoundation/algorand-typescript": "~1.0.0-beta.25 <1.0.0"
         }
     }"""
 
