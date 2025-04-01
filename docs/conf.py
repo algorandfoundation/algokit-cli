@@ -13,7 +13,7 @@ author = "Algorand Foundation"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_click"]
+extensions = ["sphinx_click", "myst_parser", "sphinx_starlight_builder"]
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 smartquotes = False
