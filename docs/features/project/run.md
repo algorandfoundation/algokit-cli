@@ -181,4 +181,4 @@ In this example, if the `hello` command in `.algokit.toml` is defined as `echo "
 
 ## Further Reading
 
-To learn more about the `algokit project run` command, please refer to [run](../../cli/index.md#run) in the AlgoKit CLI reference documentation.
+To learn more about the `algokit project run` command, please refer to [run](../../reference.md#run) in the AlgoKit CLI reference documentation.

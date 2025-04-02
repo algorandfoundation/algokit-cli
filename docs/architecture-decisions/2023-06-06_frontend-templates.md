@@ -34,7 +34,7 @@ AlgoKit v2 aims provide an end-to-end development and deployment experience that
 - **Maintainability**: The dApp templating feature should be easy to maintain and extend. This implies that the feature should be implemented in a way that allows for easy addition of new templates and/or modification of existing ones as the complexity and variety of templates scale.
 - **Seamless onramp**: The dApp templating feature should provide a seamless onramp for developers to get started with dApp development. This implies that the feature should provide a simple and intuitive way to get started with dApp development and deployment. Providing developers a choice on whether they want more flexibility or rely on default recommended practices.
 
-All of the aforementioned requirements should be met in a way that is consistent with the guiding principles of AlgoKit or attempt to find a balanced trade of between the principles that satisfies the requirements. Refer to [AlgoKit Guiding Principles](../../docs/algokit.md#Guiding-Principles) for detailed reference on the principles.
+All of the aforementioned requirements should be met in a way that is consistent with the guiding principles of AlgoKit or attempt to find a balanced trade of between the principles that satisfies the requirements. Refer to [AlgoKit Guiding Principles](../index.md#guiding-principles) for detailed reference on the principles.
 
 ## Explored options
 

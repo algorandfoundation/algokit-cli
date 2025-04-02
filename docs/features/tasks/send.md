@@ -57,4 +57,4 @@ Please note, at the moment this feature only supports [`goal clerk`](https://dev
 
 ## Further Reading
 
-For in-depth details, visit the [send section](../../cli/index.md#send) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [send section](../../reference.md#send) in the AlgoKit CLI reference documentation.

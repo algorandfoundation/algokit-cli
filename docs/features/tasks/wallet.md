@@ -94,4 +94,4 @@ WSL2 environments don't have a keyring backend installed by default. If you want
 
 ## Further Reading
 
-For in-depth details, visit the [wallet section](../../cli/index.md#wallet) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [wallet section](../../reference.md#wallet) in the AlgoKit CLI reference documentation.

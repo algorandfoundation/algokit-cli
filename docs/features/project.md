@@ -1,6 +1,6 @@
 # AlgoKit Project
 
-`algokit project` is a collection of commands and command groups useful for managing algokit compliant [project workspaces](./init.md#workspaces).
+`algokit project` is a collection of commands and command groups useful for managing algokit compliant [project workspaces](./init.md#workspaces-vs-standalone-projects).
 
 ## Overview
 

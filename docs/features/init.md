@@ -1,6 +1,6 @@
 # AlgoKit Init
 
-The `algokit init` [command](../cli/index.md#init) is used to quickly initialize new projects using official Algorand Templates or community provided templates. It supports a fully guided command line wizard experience, as well as fully scriptable / non-interactive functionality via command options.
+The `algokit init` [command](../reference.md#init) is used to quickly initialize new projects using official Algorand Templates or community provided templates. It supports a fully guided command line wizard experience, as well as fully scriptable / non-interactive functionality via command options.
 
 ## Quick start
 
@@ -36,7 +36,7 @@ For more details on workspaces and standalone projects, refer to the [AlgoKit Pr
 
 ## Bootstrapping
 
-You will also be prompted if you wish to run the [bootstrap](../cli/index.md#bootstrap) command, this is useful if you plan to immediately begin developing in the new project. If you passed in `--defaults` or `--bootstrap` then it will automatically run bootstrapping unless you passed in `--no-bootstrap`.
+You will also be prompted if you wish to run the [bootstrap](../reference.md#bootstrap) command, this is useful if you plan to immediately begin developing in the new project. If you passed in `--defaults` or `--bootstrap` then it will automatically run bootstrapping unless you passed in `--no-bootstrap`.
 
 ```
 
@@ -73,7 +73,7 @@ After bootstrapping you are also given the opportunity to initialize a git repo,
 
 ## Options
 
-There are a number of options that can be used to provide answers to the template prompts. Some of the options requiring further explanation are detailed below, but consult the CLI reference for all available [options](../cli/index.md#init).
+There are a number of options that can be used to provide answers to the template prompts. Some of the options requiring further explanation are detailed below, but consult the CLI reference for all available [options](../reference.md#init).
 
 ## Community Templates
 
@@ -119,4 +119,4 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 
 ```
 
-For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#init).
+For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../reference.md#init).

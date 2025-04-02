@@ -58,8 +58,12 @@ build-backend = "poetry.core.masonry.api"
 algokit = "algokit.cli:algokit"
 
 [tool.poe.tasks]
-docs = "sphinx-build -M starlight docs .devportal/docs/src/content/docs"
-docs-md = "sphinx-build -M markdown docs .devportal/markdown"
+docs_starlight = "sphinx-build -M starlight docs .devportal"
+docs_markdown = "sphinx-build -M markdown docs .devportal"
+docs_reference = "sphinx-build -M markdown docs/cli docs/tmp"
+docs_title = {shell = "(echo \"# AlgoKit CLI Reference Documentation\\n\\n\"; cat docs/tmp/markdown/index.md) > docs/tmp/temp.md && mv docs/tmp/temp.md docs/reference.md && rm -rf docs/tmp"}
+docs = ["docs_reference", "docs_title", "docs_markdown", "docs_starlight"]
+docs-reference = "sp"
 package_unix = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config:multiformats_config/' --add-data './src/algokit/resources:algokit/resources/'"
 package_windows = { cmd = "scripts/package_windows.bat" }
 package_mac = { cmd = "scripts/package_mac.sh" }

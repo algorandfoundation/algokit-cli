@@ -42,4 +42,4 @@ If the lookup is successful, the result will be output to the console in a JSON 
 
 ## Further Reading
 
-For in-depth details, visit the [nfd-lookup section](../../cli/index.md#nfd-lookup) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [nfd-lookup section](../../reference.md#nfd-lookup) in the AlgoKit CLI reference documentation.

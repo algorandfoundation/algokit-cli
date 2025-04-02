@@ -36,7 +36,7 @@ This implies extension of existing starter guidelines available for template bui
 - **Maintainability**: The `advanced algokit generate` capabilities on `algokit-cli` and related artifacts on respective official templates should be easy to maintain and extend.
 - **Seamless onramp**: Great developer experience for template builders to create their own `generators` and user experience to use them via `advanced algokit generate` command should be a priority.
 
-All of the aforementioned requirements should be met in a way that is consistent with the guiding principles of AlgoKit or attempt to find a balanced trade of between the principles that satisfies the requirements. Refer to [AlgoKit Guiding Principles](../../docs/algokit.md#Guiding-Principles) for detailed reference on the principles.
+All of the aforementioned requirements should be met in a way that is consistent with the guiding principles of AlgoKit or attempt to find a balanced trade of between the principles that satisfies the requirements. Refer to [AlgoKit Guiding Principles](../index.md#guiding-principles) for detailed reference on the principles.
 
 ## Considered Options
 

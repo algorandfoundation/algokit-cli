@@ -2912,7 +2912,7 @@ dev = ["black", "bumpver", "coveralls", "flake8", "isort", "pip-tools", "pylint"
 type = "git"
 url = "https://github.com/awesome-algorand/sphinx-starlight-builder"
 reference = "HEAD"
-resolved_reference = "cc96ba0224d6d7558c06c39d4eaebb373f0e43d5"
+resolved_reference = "5a156c2c000ee523427687f9cd0a0f23e08aee80"
 
 [[package]]
 name = "sphinxcontrib-applehelp"

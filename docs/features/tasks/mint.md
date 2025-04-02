@@ -67,4 +67,4 @@ For non interactive mode, refer to usage section above for available options.
 
 ## Further Reading
 
-For in-depth details, visit the [mint section](../../cli/index.md#mint) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [mint section](../../reference.md#mint) in the AlgoKit CLI reference documentation.

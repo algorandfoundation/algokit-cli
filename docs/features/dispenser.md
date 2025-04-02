@@ -87,4 +87,4 @@ Options
 
 ## Further Reading
 
-For in-depth details, visit the [dispenser section](../cli/index.md#dispenser) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [dispenser section](../reference.md#dispenser) in the AlgoKit CLI reference documentation.

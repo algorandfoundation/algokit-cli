@@ -52,4 +52,4 @@ docker compose: 2.1.3
   install via https://docs.docker.com/compose/install/
 ```
 
-For more details about the `AlgoKit doctor` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#doctor).
+For more details about the `AlgoKit doctor` command, please refer to the [AlgoKit CLI reference documentation](../reference.md#doctor).
