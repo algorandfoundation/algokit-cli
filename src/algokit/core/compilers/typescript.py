@@ -22,6 +22,10 @@ def _find_project_puyats_command(
             compile_command = [*npx_command, PUYATS_NPM_PACKAGE]
             for line in result.output.splitlines():
                 if PUYATS_NPM_PACKAGE in line:
+                    if "UNMET DEPENDENCY" in line:
+                        raise ModuleNotFoundError(
+                            f"{PUYATS_NPM_PACKAGE} was detected in the project, but is not installed."
+                        )
                     if version is not None:
                         installed_version = extract_semantic_version(line)
                         if version == installed_version:

@@ -284,6 +284,10 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 generate_command = [*npx_command, TYPESCRIPT_NPM_PACKAGE]
                 for line in result.output.splitlines():
                     if TYPESCRIPT_NPM_PACKAGE in line:
+                        if "UNMET DEPENDENCY" in line:
+                            raise ModuleNotFoundError(
+                                f"{TYPESCRIPT_NPM_PACKAGE} was detected in the project, but is not installed."
+                            )
                         if version is not None:
                             installed_version = extract_semantic_version(line)
                             if extract_semantic_version(version) == installed_version:
