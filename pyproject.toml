@@ -29,6 +29,7 @@ multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 jsondiff = "^2.0.0"
 requests = "^2.31.0"
+textual = "^3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.10.0"}
