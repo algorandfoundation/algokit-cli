@@ -2,7 +2,6 @@ import logging
 import re
 import shutil
 from collections.abc import Callable
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import NoReturn
@@ -11,6 +10,11 @@ import click
 import prompt_toolkit.document
 import questionary
 
+from algokit.cli.init.helpers import (
+    TemplateKey,
+    TemplateSource,
+    _get_blessed_templates,
+)
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import get_algokit_config
 from algokit.core.init import (
@@ -74,78 +78,10 @@ class ContractLanguage(Enum):
     TYPESCRIPT = "TypeScript 📘"
 
 
-class TemplateKey(str, Enum):
-    """
-    For templates included in wizard v2 by default
-    """
-
-    BASE = "base"
-    PYTHON = "python"
-    TYPESCRIPT = "typescript"
-    TEALSCRIPT = "tealscript"
-    FULLSTACK = "fullstack"
-    REACT = "react"
-
-
-@dataclass(kw_only=True)
-class TemplateSource:
-    url: str
-    commit: str | None = None
-    """when adding a blessed template that is verified but not controlled by Algorand,
-    ensure a specific commit is used"""
-    branch: str | None = None
-    answers: list[tuple[str, str]] | None = None
-
-    def __str__(self) -> str:
-        if self.commit:
-            return "@".join([self.url, self.commit])
-        return self.url
-
-
-@dataclass(kw_only=True)
-class BlessedTemplateSource(TemplateSource):
-    description: str
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, BlessedTemplateSource):
-            return NotImplemented
-        return self.description == other.description and self.url == other.url
-
-
 LANGUAGE_TO_TEMPLATE_MAP = {
     ContractLanguage.PYTHON: TemplateKey.PYTHON,
     ContractLanguage.TYPESCRIPT: TemplateKey.TYPESCRIPT,
 }
-
-
-# Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
-def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
-    return {
-        TemplateKey.TEALSCRIPT: BlessedTemplateSource(
-            url="gh:algorand-devrel/tealscript-algokit-template",
-            description="Official starter template for TEALScript applications.",
-        ),
-        TemplateKey.TYPESCRIPT: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-typescript-template",
-            description="Official starter template for Algorand TypeScript (Beta) applications",
-        ),
-        TemplateKey.PYTHON: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-python-template",
-            description="Official starter template for Algorand Python applications",
-        ),
-        TemplateKey.REACT: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-react-frontend-template",
-            description="Official template for React frontend applications (smart contracts not included).",
-        ),
-        TemplateKey.FULLSTACK: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-fullstack-template",
-            description="Official template for starter or production fullstack applications.",
-        ),
-        TemplateKey.BASE: BlessedTemplateSource(
-            url="gh:algorandfoundation/algokit-base-template",
-            description="Official base template for enforcing workspace structure for standalone AlgoKit projects.",
-        ),
-    }
 
 
 _unofficial_template_warning = (
@@ -153,17 +89,6 @@ _unofficial_template_warning = (
     "Please inspect the template repository, and pay particular attention to the "
     "values of _tasks, _migrations and _jinja_extensions in copier.yml"
 )
-
-
-def _validate_dir_name(context: click.Context, param: click.Parameter, value: str | None) -> str | None:
-    if value is not None and not is_valid_project_dir_name(value):
-        raise click.BadParameter(
-            "Invalid directory name. Ensure it's a mix of letters, numbers, dashes, "
-            "periods, and/or underscores, and not already used.",
-            context,
-            param,
-        )
-    return value
 
 
 def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Path, use_workspace: bool) -> None:
@@ -179,90 +104,7 @@ def _prevent_workspace_nesting(*, workspace_path: Path | None, project_path: Pat
         _fail_and_bail()
 
 
-@click.command("init", short_help="Initializes a new project from a template; run from project parent directory.")
-@click.option(
-    "directory_name",
-    "--name",
-    "-n",
-    type=str,
-    help="Name of the project / directory / repository to create.",
-    callback=_validate_dir_name,
-)
-@click.option(
-    "template_name",
-    "--template",
-    "-t",
-    type=click.Choice([k.value for k in _get_blessed_templates()]),
-    default=None,
-    help="Name of an official template to use. To choose interactively, run this command with no arguments.",
-)
-@click.option(
-    "--template-url",
-    type=str,
-    default=None,
-    help="URL to a git repo with a custom project template.",
-    metavar="URL",
-)
-@click.option(
-    "--template-url-ref",
-    type=str,
-    default=None,
-    help="Specific tag, branch or commit to use on git repo specified with --template-url. Defaults to latest.",
-    metavar="URL",
-)
-@click.option(
-    "--UNSAFE-SECURITY-accept-template-url",
-    is_flag=True,
-    default=False,
-    help=(
-        "Accept the specified template URL, "
-        "acknowledging the security implications of arbitrary code execution trusting an unofficial template."
-    ),
-)
-@click.option("use_git", "--git/--no-git", default=None, help="Initialise git repository in directory after creation.")
-@click.option(
-    "use_defaults",
-    "--defaults",
-    is_flag=True,
-    default=False,
-    help="Automatically choose default answers without asking when creating this template.",
-)
-@click.option(
-    "run_bootstrap",
-    "--bootstrap/--no-bootstrap",
-    is_flag=True,
-    default=None,
-    help="Whether to run `algokit project bootstrap` to install and configure the new project's dependencies locally.",
-)
-@click.option(
-    "open_ide",
-    "--ide/--no-ide",
-    is_flag=True,
-    default=True,
-    help="Whether to open an IDE for you if the IDE and IDE config are detected. Supported IDEs: VS Code.",
-)
-@click.option(
-    "use_workspace",
-    "--workspace/--no-workspace",
-    is_flag=True,
-    default=True,
-    help=(
-        "Whether to prefer structuring standalone projects as part of a workspace. "
-        "An AlgoKit workspace is a conventional project structure that allows managing "
-        "multiple standalone projects in a monorepo."
-    ),
-)
-@click.option(
-    "answers",
-    "--answer",
-    "-a",
-    multiple=True,
-    help="Answers key/value pairs to pass to the template.",
-    nargs=2,
-    default=[],
-    metavar="<key> <value>",
-)
-def init_command(  # noqa: PLR0913, C901, PLR0915
+def initialize_new_project(  # noqa: PLR0913, C901, PLR0915
     *,
     directory_name: str | None,
     template_name: str | None,
@@ -276,26 +118,6 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
     use_workspace: bool,
     open_ide: bool,
 ) -> None:
-    """
-    Initializes a new project from a template, including prompting
-    for template specific questions to be used in template rendering.
-
-    Templates can be default templates shipped with AlgoKit, or custom
-    templates in public Git repositories.
-
-    Includes ability to initialise Git repository, run algokit project bootstrap and
-    automatically open Visual Studio Code.
-
-    This should be run in the parent directory that you want the project folder
-    created in.
-
-    By default, the `--workspace` flag creates projects within a workspace structure or integrates them into an existing
-    one, promoting organized management of multiple projects. Alternatively,
-    to disable this behavior use the `--no-workspace` flag, which ensures
-    the new project is created in a standalone target directory. This is
-    suitable for isolated projects or when workspace integration is unnecessary.
-    """
-
     if not shutil.which("git"):
         raise click.ClickException(
             "Git not found; please install git and add to path.\n"
