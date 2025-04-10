@@ -89,6 +89,9 @@
     - [--ide, --no-ide](#--ide---no-ide)
     - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
+    - [example](#example)
+    - [Arguments](#arguments-9)
+    - [EXAMPLE_ID](#example_id)
   - [localnet](#localnet)
     - [codespace](#codespace)
     - [Options](#options-13)
@@ -103,7 +106,7 @@
     - [config](#config-1)
     - [Options](#options-14)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-10)
     - [ENGINE](#engine-1)
     - [console](#console)
     - [explore](#explore-1)
@@ -143,7 +146,7 @@
     - [--deployer ](#--deployer-)
     - [--dispenser ](#--dispenser-)
     - [-p, --project-name ](#-p---project-name--1)
-    - [Arguments](#arguments-10)
+    - [Arguments](#arguments-11)
     - [ENVIRONMENT_NAME](#environment_name)
     - [EXTRA_ARGS](#extra_args)
     - [link](#link)
@@ -154,7 +157,7 @@
     - [-f, --fail-fast](#-f---fail-fast)
     - [-v, --version ](#-v---version--2)
     - [list](#list)
-    - [Arguments](#arguments-11)
+    - [Arguments](#arguments-12)
     - [WORKSPACE_PATH](#workspace_path)
     - [run](#run)
   - [task](#task)
@@ -165,7 +168,7 @@
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-12)
+    - [Arguments](#arguments-13)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
     - [Options](#options-25)
@@ -186,20 +189,20 @@
     - [nfd-lookup](#nfd-lookup)
     - [Options](#options-27)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-13)
+    - [Arguments](#arguments-14)
     - [VALUE](#value)
     - [opt-in](#opt-in)
     - [Options](#options-28)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-14)
+    - [Arguments](#arguments-15)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
     - [Options](#options-29)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-15)
+    - [Arguments](#arguments-16)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
     - [Options](#options-30)
@@ -228,20 +231,20 @@
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force-3)
-    - [Arguments](#arguments-16)
+    - [Arguments](#arguments-17)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
     - [Options](#options-34)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-4)
-    - [Arguments](#arguments-17)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-18)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-19)
     - [ALIAS](#alias)
     - [Options](#options-35)
     - [-f, --force](#-f---force-5)
-    - [Arguments](#arguments-19)
+    - [Arguments](#arguments-20)
     - [ALIAS](#alias-1)
     - [Options](#options-36)
     - [-f, --force](#-f---force-6)
@@ -659,7 +662,7 @@ the new project is created in a standalone target directory. This is
 suitable for isolated projects or when workspace integration is unnecessary.
 
 ```shell
-algokit init [OPTIONS]
+algokit init [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### Options
@@ -713,6 +716,20 @@ Whether to prefer structuring standalone projects as part of a workspace. An Alg
 
 ### -a, --answer <key> <value>
 Answers key/value pairs to pass to the template.
+
+### example
+
+Example initialization subcommand.
+
+```shell
+algokit init example [OPTIONS] [EXAMPLE_ID]
+```
+
+### Arguments
+
+
+### EXAMPLE_ID
+Optional argument
 
 ## localnet
 

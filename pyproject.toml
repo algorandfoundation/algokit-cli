@@ -50,6 +50,7 @@ poethepoet = ">=0.17.1,<0.27.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
 pytest-sugar = "^1.0.0"
+types-pyyaml = "^6.0.12.20250402"
 
 [build-system]
 requires = ["poetry-core"]

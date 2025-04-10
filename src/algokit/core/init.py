@@ -1,10 +1,13 @@
 import json
 import re
 import shutil
+import subprocess
 from logging import getLogger
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NoReturn, cast
 
+import click
+import yaml
 from copier._main import Worker
 from copier._types import MISSING
 from copier._user_data import AnswersMap, Question
@@ -16,6 +19,9 @@ logger = getLogger(__name__)
 
 DEFAULT_MIN_VERSION = "1.8.0"
 DEFAULT_PROJECTS_ROOT_PATH = "projects"
+ALGOKIT_TEMPLATES_REPO_URL = "https://github.com/algorandfoundation/algokit-templates"
+ALGOKIT_USER_DIR = ".algokit"
+ALGOKIT_TEMPLATES_DIR = "algokit-templates"
 
 
 def populate_default_answers(worker: Worker) -> None:
@@ -131,3 +137,95 @@ def _save_vscode_workspace(workspace_path: Path, workspace: dict) -> None:
     """Save the modified workspace back to the file."""
     with workspace_path.open(mode="w", encoding="utf-8") as f:
         json.dump(workspace, f, indent=2)
+
+
+def _fail_and_bail() -> NoReturn:
+    """Exit the program with an error code"""
+    logger.info("🛑 Bailing out... 👋")
+    raise click.exceptions.Exit(code=1)
+
+
+def _manage_templates_repository() -> None:
+    """Manage the templates repository by cloning or updating it."""
+    algokit_dir = Path.home() / ALGOKIT_USER_DIR
+    templates_dir = algokit_dir / ALGOKIT_TEMPLATES_DIR
+
+    try:
+        if not templates_dir.exists():
+            # Clone the repository if it doesn't exist
+            click.echo("Cloning templates repository...")
+            algokit_dir.mkdir(exist_ok=True)
+            subprocess.run(
+                ["git", "clone", ALGOKIT_TEMPLATES_REPO_URL, str(templates_dir)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        else:
+            # Pull latest changes if the repository exists
+            subprocess.run(
+                ["git", "-C", str(templates_dir), "pull"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to fetch templates: {e.stderr}")
+        _fail_and_bail()
+
+
+def _open_ide(project_path: Path, readme_path: Path | None = None, *, open_ide: bool = True) -> None:
+    """Open an IDE for the given project path, preferring VSCode over PyCharm if both are available."""
+    vscode_workspace_file = resolve_vscode_workspace_file(project_path)
+    code_cmd = shutil.which("code")
+    pycharm_cmd = shutil.which("charm")
+
+    if open_ide and ((project_path / ".vscode").is_dir() or vscode_workspace_file) and code_cmd:
+        target_path = str(vscode_workspace_file if vscode_workspace_file else project_path)
+        logger.info(
+            "VSCode configuration detected in project directory, and 'code' command is available on path, "
+            "attempting to launch VSCode"
+        )
+        code_cmd_and_args = [code_cmd, target_path]
+        if readme_path:
+            code_cmd_and_args.append(str(readme_path))
+        subprocess.run(code_cmd_and_args, check=False)
+        return
+
+    if open_ide and pycharm_cmd:
+        logger.info("PyCharm command is available on path, attempting to launch PyCharm")
+        pycharm_cmd_and_args = [pycharm_cmd, str(project_path)]
+        if readme_path:
+            pycharm_cmd_and_args.append(str(readme_path))
+        subprocess.run(pycharm_cmd_and_args, check=False)
+        return
+
+    if readme_path:
+        logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
+
+
+# ... existing code ...
+
+
+def _load_alogkit_examples(examples_config_path: str) -> list[dict]:
+    """
+    Load and parse the examples from a YAML configuration file.
+
+    Args:
+        examples_config_path: Path to the YAML configuration file containing example templates
+
+    Returns:
+        A list of dictionaries with 'id' and 'name' of each example
+    """
+    examples = []
+
+    config_file = Path(examples_config_path)
+    if config_file.is_file():
+        with config_file.open() as file:
+            file_content = yaml.safe_load(file)
+            for example in file_content.get("examples", []):
+                examples.append(
+                    {"id": example.get("id"), "type": example.get("type"), "name": example.get("project_name")}
+                )
+
+    return examples
