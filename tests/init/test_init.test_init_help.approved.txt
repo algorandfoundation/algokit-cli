@@ -1,4 +1,4 @@
-Usage: algokit init [OPTIONS]
+Usage: algokit init [OPTIONS] COMMAND [ARGS]...
 
   Initializes a new project from a template, including prompting for template
   specific questions to be used in template rendering.
@@ -54,3 +54,6 @@ Options:
   -a, --answer <key> <value>      Answers key/value pairs to pass to the
                                   template.
   -h, --help                      Show this message and exit.
+
+Commands:
+  example  Example initialization subcommand.

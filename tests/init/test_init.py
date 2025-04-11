@@ -97,12 +97,12 @@ class ExtendedTemplateKey(str, Enum):
 # Define a fixture to monkeypatch TemplateKey with ExtendedTemplateKey
 @pytest.fixture(autouse=True)
 def _set_mocked_template_keys(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("algokit.cli.init.helpers.TemplateKey", ExtendedTemplateKey)
+    monkeypatch.setattr("algokit.cli.init.command.TemplateKey", ExtendedTemplateKey)
 
 
 @pytest.fixture(autouse=True)
 def _set_blessed_templates(mocker: MockerFixture) -> None:
-    from algokit.cli.init.__init__ import init_group as init_command
+    from algokit.cli.init import init_group
     from algokit.cli.init.helpers import BlessedTemplateSource
 
     blessed_templates = {
@@ -133,10 +133,10 @@ def _set_blessed_templates(mocker: MockerFixture) -> None:
         ),
     }
 
-    (template_param,) = (p for p in init_command.params if p.name == "template_name")
+    (template_param,) = (p for p in init_group.params if p.name == "template_name")
     template_param.type = click.Choice(list(blessed_templates))
 
-    mocker.patch("algokit.cli.init.helpers._get_blessed_templates").return_value = blessed_templates
+    mocker.patch("algokit.cli.init.command._get_blessed_templates").return_value = blessed_templates
 
 
 @pytest.fixture(autouse=True)
