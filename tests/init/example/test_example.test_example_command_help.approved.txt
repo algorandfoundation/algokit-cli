@@ -1,0 +1,6 @@
+Usage: algokit init example [OPTIONS] [EXAMPLE_ID]
+
+  Example initialization subcommand.
+
+Options:
+  -h, --help  Show this message and exit.
