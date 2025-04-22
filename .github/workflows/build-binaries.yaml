@@ -21,7 +21,7 @@ jobs:
         # macos-14 is the Apple Silicon M1 runner (mac os 14)
         # macos-13 is the last available Intel Mac runner (mac os 13)
         # See https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-        os: [ubuntu-20.04, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
 
     steps:
       - name: Set signing condition
