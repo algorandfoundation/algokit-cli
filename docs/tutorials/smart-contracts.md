@@ -1,5 +1,9 @@
 # Smart Contract Tutorial
 
+```{warning}
+This is a work in progress!
+```
+
 _TODO_
 
 [mental model image]

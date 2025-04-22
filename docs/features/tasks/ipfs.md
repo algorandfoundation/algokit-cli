@@ -63,4 +63,4 @@ Please note, the maximum file size that can be uploaded is 100MB. If you try to 
 
 ## Further Reading
 
-For in-depth details, visit the [ipfs section](../../cli/index.md#ipfs) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [ipfs section](../../reference.md#ipfs) in the AlgoKit CLI reference documentation.

@@ -18,7 +18,7 @@ We will also refer to the official [`algokit-python-template`](https://github.co
   - [Bootstrap Option](#bootstrap-option)
   - [Predefined Copier Answers](#predefined-copier-answers)
   - [Default Behaviors](#default-behaviors)
-  - [Generators](#generators)
+  - [Generators](#working-with-generators)
 - [Recommendations](#recommendations)
 - [Conclusion](#conclusion)
 
@@ -211,7 +211,7 @@ This should dynamically load and display your generator as an optional `cli` com
 - **Versioning**: Use `.algokit.toml` to specify the minimum compatible version of AlgoKit.
 - **Testing**: Include test configurations and scripts in your templates to encourage testing best practices.
 - **Linting and Formatting**: Integrate linters and code formatters in your templates to ensure code quality.
-- **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles).
+- **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](../index.md#guiding-principles).
 
 ## Conclusion
 

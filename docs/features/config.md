@@ -34,4 +34,4 @@ This command configures the container engine settings for AlgoKit.
 
 ## Further Reading
 
-For in-depth details, visit the [configuration section](../cli/index.md#config) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [configuration section](../reference.md#config) in the AlgoKit CLI reference documentation.

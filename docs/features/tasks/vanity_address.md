@@ -53,4 +53,4 @@ $ ~ algokit task vanity-address ALGO -o alias -a my-vanity-address
 
 ## Further Reading
 
-For in-depth details, visit the [vanity-address section](../../cli/index.md#vanity-address) in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [vanity-address section](../../reference.md#vanity-address) in the AlgoKit CLI reference documentation.

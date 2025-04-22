@@ -86,7 +86,9 @@ Once finished, (if you have it installed) VS Code should automatically be opened
 
 ![AlgoKit Playground Contract](../imgs/algokitplayground.png)
 
+(algokit-project-structure)=
 ## AlgoKit Project structure 🏗
+
 
 The structure of your fresh algokit project instance will look similar to below:
 
@@ -162,7 +164,7 @@ This will then deploy to your LocalNet instance and display the same output as i
 
 We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and its related ecosystem of templates and utilities for an efficient developer experience.
 
-- To get the most out of `AlgoKit`, we recommend to get started with learning more about AlgoKit and what you can do with it by checking out our extensive [AlgoKit CLI documentation](../algokit.md).
+- To get the most out of `AlgoKit`, we recommend to get started with learning more about AlgoKit and what you can do with it by checking out our extensive [AlgoKit CLI documentation](../index.md).
 - Explore the `README.md` files at the root of any project created via `algokit init`. All official AlgoKit templates include detailed quick started guides, an interactive code tour and various presets which can be customized to your needs.
 - To learn more about `Algorand Python`, take a look at the [documentation](https://algorandfoundation.github.io/puya/).
 - To learn more about the commands demonstrated in this tutorial, refer to [`init`](../features/init.md) and [`project`](../features/project.md) to get a comprehensive understanding of their further capabilities.
