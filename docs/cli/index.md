@@ -719,7 +719,11 @@ Answers key/value pairs to pass to the template.
 
 ### example
 
-Example initialization subcommand.
+Initialize a new project from an example template.
+
+Allows you to quickly create a new project by copying one of the official AlgoKit example templates.
+If no example ID is provided, launches an interactive selector to choose from available examples.
+The example will be copied to a new directory in your current location.
 
 ```shell
 algokit init example [OPTIONS] [EXAMPLE_ID]

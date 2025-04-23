@@ -55,12 +55,12 @@ def _setup_mocks(mocker: MockerFixture, tmp_path: Path) -> MagicMock:  # noqa: P
     # Mock _manage_templates_repository
     mocker.patch("algokit.cli.init.example._manage_templates_repository")
 
-    # Mock _load_alogkit_examples to return mock data and check correct path is used
+    # Mock _load_algokit_examples to return mock data and check correct path is used
     def _mock_load_examples(config_path: str) -> list[dict]:
         assert Path(config_path) == mock_examples_config_path
         return MOCK_EXAMPLES
 
-    mocker.patch("algokit.cli.init.example._load_alogkit_examples", side_effect=_mock_load_examples)
+    mocker.patch("algokit.cli.init.example._load_algokit_examples", side_effect=_mock_load_examples)
 
     # Mock _open_ide
     mocker.patch("algokit.cli.init.example._open_ide")
@@ -196,7 +196,7 @@ def test_example_command_tui_select_valid(mocker: MockerFixture, cwd: Path) -> N
     # Get the mock instance from the fixture
     mock_example_selector = mocker.patch("algokit.cli.init.example.ExampleSelector").return_value
     # Configure the mocked selector instance to return the selected ID
-    mock_example_selector.user_answers = {"selected_example": selected_example_id}
+    mock_example_selector.user_answers = {"example_id": selected_example_id}
 
     mock_copytree = mocker.patch("algokit.cli.init.example.shutil.copytree")
     mock_open_ide = mocker.patch("algokit.cli.init.example._open_ide")
@@ -240,7 +240,7 @@ def test_example_command_tui_select_valid_but_source_missing(mocker: MockerFixtu
     # Get the mock instance from the fixture
     mock_example_selector = mocker.patch("algokit.cli.init.example.ExampleSelector").return_value
     # Configure the mocked selector instance to return the selected ID
-    mock_example_selector.user_answers = {"selected_example": selected_example_id}
+    mock_example_selector.user_answers = {"example_id": selected_example_id}
 
     home_path = Path.home()
     example_src_path = get_mock_examples_dir(home_path) / selected_example_id

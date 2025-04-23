@@ -56,4 +56,4 @@ Options:
   -h, --help                      Show this message and exit.
 
 Commands:
-  example  Example initialization subcommand.
+  example  Initialize a new project from an example template.

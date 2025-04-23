@@ -207,7 +207,7 @@ def _open_ide(project_path: Path, readme_path: Path | None = None, *, open_ide: 
 # ... existing code ...
 
 
-def _load_alogkit_examples(examples_config_path: str) -> list[dict]:
+def _load_algokit_examples(examples_config_path: str) -> list[dict]:
     """
     Load and parse the examples from a YAML configuration file.
 
