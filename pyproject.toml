@@ -22,7 +22,7 @@ keyring = "25.2.1"
 # vendored from auth0 repo, to reduce depedency on auth0 package that caused many adhoc transitive dependency errors in cli
 # see header in src/algokit/core/_vendor/auth0/authentication/token_verifier.py
 pyjwt = "^2.8.0" 
-cryptography = "^43.0.1" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
+cryptography = ">=43.0.1,<45.0.0" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
 algokit-utils = "^3.0.0"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
