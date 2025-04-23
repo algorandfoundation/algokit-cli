@@ -6,8 +6,7 @@ from textual.containers import Vertical
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Label, ListItem, ListView
 
-# Import the load_examples function
-from algokit.core.init import _load_alogkit_examples
+from algokit.core.init import _load_algokit_examples
 
 if TYPE_CHECKING:
     from algokit.cli.tui.init.example_selector import ExampleSelector
@@ -27,13 +26,13 @@ class ChooseExampleScreen(Screen):
         width: 100%;
     }
     """
-    SUB_TITLE = "Add Example"
+    SUB_TITLE = "Initialize Example"
 
     def __init__(self, examples_path: str) -> None:
         super().__init__()
         self.examples_path = examples_path
         # Use the imported load_examples function
-        self.examples = _load_alogkit_examples(examples_path)
+        self.examples = _load_algokit_examples(examples_path)
 
     def compose(self) -> ComposeResult:
         yield Header(icon="📚")
@@ -56,5 +55,5 @@ class ChooseExampleScreen(Screen):
         """Handle the selection of an example using the keyboard."""
         selected_item = event.item.id
         if selected_item:
-            self.app.user_answers["selected_example"] = selected_item
+            self.app.user_answers["example_id"] = selected_item
             self.app.exit()

@@ -23,7 +23,7 @@ class ExampleSelector(App):
         ("b", "toggle_dark", "Toggle theme"),
         ("q", "quit", "Quit"),
     ]
-    TITLE: str = "Algokit Examples"
+    TITLE: str = "AlgoKit Examples"
 
     def __init__(self) -> None:
         super().__init__()
