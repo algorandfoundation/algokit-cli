@@ -29,7 +29,7 @@ def test_install_gh_not_installed_failed_install(mocker: MockerFixture, proc_moc
 
 @pytest.mark.mock_platform_system("Windows")
 def test_install_gh_windows(
-    mocker: MockerFixture, proc_mock: ProcMock, tmp_path_factory: pytest.TempPathFactory
+    mocker: MockerFixture, proc_mock: ProcMock, httpx_mock: HTTPXMock, tmp_path_factory: pytest.TempPathFactory
 ) -> None:
     cwd = tmp_path_factory.mktemp("cwd")
     dummy_script_path = cwd / "webi_dummy_installer.ps1"
@@ -49,6 +49,7 @@ def test_install_gh_windows(
         ],
         ["installed gh!"],
     )
+    httpx_mock.add_response(url="https://webi.ms/gh", text="")
     mocker.patch("algokit.cli.codespace.authenticate_with_github", return_value=False)
     temp_file_mock = mocker.MagicMock()
     temp_file_mock.__enter__.return_value.name = str(dummy_script_path)

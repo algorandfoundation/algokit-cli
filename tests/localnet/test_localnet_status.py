@@ -78,7 +78,8 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
     httpx_mock.add_response(
-        url="http://localhost:4001/v2/status", json={"last-round": 1, "time-since-last-round": 15.3 * 1e9}
+        url="http://localhost:4001/v2/status",
+        json={"last-round": 1, "time-since-last-round": 15.3 * 1e9},
     )
     httpx_mock.add_response(
         url="http://localhost:4001/versions",

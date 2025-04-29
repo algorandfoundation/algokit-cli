@@ -11,7 +11,7 @@ DEBUG: Running '{container_engine} compose up --detach --quiet-pull --wait' in '
 {container_engine}: STDOUT
 {container_engine}: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
-DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
+HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
 DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.
 Opening Bash console on the algod node; execute `exit` to return to original console
