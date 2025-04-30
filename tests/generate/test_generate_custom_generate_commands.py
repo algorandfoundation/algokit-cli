@@ -110,7 +110,7 @@ path = "{smart_contract_path}"
     """.strip(),
         encoding="utf-8",
     )
-    mock_copier_worker_cls = mocker.patch("copier.main.Worker")
+    mock_copier_worker_cls = mocker.patch("copier._main.Worker")
     mock_copier_worker_cls.return_value.__enter__.return_value.src_path = str(cwd / "smart_contract")
 
     result = invoke("generate smart-contract", cwd=cwd, input="y\n")

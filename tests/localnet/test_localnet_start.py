@@ -58,18 +58,14 @@ def _localnet_img_check_cmd_error(
     proc_mock.should_fail_on(["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg])
     proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
 
-    httpx_mock.add_response(
+    httpx_mock.add_exception(
+        httpx.RemoteProtocolError("No response"),
         url="https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest",
-        json={
-            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        },
     )
 
-    httpx_mock.add_response(
+    httpx_mock.add_exception(
+        httpx.RemoteProtocolError("No response"),
         url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
-        json={
-            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        },
     )
 
 

@@ -46,7 +46,7 @@ def run_generator(answers: dict, path: Path) -> None:
     # copier is lazy imported for two reasons
     # 1. it is slow to import on first execution after installing
     # 2. the import fails if git is not installed (which we check above)
-    from copier.main import Worker
+    from copier._main import Worker
 
     cwd = Path.cwd()
     expected_answers_file = cwd / ".algokit" / ".copier-answers.yml"

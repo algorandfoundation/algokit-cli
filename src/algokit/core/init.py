@@ -5,13 +5,14 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, cast
 
-from copier.main import Worker
-from copier.types import MISSING
-from copier.user_data import AnswersMap, Question
+from copier._main import Worker
+from copier._types import MISSING
+from copier._user_data import AnswersMap, Question
 
 from algokit.core.project import get_project_dir_names_from_workspace
 
 logger = getLogger(__name__)
+
 
 DEFAULT_MIN_VERSION = "1.8.0"
 DEFAULT_PROJECTS_ROOT_PATH = "projects"

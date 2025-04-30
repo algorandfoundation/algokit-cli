@@ -557,7 +557,7 @@ def test_init_template_url_and_template_name(
 
 @pytest.mark.usefixtures("mock_questionary_input")
 def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
-    mock_copier_worker_cls = mocker.patch("copier.main.Worker")
+    mock_copier_worker_cls = mocker.patch("copier._main.Worker")
     mock_copier_worker_cls.return_value.__enter__.return_value.template.url_expanded = "URL"
     ref = "abcdef123456"
     cwd = tmp_path_factory.mktemp("cwd")
