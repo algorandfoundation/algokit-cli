@@ -62,7 +62,7 @@ def run(  # noqa: PLR0913
                     level=stdout_log_level,
                     msg=(click.style(f"{command[0]}:", bold=True) if prefix_process else "") + f" {line.strip()}",
                 )
-    if exit_code == 0:  # type: ignore[unreachable]
+    if exit_code == 0:
         logger.debug(f"'{command_str}' completed successfully", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
     else:
         logger.debug(f"'{command_str}' failed, exited with code = {exit_code}", extra=EXTRA_EXCLUDE_FROM_CONSOLE)
