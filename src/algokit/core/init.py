@@ -37,6 +37,9 @@ def populate_default_answers(worker: Worker) -> None:
             answers=answers,
             jinja_env=worker.jinja_env,
             var_name=var_name,
+            # https://github.com/copier-org/copier/releases/tag/v9.7.0 introduces changes to Question model,
+            # which now requires passing context param.
+            context={**worker._render_context(), **answers.combined},  # noqa: SLF001
             **details,
         )
         default_value = question.get_default()
