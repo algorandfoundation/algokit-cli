@@ -89,6 +89,9 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
             "build": {"major": 1, "minor": 2, "build_number": 1},
         },
     )
+    httpx_mock.add_response(
+        url="http://localhost:8980/health", json={"round": 1, "errors": ["error"], "version": "v1.0"}
+    )
 
     proc_mock.set_output(
         "docker compose ps --format json",
@@ -139,6 +142,9 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
             "build": {"major": 1, "minor": 2, "build_number": 1},
         },
     )
+    # httpx_mock.add_response(
+    #     url="http://localhost:8980/health", json={"round": 1, "errors": ["error"], "version": "v1.0"}
+    # )
 
     proc_mock.set_output(
         "docker compose ps --format json",

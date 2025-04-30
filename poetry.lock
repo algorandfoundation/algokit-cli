@@ -14,23 +14,19 @@ files = [
 
 [[package]]
 name = "algokit-utils"
-version = "4.0.0"
+version = "4.0.1b3"
 description = "Utilities for Algorand development for use by AlgoKit"
 optional = false
-python-versions = ">=3.10,<4.0"
+python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "algokit_utils-4.0.0-py3-none-any.whl", hash = "sha256:26f1e0ef03dfa7ea561bf3f62b3cb0852f9339a420cac9b8a3597cd37afe3d78"},
+    {file = "algokit_utils-4.0.1b3-py3-none-any.whl", hash = "sha256:2fc8e637ac47ba3973fd56ced8cefb54940001939e1631e3fa330bc1fab41a6e"},
 ]
 
 [package.dependencies]
 httpx = ">=0.23.1,<=0.28.1"
 py-algorand-sdk = ">=2.4.0,<3.0.0"
 typing-extensions = ">=4.6.0"
-
-[package.source]
-type = "file"
-url = "../../utils/algokit-utils-py/dist/algokit_utils-4.0.0-py3-none-any.whl"
 
 [[package]]
 name = "allpairspy"
@@ -3296,4 +3292,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "14710dcb258cc9d435d9ce3e069a586a3e6d66e8b173c22eb41bffc4f50230e1"
+content-hash = "e5b05f6d8b06fed8a60af81ed75c7ca7475b8b9ffed49eeb18c4a5e0dd593dac"

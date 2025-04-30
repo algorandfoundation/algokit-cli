@@ -24,7 +24,7 @@ keyring = "25.2.1"
 # this version has been tested to work with the vendored file
 pyjwt = "^2.10.1" 
 cryptography = "^44.0.2" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
-algokit-utils = {path = "/Users/dreds/Documents/projects/algokit/utils/algokit-utils-py/dist/algokit_utils-4.0.0-py3-none-any.whl"}
+algokit-utils = "4.0.1b3"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 jsondiff = "^2.0.0"
