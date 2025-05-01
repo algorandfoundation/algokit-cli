@@ -1,2 +1,2 @@
-DEBUG: HTTP Request: GET https://snapshottest.dispenser.com/fund/0/limit "HTTP/1.1 200 OK"
+HTTP Request: GET https://snapshottest.dispenser.com/fund/0/limit "HTTP/1.1 200 OK"
 Remaining daily fund limit: 1000000 μAlgo

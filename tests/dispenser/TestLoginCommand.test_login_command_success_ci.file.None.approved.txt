@@ -1,6 +1,6 @@
-DEBUG: HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/device/code "HTTP/1.1 200 OK"
+HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/device/code "HTTP/1.1 200 OK"
 Navigate to: https://example.com/device
 Confirm code: user_code
-DEBUG: HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/token "HTTP/1.1 200 OK"
+HTTP Request: POST https://dispenser-prod.eu.auth0.com/oauth/token "HTTP/1.1 200 OK"
 WARNING: Your CI access token has been saved to `algokit_ci_token.txt`.
 Please ensure you keep this file safe or remove after copying the token!

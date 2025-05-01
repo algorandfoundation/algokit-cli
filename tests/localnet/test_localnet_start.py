@@ -50,10 +50,23 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
 
 
 @pytest.fixture()
-def _localnet_img_check_cmd_error(proc_mock: ProcMock) -> None:
+def _localnet_img_check_cmd_error(
+    proc_mock: ProcMock,
+    httpx_mock: HTTPXMock,
+) -> None:
     arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.should_fail_on(["docker", "image", "inspect", ALGORAND_IMAGE, "--format", arg])
     proc_mock.should_fail_on(["docker", "image", "inspect", INDEXER_IMAGE, "--format", arg])
+
+    httpx_mock.add_exception(
+        httpx.RemoteProtocolError("No response"),
+        url="https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest",
+    )
+
+    httpx_mock.add_exception(
+        httpx.RemoteProtocolError("No response"),
+        url="https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest",
+    )
 
 
 @pytest.mark.usefixtures("_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")

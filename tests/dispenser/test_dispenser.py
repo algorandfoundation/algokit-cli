@@ -260,6 +260,7 @@ class TestLoginCommand:
                 "user_code": "user_code",
                 "verification_uri_complete": "https://example.com/device",
             },
+            is_reusable=True,
         )
         httpx_mock.add_response(
             url=AuthConfig.OAUTH_TOKEN_URL,
@@ -268,6 +269,7 @@ class TestLoginCommand:
                 "error": "authorization_pending",
                 "error_description": "The user authentication is pending.",
             },
+            is_reusable=True,
         )
         mocker.patch("algokit.core.dispenser.TokenVerifier")
         mocker.patch("algokit.core.dispenser.DISPENSER_LOGIN_TIMEOUT", 1)

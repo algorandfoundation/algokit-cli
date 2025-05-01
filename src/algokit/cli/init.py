@@ -350,7 +350,7 @@ def init_command(  # noqa: PLR0913, C901, PLR0915
     # 2. the import fails if git is not installed (which we check above)
     # TODO: copier is typed, need to figure out how to force mypy to accept that or submit a PR
     #       to their repo to include py.typed file
-    from copier.main import Worker
+    from copier._main import Worker
 
     from algokit.core.init import populate_default_answers
 
@@ -518,7 +518,7 @@ def _fail_and_bail() -> NoReturn:
 
 def _repo_url_is_valid(url: str) -> bool:
     """Check the repo URL is valid according to copier"""
-    from copier.vcs import get_repo
+    from copier._vcs import get_repo
 
     if not url:
         return False
@@ -795,7 +795,7 @@ def _init_base_template(*, target_path: Path, is_blessed: bool) -> None:
         "projects_root_path": "projects",
         "include_github_workflow_template": not is_blessed,
     }
-    from copier.main import Worker
+    from copier._main import Worker
 
     with Worker(
         src_path=base_template.url,

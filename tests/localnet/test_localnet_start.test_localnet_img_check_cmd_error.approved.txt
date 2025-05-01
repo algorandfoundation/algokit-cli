@@ -8,18 +8,16 @@ DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": 
 DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
 DEBUG: Failed to get local image versions: No such file or directory: docker
-DEBUG: Error checking image status: No response can be found for GET request on https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest amongst:
-Match all requests on http://localhost:4001/v2/status
+DEBUG: Error checking image status: No response
 DEBUG: Running 'docker image inspect algorand/algod:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
 DEBUG: Failed to get local image versions: No such file or directory: docker
-DEBUG: Error checking image status: No response can be found for GET request on https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest amongst:
-Match all requests on http://localhost:4001/v2/status
+DEBUG: Error checking image status: No response
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
 DEBUG: AlgoKit LocalNet started, waiting for health check
-DEBUG: HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
+HTTP Request: GET http://localhost:4001/v2/status "HTTP/1.1 200 OK"
 DEBUG: AlgoKit LocalNet health check successful, algod is ready
 Started; execute `algokit explore` to explore LocalNet in a web user interface.

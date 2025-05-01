@@ -5,13 +5,14 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, cast
 
-from copier.main import Worker
-from copier.types import MISSING
-from copier.user_data import AnswersMap, Question
+from copier._main import Worker
+from copier._types import MISSING
+from copier._user_data import AnswersMap, Question
 
 from algokit.core.project import get_project_dir_names_from_workspace
 
 logger = getLogger(__name__)
+
 
 DEFAULT_MIN_VERSION = "1.8.0"
 DEFAULT_PROJECTS_ROOT_PATH = "projects"
@@ -37,6 +38,9 @@ def populate_default_answers(worker: Worker) -> None:
             answers=answers,
             jinja_env=worker.jinja_env,
             var_name=var_name,
+            # https://github.com/copier-org/copier/releases/tag/v9.7.0 introduces changes to Question model,
+            # which now requires passing context param.
+            context={**worker._render_context(), **answers.combined},  # noqa: SLF001
             **details,
         )
         default_value = question.get_default()
