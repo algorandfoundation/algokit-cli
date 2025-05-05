@@ -17,7 +17,7 @@ shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
-keyring = "25.2.1"
+keyring = "25.6.0"
 # pyjwt is locked to version ^2.10.1 because its explicitly
 # vendored from auth0 repo, to reduce depedency on auth0 package that caused many adhoc transitive dependency errors in cli
 # see header in src/algokit/core/_vendor/auth0/authentication/token_verifier.py
@@ -33,7 +33,7 @@ requests = "^2.31.0"
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.10.0"}
 pytest = "^8"
-ruff = ">=0.1.6,<0.5.0"
+ruff = ">=0.1.6,<0.12.0"
 pip-audit = "^2.4.7"
 approvaltests = "^7.2.0"
 pytest-mock = "^3.10.0"
@@ -45,7 +45,7 @@ pre-commit = ">=2.20,<4.0"
 sphinx = "^6.0.0"
 sphinx-click = "^4.4.0"
 sphinxnotes-markdown-builder = "^0.5.6"
-poethepoet = ">=0.17.1,<0.27.0"
+poethepoet = ">=0.17.1,<0.35.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
 pytest-sugar = "^1.0.0"
