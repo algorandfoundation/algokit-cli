@@ -1,0 +1,4 @@
+Example nonexistent not found
+Available example ids:
+  react-vite
+  python-smart-contract

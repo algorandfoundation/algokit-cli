@@ -1,6 +1,6 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
-Usage: algokit init [OPTIONS]
+Usage: algokit init [OPTIONS] COMMAND [ARGS]...
 Try 'algokit init -h' for help.
 
 Error: Invalid value for '--name' / '-n': Invalid directory name. Ensure it's a mix of letters, numbers, dashes, periods, and/or underscores, and not already used.
