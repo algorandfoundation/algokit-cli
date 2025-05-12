@@ -2,9 +2,9 @@ import json
 from subprocess import CompletedProcess
 
 import pytest
-from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml, get_proxy_config
 from pytest_mock import MockerFixture
 
+from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml, get_proxy_config
 from tests.goal.test_goal import _normalize_output
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify

@@ -40,7 +40,7 @@ def _disable_animation(mocker: MockerFixture) -> None:
     mocker.patch("algokit.core.utils.animate", return_value=None)
 
 
-@pytest.fixture()
+@pytest.fixture
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
     mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which
@@ -119,7 +119,7 @@ hello = {custom_project_order}
         )
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd_with_workspace_sequential(
     tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock
 ) -> Path:
@@ -147,7 +147,7 @@ def cwd_with_workspace_sequential(
     return cwd
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd_with_workspace(tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock) -> Path:
     """
     Creates a standalone project with a single command.
@@ -172,7 +172,7 @@ def cwd_with_workspace(tmp_path_factory: TempPathFactory, which_mock: WhichMock,
     return cwd
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd_with_standalone(tmp_path_factory: TempPathFactory, which_mock: WhichMock, proc_mock: ProcMock) -> Path:
     cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
     cwd.mkdir()

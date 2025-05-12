@@ -36,7 +36,7 @@ def _get_transactions(file: Path | None, transaction: str | None) -> list[Transa
             txns: list[Transaction] = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
             return txns
         else:
-            return [cast(Transaction, encoding.msgpack_decode(transaction))]  # type: ignore[no-untyped-call]
+            return [cast("Transaction", encoding.msgpack_decode(transaction))]  # type: ignore[no-untyped-call]
     except Exception as ex:
         logger.debug(ex, exc_info=True)
         raise click.ClickException(

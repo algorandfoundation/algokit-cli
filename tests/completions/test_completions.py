@@ -2,10 +2,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
-from algokit.cli.completions import SUPPORTED_SHELLS
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 
+from algokit.cli.completions import SUPPORTED_SHELLS
 from tests import get_combined_verify_output
 from tests.utils.approvals import normalize_path, verify
 from tests.utils.click_invoker import ClickInvokeResult, invoke

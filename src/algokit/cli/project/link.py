@@ -112,7 +112,7 @@ def _prompt_contract_project() -> ContractArtifacts | None:
         return None
 
     return typing.cast(
-        ContractArtifacts,
+        "ContractArtifacts",
         questionary_extensions.prompt_select(
             "Select contract project to link with",
             *[questionary.Choice(title=contract.project_name, value=contract) for contract in contract_projects],

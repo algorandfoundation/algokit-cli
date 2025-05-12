@@ -1,8 +1,7 @@
 import json
 import logging
-from io import TextIOWrapper
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import click
 from algosdk import encoding, error
@@ -16,6 +15,9 @@ from algokit.cli.tasks.utils import (
 )
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from io import TextIOWrapper
 
 
 def _is_sign_task_output_txn(item: dict) -> bool:
@@ -44,7 +46,7 @@ def _load_from_stdin() -> list[SignedTransaction]:
     """
     # Read the raw file content from the standard input
 
-    raw_file_content = cast(TextIOWrapper, click.get_text_stream("stdin")).read()
+    raw_file_content = cast("TextIOWrapper", click.get_text_stream("stdin")).read()
 
     try:
         # Parse the raw file content as JSON
@@ -88,7 +90,7 @@ def _get_signed_transactions(file: Path | None = None, transaction: str | None =
             if not isinstance(txn, SignedTransaction):
                 raise click.ClickException("Supplied transaction is not signed!")
 
-        return cast(list[SignedTransaction], txns)
+        return cast("list[SignedTransaction]", txns)
 
     except Exception as ex:
         logger.debug(ex, exc_info=True)

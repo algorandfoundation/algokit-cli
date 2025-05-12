@@ -250,7 +250,7 @@ class ComposeSandbox:
             data = [json.loads(line) for line in json_lines]
 
         assert isinstance(data, list)
-        return cast(list[dict[str, Any]], data)
+        return cast("list[dict[str, Any]]", data)
 
     def _get_local_image_versions(self, image_name: str) -> list[str]:
         """

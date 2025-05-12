@@ -1,10 +1,10 @@
 import json
 
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algokit_utils import BulkAssetOptInOutResult
 from algosdk import account, mnemonic
 from pytest_mock import MockerFixture
 
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 

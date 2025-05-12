@@ -191,7 +191,7 @@ class _DeployCommand(click.Command):
     "-c",
     type=_CommandParamType(),
     default=None,
-    help=("Custom deploy command. If not provided, will load the deploy command " "from .algokit.toml file."),
+    help=("Custom deploy command. If not provided, will load the deploy command from .algokit.toml file."),
     required=False,
 )
 @click.option(

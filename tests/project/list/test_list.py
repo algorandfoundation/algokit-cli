@@ -10,7 +10,7 @@ from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
 
-@pytest.fixture()
+@pytest.fixture
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
     mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which
@@ -114,10 +114,10 @@ def _cwd_with_workspace(
     def _generate_projects(num: int) -> list[dict[str, str]]:
         return [
             {
-                "dir": f"project{i+1}",
+                "dir": f"project{i + 1}",
                 "type": "contract",
-                "name": f"contract_project_{i+1}",
-                "command": f"command_{chr(97+i)}",
+                "name": f"contract_project_{i + 1}",
+                "command": f"command_{chr(97 + i)}",
                 "description": "Prints hello",
             }
             for i in range(num)

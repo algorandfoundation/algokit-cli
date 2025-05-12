@@ -3,12 +3,12 @@ from importlib import metadata
 from time import time
 
 import pytest
-from algokit.core.conf import PACKAGE_NAME
-from algokit.core.config_commands.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
+from algokit.core.conf import PACKAGE_NAME
+from algokit.core.config_commands.version_prompt import LATEST_URL, VERSION_CHECK_INTERVAL
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import normalize_path, verify
 from tests.utils.click_invoker import invoke

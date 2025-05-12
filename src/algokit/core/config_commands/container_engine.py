@@ -40,7 +40,7 @@ def save_container_engine(engine: str) -> None:
     required=False,
     default=False,
     type=click.BOOL,
-    help=("Skip confirmation prompts. " "Defaults to 'yes' to all prompts."),
+    help=("Skip confirmation prompts. Defaults to 'yes' to all prompts."),
 )
 def container_engine_configuration_command(*, engine: str | None, force: bool) -> None:
     """Set the default container engine for use by AlgoKit CLI to run LocalNet images."""

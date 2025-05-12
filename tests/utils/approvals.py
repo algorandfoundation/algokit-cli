@@ -2,12 +2,13 @@ import re
 from typing import Any
 
 import approvaltests
-from algokit.core.utils import CLEAR_LINE, SPINNER_FRAMES
 from approvaltests.scrubbers.scrubbers import Scrubber, combine_scrubbers
 
+from algokit.core.utils import CLEAR_LINE, SPINNER_FRAMES
+
 __all__ = [
-    "TokenScrubber",
     "Scrubber",
+    "TokenScrubber",
     "combine_scrubbers",
     "normalize_path",
     "verify",

@@ -25,7 +25,7 @@ class VersionInfoType(typing.NamedTuple):
     serial: int
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_doctor_dependencies(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.doctor.get_current_package_version").return_value = "1.2.3"
     mocker.patch("algokit.cli.doctor.get_latest_github_version").return_value = "1.2.3"

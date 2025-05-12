@@ -4,16 +4,16 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
+from approvaltests.namer import NamerFactory
+from approvaltests.pytest.py_test_namer import PyTestNamer
+from pytest_mock import MockerFixture
+
 from algokit.core.typed_client_generation import (
     PYTHON_PYPI_PACKAGE,
     TYPESCRIPT_NPM_PACKAGE,
     _snake_case,
 )
 from algokit.core.utils import is_windows
-from approvaltests.namer import NamerFactory
-from approvaltests.pytest.py_test_namer import PyTestNamer
-from pytest_mock import MockerFixture
-
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
@@ -48,12 +48,12 @@ def _get_typescript_generate_command(version: str | None, application_json: Path
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd(tmp_path_factory: TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
 
 
-@pytest.fixture()
+@pytest.fixture
 def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
     def factory(app_spec_dir: Path, app_spec_file_name: str) -> Path:
         app_spec_example_path = Path(__file__).parent / app_spec_file_name
@@ -65,17 +65,17 @@ def dir_with_app_spec_factory() -> DirWithAppSpecFactory:
     return factory
 
 
-@pytest.fixture()
+@pytest.fixture
 def application_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
     return dir_with_app_spec_factory(cwd, "application.json")
 
 
-@pytest.fixture()
+@pytest.fixture
 def arc32_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
     return dir_with_app_spec_factory(cwd, "app.arc32.json")
 
 
-@pytest.fixture()
+@pytest.fixture
 def arc56_json(cwd: Path, dir_with_app_spec_factory: DirWithAppSpecFactory) -> Path:
     return dir_with_app_spec_factory(cwd, "app.arc56.json")
 

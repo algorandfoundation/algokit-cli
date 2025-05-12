@@ -1,8 +1,8 @@
 import json
 
 import pytest
-from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml, get_proxy_config
 
+from algokit.core.sandbox import get_algod_network_template, get_config_json, get_docker_compose_yml, get_proxy_config
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify

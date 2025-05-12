@@ -5,6 +5,10 @@ import click
 import httpx
 import jwt
 import pytest
+from approvaltests.namer import NamerFactory
+from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
+
 from algokit.cli.dispenser import DEFAULT_CI_TOKEN_FILENAME, DISPENSER_ASSETS, DispenserAssetName
 from algokit.core.dispenser import (
     DISPENSER_KEYRING_ACCESS_TOKEN_KEY,
@@ -16,10 +20,6 @@ from algokit.core.dispenser import (
     AuthConfig,
 )
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
-from approvaltests.namer import NamerFactory
-from pytest_httpx import HTTPXMock
-from pytest_mock import MockerFixture
-
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
@@ -38,7 +38,7 @@ def _set_mock_keyring_credentials(
     mock_keyring[DISPENSER_KEYRING_USER_ID_KEY] = user_id
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
 

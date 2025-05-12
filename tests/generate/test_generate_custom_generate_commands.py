@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.conf import ALGOKIT_CONFIG
 from pytest_mock import MockerFixture
 
+from algokit.core.conf import ALGOKIT_CONFIG
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.which_mock import WhichMock
@@ -13,7 +13,7 @@ from tests.utils.which_mock import WhichMock
 DirWithAppSpecFactory = Callable[[Path], Path]
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd_with_custom_folder(tmp_path_factory: TempPathFactory) -> tuple[Path, str]:
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "smart_contract").mkdir()
@@ -21,7 +21,7 @@ def cwd_with_custom_folder(tmp_path_factory: TempPathFactory) -> tuple[Path, str
     return cwd, str((cwd / "smart_contract").absolute()).replace("\\", r"\\")
 
 
-@pytest.fixture()
+@pytest.fixture
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
     which_mock.add("git")

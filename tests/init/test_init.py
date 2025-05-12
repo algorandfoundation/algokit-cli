@@ -8,13 +8,13 @@ from pathlib import Path
 import click
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.init import append_project_to_vscode_workspace
 from approvaltests.namer import NamerFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 from pytest_mock import MockerFixture
 
+from algokit.core.init import append_project_to_vscode_workspace
 from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock

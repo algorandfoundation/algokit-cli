@@ -87,7 +87,7 @@ def test_algokit_init_with_template_url(
     )
 
     full_output = ""
-    logger.info(f'Running command: {" ".join([algokit, *command])}')
+    logger.info(f"Running command: {' '.join([algokit, *command])}")
     while process.poll() is None and process.stdout and process.stdin:
         output = process.stdout.readline()
         full_output += output  # Accumulate the output

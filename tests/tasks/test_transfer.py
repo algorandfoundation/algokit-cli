@@ -1,11 +1,11 @@
 import json
 
 import pytest
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algokit_utils import SendAtomicTransactionComposerResults
 from algosdk import account, mnemonic
 from pytest_mock import MockerFixture
 
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 

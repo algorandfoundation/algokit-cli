@@ -3,6 +3,9 @@ from pathlib import Path
 from subprocess import CompletedProcess
 
 import pytest
+from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
+
 from algokit.core.sandbox import (
     ALGOD_HEALTH_URL,
     get_algod_network_template,
@@ -10,9 +13,6 @@ from algokit.core.sandbox import (
     get_docker_compose_yml,
     get_proxy_config,
 )
-from pytest_httpx import HTTPXMock
-from pytest_mock import MockerFixture
-
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -25,17 +25,17 @@ def _normalize_output(output: str) -> str:
     return output.replace("\\", "/").replace("docker", "{container_engine}").replace("podman", "{container_engine}")
 
 
-@pytest.fixture()
+@pytest.fixture
 def _health_success(httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=ALGOD_HEALTH_URL)
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd")
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     mocked_goal_mount = cwd / "goal_mount"
     mocked_goal_mount.mkdir()
@@ -43,7 +43,7 @@ def mocked_goal_mount_path(cwd: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return mocked_goal_mount
 
 
-@pytest.fixture()
+@pytest.fixture
 def _setup_latest_dummy_compose(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
@@ -52,7 +52,7 @@ def _setup_latest_dummy_compose(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox" / "nginx.conf").write_text(get_proxy_config())
 
 
-@pytest.fixture()
+@pytest.fixture
 def _setup_input_files(cwd: Path, request: pytest.FixtureRequest) -> None:
     files = request.param
     for file in files:
@@ -65,12 +65,12 @@ def _setup_input_files(cwd: Path, request: pytest.FixtureRequest) -> None:
             assert (cwd / file["name"]).exists()
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_proc_with_running_localnet(proc_mock: ProcMock) -> None:
     proc_mock.set_output("docker compose ls --format json --filter name=algokit_sandbox*", [json.dumps([])])
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_proc_with_algod_running_state(proc_mock: ProcMock) -> None:
     proc_mock.set_output(
         cmd=["docker", "compose", "ps", "algod", "--format", "json"],

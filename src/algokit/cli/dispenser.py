@@ -54,7 +54,7 @@ NOT_AUTHENTICATED_MESSAGE = "Please login first by running `algokit dispenser lo
 
 def _handle_ci_token(output_mode: str, output_filename: str, token_data: dict) -> None:
     if output_mode == OutputMode.STDOUT.value:
-        click.echo(f'\n{DISPENSER_ACCESS_TOKEN_KEY} (valid for 30 days):\n\n{token_data["access_token"]}\n')
+        click.echo(f"\n{DISPENSER_ACCESS_TOKEN_KEY} (valid for 30 days):\n\n{token_data['access_token']}\n")
         logger.warning(
             "Your CI access token has been printed to stdout.\n"
             "Please ensure you keep this token safe!\n"

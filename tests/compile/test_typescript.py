@@ -4,9 +4,9 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from algokit.core.compilers.typescript import PUYATS_NPM_PACKAGE
 from pytest_mock import MockerFixture
 
+from algokit.core.compilers.typescript import PUYATS_NPM_PACKAGE
 from tests.compile.conftest import (
     INVALID_ALGORAND_TYPESCRIPT_CONTRACT_FILE_CONTENT,
     VALID_ALGORAND_TYPESCRIPT_CONTRACT_FILE_CONTENT,
@@ -42,7 +42,7 @@ def _command_name_scrubber(output: str) -> str:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_contract_path() -> Path:
     return Path(__file__).parent / "dummy_contract.py"
 
@@ -52,12 +52,12 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd", numbered=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def output_path(cwd: Path) -> Path:
     return cwd / "output"
 
 
-@pytest.fixture()
+@pytest.fixture
 def typescript_test_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     # Create a test directory
     test_dir = tmp_path_factory.mktemp("ts_test", numbered=True)

@@ -4,9 +4,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from algokit.cli.tasks.analyze import has_template_vars
 from pytest_mock import MockerFixture
 
+from algokit.cli.tasks.analyze import has_template_vars
 from tests.tasks.conftest import DUMMY_TEAL_FILE_CONTENT
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -52,7 +52,7 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Generator[Path, None, None]
         yield cwd
 
 
-@pytest.fixture()
+@pytest.fixture
 def generate_report_filename_mock() -> Generator[MagicMock, None, None]:
     with patch("algokit.cli.tasks.analyze.generate_report_filename", return_value="dummy_report.json") as mock:
         yield mock
