@@ -66,7 +66,7 @@ def test_mint_token_successful(
     # Act
     result = invoke(
         f"""task mint --creator {account} --name test --unit tst --total 1 --decimals 0
-        --image image.png -n {network} --{'mutable' if is_mutable else "immutable"} --nft""",
+        --image image.png -n {network} --{"mutable" if is_mutable else "immutable"} --nft""",
         input=prompt_input,
         cwd=cwd,
     )
@@ -75,9 +75,9 @@ def test_mint_token_successful(
     assert result.exit_code == 0
     if is_mutable:
         # Reserve value must be set since its a mutable asset
-        assert (
-            re.search(r'"reserve": ".{58}"', result.output) is not None
-        ), "Reserve key not found or addr length is not 58"
+        assert re.search(r'"reserve": ".{58}"', result.output) is not None, (
+            "Reserve key not found or addr length is not 58"
+        )
     else:
         assert re.search(r'"reserve": ""', result.output) is not None, "Reserve key must be empty"
     verify(result.output, options=NamerFactory.with_parameters(account_type, is_mutable, network))
@@ -131,7 +131,7 @@ def test_mint_token_successful_on_decimals(
     # Act
     result = invoke(
         f"""task mint --creator {account} --name test --unit tst --total 100
-        {'--decimals 2 ' if include_decimals_argument else ''}
+        {"--decimals 2 " if include_decimals_argument else ""}
         --image image.png -n localnet --mutable --nft""",
         input=prompt_input,
         cwd=cwd,

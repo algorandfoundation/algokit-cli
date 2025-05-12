@@ -81,7 +81,7 @@ def localnet_group(ctx: click.Context) -> None:
     required=False,
     default=False,
     type=click.BOOL,
-    help=("Skip confirmation prompts. " "Defaults to 'yes' to all prompts."),
+    help=("Skip confirmation prompts. Defaults to 'yes' to all prompts."),
 )
 def config_command(*, engine: str | None, force: bool) -> None:
     """Set the default container engine for use by AlgoKit CLI to run LocalNet images."""

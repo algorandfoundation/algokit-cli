@@ -119,8 +119,6 @@ lint.select = [
   "RUF",    # Ruff-specific rules
 ]
 lint.ignore = [
-  "ANN101", # no type for self
-  "ANN102", # no type for cls
   "RET505", # allow else after return
   "SIM108", # allow if-else in place of ternary
   # To avoid conflict with ruff formatter. More details on https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
