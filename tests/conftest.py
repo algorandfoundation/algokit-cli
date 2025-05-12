@@ -4,13 +4,11 @@ import logging
 import os
 import subprocess
 import typing
-from collections.abc import Callable, Sequence  # noqa: RUF100, TCH003
+from collections.abc import Callable, Sequence  # noqa: RUF100, TC003
 from pathlib import Path
 
 import pytest
 import questionary
-from algokit.core import questionary_extensions
-from algokit.core.project import get_project_configs, get_project_dir_names_from_workspace
 from approvaltests import Reporter, reporters, set_default_reporter
 from approvaltests.reporters.generic_diff_reporter_config import create_config
 from approvaltests.reporters.generic_diff_reporter_factory import GenericDiffReporter
@@ -19,11 +17,13 @@ from prompt_toolkit.input import PipeInput, create_pipe_input
 from prompt_toolkit.output import DummyOutput
 from pytest_mock import MockerFixture
 
+from algokit.core import questionary_extensions
+from algokit.core.project import get_project_configs, get_project_dir_names_from_workspace
 from tests.utils.app_dir_mock import AppDirs, tmp_app_dir
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.fixture()
+@pytest.fixture
 def proc_mock(mocker: MockerFixture) -> ProcMock:
     proc_mock = ProcMock()
     # add a default for docker compose version
@@ -59,12 +59,12 @@ def _mock_platform_system_marker(request: pytest.FixtureRequest, monkeypatch: py
         _do_platform_mock(platform_system=marker.args[0], monkeypatch=monkeypatch)
 
 
-@pytest.fixture()
+@pytest.fixture
 def app_dir_mock(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
     return tmp_app_dir(mocker, tmp_path)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_questionary_input() -> typing.Iterator[PipeInput]:
     with create_pipe_input() as pipe_input, create_app_session(input=pipe_input, output=DummyOutput()):
         yield pipe_input
@@ -174,7 +174,7 @@ else:
     set_default_reporter(reporters.FirstWorkingReporter(*default_reporters))
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None], None, None]:
     credentials: dict[str, str | None] = {}
 
@@ -198,7 +198,7 @@ def mock_keyring(mocker: MockerFixture) -> typing.Generator[dict[str, str | None
         credentials[key] = None
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_algokit_template_with_python_task(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     """
     Used in init approval tests and binary portability tests

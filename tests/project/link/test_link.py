@@ -4,16 +4,16 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.typed_client_generation import AppSpecsNotFoundError
 from pytest_mock import MockerFixture
 
+from algokit.core.typed_client_generation import AppSpecsNotFoundError
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
 
-@pytest.fixture()
+@pytest.fixture
 def which_mock(mocker: MockerFixture) -> WhichMock:
     """
     Fixture to mock 'shutil.which' with predefined responses.

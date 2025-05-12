@@ -1,8 +1,8 @@
 import pytest
-from algokit.core.tasks.ipfs import ALGOKIT_PINATA_TOKEN_KEY
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
+from algokit.core.tasks.ipfs import ALGOKIT_PINATA_TOKEN_KEY
 from tests.utils.approvals import TokenScrubber, verify
 from tests.utils.click_invoker import invoke
 

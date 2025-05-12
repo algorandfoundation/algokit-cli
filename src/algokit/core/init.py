@@ -68,13 +68,10 @@ def get_git_user_info(param: str) -> str | None:
 
 def is_valid_project_dir_name(value: str) -> bool:
     """Check if the project directory name for algokit project is valid."""
-
     algokit_project_names = get_project_dir_names_from_workspace()
     if value in algokit_project_names:
         return False
-    if not re.match(r"^[\w\-.]+$", value):
-        return False
-    return True
+    return bool(re.match(r"^[\w\-.]+$", value))
 
 
 def resolve_vscode_workspace_file(project_root: Path | None) -> Path | None:
@@ -124,7 +121,7 @@ def _load_vscode_workspace(workspace_path: Path) -> dict[str, Any]:
     with workspace_path.open(mode="r", encoding="utf-8") as f:
         data = json.load(f)
         assert isinstance(data, dict)
-        return cast(dict[str, Any], data)
+        return cast("dict[str, Any]", data)
 
 
 def _save_vscode_workspace(workspace_path: Path, workspace: dict) -> None:

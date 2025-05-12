@@ -3,10 +3,10 @@ from pathlib import Path
 
 import click
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
 
+from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock

@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 MAX_UNIT_NAME_BYTE_LENGTH = 8
 MAX_ASSET_NAME_BYTE_LENGTH = 32
-ASSET_MINTING_MBR = Decimal(0.2)  # Algos, 0.1 for base account, 0.1 for asset creation
+ASSET_MINTING_MBR = Decimal("0.2")  # Algos, 0.1 for base account, 0.1 for asset creation
 
 
 def _validate_supply(total: int, decimals: int) -> None:

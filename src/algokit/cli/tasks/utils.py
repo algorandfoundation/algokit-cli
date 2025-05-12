@@ -280,7 +280,7 @@ def validate_account_balance_to_opt_in(
     if not isinstance(account_info, dict):
         raise click.ClickException("Invalid account info response")
 
-    required_microalgos = num_assets * AlgoAmount.from_algo(Decimal(0.1)).micro_algo
+    required_microalgos = num_assets * AlgoAmount.from_algo(Decimal("0.1")).micro_algo
     available_microalgos = account_info.get("amount", 0)
     if available_microalgos < required_microalgos:
         required_algo = AlgoAmount.from_micro_algo(required_microalgos).algo
