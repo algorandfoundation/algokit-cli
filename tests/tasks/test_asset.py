@@ -65,7 +65,11 @@ def test_opt_in_of_assets_from_account_alias_successful(mocker: MockerFixture, m
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_account_address, "private_key": dummy_account_pk}
+        {
+            "alias": alias_name,
+            "address": dummy_account_address,
+            "private_key": dummy_account_pk,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
@@ -159,7 +163,11 @@ def test_opt_out_of_assets_from_account_alias_successful(mocker: MockerFixture, 
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_account_address, "private_key": dummy_account_pk}
+        {
+            "alias": alias_name,
+            "address": dummy_account_address,
+            "private_key": dummy_account_pk,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
