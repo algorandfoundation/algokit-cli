@@ -25,7 +25,11 @@ def test_sign_atomic_txn_group_successful(
     cwd = tmp_path_factory.mktemp("cwd")
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+        {
+            "alias": alias_name,
+            "address": DUMMY_ACCOUNT.address,
+            "private_key": DUMMY_ACCOUNT.private_key,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
     txn_a = _generate_dummy_txn(DUMMY_ACCOUNT.address)
@@ -47,7 +51,11 @@ def test_sign_from_stdin_with_alias_successful(mock_keyring: dict[str, str]) -> 
     # Arrange
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+        {
+            "alias": alias_name,
+            "address": DUMMY_ACCOUNT.address,
+            "private_key": DUMMY_ACCOUNT.private_key,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
     dummy_txn = _generate_dummy_txn(DUMMY_ACCOUNT.address)
@@ -84,7 +92,11 @@ def test_sign_many_from_file_with_alias_successful(
     cwd = tmp_path_factory.mktemp("cwd")
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+        {
+            "alias": alias_name,
+            "address": DUMMY_ACCOUNT.address,
+            "private_key": DUMMY_ACCOUNT.private_key,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
     _generate_dummy_txn(DUMMY_ACCOUNT.address)
