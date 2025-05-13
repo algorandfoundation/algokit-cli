@@ -114,4 +114,12 @@ def explore_command(network: str) -> None:
         except Exception as e:
             logger.warning(warning, exc_info=e)
     else:
-        click.launch(url)
+        try:
+            click.launch(url)
+        except Exception:
+            # https://github.com/pallets/click/issues/2868
+            try:
+                if not webbrowser.open(url):
+                    logger.warning(f"Failed to open browser. Please open this URL manually: {url}")
+            except Exception:
+                logger.warning(f"Failed to open browser. Please open this URL manually: {url}")
