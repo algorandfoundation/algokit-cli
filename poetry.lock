@@ -1158,18 +1158,18 @@ dev = ["build", "hypothesis", "pytest", "setuptools-scm"]
 
 [[package]]
 name = "keyring"
-version = "25.2.1"
+version = "25.6.0"
 description = "Store and access your passwords safely."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main", "dev"]
 files = [
-    {file = "keyring-25.2.1-py3-none-any.whl", hash = "sha256:2458681cdefc0dbc0b7eb6cf75d0b98e59f9ad9b2d4edd319d18f68bdca95e50"},
-    {file = "keyring-25.2.1.tar.gz", hash = "sha256:daaffd42dbda25ddafb1ad5fec4024e5bbcfe424597ca1ca452b299861e49f1b"},
+    {file = "keyring-25.6.0-py3-none-any.whl", hash = "sha256:552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd"},
+    {file = "keyring-25.6.0.tar.gz", hash = "sha256:0b39998aa941431eb3d9b0d4b2460bc773b9df6fed7621c2dfb291a7e0187a66"},
 ]
 
 [package.dependencies]
-importlib-metadata = {version = ">=4.11.4", markers = "python_version < \"3.12\""}
+importlib_metadata = {version = ">=4.11.4", markers = "python_version < \"3.12\""}
 "jaraco.classes" = "*"
 "jaraco.context" = "*"
 "jaraco.functools" = "*"
@@ -1178,9 +1178,13 @@ pywin32-ctypes = {version = ">=0.2.0", markers = "sys_platform == \"win32\""}
 SecretStorage = {version = ">=3.2", markers = "sys_platform == \"linux\""}
 
 [package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
 completion = ["shtab (>=1.1.0)"]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
+cover = ["pytest-cov"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+enabler = ["pytest-enabler (>=2.2)"]
+test = ["pyfakefs", "pytest (>=6,!=8.1.*)"]
+type = ["pygobject-stubs", "pytest-mypy", "shtab", "types-pywin32"]
 
 [[package]]
 name = "license-expression"
@@ -3385,4 +3389,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "6215fa6600786d8adf79e979d3ce410a343916526533aa80ff545407783aced0"
+content-hash = "78c4ee84fd46e555377a1f440f6f9a71e9a2bc24da2cc8a4e9c2f4b70489a645"

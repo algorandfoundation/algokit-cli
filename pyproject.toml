@@ -17,7 +17,7 @@ shellingham = "^1.5.4"
 tomli = { version = "^2.0.1", python = "<3.11" }
 python-dotenv = "^1.0.0"
 mslex = "^1.1.0"
-keyring = "25.2.1"
+keyring = "25.6.0"
 # pyjwt is locked to version ^2.10.1 because its explicitly
 # vendored from auth0 repo, to reduce depedency on auth0 package that caused many adhoc transitive dependency errors in cli
 # see header in src/algokit/core/_vendor/auth0/authentication/token_verifier.py
