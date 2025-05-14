@@ -119,4 +119,42 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 
 ```
 
+## Initializing Examples
+
+AlgoKit provides a collection of pre-built example projects that you can use to quickly start development. These examples demonstrate various use cases and best practices for Algorand development.
+
+### Using the Example Command
+
+You can initialize a new project from an example using the `algokit init example` command:
+
+```bash
+# List and select from available examples interactively
+algokit init example
+
+#List the available examples
+algokit init example -l/--list
+
+# Initialize a specific example directly
+algokit init example <example_id>
+```
+
+When run without an example ID, the command launches an interactive selector that displays available examples with their descriptions and categories. Examples are copied to a new directory in your current location, named after the example ID.
+
+### Available Examples
+
+Examples are organized in the AlgoKit templates repository and cover various use cases including:
+
+- Smart contract examples
+- dApp frontend examples
+- Full-stack applications
+- Integration samples
+
+Each example comes with all necessary files and configurations to get started immediately. After initialization, you can navigate to the example directory and begin development.
+
+### Exploring Example Code
+
+To explore what examples are available before initializing, you can run the interactive selector and browse through the options. Examples include a name and type to help you select the most appropriate one for your needs.
+
+After initializing an example, AlgoKit automatically attempts to open the project in your default IDE to help you quickly start exploring and modifying the code.
+
 For more details about the `AlgoKit init` command, please refer to the [AlgoKit CLI reference documentation](../cli/index.md#init).

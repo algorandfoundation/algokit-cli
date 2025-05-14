@@ -204,7 +204,6 @@ def _open_ide(project_path: Path, readme_path: Path | None = None, *, open_ide: 
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
 
 
-
 def _load_algokit_examples(examples_config_path: str) -> list[dict]:
     """
     Load and parse the examples from a YAML configuration file.

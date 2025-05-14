@@ -1,0 +1,3 @@
+Available examples:
+  react-vite - React Vite
+  python-smart-contract - Python Smart Contract

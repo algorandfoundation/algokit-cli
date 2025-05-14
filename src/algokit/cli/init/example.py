@@ -15,7 +15,8 @@ from algokit.core.init import (
 
 @click.command("example")
 @click.argument("example_id", required=False)
-def example_command(example_id: str) -> None:
+@click.option("-l", "--list", "list_examples", is_flag=True, help="List all available examples")
+def example_command(example_id: str, *, list_examples: bool) -> None:
     """Initialize a new project from an example template.
 
     Allows you to quickly create a new project by copying one of the official AlgoKit example templates.
@@ -24,6 +25,15 @@ def example_command(example_id: str) -> None:
 
     _manage_templates_repository()
 
+    examples_config_path = Path.home() / ALGOKIT_USER_DIR / ALGOKIT_TEMPLATES_DIR / "examples" / "examples.yml"
+
+    if list_examples:
+        examples = _load_algokit_examples(str(examples_config_path.absolute()))
+        click.echo("Available examples:")
+        for example in examples:
+            click.echo(f"  {example['id']} - {example.get('name', '')}")
+        return
+
     if not example_id:
         app = ExampleSelector()
         app.run()
@@ -31,7 +41,6 @@ def example_command(example_id: str) -> None:
         if not example_id:
             return
 
-    examples_config_path = Path.home() / ALGOKIT_USER_DIR / ALGOKIT_TEMPLATES_DIR / "examples" / "examples.yml"
     source_dir = Path.home() / ALGOKIT_USER_DIR / ALGOKIT_TEMPLATES_DIR / "examples" / example_id
     target_dir = Path.cwd() / example_id
 

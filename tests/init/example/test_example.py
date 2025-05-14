@@ -259,3 +259,32 @@ def test_example_command_tui_select_valid_but_source_missing(mocker: MockerFixtu
     mock_copytree.assert_not_called()
     mock_open_ide.assert_not_called()
     verify(result.output)
+
+
+def test_example_command_list_option(mocker: MockerFixture, cwd: Path) -> None:
+    """Test that the --list option displays all available examples."""
+
+    mock_copytree = mocker.patch("algokit.cli.init.example.shutil.copytree")
+    mock_open_ide = mocker.patch("algokit.cli.init.example._open_ide")
+
+    # Test with short flag
+    result = invoke(["init", "example", "-l"], cwd=cwd)
+
+    assert result.exit_code == 0
+    assert "Available examples:" in result.output
+    for example in MOCK_EXAMPLES:
+        assert f"  {example['id']} - {example.get('name', '')}" in result.output
+    mock_copytree.assert_not_called()
+    mock_open_ide.assert_not_called()
+    verify(result.output)
+
+    # Test with long flag
+    result = invoke(["init", "example", "--list"], cwd=cwd)
+
+    assert result.exit_code == 0
+    assert "Available examples:" in result.output
+    for example in MOCK_EXAMPLES:
+        assert f"  {example['id']} - {example.get('name', '')}" in result.output
+    mock_copytree.assert_not_called()
+    mock_open_ide.assert_not_called()
+    verify(result.output)

@@ -8,4 +8,5 @@ Usage: algokit init example [OPTIONS] [EXAMPLE_ID]
   copied to a new directory in your current location.
 
 Options:
+  -l, --list  List all available examples
   -h, --help  Show this message and exit.
