@@ -89,9 +89,14 @@
     - [--ide, --no-ide](#--ide---no-ide)
     - [--workspace, --no-workspace](#--workspace---no-workspace)
     - [-a, --answer  ](#-a---answer--)
+    - [example](#example)
+    - [Options](#options-13)
+    - [-l, --list](#-l---list)
+    - [Arguments](#arguments-9)
+    - [EXAMPLE_ID](#example_id)
   - [localnet](#localnet)
     - [codespace](#codespace)
-    - [Options](#options-13)
+    - [Options](#options-14)
     - [-m, --machine ](#-m---machine-)
     - [-a, --algod-port ](#-a---algod-port-)
     - [-i, --indexer-port ](#-i---indexer-port-)
@@ -101,22 +106,22 @@
     - [-t, --timeout ](#-t---timeout-)
     - [-f, --force](#-f---force-1)
     - [config](#config-1)
-    - [Options](#options-14)
+    - [Options](#options-15)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-10)
     - [ENGINE](#engine-1)
     - [console](#console)
     - [explore](#explore-1)
     - [logs](#logs)
-    - [Options](#options-15)
+    - [Options](#options-16)
     - [--follow, -f](#--follow--f)
     - [--tail ](#--tail-)
     - [reset](#reset)
-    - [Options](#options-16)
+    - [Options](#options-17)
     - [--update, --no-update](#--update---no-update)
     - [-P, --config-dir ](#-p---config-dir-)
     - [start](#start)
-    - [Options](#options-17)
+    - [Options](#options-18)
     - [-n, --name ](#-n---name--1)
     - [-P, --config-dir ](#-p---config-dir--1)
     - [-d, --dev, --no-dev](#-d---dev---no-dev)
@@ -125,54 +130,54 @@
     - [stop](#stop)
   - [project](#project)
     - [bootstrap](#bootstrap)
-    - [Options](#options-18)
-    - [--force](#--force-1)
     - [Options](#options-19)
+    - [--force](#--force-1)
+    - [Options](#options-20)
     - [--interactive, --no-ci, --non-interactive, --ci](#--interactive---no-ci---non-interactive---ci)
     - [-p, --project-name ](#-p---project-name-)
     - [-t, --type ](#-t---type-)
-    - [Options](#options-20)
-    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [Options](#options-21)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
+    - [Options](#options-22)
     - [--ci, --no-ci](#--ci---no-ci)
     - [deploy](#deploy)
-    - [Options](#options-22)
+    - [Options](#options-23)
     - [-C, -c, --command ](#-c--c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [-P, --path ](#-p---path-)
     - [--deployer ](#--deployer-)
     - [--dispenser ](#--dispenser-)
     - [-p, --project-name ](#-p---project-name--1)
-    - [Arguments](#arguments-10)
+    - [Arguments](#arguments-11)
     - [ENVIRONMENT_NAME](#environment_name)
     - [EXTRA_ARGS](#extra_args)
     - [link](#link)
-    - [Options](#options-23)
+    - [Options](#options-24)
     - [-p, --project-name ](#-p---project-name--2)
     - [-l, --language ](#-l---language--1)
     - [-a, --all](#-a---all)
     - [-f, --fail-fast](#-f---fail-fast)
     - [-v, --version ](#-v---version--2)
     - [list](#list)
-    - [Arguments](#arguments-11)
+    - [Arguments](#arguments-12)
     - [WORKSPACE_PATH](#workspace_path)
     - [run](#run)
   - [task](#task)
     - [analyze](#analyze)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-r, --recursive](#-r---recursive)
     - [--force](#--force-2)
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-12)
+    - [Arguments](#arguments-13)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [--creator ](#--creator-)
     - [--name ](#--name-)
     - [-u, --unit ](#-u---unit-)
@@ -184,37 +189,37 @@
     - [--mutable, --immutable](#--mutable---immutable)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-13)
+    - [Arguments](#arguments-14)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-28)
+    - [Options](#options-29)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-14)
+    - [Arguments](#arguments-15)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-29)
+    - [Options](#options-30)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-15)
+    - [Arguments](#arguments-16)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-30)
+    - [Options](#options-31)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-31)
+    - [Options](#options-32)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
     - [--force](#--force-3)
     - [transfer](#transfer)
-    - [Options](#options-32)
+    - [Options](#options-33)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -222,28 +227,28 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-33)
+    - [Options](#options-34)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force-3)
-    - [Arguments](#arguments-16)
+    - [Arguments](#arguments-17)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-34)
+    - [Options](#options-35)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-4)
-    - [Arguments](#arguments-17)
-    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-18)
-    - [ALIAS](#alias)
-    - [Options](#options-35)
-    - [-f, --force](#-f---force-5)
+    - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-19)
-    - [ALIAS](#alias-1)
+    - [ALIAS](#alias)
     - [Options](#options-36)
+    - [-f, --force](#-f---force-5)
+    - [Arguments](#arguments-20)
+    - [ALIAS](#alias-1)
+    - [Options](#options-37)
     - [-f, --force](#-f---force-6)
 
 # algokit
@@ -659,7 +664,7 @@ the new project is created in a standalone target directory. This is
 suitable for isolated projects or when workspace integration is unnecessary.
 
 ```shell
-algokit init [OPTIONS]
+algokit init [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### Options
@@ -713,6 +718,30 @@ Whether to prefer structuring standalone projects as part of a workspace. An Alg
 
 ### -a, --answer <key> <value>
 Answers key/value pairs to pass to the template.
+
+### example
+
+Initialize a new project from an example template.
+
+Allows you to quickly create a new project by copying one of the official AlgoKit example templates.
+If no example ID is provided, launches an interactive selector to choose from available examples.
+The example will be copied to a new directory in your current location.
+
+```shell
+algokit init example [OPTIONS] [EXAMPLE_ID]
+```
+
+### Options
+
+
+### -l, --list
+List all available examples
+
+### Arguments
+
+
+### EXAMPLE_ID
+Optional argument
 
 ## localnet
 

@@ -8,7 +8,7 @@ from algokit.cli.doctor import doctor_command
 from algokit.cli.explore import explore_command
 from algokit.cli.generate import generate_group
 from algokit.cli.goal import goal_command
-from algokit.cli.init import init_command
+from algokit.cli.init import init_group
 from algokit.cli.localnet import localnet_group
 from algokit.cli.project import project_group
 from algokit.cli.project.bootstrap import bootstrap_group
@@ -60,7 +60,7 @@ algokit.add_command(config_group)
 algokit.add_command(doctor_command)
 algokit.add_command(explore_command)
 algokit.add_command(goal_command)
-algokit.add_command(init_command)
+algokit.add_command(init_group)
 algokit.add_command(localnet_group)
 algokit.add_command(generate_group)
 algokit.add_command(dispenser_group)
