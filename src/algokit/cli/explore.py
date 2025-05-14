@@ -99,10 +99,11 @@ def get_explore_url(network: str) -> str:
 def explore_command(network: str) -> None:
     url = get_explore_url(network)
     logger.info(f"Opening {network} explorer in your default browser")
+    logger.info(f"URL: {url}")
+
+    import webbrowser
 
     if is_wsl():
-        import webbrowser
-
         warning = (
             "Unable to open browser from WSL environment.\n"
             "Ensure 'wslu' is installed: (https://wslutiliti.es/wslu/install.html),\n"
@@ -111,7 +112,13 @@ def explore_command(network: str) -> None:
         try:
             if not webbrowser.open(url):
                 logger.warning(warning)
-        except Exception as e:
-            logger.warning(warning, exc_info=e)
+        except Exception:
+            logger.warning(warning)
     else:
-        click.launch(url)
+        # https://github.com/pallets/click/issues/2868 restore click.launch once bug is fixed
+        try:
+            if not webbrowser.open(url):
+                logger.warning(f"Failed to open browser. Please open this URL manually: {url}")
+        except Exception as e:
+            logger.debug("Error opening browser", exc_info=e)
+            logger.warning(f"Failed to open browser. Please open this URL manually: {url}")
