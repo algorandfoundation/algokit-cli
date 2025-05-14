@@ -181,7 +181,11 @@ class TestListAliases:
             {"alias": "test_alias_1", "address": "test_address_1", "private_key": None},
         )
         mock_keyring["test_alias_2"] = json.dumps(
-            {"alias": "test_alias_2", "address": "test_address_2", "private_key": "blabla"}
+            {
+                "alias": "test_alias_2",
+                "address": "test_address_2",
+                "private_key": "blabla",
+            }
         )
         mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps(["test_alias_1", "test_alias_2"])
 
@@ -255,7 +259,11 @@ class TestResetAliases:
             {"alias": "test_alias_1", "address": "test_address_1", "private_key": None},
         )
         mock_keyring["test_alias_2"] = json.dumps(
-            {"alias": "test_alias_2", "address": "test_address_2", "private_key": "blabla"}
+            {
+                "alias": "test_alias_2",
+                "address": "test_address_2",
+                "private_key": "blabla",
+            }
         )
         mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps(["test_alias_1", "test_alias_2"])
 

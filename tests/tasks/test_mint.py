@@ -38,7 +38,11 @@ def test_mint_token_successful(
     else:
         account = "my_alias"
         mock_keyring[account] = json.dumps(
-            {"alias": account, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+            {
+                "alias": account,
+                "address": DUMMY_ACCOUNT.address,
+                "private_key": DUMMY_ACCOUNT.private_key,
+            }
         )
         mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([account])
     (cwd / "image.png").touch()
@@ -66,7 +70,7 @@ def test_mint_token_successful(
     # Act
     result = invoke(
         f"""task mint --creator {account} --name test --unit tst --total 1 --decimals 0
-        --image image.png -n {network} --{'mutable' if is_mutable else "immutable"} --nft""",
+        --image image.png -n {network} --{"mutable" if is_mutable else "immutable"} --nft""",
         input=prompt_input,
         cwd=cwd,
     )
@@ -102,7 +106,11 @@ def test_mint_token_successful_on_decimals(
 
     account = "my_alias"
     mock_keyring[account] = json.dumps(
-        {"alias": account, "address": DUMMY_ACCOUNT.address, "private_key": DUMMY_ACCOUNT.private_key}
+        {
+            "alias": account,
+            "address": DUMMY_ACCOUNT.address,
+            "private_key": DUMMY_ACCOUNT.private_key,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([account])
 
@@ -131,7 +139,7 @@ def test_mint_token_successful_on_decimals(
     # Act
     result = invoke(
         f"""task mint --creator {account} --name test --unit tst --total 100
-        {'--decimals 2 ' if include_decimals_argument else ''}
+        {"--decimals 2 " if include_decimals_argument else ""}
         --image image.png -n localnet --mutable --nft""",
         input=prompt_input,
         cwd=cwd,

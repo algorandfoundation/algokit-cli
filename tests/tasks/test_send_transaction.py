@@ -63,7 +63,7 @@ def test_send_from_transaction_successful(mocker: MockerFixture) -> None:
     mocker.patch("algokit.cli.tasks.send_transaction.load_algod_client", return_value=algod_mock)
 
     # Act
-    result = invoke(f"task send --transaction {_generate_dummy_signed_txn( encode=True)}")
+    result = invoke(f"task send --transaction {_generate_dummy_signed_txn(encode=True)}")
 
     # Assert
     assert result.exit_code == 0
