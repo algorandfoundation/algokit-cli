@@ -1,4 +1,5 @@
 Opening localnet explorer in your default browser
+URL: https://explore.algokit.io/localnet
 ----
 launch args:
 ----
