@@ -2,6 +2,20 @@
 
 <!--next-version-placeholder-->
 
+## v2.7.0 (2025-05-15)
+
+### Feature
+
+* Add algokit init example command ([`70ed744`](https://github.com/algorandfoundation/algokit-cli/commit/70ed744574a8689374b3396c224c636966848e47))
+* Added the choose example selector ([`da5cc9e`](https://github.com/algorandfoundation/algokit-cli/commit/da5cc9e538dae458230a0ff78ff3ab7671777ddb))
+* Adding new init command structure with example subcommand ([`3fb110a`](https://github.com/algorandfoundation/algokit-cli/commit/3fb110afa867a65d67aeb605a3a5c23f651d278f))
+
+### Fix
+
+* Add fallback for browser opening in explore command ([`71088cf`](https://github.com/algorandfoundation/algokit-cli/commit/71088cf031c6575c7368f60ad2d2ea20311fe1cd))
+* Add fallback for browser opening in explore command ([`d1be606`](https://github.com/algorandfoundation/algokit-cli/commit/d1be606cc252affb5de0516c9c973ab176b574b8))
+* Compile ts hangs when puya-ts is detected but not installed in the project ([#628](https://github.com/algorandfoundation/algokit-cli/issues/628)) ([`f3cd199`](https://github.com/algorandfoundation/algokit-cli/commit/f3cd19967068e4310eaae5acbf85d8ec445e5181))
+
 ## v2.6.2 (2025-03-28)
 
 ### Fix
