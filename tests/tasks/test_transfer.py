@@ -127,7 +127,11 @@ def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_sender_address, "private_key": dummy_sender_pk}
+        {
+            "alias": alias_name,
+            "address": dummy_sender_address,
+            "private_key": dummy_sender_pk,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
@@ -193,7 +197,11 @@ def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, 
 
     dummy_receiver_alias = "dummy_receiver_alias"
     mock_keyring[dummy_receiver_alias] = json.dumps(
-        {"alias": dummy_receiver_alias, "address": dummy_sender_address, "private_key": None}
+        {
+            "alias": dummy_receiver_alias,
+            "address": dummy_sender_address,
+            "private_key": None,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([dummy_receiver_alias])
 
@@ -229,7 +237,11 @@ def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyrin
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_sender_address, "private_key": dummy_sender_pk}
+        {
+            "alias": alias_name,
+            "address": dummy_sender_address,
+            "private_key": dummy_sender_pk,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
@@ -258,7 +270,11 @@ def test_transfer_failed(mocker: MockerFixture, mock_keyring: dict[str, str]) ->
 
     alias_name = "dummy_alias"
     mock_keyring[alias_name] = json.dumps(
-        {"alias": alias_name, "address": dummy_sender_address, "private_key": dummy_sender_pk}
+        {
+            "alias": alias_name,
+            "address": dummy_sender_address,
+            "private_key": dummy_sender_pk,
+        }
     )
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
