@@ -202,7 +202,7 @@ class ComposeSandbox:
             bad_return_code_error_message="Failed to start LocalNet",
         )
         logger.debug("AlgoKit LocalNet started, waiting for health check")
-        if _wait_for_algod():
+        if _wait_for_algod() and _wait_for_indexer():
             logger.info("Started; execute `algokit explore` to explore LocalNet in a web user interface.")
         else:
             logger.warning("AlgoKit LocalNet failed to return a successful health check")
@@ -305,32 +305,61 @@ DEFAULT_INDEXER_TOKEN = "a" * 64
 DEFAULT_ALGOD_PORT = 4001
 DEFAULT_INDEXER_PORT = 8980
 DEFAULT_WAIT_FOR_ALGOD = 60
+DEFAULT_WAIT_FOR_INDEXER = 60
 DEFAULT_HEALTH_TIMEOUT = 1
 ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
+INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
 CONDUIT_IMAGE = "algorand/conduit:latest"
 
 
-def _wait_for_algod() -> bool:
-    end_time = time.time() + DEFAULT_WAIT_FOR_ALGOD
+def _wait_for_service(
+    url: str,
+    token: str,
+    header_name: str,
+    service_name: str,
+    timeout: int = DEFAULT_WAIT_FOR_ALGOD,
+) -> bool:
+    """Generic function to wait for a service to become ready via health check."""
+    end_time = time.time() + timeout
     last_exception: httpx.RequestError | None = None
     while time.time() < end_time:
         try:
-            health = httpx.get(
-                ALGOD_HEALTH_URL, timeout=DEFAULT_HEALTH_TIMEOUT, headers={"X-Algo-API-Token": DEFAULT_ALGOD_TOKEN}
-            )
+            health = httpx.get(url, timeout=DEFAULT_HEALTH_TIMEOUT, headers={header_name: token})
         except httpx.RequestError as ex:
             last_exception = ex
         else:
             if health.is_success:
-                logger.debug("AlgoKit LocalNet health check successful, algod is ready")
+                logger.debug(f"AlgoKit LocalNet health check successful, {service_name} is ready")
                 return True
             logger.debug(f"AlgoKit LocalNet health check returned {health.status_code}, waiting")
         time.sleep(DEFAULT_HEALTH_TIMEOUT)
     if last_exception:
-        logger.debug("AlgoKit LocalNet health request failed", exc_info=last_exception)
+        logger.debug(f"AlgoKit LocalNet health request failed for {service_name}", exc_info=last_exception)
     return False
+
+
+def _wait_for_algod() -> bool:
+    """Wait for algod service to become ready."""
+    return _wait_for_service(
+        ALGOD_HEALTH_URL,
+        DEFAULT_ALGOD_TOKEN,
+        "X-Algo-API-Token",
+        "algod",
+        DEFAULT_WAIT_FOR_ALGOD,
+    )
+
+
+def _wait_for_indexer() -> bool:
+    """Wait for indexer service to become ready."""
+    return _wait_for_service(
+        INDEXER_HEALTH_URL,
+        DEFAULT_INDEXER_TOKEN,
+        "X-Indexer-API-Token",
+        "indexer",
+        DEFAULT_WAIT_FOR_INDEXER,
+    )
 
 
 def get_config_json() -> str:
