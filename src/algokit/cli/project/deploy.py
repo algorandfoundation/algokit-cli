@@ -191,7 +191,7 @@ class _DeployCommand(click.Command):
     "-c",
     type=_CommandParamType(),
     default=None,
-    help=("Custom deploy command. If not provided, will load the deploy command " "from .algokit.toml file."),
+    help=("Custom deploy command. If not provided, will load the deploy command from .algokit.toml file."),
     required=False,
 )
 @click.option(
@@ -309,7 +309,7 @@ def deploy_command(  # noqa: PLR0913
                 continue
 
             _execute_deploy_command(
-                path=project.get("cwd", None),
+                path=project.get("cwd", Path.cwd()),
                 environment_name=environment_name,
                 command=None,
                 interactive=interactive,

@@ -4,13 +4,13 @@ from pathlib import Path
 
 import click
 import pytest
-from algokit.cli.tasks.mint import _get_and_validate_asset_name, _get_and_validate_decimals
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
 
+from algokit.cli.tasks.mint import _get_and_validate_asset_name, _get_and_validate_decimals
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.tasks.conftest import DUMMY_ACCOUNT, DUMMY_SUGGESTED_PARAMS
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
@@ -79,9 +79,9 @@ def test_mint_token_successful(
     assert result.exit_code == 0
     if is_mutable:
         # Reserve value must be set since its a mutable asset
-        assert (
-            re.search(r'"reserve": ".{58}"', result.output) is not None
-        ), "Reserve key not found or addr length is not 58"
+        assert re.search(r'"reserve": ".{58}"', result.output) is not None, (
+            "Reserve key not found or addr length is not 58"
+        )
     else:
         assert re.search(r'"reserve": ""', result.output) is not None, "Reserve key must be empty"
     verify(result.output, options=NamerFactory.with_parameters(account_type, is_mutable, network))

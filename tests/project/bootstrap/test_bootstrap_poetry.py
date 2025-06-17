@@ -22,7 +22,7 @@ def python_base_executable() -> str:
     return value
 
 
-@pytest.fixture()
+@pytest.fixture
 def system_python_paths(request: FixtureRequest, mocker: MockerFixture) -> MagicMock:
     python_names: list[str] = getattr(request, "param", [])
 
