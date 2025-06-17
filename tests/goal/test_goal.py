@@ -5,6 +5,7 @@ from subprocess import CompletedProcess
 import pytest
 from algokit.core.sandbox import (
     ALGOD_HEALTH_URL,
+    INDEXER_HEALTH_URL,
     get_algod_network_template,
     get_config_json,
     get_docker_compose_yml,
@@ -28,6 +29,7 @@ def _normalize_output(output: str) -> str:
 @pytest.fixture()
 def _health_success(httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=ALGOD_HEALTH_URL)
+    httpx_mock.add_response(url=INDEXER_HEALTH_URL)
 
 
 @pytest.fixture()
