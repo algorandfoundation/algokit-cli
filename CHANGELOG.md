@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.7.1 (2025-06-19)
+
+### Fix
+
+* Adds health check for indexer ([#653](https://github.com/algorandfoundation/algokit-cli/issues/653)) ([`ceed902`](https://github.com/algorandfoundation/algokit-cli/commit/ceed902315770a8af68219e1eca52a37d4af7cf2))
+
 ## v2.7.0 (2025-05-15)
 
 ### Feature
