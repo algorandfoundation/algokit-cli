@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 @click.group("localnet", short_help="Manage the AlgoKit LocalNet.")
 @click.pass_context
 def localnet_group(ctx: click.Context) -> None:
-    if ctx.invoked_subcommand and "codespace" in ctx.invoked_subcommand or not ctx.invoked_subcommand:
+    if (ctx.invoked_subcommand and "codespace" in ctx.invoked_subcommand) or not ctx.invoked_subcommand:
         return
 
     try:
@@ -81,7 +81,7 @@ def localnet_group(ctx: click.Context) -> None:
     required=False,
     default=False,
     type=click.BOOL,
-    help=("Skip confirmation prompts. " "Defaults to 'yes' to all prompts."),
+    help=("Skip confirmation prompts. Defaults to 'yes' to all prompts."),
 )
 def config_command(*, engine: str | None, force: bool) -> None:
     """Set the default container engine for use by AlgoKit CLI to run LocalNet images."""

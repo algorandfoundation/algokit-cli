@@ -3,8 +3,8 @@ import re
 from pathlib import Path
 
 import pytest
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 

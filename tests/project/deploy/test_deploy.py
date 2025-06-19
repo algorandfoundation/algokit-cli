@@ -4,14 +4,14 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.cli.common.utils import sanitize_extra_args
-from algokit.core.conf import ALGOKIT_CONFIG
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk.account import generate_account
 from algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 
+from algokit.cli.common.utils import sanitize_extra_args
+from algokit.core.conf import ALGOKIT_CONFIG
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock

@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from approvaltests.pytest.py_test_namer import PyTestNamer
 
+from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 

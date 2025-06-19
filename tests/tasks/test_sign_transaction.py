@@ -2,9 +2,9 @@ import json
 
 import click
 import pytest
-from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from algosdk import encoding, mnemonic, transaction
 
+from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.tasks.conftest import DUMMY_ACCOUNT, DUMMY_SUGGESTED_PARAMS
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke

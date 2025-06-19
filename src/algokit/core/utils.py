@@ -262,7 +262,7 @@ def resolve_command_path(
     raise click.ClickException(f"Failed to resolve command path, '{cmd}' wasn't found")
 
 
-def load_env_file(path: Path) -> dict[str, str | None]:
+def load_env_file(path: Path | None) -> dict[str, str | None]:
     """Load the general .env configuration.
 
     Args:
@@ -271,16 +271,13 @@ def load_env_file(path: Path) -> dict[str, str | None]:
     Returns:
         dict[str, str | None]: Dictionary with .env configurations.
     """
+    if path is None:
+        return {}
 
-    # Check if the path is a file, if yes, use it directly
-    if path.is_file():
-        env_path = path
-    else:
-        # Assume the default .env file name in the given directory
-        env_path = path / ".env"
-
-    if env_path.exists():
+    env_path = path if path.is_file() else path / ".env"
+    if env_path.is_file():
         return dotenv.dotenv_values(env_path, verbose=True)
+
     return {}
 
 

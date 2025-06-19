@@ -10,7 +10,7 @@ from tests.utils.proc_mock import ProcMock
 from tests.utils.which_mock import WhichMock
 
 
-@pytest.fixture()
+@pytest.fixture
 def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock = WhichMock()
     mocker.patch("algokit.core.utils.shutil.which").side_effect = which_mock.which

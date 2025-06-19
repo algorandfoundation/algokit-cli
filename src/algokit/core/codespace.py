@@ -160,7 +160,7 @@ def install_github_cli_via_webi() -> None:
     """
     Installs `gh` using the `webi.sh` script.
     """
-    response = httpx.get(f'https://webi.{"ms" if is_windows() else "sh"}/gh')
+    response = httpx.get(f"https://webi.{'ms' if is_windows() else 'sh'}/gh")
     response.raise_for_status()
 
     script_extension = "ps1" if is_windows() else "sh"

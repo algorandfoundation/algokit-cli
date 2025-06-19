@@ -21,7 +21,7 @@ def _normalize_path(path: Path) -> str:
     return str(path.absolute()).replace("\\", r"\\")
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_contract_path() -> Path:
     return Path(__file__).parent / "dummy_contract.py"
 
@@ -31,7 +31,7 @@ def cwd(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return tmp_path_factory.mktemp("cwd", numbered=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 def output_path(cwd: Path) -> Path:
     return cwd / "output"
 

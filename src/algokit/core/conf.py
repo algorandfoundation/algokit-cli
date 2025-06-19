@@ -9,7 +9,7 @@ from pathlib import Path
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    import tomli as tomllib
+    import tomli as tomllib  # type: ignore[import-not-found]
 
 PACKAGE_NAME = "algokit"
 ALGOKIT_CONFIG = ".algokit.toml"
@@ -74,7 +74,7 @@ def get_algokit_config(*, project_dir: Path | None = None, verbose_validation: b
         logger.debug(f"Unexpected error reading {ALGOKIT_CONFIG} file: {ex}", exc_info=True)
         return None
     try:
-        return tomllib.loads(config_text)
+        return tomllib.loads(config_text)  # type: ignore[no-any-return]
     except Exception as ex:
         if verbose_validation:
             logger.warning(f"{ALGOKIT_CONFIG} file at {project_dir} is not valid toml! Skipping...", exc_info=True)

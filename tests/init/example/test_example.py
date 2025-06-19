@@ -37,7 +37,7 @@ def get_mock_examples_config_path(home_path: Path) -> Path:
 
 
 @pytest.fixture(autouse=True)
-def _setup_mocks(mocker: MockerFixture, tmp_path: Path) -> MagicMock:  # noqa: PT005
+def _setup_mocks(mocker: MockerFixture, tmp_path: Path) -> MagicMock:
     """Sets up mocks for dependencies used by the example command."""
     mock_home = mocker.patch("pathlib.Path.home", return_value=tmp_path)
 
@@ -95,7 +95,7 @@ def _setup_mocks(mocker: MockerFixture, tmp_path: Path) -> MagicMock:  # noqa: P
     return mock_example_selector_instance
 
 
-@pytest.fixture()
+@pytest.fixture
 def cwd(tmp_path: Path) -> Path:
     """Provides the temporary working directory for tests."""
     # Use a sub-directory within tmp_path to avoid conflicts with mocked home

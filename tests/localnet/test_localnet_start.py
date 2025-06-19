@@ -2,6 +2,9 @@ import json
 
 import httpx
 import pytest
+from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
+
 from algokit.core.sandbox import (
     ALGOD_HEALTH_URL,
     ALGORAND_IMAGE,
@@ -11,9 +14,6 @@ from algokit.core.sandbox import (
     get_docker_compose_yml,
     get_proxy_config,
 )
-from pytest_httpx import HTTPXMock
-from pytest_mock import MockerFixture
-
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
 from tests.utils.approvals import verify
@@ -21,7 +21,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.fixture()
+@pytest.fixture
 def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     arg = "{{range .RepoDigests}}{{println .}}{{end}}"
     proc_mock.set_output(
@@ -49,7 +49,7 @@ def _localnet_out_of_date(proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def _localnet_img_check_cmd_error(
     proc_mock: ProcMock,
     httpx_mock: HTTPXMock,

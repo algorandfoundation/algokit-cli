@@ -7,7 +7,6 @@ from algokit.core.sandbox import (
     get_docker_compose_yml,
     get_proxy_config,
 )
-
 from tests.utils.approvals import verify
 
 

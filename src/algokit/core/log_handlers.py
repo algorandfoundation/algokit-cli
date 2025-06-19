@@ -11,12 +11,12 @@ from click.globals import resolve_color_default
 from .conf import get_app_state_dir
 
 __all__ = [
-    "initialise_logging",
-    "color_option",
-    "verbose_option",
-    "uncaught_exception_logging_handler",
     "EXTRA_EXCLUDE_FROM_CONSOLE",
     "EXTRA_EXCLUDE_FROM_LOGFILE",
+    "color_option",
+    "initialise_logging",
+    "uncaught_exception_logging_handler",
+    "verbose_option",
 ]
 
 
