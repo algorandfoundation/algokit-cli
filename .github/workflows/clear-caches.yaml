@@ -1,0 +1,30 @@
+name: Clear Repository Caches
+
+on:
+  schedule:
+    # Run every 5 days at 2 AM UTC
+    - cron: "0 2 */5 * *"
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  actions: write
+
+jobs:
+  clear-caches:
+    name: Clear Repository Caches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clear all repository caches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🧹 Starting cache cleanup process..."
+          if gh cache delete --all --succeed-on-no-caches; then
+            echo "🎉 Cache cleanup completed!"
+          else
+            echo "❌ Failed to clear caches"
+            exit 1
+          fi
