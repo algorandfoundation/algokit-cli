@@ -45,10 +45,18 @@ jobs:
     outputs:
       release_version: ${{ steps.get_release_version.outputs.RELEASE_VERSION }}
     steps:
+      - name: Generate bot token
+        uses: actions/create-github-app-token@v1
+        id: app_token
+        with:
+          app-id: ${{ secrets.BOT_ID }}
+          private-key: ${{ secrets.BOT_SK }}
+
       - uses: actions/checkout@v4
         with:
           # Fetch entire repository history so we can determine version number from it
           fetch-depth: 0
+          token: ${{ steps.app_token.outputs.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -67,7 +75,7 @@ jobs:
         id: get_branch
 
       - name: Set Git user as GitHub actions
-        run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+        run: git config --global user.email "179917785+engineering-ci[bot]@users.noreply.github.com" && git config --global user.name "engineering-ci[bot]"
 
       - name: Create Continuous Deployment - Feature Branch
         if: steps.get_branch.outputs.branch != 'main' && inputs.production_release != 'true'
@@ -83,7 +91,7 @@ jobs:
           gh release edit --prerelease $release_version_tag
           echo "RELEASE_VERSION=${release_version_tag:1}" >> $GITHUB_ENV
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
           REPOSITORY_USERNAME: __token__
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
@@ -99,7 +107,7 @@ jobs:
           gh release edit --prerelease "v$release_version"
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
           REPOSITORY_USERNAME: __token__
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 
@@ -116,7 +124,7 @@ jobs:
           release_version="$(poetry run semantic-release print-version --current)"
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
           REPOSITORY_USERNAME: __token__
           REPOSITORY_PASSWORD: ${{ secrets.PYPI_API_KEY }}
 

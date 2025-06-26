@@ -79,7 +79,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Set Git user as GitHub actions
-        run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+        run: git config --global user.email "179917785+engineering-ci[bot]@users.noreply.github.com" && git config --global user.name "engineering-ci[bot]"
 
       - name: Update homebrew cask
         run: scripts/update-brew-cask.sh "dist/algokit*-py3-none-any.whl" "dist/algokit*-macos_arm64-brew.tar.gz" "dist/algokit*-macos_x64-brew.tar.gz" "algorandfoundation/homebrew-tap"
