@@ -2907,20 +2907,20 @@ test = ["cython", "filelock", "html5lib", "pytest (>=4.6)"]
 
 [[package]]
 name = "sphinx-click"
-version = "4.4.0"
+version = "6.0.0"
 description = "Sphinx extension that automatically documents click applications"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "sphinx-click-4.4.0.tar.gz", hash = "sha256:cc67692bd28f482c7f01531c61b64e9d2f069bfcf3d24cbbb51d4a84a749fa48"},
-    {file = "sphinx_click-4.4.0-py3-none-any.whl", hash = "sha256:2821c10a68fc9ee6ce7c92fad26540d8d8c8f45e6d7258f0e4fb7529ae8fab49"},
+    {file = "sphinx_click-6.0.0-py3-none-any.whl", hash = "sha256:1e0a3c83bcb7c55497751b19d07ebe56b5d7b85eb76dd399cf9061b497adc317"},
+    {file = "sphinx_click-6.0.0.tar.gz", hash = "sha256:f5d664321dc0c6622ff019f1e1c84e58ce0cecfddeb510e004cf60c2a3ab465b"},
 ]
 
 [package.dependencies]
-click = ">=7.0"
+click = ">=8.0"
 docutils = "*"
-sphinx = ">=2.0"
+sphinx = ">=4.0"
 
 [[package]]
 name = "sphinxcontrib-applehelp"
@@ -3393,4 +3393,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "37a92fb6b2a31fa8fc408b00db35f2641a8ccdbbf6d7889e16e8561884529457"
+content-hash = "621ccaa22c67b3a07df08a7e5c167c848ec5275146bcf04ad3007e75ef2db1c8"
