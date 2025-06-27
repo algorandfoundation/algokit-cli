@@ -103,12 +103,6 @@ cask "$package_name" do
   homepage "$homepage"
 
   binary "#{staged_path}/#{token}"
-
-  postflight do
-    set_permissions "#{staged_path}/#{token}", "0755"
-  end
-
-  uninstall delete: "/usr/local/bin/#{token}"
 end
 EOF
 
