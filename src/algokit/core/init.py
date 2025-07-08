@@ -4,6 +4,7 @@ import shutil
 import subprocess
 from logging import getLogger
 from pathlib import Path
+from subprocess import check_output
 from typing import Any, NoReturn, cast
 
 import click
@@ -56,8 +57,6 @@ def populate_default_answers(worker: Worker) -> None:
 
 def get_git_user_info(param: str) -> str | None:
     """Get git user info from the system. Returns None if git is not available."""
-
-    from subprocess import check_output
 
     if not shutil.which("git"):
         return None

@@ -125,7 +125,7 @@ def _set_verbose(_ctx: click.Context, _param: click.Option, value: bool) -> None
         raise RuntimeError(f"Couldn't locate required logger named {CONSOLE_LOG_HANDLER_NAME}")
 
 
-def _set_force_styles_to(ctx: click.Context, _param: click.Option, value: bool | None) -> None:
+def _set_force_styles_to(ctx: click.Context, _param: click.Option, value: bool | None) -> None:  # noqa: FBT001
     if value is not None:
         ctx.color = value
 

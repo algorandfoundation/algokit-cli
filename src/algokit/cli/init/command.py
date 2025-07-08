@@ -513,7 +513,7 @@ def _get_template_interactive() -> TemplateSource:
     return TemplateSource(url=template_url)
 
 
-def _should_attempt_git_init(use_git_option: bool | None, project_path: Path) -> bool:
+def _should_attempt_git_init(*, use_git_option: bool | None, project_path: Path) -> bool:
     if use_git_option is False:
         return False
     try:

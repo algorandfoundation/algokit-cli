@@ -43,6 +43,9 @@ class BlessedTemplateSource(TemplateSource):
             return NotImplemented
         return self.description == other.description and self.url == other.url
 
+    def __hash__(self) -> int:
+        return hash((self.description, self.url))
+
 
 # Please note, the main reason why below is a function is due to the need to patch the values in unit/approval tests
 def _get_blessed_templates() -> dict[TemplateKey, BlessedTemplateSource]:
