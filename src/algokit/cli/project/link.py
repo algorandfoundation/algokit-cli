@@ -90,6 +90,7 @@ def _link_projects(
         generator.generate_all(
             contract_project_root,
             output_path_pattern,
+            None,  # no additional args for project link
             raise_on_path_resolution_failure=fail_fast,
         )
     except AppSpecsNotFoundError:

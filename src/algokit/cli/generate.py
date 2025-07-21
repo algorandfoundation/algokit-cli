@@ -106,10 +106,17 @@ def generate_group() -> None:
     """Generate code for an Algorand project."""
 
 
-@generate_group.command("client")
+@generate_group.command(
+    "client",
+    context_settings={
+        "ignore_unknown_options": True,
+    },
+    add_help_option=False,
+)
 @click.argument(
     "app_spec_path_or_dir",
-    type=click.Path(exists=True, dir_okay=True, resolve_path=True, path_type=Path),
+    type=click.Path(dir_okay=True, resolve_path=True, path_type=Path),
+    required=False,
 )
 @click.option(
     "output_path_pattern",
@@ -138,13 +145,20 @@ def generate_group() -> None:
     "If a version is specified, AlgoKit checks if an installed version matches and runs the installed version. "
     "Otherwise, AlgoKit runs the specified version.",
 )
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def generate_client(
-    output_path_pattern: str | None, app_spec_path_or_dir: Path, language: str | None, version: str | None
+    app_spec_path_or_dir: Path | None,
+    output_path_pattern: str | None,
+    language: str | None,
+    version: str | None,
+    args: tuple[str, ...],
 ) -> None:
     """Create a typed ApplicationClient from an ARC-32/56 application.json
 
     Supply the path to an application specification file or a directory to recursively search
     for "application.json" files"""
+
+    generator = None
     if language is not None:
         generator = ClientGenerator.create_for_language(language, version)
     elif output_path_pattern is not None:
@@ -156,16 +170,41 @@ def generate_client(
                 "Could not determine language from file extension, Please use the --language option to specify a "
                 "target language"
             ) from ex
+
+    help_in_args = any(_is_help_flag(arg) for arg in args)
+    help_in_positional = app_spec_path_or_dir is not None and _is_help_flag(app_spec_path_or_dir)
+
+    if help_in_positional:
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+    elif generator:
+        if help_in_args:
+            generator.show_help()
+            return
+
+        if app_spec_path_or_dir is None:
+            raise click.ClickException("Missing argument 'APP_SPEC_PATH_OR_DIR'.")
+
+        try:
+            generator.generate_all(
+                app_spec_path_or_dir,
+                output_path_pattern,
+                list(args),
+                raise_on_path_resolution_failure=False,
+            )
+        except AppSpecsNotFoundError as ex:
+            raise click.ClickException("No app specs found") from ex
     else:
         raise click.ClickException(
             "One of --language or --output is required to determine the client language to generate"
         )
 
-    try:
-        generator.generate_all(
-            app_spec_path_or_dir,
-            output_path_pattern,
-            raise_on_path_resolution_failure=False,
-        )
-    except AppSpecsNotFoundError as ex:
-        raise click.ClickException("No app specs found") from ex
+
+HELP_FLAGS = ("--help", "-h")
+
+
+def _is_help_flag(value: str | Path) -> bool:
+    """Check if a value is a help flag (--help or -h)."""
+    if isinstance(value, Path):
+        return any(str(value).endswith(flag) for flag in HELP_FLAGS)
+    return value in HELP_FLAGS
