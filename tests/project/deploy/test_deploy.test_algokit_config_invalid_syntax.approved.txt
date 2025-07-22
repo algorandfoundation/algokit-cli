@@ -1,3 +1,5 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: Poetry (version 2.1.3)
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: Error parsing .algokit.toml file: Invalid statement (at line 1, column 1)
 DEBUG: Deploying from project directory: {current_working_directory}

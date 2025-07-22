@@ -2,5 +2,7 @@ DEBUG: 1234.56.78 found in cache {app_state}/last-version-check
 HTTP Request: GET https://api.github.com/repos/algorandfoundation/algokit-cli/releases/latest "HTTP/1.1 200 OK"
 DEBUG: Latest version tag: v{new_version}
 You are using AlgoKit version {current_version}, however version {new_version} is available. Please update using the tool used to install AlgoKit.
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: Poetry (version 2.1.3)
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
