@@ -231,8 +231,8 @@ command = "command_b"
 
     result = invoke(["project", "deploy", "localnet"], cwd=cwd)
 
-    assert proc_mock.called[0].env
-    passed_env_vars = proc_mock.called[0].env
+    assert proc_mock.called[1].env
+    passed_env_vars = proc_mock.called[1].env
 
     assert passed_env_vars["ENV_A"] == "ENVIRON_ENV_A"  # os.environ is highest loading priority
     assert passed_env_vars["ENV_B"] == "LOCALNET_ENV_B"  # then .env.{name}
@@ -263,8 +263,8 @@ ENV_A=GENERIC_ENV_A
     result = invoke(["project", "deploy"], cwd=cwd)
 
     assert result.exit_code == 0
-    assert proc_mock.called[0].env
-    passed_env_vars = proc_mock.called[0].env
+    assert proc_mock.called[1].env
+    passed_env_vars = proc_mock.called[1].env
 
     assert passed_env_vars["ENV_A"] == "GENERIC_ENV_A"
 
@@ -368,8 +368,8 @@ environment_secrets = [
     assert result.exit_code == 0  # ensure success
 
     # assert that entered value is passed to proc run
-    assert proc_mock.called[0].env
-    called_env = proc_mock.called[0].env
+    assert proc_mock.called[1].env
+    called_env = proc_mock.called[1].env
     assert "DEPLOYER_MNEMONIC" in called_env
     assert called_env["DEPLOYER_MNEMONIC"] == "secret_value"
 
@@ -463,8 +463,8 @@ environment_secrets = [
     which_mock.add("command_a")
     result = invoke(["project", "deploy", f"--{alias}", alias], cwd=cwd)
 
-    assert proc_mock.called[0].env
-    passed_env_vars = proc_mock.called[0].env
+    assert proc_mock.called[1].env
+    passed_env_vars = proc_mock.called[1].env
 
     assert passed_env_vars[env_var_name] == from_private_key(dummy_account_pk)  # type: ignore[no-untyped-call]
 
@@ -488,7 +488,7 @@ command = "command_a"
     result = invoke(["project", "deploy", "--", *extra_args], cwd=cwd)
 
     assert result.exit_code == 0
-    assert proc_mock.called[0].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
+    assert proc_mock.called[1].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
     verify(result.output)
 
 
@@ -506,5 +506,5 @@ def test_deploy_with_extra_args_and_custom_command(
     result = invoke(["project", "deploy", "localnet", "--command", custom_command, "--", *extra_args], cwd=cwd)
 
     assert result.exit_code == 0
-    assert proc_mock.called[0].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
+    assert proc_mock.called[1].command == [cmd_resolved, *sanitize_extra_args(extra_args)]
     verify(result.output)

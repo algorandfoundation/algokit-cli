@@ -1,3 +1,6 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Installing npm dependencies
