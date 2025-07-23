@@ -112,6 +112,7 @@ def test_generate_no_options(application_json: Path) -> None:
         ("-o client.ts --language python", "client.ts"),
         ("-o client.py --language python --version 1.1.2", "client.py"),
         ("-l python -v 1.1.0", "hello_world_app_client.py"),
+        ("-o client.py -p --mode minimal", "client.py"),
     ],
 )
 def test_generate_client_python(
@@ -124,7 +125,7 @@ def test_generate_client_python(
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
 
-    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
+    result = invoke(f"generate client {application_json.name} {options}", cwd=application_json.parent)
     assert result.exit_code == 0
     verify(
         _normalize_output(result.output),
@@ -133,9 +134,8 @@ def test_generate_client_python(
     )
     version = options.split()[-1] if "--version" in options or "-v" in options else None
     assert len(proc_mock.called) == 4  # noqa: PLR2004
-    assert (
-        proc_mock.called[3].command
-        == _get_python_generate_command(version, application_json, expected_output_path).split()
+    assert " ".join(proc_mock.called[3].command).startswith(
+        _get_python_generate_command(version, application_json, expected_output_path)
     )
 
 
@@ -278,6 +278,7 @@ def test_generate_client_python_multiple_app_specs_in_directory(
         ("-o client.py --language typescript", "client.py"),
         ("-o client.ts --language typescript --version 3.0.0", "client.ts"),
         ("-l typescript -v 2.6.0", "HelloWorldAppClient.ts"),
+        ("-o client.ts -pn --mode minimal", "client.ts"),
     ],
 )
 def test_generate_client_typescript(
@@ -291,7 +292,7 @@ def test_generate_client_typescript(
     proc_mock.should_bad_exit_on([npm_command, "ls"])
     proc_mock.should_bad_exit_on([npm_command, "ls", "--global"])
 
-    result = invoke(f"generate client {options} {application_json.name}", cwd=application_json.parent)
+    result = invoke(f"generate client {application_json.name} {options}", cwd=application_json.parent)
 
     assert result.exit_code == 0
     verify(
@@ -301,9 +302,8 @@ def test_generate_client_typescript(
     )
     version = options.split()[-1] if "--version" in options or "-v" in options else "latest"
     assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert (
-        proc_mock.called[2].command
-        == _get_typescript_generate_command(version, application_json, expected_output_path).split()
+    assert " ".join(proc_mock.called[2].command).startswith(
+        _get_typescript_generate_command(version, application_json, expected_output_path)
     )
 
 

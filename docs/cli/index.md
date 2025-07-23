@@ -70,6 +70,7 @@
     - [-v, --version ](#-v---version--1)
     - [Arguments](#arguments-7)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
+    - [ARGS](#args)
   - [goal](#goal)
     - [Options](#options-11)
     - [--console](#--console)
@@ -588,7 +589,7 @@ Supply the path to an application specification file or a directory to recursive
 for "application.json" files
 
 ```shell
-algokit generate client [OPTIONS] APP_SPEC_PATH_OR_DIR
+algokit generate client [OPTIONS] [APP_SPEC_PATH_OR_DIR] [ARGS]...
 ```
 
 ### Options
@@ -615,7 +616,11 @@ The client generator version to pin to, for example, 1.0.0. If no version is spe
 
 
 ### APP_SPEC_PATH_OR_DIR
-Required argument
+Optional argument
+
+
+### ARGS
+Optional argument(s)
 
 ## goal
 

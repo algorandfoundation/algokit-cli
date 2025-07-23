@@ -95,7 +95,10 @@ class ClientGenerator(abc.ABC):
         return (output_path, app_spec_type)
 
     @abc.abstractmethod
-    def generate(self, app_spec: Path, output: Path) -> None: ...
+    def generate(self, app_spec: Path, output: Path, args: list[str] | None = None) -> None: ...
+
+    @abc.abstractmethod
+    def show_help(self) -> None: ...
 
     @property
     @abc.abstractmethod
@@ -111,6 +114,7 @@ class ClientGenerator(abc.ABC):
         self,
         app_spec_path_or_dir: Path,
         output_path_pattern: str | None,
+        args: list[str] | None,
         *,
         raise_on_path_resolution_failure: bool,
     ) -> None:
@@ -142,11 +146,11 @@ class ClientGenerator(abc.ABC):
 
         items_to_generate: dict[Path, tuple[Path, AppSpecType]] = reduce(accumulate_items_to_generate, app_specs, {})
         for output_path, (app_spec, _) in items_to_generate.items():
-            self.generate(app_spec, output_path)
+            self.generate(app_spec, output_path, args)
 
 
 class PythonClientGenerator(ClientGenerator, language="python", extension=".py"):
-    def generate(self, app_spec: Path, output: Path) -> None:
+    def generate(self, app_spec: Path, output: Path, args: list[str] | None = None) -> None:
         logger.info(f"Generating Python client code for application specified in {app_spec} and writing to {output}")
         cmd = [
             *self.command,
@@ -155,6 +159,9 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
             "-o",
             str(output),
         ]
+        if args:
+            cmd.extend(args)
+
         run_result = proc.run(cmd)
         click.echo(run_result.output)
 
@@ -164,6 +171,39 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
                 err=True,
                 fg="red",
             )
+            raise click.exceptions.Exit(run_result.exit_code)
+
+    def show_help(self) -> None:
+        """Show help for the Python client generator."""
+        cmd = [*self.command, "--help"]
+        run_result = proc.run(cmd)
+
+        # Filter out unwanted lines from the help output
+        filtered_lines = []
+        skip_next_lines = False
+
+        for line in run_result.output.splitlines():
+            # Skip usage line
+            if "usage: algokitgen-py" in line:
+                continue
+
+            # Start skipping when we encounter the -a option
+            if "-a APP_SPEC" in line:
+                skip_next_lines = True
+                continue
+
+            # If we're skipping and encounter a line that starts a new option (starts with a dash), stop skipping
+            if skip_next_lines:
+                is_new_option = line.lstrip().startswith("-")
+                if is_new_option:
+                    skip_next_lines = False
+                else:
+                    continue
+
+            filtered_lines.append(line)
+
+        click.echo("\n".join(filtered_lines))
+        if run_result.exit_code != 0:
             raise click.exceptions.Exit(run_result.exit_code)
 
     @property
@@ -257,8 +297,11 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
 
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):
-    def generate(self, app_spec: Path, output: Path) -> None:
+    def generate(self, app_spec: Path, output: Path, args: list[str] | None = None) -> None:
         cmd = [*self.command, "generate", "-a", str(app_spec), "-o", str(output)]
+        if args:
+            cmd.extend(args)
+
         logger.info(
             f"Generating TypeScript client code for application specified in {app_spec} and writing to {output}"
         )
@@ -271,6 +314,21 @@ class TypeScriptClientGenerator(ClientGenerator, language="typescript", extensio
                 err=True,
                 fg="red",
             )
+            raise click.exceptions.Exit(run_result.exit_code)
+
+    def show_help(self) -> None:
+        """Show help for the TypeScript client generator."""
+        cmd = [*self.command, "generate", "--help"]
+        run_result = proc.run(cmd)
+
+        # Filter out unwanted lines from the help output
+        filtered_lines = []
+        for line in run_result.output.splitlines():
+            if "-a" not in line and "Usage: algokitgen" not in line:
+                filtered_lines.append(line)
+
+        click.echo("\n".join(filtered_lines))
+        if run_result.exit_code != 0:
             raise click.exceptions.Exit(run_result.exit_code)
 
     def find_project_generate_command(
