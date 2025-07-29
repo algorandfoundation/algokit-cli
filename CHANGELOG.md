@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v2.8.0 (2025-07-29)
+
+### Feature
+
+* Replace GITHUB_TOKEN with engineering-ci bot token in release workflows ([`4070cb0`](https://github.com/algorandfoundation/algokit-cli/commit/4070cb013b9af77fc4ae66cbb6edb8de7c431ce2))
+
+### Fix
+
+* Update the brew cask to not require sudo on install ([`a82f74b`](https://github.com/algorandfoundation/algokit-cli/commit/a82f74ba90d3ab61ddba98356ed512579d158e38))
+* Bust cache by tweaking the poetry lock ([#662](https://github.com/algorandfoundation/algokit-cli/issues/662)) ([`a137989`](https://github.com/algorandfoundation/algokit-cli/commit/a137989f1d679ed47e6219998f488bbf5571a74c))
+
 ## v2.7.1 (2025-06-19)
 
 ### Fix
