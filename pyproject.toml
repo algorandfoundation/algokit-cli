@@ -8,9 +8,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
-click = "8.1.8" # TODO: 8.2.0 upgrade requires refinements in click_invoker.py due to breaking changes
+click = "8.2.1" # TODO: 8.2.0 upgrade requires refinements in click_invoker.py due to breaking changes
 httpx = ">=0.23.1,<=0.28.1"
-copier = "9.7.1"
+copier = "9.8.0"
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.4"
