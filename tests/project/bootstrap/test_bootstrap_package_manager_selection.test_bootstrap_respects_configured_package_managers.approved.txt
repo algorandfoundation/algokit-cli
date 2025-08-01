@@ -24,5 +24,6 @@ DEBUG: Running 'pnpm install' in '{current_working_directory}'
 pnpm: STDOUT
 pnpm: STDERR
 DEBUG: Skipping {current_working_directory}/package.json
+DEBUG: Skipping {current_working_directory}/pnpm-lock.yaml
 DEBUG: Skipping {current_working_directory}/pyproject.toml
 Finished bootstrapping {current_working_directory}

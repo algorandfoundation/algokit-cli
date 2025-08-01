@@ -19,6 +19,7 @@ def test_bootstrap_respects_configured_package_managers(
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "pyproject.toml").write_text('[project]\nname = "test"\nversion = "0.1.0"')
     (cwd / "package.json").touch()
+    (cwd / "pnpm-lock.yaml").touch()  # Required for CI mode
 
     # Mock user preferences
     mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="uv")
