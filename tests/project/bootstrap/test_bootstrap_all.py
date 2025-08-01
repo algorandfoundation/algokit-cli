@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.pytest.py_test_namer import PyTestNamer
+from pytest_mock import MockerFixture
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from tests.utils.approvals import verify
@@ -96,7 +97,10 @@ def test_bootstrap_all_env(tmp_path_factory: TempPathFactory) -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory) -> None:
+def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    # Mock global preference to use Poetry for this test
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "poetry.toml").touch()
 
@@ -110,7 +114,12 @@ def test_bootstrap_all_poetry(tmp_path_factory: TempPathFactory) -> None:
 
 
 @pytest.mark.usefixtures("mock_platform_system", "proc_mock")
-def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest) -> None:
+def test_bootstrap_all_npm(
+    tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mocker: MockerFixture
+) -> None:
+    # Mock global preference to use npm for this test
+    mocker.patch("algokit.core.project.bootstrap.get_js_package_manager", return_value="npm")
+
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "package.json").touch()
 
@@ -124,7 +133,10 @@ def test_bootstrap_all_npm(tmp_path_factory: TempPathFactory, request: pytest.Fi
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory) -> None:
+def test_bootstrap_all_poetry_via_pyproject(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    # Mock global preference to use Poetry for this test
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "pyproject.toml").write_text("[tool.poetry]", encoding="utf-8")
 
@@ -161,7 +173,10 @@ def test_bootstrap_all_skip_dirs(tmp_path_factory: TempPathFactory) -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory) -> None:
+def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    # Mock global preference to use Poetry for this test
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+
     cwd = tmp_path_factory.mktemp("cwd")
     (cwd / "empty_dir").mkdir()
     (cwd / "live_dir").mkdir()
@@ -178,7 +193,10 @@ def test_bootstrap_all_sub_dir(tmp_path_factory: TempPathFactory) -> None:
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_bootstrap_all_projects_name_filter(tmp_path_factory: TempPathFactory) -> None:
+def test_bootstrap_all_projects_name_filter(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    # Mock global preference to use Poetry for this test
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+
     cwd = tmp_path_factory.mktemp("cwd")
     _setup_workspace(cwd)
     _setup_standalone_project(cwd, "project_1", "contract")
@@ -198,7 +216,11 @@ def test_bootstrap_all_projects_name_filter_not_found(tmp_path_factory: TempPath
 
 
 @pytest.mark.usefixtures("proc_mock")
-def test_bootstrap_all_projects_type_filter(tmp_path_factory: TempPathFactory) -> None:
+def test_bootstrap_all_projects_type_filter(tmp_path_factory: TempPathFactory, mocker: MockerFixture) -> None:
+    # Mock global preferences for this test
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+    mocker.patch("algokit.core.project.bootstrap.get_js_package_manager", return_value="npm")
+
     cwd = tmp_path_factory.mktemp("cwd")
     _setup_workspace(cwd)
     _setup_standalone_project(cwd, "project_1", "contract")

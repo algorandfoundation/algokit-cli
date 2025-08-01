@@ -1,0 +1,4 @@
+Usage: algokit config js-package-manager [OPTIONS] [[npm|pnpm]]
+Try 'algokit config js-package-manager -h' for help.
+
+Error: Invalid value for '[[npm|pnpm]]': 'invalid' is not one of <JSPackageManager.NPM: 'npm'>, <JSPackageManager.PNPM: 'pnpm'>.

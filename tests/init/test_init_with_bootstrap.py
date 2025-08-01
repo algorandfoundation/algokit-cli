@@ -5,6 +5,7 @@ import click
 from _pytest.tmpdir import TempPathFactory
 from approvaltests.scrubbers.scrubbers import Scrubber
 from prompt_toolkit.input import PipeInput
+from pytest_mock import MockerFixture
 
 from algokit.core.conf import ALGOKIT_CONFIG, get_current_package_version
 from tests.utils.approvals import TokenScrubber, combine_scrubbers, verify
@@ -40,8 +41,13 @@ def make_output_scrubber(*extra_scrubbers: Callable[[str], str], **extra_tokens:
 
 
 def test_init_bootstrap_broken_poetry(
-    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput, proc_mock: ProcMock
+    tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput, proc_mock: ProcMock, mocker: MockerFixture
 ) -> None:
+    # Mock global preference to use Poetry for this test
+    mocker.patch("algokit.core.config_commands.py_package_manager.get_py_package_manager", return_value="poetry")
+    # Also mock the bootstrap function directly to ensure it uses Poetry
+    mocker.patch("algokit.core.project.bootstrap.get_py_package_manager", return_value="poetry")
+
     proc_mock.should_bad_exit_on("poetry --version")
     cwd = tmp_path_factory.mktemp("cwd")
     app_name = "myapp"

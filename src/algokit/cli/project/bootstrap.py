@@ -9,7 +9,9 @@ from algokit.core.project.bootstrap import (
     bootstrap_any_including_subdirs,
     bootstrap_env,
     bootstrap_npm,
+    bootstrap_pnpm,
     bootstrap_poetry,
+    bootstrap_uv,
     project_minimum_algokit_version_check,
 )
 
@@ -100,6 +102,15 @@ def poetry() -> None:
 
 
 @bootstrap_group.command(
+    "uv",
+    short_help="Installs UV (if not present) and runs `uv sync` in the "
+    "current working directory to install Python dependencies.",
+)
+def uv() -> None:
+    bootstrap_uv(Path.cwd())
+
+
+@bootstrap_group.command(
     "npm", short_help="Runs `npm install` in the current working directory to install Node.js dependencies."
 )
 @click.option(
@@ -110,3 +121,17 @@ def poetry() -> None:
 )
 def npm(*, ci: bool) -> None:
     bootstrap_npm(Path.cwd(), ci_mode=ci)
+
+
+@bootstrap_group.command(
+    "pnpm", short_help="Runs `pnpm install` in the current working directory to install Node.js dependencies."
+)
+@click.option(
+    "--ci/--no-ci",
+    is_flag=True,
+    default=lambda: "CI" in os.environ,
+    help="Run 'pnpm install --frozen-lockfile' instead of 'pnpm install' in \
+    CI mode (clean install with frozen lockfile).",
+)
+def pnpm(*, ci: bool) -> None:
+    bootstrap_pnpm(Path.cwd(), ci_mode=ci)

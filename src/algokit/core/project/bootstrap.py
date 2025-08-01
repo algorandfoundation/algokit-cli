@@ -3,10 +3,21 @@ import os
 from pathlib import Path
 
 import click
+import questionary
 from packaging import version
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
+from algokit.core.config_commands.js_package_manager import (
+    JSPackageManager,
+    get_js_package_manager,
+    save_js_package_manager,
+)
+from algokit.core.config_commands.py_package_manager import (
+    PyPackageManager,
+    get_py_package_manager,
+    save_py_package_manager,
+)
 from algokit.core.utils import find_valid_pipx_command, is_windows
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
@@ -14,24 +25,167 @@ MAX_BOOTSTRAP_DEPTH = 2
 logger = logging.getLogger(__name__)
 
 
-def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
+def _has_pyproject_toml(project_dir: Path) -> bool:
+    return (project_dir / "pyproject.toml").exists()
+
+
+def _get_py_package_manager_override(project_dir: Path) -> str | None:
+    """Get Python package manager override from .algokit.toml configuration."""
+    algokit_config = get_algokit_config(project_dir=project_dir)
+    if algokit_config and "package_manager" in algokit_config and "python" in algokit_config["package_manager"]:
+        manager = algokit_config["package_manager"]["python"]
+        logger.debug(f"Using Python package manager from .algokit.toml: {manager}")
+        return str(manager)
+    return None
+
+
+def _get_js_package_manager_override(project_dir: Path) -> str | None:
+    """Get JavaScript package manager override from .algokit.toml configuration."""
+    algokit_config = get_algokit_config(project_dir=project_dir)
+    if algokit_config and "package_manager" in algokit_config and "javascript" in algokit_config["package_manager"]:
+        manager = algokit_config["package_manager"]["javascript"]
+        logger.debug(f"Using JavaScript package manager from .algokit.toml: {manager}")
+        return str(manager)
+    return None
+
+
+def is_uv_project(project_dir: Path) -> bool:
+    uv_path = project_dir / "uv.lock"
+    return uv_path.exists()
+
+
+def _has_python_project(project_dir: Path) -> bool:
+    """Check if the directory contains a Python project."""
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
-    package_json_path = project_dir / "package.json"
+    return poetry_path.exists() or pyproject_path.exists()
+
+
+def _has_javascript_project(project_dir: Path) -> bool:
+    """Check if the directory contains a JavaScript project."""
+    return (project_dir / "package.json").exists()
+
+
+def _determine_python_package_manager(project_dir: Path) -> str:
+    """
+    Determine Python package manager with proper precedence:
+    1. Project override (.algokit.toml) - Explicit project configuration
+    2. User preference (algokit config) - User's explicit choice
+    3. Smart defaults (project structure) - Only when no preference exists
+    4. Interactive prompt - First-time user experience
+    """
+
+    # 1. Project-specific override (highest priority)
+    override = _get_py_package_manager_override(project_dir)
+    if override:
+        return override
+
+    # 2. User's global preference (respects user's explicit choice)
+    user_preference = get_py_package_manager()
+    if user_preference:
+        return user_preference
+
+    # 3. Smart defaults based on project structure (only when no user preference)
+    poetry_path = project_dir / "poetry.toml"
+    pyproject_path = project_dir / "pyproject.toml"
+
+    if poetry_path.exists():
+        # Standalone poetry.toml suggests Poetry
+        return PyPackageManager.POETRY
+
+    if pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8"):
+        # pyproject.toml with [tool.poetry] section suggests Poetry
+        return PyPackageManager.POETRY
+
+    # 4. Interactive prompt for first-time users
+    manager = questionary.select(
+        "Which Python package manager would you prefer `bootstrap` command to use?",
+        choices=[PyPackageManager.POETRY, PyPackageManager.UV],
+    ).ask()
+    if manager is None:
+        # Default to Poetry if user cancels
+        manager = PyPackageManager.POETRY
+    save_py_package_manager(manager)
+    return str(manager)
+
+
+def _determine_javascript_package_manager(project_dir: Path) -> str:
+    """
+    Determine JavaScript package manager with proper precedence:
+    1. Project override (.algokit.toml) - Explicit project configuration
+    2. User preference (algokit config) - User's explicit choice
+    3. Smart defaults (lock files) - Only when no preference exists
+    4. Interactive prompt - First-time user experience
+    """
+
+    # 1. Project-specific override (highest priority)
+    override = _get_js_package_manager_override(project_dir)
+    if override:
+        return override
+
+    # 2. User's global preference (respects user's explicit choice)
+    user_preference = get_js_package_manager()
+    if user_preference:
+        return user_preference
+
+    # 3. Smart defaults based on lock files (only when no user preference)
+    if (project_dir / "pnpm-lock.yaml").exists():
+        return JSPackageManager.PNPM
+
+    if (project_dir / "package-lock.json").exists():
+        return JSPackageManager.NPM
+
+    # 4. Interactive prompt for first-time users
+    manager = questionary_extensions.prompt_select(
+        "Which JavaScript package manager would you prefer `bootstrap` command to use?",
+        *[questionary.Choice(title=npm.value, value=npm) for npm in JSPackageManager],
+    )
+    if manager is None:
+        # Default to NPM if user cancels
+        manager = JSPackageManager.NPM
+    save_js_package_manager(manager)
+    return str(manager)
+
+
+def _bootstrap_python_project(project_dir: Path, manager: str) -> None:
+    """Bootstrap a Python project with the specified package manager."""
+    if manager == PyPackageManager.UV:
+        logger.debug("Running `algokit project bootstrap uv`")
+        bootstrap_uv(project_dir)
+    else:  # Default to Poetry for backward compatibility
+        logger.debug("Running `algokit project bootstrap poetry`")
+        bootstrap_poetry(project_dir)
+
+
+def _bootstrap_javascript_project(project_dir: Path, manager: str, *, ci_mode: bool) -> None:
+    """Bootstrap a JavaScript project with the specified package manager."""
+    if manager == JSPackageManager.NPM:
+        logger.debug("Running `algokit project bootstrap npm`")
+        bootstrap_npm(project_dir, ci_mode=ci_mode)
+    elif manager == JSPackageManager.PNPM:
+        logger.debug("Running `algokit project bootstrap pnpm`")
+        bootstrap_pnpm(project_dir, ci_mode=ci_mode)
+
+
+def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
+    """Bootstrap a project with elegant package manager selection."""
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
+    # Environment files
     if next(project_dir.glob(ENV_TEMPLATE_PATTERN), None):
         logger.debug("Running `algokit project bootstrap env`")
         bootstrap_env(project_dir, ci_mode=ci_mode)
 
-    if poetry_path.exists() or (pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")):
-        logger.debug("Running `algokit project bootstrap poetry`")
-        bootstrap_poetry(project_dir)
+    # Python projects
+    if _has_python_project(project_dir):
+        manager = _determine_python_package_manager(project_dir)
+        _bootstrap_python_project(project_dir, manager)
 
-    if package_json_path.exists():
-        logger.debug("Running `algokit project bootstrap npm`")
-        bootstrap_npm(project_dir, ci_mode=ci_mode)
+    # JavaScript projects
+    if _has_javascript_project(project_dir):
+        manager = _determine_javascript_package_manager(project_dir)
+        _bootstrap_javascript_project(project_dir, manager, ci_mode=ci_mode)
 
 
 def bootstrap_any_including_subdirs(  # noqa: PLR0913
@@ -202,6 +356,134 @@ def bootstrap_npm(project_dir: Path, *, ci_mode: bool) -> None:
             raise click.ClickException(
                 f"Failed to run `{' '.join(cmd)}` for {package_json_path}. Is npm installed and available on PATH?"
             ) from e
+
+
+def bootstrap_pnpm(project_dir: Path, *, ci_mode: bool) -> None:
+    def get_install_command(*, ci_mode: bool) -> list[str]:
+        has_package_lock = (project_dir / "pnpm-lock.yaml").exists()
+        if ci_mode and not has_package_lock:
+            raise click.ClickException(
+                "Cannot run `pnpm install --frozen-lockfile` because `pnpm-lock.yaml` is missing. "
+                "Please run `pnpm install` instead and commit it to your source control."
+            )
+        cmd = "install --frozen-lockfile" if ci_mode else "install"
+        return [cmd]
+
+    package_json_path = project_dir / "package.json"
+    if not package_json_path.exists():
+        logger.info(f"{package_json_path} doesn't exist; nothing to do here, skipping bootstrap of pnpm")
+    else:
+        logger.info("Installing pnpm dependencies")
+        cmd = ["pnpm" if not is_windows() else "pnpm.cmd", *get_install_command(ci_mode=ci_mode)]
+        try:
+            proc.run(cmd, stdout_log_level=logging.INFO, cwd=project_dir)
+        except OSError as e:
+            raise click.ClickException(
+                f"Failed to run `{' '.join(cmd)}` for {package_json_path}. Is pnpm installed and available on PATH?"
+            ) from e
+
+
+def migrate_pyproject_to_uv(project_dir: Path) -> None:
+    pyproject_path = project_dir / "pyproject.toml"
+    if not pyproject_path.exists():
+        raise click.ClickException("pyproject.toml doesn't exist; nothing to do here, skipping migration")
+    try:
+        proc.run(["uvx", "migrate-to-uv"], cwd=project_dir, stdout_log_level=logging.INFO)
+    except OSError as e:
+        raise click.ClickException(
+            "Failed to run `uvx migrate-to-uv` for pyproject.toml. Is uv installed and available on PATH?"
+        ) from e
+
+
+def bootstrap_uv(project_dir: Path) -> None:  # noqa: C901, PLR0912
+    try:
+        proc.run(
+            ["uv", "--version"],
+            bad_return_code_error_message="uv --version failed, please check your uv install",
+        )
+        try_install_uv = False
+    except OSError:
+        try_install_uv = True
+
+    if try_install_uv:
+        logger.info("UV not found; attempting to install it...")
+        if not questionary_extensions.prompt_confirm(
+            "We couldn't find `uv`; can we install it for you via curl so we can install Python dependencies?",
+            default=True,
+        ):
+            raise click.ClickException(
+                "Unable to install uv; please install uv "
+                "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
+            )
+
+        # Use the standalone installer as recommended in the UV docs
+        if is_windows():
+            cmd = ["powershell", "-ExecutionPolicy", "ByPass", "-c", "irm https://astral.sh/uv/install.ps1 | iex"]
+            try:
+                proc.run(
+                    cmd,
+                    bad_return_code_error_message=(
+                        "Unable to install uv; please install uv "
+                        "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
+                    ),
+                )
+            except Exception as e:
+                raise click.ClickException(
+                    "Failed to install uv. Please install it manually via "
+                    "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
+                ) from e
+        else:
+            # For Unix platforms, we need to use subprocess directly to handle the pipe
+            import subprocess
+
+            try:
+                result = subprocess.run(
+                    "curl -LsSf https://astral.sh/uv/install.sh | sh",
+                    shell=True,
+                    check=False,  # Handle the check ourselves to provide a better error message
+                )
+                if result.returncode != 0:
+                    raise click.ClickException(
+                        "Unable to install uv; please install uv "
+                        "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
+                    )
+            except subprocess.SubprocessError as e:
+                raise click.ClickException(
+                    "Failed to install uv. Please install it manually via "
+                    "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
+                ) from e
+
+    # Check if pyproject.toml contains poetry configuration
+    pyproject_path = project_dir / "pyproject.toml"
+    is_poetry_project = pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")
+    if is_poetry_project:
+        if questionary_extensions.prompt_confirm(
+            "Would you like to attempt to migrate the pyproject configuration to uv compliant format?\n"
+            "⚠️  This will run a third-party tool (https://mkniewallner.github.io/migrate-to-uv/) "
+            "that will attempt to convert your poetry project to uv. "
+            "You are advised to double check the migrated file and it's recommended to run this "
+            "in a version controlled repository to revert changes if needed.",
+            default=False,
+        ):
+            migrate_pyproject_to_uv(project_dir)
+        else:
+            raise click.ClickException(
+                "This project is configured to use Poetry. Please use `algokit project bootstrap poetry`, "
+                "set poetry as default package manager via `algokit config py-package-manager`, "
+                "or modify your pyproject.toml to be compatible with UV."
+            )
+
+    logger.info("Installing Python dependencies and setting up Python virtual environment via UV")
+    try:
+        # Sync will create/update the virtual environment and install dependencies
+        proc.run(["uv", "sync"], stdout_log_level=logging.INFO, cwd=project_dir)
+    except OSError as e:
+        if try_install_uv:
+            raise click.ClickException(
+                "Unable to access UV on PATH after installing it; "
+                "try restarting your terminal and running `algokit project bootstrap uv` again."
+            ) from e
+        raise  # unexpected error, we already ran without IOError before
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:
