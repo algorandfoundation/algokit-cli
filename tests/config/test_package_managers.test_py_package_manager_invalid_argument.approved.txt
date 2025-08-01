@@ -1,0 +1,4 @@
+Usage: algokit config py-package-manager [OPTIONS] [[poetry|uv]]
+Try 'algokit config py-package-manager -h' for help.
+
+Error: Invalid value for '[[poetry|uv]]': 'invalid' is not one of <PyPackageManager.POETRY: 'poetry'>, <PyPackageManager.UV: 'uv'>.

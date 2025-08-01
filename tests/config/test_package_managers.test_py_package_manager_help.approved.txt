@@ -1,0 +1,6 @@
+Usage: algokit config py-package-manager [OPTIONS] [[poetry|uv]]
+
+  Set the default Python package manager for use by AlgoKit CLI.
+
+Options:
+  -h, --help  Show this message and exit.

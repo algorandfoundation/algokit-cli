@@ -6,11 +6,40 @@ This is useful to allow for expedited initial setup for each developer e.g. when
 
 It can bootstrap one or all of the following (with other options potentially being added in the future):
 
-- Python Poetry projects - Installs Poetry via pipx if its not present and then runs `poetry install`
-- Node.js project - Checks if npm is installed and runs `npm install`
+- Python projects - Supports Poetry and uv package managers. Installs the configured package manager if not present and runs the appropriate install command.
+- JavaScript/Node.js projects - Supports npm and pnpm package managers. Runs the appropriate install command for the configured package manager.
 - dotenv (.env) file - Checks for `.env.template` files, copies them to `.env` (which should be in `.gitignore` so developers can safely make local specific changes) and prompts for any blank values (so the developer has an easy chance to fill in their initial values where there isn't a clear default).
 
 > **Note**: Invoking bootstrap from `algokit bootstrap` is not recommended. Please prefer using `algokit project bootstrap` instead.
+
+You can configure which package managers are used by default via:
+- `algokit config py-package-manager` - Configure Python package manager (poetry or uv)
+- `algokit config js-package-manager` - Configure JavaScript package manager (npm or pnpm)
+
+For more details, see the [configuration documentation](../config.md).
+
+## Package Manager Override
+
+You can override the default package manager settings on a per-project basis by adding configuration to your project's `.algokit.toml` file:
+
+```toml
+[package_manager]
+python = "uv"        # Override Python package manager (poetry or uv)
+javascript = "pnpm"  # Override JavaScript package manager (npm or pnpm)
+```
+
+This project-specific configuration takes precedence over your global settings, allowing different projects to use different package managers as needed.
+
+### Configuration Precedence
+
+The bootstrap command follows this precedence order when determining which package manager to use:
+
+1. **Project override** - Configuration in `.algokit.toml` (highest priority)
+2. **User preference** - Global configuration set via `algokit config` (respects your explicit choice)
+3. **Smart defaults** - Based on project structure (e.g., `poetry.toml` → Poetry, `pnpm-lock.yaml` → PNPM)
+4. **Interactive prompt** - Asked on first use if no preference is set
+
+This means if you set a global preference (e.g., `algokit config py-package-manager uv`), it will be used across all projects unless explicitly overridden at the project level. Smart defaults only apply when you haven't set a preference yet.
 
 ## Usage
 

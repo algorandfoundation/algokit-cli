@@ -1,0 +1,6 @@
+Usage: algokit config js-package-manager [OPTIONS] [[npm|pnpm]]
+
+  Set the default JavaScript package manager for use by AlgoKit CLI.
+
+Options:
+  -h, --help  Show this message and exit.

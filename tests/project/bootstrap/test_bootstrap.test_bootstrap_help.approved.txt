@@ -16,5 +16,9 @@ Commands:
           prompts for any unspecified values.
   npm     Runs `npm install` in the current working directory to install Node.js
           dependencies.
+  pnpm    Runs `pnpm install` in the current working directory to install
+          Node.js dependencies.
   poetry  Installs Python Poetry (if not present) and runs `poetry install` in
           the current working directory to install Python dependencies.
+  uv      Installs UV (if not present) and runs `uv sync` in the current working
+          directory to install Python dependencies.
