@@ -1,0 +1,29 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Checking {current_working_directory} for bootstrapping needs
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Running `algokit project bootstrap uv`
+DEBUG: Running 'uv --version' in '{current_working_directory}'
+DEBUG: uv: STDOUT
+DEBUG: uv: STDERR
+Installing Python dependencies and setting up Python virtual environment via UV
+DEBUG: Running 'uv sync' in '{current_working_directory}'
+uv: STDOUT
+uv: STDERR
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Running `algokit project bootstrap pnpm`
+Installing pnpm dependencies
+DEBUG: Running 'pnpm.cmd install --frozen-lockfile' in '{current_working_directory}'
+pnpm.cmd: STDOUT
+pnpm.cmd: STDERR
+DEBUG: Skipping {current_working_directory}/package.json
+DEBUG: Skipping {current_working_directory}/pnpm-lock.yaml
+DEBUG: Skipping {current_working_directory}/pyproject.toml
+Finished bootstrapping {current_working_directory}

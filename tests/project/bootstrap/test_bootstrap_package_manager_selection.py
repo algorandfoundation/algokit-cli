@@ -11,7 +11,7 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
-@pytest.mark.usefixtures("proc_mock")
+@pytest.mark.usefixtures("mock_platform_system", "proc_mock")
 def test_bootstrap_respects_configured_package_managers(
     tmp_path_factory: TempPathFactory, request: pytest.FixtureRequest, mocker: MockerFixture
 ) -> None:
