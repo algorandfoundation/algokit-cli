@@ -72,7 +72,7 @@ def _determine_python_package_manager(project_dir: Path) -> str:
     1. Project override (.algokit.toml) - Explicit project configuration
     2. User preference (algokit config) - User's explicit choice
     3. Smart defaults (project structure) - Only when no preference exists
-    4. Interactive prompt - First-time user experience
+    4. Interactive prompt - Falls back to user input and saves preference
     """
 
     # 1. Project-specific override (highest priority)
@@ -115,7 +115,7 @@ def _determine_javascript_package_manager(project_dir: Path) -> str:
     1. Project override (.algokit.toml) - Explicit project configuration
     2. User preference (algokit config) - User's explicit choice
     3. Smart defaults (lock files) - Only when no preference exists
-    4. Interactive prompt - First-time user experience
+    4. Interactive prompt - Falls back to user input and saves preference
     """
 
     # 1. Project-specific override (highest priority)
@@ -360,14 +360,16 @@ def bootstrap_npm(project_dir: Path, *, ci_mode: bool) -> None:
 
 def bootstrap_pnpm(project_dir: Path, *, ci_mode: bool) -> None:
     def get_install_command(*, ci_mode: bool) -> list[str]:
-        has_package_lock = (project_dir / "pnpm-lock.yaml").exists()
-        if ci_mode and not has_package_lock:
-            raise click.ClickException(
-                "Cannot run `pnpm install --frozen-lockfile` because `pnpm-lock.yaml` is missing. "
-                "Please run `pnpm install` instead and commit it to your source control."
-            )
-        cmd = "install --frozen-lockfile" if ci_mode else "install"
-        return [cmd]
+        # PNPM auto-detects CI environments and uses appropriate behavior automatically
+        # Only check for lockfile existence in CI mode for better error messages
+        if ci_mode:
+            has_package_lock = (project_dir / "pnpm-lock.yaml").exists()
+            if not has_package_lock:
+                raise click.ClickException(
+                    "Cannot run in CI mode because `pnpm-lock.yaml` is missing. "
+                    "Please run `pnpm install` to generate the lockfile and commit it to your source control."
+                )
+        return ["install"]  # Let PNPM handle CI detection automatically
 
     package_json_path = project_dir / "package.json"
     if not package_json_path.exists():
@@ -395,7 +397,7 @@ def migrate_pyproject_to_uv(project_dir: Path) -> None:
         ) from e
 
 
-def bootstrap_uv(project_dir: Path) -> None:  # noqa: C901, PLR0912
+def bootstrap_uv(project_dir: Path) -> None:  # noqa: C901
     try:
         proc.run(
             ["uv", "--version"],
@@ -433,21 +435,16 @@ def bootstrap_uv(project_dir: Path) -> None:  # noqa: C901, PLR0912
                     "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
                 ) from e
         else:
-            # For Unix platforms, we need to use subprocess directly to handle the pipe
-            import subprocess
-
+            # For Unix platforms, use proc.run with sh -c to handle the pipe safely
             try:
-                result = subprocess.run(
-                    "curl -LsSf https://astral.sh/uv/install.sh | sh",
-                    shell=True,
-                    check=False,  # Handle the check ourselves to provide a better error message
-                )
-                if result.returncode != 0:
-                    raise click.ClickException(
+                proc.run(
+                    ["sh", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"],
+                    bad_return_code_error_message=(
                         "Unable to install uv; please install uv "
                         "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-                    )
-            except subprocess.SubprocessError as e:
+                    ),
+                )
+            except Exception as e:
                 raise click.ClickException(
                     "Failed to install uv. Please install it manually via "
                     "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
