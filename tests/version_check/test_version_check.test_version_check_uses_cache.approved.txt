@@ -1,6 +1,6 @@
 DEBUG: 1234.56.78 found in cache {app_state}/last-version-check
 You are using AlgoKit version {current_version}, however version 1234.56.78 is available. Please update using the tool used to install AlgoKit.
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
-DEBUG: poetry: Poetry (version 2.1.3)
+DEBUG: poetry: Poetry (version 99.99.99)
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.

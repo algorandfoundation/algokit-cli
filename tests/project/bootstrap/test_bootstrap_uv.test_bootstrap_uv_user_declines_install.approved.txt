@@ -1,0 +1,8 @@
+DEBUG: Running 'poetry --version' in '{current_working_directory}'
+DEBUG: poetry: STDOUT
+DEBUG: poetry: STDERR
+DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
+DEBUG: No .algokit.toml file found in the project directory.
+DEBUG: Running 'uv --version' in '{current_working_directory}'
+UV not found; attempting to install it...
+Error: Unable to install uv; please install uv manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again.

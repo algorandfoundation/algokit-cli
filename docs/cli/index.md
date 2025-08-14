@@ -35,8 +35,14 @@
     - [-f, --force](#-f---force)
     - [Arguments](#arguments-4)
     - [ENGINE](#engine)
-    - [version-prompt](#version-prompt)
+    - [js-package-manager](#js-package-manager)
     - [Arguments](#arguments-5)
+    - [PACKAGE_MANAGER](#package_manager)
+    - [py-package-manager](#py-package-manager)
+    - [Arguments](#arguments-6)
+    - [PACKAGE_MANAGER](#package_manager-1)
+    - [version-prompt](#version-prompt)
+    - [Arguments](#arguments-7)
     - [ENABLE](#enable)
   - [dispenser](#dispenser)
     - [fund](#fund)
@@ -60,7 +66,7 @@
     - [Options](#options-9)
     - [-c, --copy-to-clipboard](#-c---copy-to-clipboard)
   - [explore](#explore)
-    - [Arguments](#arguments-6)
+    - [Arguments](#arguments-8)
     - [NETWORK](#network)
   - [generate](#generate)
     - [client](#client)
@@ -68,14 +74,14 @@
     - [-o, --output ](#-o---output--1)
     - [-l, --language ](#-l---language-)
     - [-v, --version ](#-v---version--1)
-    - [Arguments](#arguments-7)
+    - [Arguments](#arguments-9)
     - [APP_SPEC_PATH_OR_DIR](#app_spec_path_or_dir)
     - [ARGS](#args)
   - [goal](#goal)
     - [Options](#options-11)
     - [--console](#--console)
     - [--interactive](#--interactive)
-    - [Arguments](#arguments-8)
+    - [Arguments](#arguments-10)
     - [GOAL_ARGS](#goal_args)
   - [init](#init)
     - [Options](#options-12)
@@ -93,7 +99,7 @@
     - [example](#example)
     - [Options](#options-13)
     - [-l, --list](#-l---list)
-    - [Arguments](#arguments-9)
+    - [Arguments](#arguments-11)
     - [EXAMPLE_ID](#example_id)
   - [localnet](#localnet)
     - [codespace](#codespace)
@@ -109,7 +115,7 @@
     - [config](#config-1)
     - [Options](#options-15)
     - [-f, --force](#-f---force-2)
-    - [Arguments](#arguments-10)
+    - [Arguments](#arguments-12)
     - [ENGINE](#engine-1)
     - [console](#console)
     - [explore](#explore-1)
@@ -141,44 +147,46 @@
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [Options](#options-22)
     - [--ci, --no-ci](#--ci---no-ci)
-    - [deploy](#deploy)
     - [Options](#options-23)
+    - [--ci, --no-ci](#--ci---no-ci-1)
+    - [deploy](#deploy)
+    - [Options](#options-24)
     - [-C, -c, --command ](#-c--c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [-P, --path ](#-p---path-)
     - [--deployer ](#--deployer-)
     - [--dispenser ](#--dispenser-)
     - [-p, --project-name ](#-p---project-name--1)
-    - [Arguments](#arguments-11)
+    - [Arguments](#arguments-13)
     - [ENVIRONMENT_NAME](#environment_name)
     - [EXTRA_ARGS](#extra_args)
     - [link](#link)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-p, --project-name ](#-p---project-name--2)
     - [-l, --language ](#-l---language--1)
     - [-a, --all](#-a---all)
     - [-f, --fail-fast](#-f---fail-fast)
     - [-v, --version ](#-v---version--2)
     - [list](#list)
-    - [Arguments](#arguments-12)
+    - [Arguments](#arguments-14)
     - [WORKSPACE_PATH](#workspace_path)
     - [run](#run)
   - [task](#task)
     - [analyze](#analyze)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-r, --recursive](#-r---recursive)
     - [--force](#--force-2)
     - [--diff](#--diff)
     - [-o, --output ](#-o---output--2)
     - [-e, --exclude ](#-e---exclude-)
-    - [Arguments](#arguments-13)
+    - [Arguments](#arguments-15)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [--creator ](#--creator-)
     - [--name ](#--name-)
     - [-u, --unit ](#-u---unit-)
@@ -190,37 +198,37 @@
     - [--mutable, --immutable](#--mutable---immutable)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-28)
+    - [Options](#options-29)
     - [-o, --output ](#-o---output--3)
-    - [Arguments](#arguments-14)
+    - [Arguments](#arguments-16)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-29)
+    - [Options](#options-30)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
-    - [Arguments](#arguments-15)
+    - [Arguments](#arguments-17)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-30)
+    - [Options](#options-31)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
-    - [Arguments](#arguments-16)
+    - [Arguments](#arguments-18)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-31)
+    - [Options](#options-32)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-32)
+    - [Options](#options-33)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
     - [--force](#--force-3)
     - [transfer](#transfer)
-    - [Options](#options-33)
+    - [Options](#options-34)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -228,28 +236,28 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-34)
+    - [Options](#options-35)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
     - [--file-path ](#--file-path-)
     - [-f, --force](#-f---force-3)
-    - [Arguments](#arguments-17)
+    - [Arguments](#arguments-19)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-35)
+    - [Options](#options-36)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-4)
-    - [Arguments](#arguments-18)
-    - [ALIAS_NAME](#alias_name)
-    - [Arguments](#arguments-19)
-    - [ALIAS](#alias)
-    - [Options](#options-36)
-    - [-f, --force](#-f---force-5)
     - [Arguments](#arguments-20)
-    - [ALIAS](#alias-1)
+    - [ALIAS_NAME](#alias_name)
+    - [Arguments](#arguments-21)
+    - [ALIAS](#alias)
     - [Options](#options-37)
+    - [-f, --force](#-f---force-5)
+    - [Arguments](#arguments-22)
+    - [ALIAS](#alias-1)
+    - [Options](#options-38)
     - [-f, --force](#-f---force-6)
 
 # algokit
@@ -428,6 +436,34 @@ Skip confirmation prompts. Defaults to 'yes' to all prompts.
 
 
 ### ENGINE
+Optional argument
+
+### js-package-manager
+
+Set the default JavaScript package manager for use by AlgoKit CLI.
+
+```shell
+algokit config js-package-manager [OPTIONS] [[npm|pnpm]]
+```
+
+### Arguments
+
+
+### PACKAGE_MANAGER
+Optional argument
+
+### py-package-manager
+
+Set the default Python package manager for use by AlgoKit CLI.
+
+```shell
+algokit config py-package-manager [OPTIONS] [[poetry|uv]]
+```
+
+### Arguments
+
+
+### PACKAGE_MANAGER
 Optional argument
 
 ### version-prompt
@@ -1005,12 +1041,34 @@ algokit project bootstrap npm [OPTIONS]
 ### --ci, --no-ci
 Run 'npm ci' instead of 'npm install' in CI mode (clean install).
 
+#### pnpm
+
+Runs pnpm install in the current working directory to install Node.js dependencies.
+
+```shell
+algokit project bootstrap pnpm [OPTIONS]
+```
+
+### Options
+
+
+### --ci, --no-ci
+Run 'pnpm install --frozen-lockfile' instead of 'pnpm install' in     CI mode (clean install with frozen lockfile).
+
 #### poetry
 
 Installs Python Poetry (if not present) and runs poetry install in the current working directory to install Python dependencies.
 
 ```shell
 algokit project bootstrap poetry [OPTIONS]
+```
+
+#### uv
+
+Installs UV (if not present) and runs uv sync in the current working directory to install Python dependencies.
+
+```shell
+algokit project bootstrap uv [OPTIONS]
 ```
 
 ### deploy

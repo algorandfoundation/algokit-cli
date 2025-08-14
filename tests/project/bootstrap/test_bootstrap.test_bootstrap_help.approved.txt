@@ -1,5 +1,5 @@
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
-DEBUG: poetry: Poetry (version 2.1.3)
+DEBUG: poetry: Poetry (version 99.99.99)
 Usage: algokit project bootstrap [OPTIONS] COMMAND [ARGS]...
 
   Expedited initial setup for any developer by installing and configuring
@@ -16,5 +16,9 @@ Commands:
           prompts for any unspecified values.
   npm     Runs `npm install` in the current working directory to install Node.js
           dependencies.
+  pnpm    Runs `pnpm install` in the current working directory to install
+          Node.js dependencies.
   poetry  Installs Python Poetry (if not present) and runs `poetry install` in
           the current working directory to install Python dependencies.
+  uv      Installs UV (if not present) and runs `uv sync` in the current working
+          directory to install Python dependencies.
