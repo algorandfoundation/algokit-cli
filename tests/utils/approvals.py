@@ -23,6 +23,28 @@ def normalize_path(content: str, path: str, token: str) -> str:
     )
 
 
+def _normalize_platform_differences(data: str, poetry_version: str = "99.99.99") -> str:
+    """Normalize platform-specific and version-specific differences."""
+    result = data
+
+    # Normalize Git error messages across platforms (Arch Linux vs others)
+    result = re.sub(
+        r"DEBUG: git: fatal: not a git repository \(or any parent up to mount point /\)",
+        "DEBUG: git: fatal: not a git repository (or any of the parent directories): .git",
+        result,
+    )
+
+    # Remove Arch Linux specific Git filesystem boundary message
+    result = re.sub(
+        r"DEBUG: git: Stopping at filesystem boundary \(GIT_DISCOVERY_ACROSS_FILESYSTEM not set\)\.\n", "", result
+    )
+
+    # Normalize Poetry version output to avoid test failures on version updates
+    return re.sub(
+        r"DEBUG: poetry: Poetry \(version \d+\.\d+\.\d+\)", f"DEBUG: poetry: Poetry (version {poetry_version})", result
+    )
+
+
 class TokenScrubber(Scrubber):  # type: ignore[misc]
     def __init__(self, tokens: dict[str, str]):
         self._tokens = tokens
@@ -31,6 +53,10 @@ class TokenScrubber(Scrubber):  # type: ignore[misc]
         result = data
         for token, search in self._tokens.items():
             result = result.replace(search, "{" + token + "}")
+
+        # Normalize platform and version differences for consistent tests
+        result = _normalize_platform_differences(result)
+
         # Normalize SPINNER_FRAMES
         for frame in SPINNER_FRAMES:
             result = result.replace(frame, "")
@@ -43,6 +69,7 @@ def verify(
     *,
     options: approvaltests.Options | None = None,
     scrubber: Scrubber | None = None,
+    poetry_version: str = "99.99.99",
     **kwargs: Any,
 ) -> None:
     options = options or approvaltests.Options()
@@ -50,6 +77,10 @@ def verify(
         options = options.add_scrubber(scrubber)
     kwargs.setdefault("encoding", "utf-8")
     normalised_data = str(data).replace("\r\n", "\n")
+
+    # Apply global platform/version normalization with configurable poetry version
+    normalised_data = _normalize_platform_differences(normalised_data, poetry_version)
+
     approvaltests.verify(
         data=normalised_data,
         options=options,

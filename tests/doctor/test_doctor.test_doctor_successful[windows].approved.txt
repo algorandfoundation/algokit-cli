@@ -13,7 +13,7 @@ DEBUG: pipx: 1.1.0
 DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: blah blah
 DEBUG: poetry: 
-DEBUG: poetry: Poetry (version 1.2.2)
+DEBUG: poetry: Poetry (version 99.99.99)
 DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: node: v18.12.1
 DEBUG: Running 'npm.cmd --version' in '{current_working_directory}'
