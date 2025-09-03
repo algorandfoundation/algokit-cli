@@ -1,5 +1,6 @@
 import enum
 import logging
+from pathlib import Path
 
 import click
 import questionary
@@ -7,8 +8,6 @@ import questionary
 from algokit.core.conf import get_app_config_dir
 
 logger = logging.getLogger(__name__)
-
-JS_PACKAGE_MANAGER_CONFIG_FILE = get_app_config_dir() / "default-js-package-manager"
 
 
 class JSPackageManager(str, enum.Enum):
@@ -19,20 +18,26 @@ class JSPackageManager(str, enum.Enum):
         return self.value
 
 
+def _get_js_config_file() -> Path:
+    return get_app_config_dir() / "default-js-package-manager"
+
+
 def get_js_package_manager() -> str | None:
     """Get the default JavaScript package manager for use by AlgoKit CLI.
     None implies it has not been set yet, likely to be first time user.
     """
 
-    if JS_PACKAGE_MANAGER_CONFIG_FILE.exists():
-        return JS_PACKAGE_MANAGER_CONFIG_FILE.read_text().strip()
+    config_file = _get_js_config_file()
+    if config_file.exists():
+        return config_file.read_text().strip()
     return None
 
 
 def save_js_package_manager(manager: str) -> None:
     if manager not in JSPackageManager:
         raise ValueError(f"Invalid JavaScript package manager: {manager}")
-    JS_PACKAGE_MANAGER_CONFIG_FILE.write_text(manager)
+    config_file = _get_js_config_file()
+    config_file.write_text(manager)
 
 
 @click.command("js-package-manager", short_help="Configure the default JavaScript package manager for AlgoKit.")
