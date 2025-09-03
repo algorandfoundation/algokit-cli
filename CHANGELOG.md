@@ -2,6 +2,16 @@
 
 <!--next-version-placeholder-->
 
+## v2.9.0 (2025-09-03)
+
+### Feature
+
+* Pnpm and uv support ([#672](https://github.com/algorandfoundation/algokit-cli/issues/672)) ([`52293f4`](https://github.com/algorandfoundation/algokit-cli/commit/52293f43e7d0c441fb2863f5871a3ae7461119cd))
+
+### Fix
+
+* Pin prompt_toolkit as the latest version breaks algokit init ([`d1dc658`](https://github.com/algorandfoundation/algokit-cli/commit/d1dc658f4fada935d8e8ccc31067ce695bd487fb))
+
 ## v2.8.0 (2025-07-29)
 
 ### Feature
