@@ -3,6 +3,8 @@ Essential tests for package manager configuration commands.
 Focuses on critical user-facing functionality only.
 """
 
+import pytest
+
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
@@ -38,6 +40,7 @@ def test_py_package_manager_invalid_argument() -> None:
     verify(result.output)
 
 
+@pytest.mark.usefixtures("app_dir_mock")
 def test_js_package_manager_set_npm() -> None:
     """Test setting npm as js package manager."""
     result = invoke("config js-package-manager npm")
@@ -45,6 +48,7 @@ def test_js_package_manager_set_npm() -> None:
     verify(result.output)
 
 
+@pytest.mark.usefixtures("app_dir_mock")
 def test_js_package_manager_set_pnpm() -> None:
     """Test setting pnpm as js package manager."""
     result = invoke("config js-package-manager pnpm")
@@ -52,6 +56,7 @@ def test_js_package_manager_set_pnpm() -> None:
     verify(result.output)
 
 
+@pytest.mark.usefixtures("app_dir_mock")
 def test_py_package_manager_set_poetry() -> None:
     """Test setting poetry as py package manager."""
     result = invoke("config py-package-manager poetry")
@@ -59,6 +64,7 @@ def test_py_package_manager_set_poetry() -> None:
     verify(result.output)
 
 
+@pytest.mark.usefixtures("app_dir_mock")
 def test_py_package_manager_set_uv() -> None:
     """Test setting uv as py package manager."""
     result = invoke("config py-package-manager uv")
