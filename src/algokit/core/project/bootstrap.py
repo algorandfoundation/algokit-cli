@@ -1,10 +1,17 @@
 import logging
 import os
+import re
+import sys
 from pathlib import Path
 
 import click
 import questionary
 from packaging import version
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib  # type: ignore[import-not-found]
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
@@ -22,6 +29,38 @@ from algokit.core.utils import find_valid_pipx_command, is_windows
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 MAX_BOOTSTRAP_DEPTH = 2
+PKG_MANAGER_TRANSLATIONS = {
+    JSPackageManager.PNPM: [
+        ("npm install", "pnpm install"),
+        ("npm run ", "pnpm run "),
+        ("npm test", "pnpm test"),
+        ("npm start", "pnpm start"),
+        ("npm build", "pnpm build"),
+    ],
+    JSPackageManager.NPM: [
+        ("pnpm install", "npm install"),
+        ("pnpm run ", "npm run "),
+        ("pnpm test", "npm test"),
+        ("pnpm start", "npm start"),
+        ("pnpm build", "npm build"),
+    ],
+    PyPackageManager.UV: [
+        ("poetry install", "uv sync"),
+        ("poetry run ", "uv run "),
+        ("poetry add ", "uv add "),
+        ("poetry remove ", "uv remove "),
+        ("poetry init", "uv init"),
+        ("poetry lock", "uv lock"),
+    ],
+    PyPackageManager.POETRY: [
+        ("uv sync", "poetry install"),
+        ("uv run ", "poetry run "),
+        ("uv add ", "poetry add "),
+        ("uv remove ", "poetry remove "),
+        ("uv init", "poetry init"),
+        ("uv lock", "poetry lock"),
+    ],
+}
 logger = logging.getLogger(__name__)
 
 
@@ -167,8 +206,111 @@ def _bootstrap_javascript_project(project_dir: Path, manager: str, *, ci_mode: b
         bootstrap_pnpm(project_dir, ci_mode=ci_mode)
 
 
+def _translate_package_manager_in_toml(project_dir: Path, js_manager: str | None, py_manager: str | None) -> None:
+    """Translate package manager commands in .algokit.toml file."""
+    toml_path = project_dir / ALGOKIT_CONFIG
+    if not toml_path.exists():
+        return
+
+    try:
+        content = toml_path.read_text()
+        config = tomllib.loads(content)
+
+        # Early exit if no run commands
+        if not (run_commands := config.get("project", {}).get("run", {})):
+            return
+
+        original = content
+
+        # Process all commands
+        for command_config in run_commands.values():
+            if not isinstance(command_config, dict):
+                continue
+
+            for cmd in command_config.get("commands", []):
+                if (translated := _translate_single_command(cmd, js_manager, py_manager)) != cmd:
+                    # Replace command preserving quotes
+                    content = re.sub(f"([\"']){re.escape(cmd)}([\"'])", f"\\1{translated}\\2", content)
+                    logger.debug(f"Translating: '{cmd}' -> '{translated}'")
+
+        # Write back if changed
+        if content != original:
+            toml_path.write_text(content)
+            logger.info(f"Updated package manager commands in {ALGOKIT_CONFIG}")
+
+    except Exception as e:
+        logger.warning(f"Failed to translate package managers in {ALGOKIT_CONFIG}: {e}")
+
+
+def _warn_incompatible_commands(cmd: str, js_manager: str | None, py_manager: str | None) -> None:
+    """Warn about commands that cannot be translated between package managers."""
+
+    # Define incompatible command prefixes
+    py_incompatibles = {
+        PyPackageManager.UV: {
+            "poetry show",
+            "poetry config",
+            "poetry export",
+            "poetry search",
+            "poetry check",
+            "poetry publish",
+        },
+        PyPackageManager.POETRY: {"uv pip", "uv venv", "uv tool", "uv python"},
+    }
+
+    js_incompatibles = {
+        JSPackageManager.PNPM: {"npm fund", "npm exec", "npx", "npm audit"},
+        JSPackageManager.NPM: {"pnpm dlx", "pnpm exec", "pnpm audit"},
+    }
+
+    # Check for incompatible Python commands
+    if py_manager:
+        py_manager_enum = PyPackageManager(py_manager)
+        if py_manager_enum in py_incompatibles:
+            for prefix in py_incompatibles[py_manager_enum]:
+                if cmd.startswith(prefix):
+                    logger.warning(
+                        f"⚠️  Command '{cmd}' may not be compatible with {py_manager}. "
+                        "The command will remain unchanged and may not work as expected."
+                    )
+                    return
+
+    # Check for incompatible JavaScript commands
+    if js_manager:
+        js_manager_enum = JSPackageManager(js_manager)
+        if js_manager_enum in js_incompatibles:
+            for prefix in js_incompatibles[js_manager_enum]:
+                if cmd.startswith(prefix):
+                    logger.warning(
+                        f"⚠️  Command '{cmd}' may not be compatible with {js_manager}. "
+                        "The command will remain unchanged and may not work as expected."
+                    )
+                    return
+
+
+def _translate_single_command(cmd: str, js_manager: str | None, py_manager: str | None) -> str:
+    """Minimal translation - only for semantically equivalent commands."""
+    if not cmd:
+        return cmd
+
+    _warn_incompatible_commands(cmd, js_manager, py_manager)
+
+    for manager in (js_manager, py_manager):
+        if manager and (translations := PKG_MANAGER_TRANSLATIONS.get(manager)):
+            for old, new in translations:
+                if old.endswith(" "):
+                    if cmd.startswith(old):
+                        return new + cmd[len(old) :]
+
+                elif cmd == old or cmd.startswith(f"{old} "):
+                    remainder = cmd[len(old) :] if cmd != old else ""
+                    return new + remainder
+
+    return cmd
+
+
 def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
-    """Bootstrap a project with elegant package manager selection."""
+    """Bootstrap a project with automatic package manager selection."""
 
     logger.debug(f"Checking {project_dir} for bootstrapping needs")
 
@@ -177,15 +319,23 @@ def bootstrap_any(project_dir: Path, *, ci_mode: bool) -> None:
         logger.debug("Running `algokit project bootstrap env`")
         bootstrap_env(project_dir, ci_mode=ci_mode)
 
+    # Determine package managers
+    js_manager = None
+    py_manager = None
+
     # Python projects
     if _has_python_project(project_dir):
-        manager = _determine_python_package_manager(project_dir)
-        _bootstrap_python_project(project_dir, manager)
+        py_manager = _determine_python_package_manager(project_dir)
+        _bootstrap_python_project(project_dir, py_manager)
 
     # JavaScript projects
     if _has_javascript_project(project_dir):
-        manager = _determine_javascript_package_manager(project_dir)
-        _bootstrap_javascript_project(project_dir, manager, ci_mode=ci_mode)
+        js_manager = _determine_javascript_package_manager(project_dir)
+        _bootstrap_javascript_project(project_dir, js_manager, ci_mode=ci_mode)
+
+    # Translate package manager commands in .algokit.toml
+    if js_manager or py_manager:
+        _translate_package_manager_in_toml(project_dir, js_manager, py_manager)
 
 
 def bootstrap_any_including_subdirs(  # noqa: PLR0913

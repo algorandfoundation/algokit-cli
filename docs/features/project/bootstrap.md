@@ -13,6 +13,7 @@ It can bootstrap one or all of the following (with other options potentially bei
 > **Note**: Invoking bootstrap from `algokit bootstrap` is not recommended. Please prefer using `algokit project bootstrap` instead.
 
 You can configure which package managers are used by default via:
+
 - `algokit config py-package-manager` - Configure Python package manager (poetry or uv)
 - `algokit config js-package-manager` - Configure JavaScript package manager (npm or pnpm)
 
@@ -40,6 +41,96 @@ The bootstrap command follows this precedence order when determining which packa
 4. **Interactive prompt** - Asked on first use if no preference is set
 
 This means if you set a global preference (e.g., `algokit config py-package-manager uv`), it will be used across all projects unless explicitly overridden at the project level. Smart defaults only apply when you haven't set a preference yet.
+
+## Package Manager Command Translation
+
+During the bootstrap process, AlgoKit automatically translates package manager commands in your project's `.algokit.toml` file to match your configured package manager preferences. This ensures that project run commands work correctly regardless of which package manager the template was originally created with.
+
+### How It Works
+
+When you run `algokit project bootstrap`, if your project contains run commands in `.algokit.toml`, they will be automatically updated:
+
+- **JavaScript**: `npm` ↔ `pnpm` - Only semantically equivalent commands are translated
+- **Python**: `poetry` ↔ `uv` - Only semantically equivalent commands are translated
+
+### JavaScript Translation (npm ↔ pnpm)
+
+**Commands that translate:**
+
+- `npm install` → `pnpm install`
+- `npm run <script>` → `pnpm run <script>`
+- `npm test` → `pnpm test`
+- `npm start` → `pnpm start`
+- `npm build` → `pnpm build`
+
+**Commands that DON'T translate** (will show a warning):
+
+- `npm exec` / `npx` ↔ `pnpm exec` / `pnpm dlx` - Different behavior:
+  - `npx` searches locally in `node_modules/.bin`, then in global installs, then downloads remotely if not found
+  - `pnpm exec` only searches locally in project dependencies (fails if not found locally)
+  - `pnpm dlx` always fetches from remote registry (never checks local dependencies)
+- `npm fund` - No pnpm equivalent (pnpm does not provide funding information display)
+- `npm audit` ↔ `pnpm audit` - May report different vulnerabilities due to differences in auditing algorithms and vulnerability databases (command translates with warning)
+
+### Python Translation (poetry ↔ uv)
+
+Only commands with equivalent semantics are translated:
+
+**Commands that translate:**
+
+- `poetry install` → `uv sync` (special case: different command name)
+- `poetry run` → `uv run`
+- `poetry add` → `uv add`
+- `poetry remove` → `uv remove`
+- `poetry lock` → `uv lock`
+- `poetry init` → `uv init`
+
+**Commands that DON'T translate** (will show a warning):
+
+- `poetry show`, `poetry config`, `poetry export`, `poetry search`, `poetry check`, `poetry publish` - No uv equivalent
+- `uv pip`, `uv venv`, `uv tool`, `uv python` - No poetry equivalent
+
+When AlgoKit encounters a command that cannot be translated, it will:
+
+1. Leave the command unchanged in `.algokit.toml`
+2. Display a warning message explaining that the command has no equivalent
+3. The command may not work when executed with `algokit project run`
+
+### Example
+
+Given a `.algokit.toml` with:
+
+```toml
+[project.run]
+build = { commands = ["npm run build"] }
+create = { commands = ["npx create-next-app"] }  # Different behavior in pnpm
+test = { commands = ["poetry run pytest"] }
+deps = { commands = ["poetry show --tree"] }  # No uv equivalent
+```
+
+If you've configured:
+
+- JavaScript package manager: `pnpm`
+- Python package manager: `uv`
+
+After bootstrap:
+
+```toml
+[project.run]
+build = { commands = ["pnpm run build"] }        # ✅ Translated
+create = { commands = ["npx create-next-app"] }   # ⚠️ Not translated (warning shown)
+test = { commands = ["uv run pytest"] }          # ✅ Translated
+deps = { commands = ["poetry show --tree"] }     # ⚠️ Not translated (warning shown)
+```
+
+You'll see warnings:
+
+```
+⚠️ Command 'npx create-next-app' behaves differently in pnpm. Consider using 'pnpm exec' for local binaries or 'pnpm dlx' for remote packages. The command will remain unchanged.
+⚠️ Command 'poetry show --tree' has no direct equivalent in uv. The command will remain unchanged and may not work as expected.
+```
+
+This approach ensures your project commands work correctly while being transparent about limitations.
 
 ## Usage
 
