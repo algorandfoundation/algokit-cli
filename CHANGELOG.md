@@ -2,6 +2,13 @@
 
 <!--next-version-placeholder-->
 
+## v2.9.1 (2025-09-11)
+
+### Fix
+
+* Dynamically detect Windows SDK tools for GitHub Actions compatibility ([#686](https://github.com/algorandfoundation/algokit-cli/issues/686)) ([`db88fb9`](https://github.com/algorandfoundation/algokit-cli/commit/db88fb9129061f7fcb8282c7745a9bd3178b872d))
+* Enables package manager command translation ([#684](https://github.com/algorandfoundation/algokit-cli/issues/684)) ([`a08eae5`](https://github.com/algorandfoundation/algokit-cli/commit/a08eae534cd9898687ba80400ba132221fcea69d))
+
 ## v2.9.0 (2025-09-03)
 
 ### Feature
