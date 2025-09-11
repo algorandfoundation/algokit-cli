@@ -26,11 +26,58 @@ runs:
   using: "composite"
   steps:
     - name: Configure build environment
-      shell: bash
+      shell: pwsh
       run: |
-        echo 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64' >> $GITHUB_PATH
-        echo 'BINARY_BUILD_DIR=dist\algokit' >> $GITHUB_ENV
-        echo 'WINGET_INSTALLER=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix' >> $GITHUB_ENV
+        # Find Windows SDK tools dynamically (works on both Windows 2022 and 2025)
+        $sdkPath = "C:\Program Files (x86)\Windows Kits\10\bin"
+        
+        # First, try to find makepri and makeappx in PATH
+        $makepriCmd = Get-Command makepri -ErrorAction SilentlyContinue
+        $makeappxCmd = Get-Command makeappx -ErrorAction SilentlyContinue
+        
+        if (-not $makepriCmd -or -not $makeappxCmd) {
+          Write-Host "SDK tools not in PATH, searching for Windows SDK..."
+          
+          if (Test-Path $sdkPath) {
+            # Find the latest SDK version
+            $latestVersion = Get-ChildItem $sdkPath -Directory | 
+              Where-Object { $_.Name -match '^\d+\.\d+\.\d+\.\d+$' } | 
+              Sort-Object { [Version]$_.Name } -Descending | 
+              Select-Object -First 1
+            
+            if ($latestVersion) {
+              $sdkBinPath = Join-Path $latestVersion.FullName "x64"
+              Write-Host "Adding Windows SDK to PATH: $sdkBinPath"
+              echo "$sdkBinPath" >> $env:GITHUB_PATH
+              
+              # Verify tools exist
+              $makepriPath = Join-Path $sdkBinPath "makepri.exe"
+              $makeappxPath = Join-Path $sdkBinPath "makeappx.exe"
+              
+              if (-not (Test-Path $makepriPath)) {
+                throw "makepri.exe not found at $makepriPath"
+              }
+              if (-not (Test-Path $makeappxPath)) {
+                throw "makeappx.exe not found at $makeappxPath"
+              }
+              
+              Write-Host "✓ Found makepri.exe at: $makepriPath"
+              Write-Host "✓ Found makeappx.exe at: $makeappxPath"
+            } else {
+              throw "No Windows SDK versions found in $sdkPath"
+            }
+          } else {
+            throw "Windows SDK not found at $sdkPath"
+          }
+        } else {
+          Write-Host "✓ SDK tools already in PATH"
+          Write-Host "  makepri: $($makepriCmd.Source)"
+          Write-Host "  makeappx: $($makeappxCmd.Source)"
+        }
+        
+        # Set environment variables
+        echo 'BINARY_BUILD_DIR=dist\algokit' >> $env:GITHUB_ENV
+        echo 'WINGET_INSTALLER=${{ inputs.artifacts_dir }}\${{ inputs.package_name }}-winget.msix' >> $env:GITHUB_ENV
 
     - name: Build binary
       shell: bash
