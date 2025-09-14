@@ -72,7 +72,7 @@ Options
 
 - `--txID`, -t: Transaction ID of your refund operation. This option is required. The receiver address of the transaction must be the same as the dispenser wallet address that you can obtain by observing a `sender` field of [`fund`](#fund) transaction.
 
-> Please note, performing a refund operation will not immedately change your daily fund limit. Your daily fund limit is reset daily at midnigth UTC. If you have reached your daily fund limit, you will not be able to perform a refund operation until your daily fund limit is reset.
+> Please note, performing a refund operation will not immediately change your daily fund limit. Your daily fund limit is reset daily at midnigth UTC. If you have reached your daily fund limit, you will not be able to perform a refund operation until your daily fund limit is reset.
 
 ## Limit
 

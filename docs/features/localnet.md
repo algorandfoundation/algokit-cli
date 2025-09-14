@@ -6,8 +6,6 @@ AlgoKit LocalNet uses Docker images that are optimised for a great dev experienc
 
 The philosophy we take with AlgoKit LocalNet is that you should treat it as an ephemeral network. This means assume it could be reset at any time - don't store data on there that you can't recover / recreate. We have optimised the AlgoKit LocalNet experience to minimise situations where the network will get reset to improve the experience, but it can and will still happen in a number of situations.
 
-> For details on executing `algokit localnet` without `docker` or `podman` refer to the [codespaces](#codespaces) section.
-
 ## Prerequisites
 
 AlgoKit LocalNet relies on Docker and Docker Compose being present and running on your system. Alternatively, you can use Podman as a replacement for Docker see [Podman support](#podman-support).
