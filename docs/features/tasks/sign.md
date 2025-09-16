@@ -75,7 +75,7 @@ Encoding simple txn object in python:
 
 ```py
 # Encoding single transaction as a base64 encoded string
-algosdk.encoding.msgpack_encode({"txn": {YOUR_TXN_OBJECT}.dictify()}) # Resulting string can be passed directy to algokit task sign with --transaction flag
+algosdk.encoding.msgpack_encode({"txn": {YOUR_TXN_OBJECT}.dictify()}) # Resulting string can be passed directly to algokit task sign with --transaction flag
 
 # Encoding multiple transactions as a message pack encoded binary file
 algosdk.transaction.write_to_file([{YOUR_TXN_OBJECT}], "some_file.txn") # Resulting file path can be passed directly to algokit sign with --file flag
@@ -86,7 +86,7 @@ Encoding simple txn object in javascript:
 ```ts
 Buffer.from(algosdk.encodeObj({ txn: txn.get_obj_for_encoding() })).toString(
   "base64"
-); // Resulting string can be passed directy to algokit task sign with --transaction flag
+); // Resulting string can be passed directly to algokit task sign with --transaction flag
 ```
 
 ## Further Reading

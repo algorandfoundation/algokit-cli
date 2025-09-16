@@ -83,7 +83,7 @@ Here's an example of what the `.algokit.toml` file might look like. When deployi
 
 ```toml
 [algokit]
-min_version = "v{lastest_version}"
+min_version = "v{latest_version}"
 
 [project]
 
