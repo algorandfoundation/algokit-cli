@@ -51,6 +51,6 @@ AlgoKit completions uninstalled for zsh 🎉
 
 ## Shell Option
 
-To install/uninstall the completions for a specific [shell](../cli/index.md#shell) the `--shell` option can be used e.g. `algokit completions install --shell bash`.
+To install/uninstall the completions for a specific [shell](../cli/index.md#--shell-) the `--shell` option can be used e.g. `algokit completions install --shell bash`.
 
 To learn more about the `algokit completions` command, please refer to [completions](../cli/index.md#completions) in the AlgoKit CLI reference documentation.
