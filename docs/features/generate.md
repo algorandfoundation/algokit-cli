@@ -22,7 +22,7 @@ You can either specify a path to an ARC-0032 JSON file, an ARC-0056 JSON file or
 The output path is interpreted as relative to the current working directory, however an absolute path may also be specified e.g.
 `algokit generate client application.json --output /absolute/path/to/client.py`
 
-There are two tokens available for use with the `-o`, `--output` [option](../cli/index.md#-o---output-):
+There are two tokens available for use with the `-o`, `--output` [option](../cli/index.md#-o---output-output_path_pattern):
 
 - `{contract_name}`: This will resolve to a name based on the ARC-0032/ARC-0056 contract name, formatted appropriately for the target language.
 - `{app_spec_dir}`: This will resolve to the parent directory of the `application.json`, `*.arc32.json`, `*.arc56.json` file which can be useful to output a client relative to its source file.
