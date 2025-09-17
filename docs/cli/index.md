@@ -264,7 +264,7 @@
 
 AlgoKit is your one-stop shop to develop applications on the Algorand blockchain.
 
-If you are getting started, please see the quick start tutorial: [https://bit.ly/algokit-intro-tutorial](https://bit.ly/algokit-intro-tutorial).
+If you are getting started, please see the quick start tutorial: [https://dev.algorand.co/getting-started/algokit-quick-start/](https://dev.algorand.co/getting-started/algokit-quick-start/).
 
 ```shell
 algokit [OPTIONS] COMMAND [ARGS]...
