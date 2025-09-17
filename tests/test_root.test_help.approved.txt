@@ -4,7 +4,7 @@ Usage: algokit [OPTIONS] COMMAND [ARGS]...
   blockchain.
 
   If you are getting started, please see the quick start tutorial:
-  https://bit.ly/algokit-intro-tutorial.
+  https://dev.algorand.co/getting-started/algokit-quick-start/.
 
 Options:
   --version             Show the version and exit.
