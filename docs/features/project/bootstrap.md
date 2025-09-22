@@ -2,7 +2,7 @@
 
 The AlgoKit Project Bootstrap feature allows you to bootstrap different project dependencies by looking up specific files in your current directory and immediate sub directories by convention.
 
-This is useful to allow for expedited initial setup for each developer e.g. when they clone a repository for the first time. It's also useful to provide a quick getting started experience when initialising a new project via [AlgoKit Init](./init.md) and meeting our goal of "nothing to debugging code in 5 minutes".
+This is useful to allow for expedited initial setup for each developer e.g. when they clone a repository for the first time. It's also useful to provide a quick getting started experience when initialising a new project via [AlgoKit Init](../init.md) and meeting our goal of "nothing to debugging code in 5 minutes".
 
 It can bootstrap one or all of the following (with other options potentially being added in the future):
 
@@ -231,7 +231,7 @@ poetry: Installing the current project: algokit (0.1.0)
 
 ### Bootstrap all
 
-Execute `algokit project bootstrap all` to initiate `algokit project bootstrap env`, `algokit project bootstrap npm`, and `algokit project bootstrap poetry` commands within the current directory and all its immediate sub-directories. This comprehensive command is automatically triggered following the initialization of a new project through the [AlgoKit Init](./init.md) command.
+Execute `algokit project bootstrap all` to initiate `algokit project bootstrap env`, `algokit project bootstrap npm`, and `algokit project bootstrap poetry` commands within the current directory and all its immediate sub-directories. This comprehensive command is automatically triggered following the initialization of a new project through the [AlgoKit Init](../init.md) command.
 
 #### Filtering Options
 
