@@ -12,7 +12,6 @@ from algokit.core.sandbox import (
     get_algod_network_template,
     get_config_json,
     get_docker_compose_yml,
-    get_proxy_config,
 )
 from tests import get_combined_verify_output
 from tests.utils.app_dir_mock import AppDirs
@@ -167,7 +166,6 @@ def test_localnet_start_up_to_date_definition(app_dir_mock: AppDirs) -> None:
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text(get_docker_compose_yml())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_config.json").write_text(get_config_json())
     (app_dir_mock.app_config_dir / "sandbox" / "algod_network_template.json").write_text(get_algod_network_template())
-    (app_dir_mock.app_config_dir / "sandbox" / "nginx.conf").write_text(get_proxy_config())
 
     result = invoke("localnet start")
 
@@ -327,7 +325,6 @@ def test_localnet_start_with_custom_config_dir(tmp_path_factory: pytest.TempPath
     assert (custom_config_dir / "sandbox" / "docker-compose.yml").exists()
     assert (custom_config_dir / "sandbox" / "algod_network_template.json").exists()
     assert (custom_config_dir / "sandbox" / "algod_config.json").exists()
-    assert (custom_config_dir / "sandbox" / "nginx.conf").exists()
 
 
 @pytest.mark.usefixtures("proc_mock", "_health_success", "_localnet_up_to_date", "_mock_proc_with_running_localnet")

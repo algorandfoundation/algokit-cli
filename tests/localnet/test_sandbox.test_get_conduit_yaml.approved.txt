@@ -24,21 +24,16 @@ metrics:
 
 # The importer is typically an algod follower node.
 importer:
-  name: algod
+  name: localnet_importer
   config:
-    # The mode of operation, either "archival" or "follower".
-    # * archival mode allows you to start processing on any round but does not
-    # contain the ledger state delta objects required for the postgres writer.
-    # * follower mode allows you to use a lightweight non-archival node as the
-    # data source. In addition, it will provide ledger state delta objects to
-    # the processors and exporter.
-    mode: "follower"
+    lead-node-url: "algod:8080"
+    follower-node-url: "algod:8081"
 
-    # Algod API address.
-    netaddr: "http://algod:8081"
-
-    # Algod API token.
+    # API token (used for both nodes if specific tokens not provided)
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+    # How often to poll the lead node for status updates. Default: 100ms
+    lead-node-poll-interval: 50ms
 
 # Zero or more processors may be defined to manipulate what data
 # reaches the exporter.

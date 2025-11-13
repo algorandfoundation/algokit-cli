@@ -1,10 +1,11 @@
 {
-  "Version": 12,
+  "Version": 36,
   "GossipFanout": 1,
   "EndpointAddress": "0.0.0.0:8080",
   "DNSBootstrapID": "",
   "IncomingConnectionsLimit": 0,
   "Archival": true,
   "isIndexerActive": false,
-  "EnableDeveloperAPI": true
+  "EnableDeveloperAPI": true,
+  "EnablePrivateNetworkAccessHeader": true
 }

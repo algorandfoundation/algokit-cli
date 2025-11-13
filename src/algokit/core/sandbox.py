@@ -58,7 +58,6 @@ class ComposeSandbox:
         self._latest_yaml = get_docker_compose_yml(name=f"algokit_{self.name}")
         self._latest_config_json = get_config_json()
         self._latest_algod_network_template = get_algod_network_template()
-        self._latest_proxy_config = get_proxy_config()
 
     @property
     def compose_file_path(self) -> Path:
@@ -75,10 +74,6 @@ class ComposeSandbox:
     @property
     def algod_network_template_file_path(self) -> Path:
         return self.directory / "algod_network_template.json"
-
-    @property
-    def proxy_config_file_path(self) -> Path:
-        return self.directory / "nginx.conf"
 
     @classmethod
     def from_environment(cls) -> ComposeSandbox | None:
@@ -148,7 +143,6 @@ class ComposeSandbox:
             compose_content = self.compose_file_path.read_text()
             config_content = self.algod_config_file_path.read_text()
             algod_network_template_content = self.algod_network_template_file_path.read_text()
-            proxy_config_content = self.proxy_config_file_path.read_text()
 
         except FileNotFoundError:
             # treat as out of date if compose file exists but algod config doesn't
@@ -157,24 +151,27 @@ class ComposeSandbox:
                 return ComposeFileStatus.OUT_OF_DATE
             return ComposeFileStatus.MISSING
         else:
-            algod_network_json_content = json.loads(
-                algod_network_template_content.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
-            )
-            latest_algod_network_json_content = json.loads(
-                self._latest_algod_network_template.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
-            )
+            try:
+                algod_network_json_content = json.loads(
+                    algod_network_template_content.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+                )
+                latest_algod_network_json_content = json.loads(
+                    self._latest_algod_network_template.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
+                )
 
-            del algod_network_json_content["Genesis"]["DevMode"]
-            del latest_algod_network_json_content["Genesis"]["DevMode"]
+                del algod_network_json_content["Genesis"]["DevMode"]
+                del latest_algod_network_json_content["Genesis"]["DevMode"]
 
-            if (
-                compose_content == self._latest_yaml
-                and config_content == self._latest_config_json
-                and algod_network_json_content == latest_algod_network_json_content
-                and proxy_config_content == self._latest_proxy_config
-            ):
-                return ComposeFileStatus.UP_TO_DATE
-            else:
+                if (
+                    compose_content == self._latest_yaml
+                    and config_content == self._latest_config_json
+                    and algod_network_json_content == latest_algod_network_json_content
+                ):
+                    return ComposeFileStatus.UP_TO_DATE
+                else:
+                    return ComposeFileStatus.OUT_OF_DATE
+            except (json.JSONDecodeError, KeyError):
+                # If config files are corrupted or malformed, treat as out of date
                 return ComposeFileStatus.OUT_OF_DATE
 
     def write_compose_file(self) -> None:
@@ -182,7 +179,6 @@ class ComposeSandbox:
         self.compose_file_path.write_text(self._latest_yaml)
         self.algod_config_file_path.write_text(self._latest_config_json)
         self.algod_network_template_file_path.write_text(self._latest_algod_network_template)
-        self.proxy_config_file_path.write_text(self._latest_proxy_config)
 
     def _run_compose_command(
         self,
@@ -328,7 +324,7 @@ ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
-CONDUIT_IMAGE = "algorand/conduit:latest"
+CONDUIT_IMAGE = "makerxstudio/conduit-localnet-importer:latest"
 IMAGE_VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 
 
@@ -440,8 +436,9 @@ def _wait_for_indexer() -> bool:
 
 def get_config_json() -> str:
     return (
-        '{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
-        ' "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true}'
+        '{ "Version": 36, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
+        ' "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true,'
+        ' "EnablePrivateNetworkAccessHeader":true}'
     )
 
 
@@ -528,21 +525,16 @@ metrics:
 
 # The importer is typically an algod follower node.
 importer:
-  name: algod
+  name: localnet_importer
   config:
-    # The mode of operation, either "archival" or "follower".
-    # * archival mode allows you to start processing on any round but does not
-    # contain the ledger state delta objects required for the postgres writer.
-    # * follower mode allows you to use a lightweight non-archival node as the
-    # data source. In addition, it will provide ledger state delta objects to
-    # the processors and exporter.
-    mode: "follower"
+    lead-node-url: "algod:8080"
+    follower-node-url: "algod:8081"
 
-    # Algod API address.
-    netaddr: "http://algod:8081"
-
-    # Algod API token.
+    # API token (used for both nodes if specific tokens not provided)
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+    # How often to poll the lead node for status updates. Default: 100ms
+    lead-node-poll-interval: 50ms
 
 # Zero or more processors may be defined to manipulate what data
 # reaches the exporter.
@@ -563,70 +555,6 @@ exporter:
 """
 
 
-def get_proxy_config(algod_port: int = DEFAULT_ALGOD_PORT, kmd_port: int = 4002) -> str:
-    return f"""worker_processes 1;
-
-events {{
-  worker_connections 1024;
-}}
-
-http {{
-  access_log off;
-
-  resolver 127.0.0.11 ipv6=off valid=10s;
-  resolver_timeout 5s;
-  client_max_body_size 0;
-
-  map $request_method$http_access_control_request_private_network $cors_allow_private_network {{
-    "OPTIONStrue" "true";
-    default "";
-  }}
-
-  add_header Access-Control-Allow-Private-Network $cors_allow_private_network;
-
-  server {{
-    listen {algod_port};
-
-    location / {{
-      proxy_http_version 1.1;
-      proxy_read_timeout 120s;
-      proxy_set_header Host $host;
-      proxy_set_header Connection "";
-      proxy_pass_header Server;
-      set $target http://algod:8080;
-      proxy_pass $target;
-    }}
-  }}
-
-  server {{
-    listen {kmd_port};
-
-    location / {{
-      proxy_http_version 1.1;
-      proxy_set_header Host $host;
-      proxy_set_header Connection "";
-      proxy_pass_header Server;
-      set $target http://algod:7833;
-      proxy_pass $target;
-    }}
-  }}
-
-  server {{
-    listen 8980;
-
-    location / {{
-      proxy_http_version 1.1;
-      proxy_set_header Host $host;
-      proxy_set_header Connection "";
-      proxy_pass_header Server;
-      set $target http://indexer:8980;
-      proxy_pass $target;
-    }}
-  }}
-}}
-    """
-
-
 def get_docker_compose_yml(
     name: str = "algokit_sandbox",
     algod_port: int = DEFAULT_ALGOD_PORT,
@@ -640,7 +568,9 @@ services:
     container_name: "{name}_algod"
     image: {ALGORAND_IMAGE}
     ports:
-      - 7833
+      - {algod_port}:8080
+      - {kmd_port}:7833
+      - 4003:8081
       - {tealdbg_port}:9392
     environment:
       START_KMD: 1
@@ -680,32 +610,23 @@ services:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexerdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
 
   indexer:
     container_name: "{name}_indexer"
     image: {INDEXER_IMAGE}
+    ports:
+      - 8980:8980
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
       INDEXER_POSTGRES_CONNECTION_STRING: "host=indexer-db port=5432 user=algorand password=algorand dbname=indexerdb sslmode=disable"
     depends_on:
       - conduit
-
-  proxy:
-    container_name: "{name}_proxy"
-    image: nginx:1.27.0-alpine
-    restart: unless-stopped
-    ports:
-      - {algod_port}:{algod_port}
-      - {kmd_port}:{kmd_port}
-      - 8980:8980
-    volumes:
-      - type: bind
-        source: ./nginx.conf
-        target: /etc/nginx/nginx.conf
-    depends_on:
-      - algod
-      - indexer
 """  # noqa: E501
 
 
