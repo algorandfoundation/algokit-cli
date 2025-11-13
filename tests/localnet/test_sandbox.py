@@ -5,7 +5,6 @@ from algokit.core.sandbox import (
     get_conduit_yaml,
     get_config_json,
     get_docker_compose_yml,
-    get_proxy_config,
 )
 from tests.utils.approvals import verify
 
@@ -28,8 +27,3 @@ def test_get_docker_compose_yml() -> None:
 def test_algod_network_template_json() -> None:
     algod_network_template_json = get_algod_network_template()
     verify(algod_network_template_json)
-
-
-def test_proxy_config() -> None:
-    proxy_config = get_proxy_config()
-    verify(proxy_config)

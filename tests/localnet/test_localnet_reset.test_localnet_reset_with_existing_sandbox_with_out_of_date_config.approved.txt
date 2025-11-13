@@ -35,7 +35,9 @@ services:
     container_name: "algokit_sandbox_algod"
     image: algorand/algod:latest
     ports:
-      - 7833
+      - 4001:8080
+      - 4002:7833
+      - 4003:8081
       - 9392:9392
     environment:
       START_KMD: 1
@@ -55,7 +57,7 @@ services:
 
   conduit:
     container_name: "algokit_sandbox_conduit"
-    image: algorand/conduit:latest
+    image: makerxstudio/conduit-localnet-importer:latest
     restart: unless-stopped
     volumes:
       - type: bind
@@ -75,10 +77,17 @@ services:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexerdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
 
   indexer:
     container_name: "algokit_sandbox_indexer"
     image: algorand/indexer:latest
+    ports:
+      - 8980:8980
     restart: unless-stopped
     command: daemon --enable-all-parameters
     environment:
@@ -86,21 +95,5 @@ services:
     depends_on:
       - conduit
 
-  proxy:
-    container_name: "algokit_sandbox_proxy"
-    image: nginx:1.27.0-alpine
-    restart: unless-stopped
-    ports:
-      - 4001:4001
-      - 4002:4002
-      - 8980:8980
-    volumes:
-      - type: bind
-        source: ./nginx.conf
-        target: /etc/nginx/nginx.conf
-    depends_on:
-      - algod
-      - indexer
-
 {app_config}/sandbox/algod_config.json
-{ "Version": 12, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true}
+{ "Version": 36, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true, "EnablePrivateNetworkAccessHeader":true}
