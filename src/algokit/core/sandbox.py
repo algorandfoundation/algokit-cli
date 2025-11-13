@@ -360,7 +360,7 @@ def _wait_for_indexer() -> bool:
 
 def get_config_json() -> str:
     return (
-        '{ "Version": 36, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
+        '{ "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "",'
         ' "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true,'
         ' "EnablePrivateNetworkAccessHeader":true}'
     )
