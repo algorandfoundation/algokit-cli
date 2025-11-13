@@ -1,5 +1,4 @@
 {
-  "Version": 36,
   "GossipFanout": 1,
   "EndpointAddress": "0.0.0.0:8080",
   "DNSBootstrapID": "",

@@ -96,4 +96,4 @@ services:
       - conduit
 
 {app_config}/sandbox/algod_config.json
-{ "Version": 36, "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true, "EnablePrivateNetworkAccessHeader":true}
+{ "GossipFanout": 1, "EndpointAddress": "0.0.0.0:8080", "DNSBootstrapID": "", "IncomingConnectionsLimit": 0, "Archival":true, "isIndexerActive":false, "EnableDeveloperAPI":true, "EnablePrivateNetworkAccessHeader":true}
