@@ -229,3 +229,15 @@ def _clear_caches(mocker: MockerFixture) -> None:
     get_project_dir_names_from_workspace.cache_clear()
     get_project_configs.cache_clear()
     mocker.patch("algokit.core.config_commands.container_engine.get_container_engine", return_value="docker")
+
+
+@pytest.fixture(autouse=True)
+def _always_check_image_versions(mocker: MockerFixture, request: pytest.FixtureRequest) -> None:
+    """Ensure image version checks always run in tests by bypassing the cache.
+
+    Tests can opt-out of this by using @pytest.mark.use_real_image_version_cache
+    """
+    if "use_real_image_version_cache" in [marker.name for marker in request.node.iter_markers()]:
+        return
+    mocker.patch("algokit.core.sandbox._should_check_image_versions", return_value=True)
+    mocker.patch("algokit.core.sandbox._update_image_version_cache")

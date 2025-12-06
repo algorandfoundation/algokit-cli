@@ -5,12 +5,13 @@ import json
 import logging
 import re
 import time
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, cast
 
 import httpx
 
-from algokit.core.conf import get_app_config_dir
+from algokit.core.conf import get_app_config_dir, get_app_state_dir
 from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.proc import RunResult, run, run_interactive
 
@@ -285,6 +286,9 @@ class ComposeSandbox:
         return latest_version is None or latest_version in local_versions
 
     def check_docker_compose_for_new_image_versions(self) -> None:
+        if not _should_check_image_versions():
+            return
+
         is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)
         if is_indexer_up_to_date is False:
             logger.warning(
@@ -296,6 +300,8 @@ class ComposeSandbox:
             logger.warning(
                 "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
+
+        _update_image_version_cache()
 
 
 DEFAULT_ALGOD_SERVER = "http://localhost"
@@ -312,6 +318,39 @@ INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
 CONDUIT_IMAGE = "algorand/conduit:latest"
+IMAGE_VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
+
+
+def _get_image_version_cache_path() -> Path:
+    """Get the path to the image version check cache file."""
+    return get_app_state_dir() / "last-localnet-version-check"
+
+
+def _should_check_image_versions() -> bool:
+    """Determine if we should check for new image versions based on cache."""
+    cache_path = _get_image_version_cache_path()
+    try:
+        last_checked = cache_path.stat().st_mtime
+    except OSError:
+        logger.debug(f"{cache_path} inaccessible, will check for image updates")
+        return True
+
+    elapsed = time.time() - last_checked
+    if elapsed > IMAGE_VERSION_CHECK_INTERVAL:
+        logger.debug("Image version cache expired, will check for updates")
+        return True
+
+    logger.debug(f"Skipping image version check, last checked {elapsed / 3600:.1f}h ago")
+    return False
+
+
+def _update_image_version_cache() -> None:
+    """Update the image version check cache timestamp."""
+    cache_path = _get_image_version_cache_path()
+    try:
+        cache_path.touch()
+    except OSError as ex:
+        logger.debug(f"Failed to update image version cache: {ex}")
 
 
 def _wait_for_service(
