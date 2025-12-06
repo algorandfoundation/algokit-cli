@@ -286,7 +286,7 @@ compose_ps_output: list[DockerServiceInfo] = [
     {
         "ID": "2ba986bf8539527dbc1f2c3e9d8f83e834099ffea30d31f341691b172748464f",
         "Name": "algokit_conduit",
-        "Image": "makerxstudio/conduit-localnet-importer:latest",
+        "Image": "algorandfoundation/conduit-localnet:latest",
         "Command": "docker-entrypoint.sh",
         "Project": "algokit_sandbox",
         "Service": "conduit",

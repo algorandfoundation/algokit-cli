@@ -8,7 +8,7 @@ log-level: INFO
 retry-count: 10
 
 # Time duration to wait between retry attempts.
-retry-delay: "1s"
+retry-delay: "5s"
 
 # Optional filepath to use for pidfile.
 #pid-filepath: /path/to/pidfile
@@ -24,16 +24,11 @@ metrics:
 
 # The importer is typically an algod follower node.
 importer:
-  name: localnet_importer
+  name: localnet_algod
   config:
-    lead-node-url: "algod:8080"
-    follower-node-url: "algod:8081"
-
-    # API token (used for both nodes if specific tokens not provided)
+    lead-node-url: "http://algod:8080"
+    follower-node-url: "http://algod:8081"
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-
-    # How often to poll the lead node for status updates. Default: 100ms
-    lead-node-poll-interval: 50ms
 
 # Zero or more processors may be defined to manipulate what data
 # reaches the exporter.
