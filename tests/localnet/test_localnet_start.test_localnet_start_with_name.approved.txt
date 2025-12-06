@@ -38,7 +38,6 @@ services:
     ports:
       - 4001:8080
       - 4002:7833
-      - 4003:8081
       - 9392:9392
     environment:
       START_KMD: 1
@@ -58,7 +57,7 @@ services:
 
   conduit:
     container_name: "algokit_sandbox_test_conduit"
-    image: makerxstudio/conduit-localnet-importer:latest
+    image: ghcr.io/neilcampbell/conduit-localnet:latest
     restart: unless-stopped
     volumes:
       - type: bind
@@ -78,11 +77,6 @@ services:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexerdb
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 1s
-      timeout: 5s
-      retries: 10
 
   indexer:
     container_name: "algokit_sandbox_test_indexer"

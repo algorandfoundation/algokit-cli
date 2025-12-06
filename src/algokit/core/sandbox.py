@@ -324,7 +324,7 @@ ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
-CONDUIT_IMAGE = "makerxstudio/conduit-localnet:latest"
+CONDUIT_IMAGE = "ghcr.io/neilcampbell/conduit-localnet:latest"  # TODO: NC - Update once the image is published
 IMAGE_VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
 
 
@@ -509,7 +509,7 @@ log-level: INFO
 retry-count: 10
 
 # Time duration to wait between retry attempts.
-retry-delay: "1s"
+retry-delay: "5s"
 
 # Optional filepath to use for pidfile.
 #pid-filepath: /path/to/pidfile
@@ -525,16 +525,11 @@ metrics:
 
 # The importer is typically an algod follower node.
 importer:
-  name: localnet_importer
+  name: localnet_algod
   config:
-    lead-node-url: "algod:8080"
-    follower-node-url: "algod:8081"
-
-    # API token (used for both nodes if specific tokens not provided)
+    lead-node-url: "http://algod:8080"
+    follower-node-url: "http://algod:8081"
     token: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-
-    # How often to poll the lead node for status updates. Default: 100ms
-    lead-node-poll-interval: 50ms
 
 # Zero or more processors may be defined to manipulate what data
 # reaches the exporter.
@@ -570,7 +565,6 @@ services:
     ports:
       - {algod_port}:8080
       - {kmd_port}:7833
-      - 4003:8081
       - {tealdbg_port}:9392
     environment:
       START_KMD: 1
@@ -610,11 +604,6 @@ services:
       POSTGRES_USER: algorand
       POSTGRES_PASSWORD: algorand
       POSTGRES_DB: indexerdb
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 1s
-      timeout: 5s
-      retries: 10
 
   indexer:
     container_name: "{name}_indexer"

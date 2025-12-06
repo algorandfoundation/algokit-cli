@@ -53,7 +53,7 @@ services:
 
   conduit:
     container_name: "algokit_sandbox_conduit"
-    image: makerxstudio/conduit-localnet-importer:latest
+    image: algorandfoundation/conduit-localnet:latest
     restart: unless-stopped
     volumes:
       - type: bind
