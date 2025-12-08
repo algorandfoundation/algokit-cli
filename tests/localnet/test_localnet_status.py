@@ -93,9 +93,9 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
     )
 
     unexpected_port_compose_ps_output = copy.deepcopy(compose_ps_output)
-    # Change the proxy indexer configuration to use a different port
-    unexpected_port_compose_ps_output[4]["Publishers"][2]["TargetPort"] = 1234
-    unexpected_port_compose_ps_output[4]["Publishers"][2]["PublishedPort"] = 1234
+    # Change the indexer configuration to use a different port
+    unexpected_port_compose_ps_output[2]["Publishers"][0]["TargetPort"] = 1234
+    unexpected_port_compose_ps_output[2]["Publishers"][0]["PublishedPort"] = 1234
 
     proc_mock.set_output(
         "docker compose ps --format json",
@@ -152,8 +152,8 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
     )
 
     docker_error_compose_ps_output = copy.deepcopy(compose_ps_output)
-    # Remove proxy indexer publisher to create an error state
-    docker_error_compose_ps_output[4]["Publishers"].pop(2)
+    # Remove indexer publisher to create an error state
+    docker_error_compose_ps_output[2]["Publishers"] = []
 
     proc_mock.set_output(
         "docker compose ps --format json",
@@ -279,6 +279,8 @@ compose_ps_output: list[DockerServiceInfo] = [
         "ExitCode": 0,
         "Publishers": [
             {"URL": "", "TargetPort": 4160, "PublishedPort": 0, "Protocol": "tcp"},
+            {"URL": "0.0.0.0", "TargetPort": 7833, "PublishedPort": 4002, "Protocol": "tcp"},
+            {"URL": "0.0.0.0", "TargetPort": 8080, "PublishedPort": 4001, "Protocol": "tcp"},
             {"URL": "", "TargetPort": 9100, "PublishedPort": 0, "Protocol": "tcp"},
             {"URL": "0.0.0.0", "TargetPort": 9392, "PublishedPort": 9392, "Protocol": "tcp"},
         ],
@@ -309,7 +311,7 @@ compose_ps_output: list[DockerServiceInfo] = [
         "Status": "",
         "Health": "",
         "ExitCode": 0,
-        "Publishers": [],
+        "Publishers": [{"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"}],
     },
     {
         "ID": "f3a0bf6fe1e1fcbff96b88f39e30bcadab4c1792234c970d654b7a34fb71e1d7",
@@ -324,23 +326,5 @@ compose_ps_output: list[DockerServiceInfo] = [
         "Health": "",
         "ExitCode": 0,
         "Publishers": [{"URL": "0.0.0.0", "TargetPort": 5432, "PublishedPort": 5443, "Protocol": "tcp"}],
-    },
-    {
-        "ID": "6508be103d216ad8b36f53f85053adbd5cef540f50349e62bc9a57a3526b48a9",
-        "Name": "algokit_sandbox_proxy",
-        "Image": "nginx:1.27.0-alpine",
-        "Command": "docker-entrypoint.sh",
-        "Project": "algokit_sandbox",
-        "Service": "proxy",
-        "Created": 1701664778,
-        "State": "running",
-        "Status": "",
-        "Health": "",
-        "ExitCode": 0,
-        "Publishers": [
-            {"URL": "0.0.0.0", "TargetPort": 4001, "PublishedPort": 4001, "Protocol": "tcp"},
-            {"URL": "0.0.0.0", "TargetPort": 4002, "PublishedPort": 4002, "Protocol": "tcp"},
-            {"URL": "0.0.0.0", "TargetPort": 8980, "PublishedPort": 8980, "Protocol": "tcp"},
-        ],
     },
 ]
