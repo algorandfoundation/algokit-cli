@@ -285,8 +285,8 @@ class ComposeSandbox:
         latest_version = self._get_latest_image_version(image_name)
         return latest_version is None or latest_version in local_versions
 
-    def check_docker_compose_for_new_image_versions(self) -> None:
-        if not _should_check_image_versions():
+    def check_docker_compose_for_new_image_versions(self, *, force: bool = False) -> None:
+        if not force and not _should_check_image_versions():
             return
 
         is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)

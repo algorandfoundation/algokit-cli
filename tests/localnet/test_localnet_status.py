@@ -12,7 +12,7 @@ from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -44,7 +44,7 @@ def test_localnet_status_successful(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -74,7 +74,7 @@ def test_localnet_status_http_error(app_dir_mock: AppDirs, proc_mock: ProcMock, 
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -109,7 +109,7 @@ def test_localnet_status_unexpected_port(app_dir_mock: AppDirs, proc_mock: ProcM
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -134,7 +134,7 @@ def test_localnet_status_service_not_started(app_dir_mock: AppDirs, proc_mock: P
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -167,8 +167,8 @@ def test_localnet_status_docker_error(app_dir_mock: AppDirs, proc_mock: ProcMock
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
-def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock, httpx_mock: HTTPXMock) -> None:
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
+def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
 
@@ -182,13 +182,12 @@ def test_localnet_status_missing_service(app_dir_mock: AppDirs, proc_mock: ProcM
     result = invoke("localnet status")
 
     assert result.exit_code == 1
-    assert not httpx_mock.get_request()
     verify(
         result.output.replace("\\\\", "\\").replace(str(app_dir_mock.app_config_dir), "{app_config}").replace("\\", "/")
     )
 
 
-@pytest.mark.usefixtures("_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> None:
     (app_dir_mock.app_config_dir / "sandbox").mkdir()
     (app_dir_mock.app_config_dir / "sandbox" / "docker-compose.yml").write_text("existing")
@@ -202,7 +201,7 @@ def test_localnet_status_failure(app_dir_mock: AppDirs, proc_mock: ProcMock) -> 
     )
 
 
-@pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet")
+@pytest.mark.usefixtures("proc_mock", "_mock_proc_with_running_localnet", "_localnet_up_to_date")
 def test_localnet_status_no_existing_definition(app_dir_mock: AppDirs) -> None:
     result = invoke("localnet status")
 
