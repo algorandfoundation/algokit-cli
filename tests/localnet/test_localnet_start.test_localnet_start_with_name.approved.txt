@@ -57,7 +57,7 @@ services:
 
   conduit:
     container_name: "algokit_sandbox_test_conduit"
-    image: ghcr.io/neilcampbell/conduit-localnet:latest
+    image: algorandfoundation/conduit-localnet:latest
     restart: unless-stopped
     volumes:
       - type: bind

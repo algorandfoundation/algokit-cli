@@ -307,7 +307,7 @@ ALGOD_HEALTH_URL = f"{DEFAULT_ALGOD_SERVER}:{DEFAULT_ALGOD_PORT}/v2/status"
 INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
-CONDUIT_IMAGE = "ghcr.io/neilcampbell/conduit-localnet:latest"  # TODO: NC - Update once the image is published
+CONDUIT_IMAGE = "algorandfoundation/conduit-localnet:latest"
 
 
 def _wait_for_service(
