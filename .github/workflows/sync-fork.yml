@@ -1,0 +1,36 @@
+name: Sync WinGet Fork
+
+on:
+  push:
+    branches:
+      - winget-sync
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          repository: algofoundation/winget-pkgs
+          fetch-depth: 0
+          token: ${{ secrets.WINGET_GITHUB_TOKEN }}
+
+      - name: Sync upstream changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add upstream remote (microsoft/winget-pkgs is the upstream of algofoundation/winget-pkgs)
+          git remote add upstream https://github.com/microsoft/winget-pkgs.git 2>/dev/null || true
+
+          # Fetch upstream
+          git fetch upstream
+
+          # Merge upstream changes into the default branch
+          git checkout master
+          git merge upstream/master --no-edit
+
+          # Push changes
+          git push origin master
