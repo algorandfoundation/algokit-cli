@@ -152,6 +152,9 @@ class ComposeSandbox:
             return ComposeFileStatus.MISSING
         else:
             try:
+                # Perform some content normalization to ensure we correctly detect up to date files
+
+                # Ensure the NUM_ROUNDS placeholder is the same in both files
                 algod_network_json_content = json.loads(
                     algod_network_template_content.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
                 )
@@ -159,6 +162,7 @@ class ComposeSandbox:
                     self._latest_algod_network_template.replace("NUM_ROUNDS", '"NUM_ROUNDS"')
                 )
 
+                # Remove DevMode from comparison as the value is configurable via the `--dev` option
                 del algod_network_json_content["Genesis"]["DevMode"]
                 del latest_algod_network_json_content["Genesis"]["DevMode"]
 
