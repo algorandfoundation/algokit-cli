@@ -9,10 +9,10 @@ DEBUG: The sandbox directory does not exist yet; creating it
 DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
 DEBUG: docker: tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
-WARNING: indexer has a new version available, run `algokit localnet reset --update` to get the latest version
 DEBUG: Running 'docker image inspect algorand/algod:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
 DEBUG: docker: tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
+WARNING: indexer has a new version available, run `algokit localnet reset --update` to get the latest version
 WARNING: algod has a new version available, run `algokit localnet reset --update` to get the latest version
 DEBUG: LocalNet compose file does not exist yet; writing it out for the first time
 Starting AlgoKit LocalNet now...

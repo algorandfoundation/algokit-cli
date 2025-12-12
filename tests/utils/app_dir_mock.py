@@ -19,5 +19,6 @@ def tmp_app_dir(mocker: MockerFixture, tmp_path: Path) -> AppDirs:
 
     app_state_dir = tmp_path / "state"
     app_state_dir.mkdir()
+    mocker.patch("algokit.core.sandbox.get_app_state_dir").return_value = app_state_dir
 
     return AppDirs(app_config_dir=app_config_dir, app_state_dir=app_state_dir)

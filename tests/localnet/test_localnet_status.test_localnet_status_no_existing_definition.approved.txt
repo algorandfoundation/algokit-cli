@@ -6,6 +6,12 @@ DEBUG: docker: STDERR
 DEBUG: Running 'docker compose ls --format json --filter name=algokit_sandbox*' in '{current_working_directory}'
 DEBUG: docker: [{"Name": "algokit_sandbox", "Status": "running", "ConfigFiles": "{app_config}/sandbox/docker-compose.yml"}]
 DEBUG: The sandbox directory does not exist yet; creating it
+DEBUG: Running 'docker image inspect algorand/indexer:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/indexer/tags/latest "HTTP/1.1 200 OK"
+DEBUG: Running 'docker image inspect algorand/algod:latest --format {{range .RepoDigests}}{{println .}}{{end}}' in '{current_working_directory}'
+DEBUG: docker: tag@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+HTTP Request: GET https://registry.hub.docker.com/v2/repositories/algorand/algod/tags/latest "HTTP/1.1 200 OK"
 # container engine
 Name: docker (change with `algokit config container-engine`)
 DEBUG: Running 'docker compose ps --format json' in '{app_config}/sandbox'

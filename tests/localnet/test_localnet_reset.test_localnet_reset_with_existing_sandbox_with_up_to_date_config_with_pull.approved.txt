@@ -13,6 +13,7 @@ Fetching any container updates from DockerHub...
 DEBUG: Running 'docker compose pull --ignore-pull-failures --quiet' in '{app_config}/sandbox'
 docker: STDOUT
 docker: STDERR
+DEBUG: Image version cache reset
 Starting AlgoKit LocalNet now...
 DEBUG: Running 'docker compose up --detach --quiet-pull --wait' in '{app_config}/sandbox'
 docker: STDOUT

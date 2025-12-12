@@ -127,30 +127,34 @@
     - [Options](#options-17)
     - [--update, --no-update](#--update---no-update)
     - [-P, --config-dir ](#-p---config-dir-)
+    - [--check](#--check)
     - [start](#start)
     - [Options](#options-18)
     - [-n, --name ](#-n---name--1)
     - [-P, --config-dir ](#-p---config-dir--1)
     - [-d, --dev, --no-dev](#-d---dev---no-dev)
     - [--force](#--force)
+    - [--check](#--check-1)
     - [status](#status)
+    - [Options](#options-19)
+    - [--check](#--check-2)
     - [stop](#stop)
   - [project](#project)
     - [bootstrap](#bootstrap)
-    - [Options](#options-19)
-    - [--force](#--force-1)
     - [Options](#options-20)
+    - [--force](#--force-1)
+    - [Options](#options-21)
     - [--interactive, --no-ci, --non-interactive, --ci](#--interactive---no-ci---non-interactive---ci)
     - [-p, --project-name ](#-p---project-name-)
     - [-t, --type ](#-t---type-)
-    - [Options](#options-21)
-    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [Options](#options-22)
-    - [--ci, --no-ci](#--ci---no-ci)
+    - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci)
     - [Options](#options-23)
+    - [--ci, --no-ci](#--ci---no-ci)
+    - [Options](#options-24)
     - [--ci, --no-ci](#--ci---no-ci-1)
     - [deploy](#deploy)
-    - [Options](#options-24)
+    - [Options](#options-25)
     - [-C, -c, --command ](#-c--c---command-)
     - [--interactive, --non-interactive, --ci](#--interactive---non-interactive---ci-1)
     - [-P, --path ](#-p---path-)
@@ -161,7 +165,7 @@
     - [ENVIRONMENT_NAME](#environment_name)
     - [EXTRA_ARGS](#extra_args)
     - [link](#link)
-    - [Options](#options-25)
+    - [Options](#options-26)
     - [-p, --project-name ](#-p---project-name--2)
     - [-l, --language ](#-l---language--1)
     - [-a, --all](#-a---all)
@@ -173,7 +177,7 @@
     - [run](#run)
   - [task](#task)
     - [analyze](#analyze)
-    - [Options](#options-26)
+    - [Options](#options-27)
     - [-r, --recursive](#-r---recursive)
     - [--force](#--force-2)
     - [--diff](#--diff)
@@ -182,11 +186,11 @@
     - [Arguments](#arguments-15)
     - [INPUT_PATHS](#input_paths)
     - [ipfs](#ipfs)
-    - [Options](#options-27)
+    - [Options](#options-28)
     - [-f, --file ](#-f---file--1)
     - [-n, --name ](#-n---name--2)
     - [mint](#mint)
-    - [Options](#options-28)
+    - [Options](#options-29)
     - [--creator ](#--creator-)
     - [--name ](#--name-)
     - [-u, --unit ](#-u---unit-)
@@ -198,37 +202,37 @@
     - [--mutable, --immutable](#--mutable---immutable)
     - [-n, --network ](#-n---network-)
     - [nfd-lookup](#nfd-lookup)
-    - [Options](#options-29)
+    - [Options](#options-30)
     - [-o, --output ](#-o---output--3)
     - [Arguments](#arguments-16)
     - [VALUE](#value)
     - [opt-in](#opt-in)
-    - [Options](#options-30)
+    - [Options](#options-31)
     - [-a, --account ](#-a---account-)
     - [-n, --network ](#-n---network--1)
     - [Arguments](#arguments-17)
     - [ASSET_IDS](#asset_ids)
     - [opt-out](#opt-out)
-    - [Options](#options-31)
+    - [Options](#options-32)
     - [-a, --account ](#-a---account--1)
     - [--all](#--all)
     - [-n, --network ](#-n---network--2)
     - [Arguments](#arguments-18)
     - [ASSET_IDS](#asset_ids-1)
     - [send](#send)
-    - [Options](#options-32)
+    - [Options](#options-33)
     - [-f, --file ](#-f---file--2)
     - [-t, --transaction ](#-t---transaction-)
     - [-n, --network ](#-n---network--3)
     - [sign](#sign)
-    - [Options](#options-33)
+    - [Options](#options-34)
     - [-a, --account ](#-a---account--2)
     - [-f, --file ](#-f---file--3)
     - [-t, --transaction ](#-t---transaction--1)
     - [-o, --output ](#-o---output--4)
     - [--force](#--force-3)
     - [transfer](#transfer)
-    - [Options](#options-34)
+    - [Options](#options-35)
     - [-s, --sender ](#-s---sender-)
     - [-r, --receiver ](#-r---receiver--1)
     - [--asset, --id ](#--asset---id-)
@@ -236,7 +240,7 @@
     - [--whole-units](#--whole-units-2)
     - [-n, --network ](#-n---network--4)
     - [vanity-address](#vanity-address)
-    - [Options](#options-35)
+    - [Options](#options-36)
     - [-m, --match ](#-m---match-)
     - [-o, --output ](#-o---output--5)
     - [-a, --alias ](#-a---alias-)
@@ -245,7 +249,7 @@
     - [Arguments](#arguments-19)
     - [KEYWORD](#keyword)
     - [wallet](#wallet)
-    - [Options](#options-36)
+    - [Options](#options-37)
     - [-a, --address ](#-a---address-)
     - [-m, --mnemonic](#-m---mnemonic)
     - [-f, --force](#-f---force-4)
@@ -253,11 +257,11 @@
     - [ALIAS_NAME](#alias_name)
     - [Arguments](#arguments-21)
     - [ALIAS](#alias)
-    - [Options](#options-37)
+    - [Options](#options-38)
     - [-f, --force](#-f---force-5)
     - [Arguments](#arguments-22)
     - [ALIAS](#alias-1)
-    - [Options](#options-38)
+    - [Options](#options-39)
     - [-f, --force](#-f---force-6)
 
 # algokit
@@ -918,6 +922,10 @@ Enable or disable updating to the latest available LocalNet version, default: do
 ### -P, --config-dir <config_path>
 Specify the custom localnet configuration directory.
 
+
+### --check
+Force check the Docker registry for new LocalNet image versions, ignoring the version check cache.
+
 ### start
 
 Start the AlgoKit LocalNet.
@@ -944,6 +952,10 @@ Control whether to launch 'algod' in developer mode or not. Defaults to 'yes'.
 ### --force
 Ignore the prompt to stop the LocalNet if it's already running.
 
+
+### --check
+Force check the Docker registry for new LocalNet image versions, ignoring the version check cache.
+
 ### status
 
 Check the status of the AlgoKit LocalNet.
@@ -951,6 +963,12 @@ Check the status of the AlgoKit LocalNet.
 ```shell
 algokit localnet status [OPTIONS]
 ```
+
+### Options
+
+
+### --check
+Force check the Docker registry for new LocalNet image versions, ignoring the version check cache.
 
 ### stop
 

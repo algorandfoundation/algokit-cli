@@ -168,7 +168,9 @@ suppress-none-returning = true
 pythonpath = ["src", "tests"]
 markers = [
     "mock_platform_system",
-    "pyinstaller_binary_tests"
+    "pyinstaller_binary_tests",
+    "use_real_image_version_cache: opt-out of the auto-mocked image version cache checks"
+
 ]
 addopts = "-m 'not pyinstaller_binary_tests'" # by default, exclude pyinstaller_binary_tests
 [tool.mypy]

@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+import dataclasses
 import enum
 import json
 import logging
 import re
 import time
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, cast
 
 import httpx
 
-from algokit.core.conf import get_app_config_dir
+from algokit.core.conf import get_app_config_dir, get_app_state_dir
 from algokit.core.config_commands.container_engine import get_container_engine
 from algokit.core.proc import RunResult, run, run_interactive
 
@@ -219,6 +221,8 @@ class ComposeSandbox:
     def pull(self) -> None:
         logger.info("Fetching any container updates from DockerHub...")
         self._run_compose_command("pull --ignore-pull-failures --quiet")
+        logger.debug("Image version cache reset")
+        _update_image_version_cache(indexer_outdated=False, algod_outdated=False)
 
     def logs(self, *, follow: bool = False, no_color: bool = False, tail: str | None = None) -> None:
         compose_args = ["logs"]
@@ -284,15 +288,28 @@ class ComposeSandbox:
         latest_version = self._get_latest_image_version(image_name)
         return latest_version is None or latest_version in local_versions
 
-    def check_docker_compose_for_new_image_versions(self) -> None:
-        is_indexer_up_to_date = self.is_image_up_to_date(INDEXER_IMAGE)
-        if is_indexer_up_to_date is False:
+    def check_docker_compose_for_new_image_versions(self, *, force: bool = False) -> None:
+        should_check_registry = force or _should_check_image_versions()
+
+        if should_check_registry:
+            # Check Docker registry for new versions
+            is_indexer_outdated = not self.is_image_up_to_date(INDEXER_IMAGE)
+            is_algod_outdated = not self.is_image_up_to_date(ALGORAND_IMAGE)
+            _update_image_version_cache(indexer_outdated=is_indexer_outdated, algod_outdated=is_algod_outdated)
+        else:
+            # Use cached state
+            cached_state = _get_image_version_cache()
+            if cached_state is None:
+                return
+            is_indexer_outdated = cached_state.indexer_outdated
+            is_algod_outdated = cached_state.algod_outdated
+
+        if is_indexer_outdated:
             logger.warning(
                 "indexer has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
 
-        is_algorand_up_to_date = self.is_image_up_to_date(ALGORAND_IMAGE)
-        if is_algorand_up_to_date is False:
+        if is_algod_outdated:
             logger.warning(
                 "algod has a new version available, run `algokit localnet reset --update` to get the latest version"
             )
@@ -312,6 +329,65 @@ INDEXER_HEALTH_URL = f"{DEFAULT_INDEXER_SERVER}:{DEFAULT_INDEXER_PORT}/health"
 INDEXER_IMAGE = "algorand/indexer:latest"
 ALGORAND_IMAGE = "algorand/algod:latest"
 CONDUIT_IMAGE = "algorand/conduit:latest"
+IMAGE_VERSION_CHECK_INTERVAL = timedelta(weeks=1).total_seconds()
+
+
+@dataclasses.dataclass
+class ImageVersionCache:
+    """Cache state for image version checks."""
+
+    indexer_outdated: bool
+    algod_outdated: bool
+
+
+def _get_image_version_cache_path() -> Path:
+    """Get the path to the image version check cache file."""
+    return get_app_state_dir() / "last-localnet-version-check"
+
+
+def _get_image_version_cache() -> ImageVersionCache | None:
+    """Get the cached image version state.
+
+    Returns an ImageVersionCache with outdated flags, or None if cache is missing/invalid.
+    """
+    cache_path = _get_image_version_cache_path()
+    try:
+        content = cache_path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return ImageVersionCache(
+            indexer_outdated=data.get("indexer_outdated", False),
+            algod_outdated=data.get("algod_outdated", False),
+        )
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _should_check_image_versions() -> bool:
+    """Determine if we should check for new image versions based on cache."""
+    cache_path = _get_image_version_cache_path()
+    try:
+        last_checked = cache_path.stat().st_mtime
+    except OSError:
+        logger.debug(f"{cache_path} inaccessible, will check for image updates")
+        return True
+
+    elapsed = time.time() - last_checked
+    if elapsed > IMAGE_VERSION_CHECK_INTERVAL:
+        logger.debug("Image version cache expired, will check for updates")
+        return True
+
+    logger.debug(f"Skipping image version check, last checked {elapsed / 3600:.1f}h ago")
+    return False
+
+
+def _update_image_version_cache(*, indexer_outdated: bool, algod_outdated: bool) -> None:
+    """Update the image version check cache with current state."""
+    cache_path = _get_image_version_cache_path()
+    try:
+        cache_data = {"indexer_outdated": indexer_outdated, "algod_outdated": algod_outdated}
+        cache_path.write_text(json.dumps(cache_data), encoding="utf-8")
+    except OSError as ex:
+        logger.debug(f"Failed to update image version cache: {ex}")
 
 
 def _wait_for_service(
