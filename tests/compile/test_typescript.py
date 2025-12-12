@@ -68,8 +68,8 @@ def typescript_test_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
         "name": "algokit-test",
         "version": "1.0.0",
         "dependencies": {
-            "@algorandfoundation/puya-ts": "~1.0.0-beta.48 <1.0.0",
-            "@algorandfoundation/algorand-typescript": "~1.0.0-beta.25 <1.0.0"
+            "@algorandfoundation/puya-ts": "^1.0.1",
+            "@algorandfoundation/algorand-typescript": "^1.0.1"
         }
     }"""
 
@@ -77,7 +77,13 @@ def typescript_test_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     package_json_path.write_text(package_json_content)
 
     # Execute npm install in the directory
-    subprocess.run([_get_npm_command(), "install"], cwd=test_dir, check=True, capture_output=True, text=True)
+    result = subprocess.run(
+        [_get_npm_command(), "install", "--ignore-scripts"], cwd=test_dir, capture_output=True, text=True, check=False
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"npm install failed with exit code {result.returncode}\nstdout: {result.stdout}\nstderr: {result.stderr}"
+        )
 
     return test_dir
 
