@@ -2,6 +2,19 @@
 
 <!--next-version-placeholder-->
 
+## v2.10.0 (2025-12-12)
+
+### Feature
+
+* Update to use the localnet specific conduit algod importer ([#700](https://github.com/algorandfoundation/algokit-cli/issues/700)) ([`c9b423a`](https://github.com/algorandfoundation/algokit-cli/commit/c9b423afa96e6ae91d29064fea09a4b5293c4c55))
+* Add check flag to control when image update checks are run ([`dc39e49`](https://github.com/algorandfoundation/algokit-cli/commit/dc39e495b489bb110261cc5199d12a684fae2870))
+* Reduce frequency of localnet image update checks ([`3de015e`](https://github.com/algorandfoundation/algokit-cli/commit/3de015e60a32f810891b7f8d6d475f9595ff9bda))
+
+### Documentation
+
+* Updated invalid links and fixed some typos in the docs ([#693](https://github.com/algorandfoundation/algokit-cli/issues/693)) ([`35518c3`](https://github.com/algorandfoundation/algokit-cli/commit/35518c332b789ca7b3a70ed3321e8d295d5c3ab9))
+* Removed obsolete info and fixed typos ([#687](https://github.com/algorandfoundation/algokit-cli/issues/687)) ([`330cc05`](https://github.com/algorandfoundation/algokit-cli/commit/330cc059bf7bf1966a093edc333d3d4d87047276))
+
 ## v2.9.1 (2025-09-11)
 
 ### Fix
