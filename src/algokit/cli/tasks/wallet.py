@@ -2,9 +2,9 @@ import json
 import re
 
 import click
-from algosdk import account
 
 from algokit.cli.tasks.utils import get_private_key_from_mnemonic, validate_address
+from algokit.core.address_utils import address_from_private_key
 from algokit.core.tasks.wallet import (
     WALLET_ALIASING_MAX_LIMIT,
     WalletAliasingLimitError,
@@ -49,7 +49,7 @@ def add(*, alias_name: str, address: str, use_mnemonic: bool, force: bool) -> No
     private_key = get_private_key_from_mnemonic() if use_mnemonic else None
 
     if use_mnemonic:
-        derived_address = account.address_from_private_key(private_key)  # type: ignore[no-untyped-call]
+        derived_address = address_from_private_key(private_key)  # type: ignore[arg-type]
         if derived_address != address:
             click.echo(
                 "Warning: Address from the mnemonic doesn't match the provided address. "

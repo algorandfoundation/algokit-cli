@@ -1,8 +1,10 @@
+import base64
 import json
 
 import pytest
-from algokit_utils import SendAtomicTransactionComposerResults
-from algosdk import account, mnemonic
+from algokit_algosdk import account
+from algokit_utils import SendTransactionComposerResults
+from algokit_utils.algo25 import secret_key_to_mnemonic
 from pytest_mock import MockerFixture
 
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
@@ -21,7 +23,9 @@ def _generate_account() -> tuple[str, str]:
 
 
 def _get_mnemonic_from_private_key(private_key: str) -> str:
-    return str(mnemonic.from_private_key(private_key))  # type: ignore[no-untyped-call]
+    # Convert base64-encoded private key to bytes for secret_key_to_mnemonic
+    private_key_bytes = base64.b64decode(private_key)
+    return secret_key_to_mnemonic(private_key_bytes)
 
 
 def test_transfer_no_args() -> None:
@@ -81,7 +85,7 @@ def test_transfer_algo_from_address_successful(mocker: MockerFixture) -> None:
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_payment.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -111,7 +115,7 @@ def test_transfer_algo_from_alias_successful(mocker: MockerFixture, mock_keyring
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_payment.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -151,7 +155,7 @@ def test_transfer_asset_from_address_successful(mocker: MockerFixture) -> None:
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_asset_transfer.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -181,7 +185,7 @@ def test_transfer_asset_from_address_to_alias_successful(mocker: MockerFixture, 
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_asset_transfer.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -221,7 +225,7 @@ def test_transfer_asset_from_alias_successful(mocker: MockerFixture, mock_keyrin
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_asset_transfer.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -294,7 +298,7 @@ def test_transfer_on_testnet(mocker: MockerFixture) -> None:
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_payment.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],
@@ -324,7 +328,7 @@ def test_transfer_on_mainnet(mocker: MockerFixture) -> None:
     algorand_mock = mocker.MagicMock()
     composer_mock = mocker.MagicMock()
     composer_mock.add_payment.return_value = composer_mock
-    composer_mock.send.return_value = SendAtomicTransactionComposerResults(
+    composer_mock.send.return_value = SendTransactionComposerResults(
         group_id="dummy_group_id",
         confirmations=[],
         tx_ids=["dummy_txid"],

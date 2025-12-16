@@ -1,11 +1,13 @@
+import base64
 import json
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import click
-from algosdk import encoding, error
-from algosdk.transaction import SignedTransaction, retrieve_from_file
+import msgpack
+from algokit_utils.clients import UnexpectedStatusError
+from algokit_utils.transact import SignedTransaction, decode_signed_transaction, encode_signed_transaction
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import MutuallyExclusiveOption, get_explorer_url
@@ -34,6 +36,60 @@ def _is_sign_task_output_txn(item: dict) -> bool:
     return isinstance(item, dict) and all(key in item for key in ["transaction_id", "content"])
 
 
+def _retrieve_transactions_from_file(file_path: Path) -> list[SignedTransaction]:
+    """
+    Load signed transactions from a file containing msgpack-encoded data.
+
+    Args:
+        file_path: Path to the file containing signed transaction(s)
+
+    Returns:
+        A list of SignedTransaction objects
+
+    Raises:
+        click.ClickException: If the file cannot be read or decoded
+    """
+    try:
+        file_content = file_path.read_bytes()
+
+        # Try to decode as a single transaction first
+        try:
+            return [decode_signed_transaction(file_content)]
+        except Exception:
+            pass
+
+        # Try to parse multiple concatenated msgpack objects
+        transactions: list[SignedTransaction] = []
+        offset = 0
+
+        while offset < len(file_content):
+            # Use msgpack Unpacker to find the boundaries of each msgpack object
+            unpacker = msgpack.Unpacker(raw=True, strict_map_key=False)
+            unpacker.feed(file_content[offset:])
+            try:
+                _ = unpacker.unpack()  # Advance to get the position
+                msgpack_bytes_consumed = unpacker.tell()
+
+                # Extract just this msgpack object
+                encoded_txn = file_content[offset : offset + msgpack_bytes_consumed]
+                offset += msgpack_bytes_consumed
+
+                # Decode the signed transaction
+                stx = decode_signed_transaction(encoded_txn)
+                transactions.append(stx)
+            except msgpack.OutOfData:
+                break
+            except Exception:
+                break
+
+        if transactions:
+            return transactions
+        raise ValueError("No valid transactions found in file") from None
+    except Exception as ex:
+        logger.debug(ex, exc_info=True)
+        raise click.ClickException(f"Failed to read transactions from file: {ex}") from ex
+
+
 def _load_from_stdin() -> list[SignedTransaction]:
     """
     Load transaction data from standard input and convert it into a list of SignedTransaction objects.
@@ -59,7 +115,7 @@ def _load_from_stdin() -> list[SignedTransaction]:
         raise click.ClickException("Invalid piped transaction content!")
 
     # Convert the content into SignedTransaction objects
-    return [encoding.msgpack_decode(item["content"]) for item in file_content]  # type: ignore[no-untyped-call]
+    return [decode_signed_transaction(base64.b64decode(item["content"])) for item in file_content]
 
 
 def _get_signed_transactions(file: Path | None = None, transaction: str | None = None) -> list[SignedTransaction]:
@@ -80,9 +136,9 @@ def _get_signed_transactions(file: Path | None = None, transaction: str | None =
     """
     try:
         if file:
-            txns = retrieve_from_file(str(file))  # type: ignore[no-untyped-call]
+            txns = _retrieve_transactions_from_file(file)
         elif transaction:
-            txns = [encoding.msgpack_decode(transaction)]  # type: ignore[no-untyped-call]
+            txns = [decode_signed_transaction(base64.b64decode(transaction))]
         else:
             txns = _load_from_stdin()
 
@@ -90,7 +146,7 @@ def _get_signed_transactions(file: Path | None = None, transaction: str | None =
             if not isinstance(txn, SignedTransaction):
                 raise click.ClickException("Supplied transaction is not signed!")
 
-        return cast("list[SignedTransaction]", txns)
+        return txns
 
     except Exception as ex:
         logger.debug(ex, exc_info=True)
@@ -112,8 +168,11 @@ def _send_transactions(network: AlgorandNetwork, txns: list[SignedTransaction]) 
     """
     algod_client = load_algod_client(network)
 
-    if any(txn.transaction.group for txn in txns):
-        txid = algod_client.send_transactions(txns)
+    if any(txn.txn.group for txn in txns):
+        # Send all transactions as a group
+        encoded_txns = [encode_signed_transaction(txn) for txn in txns]
+        result = algod_client.send_raw_transaction(encoded_txns)
+        txid = result.tx_id
         click.echo(f"Transaction group successfully sent with txid: {txid}")
         click.echo(
             f"Check transaction group status at: {get_explorer_url(txid, network, ExplorerEntityType.TRANSACTION)}"
@@ -121,7 +180,9 @@ def _send_transactions(network: AlgorandNetwork, txns: list[SignedTransaction]) 
     else:
         for index, txn in enumerate(txns, start=1):
             click.echo(f"\nSending transaction {index}/{len(txns)}")
-            txid = algod_client.send_transaction(txn)
+            encoded_txn = encode_signed_transaction(txn)
+            result = algod_client.send_raw_transaction(encoded_txn)
+            txid = result.tx_id
             click.echo(f"Transaction successfully sent with txid: {txid}")
             click.echo(
                 f"Check transaction status at: {get_explorer_url(txid, network, ExplorerEntityType.TRANSACTION)}"
@@ -169,7 +230,7 @@ def send(*, file: Path | None, transaction: str | None, network: AlgorandNetwork
 
     try:
         _send_transactions(network, txns)
-    except error.AlgodHTTPError as ex:
+    except UnexpectedStatusError as ex:
         raise click.ClickException(str(ex)) from ex
     except Exception as ex:
         logger.debug(ex, exc_info=True)

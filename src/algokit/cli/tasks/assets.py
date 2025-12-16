@@ -1,8 +1,7 @@
 import logging
 
 import click
-from algosdk import error
-from algosdk.v2client.algod import AlgodClient
+from algokit_utils.clients import AlgodClient, UnexpectedStatusError
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import get_explorer_url
@@ -73,7 +72,7 @@ def opt_in_command(asset_ids: tuple[int], account: str, network: AlgorandNetwork
             for asset_opt_int_result in response:
                 explorer_url = get_explorer_url(asset_opt_int_result.transaction_id, network, ExplorerEntityType.ASSET)
                 click.echo(f"Check opt-in status for asset {asset_opt_int_result.asset_id} at: {explorer_url}")
-    except error.AlgodHTTPError as err:
+    except UnexpectedStatusError as err:
         raise click.ClickException(str(err)) from err
     except ValueError as err:
         logger.debug(err, exc_info=True)
@@ -140,7 +139,7 @@ def opt_out_command(*, asset_ids: tuple[int], account: str, network: AlgorandNet
                 asset_opt_out_result.transaction_id, network, ExplorerEntityType.TRANSACTION
             )
             click.echo(f"Check opt-in status for asset {asset_opt_out_result.asset_id} at: {transaction_url}")
-    except error.AlgodHTTPError as err:
+    except UnexpectedStatusError as err:
         raise click.ClickException(str(err)) from err
     except ConnectionRefusedError as err:
         raise click.ClickException(str(err)) from err
