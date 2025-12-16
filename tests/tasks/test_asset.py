@@ -1,3 +1,4 @@
+import base64
 import json
 
 from algokit_algod_client.models import Account, AssetHolding
