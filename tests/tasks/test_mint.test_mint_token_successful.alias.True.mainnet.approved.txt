@@ -22,4 +22,4 @@ DEBUG: Asset config params: {
 
 Successfully minted the asset!
 Browse your asset at: https://explore.algokit.io/mainnet/asset/123
-Check transaction status at: https://explore.algokit.io/mainnet/transaction/dummy_tx_id
+Check transaction status at: https://explore.algokit.io/mainnet/transaction/I3UTXWJIS25PAOP7KBFCQDHZC3PMDQJDOO4XUQFJHQTB3ZBYBPYA

@@ -5,8 +5,8 @@ from decimal import Decimal
 from pathlib import Path
 
 import click
-from algokit_utils import AlgoAmount, SigningAccount
-from algosdk.error import AlgodHTTPError
+from algokit_utils import AlgoAmount
+from algokit_utils.clients import UnexpectedStatusError
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import get_explorer_url
@@ -16,6 +16,7 @@ from algokit.cli.tasks.utils import (
     run_callback_once,
     validate_balance,
 )
+from algokit.core.signing_account import SigningAccount
 from algokit.core.tasks.ipfs import (
     PinataBadRequestError,
     PinataForbiddenError,
@@ -332,7 +333,7 @@ def mint(  # noqa: PLR0913
     ) as ex:
         logger.debug(ex)
         raise click.ClickException(repr(ex)) from ex
-    except AlgodHTTPError as ex:
+    except UnexpectedStatusError as ex:
         raise click.ClickException(str(ex)) from ex
     except Exception as ex:
         logger.debug(ex, exc_info=True)

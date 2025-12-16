@@ -1,4 +1,4 @@
-import algosdk
+import algokit_algosdk.account
 from pytest_httpx import HTTPXMock
 
 from tests.utils.approvals import verify
@@ -27,7 +27,7 @@ def test_nfd_lookup_by_domain_success(httpx_mock: HTTPXMock) -> None:
 
 def test_nfd_lookup_by_address_success(httpx_mock: HTTPXMock) -> None:
     # Arrange
-    _, dummy_wallet = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
+    _, dummy_wallet = algokit_algosdk.account.generate_account()  # type: ignore[no-untyped-call]
     httpx_mock.add_response(
         url=f"https://api.nf.domains/nfd/lookup?address={dummy_wallet}&view=thumbnail&allowUnverified=false",
         json={

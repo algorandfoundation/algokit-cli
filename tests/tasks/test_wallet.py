@@ -1,7 +1,10 @@
+import base64
 import json
 
-import algosdk
 import pytest
+from algokit_common import address_from_public_key
+from algokit_utils.algo25 import secret_key_to_mnemonic
+from nacl.signing import SigningKey
 from pytest_mock import MockerFixture
 
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
@@ -9,11 +12,25 @@ from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 
 
+def generate_test_account() -> tuple[str, str]:
+    """Generate a test account for testing purposes.
+
+    Returns:
+        tuple[str, str]: A tuple of (private_key, address).
+            The private key is base64-encoded (64 bytes: 32 bytes secret + 32 bytes public key).
+    """
+    signing_key = SigningKey.generate()
+    private_key_bytes = signing_key.encode() + signing_key.verify_key.encode()
+    private_key = base64.b64encode(private_key_bytes).decode()
+    address = address_from_public_key(signing_key.verify_key.encode())
+    return private_key, address
+
+
 class TestAddAlias:
     def test_wallet_add_address_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
 
         # Act
         result = invoke(f"task wallet add {alias_name} -a {address}")
@@ -31,8 +48,8 @@ class TestAddAlias:
     def test_wallet_add_account_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        pk, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
-        mnemonic = algosdk.mnemonic.from_private_key(pk)  # type: ignore[no-untyped-call]
+        pk, address = generate_test_account()
+        mnemonic = secret_key_to_mnemonic(base64.b64decode(pk))
 
         # Act
         result = invoke(f"task wallet add {alias_name} -a {address} -m", input=f"{mnemonic}\n")
@@ -60,9 +77,9 @@ class TestAddAlias:
     def test_wallet_add_alias_exists(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         bob_alias = "test_alias"
-        bob_address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        bob_address = generate_test_account()[1]
         mock_keyring[bob_alias] = json.dumps({"alias": bob_alias, "address": bob_address, "private_key": None})
-        alice_address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        alice_address = generate_test_account()[1]
 
         # Act
         result = invoke(f"task wallet add {bob_alias} -a {alice_address}", input="y\n")
@@ -80,9 +97,9 @@ class TestAddAlias:
     def test_wallet_add_alias_mnemonic_differs(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
-        pk = algosdk.account.generate_account()[0]  # type: ignore[no-untyped-call]
-        mnemonic = algosdk.mnemonic.from_private_key(pk)  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
+        pk = generate_test_account()[0]
+        mnemonic = secret_key_to_mnemonic(base64.b64decode(pk))
 
         # Act
         result = invoke(f"task wallet add {alias_name} -a {address} -m", input=f"{mnemonic}\n")
@@ -99,12 +116,12 @@ class TestAddAlias:
         for i in range(50):
             alias_name = f"test_alias_{i}"
             dummy_aliases.append(alias_name)
-            address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+            address = generate_test_account()[1]
             mock_keyring[alias_name] = json.dumps({"alias": alias_name, "address": address, "private_key": None})
         mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps(dummy_aliases)
 
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
 
         # Act
         result = invoke(f"task wallet add {alias_name} -a {address}")
@@ -118,7 +135,7 @@ class TestAddAlias:
     def test_wallet_add_alias_generic_error(self, mocker: MockerFixture, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
         mocker.patch("algokit.cli.tasks.wallet.add_alias", side_effect=Exception("test error"))
 
         # Act
@@ -135,7 +152,7 @@ class TestGetAlias:
     def test_wallet_get_address_alias_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
         mock_keyring[alias_name] = json.dumps({"alias": alias_name, "address": address, "private_key": None})
 
         # Act
@@ -148,7 +165,7 @@ class TestGetAlias:
     def test_wallet_get_account_alias_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        pk, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
+        pk, address = generate_test_account()
         mock_keyring[alias_name] = json.dumps({"alias": alias_name, "address": address, "private_key": pk})
 
         # Act
@@ -176,7 +193,6 @@ class TestGetAlias:
 class TestListAliases:
     def test_wallet_list_aliases_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
-        algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
         mock_keyring["test_alias_1"] = json.dumps(
             {"alias": "test_alias_1", "address": "test_address_1", "private_key": None},
         )
@@ -212,7 +228,7 @@ class TestRemoveAlias:
     def test_wallet_remove_alias_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
         alias_name = "test_alias"
-        address = algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
+        address = generate_test_account()[1]
         mock_keyring[alias_name] = json.dumps({"alias": alias_name, "address": address, "private_key": None})
         mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias_name])
 
@@ -254,7 +270,6 @@ class TestRemoveAlias:
 class TestResetAliases:
     def test_wallet_reset_aliases_successful(self, mock_keyring: dict[str, str | None]) -> None:
         # Arrange
-        algosdk.account.generate_account()[1]  # type: ignore[no-untyped-call]
         mock_keyring["test_alias_1"] = json.dumps(
             {"alias": "test_alias_1", "address": "test_address_1", "private_key": None},
         )
