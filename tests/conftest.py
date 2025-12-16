@@ -241,3 +241,27 @@ def _always_check_image_versions(mocker: MockerFixture, request: pytest.FixtureR
         return
     mocker.patch("algokit.core.sandbox._should_check_image_versions", return_value=True)
     mocker.patch("algokit.core.sandbox._update_image_version_cache")
+
+
+def generate_test_account() -> tuple[str, str, str]:
+    """Generate a random test account.
+
+    Returns:
+        tuple of (private_key_b64, address, mnemonic)
+    """
+    import base64
+
+    import nacl.signing
+    from algokit_utils.algo25 import secret_key_to_mnemonic
+    from algokit_utils.common import address_from_public_key
+
+    signing_key = nacl.signing.SigningKey.generate()
+    public_key = signing_key.verify_key.encode()
+    address = address_from_public_key(public_key)
+
+    # Private key is seed (32 bytes) + public key (32 bytes), base64 encoded
+    private_key_bytes = bytes(signing_key) + public_key
+    private_key_b64 = base64.b64encode(private_key_bytes).decode()
+    mnemonic = secret_key_to_mnemonic(private_key_bytes)
+
+    return private_key_b64, address, mnemonic
