@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algosdk.account import generate_account
-from algosdk.mnemonic import from_private_key
+from algokit_algosdk.account import generate_account
+from algokit_algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 

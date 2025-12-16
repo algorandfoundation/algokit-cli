@@ -5,18 +5,76 @@ import logging
 import mimetypes
 import pathlib
 import re
-from dataclasses import asdict
 
-from algokit_utils import SigningAccount
-from algosdk import encoding, transaction
-from algosdk.transaction import wait_for_confirmation
-from algosdk.v2client import algod
+from algokit_utils.clients import AlgodClient, algod_models
+from algokit_utils.transact import get_transaction_id, make_basic_account_transaction_signer
+from algokit_utils.transactions.builders.asset import build_asset_create_transaction
+from algokit_utils.transactions.types import AssetCreateParams
 from multiformats import CID
 
+from algokit.core.signing_account import SigningAccount
 from algokit.core.tasks.ipfs import upload_to_pinata
-from algokit.core.tasks.mint.models import AssetConfigTxnParams, TokenMetadata
+from algokit.core.tasks.mint.models import TokenMetadata
 
 logger = logging.getLogger(__name__)
+
+# Constants for Algorand address validation
+ALGORAND_ADDRESS_LENGTH = 58
+ALGORAND_ADDRESS_DECODED_LENGTH = 36  # 32 bytes address + 4 bytes checksum
+
+
+def _encode_address_from_bytes(digest: bytes) -> str:
+    """
+    Encode an address from a 32-byte digest using Algorand address encoding.
+
+    Args:
+        digest: 32-byte hash digest
+
+    Returns:
+        str: Base32-encoded address with checksum
+    """
+    # Standard Algorand checksum uses sha512_256, taking last 4 bytes
+    h = hashlib.new("sha512_256")
+    h.update(digest)
+    checksum = h.digest()[-4:]
+    address_bytes = digest + checksum
+    # Base32 encode without padding
+    encoded = base64.b32encode(address_bytes).decode("utf-8")
+    # Remove padding
+    return encoded.rstrip("=")
+
+
+def _is_valid_address(address: str) -> bool:
+    """
+    Validate an Algorand address.
+
+    Args:
+        address: The address string to validate
+
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    if len(address) != ALGORAND_ADDRESS_LENGTH:
+        return False
+    try:
+        # Add padding back for base32 decoding
+        padding_needed = (8 - len(address) % 8) % 8
+        padded = address + "=" * padding_needed
+        decoded = base64.b32decode(padded)
+
+        if len(decoded) != ALGORAND_ADDRESS_DECODED_LENGTH:
+            return False
+
+        addr_hash = decoded[:32]
+        checksum = decoded[32:]
+
+        # Standard Algorand checksum uses sha512_256, taking last 4 bytes
+        h = hashlib.new("sha512_256")
+        h.update(addr_hash)
+        expected_checksum = h.digest()[-4:]
+        return checksum == expected_checksum
+    except Exception:
+        return False
 
 
 def _reserve_address_from_cid(cid: str) -> str:
@@ -33,8 +91,8 @@ def _reserve_address_from_cid(cid: str) -> str:
     # Workaround to fix `multiformats` package issue, remove first two bytes before using `encode_address`.
     # Initial fix using `py-multiformats-cid` and `multihash.decode` was dropped due to PEP 517 incompatibility.
     digest = CID.decode(cid).digest[2:]
-    reserve_address = str(encoding.encode_address(digest))  # type: ignore[no-untyped-call]
-    assert encoding.is_valid_address(reserve_address)  # type: ignore[no-untyped-call]
+    reserve_address = _encode_address_from_bytes(digest)
+    assert _is_valid_address(reserve_address)
     return reserve_address
 
 
@@ -95,55 +153,81 @@ def _file_mimetype(filename: pathlib.Path) -> str:
     return mimetypes.types_map[extension]
 
 
-def _create_asset_txn(
-    *,
-    asset_config_params: AssetConfigTxnParams,
-    token_metadata: TokenMetadata,
-    use_metadata_hash: bool = True,
-) -> transaction.AssetConfigTxn:
-    """
-    Create an instance of the AssetConfigTxn class by setting the parameters and metadata
-    for the asset configuration transaction.
+def _wait_for_confirmation(client: AlgodClient, txid: str, rounds: int) -> algod_models.PendingTransactionResponse:
+    """Wait for transaction confirmation.
 
     Args:
-        asset_config_params (AssetConfigTxnParams): An instance of the AssetConfigTxnParams class
-        that contains the parameters for the asset configuration transaction.
-        token_metadata (TokenMetadata): An instance of the TokenMetadata class that contains the metadata for the asset.
-        use_metadata_hash (bool, optional): A boolean flag indicating whether to use the metadata hash
-        in the asset configuration transaction. Defaults to True.
+        client: AlgodClient instance
+        txid: Transaction ID to wait for
+        rounds: Maximum number of rounds to wait
 
     Returns:
-        AssetConfigTxn: An instance of the AssetConfigTxn class representing the asset configuration transaction.
+        algod_models.PendingTransactionResponse: Transaction confirmation info
+
+    Raises:
+        Exception: If transaction is rejected or not confirmed in time
     """
+    status = client.get_status()
+    last_round = getattr(status, "last_round", 0)
+    current_round = last_round
+
+    while current_round <= last_round + rounds:
+        txinfo = client.pending_transaction_information(txid)
+        confirmed_round = getattr(txinfo, "confirmed_round", None)
+        if confirmed_round is not None and confirmed_round > 0:
+            return txinfo
+        pool_error = getattr(txinfo, "pool_error", None)
+        if pool_error:
+            raise Exception(f"Transaction rejected: {pool_error}")
+        current_round += 1
+        client.status_after_block(current_round)
+
+    raise Exception(f"Transaction {txid} not confirmed after {rounds} rounds")
+
+
+def _compute_metadata_hash(
+    *,
+    token_metadata: TokenMetadata,
+    use_metadata_hash: bool = True,
+) -> bytes:
+    """
+    Compute the metadata hash for an asset.
+
+    Args:
+        token_metadata (TokenMetadata): An instance of the TokenMetadata class that contains the metadata for the asset.
+        use_metadata_hash (bool, optional): A boolean flag indicating whether to use the metadata hash.
+        Defaults to True.
+
+    Returns:
+        bytes: The computed metadata hash, or empty bytes if use_metadata_hash is False.
+    """
+    if not use_metadata_hash:
+        return b""
+
     json_metadata = token_metadata.to_json()
     metadata = json.loads(json_metadata)
 
-    if use_metadata_hash:
-        if "extra_metadata" in metadata:
-            h = hashlib.new("sha512_256")
-            h.update(b"arc0003/amj")
-            h.update(json_metadata.encode("utf-8"))
-            json_metadata_hash = h.digest()
+    if "extra_metadata" in metadata:
+        h = hashlib.new("sha512_256")
+        h.update(b"arc0003/amj")
+        h.update(json_metadata.encode("utf-8"))
+        json_metadata_hash = h.digest()
 
-            h = hashlib.new("sha512_256")
-            h.update(b"arc0003/am")
+        h = hashlib.new("sha512_256")
+        h.update(b"arc0003/am")
 
-            h.update(json_metadata_hash)
-            h.update(base64.b64decode(metadata["extra_metadata"]))
-            asset_config_params.metadata_hash = h.digest()
-        else:
-            h = hashlib.new("sha256")
-            h.update(json_metadata.encode("utf-8"))
-            asset_config_params.metadata_hash = h.digest()
+        h.update(json_metadata_hash)
+        h.update(base64.b64decode(metadata["extra_metadata"]))
+        return h.digest()
     else:
-        asset_config_params.metadata_hash = b""
-
-    return transaction.AssetConfigTxn(**asdict(asset_config_params))  # type: ignore[no-untyped-call]
+        h = hashlib.new("sha256")
+        h.update(json_metadata.encode("utf-8"))
+        return h.digest()
 
 
 def mint_token(  # noqa: PLR0913
     *,
-    client: algod.AlgodClient,
+    client: AlgodClient,
     jwt: str,
     creator_account: SigningAccount,
     unit_name: str,
@@ -156,26 +240,19 @@ def mint_token(  # noqa: PLR0913
     Mint new token on the Algorand blockchain.
 
     Args:
-        client (algod.AlgodClient): An instance of the `algod.AlgodClient` class representing the Algorand node.
+        client (AlgodClient): An instance of the `AlgodClient` class representing the Algorand node.
         jwt (str): The JWT for accessing the Piñata API.
         creator_account (SigningAccount): An instance of the `SigningAccount` class representing the account that
         will create the token.
-        asset_name (str): A string representing the name of the token.
         unit_name (str): A string representing the unit name of the token.
         total (int): An integer representing the total supply of the token.
         token_metadata (TokenMetadata): An instance of the `TokenMetadata` class representing the metadata of the token.
         mutable (bool): A boolean indicating whether the token is mutable or not.
         image_path (pathlib.Path | None, optional): A `pathlib.Path` object representing the path to the
         image file associated with the token. Defaults to None.
-        decimals (int | None, optional): An integer representing the number of decimal places for the token.
-        Defaults to 0.
 
     Returns:
         tuple[int, str]: A tuple containing the asset index and transaction ID of the minted token.
-
-    Raises:
-        ValueError: If the token name in the metadata JSON does not match the provided asset name.
-        ValueError: If the decimals in the metadata JSON does not match the provided decimals amount.
     """
 
     if image_path:
@@ -192,26 +269,75 @@ def mint_token(  # noqa: PLR0913
     )
     logger.info(f"Metadata uploaded to pinata: {metadata_cid}")
 
-    asset_config_params = AssetConfigTxnParams(
-        sender=creator_account.address,
-        sp=client.suggested_params(),
-        reserve=_reserve_address_from_cid(metadata_cid) if mutable else "",
-        unit_name=unit_name,
-        asset_name=token_metadata.name,
-        url=_create_url_from_cid(metadata_cid) + "#arc3" if mutable else "ipfs://" + metadata_cid + "#arc3",
-        manager=creator_account.address if mutable else "",
-        total=total,
-        decimals=token_metadata.decimals,
-    )
-
-    logger.debug(f"Asset config params: {asset_config_params.to_json()}")
-    asset_config_txn = _create_asset_txn(
-        asset_config_params=asset_config_params,
+    # Compute metadata hash
+    metadata_hash = _compute_metadata_hash(
         token_metadata=token_metadata,
         use_metadata_hash=not mutable,
     )
-    signed_asset_config_txn = asset_config_txn.sign(creator_account.private_key)  # type: ignore[no-untyped-call]
-    asset_config_txn_id = client.send_transaction(signed_asset_config_txn)
-    response = wait_for_confirmation(client, asset_config_txn_id, 4)
 
-    return response["asset-index"], asset_config_txn_id
+    # Build asset creation parameters
+    asset_create_params = AssetCreateParams(
+        sender=creator_account.address,
+        total=total,
+        decimals=token_metadata.decimals,
+        default_frozen=False,
+        unit_name=unit_name,
+        asset_name=token_metadata.name,
+        url=_create_url_from_cid(metadata_cid) + "#arc3" if mutable else "ipfs://" + metadata_cid + "#arc3",
+        metadata_hash=metadata_hash if metadata_hash else None,
+        manager=creator_account.address if mutable else None,
+        reserve=_reserve_address_from_cid(metadata_cid) if mutable else None,
+        freeze=None,
+        clawback=None,
+    )
+
+    logger.debug(
+        "Asset config params: "
+        + json.dumps(
+            {
+                "sender": asset_create_params.sender,
+                "unit_name": asset_create_params.unit_name or "",
+                "asset_name": asset_create_params.asset_name or "",
+                "url": asset_create_params.url or "",
+                "manager": asset_create_params.manager or "",
+                "reserve": asset_create_params.reserve or "",
+                "total": asset_create_params.total,
+                "freeze": asset_create_params.freeze or "",
+                "clawback": asset_create_params.clawback or "",
+                "note": "",
+                "decimals": asset_create_params.decimals,
+                "default_frozen": asset_create_params.default_frozen or False,
+                "lease": "",
+                "rekey_to": "",
+                "strict_empty_address_check": False,
+            },
+            indent=4,
+        )
+    )
+
+    # Build the transaction
+    suggested_params = client.suggested_params()
+    built_txn = build_asset_create_transaction(
+        params=asset_create_params,
+        suggested_params=suggested_params,
+        default_validity_window=1000,
+        default_validity_window_is_explicit=False,
+        is_localnet=False,
+    )
+
+    # Sign the transaction
+    signer = make_basic_account_transaction_signer(creator_account.private_key)
+    signed_txn_bytes = signer([built_txn.txn], [0])[0]
+
+    # Send the transaction (signer returns encoded signed transaction bytes)
+    txid = get_transaction_id(built_txn.txn)
+    client.send_raw_transaction(signed_txn_bytes)
+
+    # Wait for confirmation
+    response = _wait_for_confirmation(client, txid, 4)
+
+    asset_index = getattr(response, "asset_index", None)
+    if asset_index is None:
+        raise Exception("Asset creation failed: no asset-index in response")
+
+    return asset_index, txid

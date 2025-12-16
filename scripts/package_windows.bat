@@ -1,2 +1,2 @@
 @echo off
-pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config;multiformats_config/ --add-data ./src/algokit/resources;algokit/resources/
+pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --hidden-import algokit_algod_client --hidden-import algokit_transact --hidden-import algokit_common --hidden-import algokit_algosdk --hidden-import algokit_algo25 --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data ./misc/multiformats_config;multiformats_config/ --add-data ./src/algokit/resources;algokit/resources/
