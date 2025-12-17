@@ -167,7 +167,7 @@ def _wait_for_confirmation(client: AlgodClient, txid: str, rounds: int) -> algod
     Raises:
         Exception: If transaction is rejected or not confirmed in time
     """
-    status = client.get_status()
+    status = client.status()
     last_round = getattr(status, "last_round", 0)
     current_round = last_round
 
