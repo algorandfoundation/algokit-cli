@@ -143,7 +143,7 @@ def get_asset_decimals(asset_id: int, algod_client: AlgodClient) -> int:
     if asset_id == 0:
         return 6
 
-    asset_response = algod_client.get_asset_by_id(asset_id)
+    asset_response = algod_client.asset_by_id(asset_id)
     decimals = getattr(getattr(asset_response, "params", None), "decimals", None)
 
     if decimals is None:
