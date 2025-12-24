@@ -14,12 +14,12 @@ from algokit_utils.transact import (
     decode_transaction,
     encode_signed_transactions,
     get_transaction_id,
-    make_basic_account_transaction_signer,
     to_transaction_dto,
 )
 
 from algokit.cli.common.utils import MutuallyExclusiveOption
 from algokit.cli.tasks.utils import get_account_with_private_key
+from algokit.core.signing_account import SigningAccount
 
 logger = logging.getLogger(__name__)
 
@@ -148,12 +148,11 @@ def _confirm_transaction(txns: list[Transaction]) -> bool:
     return bool(response == "y")
 
 
-def _sign_and_output_transaction(txns: list[Transaction], private_key: str, output: Path | None) -> None:
+def _sign_and_output_transaction(txns: list[Transaction], signing_account: SigningAccount, output: Path | None) -> None:
     # Create a transaction signer from the private key
-    signer = make_basic_account_transaction_signer(private_key)
 
     # Sign all transactions - signer returns encoded SignedTransaction bytes
-    signed_txn_bytes_list = signer(txns, list(range(len(txns))))
+    signed_txn_bytes_list = signing_account.signer(txns, list(range(len(txns))))
 
     # Decode the signed transaction bytes to get SignedTransaction objects
     signed_txns = [decode_signed_transaction(stx_bytes) for stx_bytes in signed_txn_bytes_list]
@@ -216,4 +215,4 @@ def sign(*, account: str, file: Path | None, transaction: str | None, output: Pa
     if not force and not _confirm_transaction(txns):
         return
 
-    _sign_and_output_transaction(txns, signer_account.private_key, output)
+    _sign_and_output_transaction(txns, signer_account, output)
