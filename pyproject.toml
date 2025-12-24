@@ -24,7 +24,7 @@ keyring = "25.6.0"
 # this version has been tested to work with the vendored file
 pyjwt = "^2.10.1" 
 cryptography = "^44.0.2" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
-algokit-utils = "^5.0.0a4"
+algokit-utils = "^5.0.0a7"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
 jsondiff = "^2.0.0"
