@@ -12,6 +12,7 @@ from typing import Any
 
 import click
 import nacl.signing
+from algokit_algod_client import models as algod
 from algokit_utils import AlgoAmount, ClientManager
 from algokit_utils.algo25 import seed_from_mnemonic
 from algokit_utils.clients import AlgodClient
@@ -24,33 +25,24 @@ from algokit.core.tasks.wallet import get_alias
 logger = logging.getLogger(__name__)
 
 
-def _get_account_info_dict(algod_client: AlgodClient, address: str) -> dict:
-    """Convert AlgodClient account_information response to a dict format."""
-    response = algod_client.account_information(address)
-    return {
-        "amount": getattr(response, "amount", 0),
-        "assets": [{"asset-id": a.asset_id, "amount": a.amount} for a in getattr(response, "assets", []) or []],
-    }
+def _validate_asset_balance(account_info: algod.Account, asset_id: int, decimals: int, amount: int = 0) -> None:
+    try:
+        (asset_record,) = (asset for asset in (account_info.assets or ()) if asset.asset_id == asset_id)
+    except ValueError:
+        raise click.ClickException("SigningAccount is not opted into the asset") from None
 
-
-def _validate_asset_balance(account_info: dict, asset_id: int, decimals: int, amount: int = 0) -> None:
-    asset_record = next((asset for asset in account_info.get("assets", []) if asset["asset-id"] == asset_id), None)
-
-    if not asset_record:
-        raise click.ClickException("SigningAccount is not opted into the asset")
-
-    if amount > 0 and asset_record["amount"] < amount:
+    if amount > 0 and asset_record.amount < amount:
         required = amount / 10**decimals
-        available = asset_record["amount"] / 10**decimals
+        available = asset_record.amount / 10**decimals
         raise click.ClickException(
             f"Insufficient asset balance in account, required: {required}, available: {available}"
         )
 
 
-def _validate_algo_balance(account_info: dict, amount: int) -> None:
-    if account_info.get("amount", 0) < amount:
+def _validate_algo_balance(account_info: algod.Account, amount: int) -> None:
+    if account_info.amount < amount:
         required = AlgoAmount.from_micro_algo(amount)
-        available = AlgoAmount.from_micro_algo(account_info.get("amount", 0))
+        available = AlgoAmount.from_micro_algo(account_info.amount)
         raise click.ClickException(
             f"Insufficient Algos balance in account, required: {required.algo} Algos, available: {available.algo} Algos"
         )
@@ -144,12 +136,7 @@ def get_asset_decimals(asset_id: int, algod_client: AlgodClient) -> int:
         return 6
 
     asset_response = algod_client.asset_by_id(asset_id)
-    decimals = getattr(getattr(asset_response, "params", None), "decimals", None)
-
-    if decimals is None:
-        raise click.ClickException("Invalid asset info response")
-
-    return int(decimals)
+    return asset_response.params.decimals
 
 
 def validate_balance(algod_client: AlgodClient, account: SigningAccount | str, asset_id: int, amount: int = 0) -> None:
@@ -167,7 +154,7 @@ def validate_balance(algod_client: AlgodClient, account: SigningAccount | str, a
         click.ClickException: If any validation check fails.
     """
     address = account.address if isinstance(account, SigningAccount) else account
-    account_info = _get_account_info_dict(algod_client, address)
+    account_info = algod_client.account_information(address)
 
     if asset_id == 0:
         _validate_algo_balance(account_info, amount)
@@ -289,10 +276,10 @@ def validate_account_balance_to_opt_in(algod_client: AlgodClient, account: Signi
     """
 
     address = account.address if isinstance(account, SigningAccount) else account
-    account_info = _get_account_info_dict(algod_client, address)
+    account_info = algod_client.account_information(address)
 
     required_microalgos = num_assets * AlgoAmount.from_algo(Decimal("0.1")).micro_algo
-    available_microalgos = account_info.get("amount", 0)
+    available_microalgos = account_info.amount
     if available_microalgos < required_microalgos:
         required_algo = AlgoAmount.from_micro_algo(required_microalgos).algo
         available_algos = AlgoAmount.from_micro_algo(available_microalgos).algo
@@ -300,10 +287,6 @@ def validate_account_balance_to_opt_in(algod_client: AlgodClient, account: Signi
             f"Insufficient Algos balance in account to opt in, required: {required_algo} Algos, available:"
             f" {available_algos} Algos"
         )
-
-
-def get_account_info(algod_client: AlgodClient, account_address: str) -> dict:
-    return _get_account_info_dict(algod_client, account_address)
 
 
 def run_callback_once(callback: Callable) -> Callable:
