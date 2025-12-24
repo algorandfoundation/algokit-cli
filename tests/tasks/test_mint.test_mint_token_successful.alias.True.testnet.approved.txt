@@ -12,6 +12,7 @@ DEBUG: Asset config params: {
     "total": 1,
     "freeze": "",
     "clawback": "",
+    "metadata_hash": null,
     "note": "",
     "decimals": 0,
     "default_frozen": false,
