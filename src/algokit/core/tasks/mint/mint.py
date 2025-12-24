@@ -304,6 +304,9 @@ def mint_token(  # noqa: PLR0913
                 "total": asset_create_params.total,
                 "freeze": asset_create_params.freeze or "",
                 "clawback": asset_create_params.clawback or "",
+                "metadata_hash": base64.b64encode(asset_create_params.metadata_hash).decode("ascii")
+                if asset_create_params.metadata_hash
+                else None,
                 "note": "",
                 "decimals": asset_create_params.decimals,
                 "default_frozen": asset_create_params.default_frozen or False,
