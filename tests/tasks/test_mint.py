@@ -1,10 +1,11 @@
+import base64
 import json
 import re
 from pathlib import Path
 
 import click
 import pytest
-from algosdk.mnemonic import from_private_key
+from algokit_utils.algo25 import secret_key_to_mnemonic
 from approvaltests.namer import NamerFactory
 from pytest_httpx import HTTPXMock
 from pytest_mock import MockerFixture
@@ -14,6 +15,12 @@ from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
 from tests.tasks.conftest import DUMMY_ACCOUNT, DUMMY_SUGGESTED_PARAMS
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
+
+
+def _get_mnemonic_from_private_key(private_key: str) -> str:
+    """Convert base64-encoded private key to mnemonic."""
+    private_key_bytes = base64.b64decode(private_key)
+    return secret_key_to_mnemonic(private_key_bytes)
 
 
 @pytest.mark.parametrize(("account_type", "mutability"), [("alias", "mutable"), ("address", "immutable")])
@@ -34,7 +41,7 @@ def test_mint_token_successful(
     prompt_input = None
     if account_type == "address":
         account = DUMMY_ACCOUNT.address
-        prompt_input = from_private_key(DUMMY_ACCOUNT.private_key)  # type: ignore[no-untyped-call]
+        prompt_input = _get_mnemonic_from_private_key(DUMMY_ACCOUNT.private_key)
     else:
         account = "my_alias"
         mock_keyring[account] = json.dumps(
@@ -54,7 +61,7 @@ def test_mint_token_successful(
             "bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe",
         ],
     )
-    mocker.patch("algokit.core.tasks.mint.mint.wait_for_confirmation", return_value={"asset-index": 123})
+    mocker.patch("algokit.core.tasks.mint.mint._wait_for_confirmation", return_value=mocker.MagicMock(asset_index=123))
     mocker.patch(
         "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value="dummy_key",
@@ -63,7 +70,7 @@ def test_mint_token_successful(
         "algokit.cli.tasks.mint.validate_balance",
     )
     algod_mock = mocker.MagicMock()
-    algod_mock.send_transaction.return_value = "dummy_tx_id"
+    algod_mock.send_raw_transaction.return_value = mocker.MagicMock(tx_id="dummy_tx_id")
     algod_mock.suggested_params.return_value = DUMMY_SUGGESTED_PARAMS
     mocker.patch("algokit.cli.tasks.mint.load_algod_client", return_value=algod_mock)
 
@@ -123,7 +130,7 @@ def test_mint_token_successful_on_decimals(
             "bafkreiftmc4on252dnckhv7jdqnhkxjkpvlrekpevjwm3gjszygxkus5oe",
         ],
     )
-    mocker.patch("algokit.core.tasks.mint.mint.wait_for_confirmation", return_value={"asset-index": 123})
+    mocker.patch("algokit.core.tasks.mint.mint._wait_for_confirmation", return_value=mocker.MagicMock(asset_index=123))
     mocker.patch(
         "algokit.cli.tasks.mint.get_pinata_jwt",
         return_value="dummy_key",
@@ -132,7 +139,7 @@ def test_mint_token_successful_on_decimals(
         "algokit.cli.tasks.mint.validate_balance",
     )
     algod_mock = mocker.MagicMock()
-    algod_mock.send_transaction.return_value = "dummy_tx_id"
+    algod_mock.send_raw_transaction.return_value = mocker.MagicMock(tx_id="dummy_tx_id")
     algod_mock.suggested_params.return_value = DUMMY_SUGGESTED_PARAMS
     mocker.patch("algokit.cli.tasks.mint.load_algod_client", return_value=algod_mock)
 
@@ -157,7 +164,7 @@ def test_mint_token_pure_fractional_nft_ft_validation(
     network = "localnet"
     cwd = tmp_path_factory.mktemp("cwd")
     account = DUMMY_ACCOUNT.address
-    prompt_input = from_private_key(DUMMY_ACCOUNT.private_key)  # type: ignore[no-untyped-call]
+    prompt_input = _get_mnemonic_from_private_key(DUMMY_ACCOUNT.private_key)
     (cwd / "image.png").touch()
 
     # Act
@@ -181,7 +188,7 @@ def test_mint_token_pinata_error(
     cwd = tmp_path_factory.mktemp("cwd")
     account = ""
     account = DUMMY_ACCOUNT.address
-    prompt_input = from_private_key(DUMMY_ACCOUNT.private_key)  # type: ignore[no-untyped-call]
+    prompt_input = _get_mnemonic_from_private_key(DUMMY_ACCOUNT.private_key)
     (cwd / "image.png").touch()
     httpx_mock.add_response(status_code=403, json={"ok": False})
 
@@ -216,7 +223,7 @@ def test_mint_token_no_pinata_jwt_error(
     cwd = tmp_path_factory.mktemp("cwd")
     account = ""
     account = DUMMY_ACCOUNT.address
-    prompt_input = from_private_key(DUMMY_ACCOUNT.private_key)  # type: ignore[no-untyped-call]
+    prompt_input = _get_mnemonic_from_private_key(DUMMY_ACCOUNT.private_key)
     (cwd / "image.png").touch()
 
     mocker.patch(

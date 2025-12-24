@@ -180,3 +180,7 @@ ci_token.txt
 .algokit/
 
 temp/
+
+*.md
+
+mise.toml

@@ -1,56 +1,59 @@
 [
   {
-    "transaction_id": "YGSOMX5QSASQALR5V4MH47L4GEHFJZVGSUETJAWUFM2I6PJAQL4Q",
+    "transaction_id": "FXAXUBFEV7TTXNDPNWDEVIPHP5FFILUBHLFZUU5ZUWO6PDBDHNBA",
     "content": {
+      "type": "pay",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "fv": 33652328,
+      "lv": 33653328,
+      "fee": 1000,
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "gen": "testnet-v1.0",
       "amt": 1,
-      "fv": 33652328,
-      "gen": "testnet-v1.0",
-      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-      "lv": 33653328,
-      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
-      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
-      "type": "pay"
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI="
     }
   },
   {
-    "transaction_id": "MLS7IUJQVK7GABTCOLTG5QE7NWITX74D6YC3QZLN6Y5SZF23WZBQ",
+    "transaction_id": "U7BEN5KFHLXU45NWEDZCYOZGR3MAACTPJ3YNOPDWRRCBDCN2OARQ",
     "content": {
+      "type": "pay",
+      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "fv": 33652328,
+      "lv": 33653328,
+      "fee": 1000,
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "gen": "testnet-v1.0",
       "amt": 2,
-      "fv": 33652328,
-      "gen": "testnet-v1.0",
-      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-      "lv": 33653328,
-      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
-      "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
-      "type": "pay"
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI="
     }
   },
   {
-    "transaction_id": "NEI3KU7ALQ6PFOSTYEN3LSJX2CUDEESDH2NH2XUJGYHNR3UVB3OQ",
+    "transaction_id": "XU2X2APELWEA5F5FJXRY3HY2HN2WZHZ5QXVB3KSWTII2GSFJGANQ",
     "content": {
-      "amt": 3,
-      "fv": 33652328,
-      "gen": "testnet-v1.0",
-      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-      "lv": 33653328,
-      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
+      "type": "pay",
       "snd": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI=",
-      "type": "pay"
+      "fv": 33652328,
+      "lv": 33653328,
+      "fee": 1000,
+      "gh": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+      "gen": "testnet-v1.0",
+      "amt": 3,
+      "rcv": "ZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQI="
     }
   }
 ]
 Would you like to proceed with signing the above? (y, n) [n]: y
 [
   {
-    "transaction_id": "YGSOMX5QSASQALR5V4MH47L4GEHFJZVGSUETJAWUFM2I6PJAQL4Q",
-    "content": "gqNzaWfEQHHuPbhkAADyq8eKU/NiDCuJ+cnW9MrHT3iAAEPm+okmoio/rmgctA7QUpqqd4eF5aYlUcgz9EbU+uUXS1rFOg2jdHhuiKNhbXQBomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+    "transaction_id": "FXAXUBFEV7TTXNDPNWDEVIPHP5FFILUBHLFZUU5ZUWO6PDBDHNBA",
+    "content": "gqNzaWfEQOQpODGqNgY91HdDDSGiDNaAa10DK3TTGBrDclzUpppvRkvxvQtB3GQWVVFXqIg4zsZn6a3xxT5dYmTFixo4gw+jdHhuiaNhbXQBo2ZlZc0D6KJmds4CAX5oo2dlbqx0ZXN0bmV0LXYxLjCiZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgIBglCjcmN2xCBluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAqNzbmTEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCpHR5cGWjcGF5"
   },
   {
-    "transaction_id": "MLS7IUJQVK7GABTCOLTG5QE7NWITX74D6YC3QZLN6Y5SZF23WZBQ",
-    "content": "gqNzaWfEQMDbNg81bX8hvW+MHye1pJhtDxWvk/3Oec8lC8QZ5i0pn7LNnXTEniYzhECzjwxL11ENlTh6w66M2jl1f4YeZwijdHhuiKNhbXQComZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+    "transaction_id": "U7BEN5KFHLXU45NWEDZCYOZGR3MAACTPJ3YNOPDWRRCBDCN2OARQ",
+    "content": "gqNzaWfEQKfuYSfeVHZOW7O2I388MWbjE1zRhp6zrZE7KJ4oV75XJpx8ExKByk9NIAYpyneekuoGDg4Ks+kVVcvT6X6J9wujdHhuiaNhbXQCo2ZlZc0D6KJmds4CAX5oo2dlbqx0ZXN0bmV0LXYxLjCiZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgIBglCjcmN2xCBluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAqNzbmTEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCpHR5cGWjcGF5"
   },
   {
-    "transaction_id": "NEI3KU7ALQ6PFOSTYEN3LSJX2CUDEESDH2NH2XUJGYHNR3UVB3OQ",
-    "content": "gqNzaWfEQJPaDlnXKBkMacMv6SNJmDlRf2dBzVBZwhOelc/Q+uriONVXzP0pqmZqqCua/fo3DxH9tbKyCDcSYVmn9MsaLgqjdHhuiKNhbXQDomZ2zgIBfmijZ2VurHRlc3RuZXQtdjEuMKJnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAgGCUKNyY3bEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCo3NuZMQgZbpO9Kb7j1+HWA9SYq/ObmT/gCJjP/EgZnT0aQUkxQKkdHlwZaNwYXk="
+    "transaction_id": "XU2X2APELWEA5F5FJXRY3HY2HN2WZHZ5QXVB3KSWTII2GSFJGANQ",
+    "content": "gqNzaWfEQEsValgtAQZFPE1/iDUyIr58QNhNCjogIK72ckwM78kyUaEX3+PYPLZDkoVLvjx5ChMrbB71avpVt0onfrqSvQCjdHhuiaNhbXQDo2ZlZc0D6KJmds4CAX5oo2dlbqx0ZXN0bmV0LXYxLjCiZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgIBglCjcmN2xCBluk70pvuPX4dYD1Jir85uZP+AImM/8SBmdPRpBSTFAqNzbmTEIGW6TvSm+49fh1gPUmKvzm5k/4AiYz/xIGZ09GkFJMUCpHR5cGWjcGF5"
   }
 ]

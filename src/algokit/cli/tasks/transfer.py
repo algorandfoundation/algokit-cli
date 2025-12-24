@@ -1,7 +1,7 @@
 import logging
 
 import click
-from algokit_utils import AlgoAmount, AssetTransferParams, PaymentParams, SendAtomicTransactionComposerResults
+from algokit_utils import AlgoAmount, AssetTransferParams, PaymentParams, SendTransactionComposerResults
 
 from algokit.cli.common.constants import AlgorandNetwork, ExplorerEntityType
 from algokit.cli.common.utils import get_explorer_url
@@ -85,7 +85,7 @@ def transfer(  # noqa: PLR0913
     validate_balance(algod_client, receiver_address, asset_id)
 
     # Transfer algos or assets depending on asset_id
-    txn_response: SendAtomicTransactionComposerResults | None = None
+    txn_response: SendTransactionComposerResults | None = None
     algorand = get_algorand_client_for_network(network)
     try:
         if asset_id == 0:

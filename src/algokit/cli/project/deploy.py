@@ -1,10 +1,11 @@
+import base64
 import logging
 import os
 import typing as t
 from pathlib import Path
 
 import click
-from algosdk.mnemonic import from_private_key
+from algokit_utils.algo25 import secret_key_to_mnemonic
 
 from algokit.cli.common.utils import MutuallyExclusiveOption, sanitize_extra_args
 from algokit.core import proc
@@ -47,7 +48,9 @@ def _ensure_aliases(
             raise click.ClickException(f"Error: missing {alias} alias")
         if not alias_data.private_key:
             raise click.ClickException(f"Error: missing private key for {alias} alias")
-        config_env[key] = from_private_key(alias_data.private_key)  # type: ignore[no-untyped-call]
+        # Private key is stored as base64 string, decode to bytes for mnemonic conversion
+        private_key_bytes = base64.b64decode(alias_data.private_key)
+        config_env[key] = secret_key_to_mnemonic(private_key_bytes)
         logger.debug(f"Loaded {alias} alias mnemonic as {key} environment variable")
 
 

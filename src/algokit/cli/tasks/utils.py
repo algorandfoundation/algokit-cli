@@ -1,5 +1,6 @@
 # AlgoKit Tasks related utility functions
 
+import base64
 import logging
 import os
 import stat
@@ -9,35 +10,40 @@ from decimal import Decimal
 from functools import wraps
 from typing import Any
 
-import algosdk
-import algosdk.encoding
 import click
-from algokit_utils import AlgoAmount, ClientManager, SigningAccount
+import nacl.signing
+from algokit_algod_client import models as algod
+from algokit_utils import AlgoAmount, ClientManager
+from algokit_utils.algo25 import seed_from_mnemonic
+from algokit_utils.clients import AlgodClient
+from algokit_utils.common import ADDRESS_LENGTH
 
 from algokit.cli.common.constants import AlgorandNetwork
+from algokit.core.address_utils import is_valid_address
+from algokit.core.signing_account import SigningAccount
 from algokit.core.tasks.wallet import get_alias
 
 logger = logging.getLogger(__name__)
 
 
-def _validate_asset_balance(account_info: dict, asset_id: int, decimals: int, amount: int = 0) -> None:
-    asset_record = next((asset for asset in account_info.get("assets", []) if asset["asset-id"] == asset_id), None)
+def _validate_asset_balance(account_info: algod.Account, asset_id: int, decimals: int, amount: int = 0) -> None:
+    try:
+        (asset_record,) = (asset for asset in (account_info.assets or ()) if asset.asset_id == asset_id)
+    except ValueError:
+        raise click.ClickException("SigningAccount is not opted into the asset") from None
 
-    if not asset_record:
-        raise click.ClickException("SigningAccount is not opted into the asset")
-
-    if amount > 0 and asset_record["amount"] < amount:
+    if amount > 0 and asset_record.amount < amount:
         required = amount / 10**decimals
-        available = asset_record["amount"] / 10**decimals
+        available = asset_record.amount / 10**decimals
         raise click.ClickException(
             f"Insufficient asset balance in account, required: {required}, available: {available}"
         )
 
 
-def _validate_algo_balance(account_info: dict, amount: int) -> None:
-    if account_info.get("amount", 0) < amount:
+def _validate_algo_balance(account_info: algod.Account, amount: int) -> None:
+    if account_info.amount < amount:
         required = AlgoAmount.from_micro_algo(amount)
-        available = AlgoAmount.from_micro_algo(account_info.get("amount", 0))
+        available = AlgoAmount.from_micro_algo(account_info.amount)
         raise click.ClickException(
             f"Insufficient Algos balance in account, required: {required.algo} Algos, available: {available.algo} Algos"
         )
@@ -48,7 +54,7 @@ def get_private_key_from_mnemonic() -> str:
     Converts a mnemonic phrase into a private key.
 
     Returns:
-        str: The private key generated from the mnemonic phrase.
+        str: The base64-encoded private key (64 bytes: seed + public key) generated from the mnemonic phrase.
 
     Raises:
         click.ClickException: If the entered mnemonic phrase is invalid.
@@ -62,27 +68,34 @@ def get_private_key_from_mnemonic() -> str:
 
     Flow:
         1. Prompts the user to enter a mnemonic phrase.
-        2. Converts the entered mnemonic phrase into a private key using `algosdk.mnemonic.to_private_key`.
-        3. Returns the private key.
+        2. Converts the entered mnemonic phrase into a seed using `seed_from_mnemonic`.
+        3. Derives the public key from the seed.
+        4. Returns the base64-encoded concatenation of seed + public key.
 
     """
 
     mnemonic_phrase = click.prompt("Enter the mnemonic phrase (25 words separated by whitespace)", hide_input=True)
     try:
-        return str(algosdk.mnemonic.to_private_key(mnemonic_phrase))  # type: ignore[no-untyped-call]
+        # Get the 32-byte seed from the mnemonic
+        seed = seed_from_mnemonic(mnemonic_phrase)
+        # Generate the public key from the seed using nacl
+        signing_key = nacl.signing.SigningKey(seed)
+        public_key = signing_key.verify_key.encode()
+        # Return base64-encoded 64-byte private key (seed + public key)
+        return base64.b64encode(seed + public_key).decode()
     except Exception as err:
         raise click.ClickException("Invalid mnemonic. Please provide a valid Algorand mnemonic.") from err
 
 
-def load_algod_client(network: AlgorandNetwork) -> algosdk.v2client.algod.AlgodClient:
+def load_algod_client(network: AlgorandNetwork) -> AlgodClient:
     """
-    Returns an instance of the `algosdk.v2client.algod.AlgodClient` class for the specified network.
+    Returns an instance of the `AlgodClient` class for the specified network.
 
     Args:
         network (str): The network for which the `AlgodClient` instance needs to be loaded.
 
     Returns:
-        algosdk.v2client.algod.AlgodClient: An instance of the `AlgodClient` class for the specified network.
+        AlgodClient: An instance of the `AlgodClient` class for the specified network.
 
     Raises:
         click.ClickException: If the specified network is invalid.
@@ -99,13 +112,13 @@ def load_algod_client(network: AlgorandNetwork) -> algosdk.v2client.algod.AlgodC
         raise click.ClickException("Invalid network") from err
 
 
-def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.AlgodClient) -> int:
+def get_asset_decimals(asset_id: int, algod_client: AlgodClient) -> int:
     """
     Retrieves the number of decimal places for a given asset.
 
     Args:
         asset_id (int): The ID of the asset for which the number of decimal places is to be retrieved. (0 for Algo)
-        algod_client (algosdk.v2client.algod.AlgodClient): An instance of the AlgodClient class.
+        algod_client (AlgodClient): An instance of the AlgodClient class.
 
     Returns:
         int: The number of decimal places for the given asset.
@@ -115,7 +128,7 @@ def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algod
 
     Example:
         asset_id = 123
-        algod_client = algosdk.v2client.algod.AlgodClient("https://mainnet-api.algonode.cloud", "API_KEY")
+        algod_client = AlgodClient(...)
         decimals = get_asset_decimals(asset_id, algod_client)
         print(decimals)
     """
@@ -123,22 +136,16 @@ def get_asset_decimals(asset_id: int, algod_client: algosdk.v2client.algod.Algod
     if asset_id == 0:
         return 6
 
-    asset_info = algod_client.asset_info(asset_id)
-
-    if not isinstance(asset_info, dict) or "params" not in asset_info or "decimals" not in asset_info["params"]:
-        raise click.ClickException("Invalid asset info response")
-
-    return int(asset_info["params"]["decimals"])
+    asset_response = algod_client.asset_by_id(asset_id)
+    return asset_response.params.decimals
 
 
-def validate_balance(
-    algod_client: algosdk.v2client.algod.AlgodClient, account: SigningAccount | str, asset_id: int, amount: int = 0
-) -> None:
+def validate_balance(algod_client: AlgodClient, account: SigningAccount | str, asset_id: int, amount: int = 0) -> None:
     """
     Validates the balance of an account before an operation.
 
     Args:
-        algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
+        algod_client (AlgodClient): The AlgodClient object for
         interacting with the Algorand blockchain.
         account (SigningAccount | str): The account object.
         asset_id (int): The ID of the asset to be checked (0 for Algos).
@@ -148,10 +155,7 @@ def validate_balance(
         click.ClickException: If any validation check fails.
     """
     address = account.address if isinstance(account, SigningAccount) else account
-    account_info = algod_client.account_info(address)
-
-    if not isinstance(account_info, dict):
-        raise click.ClickException("Invalid account info response")
+    account_info = algod_client.account_information(address)
 
     if asset_id == 0:
         _validate_algo_balance(account_info, amount)
@@ -174,7 +178,7 @@ def validate_address(address: str) -> None:
         None
     """
 
-    if not algosdk.encoding.is_valid_address(address):  # type: ignore[no-untyped-call]
+    if not is_valid_address(address):
         raise click.ClickException(f"`{address}` is an invalid account address")
 
 
@@ -234,7 +238,7 @@ def get_address(address: str) -> str:
         validate_address(parsed_address)
         return parsed_address
     except click.ClickException as ex:
-        if len(parsed_address) == algosdk.constants.address_len:
+        if len(parsed_address) == ADDRESS_LENGTH:
             raise click.ClickException(f"`{parsed_address}` is an invalid account address") from ex
 
         alias_data = get_alias(parsed_address)
@@ -257,15 +261,13 @@ def stdin_has_content() -> bool:
     return stat.S_ISFIFO(mode) or stat.S_ISREG(mode)
 
 
-def validate_account_balance_to_opt_in(
-    algod_client: algosdk.v2client.algod.AlgodClient, account: SigningAccount, num_assets: int
-) -> None:
+def validate_account_balance_to_opt_in(algod_client: AlgodClient, account: SigningAccount, num_assets: int) -> None:
     """
     Validates the balance of an account before opt in operation.
     Each asset requires 0.1 Algos to opt in.
 
     Args:
-        algod_client (algosdk.v2client.algod.AlgodClient): The AlgodClient object for
+        algod_client (AlgodClient): The AlgodClient object for
         interacting with the Algorand blockchain.
         account (SigningAccount | str): The account object.
         num_assets (int): The number of the assets for opt in (0 for Algos).
@@ -275,13 +277,10 @@ def validate_account_balance_to_opt_in(
     """
 
     address = account.address if isinstance(account, SigningAccount) else account
-    account_info = algod_client.account_info(address)
-
-    if not isinstance(account_info, dict):
-        raise click.ClickException("Invalid account info response")
+    account_info = algod_client.account_information(address)
 
     required_microalgos = num_assets * AlgoAmount.from_algo(Decimal("0.1")).micro_algo
-    available_microalgos = account_info.get("amount", 0)
+    available_microalgos = account_info.amount
     if available_microalgos < required_microalgos:
         required_algo = AlgoAmount.from_micro_algo(required_microalgos).algo
         available_algos = AlgoAmount.from_micro_algo(available_microalgos).algo
@@ -289,12 +288,6 @@ def validate_account_balance_to_opt_in(
             f"Insufficient Algos balance in account to opt in, required: {required_algo} Algos, available:"
             f" {available_algos} Algos"
         )
-
-
-def get_account_info(algod_client: algosdk.v2client.algod.AlgodClient, account_address: str) -> dict:
-    account_info = algod_client.account_info(account_address)
-    assert isinstance(account_info, dict)
-    return account_info
 
 
 def run_callback_once(callback: Callable) -> Callable:

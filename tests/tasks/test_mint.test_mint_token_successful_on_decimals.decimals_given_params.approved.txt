@@ -12,6 +12,7 @@ DEBUG: Asset config params: {
     "total": 100,
     "freeze": "",
     "clawback": "",
+    "metadata_hash": null,
     "note": "",
     "decimals": 2,
     "default_frozen": false,
@@ -22,4 +23,4 @@ DEBUG: Asset config params: {
 
 Successfully minted the asset!
 Browse your asset at: https://explore.algokit.io/localnet/asset/123
-Check transaction status at: https://explore.algokit.io/localnet/transaction/dummy_tx_id
+Check transaction status at: https://explore.algokit.io/localnet/transaction/Z7YFUSBBC4TQBYZQ3L7PHW75ZZNJ57C6M5LORMFNDRZGJOWIVAZQ

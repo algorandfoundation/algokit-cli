@@ -4,14 +4,13 @@ from pathlib import Path
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
-from algosdk.account import generate_account
-from algosdk.mnemonic import from_private_key
 from approvaltests.namer import NamerFactory
 from pytest_mock import MockerFixture
 
 from algokit.cli.common.utils import sanitize_extra_args
 from algokit.core.conf import ALGOKIT_CONFIG
 from algokit.core.tasks.wallet import WALLET_ALIASES_KEYRING_USERNAME
+from tests.conftest import generate_test_account
 from tests.utils.approvals import verify
 from tests.utils.click_invoker import invoke
 from tests.utils.proc_mock import ProcMock
@@ -453,7 +452,7 @@ environment_secrets = [
 ]
     """.strip()
 
-    dummy_account_pk, dummy_account_addr = generate_account()  # type: ignore[no-untyped-call]
+    dummy_account_pk, dummy_account_addr, dummy_account_mnemonic = generate_test_account()
     mock_keyring[alias] = json.dumps({"alias": alias, "address": dummy_account_addr, "private_key": dummy_account_pk})
     mock_keyring[WALLET_ALIASES_KEYRING_USERNAME] = json.dumps([alias])
 
@@ -466,7 +465,7 @@ environment_secrets = [
     assert proc_mock.called[1].env
     passed_env_vars = proc_mock.called[1].env
 
-    assert passed_env_vars[env_var_name] == from_private_key(dummy_account_pk)  # type: ignore[no-untyped-call]
+    assert passed_env_vars[env_var_name] == dummy_account_mnemonic
 
     verify(result.output, options=NamerFactory.with_parameters(alias))
 
