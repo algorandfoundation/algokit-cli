@@ -6,6 +6,7 @@ import mimetypes
 import pathlib
 import re
 
+from algokit_common import address_from_public_key, sha512_256
 from algokit_utils.clients import AlgodClient, algod_models
 from algokit_utils.transact import get_transaction_id, make_basic_account_transaction_signer
 from algokit_utils.transactions.builders.asset import build_asset_create_transaction
@@ -17,64 +18,6 @@ from algokit.core.tasks.ipfs import upload_to_pinata
 from algokit.core.tasks.mint.models import TokenMetadata
 
 logger = logging.getLogger(__name__)
-
-# Constants for Algorand address validation
-ALGORAND_ADDRESS_LENGTH = 58
-ALGORAND_ADDRESS_DECODED_LENGTH = 36  # 32 bytes address + 4 bytes checksum
-
-
-def _encode_address_from_bytes(digest: bytes) -> str:
-    """
-    Encode an address from a 32-byte digest using Algorand address encoding.
-
-    Args:
-        digest: 32-byte hash digest
-
-    Returns:
-        str: Base32-encoded address with checksum
-    """
-    # Standard Algorand checksum uses sha512_256, taking last 4 bytes
-    h = hashlib.new("sha512_256")
-    h.update(digest)
-    checksum = h.digest()[-4:]
-    address_bytes = digest + checksum
-    # Base32 encode without padding
-    encoded = base64.b32encode(address_bytes).decode("utf-8")
-    # Remove padding
-    return encoded.rstrip("=")
-
-
-def _is_valid_address(address: str) -> bool:
-    """
-    Validate an Algorand address.
-
-    Args:
-        address: The address string to validate
-
-    Returns:
-        bool: True if valid, False otherwise
-    """
-    if len(address) != ALGORAND_ADDRESS_LENGTH:
-        return False
-    try:
-        # Add padding back for base32 decoding
-        padding_needed = (8 - len(address) % 8) % 8
-        padded = address + "=" * padding_needed
-        decoded = base64.b32decode(padded)
-
-        if len(decoded) != ALGORAND_ADDRESS_DECODED_LENGTH:
-            return False
-
-        addr_hash = decoded[:32]
-        checksum = decoded[32:]
-
-        # Standard Algorand checksum uses sha512_256, taking last 4 bytes
-        h = hashlib.new("sha512_256")
-        h.update(addr_hash)
-        expected_checksum = h.digest()[-4:]
-        return checksum == expected_checksum
-    except Exception:
-        return False
 
 
 def _reserve_address_from_cid(cid: str) -> str:
@@ -91,9 +34,7 @@ def _reserve_address_from_cid(cid: str) -> str:
     # Workaround to fix `multiformats` package issue, remove first two bytes before using `encode_address`.
     # Initial fix using `py-multiformats-cid` and `multihash.decode` was dropped due to PEP 517 incompatibility.
     digest = CID.decode(cid).digest[2:]
-    reserve_address = _encode_address_from_bytes(digest)
-    assert _is_valid_address(reserve_address)
-    return reserve_address
+    return address_from_public_key(digest)
 
 
 def _create_url_from_cid(cid: str) -> str:
@@ -205,24 +146,15 @@ def _compute_metadata_hash(
         return b""
 
     json_metadata = token_metadata.to_json()
+    json_metadata_bytes = json_metadata.encode("utf-8")
     metadata = json.loads(json_metadata)
 
     if "extra_metadata" in metadata:
-        h = hashlib.new("sha512_256")
-        h.update(b"arc0003/amj")
-        h.update(json_metadata.encode("utf-8"))
-        json_metadata_hash = h.digest()
+        json_metadata_hash = sha512_256(b"arc0003/amj" + json_metadata_bytes)
 
-        h = hashlib.new("sha512_256")
-        h.update(b"arc0003/am")
-
-        h.update(json_metadata_hash)
-        h.update(base64.b64decode(metadata["extra_metadata"]))
-        return h.digest()
+        return sha512_256(b"arc0003/am" + json_metadata_hash + base64.b64decode(metadata["extra_metadata"]))
     else:
-        h = hashlib.new("sha256")
-        h.update(json_metadata.encode("utf-8"))
-        return h.digest()
+        return hashlib.sha256(json_metadata_bytes).digest()
 
 
 def mint_token(  # noqa: PLR0913
