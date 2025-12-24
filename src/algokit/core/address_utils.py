@@ -11,9 +11,6 @@ from algokit_utils.common import (
     public_key_from_address,
 )
 
-# Standard Algorand address length (58 characters)
-ALGORAND_ADDRESS_LENGTH = ADDRESS_LENGTH
-
 
 def is_valid_address(address: str) -> bool:
     """Check if an address is a valid Algorand address.

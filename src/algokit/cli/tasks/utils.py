@@ -16,9 +16,10 @@ from algokit_algod_client import models as algod
 from algokit_utils import AlgoAmount, ClientManager
 from algokit_utils.algo25 import seed_from_mnemonic
 from algokit_utils.clients import AlgodClient
+from algokit_utils.common import ADDRESS_LENGTH
 
 from algokit.cli.common.constants import AlgorandNetwork
-from algokit.core.address_utils import ALGORAND_ADDRESS_LENGTH, is_valid_address
+from algokit.core.address_utils import is_valid_address
 from algokit.core.signing_account import SigningAccount
 from algokit.core.tasks.wallet import get_alias
 
@@ -237,7 +238,7 @@ def get_address(address: str) -> str:
         validate_address(parsed_address)
         return parsed_address
     except click.ClickException as ex:
-        if len(parsed_address) == ALGORAND_ADDRESS_LENGTH:
+        if len(parsed_address) == ADDRESS_LENGTH:
             raise click.ClickException(f"`{parsed_address}` is an invalid account address") from ex
 
         alias_data = get_alias(parsed_address)

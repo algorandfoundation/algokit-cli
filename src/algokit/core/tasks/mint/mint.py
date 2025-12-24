@@ -8,7 +8,7 @@ import re
 
 from algokit_common import address_from_public_key, sha512_256
 from algokit_utils.clients import AlgodClient, algod_models
-from algokit_utils.transact import get_transaction_id, make_basic_account_transaction_signer
+from algokit_utils.transact import get_transaction_id
 from algokit_utils.transactions.builders.asset import build_asset_create_transaction
 from algokit_utils.transactions.types import AssetCreateParams
 from multiformats import CID
@@ -261,7 +261,7 @@ def mint_token(  # noqa: PLR0913
     )
 
     # Sign the transaction
-    signer = make_basic_account_transaction_signer(creator_account.private_key)
+    signer = creator_account.signer
     signed_txn_bytes = signer([built_txn.txn], [0])[0]
 
     # Send the transaction (signer returns encoded signed transaction bytes)
