@@ -1,5 +1,6 @@
 import json
 
+from algokit_algod_client.models import Account, AssetHolding
 from algokit_utils import BulkAssetOptInOutResult
 from pytest_mock import MockerFixture
 
@@ -125,8 +126,8 @@ def test_opt_out_of_assets_from_account_address_successful(mocker: MockerFixture
 
 
 def test_opt_out_of_all_assets_from_account_address_successful(mocker: MockerFixture) -> None:
-    dummy_account_info = {"assets": [{"asset-id": 1, "amount": 0}]}
-    mocker.patch("algokit.cli.tasks.assets.get_account_info", return_value=dummy_account_info)
+    dummy_account_info = Account(assets=[AssetHolding(asset_id=1)])
+    mocker.patch("algokit_algod_client.client.AlgodClient.account_information", return_value=dummy_account_info)
     algorand_mock = mocker.MagicMock()
     algorand_mock.asset.bulk_opt_out.return_value = [
         BulkAssetOptInOutResult(asset_id=123, transaction_id="dummy_txn_id")
