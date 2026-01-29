@@ -2,6 +2,12 @@
 
 <!--next-version-placeholder-->
 
+## v2.10.1 (2026-01-29)
+
+### Fix
+
+* Update versioning constraint to support 3.14 ([#706](https://github.com/algorandfoundation/algokit-cli/issues/706)) ([`b6be55a`](https://github.com/algorandfoundation/algokit-cli/commit/b6be55ac219fcc6f46bc938644a272586efa4ff8))
+
 ## v2.10.0 (2025-12-12)
 
 ### Feature
