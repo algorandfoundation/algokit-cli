@@ -1,19 +1,14 @@
 import logging
 import os
 import re
-import sys
 from pathlib import Path
 
 import click
 import questionary
 from packaging import version
 
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
 from algokit.core import proc, questionary_extensions
+from algokit.core._toml import loads as toml_loads
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
 from algokit.core.config_commands.js_package_manager import (
     JSPackageManager,
@@ -214,7 +209,7 @@ def _translate_package_manager_in_toml(project_dir: Path, js_manager: str | None
 
     try:
         content = toml_path.read_text()
-        config = tomllib.loads(content)
+        config = toml_loads(content)
 
         # Early exit if no run commands
         if not (run_commands := config.get("project", {}).get("run", {})):
