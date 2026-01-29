@@ -5,9 +5,10 @@ on: [workflow_call]
 jobs:
   build-python:
     strategy:
+      fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
@@ -29,7 +30,7 @@ jobs:
       - name: Install dependencies
         # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
         # track here -> https://github.com/crytic/tealer/pull/209
-        run: poetry install --no-interaction && pipx install tealer==0.1.2
+        run: poetry install --no-interaction --without docs && pipx install tealer==0.1.2
 
       - name: Install PuyaPy
         if: ${{ matrix.python == '3.12' }}

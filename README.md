@@ -202,7 +202,7 @@ Some useful commands for updating or removing AlgoKit in the future.
 
 1. Ensure desired prerequisites are installed
 
-   - [Python 3.10+](https://www.python.org/downloads/)
+   - [Python 3.10 - 3.14](https://www.python.org/downloads/)
    - [pipx](https://pypa.github.io/pipx/installation/)
    - [Git](https://github.com/git-guides/install-git)
    - [Docker](https://docs.docker.com/get-docker/)

@@ -7,10 +7,10 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.14"
+python = ">=3.10,<3.15"
 click = "8.1.8" # TODO: 8.2.0 upgrade requires refinements in click_invoker.py due to breaking changes
 httpx = ">=0.23.1,<=0.28.1"
-copier = "9.10.1" # Pinned as we have seen breaking changes in minor releases. Updates should be tested before bumping.
+copier = "^9.11.3" # Using caret to allow patch updates. Major/minor updates should be tested before bumping.
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.4"
@@ -31,6 +31,7 @@ jsondiff = "^2.0.0"
 requests = "^2.31.0"
 textual = "^3.0.1"
 prompt_toolkit = "3.0.51" # dependency of questionary, pinned to avoid 3.0.52 which has breaking changes
+pywin32 = { version = "^311", markers = "sys_platform == 'win32'" } # transitive dep of pyclip, pinned to support Python 3.14 on Windows
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.10.0"}
@@ -46,12 +47,17 @@ pytest-cov = "^4.0.0"
 pre-commit = ">=2.20,<4.0"
 sphinx = "^6.0.0"
 sphinx-click = "^4.4.0"
-sphinxnotes-markdown-builder = "^0.5.6"
 poethepoet = ">=0.17.1,<0.37.0"
 gfm-toc = "^0.0.7"
 pytest-xdist = "^3.4.0"
 pytest-sugar = "^1.0.0"
 types-pyyaml = "^6.0.12.20250402"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinxnotes-markdown-builder = "^0.5.6"
 
 [build-system]
 requires = ["poetry-core"]
