@@ -47,13 +47,11 @@ def _normalize_platform_differences(data: str, poetry_version: str = "99.99.99")
     # Normalize msgpack/Python TypeError messages for 'in' operator
     # C-extension msgpack (Python 3.10-3.13) says "is not a container or iterable"
     # Pure-Python msgpack (Python 3.14+, no wheel available) uses native "is not iterable"
-    result = re.sub(
+    return re.sub(
         r"argument of type 'int' is not a container or iterable",
         "argument of type 'int' is not iterable",
         result,
     )
-
-    return result
 
 
 class TokenScrubber(Scrubber):  # type: ignore[misc]

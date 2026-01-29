@@ -11,7 +11,7 @@ from packaging import version
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    import tomli as tomllib  # type: ignore[import-not-found]
+    import tomli as tomllib
 
 from algokit.core import proc, questionary_extensions
 from algokit.core.conf import ALGOKIT_CONFIG, get_algokit_config, get_current_package_version
