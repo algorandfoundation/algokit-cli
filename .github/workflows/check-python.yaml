@@ -19,16 +19,14 @@ jobs:
         uses: ./.github/actions/setup-poetry
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with docs
 
       - name: Audit with pip-audit
         run: |
-          # audit non dev dependencies, no exclusions
-          # poetry export --without=dev > requirements.txt
-          # poetry run pip-audit -r requirements.txt --ignore-vuln 'GHSA-xjhm-gp88-8pfx'
-          # audit all dependencies, with exclusions.
-          # If a vulnerability is found in a dev dependency without an available fix,
-          # it can be temporarily ignored by adding --ignore-vuln e.g. poetry run pip-audit -r requirements.txt --ignore-vuln 'GHSA-79v4-65xg-pq4g'
+          poetry export --without=dev --without=docs -o requirements.txt
+          poetry run pip-audit -r requirements.txt
+          # If a vulnerability is found in a dependency without an available fix,
+          # it can be temporarily ignored by adding --ignore-vuln e.g. poetry run pip-audit -r requirements.txt --ignore-vuln 'GHSA-xxxxx'
 
       - name: Check formatting with Ruff
         run: |
@@ -45,6 +43,5 @@ jobs:
 
       - name: Check docs are up to date
         run: |
-          poetry run pip install sphinxnotes-markdown-builder
           poetry run poe docs
           [ $(git status --porcelain docs/ | wc -l) -eq "0" ]

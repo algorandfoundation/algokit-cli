@@ -1,2 +1,2 @@
-DEBUG: argument of type 'int' is not a container or iterable
+DEBUG: argument of type 'int' is not iterable
 Error: Failed to decode transaction! If you are intending to send multiple transactions use `--file` instead.

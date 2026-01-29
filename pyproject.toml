@@ -10,7 +10,7 @@ readme = "README.md"
 python = ">=3.10,<3.15"
 click = "8.1.8" # TODO: 8.2.0 upgrade requires refinements in click_invoker.py due to breaking changes
 httpx = ">=0.23.1,<=0.28.1"
-copier = "^9.11.3" # Pinned as we have seen breaking changes in minor releases. Updates should be tested before bumping.
+copier = "^9.11.3" # Using caret to allow patch updates. Major/minor updates should be tested before bumping.
 questionary = "^1.10.0"
 pyclip = "^0.7.0"
 shellingham = "^1.5.4"
@@ -53,10 +53,10 @@ pytest-xdist = "^3.4.0"
 pytest-sugar = "^1.0.0"
 types-pyyaml = "^6.0.12.20250402"
 
-[tool.poetry.group.ci]
+[tool.poetry.group.docs]
 optional = true
 
-[tool.poetry.group.ci.dependencies]
+[tool.poetry.group.docs.dependencies]
 sphinxnotes-markdown-builder = "^0.5.6"
 
 [build-system]
