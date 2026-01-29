@@ -31,6 +31,7 @@ jsondiff = "^2.0.0"
 requests = "^2.31.0"
 textual = "^3.0.1"
 prompt_toolkit = "3.0.51" # dependency of questionary, pinned to avoid 3.0.52 which has breaking changes
+pywin32 = { version = "^311", markers = "sys_platform == 'win32'" } # transitive dep of pyclip, pinned to support Python 3.14 on Windows
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = {version = "^6.10.0"}
