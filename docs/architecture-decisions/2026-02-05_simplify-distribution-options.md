@@ -37,6 +37,7 @@ flowchart TD
   UV --> PY["Install Python 3.12"]
   PY --> A["uv tool install algokit"]
   A --> CLI["algokit (uv-managed)"]
+  NPM["npm wrapper (nice to have)"] --> I
   L[Legacy channels<br/>brew/winget/snap] -->|phase out| X["Removed next major"]
 ```
 
@@ -50,6 +51,7 @@ flowchart TD
 - Tests: replace `tests/portability/test_pyinstaller_binary.py` with installer smoke tests (e.g., run the script, verify `algokit doctor` / `algokit init`).
 - Internal tool resolution: migrate pipx-based helpers (typed client generation, compiler installs, tealer install, poetry bootstrap) to uv equivalents (`uv tool run` / `uvx`).
 - CLI update command: add `algokit update` behind a feature flag. Initially no-op or hidden; once binaries are removed, it becomes the default update path and runs `uv tool upgrade algokit`. If a legacy binary install is detected (via binary mode + distribution-method), it can launch a migration wizard on startup that points to the universal installer script and offers to install the legacy version first (nice to have).
+- npm channel: publish a small npm wrapper that invokes the universal installer (nice to have, easy once Option A exists).
 
 **Smooth migration for existing brew/winget/snap users**
 
