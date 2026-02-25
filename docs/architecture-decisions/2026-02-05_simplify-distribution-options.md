@@ -1,6 +1,6 @@
 # Simplify AlgoKit CLI distribution (2026)
 
-- **Status:** Draft for discussion
+- **Status:** Decided — Option A (uvget-style installer + `uv tool install algokit`)
 - **Date:** 2026-02-05
 - **Why now:** The current pipeline needs Apple Developer + Canonical + Winget community workflows, and still ships a binary that does not help users get Python when they open a template in an IDE. PyInstaller was the most mature choice at the time, but by 2026 there are solid alternatives.
 
