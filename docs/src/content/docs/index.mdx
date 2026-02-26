@@ -1,40 +1,76 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: AlgoKit CLI
+description: The one-stop shop tool for developers building on the Algorand network
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  title: AlgoKit CLI
+  tagline: The one-stop shop tool for developers building on the Algorand network
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get Started
+      link: /algokit-cli/tutorials/intro/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
+    - text: CLI Reference
+      link: /algokit-cli/cli/index/
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
 
-## Next steps
+## Installation
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+<Tabs>
+  <TabItem label="macOS">
+    ```bash
+    brew install algorandfoundation/tap/algokit
+    ```
+  </TabItem>
+  <TabItem label="Windows">
+    ```bash
+    winget install AlgoKit
+    ```
+  </TabItem>
+  <TabItem label="pipx (any OS)">
+    ```bash
+    pipx install algokit
+    ```
+  </TabItem>
+</Tabs>
+
+## Quick Start
+
+```bash
+# Verify installation
+algokit --version
+
+# Create a new project from a template
+algokit init
+
+# Start a local Algorand network
+algokit localnet start
+
+# Explore the network with lora
+algokit explore
+```
+
+## Features
+
+<CardGrid>
+  <Card title="Init" icon="rocket">
+    Quickly scaffold new Algorand projects from official templates or community templates.
+  </Card>
+  <Card title="LocalNet" icon="laptop">
+    Spin up a local isolated Algorand network for development and testing.
+  </Card>
+  <Card title="Compile" icon="puzzle">
+    Compile Algorand Python and other smart contract languages to AVM bytecode.
+  </Card>
+  <Card title="Deploy" icon="up-caret">
+    Deploy smart contracts to LocalNet, TestNet or MainNet with a single command.
+  </Card>
+  <Card title="Tasks" icon="list-format">
+    Perform blockchain operations: send, sign, mint, transfer assets and more.
+  </Card>
+  <Card title="Generate" icon="document">
+    Generate typed clients and other code artifacts for your Algorand project.
+  </Card>
 </CardGrid>
