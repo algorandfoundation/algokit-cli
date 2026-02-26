@@ -3,7 +3,7 @@
 then post-process the output for Starlight consumption.
 
 Run via: poetry run poe docs-cli
-Or directly: python docs/cli_build.py (requires sphinx-build in PATH)
+Or directly: python docs/cli_build.py (requires: poetry install --with docs)
 """
 from __future__ import annotations
 
@@ -29,9 +29,10 @@ def _clean_cli_output() -> None:
 def _run_sphinx_build() -> None:
     """Run Sphinx markdown build to generate CLI reference docs."""
     print("==> Running Sphinx + sphinx-click build...")
+    sphinx_build = Path(sys.executable).parent / "sphinx-build"
     result = subprocess.run(
         [
-            "sphinx-build",
+            str(sphinx_build),
             "-b", "markdown",
             "-E",  # force fresh build (don't reuse cached environment)
             "-q",  # quiet
