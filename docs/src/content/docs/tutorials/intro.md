@@ -4,7 +4,7 @@ title: "AlgoKit Quick Start Tutorial"
 
 AlgoKit is the primary tool used by the Algorand community to develop smart contracts on the Algorand blockchain. It provides the capabilities to develop, test and deploy Algorand smart contracts within minutes! This guide is intended to help you setup AlgoKit and to start developing your application.
 
-## Quick start videos 📹
+## Quick start videos
 
 If you prefer videos, take a look at this 10 minute guide to getting started.
 
@@ -14,7 +14,7 @@ Detailed video guides for both [Windows](https://www.youtube.com/embed/22RvINnZs
 
 > Please note, the videos above are to be refreshed to cover v2.0 features. For now, its best to follow the instructions below to get started.
 
-## Prequisites ✅
+## Prequisites
 
 This guide presents installing AlgoKit using an OS agnostic procedure. For OS specific instructions take a look that the [AlgoKit install](https://github.com/algorandfoundation/algokit-cli/blob/main/README.md#install) guide.
 
@@ -26,7 +26,7 @@ Before proceeding, ensure you have the following components installed:
 - [Docker](https://docs.docker.com/desktop/install/mac-install/) (or [Podman](https://podman.io/getting-started/installation/), see [details](/algokit-cli/features/localnet/#podman-support))
 - [VSCode](https://code.visualstudio.com/download)
 
-## Install AlgoKit 🛠
+## Install AlgoKit
 
 To install AlgoKit, run the following command from a terminal.
 
@@ -40,7 +40,7 @@ For more detailed installation documentation, see the [official installation gui
 
 > Please note, `pipx` is only one of the supported installation methods. You can also install AlgoKit via `brew` and _soon_ `winget` and `snap` as pre-build binaries. Refer to the official installation guide.
 
-## Verify the Installation ✔
+## Verify the Installation
 
 To verify AlgoKit Installed correctly run the following.
 
@@ -54,7 +54,7 @@ Output similar to the following should be displayed:
 algokit, version 2.0.3 # or higher
 ```
 
-## Start a LocalNet 🌐
+## Start a LocalNet
 
 AlgoKit supports using a [local version of the Algorand blockchain](/algokit-cli/features/localnet/). To start an instance of this LocalNet run the following command from the terminal:
 
@@ -66,7 +66,7 @@ This should start an instance of the LocalNet within docker. If you open the Doc
 
 ![Docker Desktop LocalNet Instance](/algokit-cli/images/localnet.png)
 
-## Create an AlgoKit project 🆕
+## Create an AlgoKit project
 
 Now that AlgoKit is installed, you can rapidly create a new project to get started quickly. This can be done by running:
 
@@ -88,7 +88,7 @@ Once finished, (if you have it installed) VS Code should automatically be opened
 
 ![AlgoKit Playground Contract](/algokit-cli/images/algokitplayground.png)
 
-## AlgoKit Project structure 🏗
+## AlgoKit Project structure
 
 The structure of your fresh algokit project instance will look similar to below:
 
@@ -122,7 +122,7 @@ To start the interactive walkthrough, install the extension and click on the gre
 
 Upon execution, the walkthrough will guide you through the key components of your fresh AlgoKit project, which is an important prerequisite to learn before running and deploying your first smart contract. Certainly, not because its hard to learn, but because it will save you a lot of time and effort having the correct foundations.
 
-## Run the Demo Application 🏃‍♂️
+## Run the Demo Application
 
 Once the `Algorand Python` based project is created, you can get started by building and deploying your first smart contract. There are a few possible ways to do so as demonstrated on the following video.
 
@@ -140,7 +140,7 @@ At this point you have deployed a simple contract to a LocalNet Algorand network
 
 Additionally, you can find the native AVM related artifacts and the appropriate smart contract manifest JSON files have been output to the `artifacts` folder. Note that in this example, AVM bytecode is compiled using the `PuyaPy` compiler, which is what `Algorand Python` relies on to compile your Python smart contract code to TEAL ([Transaction Execution Approval Language](https://dev.algorand.co/concepts/smart-contracts/languages/teal)).
 
-### Using AlgoKit CLI to build and deploy contracts 🛠️
+### Using AlgoKit CLI to build and deploy contracts
 
 When using official AlgoKit templates via `algokit init`, you can manage your projects using the AlgoKit CLI at the convenience of your terminal.
 
@@ -160,7 +160,7 @@ This will then deploy to your LocalNet instance and display the same output as i
 
 > Please note, as highlighted in the [structure](#algokit-project-structure) section above, the `project run ...` commands are defined in the respective `.algokit.toml` file under `[project]` sections.
 
-## Next steps 🚶‍♂️
+## Next steps
 
 We have only covered a tiny fraction of the capabilities of the AlgoKit CLI and its related ecosystem of templates and utilities for an efficient developer experience.
 
