@@ -1,0 +1,36 @@
+name: "Build Documentation"
+description: "Generate CLI reference via sphinx-click and build Starlight site"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Set up Poetry
+      uses: ./.github/actions/setup-poetry
+
+    - name: Install dependencies
+      shell: bash
+      run: poetry install --no-interaction --with docs
+
+    - name: Set up Node.js 22
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: "npm"
+        cache-dependency-path: docs/package-lock.json
+
+    - name: Install docs dependencies
+      shell: bash
+      run: npm ci --prefix docs
+
+    - name: Generate CLI reference
+      shell: bash
+      run: poetry run poe docs-cli
+
+    - name: Build Starlight site
+      shell: bash
+      run: npm run --prefix docs build
