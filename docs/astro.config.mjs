@@ -99,7 +99,7 @@ export default defineConfig({
         {
           label: 'CLI Reference',
           collapsed: true,
-          items: [{ slug: 'cli/index', label: 'AlgoKit CLI' }],
+          items: [{ slug: 'cli', label: 'AlgoKit CLI' }],
         },
       ],
     }),
