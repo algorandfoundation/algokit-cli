@@ -25,7 +25,7 @@ function Stop-WithError {
     exit 1
 }
 
-function Ensure-UV {
+function Install-UV {
     if (Get-Command uv -ErrorAction SilentlyContinue) {
         $uvVersion = (uv --version 2>$null) -replace 'uv ', '' -replace '\n', ''
         Write-Log "uv found: uv $uvVersion"
@@ -48,7 +48,7 @@ function Ensure-UV {
     Write-Log "uv installed successfully."
 }
 
-function Ensure-Python {
+function Install-Python {
     try {
         $pythonList = uv python list 2>$null | Out-String
         if ($pythonList -match "cpython-$PYTHON_VERSION") {
@@ -56,7 +56,9 @@ function Ensure-Python {
             return
         }
     }
-    catch { }
+    catch {
+        Write-Log "Could not query Python versions: $($_.Exception.Message)" "WARN"
+    }
 
     Write-Log "Installing Python $PYTHON_VERSION via uv..."
     try {
@@ -93,8 +95,8 @@ try {
     Write-Log "AlgoKit CLI Installer"
     Write-Host ""
 
-    Ensure-UV
-    Ensure-Python
+    Install-UV
+    Install-Python
     Install-AlgoKit
 
     Write-Host ""

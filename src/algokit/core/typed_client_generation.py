@@ -218,14 +218,46 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
     def find_project_generate_command(self, version: str | None) -> list[str] | None:
         """
         Try find the generate command in the project.
+        Checks uv-based projects first, then falls back to Poetry.
         """
+        # Try uv first (modern projects)
+        result = self._find_project_command_via_uv(version)
+        if result is not None:
+            return result
+
+        # Fall back to Poetry (legacy projects)
+        return self._find_project_command_via_poetry(version)
+
+    def _find_project_command_via_uv(self, version: str | None) -> list[str] | None:
+        """Check if the generator is installed in a uv-managed project."""
+        try:
+            result = proc.run(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
+            if result.exit_code == 0:
+                generate_command = ["uv", "run", PYTHON_GENERATE_COMMAND]
+                if version is not None:
+                    for line in result.output.splitlines():
+                        if line.startswith("Version:"):
+                            installed_version = extract_version_triple(line.split(":", 1)[1].strip())
+                            if extract_version_triple(version) == installed_version:
+                                return generate_command
+                            return None  # version mismatch
+                else:
+                    return generate_command
+        except OSError:
+            pass
+        except ValueError:
+            pass
+
+        return None
+
+    def _find_project_command_via_poetry(self, version: str | None) -> list[str] | None:
+        """Check if the generator is installed in a Poetry-managed project."""
         try:
             # Use the tree output as it puts the package info on the first line of the output
             result = proc.run(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
             if result.exit_code == 0:
                 generate_command = ["poetry", "run", PYTHON_GENERATE_COMMAND]
                 if version is not None:
-                    installed_version = None
                     lines = result.output.splitlines()
                     if len(lines) > 0:
                         installed_version = extract_version_triple(lines[0])

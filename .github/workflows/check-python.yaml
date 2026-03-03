@@ -16,13 +16,9 @@ jobs:
           python-version: "3.12"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+        uses: ./.github/actions/setup-uv
         with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-
-      - name: Install dependencies
-        run: uv sync --frozen --group docs
+          extra-sync-args: "--group docs"
 
       - name: Audit with pip-audit
         run: |

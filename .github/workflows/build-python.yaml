@@ -25,16 +25,12 @@ jobs:
           node-version: 20
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          version: "0.10.x"
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
+        uses: ./.github/actions/setup-uv
 
-      - name: Install dependencies
-        # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
+      - name: Install tealer
+        # TODO: remove fixed tealer dependency once 3.12 compatibility is addressed
         # track here -> https://github.com/crytic/tealer/pull/209
-        run: uv sync --frozen && uv tool install tealer==0.1.2
+        run: uv tool install tealer==0.1.2
 
       - name: Install PuyaPy
         if: ${{ matrix.python == '3.12' }}

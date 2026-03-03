@@ -26,6 +26,7 @@ def _normalize_legacy_runner_command(command: list[str]) -> list[str]:
         if shutil.which("poetry"):
             return command
         if shutil.which("uv"):
+            logger.debug("poetry not found, rewriting 'poetry run' -> 'uv run' for: %s", " ".join(command))
             return ["uv", "run", *command[2:]]
     return command
 

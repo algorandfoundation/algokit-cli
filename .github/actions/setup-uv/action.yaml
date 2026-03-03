@@ -1,5 +1,10 @@
 name: "Setup uv"
 description: "Install uv and sync project dependencies"
+inputs:
+  extra-sync-args:
+    description: "Additional arguments to pass to uv sync (e.g. --group docs)"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -11,5 +16,5 @@ runs:
         cache-dependency-glob: "uv.lock"
 
     - name: Sync dependencies
-      run: uv sync --frozen
+      run: uv sync --frozen ${{ inputs.extra-sync-args }}
       shell: bash

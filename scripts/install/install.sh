@@ -51,7 +51,7 @@ ensure_uv() {
 }
 
 ensure_python() {
-    if uv python list 2>/dev/null | grep -q "cpython-${PYTHON_VERSION}"; then
+    if uv python find "${PYTHON_VERSION}" >/dev/null 2>&1; then
         log "Python ${PYTHON_VERSION} found."
         return 0
     fi

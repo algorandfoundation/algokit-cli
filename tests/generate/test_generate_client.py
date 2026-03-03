@@ -123,6 +123,7 @@ def test_generate_client_python(
     expected_output_path: Path,
     request: pytest.FixtureRequest,
 ) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
@@ -135,8 +136,8 @@ def test_generate_client_python(
         options=NamerFactory.with_parameters(*option_args),
     )
     version = option_args[-1] if "--version" in options or "-v" in options else None
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert " ".join(proc_mock.called[2].command).startswith(
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert " ".join(proc_mock.called[3].command).startswith(
         _get_python_generate_command(version, application_json, expected_output_path)
     )
 
@@ -156,6 +157,7 @@ def test_python_generator_is_installed_in_project(application_json: Path, proc_m
 
 @pytest.mark.usefixtures("proc_mock")
 def test_python_generator_is_installed_globally(application_json: Path, proc_mock: ProcMock) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.set_output(
         ["uv", "tool", "list"],
@@ -170,6 +172,7 @@ def test_python_generator_is_installed_globally(application_json: Path, proc_moc
 
 @pytest.mark.usefixtures("proc_mock")
 def test_python_generator_version_is_not_installed_anywhere(application_json: Path, proc_mock: ProcMock) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.set_output(
         ["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"],
         output=[f"{PYTHON_PYPI_PACKAGE} 1.1.2 Algorand typed client Generator", "└── algokit-utils 2.2.1"],
@@ -189,6 +192,7 @@ def test_python_generator_version_is_not_installed_anywhere(application_json: Pa
 
 @pytest.mark.usefixtures("proc_mock")
 def test_pipx_missing(application_json: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     mocker.patch("algokit.core.utils.shutil.which", return_value=None)
     mocker.patch("algokit.core.utils._get_candidate_pipx_commands", return_value=[])
@@ -207,6 +211,7 @@ def test_pipx_missing(application_json: Path, mocker: MockerFixture, proc_mock: 
 def test_generate_client_python_arc32_filename(
     proc_mock: ProcMock, arc32_json: Path, options: str, expected_output_path: Path
 ) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
@@ -214,8 +219,8 @@ def test_generate_client_python_arc32_filename(
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert proc_mock.called[2].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
 
 
 @pytest.mark.parametrize(
@@ -230,6 +235,7 @@ def test_generate_client_python_arc56_filename(
     options: str,
     expected_output_path: Path,
 ) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
@@ -237,8 +243,8 @@ def test_generate_client_python_arc56_filename(
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert proc_mock.called[2].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
 
 @pytest.mark.parametrize(
@@ -255,6 +261,7 @@ def test_generate_client_python_multiple_app_specs_in_directory(
     options: str,
     expected_output_path: Path,
 ) -> None:
+    proc_mock.should_bad_exit_on(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
@@ -267,8 +274,8 @@ def test_generate_client_python_multiple_app_specs_in_directory(
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
     # only a single generate call is made for the arc56 app spec
-    assert len(proc_mock.called) == 3  # noqa: PLR2004
-    assert proc_mock.called[2].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
+    assert len(proc_mock.called) == 4  # noqa: PLR2004
+    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
 
 @pytest.mark.usefixtures("mock_platform_system")

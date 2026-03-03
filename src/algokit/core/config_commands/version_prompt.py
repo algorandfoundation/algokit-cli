@@ -22,7 +22,10 @@ DISTRIBUTION_METHOD_UPDATE_COMMAND = {
     "brew": "`brew upgrade algokit`",
 }
 UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION = "the tool used to install AlgoKit"
-# TODO: Set this version as part of releasing the binary distributions.
+# Sentinel version used by binary distributions (winget, brew, snap).
+# Any version >= this value that is NOT running in binary mode is assumed
+# to have been installed via uv. This should be replaced with a proper
+# detection mechanism if the sentinel is ever changed.
 BINARY_DISTRIBUTION_RELEASE_VERSION = "99.99.99"
 
 
