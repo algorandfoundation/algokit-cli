@@ -103,9 +103,8 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:  # noqa: C901, PLR0912
         "poetry": check_dependency(
             ["poetry", "--version"],
             missing_help=[
-                "Poetry is required for some Python-based templates;",
-                "install via `algokit project bootstrap` within project directory, or via:",
-                "https://python-poetry.org/docs/#installation",
+                "Poetry may be needed for older Python-based templates;",
+                "install via https://python-poetry.org/docs/#installation",
             ],
         ),
         "node": check_dependency(
@@ -167,7 +166,7 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:  # noqa: C901, PLR0912
 
         pyclip.copy("\n".join(output_lines))
 
-    if any(not value.ok for value in service_outputs.values()):
+    if any(not value.ok for key, value in service_outputs.items() if key in critical_services):
         raise click.exceptions.Exit(code=1)
 
 

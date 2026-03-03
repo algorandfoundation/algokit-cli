@@ -23,7 +23,7 @@ def normalize_path(content: str, path: str, token: str) -> str:
     )
 
 
-def _normalize_platform_differences(data: str, poetry_version: str = "99.99.99") -> str:
+def _normalize_platform_differences(data: str) -> str:
     """Normalize platform-specific and version-specific differences."""
     result = data
 
@@ -39,10 +39,9 @@ def _normalize_platform_differences(data: str, poetry_version: str = "99.99.99")
         r"DEBUG: git: Stopping at filesystem boundary \(GIT_DISCOVERY_ACROSS_FILESYSTEM not set\)\.\n", "", result
     )
 
-    # Normalize Poetry version output to avoid test failures on version updates
-    result = re.sub(
-        r"DEBUG: poetry: Poetry \(version \d+\.\d+\.\d+\)", f"DEBUG: poetry: Poetry (version {poetry_version})", result
-    )
+    # Strip poetry version output entirely — poetry may or may not be installed
+    result = re.sub(r"DEBUG: poetry: Poetry \(version \d+\.\d+\.\d+\)\n?", "", result)
+    result = re.sub(r"DEBUG: Running 'poetry --version'[^\n]*\n?", "", result)
 
     # Normalize msgpack/Python TypeError messages for 'in' operator
     # C-extension msgpack (Python 3.10-3.13) says "is not a container or iterable"
@@ -78,7 +77,6 @@ def verify(
     *,
     options: approvaltests.Options | None = None,
     scrubber: Scrubber | None = None,
-    poetry_version: str = "99.99.99",
     **kwargs: Any,
 ) -> None:
     options = options or approvaltests.Options()
@@ -87,8 +85,7 @@ def verify(
     kwargs.setdefault("encoding", "utf-8")
     normalised_data = str(data).replace("\r\n", "\n")
 
-    # Apply global platform/version normalization with configurable poetry version
-    normalised_data = _normalize_platform_differences(normalised_data, poetry_version)
+    normalised_data = _normalize_platform_differences(normalised_data)
 
     approvaltests.verify(
         data=normalised_data,

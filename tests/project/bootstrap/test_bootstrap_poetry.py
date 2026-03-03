@@ -36,6 +36,11 @@ def system_python_paths(request: FixtureRequest, mocker: MockerFixture) -> Magic
     return mock
 
 
+@pytest.fixture(autouse=True)
+def uvx_which_mock(mocker: MockerFixture) -> None:
+    mocker.patch("algokit.core.utils.shutil.which", side_effect=lambda cmd: "/bin/uvx" if cmd == "uvx" else None)
+
+
 def test_base_python_path(python_base_executable: str) -> None:
     """When running in a venv (expected test mode), we should be able to resolve to base python.
     Otherwise, they should be the same"""
@@ -63,7 +68,7 @@ def test_bootstrap_poetry_without_poetry(proc_mock: ProcMock, mock_questionary_i
 
 def test_bootstrap_poetry_without_poetry_failed_install(proc_mock: ProcMock, mock_questionary_input: PipeInput) -> None:
     proc_mock.should_fail_on("poetry --version")
-    proc_mock.should_bad_exit_on("pipx install poetry")
+    proc_mock.should_bad_exit_on("uv tool install poetry")
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
@@ -105,7 +110,6 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path(
     mock_questionary_input: PipeInput,
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
-    proc_mock.should_fail_on("pipx --version")
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
@@ -120,8 +124,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
     proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
-    proc_mock.should_fail_on("pipx --version")
-    proc_mock.should_bad_exit_on(f"{python_base_executable} -m pipx install poetry")
+    proc_mock.should_bad_exit_on("uv tool install poetry")
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 
@@ -136,7 +139,6 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
     proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
-    proc_mock.should_fail_on("pipx --version")
     proc_mock.should_fail_on("poetry install")
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
@@ -149,11 +151,14 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
 
 @pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
-    proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
+    proc_mock: ProcMock,
+    python_base_executable: str,
+    mock_questionary_input: PipeInput,
+    mocker: MockerFixture,
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
-    proc_mock.should_fail_on("pipx --version")
-    proc_mock.should_bad_exit_on(f"{python_base_executable} -m pipx --version")
+    mocker.patch("algokit.core.utils.shutil.which", return_value=None)
+    mocker.patch("algokit.core.utils._get_candidate_pipx_commands", return_value=[])
     # Yes, install poetry
     mock_questionary_input.send_text("Y")
 

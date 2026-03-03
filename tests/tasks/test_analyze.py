@@ -235,7 +235,8 @@ def test_analyze_diff_flag_missing_old_report(
 
 def test_analyze_error_no_pipx(cwd: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
     proc_mock.should_fail_on("tealer --version")
-    mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
+    mocker.patch("algokit.core.utils.shutil.which", return_value=None)
+    mocker.patch("algokit.core.utils._get_candidate_pipx_commands", return_value=[])
 
     teal_file = cwd / "dummy.teal"
     teal_file.touch()

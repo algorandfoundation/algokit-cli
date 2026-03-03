@@ -36,7 +36,7 @@ def _get_npm_command() -> str:
 
 def _get_python_generate_command(version: str | None, application_json: Path, expected_output_path: Path) -> str:
     return (
-        f"pipx run --spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''} "
+        f"uvx --from={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''} "
         f"algokitgen-py -a {application_json} -o {expected_output_path}"
     )
 
@@ -86,6 +86,7 @@ def which_mock(mocker: MockerFixture) -> WhichMock:
     which_mock.add("npx")
     which_mock.add("npm")
     which_mock.add("pipx")
+    which_mock.add("uvx")
     mocker.patch("algokit.core.typed_client_generation.shutil.which").side_effect = which_mock.which
     return which_mock
 
@@ -123,18 +124,19 @@ def test_generate_client_python(
     request: pytest.FixtureRequest,
 ) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
-    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+    proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
     result = invoke(f"generate client {application_json.name} {options}", cwd=application_json.parent)
     assert result.exit_code == 0
+    option_args = options.split()
     verify(
         _normalize_output(result.output),
         namer=PyTestNamer(request),
-        options=NamerFactory.with_parameters(*options.split()),
+        options=NamerFactory.with_parameters(*option_args),
     )
-    version = options.split()[-1] if "--version" in options or "-v" in options else None
-    assert len(proc_mock.called) == 4  # noqa: PLR2004
-    assert " ".join(proc_mock.called[3].command).startswith(
+    version = option_args[-1] if "--version" in options or "-v" in options else None
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
+    assert " ".join(proc_mock.called[2].command).startswith(
         _get_python_generate_command(version, application_json, expected_output_path)
     )
 
@@ -156,7 +158,7 @@ def test_python_generator_is_installed_in_project(application_json: Path, proc_m
 def test_python_generator_is_installed_globally(application_json: Path, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
     proc_mock.set_output(
-        ["pipx", "list", "--short"],
+        ["uv", "tool", "list"],
         output=["algokit 1.13.0", "poetry 1.6.1", f"{PYTHON_PYPI_PACKAGE} 1.1.2"],
     )
 
@@ -173,7 +175,7 @@ def test_python_generator_version_is_not_installed_anywhere(application_json: Pa
         output=[f"{PYTHON_PYPI_PACKAGE} 1.1.2 Algorand typed client Generator", "└── algokit-utils 2.2.1"],
     )
     proc_mock.set_output(
-        ["pipx", "list", "--short"],
+        ["uv", "tool", "list"],
         output=["algokit 1.13.0", "poetry 1.6.1", f"{PYTHON_PYPI_PACKAGE} 1.1.2"],
     )
 
@@ -188,7 +190,8 @@ def test_python_generator_version_is_not_installed_anywhere(application_json: Pa
 @pytest.mark.usefixtures("proc_mock")
 def test_pipx_missing(application_json: Path, mocker: MockerFixture, proc_mock: ProcMock) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
-    mocker.patch("algokit.core.utils.get_candidate_pipx_commands", return_value=[])
+    mocker.patch("algokit.core.utils.shutil.which", return_value=None)
+    mocker.patch("algokit.core.utils._get_candidate_pipx_commands", return_value=[])
     result = invoke(f"generate client -o client.py -l python {application_json.name}", cwd=application_json.parent)
 
     assert result.exit_code == 1
@@ -205,14 +208,14 @@ def test_generate_client_python_arc32_filename(
     proc_mock: ProcMock, arc32_json: Path, options: str, expected_output_path: Path
 ) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
-    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+    proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
     result = invoke(f"generate client {options} {arc32_json.name}", cwd=arc32_json.parent)
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert len(proc_mock.called) == 4  # noqa: PLR2004
-    assert proc_mock.called[3].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
+    assert proc_mock.called[2].command == _get_python_generate_command(None, arc32_json, expected_output_path).split()
 
 
 @pytest.mark.parametrize(
@@ -228,14 +231,14 @@ def test_generate_client_python_arc56_filename(
     expected_output_path: Path,
 ) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
-    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+    proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
     result = invoke(f"generate client {options} {arc56_json.name}", cwd=arc56_json.parent)
 
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
-    assert len(proc_mock.called) == 4  # noqa: PLR2004
-    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
+    assert proc_mock.called[2].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
 
 @pytest.mark.parametrize(
@@ -253,7 +256,7 @@ def test_generate_client_python_multiple_app_specs_in_directory(
     expected_output_path: Path,
 ) -> None:
     proc_mock.should_bad_exit_on(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
-    proc_mock.should_bad_exit_on(["pipx", "list", "--short"])
+    proc_mock.should_bad_exit_on(["uv", "tool", "list"])
 
     result = invoke(f"generate client {options} .", cwd=arc56_json.parent)
 
@@ -264,8 +267,8 @@ def test_generate_client_python_multiple_app_specs_in_directory(
     assert result.exit_code == 0
     verify(_normalize_output(result.output), options=NamerFactory.with_parameters(*options.split()))
     # only a single generate call is made for the arc56 app spec
-    assert len(proc_mock.called) == 4  # noqa: PLR2004
-    assert proc_mock.called[3].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
+    assert len(proc_mock.called) == 3  # noqa: PLR2004
+    assert proc_mock.called[2].command == _get_python_generate_command(None, arc56_json, expected_output_path).split()
 
 
 @pytest.mark.usefixtures("mock_platform_system")
@@ -295,12 +298,13 @@ def test_generate_client_typescript(
     result = invoke(f"generate client {application_json.name} {options}", cwd=application_json.parent)
 
     assert result.exit_code == 0
+    option_args = options.split()
     verify(
         _normalize_output(result.output),
         namer=PyTestNamer(request),
-        options=NamerFactory.with_parameters(*options.split()),
+        options=NamerFactory.with_parameters(*option_args),
     )
-    version = options.split()[-1] if "--version" in options or "-v" in options else "latest"
+    version = option_args[-1] if "--version" in options or "-v" in options else "latest"
     assert len(proc_mock.called) == 3  # noqa: PLR2004
     assert " ".join(proc_mock.called[2].command).startswith(
         _get_typescript_generate_command(version, application_json, expected_output_path)

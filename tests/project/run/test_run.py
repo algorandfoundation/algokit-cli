@@ -355,6 +355,24 @@ def test_run_command_from_standalone_resolution_error(
     verify(_format_output(result.output))
 
 
+def test_run_command_from_standalone_poetry_run_falls_back_to_uv(
+    tmp_path_factory: pytest.TempPathFactory,
+    which_mock: WhichMock,
+    proc_mock: ProcMock,
+) -> None:
+    cwd = tmp_path_factory.mktemp("cwd") / "algokit_project"
+    cwd.mkdir()
+
+    uv_path = which_mock.add("uv")
+    proc_mock.set_output([uv_path, "run", "echo", "hello"], ["hello"])
+    _create_project_config(cwd, "contract", "contract_project", "poetry run echo hello", "Runs hello")
+
+    result = invoke("project run hello", cwd=cwd)
+
+    assert result.exit_code == 0
+    assert proc_mock.called[0].command == [uv_path, "run", "echo", "hello"]
+
+
 def test_run_command_from_standalone_execution_error(tmp_path_factory: pytest.TempPathFactory) -> None:
     """
     Verifies the behavior when a command execution error occurs within a standalone project.

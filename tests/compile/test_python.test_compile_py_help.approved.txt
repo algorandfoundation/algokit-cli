@@ -1,3 +1,5 @@
+DEBUG: Running 'uv run puyapy --version' in '{current_working_directory}'
+DEBUG: uv: uv: not found
 DEBUG: Running 'poetry run puyapy --version' in '{current_working_directory}'
 DEBUG: poetry: puyapy 1.0.0
 DEBUG: Running 'poetry run puyapy -h' in '{current_working_directory}'

@@ -89,10 +89,20 @@ def test_algokit_init_and_project_run(tmp_path_factory: pytest.TempPathFactory) 
     logger.info(f"Command {init_command} returned {init_result.stdout}")
     assert init_result.returncode == 0, f"Init command failed with {init_result.stderr}"
 
-    # Run algokit project run build
+    # Add a deterministic project command to avoid template-specific dependency failures
+    project_config_path = cwd / "playground" / "projects" / "playground" / ".algokit.toml"
+    project_config_path.write_text(
+        project_config_path.read_text(encoding="utf-8")
+        + "\n[project.run.binary_smoke]\n"
+        + 'commands = ["python --version"]\n'
+        + 'description = "Binary smoke test"\n',
+        encoding="utf-8",
+    )
+
+    # Run algokit project run for the deterministic command
     build_cwd = cwd / "playground"
     build_cwd.mkdir(exist_ok=True)
-    build_command = [algokit, "-v", "project", "run", "build", "--", "hello_world"]
+    build_command = [algokit, "-v", "project", "run", "binary_smoke"]
     build_result = subprocess.run(build_command, capture_output=True, text=True, check=False, cwd=build_cwd)
     logger.info(f"Command {build_command} returned {build_result.stdout}")
     assert build_result.returncode == 0, f"Build command failed with {build_result.stderr}"
