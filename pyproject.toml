@@ -23,7 +23,7 @@ keyring = "25.6.0"
 # see header in src/algokit/core/_vendor/auth0/authentication/token_verifier.py
 # this version has been tested to work with the vendored file
 pyjwt = "^2.10.1" 
-cryptography = "^44.0.2" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
+cryptography = "^46.0.5" # pyjwt has a weak dependency on cryptography and explicitly requires it in the vendored file, hence the lock
 algokit-utils = "^5.0.0a7"
 multiformats = "0.3.1"
 multiformats_config = "0.3.1" # pinned this to be in lockstep with multiformats
