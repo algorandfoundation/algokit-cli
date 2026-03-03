@@ -15,8 +15,10 @@ from algokit.core import proc
 from algokit.core.utils import (
     extract_semantic_version,
     extract_version_triple,
-    find_valid_pipx_command,
+    find_valid_x_command,
     get_npm_command,
+    get_tool_list_command,
+    get_tool_run_command,
 )
 
 logger = logging.getLogger(__name__)
@@ -238,12 +240,12 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
         return None
 
-    def find_global_generate_command(self, pipx_command: list[str], version: str | None) -> list[str] | None:
+    def find_global_generate_command(self, tool_command: list[str], version: str | None) -> list[str] | None:
         """
         Try find the generate command installed globally.
         """
         try:
-            result = proc.run([*pipx_command, "list", "--short"])
+            result = proc.run(get_tool_list_command(tool_command))
             if result.exit_code == 0:
                 generate_command = [PYTHON_GENERATE_COMMAND]
                 for line in result.output.splitlines():
@@ -267,7 +269,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         Find Python generator command.
         If a matching version is installed at a project level, use that.
         If a matching version is installed at a global level, use that.
-        Otherwise, run the matching version via pipx.
+        Otherwise, run via uvx/pipx.
         """
 
         logger.debug("Searching for project installed client generator")
@@ -275,25 +277,20 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         if project_result is not None:
             return project_result
 
-        pipx_command = find_valid_pipx_command(
-            f"Unable to find pipx install so that the `{PYTHON_PYPI_PACKAGE}` can be run; "
-            "please install pipx via https://pypa.github.io/pipx/ "
+        tool_command = find_valid_x_command(
+            f"Unable to find uvx or pipx so that `{PYTHON_PYPI_PACKAGE}` can be run; "
+            "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit generate client ...` again."
         )
 
         logger.debug("Searching for globally installed client generator")
-        global_result = self.find_global_generate_command(pipx_command, version)
+        global_result = self.find_global_generate_command(tool_command, version)
         if global_result is not None:
             return global_result
 
-        # when not installed, run via pipx
-        logger.debug("No matching installed client generator found, run client generator via pipx")
-        return [
-            *pipx_command,
-            "run",
-            f"--spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''}",
-            PYTHON_GENERATE_COMMAND,
-        ]
+        spec = f"{PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''}"
+        logger.debug("No matching installed client generator found, running via %s", tool_command[0])
+        return get_tool_run_command(tool_command, spec=spec, binary=PYTHON_GENERATE_COMMAND)
 
 
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):

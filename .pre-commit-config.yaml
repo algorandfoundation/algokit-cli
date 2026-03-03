@@ -4,7 +4,7 @@ repos:
       - id: ruff-format
         name: ruff-format
         description: "Run 'ruff format' for extremely fast Python formatting"
-        entry: poetry run ruff format
+        entry: uv run ruff format
         language: system
         types: [python]
         args: [--no-cache]
@@ -13,7 +13,7 @@ repos:
       - id: ruff
         name: ruff
         description: "Run 'ruff' for extremely fast Python linting"
-        entry: poetry run ruff check
+        entry: uv run ruff check
         language: system
         "types": [python]
         args: [--fix, --no-cache]
@@ -23,7 +23,7 @@ repos:
       - id: mypy
         name: mypy
         description: "`mypy` will check Python types for correctness"
-        entry: poetry run mypy
+        entry: uv run mypy
         language: system
         types_or: [python, pyi]
         require_serial: true

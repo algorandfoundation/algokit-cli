@@ -16,7 +16,7 @@ def test_explore(command: str, mocker: MockerFixture) -> None:
 
     assert result.exit_code == 0
     verify(
-        get_combined_verify_output(result.output, "launch args", launch_mock.call_args),
+        get_combined_verify_output(result.output, "launch args", str(launch_mock.call_args)),
         options=NamerFactory.with_parameters(command or "localnet"),
     )
 

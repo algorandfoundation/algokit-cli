@@ -17,6 +17,15 @@ from algokit.cli.task import task_group
 from algokit.core.conf import PACKAGE_NAME
 from algokit.core.config_commands.version_prompt import do_version_prompt, skip_version_check_option
 from algokit.core.log_handlers import color_option, verbose_option
+from algokit.core.utils import is_binary_mode
+
+_INSTALL_URL_BASE = "https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install"
+_INSTALL_URL_SH = f"{_INSTALL_URL_BASE}/install.sh"
+_INSTALL_URL_PS1 = f"{_INSTALL_URL_BASE}/install.ps1"
+_ADR_URL = (
+    "https://github.com/algorandfoundation/algokit-cli/blob/main/"
+    "docs/architecture-decisions/2025-03-03_uv_distribution.md"
+)
 
 HIDDEN_COMMANDS: dict[str, click.Command] = {"deploy": deploy_command, "bootstrap": bootstrap_group}
 
@@ -54,6 +63,8 @@ def algokit(*, skip_version_check: bool) -> None:
     if not skip_version_check:
         do_version_prompt()
 
+    _check_binary_deprecation()
+
 
 algokit.add_command(completions_group)
 algokit.add_command(config_group)
@@ -67,3 +78,30 @@ algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
 algokit.add_command(compile_group)
 algokit.add_command(project_group)
+
+
+def _check_binary_deprecation() -> None:
+    if not is_binary_mode():
+        return
+
+    import logging
+    import platform
+
+    install_cmd = (
+        f"irm {_INSTALL_URL_PS1} | iex" if platform.system() == "Windows" else f"curl -fsSL {_INSTALL_URL_SH} | bash"
+    )
+
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "\n"
+        "  ⚠️  AlgoKit binary installation is being phased out.\n"
+        "  Starting from the next major version, AlgoKit will be distributed via uv.\n"
+        "  To migrate now, run:\n"
+        "\n"
+        "    %s\n"
+        "\n"
+        "  For more information, see:\n"
+        "    %s\n",
+        install_cmd,
+        _ADR_URL,
+    )

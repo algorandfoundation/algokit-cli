@@ -86,10 +86,17 @@ def doctor_command(*, copy_to_clipboard: bool) -> None:  # noqa: C901, PLR0912
         ),
         "python": check_dependency(["python", "--version"], include_location=True),
         "python3": check_dependency(["python3", "--version"], include_location=True),
+        "uv": check_dependency(
+            ["uv", "--version"],
+            missing_help=[
+                "uv is the recommended tool runner for AlgoKit;",
+                "install via https://docs.astral.sh/uv/",
+            ],
+        ),
         "pipx": check_dependency(
             ["pipx", "--version"],
             missing_help=[
-                "pipx is required if poetry is not installed in order to install it automatically;",
+                "pipx can be used as a fallback tool runner if uv is not installed;",
                 "install via https://pypa.github.io/pipx/",
             ],
         ),

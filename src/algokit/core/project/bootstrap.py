@@ -20,7 +20,7 @@ from algokit.core.config_commands.py_package_manager import (
     get_py_package_manager,
     save_py_package_manager,
 )
-from algokit.core.utils import find_valid_pipx_command, is_windows
+from algokit.core.utils import find_valid_x_command, get_tool_install_command, is_uvx, is_windows
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 MAX_BOOTSTRAP_DEPTH = 2
@@ -430,6 +430,7 @@ def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:
 
 
 def bootstrap_poetry(project_dir: Path) -> None:
+    tool_command: list[str] = []
     try:
         proc.run(
             ["poetry", "--version"],
@@ -438,26 +439,28 @@ def bootstrap_poetry(project_dir: Path) -> None:
         try_install_poetry = False
     except OSError:
         try_install_poetry = True
-
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
+        tool_command = find_valid_x_command(
+            "Unable to find uvx or pipx so that poetry can be installed; "
+            "please install uv via https://docs.astral.sh/uv/ "
+            "and then try `algokit project bootstrap poetry` again."
+        )
+        tool_name = "uv" if is_uvx(tool_command) else "pipx"
         if not questionary_extensions.prompt_confirm(
-            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
+            f"We couldn't find `poetry`; can we install it for you via {tool_name} "
+            "so we can install Python dependencies?",
             default=True,
         ):
             raise click.ClickException(
-                "Unable to install poetry via pipx; please install poetry "
+                f"Unable to install poetry via {tool_name}; please install poetry "
                 "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             )
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that poetry can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit project bootstrap poetry` again."
-        )
+        install_cmd = get_tool_install_command(tool_command, package="poetry")
         proc.run(
-            [*pipx_command, "install", "poetry"],
+            install_cmd,
             bad_return_code_error_message=(
-                "Unable to install poetry via pipx; please install poetry "
+                f"Unable to install poetry via {tool_name}; please install poetry "
                 "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             ),
         )
@@ -467,12 +470,12 @@ def bootstrap_poetry(project_dir: Path) -> None:
         proc.run(["poetry", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
     except OSError as e:
         if try_install_poetry:
+            tool_name = "uv" if is_uvx(tool_command) else "pipx"
             raise click.ClickException(
-                "Unable to access Poetry on PATH after installing it via pipx; "
-                "check pipx installations are on your path by running `pipx ensurepath` "
-                "and try `algokit project bootstrap poetry` again."
+                f"Unable to access Poetry on PATH after installing it via {tool_name}; "
+                f"check installations are on your path and try `algokit project bootstrap poetry` again."
             ) from e
-        raise  # unexpected error, we already ran without IOError before
+        raise
 
 
 def bootstrap_npm(project_dir: Path, *, ci_mode: bool) -> None:

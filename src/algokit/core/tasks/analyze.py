@@ -8,7 +8,7 @@ from jsondiff import diff
 from pydantic import BaseModel, Field
 
 from algokit.core.proc import RunResult, run
-from algokit.core.utils import find_valid_pipx_command
+from algokit.core.utils import find_valid_x_command, get_tool_install_command, is_uvx
 
 logger = logging.getLogger(__name__)
 
@@ -97,19 +97,21 @@ def ensure_tealer_installed() -> None:
     except Exception as e:
         logger.debug(e)
         logger.info("Tealer not found; attempting to install it...")
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that `tealer` static analyzer can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
+        pipx_command = find_valid_x_command(
+            "Unable to find uvx or pipx so that `tealer` can be installed; "
+            "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit task analyze ...` again."
         )
+        install_cmd = get_tool_install_command(pipx_command, package=f"tealer=={TEALER_VERSION}")
+        tool_name = "uv" if is_uvx(pipx_command) else "pipx"
         run(
-            [*pipx_command, "install", f"tealer=={TEALER_VERSION}"],
+            install_cmd,
             bad_return_code_error_message=(
-                "Unable to install tealer via pipx; please install tealer "
+                f"Unable to install tealer via {tool_name}; please install tealer "
                 "manually and try `algokit task analyze ...` again."
             ),
         )
-        logger.info("Tealer installed successfully via pipx!")
+        logger.info("Tealer installed successfully via %s!", tool_name)
 
 
 def generate_tealer_command(cur_file: Path, report_output_path: Path, detectors_to_exclude: list[str]) -> list[str]:

@@ -281,7 +281,7 @@ def set_dispenser_credentials(token_data: dict[str, str]) -> None:
     keyring.set_password(
         DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_REFRESH_TOKEN_KEY, token_data.get("refresh_token", "")
     )
-    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_USER_ID_KEY, decoded_id_token.get("sub"))
+    keyring.set_password(DISPENSER_KEYRING_NAMESPACE, DISPENSER_KEYRING_USER_ID_KEY, decoded_id_token.get("sub") or "")
 
 
 def clear_dispenser_credentials() -> None:

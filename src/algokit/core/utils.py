@@ -103,28 +103,54 @@ def run_with_animation(
     return result
 
 
-def find_valid_pipx_command(error_message: str) -> list[str]:
-    for pipx_command in get_candidate_pipx_commands():
+def find_valid_x_command(error_message: str) -> list[str]:
+    """Find uvx (preferred) or pipx command. Returns base command list."""
+    # prefer uvx (uv's tool runner)
+    uvx_path = shutil.which("uvx")
+    if uvx_path:
+        return ["uvx"]
+
+    for pipx_command in _get_candidate_pipx_commands():
         try:
             pipx_version_result = proc.run([*pipx_command, "--version"])
         except OSError:
-            pass  # in case of path/permission issues, go to next candidate
+            pass
         else:
             if pipx_version_result.exit_code == 0:
                 return pipx_command
-    # If pipx isn't found in global path or python -m pipx then bail out
-    #   this is an exceptional circumstance since pipx should always be present with algokit
-    #   since it's installed with brew / winget as a dependency, and otherwise is used to install algokit
     raise click.ClickException(error_message)
 
 
-def get_candidate_pipx_commands() -> Iterator[list[str]]:
-    # first try is pipx via PATH
+def _get_candidate_pipx_commands() -> Iterator[list[str]]:
     yield ["pipx"]
-    # otherwise try getting an interpreter with pipx installed as a module,
-    # this won't work if pipx is installed in its own venv but worth a shot
     for python_path in get_python_paths():
         yield [python_path, "-m", "pipx"]
+
+
+def is_uvx(command: list[str]) -> bool:
+    """Check if the resolved tool runner is uvx."""
+    return len(command) == 1 and command[0] == "uvx"
+
+
+def get_tool_run_command(base_command: list[str], *, spec: str, binary: str) -> list[str]:
+    """Build a command to run a tool via uvx or pipx."""
+    if is_uvx(base_command):
+        return ["uvx", f"--from={spec}", binary]
+    return [*base_command, "run", f"--spec={spec}", binary]
+
+
+def get_tool_install_command(base_command: list[str], *, package: str) -> list[str]:
+    """Build a command to install a tool via uv or pipx."""
+    if is_uvx(base_command):
+        return ["uv", "tool", "install", package]
+    return [*base_command, "install", package]
+
+
+def get_tool_list_command(base_command: list[str]) -> list[str]:
+    """Build a command to list installed tools via uv or pipx."""
+    if is_uvx(base_command):
+        return ["uv", "tool", "list"]
+    return [*base_command, "list", "--short"]
 
 
 def get_npm_command(error_message: str, *, is_npx: bool = False) -> list[str]:

@@ -47,11 +47,9 @@ def do_version_prompt() -> None:
                 if distribution
                 else UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
             )
-        # If you're not using the binary mode, then you've used pipx to install AlgoKit.
-        # One exception is that older versions of the brew package used pipx,
-        # however require updating via brew, so we show the default update instruction instead.
+        # If not using binary mode, it was installed via uv or pipx.
         elif current_version_sequence >= _get_version_sequence(BINARY_DISTRIBUTION_RELEASE_VERSION):
-            update_instruction = "`pipx upgrade algokit`"
+            update_instruction = "`uv tool upgrade algokit`"
 
         logger.info(
             f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
