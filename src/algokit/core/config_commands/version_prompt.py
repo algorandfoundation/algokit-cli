@@ -98,7 +98,7 @@ def get_latest_version_or_cached() -> str | None:
 def get_latest_github_version() -> str:
     headers = {"ACCEPT": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
 
-    response = httpx.get(LATEST_URL, headers=headers)
+    response = httpx.get(LATEST_URL, headers=headers, timeout=5)
     response.raise_for_status()
 
     json = response.json()

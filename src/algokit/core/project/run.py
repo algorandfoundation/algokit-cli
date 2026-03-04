@@ -28,6 +28,10 @@ def _normalize_legacy_runner_command(command: list[str]) -> list[str]:
         if shutil.which("uv"):
             logger.debug("poetry not found, rewriting 'poetry run' -> 'uv run' for: %s", " ".join(command))
             return ["uv", "run", *command[2:]]
+        raise click.ClickException(
+            "Unable to run legacy `poetry run` command because neither `poetry` nor `uv` is installed. "
+            "Install uv via https://docs.astral.sh/uv/ and then try again."
+        )
     return command
 
 

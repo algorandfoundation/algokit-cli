@@ -88,8 +88,8 @@ def test_bootstrap_poetry_without_poetry_failed_poetry_path(
 
     result = invoke("project bootstrap poetry")
 
-    assert result.exit_code == 1
-    verify(result.output)
+    assert result.exit_code == 0
+    assert any(call.command == ["uvx", "--from=poetry", "poetry", "install"] for call in proc_mock.called)
 
 
 @pytest.mark.parametrize(
@@ -136,7 +136,7 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_install(
 
 @pytest.mark.usefixtures("system_python_paths")
 def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
-    proc_mock: ProcMock, python_base_executable: str, mock_questionary_input: PipeInput
+    proc_mock: ProcMock, mock_questionary_input: PipeInput
 ) -> None:
     proc_mock.should_fail_on("poetry --version")
     proc_mock.should_fail_on("poetry install")
@@ -145,8 +145,8 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_failed_poetry_path(
 
     result = invoke("project bootstrap poetry")
 
-    assert result.exit_code == 1
-    verify(result.output.replace(python_base_executable, "{python_base_executable}"))
+    assert result.exit_code == 0
+    assert any(call.command == ["uvx", "--from=poetry", "poetry", "install"] for call in proc_mock.called)
 
 
 @pytest.mark.usefixtures("system_python_paths")
@@ -166,3 +166,17 @@ def test_bootstrap_poetry_without_poetry_or_pipx_path_or_pipx_module(
 
     assert result.exit_code == 1
     verify(result.output.replace(python_base_executable, "{python_base_executable}"))
+
+
+def test_bootstrap_poetry_without_poetry_with_uv_no_uvx_uses_runner_fallback(
+    proc_mock: ProcMock, mock_questionary_input: PipeInput, mocker: MockerFixture
+) -> None:
+    proc_mock.should_fail_on("poetry --version")
+    proc_mock.should_fail_on("poetry install")
+    mocker.patch("algokit.core.utils.shutil.which", side_effect=lambda cmd: "/bin/uv" if cmd == "uv" else None)
+    mock_questionary_input.send_text("Y")
+
+    result = invoke("project bootstrap poetry")
+
+    assert result.exit_code == 0
+    assert any(call.command == ["uv", "tool", "run", "--from=poetry", "poetry", "install"] for call in proc_mock.called)

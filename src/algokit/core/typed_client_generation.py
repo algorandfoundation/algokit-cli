@@ -15,7 +15,7 @@ from algokit.core import proc
 from algokit.core.utils import (
     extract_semantic_version,
     extract_version_triple,
-    find_valid_x_command,
+    find_valid_tool_runner_command,
     get_npm_command,
     get_tool_list_command,
     get_tool_run_command,
@@ -309,7 +309,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         if project_result is not None:
             return project_result
 
-        tool_command = find_valid_x_command(
+        tool_command = find_valid_tool_runner_command(
             f"Unable to find uvx or pipx so that `{PYTHON_PYPI_PACKAGE}` can be run; "
             "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit generate client ...` again."

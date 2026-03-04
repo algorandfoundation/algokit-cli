@@ -8,7 +8,7 @@ from jsondiff import diff
 from pydantic import BaseModel, Field
 
 from algokit.core.proc import RunResult, run
-from algokit.core.utils import find_valid_x_command, get_tool_install_command, is_uvx
+from algokit.core.utils import find_valid_tool_runner_command, get_tool_install_command, is_uvx
 
 logger = logging.getLogger(__name__)
 
@@ -97,13 +97,13 @@ def ensure_tealer_installed() -> None:
     except Exception as e:
         logger.debug(e)
         logger.info("Tealer not found; attempting to install it...")
-        pipx_command = find_valid_x_command(
+        tool_runner_command = find_valid_tool_runner_command(
             "Unable to find uvx or pipx so that `tealer` can be installed; "
             "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit task analyze ...` again."
         )
-        install_cmd = get_tool_install_command(pipx_command, package=f"tealer=={TEALER_VERSION}")
-        tool_name = "uv" if is_uvx(pipx_command) else "pipx"
+        install_cmd = get_tool_install_command(tool_runner_command, package=f"tealer=={TEALER_VERSION}")
+        tool_name = "uv" if is_uvx(tool_runner_command) else "pipx"
         run(
             install_cmd,
             bad_return_code_error_message=(

@@ -101,13 +101,13 @@ AlgoKit is installed via [uv](https://docs.astral.sh/uv/), which handles Python 
 ### macOS / Linux
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/algorandfoundation/algokit-cli/decoupling/scripts/install/install.sh | bash
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install/install.ps1 | iex
+irm https://raw.githubusercontent.com/algorandfoundation/algokit-cli/decoupling/scripts/install/install.ps1 | iex
 ```
 
 ### What the installer does

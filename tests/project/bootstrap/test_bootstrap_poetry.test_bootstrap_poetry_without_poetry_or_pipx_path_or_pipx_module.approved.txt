@@ -1,4 +1,4 @@
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
 Poetry not found; attempting to install it...
-Error: Unable to find uvx or pipx so that poetry can be installed; please install uv via https://docs.astral.sh/uv/ and then try `algokit project bootstrap poetry` again.
+Error: Unable to find uv or pipx so that poetry can be installed; please install uv via https://docs.astral.sh/uv/ and then try `algokit project bootstrap poetry` again.

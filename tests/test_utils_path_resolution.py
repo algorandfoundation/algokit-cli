@@ -15,9 +15,11 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
 
 
-def _make_executable(path: Path) -> None:
-    path.write_text("#!/usr/bin/env sh\n", encoding="utf-8")
-    path.chmod(path.stat().st_mode | stat.S_IXUSR)
+def _make_executable(path: Path) -> Path:
+    executable_path = path.with_suffix(".exe") if os.name == "nt" else path
+    executable_path.write_text("#!/usr/bin/env sh\n", encoding="utf-8")
+    executable_path.chmod(executable_path.stat().st_mode | stat.S_IXUSR)
+    return executable_path
 
 
 def test_find_all_on_path_returns_matches_in_path_order(tmp_path: Path, monkeypatch: "MonkeyPatch") -> None:
@@ -26,10 +28,8 @@ def test_find_all_on_path_returns_matches_in_path_order(tmp_path: Path, monkeypa
     legacy_dir.mkdir()
     uv_dir.mkdir()
 
-    legacy_algokit = legacy_dir / "algokit"
-    uv_algokit = uv_dir / "algokit"
-    _make_executable(legacy_algokit)
-    _make_executable(uv_algokit)
+    legacy_algokit = _make_executable(legacy_dir / "algokit")
+    uv_algokit = _make_executable(uv_dir / "algokit")
 
     monkeypatch.setenv("PATH", f"{legacy_dir}{os.pathsep}{uv_dir}")
 
@@ -42,8 +42,7 @@ def test_find_all_on_path_deduplicates_repeated_entries(tmp_path: Path, monkeypa
     tools_dir = tmp_path / "tools"
     tools_dir.mkdir()
 
-    algokit = tools_dir / "algokit"
-    _make_executable(algokit)
+    algokit = _make_executable(tools_dir / "algokit")
 
     monkeypatch.setenv("PATH", f"{tools_dir}{os.pathsep}{tools_dir}")
 
@@ -56,15 +55,14 @@ def test_check_binary_deprecation_warns_when_multiple_algokit_are_on_path(
     caplog: "LogCaptureFixture", mocker: MockerFixture, monkeypatch: "MonkeyPatch"
 ) -> None:
     mocker.patch("algokit.cli.is_binary_mode", return_value=True)
-    mocker.patch(
-        "algokit.cli.find_all_on_path",
-        return_value=[Path("/usr/local/bin/algokit"), Path("/home/user/.local/bin/algokit")],
-    )
-    monkeypatch.setattr(sys, "executable", "/usr/local/bin/algokit")
+    first_algokit_path = Path("/usr/local/bin/algokit")
+    second_algokit_path = Path("/home/user/.local/bin/algokit")
+    mocker.patch("algokit.cli.find_all_on_path", return_value=[first_algokit_path, second_algokit_path])
+    monkeypatch.setattr(sys, "executable", str(first_algokit_path))
 
     with caplog.at_level(logging.WARNING):
         _check_binary_deprecation()
 
     assert "Multiple `algokit` executables were found on PATH." in caplog.text
-    assert "/usr/local/bin/algokit" in caplog.text
-    assert "/home/user/.local/bin/algokit" in caplog.text
+    assert str(first_algokit_path) in caplog.text
+    assert str(second_algokit_path) in caplog.text

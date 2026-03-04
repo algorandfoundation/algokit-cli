@@ -20,7 +20,14 @@ from algokit.core.config_commands.py_package_manager import (
     get_py_package_manager,
     save_py_package_manager,
 )
-from algokit.core.utils import find_valid_x_command, get_tool_install_command, is_uvx, is_windows
+from algokit.core.utils import (
+    find_valid_tool_runner_command,
+    get_tool_install_command,
+    get_tool_run_command,
+    is_uv,
+    is_uvx,
+    is_windows,
+)
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 MAX_BOOTSTRAP_DEPTH = 2
@@ -123,6 +130,9 @@ def _determine_python_package_manager(project_dir: Path) -> str:
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
 
+    if is_uv_project(project_dir):
+        return PyPackageManager.UV
+
     if poetry_path.exists():
         # Standalone poetry.toml suggests Poetry
         return PyPackageManager.POETRY
@@ -134,11 +144,10 @@ def _determine_python_package_manager(project_dir: Path) -> str:
     # 4. Interactive prompt for first-time users
     manager = questionary.select(
         "Which Python package manager would you prefer `bootstrap` command to use?",
-        choices=[PyPackageManager.POETRY, PyPackageManager.UV],
+        choices=[PyPackageManager.UV, PyPackageManager.POETRY],
     ).ask()
     if manager is None:
-        # Default to Poetry if user cancels
-        manager = PyPackageManager.POETRY
+        manager = PyPackageManager.UV
     save_py_package_manager(manager)
     return str(manager)
 
@@ -186,7 +195,7 @@ def _bootstrap_python_project(project_dir: Path, manager: str) -> None:
     if manager == PyPackageManager.UV:
         logger.debug("Running `algokit project bootstrap uv`")
         bootstrap_uv(project_dir)
-    else:  # Default to Poetry for backward compatibility
+    else:
         logger.debug("Running `algokit project bootstrap poetry`")
         bootstrap_poetry(project_dir)
 
@@ -441,12 +450,12 @@ def bootstrap_poetry(project_dir: Path) -> None:
         try_install_poetry = True
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
-        tool_command = find_valid_x_command(
-            "Unable to find uvx or pipx so that poetry can be installed; "
+        tool_command = find_valid_tool_runner_command(
+            "Unable to find uv or pipx so that poetry can be installed; "
             "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit project bootstrap poetry` again."
         )
-        tool_name = "uv" if is_uvx(tool_command) else "pipx"
+        tool_name = "uv" if is_uvx(tool_command) or is_uv(tool_command) else "pipx"
         if not questionary_extensions.prompt_confirm(
             f"We couldn't find `poetry`; can we install it for you via {tool_name} "
             "so we can install Python dependencies?",
@@ -468,13 +477,22 @@ def bootstrap_poetry(project_dir: Path) -> None:
     logger.info("Installing Python dependencies and setting up Python virtual environment via Poetry")
     try:
         proc.run(["poetry", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
-    except OSError as e:
+    except OSError:
         if try_install_poetry:
-            tool_name = "uv" if is_uvx(tool_command) else "pipx"
-            raise click.ClickException(
-                f"Unable to access Poetry on PATH after installing it via {tool_name}; "
-                f"check installations are on your path and try `algokit project bootstrap poetry` again."
-            ) from e
+            tool_name = "uv" if is_uvx(tool_command) or is_uv(tool_command) else "pipx"
+            logger.info(
+                "Poetry is not available on PATH yet after installation; retrying via %s tool runner", tool_name
+            )
+            fallback_cmd = [*get_tool_run_command(tool_command, spec="poetry", binary="poetry"), "install"]
+            try:
+                proc.run(fallback_cmd, stdout_log_level=logging.INFO, cwd=project_dir)
+                return
+            except Exception as fallback_error:
+                raise click.ClickException(
+                    f"Unable to access Poetry on PATH after installing it via {tool_name}; "
+                    "and fallback execution failed. Please restart your terminal and try "
+                    "`algokit project bootstrap poetry` again."
+                ) from fallback_error
         raise
 
 

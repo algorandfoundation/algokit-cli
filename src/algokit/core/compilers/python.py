@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 
 from algokit.core.proc import run
-from algokit.core.utils import extract_version_triple, find_valid_x_command, get_tool_run_command
+from algokit.core.utils import extract_version_triple, find_valid_tool_runner_command, get_tool_run_command
 
 
 def find_valid_puyapy_command(version: str | None) -> list[str]:
@@ -24,13 +24,13 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
             ):
                 return puyapy_command
 
-    pipx_command = find_valid_x_command(
+    tool_runner_command = find_valid_tool_runner_command(
         "Unable to find uvx or pipx so that `PuyaPy` can be run; "
         "please install uv via https://docs.astral.sh/uv/ "
         "and then try `algokit compile python ...` again."
     )
 
-    return get_tool_run_command(pipx_command, spec=f"puyapy=={version}", binary="puyapy")
+    return get_tool_run_command(tool_runner_command, spec=f"puyapy=={version}", binary="puyapy")
 
 
 def _find_puyapy_command() -> list[str]:
@@ -47,12 +47,12 @@ def _find_puyapy_command() -> list[str]:
             if puyapy_help_result.exit_code == 0:
                 return puyapy_command
 
-    pipx_command = find_valid_x_command(
+    tool_runner_command = find_valid_tool_runner_command(
         "Unable to find uvx or pipx so that `PuyaPy` can be run; "
         "please install uv via https://docs.astral.sh/uv/ "
         "and then try `algokit compile python ...` again."
     )
-    return get_tool_run_command(pipx_command, spec="puyapy", binary="puyapy")
+    return get_tool_run_command(tool_runner_command, spec="puyapy", binary="puyapy")
 
 
 def _get_candidate_puyapy_commands() -> Iterator[list[str]]:
