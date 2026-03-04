@@ -103,12 +103,16 @@ def run_with_animation(
     return result
 
 
-def find_valid_x_command(error_message: str) -> list[str]:
+def find_valid_tool_runner_command(error_message: str) -> list[str]:
     """Find uvx (preferred) or pipx command. Returns base command list."""
     # prefer uvx (uv's tool runner)
     uvx_path = shutil.which("uvx")
     if uvx_path:
         return ["uvx"]
+
+    uv_path = shutil.which("uv")
+    if uv_path:
+        return ["uv"]
 
     for pipx_command in _get_candidate_pipx_commands():
         try:
@@ -132,23 +136,29 @@ def is_uvx(command: list[str]) -> bool:
     return len(command) == 1 and command[0] == "uvx"
 
 
+def is_uv(command: list[str]) -> bool:
+    return len(command) == 1 and command[0] == "uv"
+
+
 def get_tool_run_command(base_command: list[str], *, spec: str, binary: str) -> list[str]:
     """Build a command to run a tool via uvx or pipx."""
     if is_uvx(base_command):
         return ["uvx", f"--from={spec}", binary]
+    if is_uv(base_command):
+        return ["uv", "tool", "run", f"--from={spec}", binary]
     return [*base_command, "run", f"--spec={spec}", binary]
 
 
 def get_tool_install_command(base_command: list[str], *, package: str) -> list[str]:
     """Build a command to install a tool via uv or pipx."""
-    if is_uvx(base_command):
+    if is_uvx(base_command) or is_uv(base_command):
         return ["uv", "tool", "install", package]
     return [*base_command, "install", package]
 
 
 def get_tool_list_command(base_command: list[str]) -> list[str]:
     """Build a command to list installed tools via uv or pipx."""
-    if is_uvx(base_command):
+    if is_uvx(base_command) or is_uv(base_command):
         return ["uv", "tool", "list"]
     return [*base_command, "list", "--short"]
 
@@ -228,6 +238,37 @@ def is_binary_mode() -> bool:
 
 def is_windows() -> bool:
     return platform.system() == "Windows"
+
+
+def find_all_on_path(command: str) -> list[Path]:
+    matches: list[Path] = []
+    seen: set[str] = set()
+
+    for path_entry in environ.get("PATH", "").split(os.pathsep):
+        if not path_entry:
+            continue
+
+        match = shutil.which(command, path=path_entry)
+        if not match:
+            continue
+
+        match_path = Path(match)
+        try:
+            canonical_path = match_path.resolve()
+        except OSError:
+            canonical_path = match_path.absolute()
+
+        dedupe_key = str(canonical_path)
+        if is_windows():
+            dedupe_key = dedupe_key.lower()
+
+        if dedupe_key in seen:
+            continue
+
+        seen.add(dedupe_key)
+        matches.append(match_path)
+
+    return matches
 
 
 def is_wsl() -> bool:

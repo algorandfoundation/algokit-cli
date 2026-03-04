@@ -68,8 +68,41 @@ install_algokit() {
         || die "Failed to install ${PACKAGE}."
 
     if command -v algokit >/dev/null 2>&1; then
+        local active_algokit
+        active_algokit=$(command -v algokit)
+        local -a all_algokit_paths=()
+        local -a path_entries=()
+        local seen_paths=":"
+        local path_entry
+        IFS=: read -r -a path_entries <<< "$PATH"
+        for path_entry in "${path_entries[@]}"; do
+            [[ -z "$path_entry" ]] && continue
+            local candidate="$path_entry/algokit"
+            if [[ -f "$candidate" && -x "$candidate" ]]; then
+                case "$seen_paths" in
+                    *":$candidate:"*) ;;
+                    *)
+                        seen_paths="${seen_paths}${candidate}:"
+                        all_algokit_paths+=("$candidate")
+                        ;;
+                esac
+            fi
+        done
+
         log "Installed: $(algokit --version 2>/dev/null || echo "${PACKAGE}")"
         log "Run ${BOLD}algokit --help${NC} to get started."
+
+        if [[ ${#all_algokit_paths[@]} -gt 1 ]]; then
+            warn "Multiple algokit executables were found on PATH."
+            warn "Active executable: ${active_algokit}"
+            warn "All PATH matches:"
+            local match_path
+            for match_path in "${all_algokit_paths[@]}"; do
+                warn "  - ${match_path}"
+            done
+            warn "If this is not the uv-managed executable, move ~/.local/bin earlier on PATH or remove legacy binary."
+            warn "Restart your shell and run: algokit --version"
+        fi
     else
         warn "${PACKAGE} installed but not found on PATH."
         warn "Add ~/.local/bin to your PATH:"

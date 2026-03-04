@@ -34,7 +34,11 @@ function Install-UV {
 
     Write-Log "Installing uv..."
     try {
-        Invoke-RestMethod $UV_INSTALL_URL | Invoke-Expression
+        $uvInstallerScript = [string](Invoke-RestMethod $UV_INSTALL_URL)
+        if ($uvInstallerScript.Length -lt 1000) {
+            Stop-WithError "uv installer appears corrupted (too small)."
+        }
+        Invoke-Expression $uvInstallerScript
     }
     catch {
         Stop-WithError "Failed to install uv: $($_.Exception.Message)"
@@ -82,9 +86,21 @@ function Install-AlgoKit {
 
     $toolPath = Get-Command algokit -ErrorAction SilentlyContinue
     if ($toolPath) {
+        $allToolPaths = @(Get-Command algokit -All -ErrorAction SilentlyContinue | ForEach-Object { $_.Source } | Where-Object { $_ })
         $version = algokit --version 2>$null
         Write-Log "Installed: $version"
         Write-Log "Run 'algokit --help' to get started."
+
+        if ($allToolPaths.Count -gt 1) {
+            Write-Log "Multiple algokit executables were found on PATH." "WARN"
+            Write-Log "Active executable: $($toolPath.Source)" "WARN"
+            Write-Log "All PATH matches:" "WARN"
+            foreach ($path in $allToolPaths) {
+                Write-Log "  - $path" "WARN"
+            }
+            Write-Log "If this is not the uv-managed executable, move $env:USERPROFILE\.local\bin earlier on PATH or remove legacy binary." "WARN"
+            Write-Log "Restart your shell and run: algokit --version" "WARN"
+        }
     }
     else {
         Write-Log "$PACKAGE installed but not found on PATH. Restart your shell and try again." "WARN"
