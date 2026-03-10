@@ -60,8 +60,6 @@ dev = [
     "python-semantic-release>=7.32.2,<8.0.0",
     "pytest-cov>=4.0.0,<5.0.0",
     "pre-commit>=2.20,<4.0",
-    "sphinx>=6.0.0,<7.0.0",
-    "sphinx-click>=4.4.0,<5.0.0",
     "poethepoet>=0.17.1,<0.37.0",
     "gfm-toc>=0.0.7,<0.0.8",
     "pytest-xdist>=3.4.0,<4.0.0",
@@ -69,6 +67,8 @@ dev = [
     "types-pyyaml>=6.0.12.20250402,<7.0.0",
 ]
 docs = [
+    "sphinx>=6.0.0,<7.0.0",
+    "sphinx-click>=4.4.0,<5.0.0",
     "sphinxnotes-markdown-builder>=0.5.6,<0.6.0",
 ]
 

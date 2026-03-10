@@ -55,11 +55,11 @@ dev = [
     { name = "pytest-xdist" },
     { name = "python-semantic-release" },
     { name = "ruff" },
-    { name = "sphinx" },
-    { name = "sphinx-click" },
     { name = "types-pyyaml" },
 ]
 docs = [
+    { name = "sphinx" },
+    { name = "sphinx-click" },
     { name = "sphinxnotes-markdown-builder" },
 ]
 
@@ -104,11 +104,13 @@ dev = [
     { name = "pytest-xdist", specifier = ">=3.4.0,<4.0.0" },
     { name = "python-semantic-release", specifier = ">=7.32.2,<8.0.0" },
     { name = "ruff", specifier = ">=0.1.6,<0.13.0" },
-    { name = "sphinx", specifier = ">=6.0.0,<7.0.0" },
-    { name = "sphinx-click", specifier = ">=4.4.0,<5.0.0" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20250402,<7.0.0" },
 ]
-docs = [{ name = "sphinxnotes-markdown-builder", specifier = ">=0.5.6,<0.6.0" }]
+docs = [
+    { name = "sphinx", specifier = ">=6.0.0,<7.0.0" },
+    { name = "sphinx-click", specifier = ">=4.4.0,<5.0.0" },
+    { name = "sphinxnotes-markdown-builder", specifier = ">=0.5.6,<0.6.0" },
+]
 
 [[package]]
 name = "algokit-utils"

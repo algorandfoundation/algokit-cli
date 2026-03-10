@@ -2,8 +2,8 @@
 """Generate CLI reference markdown from Click source using Sphinx + sphinx-click,
 then post-process the output for Starlight consumption.
 
-Run via: poetry run poe docs-cli
-Or directly: python docs/cli_build.py (requires: poetry install --with docs)
+Run via: uv run poe docs-cli
+Or directly: uv run --group docs python docs/cli_build.py
 """
 
 from __future__ import annotations
@@ -30,10 +30,9 @@ def _clean_cli_output() -> None:
 def _run_sphinx_build() -> None:
     """Run Sphinx markdown build to generate CLI reference docs."""
     print("==> Running Sphinx + sphinx-click build...")
-    sphinx_build = Path(sys.executable).parent / "sphinx-build"
     result = subprocess.run(
         [
-            str(sphinx_build),
+            "uv", "run", "--group", "docs", "sphinx-build",
             "-b",
             "markdown",
             "-E",  # force fresh build (don't reuse cached environment)
