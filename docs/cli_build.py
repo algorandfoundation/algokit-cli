@@ -5,6 +5,7 @@ then post-process the output for Starlight consumption.
 Run via: poetry run poe docs-cli
 Or directly: python docs/cli_build.py (requires: poetry install --with docs)
 """
+
 from __future__ import annotations
 
 import re
@@ -33,7 +34,8 @@ def _run_sphinx_build() -> None:
     result = subprocess.run(
         [
             str(sphinx_build),
-            "-b", "markdown",
+            "-b",
+            "markdown",
             "-E",  # force fresh build (don't reuse cached environment)
             "-q",  # quiet
             "docs/sphinx",
