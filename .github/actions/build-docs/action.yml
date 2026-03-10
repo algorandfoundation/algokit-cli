@@ -4,33 +4,28 @@ description: "Generate CLI reference via sphinx-click and build Starlight site"
 runs:
   using: "composite"
   steps:
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+    - name: Setup Python environment
+      uses: algorandfoundation/algokit-shared-config/.github/actions/setup-algokit-python@main
       with:
-        python-version: "3.12"
-
-    - name: Set up Poetry
-      uses: ./.github/actions/setup-poetry
-
-    - name: Install dependencies
-      shell: bash
-      run: poetry install --no-interaction --with docs
+        install-algokit: "false"
 
     - name: Set up Node.js 22
       uses: actions/setup-node@v4
       with:
         node-version: "22"
-        cache: "npm"
-        cache-dependency-path: docs/package-lock.json
+
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 10
 
     - name: Install docs dependencies
       shell: bash
-      run: npm ci --prefix docs
+      run: cd docs && pnpm install --frozen-lockfile
 
     - name: Generate CLI reference
       shell: bash
-      run: poetry run poe docs-cli
+      run: uv run poe docs-cli
 
     - name: Build Starlight site
       shell: bash
-      run: npm run --prefix docs build
+      run: cd docs && pnpm run build

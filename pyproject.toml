@@ -74,8 +74,8 @@ docs = [
 
 [tool.poe.tasks]
 docs-cli     = "python docs/cli_build.py"
-docs-dev     = { shell = "python docs/cli_build.py && npm run --prefix docs dev" }
-docs-build   = { shell = "python docs/cli_build.py && npm run --prefix docs build" }
+docs-dev     = { shell = "python docs/cli_build.py && pnpm --dir docs run dev" }
+docs-build   = { shell = "python docs/cli_build.py && pnpm --dir docs run build" }
 docs-preview = "npm run --prefix docs preview"
 package_unix = "pyinstaller --clean --onedir --hidden-import jinja2_ansible_filters --hidden-import multiformats_config --hidden-import algokit_utils.algo25 --hidden-import algokit_utils.transact --hidden-import algokit_utils.common --hidden-import algokit_utils.clients --hidden-import algokit_utils.transactions.builders --hidden-import algokit_utils.transactions.types --copy-metadata algokit --name algokit --noconfirm src/algokit/__main__.py --add-data './misc/multiformats_config:multiformats_config/' --add-data './src/algokit/resources:algokit/resources/'"
 package_windows = { cmd = "scripts/package_windows.bat" }
