@@ -32,7 +32,11 @@ def _run_sphinx_build() -> None:
     print("==> Running Sphinx + sphinx-click build...")
     result = subprocess.run(
         [
-            "uv", "run", "--group", "docs", "sphinx-build",
+            "uv",
+            "run",
+            "--group",
+            "docs",
+            "sphinx-build",
             "-b",
             "markdown",
             "-E",  # force fresh build (don't reuse cached environment)
