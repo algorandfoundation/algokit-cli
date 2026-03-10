@@ -44,7 +44,7 @@ def _run_sphinx_build() -> None:
             "docs/sphinx",
             str(CLI_OUT),
         ],
-        cwd=str(REPO_ROOT),
+        check=False, cwd=str(REPO_ROOT),
         capture_output=True,
         text=True,
     )
