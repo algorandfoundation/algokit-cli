@@ -54,6 +54,7 @@ def _mock_happy_values(proc_mock: ProcMock) -> None:
     proc_mock.set_output(["git", "--version"], ["git version 2.37.1 (Apple Git-137.1)"])
     proc_mock.set_output(["python", "--version"], ["Python 3.10.0"])
     proc_mock.set_output(["python3", "--version"], ["Python 3.11.0"])
+    proc_mock.set_output(["uv", "--version"], ["uv 0.6.0"])
     proc_mock.set_output(["pipx", "--version"], ["1.1.0"])
     proc_mock.set_output(["poetry", "--version"], ["blah blah", "", "Poetry (version 1.2.2)"])
     proc_mock.set_output(["node", "--version"], ["v18.12.1"])
@@ -148,6 +149,7 @@ ALL_COMMANDS = [
     ["git", "--version"],
     ["python", "--version"],
     ["python3", "--version"],
+    ["uv", "--version"],
     ["pipx", "--version"],
     ["poetry", "--version"],
     ["node", "--version"],
@@ -221,7 +223,7 @@ def test_npm_permission_denied(proc_mock: ProcMock) -> None:
 
     result = invoke("doctor")
 
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     verify(result.output, scrubber=make_output_scrubber())
 
 

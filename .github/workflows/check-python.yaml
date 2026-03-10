@@ -8,40 +8,35 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Set up Poetry
-        uses: ./.github/actions/setup-poetry
-
-      - name: Install dependencies
-        run: poetry install --no-interaction --with docs
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
+        with:
+          extra-sync-args: "--group docs"
 
       - name: Audit with pip-audit
         run: |
-          poetry export --without=dev --without=docs -o requirements.txt
-          poetry run pip-audit -r requirements.txt
-          # If a vulnerability is found in a dependency without an available fix,
-          # it can be temporarily ignored by adding --ignore-vuln e.g. poetry run pip-audit -r requirements.txt --ignore-vuln 'GHSA-xxxxx'
+          set -o pipefail
+          uv export --no-dev --no-group docs --no-emit-project -o requirements.txt
+          uv run pip-audit -r requirements.txt
 
       - name: Check formatting with Ruff
-        run: |
-          # stop the build if there are files that don't meet formatting requirements
-          poetry run ruff format --check .
+        run: uv run ruff format --check .
 
       - name: Check linting with Ruff
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          poetry run ruff check .
+        run: uv run ruff check .
 
       - name: Check types with mypy
-        run: poetry run mypy
+        run: uv run mypy
 
       - name: Check docs are up to date
         run: |
-          poetry run poe docs
+          set -o pipefail
+          uv run poe docs
           [ $(git status --porcelain docs/ | wc -l) -eq "0" ]

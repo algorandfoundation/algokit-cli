@@ -36,7 +36,7 @@ runs:
       run: |
         export APPLE_CERT_ID="${{ inputs.with_codesign == 'true' && inputs.apple_cert_id || '' }}"
         export APPLE_BUNDLE_ID="${{ inputs.with_codesign == 'true' && inputs.apple_bundle_id || format('beta.{0}', inputs.apple_bundle_id) }}"
-        poetry run poe package_mac
+        uv run poe package_mac
       env:
         APPLE_CERT_ID: ${{ inputs.with_codesign == 'true' && inputs.apple_cert_id || '' }}
         APPLE_BUNDLE_ID: ${{ inputs.with_codesign == 'true' && inputs.apple_bundle_id || format('beta.{0}', inputs.apple_bundle_id) }}
@@ -73,7 +73,7 @@ runs:
         cd ../..
 
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ inputs.package_name }}
         path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-brew.tar.gz

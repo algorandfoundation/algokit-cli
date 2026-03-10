@@ -8,9 +8,10 @@ DEBUG: Running 'python --version' in '{current_working_directory}'
 DEBUG: Command not found
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: Command not found
+DEBUG: Running 'uv --version' in '{current_working_directory}'
+DEBUG: Command not found
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: Command not found
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: Command not found
 DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: Command not found
@@ -29,13 +30,15 @@ git: Command not found!
   Git required to run `algokit init`; install via https://github.com/git-guides/install-git
 python: Command not found!
 python3: Command not found!
+uv: Command not found!
+  uv is the recommended tool runner for AlgoKit;
+  install via https://docs.astral.sh/uv/
 pipx: Command not found!
-  pipx is required if poetry is not installed in order to install it automatically;
+  pipx can be used as a fallback tool runner if uv is not installed;
   install via https://pypa.github.io/pipx/
 poetry: Command not found!
-  Poetry is required for some Python-based templates;
-  install via `algokit project bootstrap` within project directory, or via:
-  https://python-poetry.org/docs/#installation
+  Poetry may be needed for older Python-based templates;
+  install via https://python-poetry.org/docs/#installation
 node: Command not found!
   Node.js is required for some Node.js-based templates;
   install via `algokit project bootstrap` within project directory, or via:

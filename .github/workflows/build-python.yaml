@@ -12,29 +12,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
-      - name: Set up Poetry
-        uses: ./.github/actions/setup-poetry
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
 
-      - name: Install dependencies
-        # TODO: remove fixed pipx dependency once 3.12 compatibility is addressed
+      - name: Install tealer
+        # TODO: remove fixed tealer dependency once 3.12 compatibility is addressed
         # track here -> https://github.com/crytic/tealer/pull/209
-        run: poetry install --no-interaction --without docs && pipx install tealer==0.1.2
+        run: uv tool install tealer==0.1.2
 
       - name: Install PuyaPy
         if: ${{ matrix.python == '3.12' }}
-        run: pipx install puyapy
+        run: uv tool install puyapy
 
       - name: pytest
         shell: bash
@@ -43,7 +43,7 @@ jobs:
         run: |
           set -o pipefail
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
-          poetry run pytest -n auto
+          uv run pytest -n auto
         id: pytest
 
       - name: pytest + coverage
@@ -55,12 +55,12 @@ jobs:
         run: |
           set -o pipefail
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
-          poetry run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
+          uv run pytest -n auto --junitxml=pytest-junit.xml --cov-report=term-missing:skip-covered --cov=src | tee pytest-coverage.txt
         id: pytest-cov
 
       - name: Upload received snapshots (in case of failure)
         if: failure() && (steps.pytest.outcome == 'failure' || steps.pytest-cov.outcome == 'failure')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-artifacts-${{ matrix.os }}-python${{ matrix.python }}
           path: tests/**/*.received.txt
@@ -74,4 +74,4 @@ jobs:
           junitxml-path: ./pytest-junit.xml
 
       - name: Build Wheel
-        run: poetry build --format wheel
+        run: uv build --wheel

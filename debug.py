@@ -12,7 +12,7 @@ try:
     import click
 except ImportError:
     print(  # noqa: T201
-        "ERROR: Couldn't import click, make sure you've run 'poetry install' and activated the virtual environment.\n"
+        "ERROR: Couldn't import click, make sure you've run 'uv sync' and activated the virtual environment.\n"
         "For tips on getting started with developing AlgoKit CLI itself see CONTRIBUTING.md.\n",
         file=sys.stderr,
     )

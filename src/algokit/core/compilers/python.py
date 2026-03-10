@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 
 from algokit.core.proc import run
-from algokit.core.utils import extract_version_triple, find_valid_pipx_command
+from algokit.core.utils import extract_version_triple, find_valid_tool_runner_command, get_tool_run_command
 
 
 def find_valid_puyapy_command(version: str | None) -> list[str]:
@@ -11,7 +11,7 @@ def find_valid_puyapy_command(version: str | None) -> list[str]:
 def _find_puyapy_command_at_version(version: str) -> list[str]:
     """
     Find puyapy command with a specific version.
-    If the puyapy version isn't installed, install it with pipx run.
+    If the puyapy version isn't installed, run it via uvx/pipx.
     """
     for puyapy_command in _get_candidate_puyapy_commands():
         try:
@@ -24,24 +24,19 @@ def _find_puyapy_command_at_version(version: str) -> list[str]:
             ):
                 return puyapy_command
 
-    pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that the `PuyaPy` compiler can be run; "
-        "please install pipx via https://pypa.github.io/pipx/ "
+    tool_runner_command = find_valid_tool_runner_command(
+        "Unable to find uvx or pipx so that `PuyaPy` can be run; "
+        "please install uv via https://docs.astral.sh/uv/ "
         "and then try `algokit compile python ...` again."
     )
 
-    return [
-        *pipx_command,
-        "run",
-        f"--spec=puyapy=={version}",
-        "puyapy",
-    ]
+    return get_tool_run_command(tool_runner_command, spec=f"puyapy=={version}", binary="puyapy")
 
 
 def _find_puyapy_command() -> list[str]:
     """
     Find puyapy command.
-    If puyapy isn't installed, install the latest version with pipx.
+    If puyapy isn't installed, run the latest version via uvx/pipx.
     """
     for puyapy_command in _get_candidate_puyapy_commands():
         try:
@@ -52,21 +47,15 @@ def _find_puyapy_command() -> list[str]:
             if puyapy_help_result.exit_code == 0:
                 return puyapy_command
 
-    pipx_command = find_valid_pipx_command(
-        "Unable to find pipx install so that the `PuyaPy` compiler can be run; "
-        "please install pipx via https://pypa.github.io/pipx/ "
+    tool_runner_command = find_valid_tool_runner_command(
+        "Unable to find uvx or pipx so that `PuyaPy` can be run; "
+        "please install uv via https://docs.astral.sh/uv/ "
         "and then try `algokit compile python ...` again."
     )
-    return [
-        *pipx_command,
-        "run",
-        "--spec=puyapy",
-        "puyapy",
-    ]
+    return get_tool_run_command(tool_runner_command, spec="puyapy", binary="puyapy")
 
 
 def _get_candidate_puyapy_commands() -> Iterator[list[str]]:
-    # when puyapy is installed at the project level
+    yield ["uv", "run", "puyapy"]
     yield ["poetry", "run", "puyapy"]
-    # when puyapy is installed at the global level
     yield ["puyapy"]

@@ -8,9 +8,10 @@ DEBUG: Running 'python --version' in '{current_working_directory}'
 DEBUG: python: I AM A TEAPOT
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: python3: I AM A TEAPOT
+DEBUG: Running 'uv --version' in '{current_working_directory}'
+DEBUG: uv: I AM A TEAPOT
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: I AM A TEAPOT
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: I AM A TEAPOT
 DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: node: I AM A TEAPOT
@@ -29,6 +30,8 @@ git: Command exited with code: -1
 python: Command exited with code: -1
   I AM A TEAPOT
 python3: Command exited with code: -1
+  I AM A TEAPOT
+uv: Command exited with code: -1
   I AM A TEAPOT
 pipx: Command exited with code: -1
   I AM A TEAPOT

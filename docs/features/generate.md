@@ -8,7 +8,7 @@ The `algokit generate client` [command](../cli/index.md#client) can be used to g
 
 ### Prerequisites
 
-To generate Python clients an installation of pip and pipx is required.
+To generate Python clients an installation of Python and uv (or pipx) is required.
 To generate TypeScript clients an installation of Node.js and npx is also required.
 
 Each generated client will also have a dependency on `algokit-utils` libraries for the target language.
@@ -33,7 +33,7 @@ If you want to ensure typed client output stability across different environment
 
 To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
 
-Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `poetry` or `npm` respectively) or globally on your system (via `pipx` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
+Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `uv` or `npm` respectively) or globally on your system (via `uv tool` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
 
 ### Usage
 

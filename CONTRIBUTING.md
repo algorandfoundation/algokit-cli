@@ -15,18 +15,16 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 1. Clone this repository: `git clone https://github.com/algorandfoundation/algokit-cli`
 2. Install pre-requisites:
 
-   - Manually:
-     - Install `Python` - [Link](https://www.python.org/downloads/): The minimum required version is `3.10`, but `3.11` is recommended.)
-     - Install `Poetry` - [Link](https://python-poetry.org/docs/#installation): The minimum required version is `1.2`.
-     - If you're not using PyCharm, then run `poetry install` in the repository root directory (this should set up `.venv` and install all Python dependencies - PyCharm will do this for you on startup)
-   - Via AlgoKit CLI:
-
-     - [Install AlgoKit CLI](./README.md#install) and run `algokit project bootstrap poetry` in the root directory
-     - Install `tealer` - by running `pipx install tealer==0.1.2`. This is a prerequisite to running `pytest`, tealer is a third party tool for static analysis of TEAL code, algokit uses it in `task analyse` command. AlgoKit uses `pytest-xdist` to speed up the test suite execution by running tests in parallel, this requires `tealer` to be installed globally to avoid race conditions.
+   - Install [uv](https://docs.astral.sh/uv/) - the project's package manager:
+     ```shell
+     curl -LsSf https://astral.sh/uv/install.sh | sh
+     ```
+   - Run `uv sync` in the repository root directory (this sets up `.venv` and installs all Python dependencies)
+   - Install `tealer` - by running `uv tool install tealer==0.1.2`. This is a prerequisite to running `pytest`, tealer is a third party tool for static analysis of TEAL code, algokit uses it in `task analyse` command. AlgoKit uses `pytest-xdist` to speed up the test suite execution by running tests in parallel, this requires `tealer` to be installed globally to avoid race conditions.
 
 3. Install pre-commit hooks (optional but recommended):
 
-   [pre-commit](https://pre-commit.com/) is configured in this repository. To enable it, make sure that `poetry install` has been run and the virtual-env is activated by running `poetry shell`. Then execute `pre-commit install` to install the git hook scripts.
+   [pre-commit](https://pre-commit.com/) is configured in this repository. To enable it, make sure that `uv sync` has been run. Then execute `uv run pre-commit install` to install the git hook scripts.
 
    Once it is done, git will ensure formatting, linting, and static typing (via `mypy`) is correct when you perform a commit.
 
@@ -46,7 +44,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
      2. Hit Shift+F9 (or whatever you have debug mapped to) and it should start running with breakpoint debugging
    - Other
      1. Open the repository root in your text editor of choice
-     2. In a terminal run `poetry shell`
+     2. In a terminal run `uv run python` or activate the venv with `source .venv/bin/activate`
      3. Run `./debug.py` through your debugger of choice
    - In each of the above cases, an `args.in` file will be created in the source root.
      Each line will be executed in order, with the arguments passed to the cli.
@@ -62,7 +60,7 @@ AlgoKit development is done within the [AlgoKit Guiding Principles](./docs/algok
 
 ### Subsequently
 
-1. If you update to the latest source code and there are new dependencies you will need to run `poetry install` again
+1. If you update to the latest source code and there are new dependencies you will need to run `uv sync` again
 2. Follow step 3 above
 
 ### Documentation
@@ -71,8 +69,8 @@ Markdown documentation can be found within the docs directory of the repo, there
 
 To autogenerate the CLI documentation from the click source:
 
-1. Install the docs dependencies: `poetry install --with docs`
-2. Run the docs generation: `poetry run poe docs`
+1. Install the docs dependencies: `uv sync --group docs`
+2. Run the docs generation: `uv run poe docs`
 
 Note: this command won't work on Windows.
 
@@ -82,11 +80,9 @@ The CLI docs are generated using Sphinx, and its configuration can be found in `
 
 AlgoKit uses Python as a main language and many Python libraries and tools. This section lists all of them with a tiny brief.
 
-- [Poetry](https://python-poetry.org/): Python packaging and dependency management.
-- [pipx](https://github.com/pypa/pipx): Install and Run Python Applications in Isolated Environments
+- [uv](https://docs.astral.sh/uv/): Python packaging, dependency management, and tool installation.
 - [Click](https://palletsprojects.com/p/click/): A Python package for creating beautiful command line interfaces.
-- [Black](https://github.com/psf/black): A Python code formatter.
-- [Tox](https://tox.wiki/en/latest/): Automate and standardize testing in Python.
+- [Ruff](https://docs.astral.sh/ruff/): An extremely fast Python linter and formatter.
 
 ## Architecture decisions
 
