@@ -40,20 +40,18 @@ jobs:
         shell: bash
 
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.release_version != '' && format('v{0}', inputs.release_version) || '' }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python_version }}
 
-      - name: Set up Poetry
-        uses: ./.github/actions/setup-poetry
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
 
-      - name: Install dependencies
-        run: poetry install --no-interaction
 
       - name: Configure build environment
         shell: bash
@@ -116,14 +114,14 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         run: |
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
-          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+          uv run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
         shell: cmd
 
       - name: Run portability tests
         if: ${{ runner.os != 'Windows' }}
         run: |
           git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
-          poetry run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
+          uv run pytest tests/ -m pyinstaller_binary_tests --log-cli-level=INFO
         shell: bash
 
       # softprops/action-gh-release doesn't support the \ character in paths
@@ -136,7 +134,7 @@ jobs:
 
       - name: Append artifacts to release
         if: ${{ inputs.production_release == 'true' }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           fail_on_unmatched_files: true
           files: |

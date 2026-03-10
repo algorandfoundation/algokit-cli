@@ -22,7 +22,10 @@ DISTRIBUTION_METHOD_UPDATE_COMMAND = {
     "brew": "`brew upgrade algokit`",
 }
 UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION = "the tool used to install AlgoKit"
-# TODO: Set this version as part of releasing the binary distributions.
+# Sentinel version used by binary distributions (winget, brew, snap).
+# Any version >= this value that is NOT running in binary mode is assumed
+# to have been installed via uv. This should be replaced with a proper
+# detection mechanism if the sentinel is ever changed.
 BINARY_DISTRIBUTION_RELEASE_VERSION = "99.99.99"
 
 
@@ -47,11 +50,9 @@ def do_version_prompt() -> None:
                 if distribution
                 else UNKNOWN_DISTRIBUTION_METHOD_UPDATE_INSTRUCTION
             )
-        # If you're not using the binary mode, then you've used pipx to install AlgoKit.
-        # One exception is that older versions of the brew package used pipx,
-        # however require updating via brew, so we show the default update instruction instead.
+        # If not using binary mode, it was installed via uv or pipx.
         elif current_version_sequence >= _get_version_sequence(BINARY_DISTRIBUTION_RELEASE_VERSION):
-            update_instruction = "`pipx upgrade algokit`"
+            update_instruction = "`uv tool upgrade algokit`"
 
         logger.info(
             f"You are using AlgoKit version {current_version}, however version {latest_version} is available. "
@@ -97,7 +98,7 @@ def get_latest_version_or_cached() -> str | None:
 def get_latest_github_version() -> str:
     headers = {"ACCEPT": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
 
-    response = httpx.get(LATEST_URL, headers=headers)
+    response = httpx.get(LATEST_URL, headers=headers, timeout=5)
     response.raise_for_status()
 
     json = response.json()

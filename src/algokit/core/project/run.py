@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import os
+import shutil
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,21 @@ from algokit.core.utils import (
 )
 
 logger = logging.getLogger("rich")
+
+
+def _normalize_legacy_runner_command(command: list[str]) -> list[str]:
+    """Normalize legacy runner commands to supported equivalents."""
+    if command[:2] == ["poetry", "run"] and command[2:]:
+        if shutil.which("poetry"):
+            return command
+        if shutil.which("uv"):
+            logger.debug("poetry not found, rewriting 'poetry run' -> 'uv run' for: %s", " ".join(command))
+            return ["uv", "run", *command[2:]]
+        raise click.ClickException(
+            "Unable to run legacy `poetry run` command because neither `poetry` nor `uv` is installed. "
+            "Install uv via https://docs.astral.sh/uv/ and then try again."
+        )
+    return command
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -188,7 +204,8 @@ def run_command(
 
     for index, cmd in enumerate(command.commands):
         try:
-            resolved_command = resolve_command_path(cmd)
+            normalized_command = _normalize_legacy_runner_command(cmd)
+            resolved_command = resolve_command_path(normalized_command)
             if index == len(command.commands) - 1 and extra_args:
                 resolved_command.extend(extra_args)
         except click.ClickException as e:

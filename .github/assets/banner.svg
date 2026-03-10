@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300">
+  <defs>
+    <clipPath id="type-clip">
+      <rect x="60" y="100" width="370" height="80">
+        <animate attributeName="width" from="0" to="370" dur="1.6s" fill="freeze" calcMode="discrete" keyTimes="0;0.077;0.154;0.231;0.308;0.385;0.462;0.538;0.615;0.692;0.769;0.846;0.923;1" values="0;28;56;84;112;140;170;198;226;256;284;312;342;370"/>
+      </rect>
+    </clipPath>
+  </defs>
+
+  <style>
+    .bg { fill: #0D1117; }
+    .cli-text {
+      font-family: 'SF Mono', 'Cascadia Code', Consolas, Menlo, monospace;
+      font-size: 48px;
+      font-weight: 700;
+      fill: #FFFFFF;
+    }
+    .cursor {
+      fill: #00DC94;
+    }
+    .divider {
+      stroke: rgba(255,255,255,0.3);
+      stroke-width: 1.5;
+    }
+    .tagline {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      fill: #00DC94;
+    }
+    .prompt {
+      font-family: 'SF Mono', 'Cascadia Code', Consolas, Menlo, monospace;
+      font-size: 15px;
+      fill: rgba(255,255,255,0.2);
+    }
+  </style>
+
+  <!-- Background -->
+  <rect class="bg" width="900" height="300" rx="20" ry="20"/>
+
+  <!-- Left: [algokit-cli] typing -->
+  <text class="cli-text" x="60" y="160" clip-path="url(#type-clip)">[algokit-cli]</text>
+
+  <!-- Blinking cursor -->
+  <rect class="cursor" x="432" y="120" width="3" height="42" rx="1">
+    <animate attributeName="opacity" values="0;0;0;0;0;0;0;0;0;0;1" keyTimes="0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;1" dur="1.6s" fill="freeze"/>
+    <animate attributeName="opacity" values="1;0;1" dur="0.9s" begin="1.6s" repeatCount="5"/>
+  </rect>
+
+  <!-- Prompt hint -->
+  <text class="prompt" x="60" y="210">
+    $ uv tool install algokit
+    <animate attributeName="opacity" from="0" to="1" dur="0.5s" begin="2s" fill="freeze"/>
+    <set attributeName="opacity" to="0" dur="0.001s"/>
+  </text>
+
+  <!-- Vertical divider (draws top to bottom) -->
+  <line class="divider" x1="480" y1="60" x2="480" y2="240" stroke-dasharray="180" stroke-dashoffset="180">
+    <animate attributeName="stroke-dashoffset" from="180" to="0" dur="0.6s" begin="0.4s" fill="freeze"/>
+  </line>
+
+  <!-- Right: taglines (staggered fade-in) -->
+  <text class="tagline" x="520" y="125" opacity="0">
+    Extensive CLI
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1s" fill="freeze"/>
+  </text>
+  <text class="tagline" x="520" y="170" opacity="0">
+    for Algorand
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.3s" fill="freeze"/>
+  </text>
+  <text class="tagline" x="520" y="215" opacity="0">
+    blockchain projects
+    <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.6s" fill="freeze"/>
+  </text>
+</svg>

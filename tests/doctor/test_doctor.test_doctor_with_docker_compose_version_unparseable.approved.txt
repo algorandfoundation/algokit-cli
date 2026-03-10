@@ -9,12 +9,12 @@ DEBUG: Running 'python --version' in '{current_working_directory}'
 DEBUG: python: Python 3.10.0
 DEBUG: Running 'python3 --version' in '{current_working_directory}'
 DEBUG: python3: Python 3.11.0
+DEBUG: Running 'uv --version' in '{current_working_directory}'
+DEBUG: uv: uv 0.6.0
 DEBUG: Running 'pipx --version' in '{current_working_directory}'
 DEBUG: pipx: 1.1.0
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: blah blah
 DEBUG: poetry: 
-DEBUG: poetry: Poetry (version 99.99.99)
 DEBUG: Running 'node --version' in '{current_working_directory}'
 DEBUG: node: v18.12.1
 DEBUG: Running 'npm --version' in '{current_working_directory}'
@@ -34,6 +34,7 @@ docker compose: {"version": "TEAPOT"}
 git: 2.37.1
 python: 3.10.0 (location: /usr/local/bin/python)
 python3: 3.11.0 (location: /usr/local/bin/python3)
+uv: 0.6.0
 pipx: 1.1.0
 poetry: 1.2.2
 node: 18.12.1
