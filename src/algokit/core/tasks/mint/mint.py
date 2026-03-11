@@ -19,64 +19,6 @@ from algokit.core.tasks.mint.models import TokenMetadata
 
 logger = logging.getLogger(__name__)
 
-# Constants for Algorand address validation
-ALGORAND_ADDRESS_LENGTH = 58
-ALGORAND_ADDRESS_DECODED_LENGTH = 36  # 32 bytes address + 4 bytes checksum
-
-
-def _encode_address_from_bytes(digest: bytes) -> str:
-    """
-    Encode an address from a 32-byte digest using Algorand address encoding.
-
-    Args:
-        digest: 32-byte hash digest
-
-    Returns:
-        str: Base32-encoded address with checksum
-    """
-    # Standard Algorand checksum uses sha512_256, taking last 4 bytes
-    h = hashlib.new("sha512_256")
-    h.update(digest)
-    checksum = h.digest()[-4:]
-    address_bytes = digest + checksum
-    # Base32 encode without padding
-    encoded = base64.b32encode(address_bytes).decode("utf-8")
-    # Remove padding
-    return encoded.rstrip("=")
-
-
-def _is_valid_address(address: str) -> bool:
-    """
-    Validate an Algorand address.
-
-    Args:
-        address: The address string to validate
-
-    Returns:
-        bool: True if valid, False otherwise
-    """
-    if len(address) != ALGORAND_ADDRESS_LENGTH:
-        return False
-    try:
-        # Add padding back for base32 decoding
-        padding_needed = (8 - len(address) % 8) % 8
-        padded = address + "=" * padding_needed
-        decoded = base64.b32decode(padded)
-
-        if len(decoded) != ALGORAND_ADDRESS_DECODED_LENGTH:
-            return False
-
-        addr_hash = decoded[:32]
-        checksum = decoded[32:]
-
-        # Standard Algorand checksum uses sha512_256, taking last 4 bytes
-        h = hashlib.new("sha512_256")
-        h.update(addr_hash)
-        expected_checksum = h.digest()[-4:]
-        return checksum == expected_checksum
-    except Exception:
-        return False
-
 
 def _reserve_address_from_cid(cid: str) -> str:
     """
