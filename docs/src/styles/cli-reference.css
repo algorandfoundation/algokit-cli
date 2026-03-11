@@ -1,0 +1,27 @@
+/*
+ * CLI Reference styling for auto-generated sphinx-click docs.
+ *
+ * Styles the generated CLI reference page with monospace headings
+ * and clear visual hierarchy for commands, subcommands, and options.
+ */
+
+/* ── Command headings (H3) — monospace, reduced size ── */
+.cli-ref h3 {
+  font-family: var(--sl-font-mono, ui-monospace, monospace);
+  font-size: var(--sl-text-base, 1rem);
+  font-weight: 400;
+  margin-top: 2rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--sl-color-gray-6, #343841);
+}
+
+/* ── Subcommand / option headings (H4) — compact ── */
+.cli-ref h4 {
+  font-family: var(--sl-font-mono, ui-monospace, monospace);
+  font-size: var(--sl-text-sm, 0.875rem);
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--sl-color-gray-6, #343841);
+}

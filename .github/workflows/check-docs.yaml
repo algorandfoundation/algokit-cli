@@ -1,0 +1,14 @@
+name: Check Documentation
+
+on:
+  workflow_call:
+
+jobs:
+  check-docs:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Build documentation
+        uses: ./.github/actions/build-docs

@@ -2,8 +2,8 @@ import base64
 import json
 
 import pytest
-from algokit_common import address_from_public_key
 from algokit_utils.algo25 import secret_key_to_mnemonic
+from algokit_utils.common import address_from_public_key
 from nacl.signing import SigningKey
 from pytest_mock import MockerFixture
 
