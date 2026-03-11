@@ -47,6 +47,9 @@ def address_from_private_key(private_key: str) -> str:
     # Decode the base64 private key
     key_bytes = base64.b64decode(private_key)
 
+    if len(key_bytes) != 64:
+        raise ValueError(f"Invalid private key: expected 64 bytes, got {len(key_bytes)}")
+
     # Extract the public key (last 32 bytes of the 64-byte key)
     public_key = key_bytes[32:64]
 
