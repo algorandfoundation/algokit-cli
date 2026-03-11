@@ -11,6 +11,8 @@ from algokit_utils.common import (
     public_key_from_address,
 )
 
+PRIVATE_KEY_LENGTH = 64  # 32-byte seed + 32-byte public key
+
 
 def is_valid_address(address: str) -> bool:
     """Check if an address is a valid Algorand address.
@@ -46,6 +48,9 @@ def address_from_private_key(private_key: str) -> str:
     """
     # Decode the base64 private key
     key_bytes = base64.b64decode(private_key)
+
+    if len(key_bytes) != PRIVATE_KEY_LENGTH:
+        raise ValueError(f"Invalid private key: expected {PRIVATE_KEY_LENGTH} bytes, got {len(key_bytes)}")
 
     # Extract the public key (last 32 bytes of the 64-byte key)
     public_key = key_bytes[32:64]
