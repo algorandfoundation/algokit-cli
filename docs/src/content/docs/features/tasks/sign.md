@@ -9,7 +9,7 @@ The AlgoKit Sign feature allows you to sign Algorand transaction(s) using the Al
 Available commands and possible usage as follows:
 
 ```bash
-$ ~ algokit task sign
+algokit task sign
 Usage: algokit task sign [OPTIONS]
 
 Sign goal clerk compatible Algorand transaction(s).
@@ -38,19 +38,19 @@ Options:
 To sign a transaction, you can use the `sign` command as follows:
 
 ```bash
-$ algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --file {PATH_TO_BINARY_FILE_CONTAINING_TRANSACTIONS}
+algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --file {PATH_TO_BINARY_FILE_CONTAINING_TRANSACTIONS}
 ```
 
 This will prompt you to confirm the transaction details before signing. If you want to bypass the confirmation, you can use the `--force` flag:
 
 ```bash
-$ algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --transaction {YOUR_BASE64_ENCODED_TRANSACTION} --force
+algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --transaction {YOUR_BASE64_ENCODED_TRANSACTION} --force
 ```
 
 If the transaction is successfully signed, the signed transaction will be output to the console in a JSON format. If you want to write the signed transaction to a file, you can use the `--output` option:
 
 ```bash
-$ algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --transaction {YOUR_BASE64_ENCODED_TRANSACTION} --output /path/to/output/file
+algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --transaction {YOUR_BASE64_ENCODED_TRANSACTION} --output /path/to/output/file
 ```
 
 This will write the signed transaction to the specified file.
@@ -87,7 +87,7 @@ Encoding simple txn object in javascript:
 
 ```ts
 Buffer.from(algosdk.encodeObj({ txn: txn.get_obj_for_encoding() })).toString(
-  "base64"
+  "base64",
 ); // Resulting string can be passed directly to algokit task sign with --transaction flag
 ```
 

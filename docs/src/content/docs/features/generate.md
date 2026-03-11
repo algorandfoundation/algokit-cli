@@ -148,7 +148,7 @@ path = ".algokit/generators/create_contract"
 To execute this generator, ensure that you are operating from the same directory as the `.algokit.toml` file, and then run:
 
 ```bash
-$ algokit generate
+algokit generate
 
 # The output will be as follows:
 # Note how algokit dynamically injects a new `smart-contract` command based
@@ -169,11 +169,11 @@ Commands:
 To execute the `smart-contract` generator, run:
 
 ```bash
-$ algokit generate smart-contract
+algokit generate smart-contract
 
 # or
 
-$ algokit generate smart-contract -a contract_name "MyCoolContract"
+algokit generate smart-contract -a contract_name "MyCoolContract"
 ```
 
 #### Third Party Generators

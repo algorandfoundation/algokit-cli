@@ -16,8 +16,8 @@ Please run this command to if you are facing an issue running AlgoKit. It is rec
 
 For example, running `algokit doctor` with all prerequisites installed will result in output similar to the following:
 
-```
-$ ~ algokit doctor
+```bash
+algokit doctor
 timestamp: 2023-03-29T03:58:05+00:00
 AlgoKit: 0.6.0
 AlgoKit Python: 3.11.2 (main, Mar 24 2023, 00:16:47) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
@@ -42,13 +42,13 @@ The doctor command will indicate if there is any issues to address, for example:
 
 If AlgoKit detects a newer version, this will be indicated next to the AlgoKit version
 
-```
+```bash
 AlgoKit: 1.2.3 (latest: 4.5.6)
 ```
 
 If the detected version of docker compose is unsupported, this will be shown:
 
-```
+```bash
 docker compose: 2.1.3
   Docker Compose 2.5.0 required to run `algokit localnet command`;
   install via https://docs.docker.com/compose/install/

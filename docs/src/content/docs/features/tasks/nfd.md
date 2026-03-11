@@ -9,7 +9,7 @@ The AlgoKit NFD Lookup feature allows you to perform a lookup via NFD domain or 
 Available commands and possible usage as follows:
 
 ```bash
-$ ~ algokit task nfd-lookup
+algokit task nfd-lookup
 Usage: algokit task nfd-lookup [OPTIONS] VALUE
 
 Perform a lookup via NFD domain or address, returning the associated address or domain respectively.
@@ -31,13 +31,13 @@ Options:
 To perform a lookup, you can use the nfd-lookup command as follows:
 
 ```bash
-$ algokit task nfd-lookup {NFD_DOMAIN_OR_ALGORAND_ADDRESS}
+algokit task nfd-lookup {NFD_DOMAIN_OR_ALGORAND_ADDRESS}
 ```
 
 This will perform a lookup and return the associated address or domain. If you want to specify the output format, you can use the --output flag:
 
 ```bash
-$ algokit task nfd-lookup {NFD_DOMAIN_OR_ALGORAND_ADDRESS} --output full
+algokit task nfd-lookup {NFD_DOMAIN_OR_ALGORAND_ADDRESS} --output full
 ```
 
 If the lookup is successful, the result will be output to the console in a JSON format.

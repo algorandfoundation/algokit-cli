@@ -16,8 +16,8 @@ Subcommands
 
 ### Version Prompt Configuration
 
-```zsh
-$ algokit config version-prompt [OPTIONS]
+```bash
+algokit config version-prompt [OPTIONS]
 ```
 
 This command configures the version prompt settings for AlgoKit.
@@ -27,8 +27,8 @@ This command configures the version prompt settings for AlgoKit.
 
 ### Container Engine Configuration
 
-```zsh
-$ algokit config container-engine [OPTIONS] [ENGINE]
+```bash
+algokit config container-engine [OPTIONS] [ENGINE]
 ```
 
 This command configures the container engine settings for AlgoKit.
@@ -38,8 +38,8 @@ This command configures the container engine settings for AlgoKit.
 
 ### JavaScript Package Manager Configuration
 
-```zsh
-$ algokit config js-package-manager [OPTIONS] [PACKAGE_MANAGER]
+```bash
+algokit config js-package-manager [OPTIONS] [PACKAGE_MANAGER]
 ```
 
 This command configures the default JavaScript package manager used by AlgoKit's bootstrap command.
@@ -50,8 +50,8 @@ If no package manager is specified, AlgoKit will prompt you to select one intera
 
 ### Python Package Manager Configuration
 
-```zsh
-$ algokit config py-package-manager [OPTIONS] [PACKAGE_MANAGER]
+```bash
+algokit config py-package-manager [OPTIONS] [PACKAGE_MANAGER]
 ```
 
 This command configures the default Python package manager used by AlgoKit's bootstrap command.

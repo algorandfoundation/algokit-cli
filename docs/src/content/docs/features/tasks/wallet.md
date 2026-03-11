@@ -9,7 +9,7 @@ Manage your Algorand addresses and accounts effortlessly with the AlgoKit Wallet
 Available commands and possible usage as follows:
 
 ```bash
-$ ~ algokit task wallet
+algokit task wallet
 Usage: algokit task wallet [OPTIONS] COMMAND [ARGS]...
 
 Create short aliases for your addresses and accounts on AlgoKit CLI.

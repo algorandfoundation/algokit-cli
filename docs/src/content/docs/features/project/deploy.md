@@ -8,8 +8,8 @@ Deploy your smart contracts effortlessly to various networks with the algokit pr
 
 ## Usage
 
-```sh
-$ algokit project deploy [OPTIONS] [ENVIRONMENT_NAME] [EXTRA_ARGS]
+```bash
+algokit project deploy [OPTIONS] [ENVIRONMENT_NAME] [EXTRA_ARGS]
 ```
 
 This command deploys smart contracts from an AlgoKit compliant repository to the specified network.
@@ -115,8 +115,8 @@ The command requires a `ENVIRONMENT` argument, which specifies the network envir
 
 Example:
 
-```sh
-$ algokit project deploy testnet
+```bash
+algokit project deploy testnet
 ```
 
 This command deploys the smart contracts to the testnet.
@@ -147,7 +147,7 @@ command = "{custom_deploy_command}"
 ```
 
 ```bash
-$ algokit project deploy testnet --project-name myproject
+algokit project deploy testnet --project-name myproject
 ```
 
 This command deploys the smart contracts to TestNet from a sub project named 'myproject', which is available within the current workspace. All `.env` loading logic described in [Environment files](#environment-files) is applicable, execution from the workspace root orchestrates invoking the deploy command from the working directory of each applicable sub project.
@@ -158,8 +158,8 @@ By default, the deploy command looks for the `.algokit.toml` file in the current
 
 Example:
 
-```sh
-$ algokit project deploy testnet --project-dir="path/to/project"
+```bash
+algokit project deploy testnet --project-dir="path/to/project"
 ```
 
 ## Custom Deploy Command
@@ -168,11 +168,11 @@ You can provide a custom deploy command using the `--custom-deploy-command` opti
 
 Example:
 
-```sh
-$ algokit project deploy testnet --custom-deploy-command="your-custom-command"
+```bash
+algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
-> ⚠️ Please note, chaining multiple commands with `&&` is **not** currently supported. If you need to run multiple commands, you can defer to a custom script. Refer to [run](/algokit-cli/features/project/run/#custom-command-injection) for scenarios where multiple sub-command invocations are required.
+>⚠️ Please note, chaining multiple commands with `&&` is **not** currently supported. If you need to run multiple commands, you can defer to a custom script. Refer to [run](/algokit-cli/features/project/run/#custom-command-injection) for scenarios where multiple sub-command invocations are required.
 
 ## CI Mode
 
@@ -182,8 +182,8 @@ This is useful in CI/CD environments where user interaction is not possible. Whe
 
 Example:
 
-```sh
-$ algokit project deploy testnet --ci
+```bash
+algokit project deploy testnet --ci
 ```
 
 ## Passing Extra Arguments
@@ -194,16 +194,16 @@ To pass extra arguments, use `--` after the AlgoKit command and options to mark 
 
 Example:
 
-```sh
-$ algokit project deploy testnet -- my_contract_name --some_contract_related_param
+```bash
+algokit project deploy testnet -- my_contract_name --some_contract_related_param
 ```
 
 In this example, `my_contract_name` and `--some_contract_related_param` are extra arguments that can be utilized by the custom deploy command invocation, for instance, to filter the deployment to a specific contract or modify deployment behavior.
 
 ## Example of a Full Deployment
 
-```sh
-$ algokit project deploy testnet --custom-deploy-command="your-custom-command"
+```bash
+algokit project deploy testnet --custom-deploy-command="your-custom-command"
 ```
 
 This example shows how to deploy smart contracts to the testnet using a custom deploy command. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.

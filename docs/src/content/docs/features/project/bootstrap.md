@@ -138,8 +138,8 @@ This approach ensures your project commands work correctly while being transpare
 
 Available commands and possible usage as follows:
 
-```
-$ ~ algokit project bootstrap
+```bash
+algokit project bootstrap
 Usage: algokit project bootstrap [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -163,7 +163,7 @@ The command `algokit project bootstrap env` runs two main tasks in the current d
 
 For instance, a sample `.env.template` file as follows:
 
-```
+```bash
 SERVER_URL=https://myserver.com
 # This is a mandatory field to run the server, please enter a value
 # For example: 5000
@@ -172,8 +172,8 @@ SERVER_PORT=
 
 Running the `algokit project bootstrap env` command while the above `.env.template` file in the current directory will result in the following:
 
-```
-$ ~ algokit project bootstrap env
+```bash
+algokit project bootstrap env
 Copying /Users/me/my-project/.env.template to /Users/me/my-project/.env and prompting for empty values
 # This is a mandatory field to run the server, please enter a value value
 # For example: 5000
@@ -183,7 +183,7 @@ Copying /Users/me/my-project/.env.template to /Users/me/my-project/.env and prom
 
 And when the user enters a value for `SERVER_PORT`, a new `.env` file will be created as follows (e.g. if they entered `4000` as the value):
 
-```
+```bash
 SERVER_URL=https://myserver.com
 # This is a mandatory field to run the server, please enter a value
 # For example: 5000
@@ -196,8 +196,8 @@ The command `algokit project bootstrap npm` installs Node.js project dependencie
 
 Here is an example outcome of running `algokit project bootstrap npm` command:
 
-```
-$ ~ algokit project bootstrap npm
+```bash
+algokit project bootstrap npm
 Installing npm dependencies
 npm:
 npm: added 17 packages, and audited 18 packages in 3s
@@ -217,8 +217,8 @@ The command `algokit project bootstrap poetry` does two main actions:
 
 Here is an example of running `algokit project bootstrap poetry` command:
 
-```
-$ ~ algokit project bootstrap poetry
+```bash
+algokit project bootstrap poetry
 Installing Python dependencies and setting up Python virtual environment via Poetry
 poetry:
 poetry: Installing dependencies from lock file

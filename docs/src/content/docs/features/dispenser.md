@@ -6,8 +6,8 @@ The AlgoKit Dispenser feature allows you to interact with the AlgoKit TestNet Di
 
 ## Usage
 
-```zsh
-$ algokit dispenser [OPTIONS] COMMAND [ARGS]...
+```bash
+algokit dispenser [OPTIONS] COMMAND [ARGS]...
 ```
 
 This command provides a set of subcommands to interact with the AlgoKit TestNet Dispenser.
@@ -29,8 +29,8 @@ All dispenser commands can work in CI mode by using a CI access token that can b
 
 ## Login
 
-```zsh
-$ algokit dispenser login [OPTIONS]
+```bash
+algokit dispenser login [OPTIONS]
 ```
 
 This command logs you into your Dispenser API account if you are not already logged in.
@@ -44,16 +44,16 @@ Options
 
 ## Logout
 
-```zsh
-$ algokit dispenser logout
+```bash
+algokit dispenser logout
 ```
 
 This command logs you out of your Dispenser API account if you are logged in.
 
 ## Fund
 
-```zsh
-$ algokit dispenser fund [OPTIONS]
+```bash
+algokit dispenser fund [OPTIONS]
 ```
 
 This command funds your wallet address with TestNet ALGOs.
@@ -65,8 +65,8 @@ Options
 
 ## Refund
 
-```zsh
-$ algokit dispenser refund [OPTIONS]
+```bash
+algokit dispenser refund [OPTIONS]
 ```
 
 This command refunds ALGOs back to the dispenser wallet address.
@@ -78,8 +78,8 @@ Options
 
 ## Limit
 
-```zsh
-$ algokit dispenser limit [OPTIONS]
+```bash
+algokit dispenser limit [OPTIONS]
 ```
 
 This command gets information about current fund limits on your account. The limits reset daily.

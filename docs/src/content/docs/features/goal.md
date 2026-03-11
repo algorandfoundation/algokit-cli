@@ -6,8 +6,8 @@ AlgoKit goal command provides the user with a mechanism to run [goal cli](https:
 
 You can explore all possible goal commands by running `algokit goal` e.g.:
 
-```
-$ ~ algokit goal
+```bash
+algokit goal
  GOAL is the CLI for interacting Algorand software instance. The binary 'goal' is installed alongside the algod binary and is considered an integral part of the complete installation. The binaries should be used in tandem - you should not try to use a version of goal with a different version of algod.
 
  Usage:
@@ -43,8 +43,8 @@ $ ~ algokit goal
 
 For instance, running `algokit goal report` would result in output like:
 
-```
-$ ~ algokit goal report
+```bash
+algokit goal report
  12885688322
  3.12.2.dev [rel/stable] (commit #181490e3)
  go-algorand is licensed with AGPLv3.0
@@ -68,14 +68,14 @@ $ ~ algokit goal report
 
 If the AlgoKit Sandbox `algod` docker container is not present or not running, the command will fail with a clear error, e.g.:
 
-```
-$ ~ algokit goal
+```bash
+algokit goal
  Error: No such container: algokit_algod
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
 
-```
-$ ~ algokit goal
+```bash
+algokit goal
  Error response from daemon: Container 5a73961536e2c98e371465739053d174066c40d00647c8742f2bb39eb793ed7e is not running
  Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
 ```
@@ -90,7 +90,7 @@ When you specify a file or directory path in your `goal` command, the system wil
 
 For instance, if you want to compile a `teal` file:
 
-```
+```bash
 algokit goal clerk compile /Path/to/inputfile/approval.teal -o /Path/to/outputfile/approval.compiled
 ```
 
@@ -100,7 +100,7 @@ Here, `/Path/to/inputfile/approval.teal` and `/Path/to/outputfile/approval.compi
 
 In case you want to manually copy files into the container, you can do so using `docker cp`:
 
-```
+```bash
 docker cp foo.txt algokit_algod:/root
 ```
 
@@ -113,7 +113,7 @@ Note: Manual copying is optional and generally only necessary if you have specif
 If you want to run multiple commands or interact with the filesystem you can execute `algokit goal --console`. This will open a [Bash](https://www.gnu.org/software/bash/) shell session on the `algod` Docker container and from there you can execute goal directly, e.g.:
 
 ```bash
-$ algokit goal --console
+algokit goal --console
 Opening Bash console on the algod node; execute `exit` to return to original console
 root@82d41336608a:~# goal account list
 [online]        C62QEFC7MJBPHAUDMGVXGZ7WRWFAF3XYPBU3KZKOFHYVUYDGU5GNWS4NWU      C62QEFC7MJBPHAUDMGVXGZ7WRWFAF3XYPBU3KZKOFHYVUYDGU5GNWS4NWU      4000000000000000 microAlgos
@@ -126,7 +126,7 @@ root@82d41336608a:~# goal account list
 Some `goal` commands require interactive input from the user. By default, AlgoKit will attempt to run commands in non-interactive mode first, and automatically switch to interactive mode if needed. You can force a command to run in interactive mode by using the `--interactive` flag:
 
 ```bash
-$ algokit goal --interactive wallet new algodev
+algokit goal --interactive wallet new algodev
 Please choose a password for wallet 'algodev':
 Please confirm the password:
 Creating wallet...

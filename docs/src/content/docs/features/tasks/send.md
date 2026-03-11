@@ -9,7 +9,7 @@ The AlgoKit Send feature allows you to send signed Algorand transaction(s) to a 
 Available commands and possible usage as follows:
 
 ```bash
-$ ~ algokit task send
+algokit task send
 Usage: algokit task send [OPTIONS]
 
   Send a signed transaction to the given network.
@@ -36,19 +36,19 @@ Options:
 To send a transaction, you can use the `send` command as follows:
 
 ```bash
-$ algokit task send --file {PATH_TO_BINARY_FILE_CONTAINING_SIGNED_TRANSACTIONS}
+algokit task send --file {PATH_TO_BINARY_FILE_CONTAINING_SIGNED_TRANSACTIONS}
 ```
 
 This will send the transactions to the default `localnet` network. If you want to send the transactions to a different network, you can use the `--network` flag:
 
 ```bash
-$ algokit task send --transaction {YOUR_BASE64_ENCODED_SIGNED_TRANSACTION} --network testnet
+algokit task send --transaction {YOUR_BASE64_ENCODED_SIGNED_TRANSACTION} --network testnet
 ```
 
 You can also pipe in the `stdout` of `algokit sign` command:
 
 ```bash
-$ algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --file {PATH_TO_BINARY_FILE_CONTAINING_TRANSACTIONS} --force | algokit task send --network {network_name}
+algokit task sign --account {YOUR_ACCOUNT_ALIAS OR YOUR_ADDRESS} --file {PATH_TO_BINARY_FILE_CONTAINING_TRANSACTIONS} --force | algokit task send --network {network_name}
 ```
 
 If the transaction is successfully sent, the transaction ID (txid) will be output to the console. You can check the transaction status at the provided transaction explorer URL.

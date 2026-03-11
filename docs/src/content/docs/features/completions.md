@@ -6,15 +6,15 @@ AlgoKit supports shell completions for zsh and bash shells, e.g.
 
 **bash**
 
-```
-$ algokit <Press Tab>
+```bash
+algokit <Press Tab>
 bootstrap    completions  config       doctor       explore      goal         init         sandbox
 ```
 
 **zsh**
 
-```
-$ ~ algokit <Press Tab>
+```bash
+algokit <Press Tab>
 bootstrap    -- Bootstrap AlgoKit project dependencies.
 completions  -- Install and Uninstall AlgoKit shell integration.
 config       -- Configure AlgoKit options.
@@ -34,8 +34,8 @@ To setup the completions, AlgoKit provides commands that will modify the current
 
 To [install](/algokit-cli/cli/#install) completions for the current shell execute `algokit completions install`. You should see output similar to below:
 
-```
-$ ~ algokit completions install
+```bash
+algokit completions install
 AlgoKit completions installed for zsh 🎉
 Restart shell or run `. ~/.zshrc` to enable completions
 ```
@@ -46,8 +46,8 @@ After installing the completions don't forget to restart the shell to begin usin
 
 To [uninstall](/algokit-cli/cli/#uninstall) completions for the current shell run `algokit completions uninstall`:
 
-```
-$ ~ algokit completions uninstall
+```bash
+algokit completions uninstall
 AlgoKit completions uninstalled for zsh 🎉
 ```
 

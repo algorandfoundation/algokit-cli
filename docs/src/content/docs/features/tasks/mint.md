@@ -50,7 +50,7 @@ Options:
 To mint a new asset in interactive mode, you can use the mint command as follows:
 
 ```bash
-$ algokit task mint
+algokit task mint
 ```
 
 This will interactively prompt you for the required information, upload the asset image and metadata to IPFS using the Piñata provider and mint a new asset on the Algorand blockchain. The [asset's metadata](https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema) will be generated automatically based on the provided asset name, decimals, and image.
@@ -58,7 +58,7 @@ This will interactively prompt you for the required information, upload the asse
 If you want to provide a custom metadata file, you can use the --metadata flag:
 
 ```bash
-$ algokit task mint --metadata {PATH_TO_METADATA}
+algokit task mint --metadata {PATH_TO_METADATA}
 ```
 
 If the minting process is successful, the asset ID and transaction ID will be output to the console.

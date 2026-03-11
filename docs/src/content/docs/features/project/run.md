@@ -6,8 +6,8 @@ The `algokit project run` command allows defining custom commands to execute at 
 
 ## Usage
 
-```sh
-$ algokit project run [OPTIONS] COMMAND [ARGS]
+```bash
+algokit project run [OPTIONS] COMMAND [ARGS]
 ```
 
 This command executes a custom command defined in the `.algokit.toml` file of the current project or workspace.
@@ -157,9 +157,9 @@ You can control whether commands are executed concurrently or sequentially:
 
 1. Use command-line options:
 
-   ```sh
-   $ algokit project run hello -s  # or --sequential
-   $ algokit project run hello -c  # or --concurrent
+   ```bash
+   algokit project run hello -s  # or --sequential
+   algokit project run hello -c  # or --concurrent
    ```
 
 2. Behavior:
@@ -175,8 +175,8 @@ You can pass additional arguments to the custom command. These extra arguments w
 
 Example:
 
-```sh
-$ algokit project run hello -- world
+```bash
+algokit project run hello -- world
 ```
 
 In this example, if the `hello` command in `.algokit.toml` is defined as `echo "Hello"`, the actual command executed will be `echo "Hello" world`.

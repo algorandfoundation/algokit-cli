@@ -8,8 +8,8 @@ The `algokit project link` command is a powerful feature designed to streamline 
 
 To use the `link` command, navigate to the root directory of your standalone frontend project and execute:
 
-```sh
-$ algokit project link [OPTIONS]
+```bash
+algokit project link [OPTIONS]
 ```
 
 This command must be invoked from the root of a standalone 'frontend' typed project.
@@ -58,8 +58,8 @@ graph LR
 
 Linking all contract projects with a frontend project and generating TypeScript clients:
 
-```sh
-$ algokit project link --all -l typescript
+```bash
+algokit project link --all -l typescript
 ```
 
 This command will generate TypeScript clients for all contract projects and place them in the specified directory within the frontend project.

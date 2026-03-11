@@ -51,19 +51,19 @@ Example
 To opt-in to an asset(s), you can use the opt-in command as follows:
 
 ```bash
-$ algokit task opt-in --account {YOUR_ACCOUNT} {ASSET_ID_1} {ASSET_ID_2} {ASSET_ID_3} ...
+algokit task opt-in --account {YOUR_ACCOUNT} {ASSET_ID_1} {ASSET_ID_2} {ASSET_ID_3} ...
 ```
 
 To opt-out of an asset(s), you can use the opt-out command as follows:
 
 ```bash
-$ algokit task opt-out --account {YOUR_ACCOUNT} {ASSET_ID_1} {ASSET_ID_2} ...
+algokit task opt-out --account {YOUR_ACCOUNT} {ASSET_ID_1} {ASSET_ID_2} ...
 ```
 
 To opt-out of all assets with zero balance, you can use the opt-out command with the `--all` flag:
 
 ```bash
-$ algokit task opt-out --account {YOUR_ACCOUNT} --all
+algokit task opt-out --account {YOUR_ACCOUNT} --all
 ```
 
 > Please note, the account must have sufficient balance to cover the transaction fees.

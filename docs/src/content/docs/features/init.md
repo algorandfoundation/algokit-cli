@@ -16,8 +16,8 @@ Git is a prerequisite for the init command as it is used to clone templates and 
 
 As outlined in [quick start](#quick-start), the simplest use of the command is to just run `algokit init` and you will then be guided through selecting a template and configuring options for that template. e.g.
 
-```
-$ ~ algokit init
+```bash
+algokit init
 ? Which of these options best describes the project you want to start? `Smart Contract` | `Dapp Frontend` | `Smart Contract & Dapp Frontend` | `Custom`
 ? Name of project / directory to create the project in:  my-cool-app
 ```
@@ -40,7 +40,7 @@ For more details on workspaces and standalone projects, refer to the [AlgoKit Pr
 
 You will also be prompted if you wish to run the [bootstrap](/algokit-cli/cli/#bootstrap) command, this is useful if you plan to immediately begin developing in the new project. If you passed in `--defaults` or `--bootstrap` then it will automatically run bootstrapping unless you passed in `--no-bootstrap`.
 
-```
+```bash
 
 ? Do you want to run `algokit bootstrap` to bootstrap dependencies for this new project so it can be run immediately? Yes
 Installing Python dependencies and setting up Python virtual environment via Poetry
@@ -89,7 +89,7 @@ e.g. `algokit init --template-url https://github.com/algorandfoundation/algokit-
 
 If the URL is not an official template there is a potential security risk and so to continue you must either acknowledge this prompt, or if you are in a non-interactive environment you can pass the `--UNSAFE-SECURITY-accept-template-url` option (but we generally don't recommend this option so users can review the warning message first) e.g.
 
-```
+```bash
 
 Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of \_tasks, \_migrations and \_jinja_extensions in copier.yml
@@ -109,9 +109,9 @@ To find out the key for a specific answer you can either look at `.algokit/.copi
 
 By combining a number of options, it is possible to initialize a new project without any interaction. For example, to create a project named `my-smart-contract` using the `python` template with no git, no bootstrapping, the author name of `Algorand Foundation`, and defaults for all other values, you could execute the following:
 
-```
+```bash
 
-$ ~ algokit init -n my-smart-contract -t python --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
+algokit init -n my-smart-contract -t python --no-git --no-bootstrap --answer author_name "Algorand Foundation" --defaults
 🙌 Project initialized at `my-smart-contract`! For template specific next steps, consult the documentation of your selected template 🧐
 Your selected template comes from:
 ➡️ https://github.com/algorandfoundation/algokit-python-template
