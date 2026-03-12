@@ -1,5 +1,5 @@
 # AlgoKit CLI Installer for Windows (PowerShell)
-# Usage: irm https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install/install.ps1 | iex
+# Usage: irm https://cli.algokit.io/install.ps1 | iex
 [CmdletBinding()]
 param()
 

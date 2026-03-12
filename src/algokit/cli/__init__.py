@@ -24,7 +24,7 @@ from algokit.core.config_commands.version_prompt import do_version_prompt, skip_
 from algokit.core.log_handlers import color_option, verbose_option
 from algokit.core.utils import find_all_on_path, is_binary_mode
 
-_INSTALL_URL_BASE = "https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install"
+_INSTALL_URL_BASE = "https://cli.algokit.io"
 _INSTALL_URL_SH = f"{_INSTALL_URL_BASE}/install.sh"
 _INSTALL_URL_PS1 = f"{_INSTALL_URL_BASE}/install.ps1"
 _ADR_URL = (

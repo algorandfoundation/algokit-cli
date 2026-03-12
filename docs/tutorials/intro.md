@@ -26,7 +26,7 @@ Before proceeding, ensure you have the following components installed:
 To install AlgoKit, run the following command from a terminal.
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install/install.sh | bash
+curl -fsSL https://cli.algokit.io/install.sh | bash
 ```
 
 After the installation completes, **restart the terminal**.

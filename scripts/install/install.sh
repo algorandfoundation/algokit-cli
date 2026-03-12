@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # AlgoKit CLI Installer for Unix/macOS
-# Usage: curl -fsSL https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/scripts/install/install.sh | bash
+# Usage: curl -fsSL https://cli.algokit.io/install.sh | bash
 set -euo pipefail
 
 UV_INSTALL_URL="https://astral.sh/uv/install.sh"
