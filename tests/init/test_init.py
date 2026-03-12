@@ -573,6 +573,25 @@ def test_init_template_url_and_ref(tmp_path_factory: TempPathFactory, mocker: Mo
     assert result.exit_code == 0
     assert mock_copier_worker_cls.call_args.kwargs["vcs_ref"] == ref
 
+@pytest.mark.usefixtures("mock_questionary_input")
+def test_init_passes_python_package_manager_from_user_config(
+    tmp_path_factory: TempPathFactory, mocker: MockerFixture
+) -> None:
+    worker_cls = mocker.patch("copier._main.Worker")
+    worker_cls.return_value.__enter__.return_value.template.url_expanded = "URL"
+    mocker.patch("algokit.cli.init.command.get_py_package_manager", return_value="poetry")
+
+    cwd = tmp_path_factory.mktemp("cwd")
+    result = invoke(
+        "init --name myapp --no-git --no-bootstrap "
+        "--template-url gh:algorandfoundation/algokit-python-template "
+        "--UNSAFE-SECURITY-accept-template-url --no-workspace",
+        cwd=cwd,
+    )
+
+    assert result.exit_code == 0
+    assert worker_cls.call_args.kwargs["data"]["python_package_manager"] == "poetry"
+
 
 def test_init_blessed_template_url_get_community_warning(
     tmp_path_factory: TempPathFactory, mock_questionary_input: PipeInput
