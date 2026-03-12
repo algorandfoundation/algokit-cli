@@ -5,6 +5,7 @@ from collections.abc import Callable
 from enum import Enum
 from pathlib import Path
 from typing import NoReturn
+from algokit.core.config_commands.py_package_manager import PyPackageManager, get_py_package_manager
 
 import click
 import prompt_toolkit.document
@@ -133,7 +134,12 @@ def initialize_new_project(  # noqa: PLR0913, C901, PLR0915
         commit=template_url_ref,
         unsafe_security_accept_template_url=unsafe_security_accept_template_url,
     )
-
+    
+    # Defines the python_package_manager answer for the copier to generate the project based on the user
+    # configuration or default to UV if not set, this is needed for the templates to know which package manager to generate files for
+    selected_py_package_manager = get_py_package_manager() or str(PyPackageManager.UV)
+    answers_dict.setdefault("python_package_manager", selected_py_package_manager)
+    
     for custom_answer in template.answers or []:
         answers_dict.setdefault(*custom_answer)
 
