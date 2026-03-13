@@ -226,6 +226,8 @@ def initialize_new_project(  # noqa: PLR0913, C901, PLR0915
 
     # Below must be ensured to run after all required filesystem changes are applied to ensure first commit captures
     # all the changes introduced by init invocation
+    _maybe_setup_vibecode(project_path=project_path, use_defaults=use_defaults, run_bootstrap=run_bootstrap)
+
     _maybe_git_init(
         workspace_path or project_path,
         use_git=use_git,
@@ -252,6 +254,31 @@ def initialize_new_project(  # noqa: PLR0913, C901, PLR0915
         proc.run(code_cmd_and_args)
     elif readme_path:
         logger.info(f"Your template includes a {readme_path.name} file, you might want to review that as a next step.")
+
+
+def _maybe_setup_vibecode(*, project_path: Path, use_defaults: bool, run_bootstrap: bool | None) -> None:
+    # Keep this spike opt-in and interactive only, avoiding new prompts for non-interactive/default flows.
+    should_prompt = not use_defaults and run_bootstrap is None
+    if not should_prompt:
+        return
+
+    run_vibe_setup = questionary_extensions.prompt_confirm(
+        "Would you like to run `algokit vibe setup` to enable VibeCode for this project?",
+        default=False,
+    )
+    if not run_vibe_setup:
+        return
+
+    try:
+        from algokit.cli.vibe import run_vibe_setup
+
+        run_vibe_setup(cwd=project_path)
+    except Exception as ex:
+        logger.error(f"Received an error while attempting VibeCode setup: {ex}")
+        logger.exception(
+            "VibeCode setup failed. Once any errors above are resolved, run `algokit vibe setup`.",
+            exc_info=ex,
+        )
 
 
 def _maybe_bootstrap(
@@ -548,7 +575,14 @@ def _git_init(project_path: Path, commit_message: str) -> None:
         git("init", bad_exit_warn_message="Failed to initialise git repository")
         and git("checkout", "-b", "main", bad_exit_warn_message="Failed to name initial branch")
         and git("add", "--all", bad_exit_warn_message="Failed to add generated project files")
-        and git("commit", "-m", commit_message, bad_exit_warn_message="Initial commit failed")
+        and git(
+            "-c",
+            "commit.gpgsign=false",
+            "commit",
+            "-m",
+            commit_message,
+            bad_exit_warn_message="Initial commit failed",
+        )
     ):
         logger.info("🎉 Performed initial git commit successfully! 🎉")
 
