@@ -48,9 +48,8 @@ def _build_vibekit_init_env() -> dict[str, str]:
         if sandbox is not None:
             ps_by_name = {stats["Service"]: stats for stats in sandbox.ps()}
             required_services = ("algod", "indexer")
-            is_running = (
-                all(name in ps_by_name for name in required_services)
-                and all(ps_by_name[name].get("State") == "running" for name in required_services)
+            is_running = all(name in ps_by_name for name in required_services) and all(
+                ps_by_name[name].get("State") == "running" for name in required_services
             )
     except Exception as ex:
         # Context injection should never block initialization.
