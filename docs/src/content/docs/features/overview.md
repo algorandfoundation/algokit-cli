@@ -21,6 +21,7 @@ For details on how to use individual features see the following
 - [LocalNet](/algokit-cli/features/localnet/) - Manage a locally sandboxed private Algorand network
 - [Project](/algokit-cli/features/project/) - Manage an AlgoKit project workspace on your file system
 - [Tasks](/algokit-cli/features/tasks/) - Perform a variety of useful operations on the Algorand blockchain
+- [Vibe](/algokit-cli/features/vibe/) - Install and initialize VibeKit for AI-assisted AlgoKit development
 
 ## Common AlgoKit CLI options
 

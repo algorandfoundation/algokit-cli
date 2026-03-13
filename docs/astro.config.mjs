@@ -56,6 +56,7 @@ export default defineConfig({
             { slug: "features/dispenser" },
             { slug: "features/goal" },
             { slug: "features/completions" },
+            { slug: "features/vibe" },
             {
               label: "AlgoKit Project",
               collapsed: true,
