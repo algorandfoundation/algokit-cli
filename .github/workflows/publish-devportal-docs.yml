@@ -1,0 +1,32 @@
+name: Publish DevPortal Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ci/add-publish-to-devportal-workflow] # change to the branch you want to publish doc artifacts from
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: docs/package.json
+      - name: Setup Python environment
+        uses: algorandfoundation/algokit-shared-config/.github/actions/setup-algokit-python@main
+        with:
+          install-algokit: "false"
+      - name: Generate CLI reference
+        run: uv run poe docs-cli
+      - name: Publish DevPortal Docs
+        uses: algorandfoundation/devportal/.github/actions/publish-devportal-docs@release/ak-v4
+        with:
+          docs-dir: docs
