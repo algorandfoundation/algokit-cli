@@ -7,9 +7,7 @@ from algokit.cli.init.command import _maybe_setup_vibecode
 
 
 @pytest.mark.parametrize("run_bootstrap", [True, False, None])
-def test_maybe_setup_vibecode_skips_when_using_defaults(
-    mocker: MockerFixture, run_bootstrap: bool | None
-) -> None:
+def test_maybe_setup_vibecode_skips_when_using_defaults(mocker: MockerFixture, run_bootstrap: bool | None) -> None:
     prompt_mock = mocker.patch("algokit.cli.init.command.questionary_extensions.prompt_confirm")
     vibe_setup_mock = mocker.patch("algokit.cli.vibe.run_vibe_setup")
 
@@ -20,9 +18,7 @@ def test_maybe_setup_vibecode_skips_when_using_defaults(
 
 
 @pytest.mark.parametrize("run_bootstrap", [True, False])
-def test_maybe_setup_vibecode_skips_when_bootstrap_flag_is_explicit(
-    mocker: MockerFixture, run_bootstrap: bool
-) -> None:
+def test_maybe_setup_vibecode_skips_when_bootstrap_flag_is_explicit(mocker: MockerFixture, run_bootstrap: bool) -> None:
     prompt_mock = mocker.patch("algokit.cli.init.command.questionary_extensions.prompt_confirm")
     vibe_setup_mock = mocker.patch("algokit.cli.vibe.run_vibe_setup")
 
