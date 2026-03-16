@@ -262,11 +262,11 @@ def _maybe_setup_vibecode(*, project_path: Path, use_defaults: bool, run_bootstr
     if not should_prompt:
         return
 
-    run_vibe_setup = questionary_extensions.prompt_confirm(
+    should_run_vibe_setup = questionary_extensions.prompt_confirm(
         "Would you like to run `algokit vibe setup` to enable VibeCode for this project?",
         default=False,
     )
-    if not run_vibe_setup:
+    if not should_run_vibe_setup:
         return
 
     try:
