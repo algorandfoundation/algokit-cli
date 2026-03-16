@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import cast
 
 import pytest
 from pytest_mock import MockerFixture
@@ -7,22 +8,32 @@ from algokit.cli.init.command import _maybe_setup_vibecode
 
 
 @pytest.mark.parametrize("run_bootstrap", [True, False, None])
-def test_maybe_setup_vibecode_skips_when_using_defaults(mocker: MockerFixture, run_bootstrap: bool | None) -> None:
+def test_maybe_setup_vibecode_skips_when_using_defaults(mocker: MockerFixture, run_bootstrap: object) -> None:
     prompt_mock = mocker.patch("algokit.cli.init.command.questionary_extensions.prompt_confirm")
     vibe_setup_mock = mocker.patch("algokit.cli.vibe.run_vibe_setup")
 
-    _maybe_setup_vibecode(project_path=Path("/tmp/project"), use_defaults=True, run_bootstrap=run_bootstrap)
+    _maybe_setup_vibecode(
+        project_path=Path("/tmp/project"),
+        use_defaults=True,
+        run_bootstrap=cast("bool | None", run_bootstrap),
+    )
 
     prompt_mock.assert_not_called()
     vibe_setup_mock.assert_not_called()
 
 
 @pytest.mark.parametrize("run_bootstrap", [True, False])
-def test_maybe_setup_vibecode_skips_when_bootstrap_flag_is_explicit(mocker: MockerFixture, run_bootstrap: bool) -> None:
+def test_maybe_setup_vibecode_skips_when_bootstrap_flag_is_explicit(
+    mocker: MockerFixture, run_bootstrap: object
+) -> None:
     prompt_mock = mocker.patch("algokit.cli.init.command.questionary_extensions.prompt_confirm")
     vibe_setup_mock = mocker.patch("algokit.cli.vibe.run_vibe_setup")
 
-    _maybe_setup_vibecode(project_path=Path("/tmp/project"), use_defaults=False, run_bootstrap=run_bootstrap)
+    _maybe_setup_vibecode(
+        project_path=Path("/tmp/project"),
+        use_defaults=False,
+        run_bootstrap=cast("bool", run_bootstrap),
+    )
 
     prompt_mock.assert_not_called()
     vibe_setup_mock.assert_not_called()
