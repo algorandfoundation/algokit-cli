@@ -85,7 +85,7 @@ Any errors detected by PuyaPy during the compilation process will be printed to 
 
 PuyaPy requires Python 3.12+, so please ensure your Python version satisfies this requirement.
 
-This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically run using [pipx](https://pipx.pypa.io/stable/). In this case pipx is also required.
+This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [uv](https://docs.astral.sh/uv/) or [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically run using [uv](https://docs.astral.sh/uv/) (or [pipx](https://pipx.pypa.io/stable/) as a fallback).
 
 #### Examples
 

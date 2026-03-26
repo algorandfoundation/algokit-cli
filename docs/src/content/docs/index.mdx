@@ -19,22 +19,19 @@ import { Card, CardGrid, Tabs, TabItem } from '@astrojs/starlight/components';
 ## Installation
 
 <Tabs>
-  <TabItem label="macOS">
+  <TabItem label="macOS / Linux">
     ```bash
-    brew install algorandfoundation/tap/algokit
+    curl -fsSL https://cli.algokit.io/install.sh | bash
     ```
   </TabItem>
   <TabItem label="Windows">
-    ```bash
-    winget install AlgoKit
-    ```
-  </TabItem>
-  <TabItem label="pipx (any OS)">
-    ```bash
-    pipx install algokit
+    ```powershell
+    irm https://cli.algokit.io/install.ps1 | iex
     ```
   </TabItem>
 </Tabs>
+
+> The install script handles installing `uv` and Python automatically. Legacy installation methods via `brew`, `winget`, and `snap` are also available — see the [official installation guide](https://github.com/algorandfoundation/algokit-cli#install).
 
 ## Quick Start
 
@@ -55,16 +52,16 @@ algokit explore
 ## Features
 
 <CardGrid>
-  <Card title="Init" icon="rocket">
+  <Card title="Init" icon="add-document">
     Quickly scaffold new Algorand projects from official templates or community templates.
   </Card>
   <Card title="LocalNet" icon="laptop">
     Spin up a local isolated Algorand network for development and testing.
   </Card>
-  <Card title="Compile" icon="puzzle">
+  <Card title="Compile" icon="setting">
     Compile Algorand Python and other smart contract languages to AVM bytecode.
   </Card>
-  <Card title="Deploy" icon="up-caret">
+  <Card title="Deploy" icon="rocket">
     Deploy smart contracts to LocalNet, TestNet or MainNet with a single command.
   </Card>
   <Card title="Tasks" icon="list-format">

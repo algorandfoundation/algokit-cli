@@ -10,28 +10,26 @@ The AlgoKit Doctor allows you to make sure that your system has the correct depe
 
 Please run this command to if you are facing an issue running AlgoKit. It is recommended to run it before [submitting an issue to AlgoKit](https://github.com/algorandfoundation/algokit-cli/issues/new). You can copy the contents of the Doctor command message (in Markdown format) to your clipboard by providing the `-c` flag to the command as follows `algokit doctor -c`.
 
-> NOTE: You can also use the `--verbose` or `-v` flag to show additional information including package dependencies of the AlgoKit CLI: `algokit -v doctor`. This only works when `algokit` is installed as a Python package (e.g., via `pipx install algokit`).
+> NOTE: You can also use the `--verbose` or `-v` flag to show additional information including package dependencies of the AlgoKit CLI: `algokit -v doctor`. This only works when `algokit` is installed as a Python package (e.g., via `uv tool install algokit`).
 
 # Examples
 
 For example, running `algokit doctor` with all prerequisites installed will result in output similar to the following:
 
-```bash
-algokit doctor
+```
+$ ~ algokit doctor
 timestamp: 2023-03-29T03:58:05+00:00
-AlgoKit: 0.6.0
-AlgoKit Python: 3.11.2 (main, Mar 24 2023, 00:16:47) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
-OS: macOS-13.2.1-arm64-arm-64bit
-docker: 20.10.22
-docker compose: 2.15.1
-git: 2.39.1
-python: 3.10.9 (location: /Users/algokit/.asdf/shims/python)
-python3: 3.10.9 (location: /Users/algokit/.asdf/shims/python3)
-pipx: 1.2.0
-poetry: 1.3.2
-node: 18.12.1
-npm: 8.19.2
-brew: 4.0.10-34-gb753315
+AlgoKit: 2.10.2
+AlgoKit Python: 3.12.11 (location: ~/.local/share/uv/tools/algokit)
+OS: macOS-15.0-arm64-arm-64bit
+docker: 27.5.1
+docker compose: 2.32.4
+git: 2.47.0
+python: 3.12.11 (location: ~/.local/share/uv/python/cpython-3.12.11)
+python3: 3.12.11 (location: ~/.local/share/uv/python/cpython-3.12.11)
+uv: 0.10.7
+node: 22.14.0
+npm: 10.9.2
 
 If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
 https://github.com/algorandfoundation/algokit-cli/issues/new
