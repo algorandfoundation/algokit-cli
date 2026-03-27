@@ -24,7 +24,8 @@ jobs:
         run: |
           set -o pipefail
           uv export --no-dev --no-group docs --no-emit-project -o requirements.txt
-          uv run pip-audit -r requirements.txt
+          # CVE-2026-4539: low-severity ReDoS in pygments (transitive dep), no fix available as of 2026-03-27
+          uv run pip-audit -r requirements.txt --ignore-vuln CVE-2026-4539
 
       - name: Check formatting with Ruff
         run: uv run ruff format --check .
