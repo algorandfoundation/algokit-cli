@@ -129,7 +129,10 @@ def _execute_deploy_command(  # noqa: PLR0913
         ) from ex
     else:
         if result.exit_code != 0:
-            raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+            error_message = f"Deployment command exited with error code = {result.exit_code}"
+            if result.output.strip():
+                error_message += f"\n\nDeploy command output:\n{result.output.strip()}"
+            raise click.ClickException(error_message)
 
 
 class _CommandParamType(click.types.StringParamType):
