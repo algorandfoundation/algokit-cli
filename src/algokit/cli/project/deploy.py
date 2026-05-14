@@ -17,6 +17,14 @@ from algokit.core.utils import resolve_command_path, split_command_string
 logger = logging.getLogger(__name__)
 
 
+def _format_deploy_error(result: proc.RunResult) -> str:
+    msg = f"Deployment command exited with error code = {result.exit_code}"
+    command_output = result.output.strip()
+    if command_output:
+        msg = f"{msg}\n\nCommand output:\n{command_output}"
+    return msg
+
+
 def _ensure_aliases(
     config_env: dict[str, str],
     deployer_alias: str | None = None,
@@ -129,7 +137,7 @@ def _execute_deploy_command(  # noqa: PLR0913
         ) from ex
     else:
         if result.exit_code != 0:
-            raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
+            raise click.ClickException(_format_deploy_error(result))
 
 
 class _CommandParamType(click.types.StringParamType):
