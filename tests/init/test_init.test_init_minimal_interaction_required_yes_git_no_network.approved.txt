@@ -3,6 +3,14 @@ DEBUG: No .algokit.toml file found in the project directory.
 WARNING: Community templates have not been reviewed, and can execute arbitrary code.
 Please inspect the template repository, and pay particular attention to the values of _tasks, _migrations and _jinja_extensions in copier.yml
 ? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
+? Continue anyway? (y/N)
 DEBUG: template source = {test_parent_directory}/copier-helloworld.bundle
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No .algokit.toml file found in the project directory.
@@ -34,7 +42,7 @@ DEBUG: git: Initialized empty Git repository in {current_working_directory}/myap
 DEBUG: Running 'git checkout -b main' in '{current_working_directory}/myapp'
 DEBUG: git: Switched to a new branch 'main'
 DEBUG: Running 'git add --all' in '{current_working_directory}/myapp'
-DEBUG: Running 'git commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle' in '{current_working_directory}/myapp'
+DEBUG: Running 'git -c commit.gpgsign=false commit -m Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle' in '{current_working_directory}/myapp'
 DEBUG: git: [main (root-commit) {git_initial_commit_hash}] Project initialised with AlgoKit CLI using template: {test_parent_directory}/copier-helloworld.bundle
 DEBUG: git: 1 file changed, 1 insertion(+)
 DEBUG: git: create mode 100644 myapp/helloworld.txt

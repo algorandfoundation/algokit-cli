@@ -19,6 +19,7 @@ from algokit.cli.project import project_group
 from algokit.cli.project.bootstrap import bootstrap_group
 from algokit.cli.project.deploy import deploy_command
 from algokit.cli.task import task_group
+from algokit.cli.vibe import vibe_group
 from algokit.core.conf import PACKAGE_NAME
 from algokit.core.config_commands.version_prompt import do_version_prompt, skip_version_check_option
 from algokit.core.log_handlers import color_option, verbose_option
@@ -83,6 +84,7 @@ algokit.add_command(dispenser_group)
 algokit.add_command(task_group)
 algokit.add_command(compile_group)
 algokit.add_command(project_group)
+algokit.add_command(vibe_group)
 
 
 def _check_binary_deprecation() -> None:
