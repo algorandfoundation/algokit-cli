@@ -1,6 +1,3 @@
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
-DEBUG: poetry: STDOUT
-DEBUG: poetry: STDERR
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
 DEBUG: No 'min_version' specified in .algokit.toml file.
 DEBUG: Attempting to load project config from {current_working_directory}/.algokit.toml
@@ -16,7 +13,6 @@ DEBUG: {current_working_directory}/artifacts/project_1/.env.template exists
 Copying {current_working_directory}/artifacts/project_1/.env.template to {current_working_directory}/artifacts/project_1/.env and prompting for empty values
 DEBUG: Attempting to load project config from {current_working_directory}/artifacts/project_1/.algokit.toml
 DEBUG: Running `algokit project bootstrap poetry`
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
 DEBUG: poetry: STDERR
 Installing Python dependencies and setting up Python virtual environment via Poetry

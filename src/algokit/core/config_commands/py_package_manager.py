@@ -46,10 +46,10 @@ def py_package_manager_configuration_command(*, package_manager: str | None) -> 
     """Set the default Python package manager for use by AlgoKit CLI."""
 
     if package_manager is None:
-        current_manager = get_py_package_manager() or PyPackageManager.POETRY
+        current_manager = get_py_package_manager() or PyPackageManager.UV
         choices = [
-            f"poetry {'(active)' if current_manager == PyPackageManager.POETRY else ''}".strip(),
             f"uv {'(active)' if current_manager == PyPackageManager.UV else ''}".strip(),
+            f"poetry {'(active)' if current_manager == PyPackageManager.POETRY else ''}".strip(),
         ]
         manager = questionary.select(
             "Which Python package manager would you prefer `bootstrap` command to use by default?", choices=choices
@@ -57,6 +57,9 @@ def py_package_manager_configuration_command(*, package_manager: str | None) -> 
         if manager is None:
             raise click.ClickException("No valid Python package manager selected. Aborting...")
         package_manager = manager.split()[0].lower()
+
+    if package_manager is None:
+        raise click.ClickException("No valid Python package manager selected. Aborting...")
 
     save_py_package_manager(package_manager)
     logger.info(f"Python package manager set to `{package_manager}`")

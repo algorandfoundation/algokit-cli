@@ -1,3 +1,4 @@
+import base64
 import logging
 import multiprocessing
 import signal
@@ -10,12 +11,35 @@ from enum import Enum
 from multiprocessing import Process, Queue, cpu_count
 from timeit import default_timer as timer
 
-import algosdk
-from algosdk.mnemonic import from_private_key, to_private_key
+import nacl.signing
+from algokit_utils.algo25 import secret_key_to_mnemonic, seed_from_mnemonic
+from algokit_utils.common import address_from_public_key
 
 logger = logging.getLogger(__name__)
 
 PROGRESS_REFRESH_INTERVAL_SECONDS = 5
+
+
+def _generate_account() -> tuple[bytes, str]:
+    """
+    Generate a new Algorand account.
+
+    Returns:
+        tuple[bytes, str]: A tuple containing the secret key (64 bytes) and the address (string).
+            The secret key format is seed (32 bytes) + public key (32 bytes).
+    """
+    # Generate a random signing key
+    signing_key = nacl.signing.SigningKey.generate()
+    public_key = signing_key.verify_key.encode()
+    seed = bytes(signing_key)
+
+    # Secret key is seed + public key
+    secret_key = seed + public_key
+
+    # Generate the address from the public key
+    address = address_from_public_key(public_key)
+
+    return secret_key, address
 
 
 class MatchType(Enum):
@@ -94,14 +118,14 @@ def _search_for_matching_address(keyword: str, match: MatchType, counter: Counte
         batch_size = 100
 
         while True:
-            private_key, address = algosdk.account.generate_account()  # type: ignore[no-untyped-call]
+            secret_key, address = _generate_account()
             local_count += 1
             if local_count % batch_size == 0:
                 counter.increment(local_count)
                 local_count = 0
 
             if MATCH_FUNCTIONS[match](address, keyword):
-                generated_mnemonic = from_private_key(private_key)  # type: ignore[no-untyped-call]
+                generated_mnemonic = secret_key_to_mnemonic(secret_key)
                 queue.put((address, generated_mnemonic))
                 return
     except KeyboardInterrupt:
@@ -155,8 +179,14 @@ def generate_vanity_address(keyword: str, match: MatchType) -> VanityAccount:
     for p in jobs:
         p.terminate()
 
+    # Get seed and derive public key to create 64-byte private key (seed + pubkey)
+    seed = seed_from_mnemonic(mnemonic)
+    signing_key = nacl.signing.SigningKey(seed)
+    public_key = signing_key.verify_key.encode()
+    private_key = base64.b64encode(seed + public_key).decode()
+
     return VanityAccount(
         mnemonic=mnemonic,
         address=address,
-        private_key=to_private_key(mnemonic),  # type: ignore[no-untyped-call]
+        private_key=private_key,
     )

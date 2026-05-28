@@ -18,25 +18,22 @@ This guide presents installing AlgoKit using an OS agnostic procedure. For OS sp
 
 Before proceeding, ensure you have the following components installed:
 
-- [Python 3.10 - 3.14](https://www.python.org/downloads/)
-- [pipx](https://pypa.github.io/pipx/#on-linux-install-via-pip-requires-pip-190-or-later)
 - [git](https://github.com/git-guides/install-git#install-git)
 - [Docker](https://docs.docker.com/desktop/install/mac-install/) (or [Podman](https://podman.io/getting-started/installation/), see [details](../features/localnet.md#podman-support))
 - [VSCode](https://code.visualstudio.com/download)
-
 ## Install AlgoKit 🛠
 
 To install AlgoKit, run the following command from a terminal.
 
 ```shell
-pipx install algokit
+curl -fsSL https://cli.algokit.io/install.sh | bash
 ```
 
 After the installation completes, **restart the terminal**.
 
 For more detailed installation documentation, see the [official installation guide](https://github.com/algorandfoundation/algokit-cli#install).
 
-> Please note, `pipx` is only one of the supported installation methods. You can also install AlgoKit via `brew` and _soon_ `winget` and `snap` as pre-build binaries. Refer to the official installation guide.
+> The install script handles installing `uv` and Python automatically. For alternative installation methods, see the [official installation guide](https://github.com/algorandfoundation/algokit-cli#install).
 
 ## Verify the Installation ✔
 
@@ -100,8 +97,7 @@ The structure of your fresh algokit project instance will look similar to below:
         ├── README.md # Quick start on Algorand Python smart contract template based project.
         ├── .algokit # Hidden folder for AlgoKit AVM debugger and custom generators.
         ├── .algokit.toml # Project-specific commands and custom generator references.
-        ├── poetry.lock
-        ├── poetry.toml # Dependency definitions for {your_project_name}.
+        ├── pyproject.toml # Dependency definitions for {your_project_name}.
         ├── pyproject.toml # Project definitions for {your_project_name}.
         └── smart_contracts
             ├── README.md # Guide for adding new smart contracts.

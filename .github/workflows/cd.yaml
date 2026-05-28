@@ -52,22 +52,19 @@ jobs:
           app-id: ${{ secrets.BOT_ID }}
           private-key: ${{ secrets.BOT_SK }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Fetch entire repository history so we can determine version number from it
           fetch-depth: 0
           token: ${{ steps.app_token.outputs.token }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
-      - name: Set up Poetry
-        uses: ./.github/actions/setup-poetry
-
-      - name: Install dependencies
-        run: poetry install --no-interaction --no-root
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
 
       - name: Get branch name
         shell: bash
@@ -80,7 +77,7 @@ jobs:
       - name: Create Continuous Deployment - Feature Branch
         if: steps.get_branch.outputs.branch != 'main' && inputs.production_release != 'true'
         run: |
-          poetry run semantic-release \
+          uv run semantic-release \
             -v DEBUG \
             --prerelease \
             --patch \
@@ -98,12 +95,12 @@ jobs:
       - name: Create Continuous Deployment - Beta (non-prod)
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release != 'true'
         run: |
-          poetry run semantic-release \
+          uv run semantic-release \
             -v DEBUG \
             --prerelease \
             --define=branch=main \
             publish
-          release_version="$(poetry run semantic-release print-version --current)"
+          release_version="$(uv run semantic-release print-version --current)"
           gh release edit --prerelease "v$release_version"
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
@@ -114,14 +111,14 @@ jobs:
       - name: Create Continuous Deployment - Production
         if: steps.get_branch.outputs.branch == 'main' && inputs.production_release == 'true'
         run: |
-          poetry run semantic-release \
+          uv run semantic-release \
             -v DEBUG \
             --define=version_source="commit" \
             --define=patch_without_tag=true \
             --define=upload_to_repository=true \
             --define=branch=main \
             publish
-          release_version="$(poetry run semantic-release print-version --current)"
+          release_version="$(uv run semantic-release print-version --current)"
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ steps.app_token.outputs.token }}
@@ -134,7 +131,7 @@ jobs:
         id: get_release_version
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: algokit-cli
           path: dist/algokit*-py3-none-any.whl
@@ -162,3 +159,34 @@ jobs:
       artifactName: algokit-cli
       release_version: ${{ needs.release.outputs.release_version }}
     secrets: inherit
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    concurrency:
+      group: deploy-docs
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Build documentation
+        uses: ./.github/actions/build-docs
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

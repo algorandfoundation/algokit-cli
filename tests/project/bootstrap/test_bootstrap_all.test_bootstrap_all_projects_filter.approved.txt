@@ -12,7 +12,6 @@ DEBUG: {current_working_directory}/artifacts/project1/.env doesn't exist yet
 DEBUG: {current_working_directory}/artifacts/project1/.env.template exists
 Copying {current_working_directory}/artifacts/project1/.env.template to {current_working_directory}/artifacts/project1/.env and prompting for empty values
 DEBUG: Running `algokit bootstrap poetry`
-DEBUG: Running 'poetry --version' in '{current_working_directory}'
 DEBUG: poetry: STDOUT
 DEBUG: poetry: STDERR
 Installing Python dependencies and setting up Python virtual environment via Poetry

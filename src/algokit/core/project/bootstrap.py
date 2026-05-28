@@ -20,7 +20,14 @@ from algokit.core.config_commands.py_package_manager import (
     get_py_package_manager,
     save_py_package_manager,
 )
-from algokit.core.utils import find_valid_pipx_command, is_windows
+from algokit.core.utils import (
+    find_valid_tool_runner_command,
+    get_tool_install_command,
+    get_tool_run_command,
+    is_uv,
+    is_uvx,
+    is_windows,
+)
 
 ENV_TEMPLATE_PATTERN = ".env*.template"
 MAX_BOOTSTRAP_DEPTH = 2
@@ -123,6 +130,9 @@ def _determine_python_package_manager(project_dir: Path) -> str:
     poetry_path = project_dir / "poetry.toml"
     pyproject_path = project_dir / "pyproject.toml"
 
+    if is_uv_project(project_dir):
+        return PyPackageManager.UV
+
     if poetry_path.exists():
         # Standalone poetry.toml suggests Poetry
         return PyPackageManager.POETRY
@@ -134,11 +144,10 @@ def _determine_python_package_manager(project_dir: Path) -> str:
     # 4. Interactive prompt for first-time users
     manager = questionary.select(
         "Which Python package manager would you prefer `bootstrap` command to use?",
-        choices=[PyPackageManager.POETRY, PyPackageManager.UV],
+        choices=[PyPackageManager.UV, PyPackageManager.POETRY],
     ).ask()
     if manager is None:
-        # Default to Poetry if user cancels
-        manager = PyPackageManager.POETRY
+        manager = PyPackageManager.UV
     save_py_package_manager(manager)
     return str(manager)
 
@@ -186,7 +195,7 @@ def _bootstrap_python_project(project_dir: Path, manager: str) -> None:
     if manager == PyPackageManager.UV:
         logger.debug("Running `algokit project bootstrap uv`")
         bootstrap_uv(project_dir)
-    else:  # Default to Poetry for backward compatibility
+    else:
         logger.debug("Running `algokit project bootstrap poetry`")
         bootstrap_poetry(project_dir)
 
@@ -430,6 +439,7 @@ def bootstrap_env(project_dir: Path, *, ci_mode: bool) -> None:
 
 
 def bootstrap_poetry(project_dir: Path) -> None:
+    tool_command: list[str] = []
     try:
         proc.run(
             ["poetry", "--version"],
@@ -438,26 +448,28 @@ def bootstrap_poetry(project_dir: Path) -> None:
         try_install_poetry = False
     except OSError:
         try_install_poetry = True
-
     if try_install_poetry:
         logger.info("Poetry not found; attempting to install it...")
+        tool_command = find_valid_tool_runner_command(
+            "Unable to find uv or pipx so that poetry can be installed; "
+            "please install uv via https://docs.astral.sh/uv/ "
+            "and then try `algokit project bootstrap poetry` again."
+        )
+        tool_name = "uv" if is_uvx(tool_command) or is_uv(tool_command) else "pipx"
         if not questionary_extensions.prompt_confirm(
-            "We couldn't find `poetry`; can we install it for you via pipx so we can install Python dependencies?",
+            f"We couldn't find `poetry`; can we install it for you via {tool_name} "
+            "so we can install Python dependencies?",
             default=True,
         ):
             raise click.ClickException(
-                "Unable to install poetry via pipx; please install poetry "
+                f"Unable to install poetry via {tool_name}; please install poetry "
                 "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             )
-        pipx_command = find_valid_pipx_command(
-            "Unable to find pipx install so that poetry can be installed; "
-            "please install pipx via https://pypa.github.io/pipx/ "
-            "and then try `algokit project bootstrap poetry` again."
-        )
+        install_cmd = get_tool_install_command(tool_command, package="poetry")
         proc.run(
-            [*pipx_command, "install", "poetry"],
+            install_cmd,
             bad_return_code_error_message=(
-                "Unable to install poetry via pipx; please install poetry "
+                f"Unable to install poetry via {tool_name}; please install poetry "
                 "manually via https://python-poetry.org/docs/ and try `algokit project bootstrap poetry` again."
             ),
         )
@@ -465,14 +477,23 @@ def bootstrap_poetry(project_dir: Path) -> None:
     logger.info("Installing Python dependencies and setting up Python virtual environment via Poetry")
     try:
         proc.run(["poetry", "install"], stdout_log_level=logging.INFO, cwd=project_dir)
-    except OSError as e:
+    except OSError:
         if try_install_poetry:
-            raise click.ClickException(
-                "Unable to access Poetry on PATH after installing it via pipx; "
-                "check pipx installations are on your path by running `pipx ensurepath` "
-                "and try `algokit project bootstrap poetry` again."
-            ) from e
-        raise  # unexpected error, we already ran without IOError before
+            tool_name = "uv" if is_uvx(tool_command) or is_uv(tool_command) else "pipx"
+            logger.info(
+                "Poetry is not available on PATH yet after installation; retrying via %s tool runner", tool_name
+            )
+            fallback_cmd = [*get_tool_run_command(tool_command, spec="poetry", binary="poetry"), "install"]
+            try:
+                proc.run(fallback_cmd, stdout_log_level=logging.INFO, cwd=project_dir)
+                return
+            except Exception as fallback_error:
+                raise click.ClickException(
+                    f"Unable to access Poetry on PATH after installing it via {tool_name}; "
+                    "and fallback execution failed. Please restart your terminal and try "
+                    "`algokit project bootstrap poetry` again."
+                ) from fallback_error
+        raise
 
 
 def bootstrap_npm(project_dir: Path, *, ci_mode: bool) -> None:
@@ -542,90 +563,86 @@ def migrate_pyproject_to_uv(project_dir: Path) -> None:
         ) from e
 
 
-def bootstrap_uv(project_dir: Path) -> None:  # noqa: C901
+def _ensure_uv_installed() -> bool:
+    """Ensure uv is installed, prompting to install if missing. Returns True if freshly installed."""
     try:
         proc.run(
             ["uv", "--version"],
             bad_return_code_error_message="uv --version failed, please check your uv install",
         )
-        try_install_uv = False
+        return False
     except OSError:
-        try_install_uv = True
+        pass
 
-    if try_install_uv:
-        logger.info("UV not found; attempting to install it...")
-        if not questionary_extensions.prompt_confirm(
-            "We couldn't find `uv`; can we install it for you via curl so we can install Python dependencies?",
-            default=True,
-        ):
-            raise click.ClickException(
-                "Unable to install uv; please install uv "
-                "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-            )
+    logger.info("UV not found; attempting to install it...")
+    if not questionary_extensions.prompt_confirm(
+        "We couldn't find `uv`; can we install it for you so we can install Python dependencies?",
+        default=True,
+    ):
+        raise click.ClickException(
+            "Unable to install uv; please install uv "
+            "manually via https://docs.astral.sh/uv/ and try `algokit project bootstrap uv` again."
+        )
 
-        # Use the standalone installer as recommended in the UV docs
-        if is_windows():
-            cmd = ["powershell", "-ExecutionPolicy", "ByPass", "-c", "irm https://astral.sh/uv/install.ps1 | iex"]
-            try:
-                proc.run(
-                    cmd,
-                    bad_return_code_error_message=(
-                        "Unable to install uv; please install uv "
-                        "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-                    ),
-                )
-            except Exception as e:
-                raise click.ClickException(
-                    "Failed to install uv. Please install it manually via "
-                    "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-                ) from e
-        else:
-            # For Unix platforms, use proc.run with sh -c to handle the pipe safely
-            try:
-                proc.run(
-                    ["sh", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"],
-                    bad_return_code_error_message=(
-                        "Unable to install uv; please install uv "
-                        "manually via https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-                    ),
-                )
-            except Exception as e:
-                raise click.ClickException(
-                    "Failed to install uv. Please install it manually via "
-                    "https://github.com/astral-sh/uv and try `algokit project bootstrap uv` again."
-                ) from e
+    install_error_message = (
+        "Unable to install uv; please install uv "
+        "manually via https://docs.astral.sh/uv/ and try `algokit project bootstrap uv` again."
+    )
 
-    # Check if pyproject.toml contains poetry configuration
+    if is_windows():
+        cmd = ["powershell", "-ExecutionPolicy", "ByPass", "-c", "irm https://astral.sh/uv/install.ps1 | iex"]
+    else:
+        cmd = ["sh", "-c", "curl -LsSf https://astral.sh/uv/install.sh | sh"]
+
+    try:
+        proc.run(cmd, bad_return_code_error_message=install_error_message)
+    except Exception as e:
+        raise click.ClickException(install_error_message) from e
+
+    return True
+
+
+def _maybe_migrate_poetry_project(project_dir: Path) -> None:
+    """If the project uses Poetry, offer to migrate to uv-compatible format."""
     pyproject_path = project_dir / "pyproject.toml"
-    is_poetry_project = pyproject_path.exists() and "[tool.poetry]" in pyproject_path.read_text("utf-8")
-    if is_poetry_project:
-        if questionary_extensions.prompt_confirm(
-            "Would you like to attempt to migrate the pyproject configuration to uv compliant format?\n"
-            "⚠️  This will run a third-party tool (https://mkniewallner.github.io/migrate-to-uv/) "
-            "that will attempt to convert your poetry project to uv. "
-            "You are advised to double check the migrated file and it's recommended to run this "
-            "in a version controlled repository to revert changes if needed.",
-            default=False,
-        ):
-            migrate_pyproject_to_uv(project_dir)
-        else:
-            raise click.ClickException(
-                "This project is configured to use Poetry. Please use `algokit project bootstrap poetry`, "
-                "set poetry as default package manager via `algokit config py-package-manager`, "
-                "or modify your pyproject.toml to be compatible with UV."
-            )
+    if not pyproject_path.exists():
+        return
+
+    if "[tool.poetry]" not in pyproject_path.read_text("utf-8"):
+        return
+
+    if questionary_extensions.prompt_confirm(
+        "Would you like to attempt to migrate the pyproject configuration to uv compliant format?\n"
+        "\u26a0\ufe0f  This will run a third-party tool (https://mkniewallner.github.io/migrate-to-uv/) "
+        "that will attempt to convert your poetry project to uv. "
+        "You are advised to double check the migrated file and it's recommended to run this "
+        "in a version controlled repository to revert changes if needed.",
+        default=False,
+    ):
+        migrate_pyproject_to_uv(project_dir)
+    else:
+        raise click.ClickException(
+            "This project is configured to use Poetry. Please use `algokit project bootstrap poetry`, "
+            "set poetry as default package manager via `algokit config py-package-manager`, "
+            "or modify your pyproject.toml to be compatible with UV."
+        )
+
+
+def bootstrap_uv(project_dir: Path) -> None:
+    freshly_installed = _ensure_uv_installed()
+
+    _maybe_migrate_poetry_project(project_dir)
 
     logger.info("Installing Python dependencies and setting up Python virtual environment via UV")
     try:
-        # Sync will create/update the virtual environment and install dependencies
         proc.run(["uv", "sync"], stdout_log_level=logging.INFO, cwd=project_dir)
     except OSError as e:
-        if try_install_uv:
+        if freshly_installed:
             raise click.ClickException(
                 "Unable to access UV on PATH after installing it; "
                 "try restarting your terminal and running `algokit project bootstrap uv` again."
             ) from e
-        raise  # unexpected error, we already ran without IOError before
+        raise
 
 
 def get_min_algokit_version(project_dir: Path) -> str | None:

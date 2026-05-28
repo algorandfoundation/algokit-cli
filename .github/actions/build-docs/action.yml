@@ -1,0 +1,31 @@
+name: "Build Documentation"
+description: "Generate CLI reference via sphinx-click and build Starlight site"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python environment
+      uses: algorandfoundation/algokit-shared-config/.github/actions/setup-algokit-python@main
+      with:
+        install-algokit: "false"
+
+    - name: Set up Node.js 22
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Install docs dependencies
+      shell: bash
+      run: cd docs && pnpm install --frozen-lockfile
+
+    - name: Generate CLI reference
+      shell: bash
+      run: uv run poe docs-cli
+
+    - name: Build Starlight site
+      shell: bash
+      run: cd docs && pnpm run build

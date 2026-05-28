@@ -3,7 +3,7 @@ import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from algosdk.transaction import SuggestedParams
+from algokit_utils.clients import algod_models
 
 MIN_BG_COLOR_LENGTH = 6  # Based on ARC-0003 spec, must be a 6 character hex without a pre-pended #
 
@@ -93,7 +93,7 @@ class TokenMetadata:
 @dataclass
 class AssetConfigTxnParams:
     sender: str
-    sp: SuggestedParams
+    sp: algod_models.SuggestedParams
     unit_name: str
     asset_name: str
     url: str

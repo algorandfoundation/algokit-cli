@@ -172,7 +172,6 @@ cython_debug/
 
 #Sphinx
 .doctrees/
-docs/cli/temp.md
 
 # Miscellaneous
 ci_token.txt
@@ -180,3 +179,5 @@ ci_token.txt
 .algokit/
 
 temp/
+
+mise.toml

@@ -16,7 +16,7 @@ runs:
     - name: Build binary
       shell: bash
       run: |
-        poetry run poe package_unix
+        uv run poe package_unix
 
     - name: Package binary artifact
       shell: bash
@@ -27,7 +27,7 @@ runs:
         cd ../..
 
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ inputs.package_name }}-snap
         path: ${{ inputs.artifacts_dir }}/${{ inputs.package_name }}-snap.tar.gz

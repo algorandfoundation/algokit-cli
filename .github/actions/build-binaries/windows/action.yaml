@@ -82,7 +82,7 @@ runs:
     - name: Build binary
       shell: bash
       run: |
-        poetry run poe package_windows
+        uv run poe package_windows
 
     - name: Add metadata to binary
       shell: bash
@@ -130,7 +130,7 @@ runs:
         timestamp-digest: SHA256
 
     - name: Upload winget artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ inputs.package_name }}-winget
         path: ${{ env.WINGET_INSTALLER }}

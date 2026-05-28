@@ -15,8 +15,10 @@ from algokit.core import proc
 from algokit.core.utils import (
     extract_semantic_version,
     extract_version_triple,
-    find_valid_pipx_command,
+    find_valid_tool_runner_command,
     get_npm_command,
+    get_tool_list_command,
+    get_tool_run_command,
 )
 
 logger = logging.getLogger(__name__)
@@ -216,14 +218,46 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
     def find_project_generate_command(self, version: str | None) -> list[str] | None:
         """
         Try find the generate command in the project.
+        Checks uv-based projects first, then falls back to Poetry.
         """
+        # Try uv first (modern projects)
+        result = self._find_project_command_via_uv(version)
+        if result is not None:
+            return result
+
+        # Fall back to Poetry (legacy projects)
+        return self._find_project_command_via_poetry(version)
+
+    def _find_project_command_via_uv(self, version: str | None) -> list[str] | None:
+        """Check if the generator is installed in a uv-managed project."""
+        try:
+            result = proc.run(["uv", "pip", "show", PYTHON_PYPI_PACKAGE])
+            if result.exit_code == 0:
+                generate_command = ["uv", "run", PYTHON_GENERATE_COMMAND]
+                if version is not None:
+                    for line in result.output.splitlines():
+                        if line.startswith("Version:"):
+                            installed_version = extract_version_triple(line.split(":", 1)[1].strip())
+                            if extract_version_triple(version) == installed_version:
+                                return generate_command
+                            return None  # version mismatch
+                else:
+                    return generate_command
+        except OSError:
+            pass
+        except ValueError:
+            pass
+
+        return None
+
+    def _find_project_command_via_poetry(self, version: str | None) -> list[str] | None:
+        """Check if the generator is installed in a Poetry-managed project."""
         try:
             # Use the tree output as it puts the package info on the first line of the output
             result = proc.run(["poetry", "show", PYTHON_PYPI_PACKAGE, "--tree"])
             if result.exit_code == 0:
                 generate_command = ["poetry", "run", PYTHON_GENERATE_COMMAND]
                 if version is not None:
-                    installed_version = None
                     lines = result.output.splitlines()
                     if len(lines) > 0:
                         installed_version = extract_version_triple(lines[0])
@@ -238,12 +272,12 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
 
         return None
 
-    def find_global_generate_command(self, pipx_command: list[str], version: str | None) -> list[str] | None:
+    def find_global_generate_command(self, tool_command: list[str], version: str | None) -> list[str] | None:
         """
         Try find the generate command installed globally.
         """
         try:
-            result = proc.run([*pipx_command, "list", "--short"])
+            result = proc.run(get_tool_list_command(tool_command))
             if result.exit_code == 0:
                 generate_command = [PYTHON_GENERATE_COMMAND]
                 for line in result.output.splitlines():
@@ -267,7 +301,7 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         Find Python generator command.
         If a matching version is installed at a project level, use that.
         If a matching version is installed at a global level, use that.
-        Otherwise, run the matching version via pipx.
+        Otherwise, run via uvx/pipx.
         """
 
         logger.debug("Searching for project installed client generator")
@@ -275,25 +309,20 @@ class PythonClientGenerator(ClientGenerator, language="python", extension=".py")
         if project_result is not None:
             return project_result
 
-        pipx_command = find_valid_pipx_command(
-            f"Unable to find pipx install so that the `{PYTHON_PYPI_PACKAGE}` can be run; "
-            "please install pipx via https://pypa.github.io/pipx/ "
+        tool_command = find_valid_tool_runner_command(
+            f"Unable to find uvx or pipx so that `{PYTHON_PYPI_PACKAGE}` can be run; "
+            "please install uv via https://docs.astral.sh/uv/ "
             "and then try `algokit generate client ...` again."
         )
 
         logger.debug("Searching for globally installed client generator")
-        global_result = self.find_global_generate_command(pipx_command, version)
+        global_result = self.find_global_generate_command(tool_command, version)
         if global_result is not None:
             return global_result
 
-        # when not installed, run via pipx
-        logger.debug("No matching installed client generator found, run client generator via pipx")
-        return [
-            *pipx_command,
-            "run",
-            f"--spec={PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''}",
-            PYTHON_GENERATE_COMMAND,
-        ]
+        spec = f"{PYTHON_PYPI_PACKAGE}{f'=={version}' if version is not None else ''}"
+        logger.debug("No matching installed client generator found, running via %s", tool_command[0])
+        return get_tool_run_command(tool_command, spec=spec, binary=PYTHON_GENERATE_COMMAND)
 
 
 class TypeScriptClientGenerator(ClientGenerator, language="typescript", extension=".ts"):

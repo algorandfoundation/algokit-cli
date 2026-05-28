@@ -1,5 +1,5 @@
 <div align="center">
-<a href="https://github.com/algorandfoundation/algokit-cli"><img src="https://raw.githubusercontent.com/algorandfoundation/algokit-cli/main/docs/imgs/banner.png" width=60%></a>
+<a href="https://github.com/algorandfoundation/algokit-cli"><img src=".github/assets/banner.svg" width=60%></a>
 </div>
 
 <p align="center">
@@ -85,46 +85,65 @@ This is an open source project managed by the Algorand Foundation. See the [cont
 
 ## Prerequisites
 
-The installation pre-requisites change depending on the method you use to install. Please refer to [Installation Methods](#installation-methods).
+No prerequisites are required to install AlgoKit itself. The install script handles everything.
 
 Depending on the features you choose to leverage from the AlgoKit CLI, additional dependencies may be required.
 The AlgoKit CLI will tell you if you are missing one for a given command. These optional dependencies are:
 
 - **Git**: Essential for creating and updating projects from templates. Installation guide available at [Git Installation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - **Docker**: Necessary for running the AlgoKit LocalNet environment. Docker Compose version 2.5.0 or higher is required. See [Docker Installation](https://docs.docker.com/get-docker/).
-- **Python**: For those installing the AlgoKit CLI via `pipx` or building contracts using Algorand Python. **Minimum required version is Python 3.12+ when working with Algorand Python**. See [Python Installation](https://www.python.org/downloads/).
 - **Node.js**: For those working on frontend templates or building contracts using Algorand TypeScript or TEALScript. **Minimum required versions are Node.js `v22` and npm `v10`**. See [Node.js Installation](https://nodejs.org/en/download/).
 
+## Quick Install (Recommended)
+
+AlgoKit is installed via [uv](https://docs.astral.sh/uv/), which handles Python and dependency management automatically.
+
+### macOS / Linux
+
+```shell
+curl -fsSL https://cli.algokit.io/install.sh | bash
+```
+
+### Windows (PowerShell)
+
+```powershell
+irm https://cli.algokit.io/install.ps1 | iex
+```
+
+### What the installer does
+
+1. Installs [uv](https://docs.astral.sh/uv/) if not already present
+2. Installs Python 3.12 via uv if not already available
+3. Installs AlgoKit via `uv tool install algokit`
+
+### Maintenance
+
+- To update AlgoKit: `uv tool upgrade algokit`
+- To remove AlgoKit: `uv tool uninstall algokit`
+
+## Alternative: Install with uv directly
+
+If you already have [uv](https://docs.astral.sh/uv/) installed:
+
+```shell
+uv tool install algokit
+```
+
+## Legacy Installation Methods
+
 > **Note**
-> If you have previously installed AlgoKit using `pipx` and would like to switch to a different installation method, please ensure that
-> you first uninstall the existing version by running `pipx uninstall algokit`. Once uninstalled, you can follow the installation instructions for your preferred platform.
+> The following installation methods are being phased out in favor of the uv-based installation above.
+> They will continue to work for existing installations but are no longer the recommended approach.
 
-## Cross-platform installation
+<details>
+<summary>Click to expand legacy installation methods</summary>
 
-AlgoKit can be installed using OS specific package managers, or using the python tool [pipx](https://pypa.github.io/pipx/).
-See below for specific installation instructions.
-
-### Installation Methods
-
-- [Windows](#install-algokit-on-windows)
-- [Mac](#install-algokit-on-mac)
-- [Linux](#install-algokit-on-linux)
-- [Universal via pipx](#install-algokit-with-pipx-on-any-os)
-
-## Install AlgoKit on Windows
-
-> **Note**
-> AlgoKit is supported on Windows 10 1709 (build 16299) and later.
-> We only publish an x64 binary, however it also runs on ARM devices by default using the built in x64 emulation feature.
+### Install AlgoKit on Windows (winget)
 
 1. Ensure prerequisites are installed
-
    - [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (should be installed by default on recent Windows 10 or later)
    - [Git](https://github.com/git-guides/install-git#install-git-on-windows) (or `winget install git.git`)
    - [Docker](https://docs.docker.com/desktop/install/windows-install/) (or `winget install docker.dockerdesktop`)
-     > **Note**
-     > See [our LocalNet documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/localnet.md#prerequisites) for more tips on installing Docker on Windows
-   - [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
 
 2. Install using winget
 
@@ -132,27 +151,12 @@ See below for specific installation instructions.
    winget install algokit
    ```
 
-3. [Verify installation](#verify-installation)
-
-### Maintenance
-
-Some useful commands for updating or removing AlgoKit in the future.
-
-- To update AlgoKit: `winget upgrade algokit`
-- To remove AlgoKit: `winget uninstall algokit`
-
-## Install AlgoKit on Mac
-
-> **Note**
-> AlgoKit is supported on macOS Big Sur (11) and later for both x64 and ARM (Apple Silicon)
+### Install AlgoKit on Mac (Homebrew)
 
 1. Ensure prerequisites are installed
-
    - [Homebrew](https://docs.brew.sh/Installation)
    - [Git](https://github.com/git-guides/install-git#install-git-on-mac) (should already be available if `brew` is installed)
    - [Docker](https://docs.docker.com/desktop/install/mac-install/), (or `brew install --cask docker`)
-     > **Note**
-     > Docker requires MacOS 11+
 
 2. Install using Homebrew
 
@@ -160,24 +164,10 @@ Some useful commands for updating or removing AlgoKit in the future.
    brew install algorandfoundation/tap/algokit
    ```
 
-3. Restart the terminal to ensure AlgoKit is available on the path
-4. [Verify installation](#verify-installation)
-
-### Maintenance
-
-Some useful commands for updating or removing AlgoKit in the future.
-
-- To update AlgoKit: `brew upgrade algokit`
-- To remove AlgoKit: `brew uninstall algokit`
-
-## Install AlgoKit on Linux
-
-> **Note**
-> AlgoKit is compatible with Ubuntu 16.04 and later, Debian, RedHat, and any distribution that supports [Snap](https://snapcraft.io/docs/installing-snapd), but it is only supported on x64 architecture; ARM is not supported.
+### Install AlgoKit on Linux (snap)
 
 1. Ensure prerequisites are installed
-
-   - [Snap](https://snapcraft.io/docs/installing-snapd) (should be installed by default on Ubuntu 16.04.4 LTS (Xenial Xerus) or later)
+   - [Snap](https://snapcraft.io/docs/installing-snapd)
    - [Git](https://github.com/git-guides/install-git#install-git-on-linux)
    - [Docker](https://docs.docker.com/desktop/install/linux-install/)
 
@@ -187,21 +177,9 @@ Some useful commands for updating or removing AlgoKit in the future.
    sudo snap install algokit --classic
    ```
 
-   > For detailed guidelines per each supported linux distro, refer to [Snap Store](https://snapcraft.io/algokit).
-
-3. [Verify installation](#verify-installation)
-
-### Maintenance
-
-Some useful commands for updating or removing AlgoKit in the future.
-
-- To update AlgoKit: `snap refresh algokit`
-- To remove AlgoKit: `snap remove --purge algokit`
-
-## Install AlgoKit with pipx on any OS
+### Install AlgoKit with pipx on any OS
 
 1. Ensure desired prerequisites are installed
-
    - [Python 3.10 - 3.14](https://www.python.org/downloads/)
    - [pipx](https://pypa.github.io/pipx/installation/)
    - [Git](https://github.com/git-guides/install-git)
@@ -213,62 +191,30 @@ Some useful commands for updating or removing AlgoKit in the future.
    pipx install algokit
    ```
 
-3. Restart the terminal to ensure AlgoKit is available on the path
-4. [Verify installation](#verify-installation)
-
-### Maintenance
-
-Some useful commands for updating or removing AlgoKit in the future.
-
-- To update AlgoKit: `pipx upgrade algokit`
-- To remove AlgoKit: `pipx uninstall algokit`
+</details>
 
 ## Verify installation
 
 Verify AlgoKit is installed correctly by running `algokit --version` and you should see output similar to:
 
 ```
-algokit, version 1.0.1
+algokit, version 2.10.2
 ```
 
 > **Note**
-> If you get receive one of the following errors:
+> If you receive one of the following errors:
 >
 > - `command not found: algokit` (bash/zsh)
 > - `The term 'algokit' is not recognized as the name of a cmdlet, function, script file, or operable program.` (PowerShell)
 >
-> Then ensure that `algokit` is available on the PATH by running `pipx ensurepath` and restarting the terminal.
+> Ensure that `~/.local/bin` is on your PATH and restart the terminal.
 
-It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit. The output of this command will look similar to:
-
-```
-timestamp: 2023-03-27T01:23:45+00:00
-AlgoKit: 1.0.1
-AlgoKit Python: 3.11.1 (main, Dec 23 2022, 09:28:24) [Clang 14.0.0 (clang-1400.0.29.202)] (location: /Users/algokit/.local/pipx/venvs/algokit)
-OS: macOS-13.1-arm64-arm-64bit
-docker: 20.10.21
-docker compose: 2.13.0
-git: 2.37.1
-python: 3.10.9 (location:  /opt/homebrew/bin/python)
-python3: 3.10.9 (location:  /opt/homebrew/bin/python3)
-pipx: 1.1.0
-poetry: 1.3.2
-node: 18.12.1
-npm: 8.19.2
-brew: 3.6.18
-
-If you are experiencing a problem with AlgoKit, feel free to submit an issue via:
-https://github.com/algorandfoundation/algokit-cli/issues/new
-Please include this output, if you want to populate this message in your clipboard, run `algokit doctor -c`
-```
-
-Per the above output, the doctor command output is a helpful tool if you need to ask for support or [raise an issue](https://github.com/algorandfoundation/algokit-cli/issues/new).
+It is also recommended that you run `algokit doctor` to verify there are no issues in your local environment and to diagnose any problems if you do have difficulties running AlgoKit.
 
 ## Troubleshooting
 
 This section addresses specific edge cases and issues that some users might encounter when interacting with the CLI. The following table provides solutions to known edge cases:
 
-| Issue Description                                                                                                                                   | OS(s) with observed behaviour                             | Steps to mitigate                                                                                                                                                                                                                                                                                                                      | References                                          |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| This scenario may arise if installed `python` was build without `--with-ssl` flag enabled, causing pip to fail when trying to install dependencies. | Debian 12                                                 | Run `sudo apt-get install -y libssl-dev` to install the required openssl dependency. Afterwards, ensure to reinstall python with `--with-ssl` flag enabled. This includes options like [building python from source code](https://medium.com/@enahwe/how-to-06bc8a042345) or using tools like [pyenv](https://github.com/pyenv/pyenv). | <https://github.com/actions/setup-python/issues/93> |
-| `poetry install` invoked directly or via `algokit project bootstrap all` fails on `Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)`.      | `MacOS` >=14 using `python` 3.13 installed via `homebrew` | Install dependencies deprecated in `3.13` and latest MacOS versions via `brew install pkg-config`, delete the virtual environment folder and retry the `poetry install` command invocation.                                                                                                                                            | N/A                                                 |
+| Issue Description                                               | OS(s) with observed behaviour | Steps to mitigate                                                                            | References                                                           |
+| --------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Python was built without `--with-ssl` flag, causing pip to fail | Debian 12                     | Run `sudo apt-get install -y libssl-dev` and reinstall python with `--with-ssl` flag enabled | [setup-python#93](https://github.com/actions/setup-python/issues/93) |
