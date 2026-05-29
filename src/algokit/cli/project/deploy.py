@@ -132,6 +132,8 @@ def _execute_deploy_command(  # noqa: PLR0913
         ) from ex
     else:
         if result.exit_code != 0:
+            header = " deploy command output: ".center(80, "·")
+            logger.error(f"\n{header}\n{result.output}")
             raise click.ClickException(f"Deployment command exited with error code = {result.exit_code}")
 
 
