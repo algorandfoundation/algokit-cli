@@ -10,3 +10,6 @@ Deploying smart contracts from AlgoKit compliant repository 🚀
 DEBUG: Running '/bin/gm' in '{current_working_directory}'
 /bin/gm: it is not morning
 Error: Deployment command exited with error code = -1
+
+Command output:
+it is not morning
