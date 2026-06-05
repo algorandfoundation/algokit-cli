@@ -15,18 +15,20 @@ Usage: algokit task mint [OPTIONS]
 
 Options:
   --creator TEXT                  Address or alias of the asset creator.  [required]
-  -n, --name TEXT                 Asset name.  [required]
+  --name TEXT                     Asset name.
   -u, --unit TEXT                 Unit name of the asset.  [required]
   -t, --total INTEGER             Total supply of the asset. Defaults to 1.
   -d, --decimals INTEGER          Number of decimals. Defaults to 0.
+  --nft / --ft                    Whether the asset should be validated as NFT or FT. Refers to FT by default; when
+                                  `--nft` is set the values of `total` and `decimals` are validated as a pure or
+                                  fractional NFT per the ARC3 standard.
   -i, --image FILE                Path to the asset image file to be uploaded to IPFS.  [required]
   -m, --metadata FILE             Path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not
                                   provided, a default metadata object will be generated automatically based on asset-
                                   name, decimals and image. For more details refer to
                                   https://arc.algorand.foundation/ARCs/arc-0003#json-metadata-file-schema.
-  --mutable / --immutable         Whether the asset should be mutable or immutable. Refers to `ARC19` by default.
-  --nft / --ft                    Whether the asset should be validated as NFT or FT. Refers to NFT by default and
-                                  validates canonical definitions of pure or fractional NFTs as per ARC3 standard.
+  --mutable / --immutable         Whether the asset should be mutable or immutable. Refers to `ARC3` (immutable) by
+                                  default.
   -n, --network [localnet|testnet|mainnet]
                                   Network to use. Refers to `localnet` by default.
   -h, --help                      Show this message and exit.
@@ -35,14 +37,14 @@ Options:
 ## Options
 
 - `--creator TEXT`: Specifies the address or alias of the asset creator. This option is required.
-- `-n, --name TEXT`: Specifies the asset name. This option is required.
+- `--name TEXT`: Specifies the asset name. Required either via this flag or via the interactive prompt.
 - `-u, --unit TEXT`: Specifies the unit name of the asset. This option is required.
 - `-t, --total INTEGER`: Specifies the total supply of the asset. Defaults to 1.
 - `-d, --decimals INTEGER`: Specifies the number of decimals. Defaults to 0.
 - `-i, --image PATH`: Specifies the path to the asset image file to be uploaded to IPFS. This option is required.
 - `-m, --metadata PATH`: Specifies the path to the ARC19 compliant asset metadata file to be uploaded to IPFS. If not provided, a default metadata object will be generated automatically based on asset-name, decimals and image.
-- `--mutable / --immutable`: Specifies whether the asset should be mutable or immutable. Refers to `ARC19` by default.
-- `--nft / --ft`: Specifies whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical definitions of pure or fractional NFTs as per ARC3 standard.
+- `--mutable / --immutable`: Specifies whether the asset should be mutable or immutable. Refers to `ARC3` (immutable) by default.
+- `--nft / --ft`: Specifies whether the asset should be validated as NFT or FT. Refers to FT by default; when `--nft` is set the values of `total` and `decimals` are validated as a pure or fractional NFT per the ARC3 standard.
 - `-n, --network [localnet|testnet|mainnet]`: Specifies the network to use. Refers to `localnet` by default.
 
 ## Example

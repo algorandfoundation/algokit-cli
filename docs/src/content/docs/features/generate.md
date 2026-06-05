@@ -10,7 +10,7 @@ The `algokit generate client` [command](/algokit-cli/cli/#client) can be used to
 
 ### Prerequisites
 
-To generate Python clients an installation of pip and pipx is required.
+To generate Python clients an installation of Python and uv (or pipx) is required.
 To generate TypeScript clients an installation of Node.js and npx is also required.
 
 Each generated client will also have a dependency on `algokit-utils` libraries for the target language.
@@ -24,7 +24,7 @@ You can either specify a path to an ARC-0032 JSON file, an ARC-0056 JSON file or
 The output path is interpreted as relative to the current working directory, however an absolute path may also be specified e.g.
 `algokit generate client application.json --output /absolute/path/to/client.py`
 
-There are two tokens available for use with the `-o`, `--output` [option](/algokit-cli/cli/#-o---output-output_path_pattern):
+There are two tokens available for use with the `-o`, `--output` [option](/algokit-cli/cli/#-o-output-output_path_pattern):
 
 - `{contract_name}`: This will resolve to a name based on the ARC-0032/ARC-0056 contract name, formatted appropriately for the target language.
 - `{app_spec_dir}`: This will resolve to the parent directory of the `application.json`, `*.arc32.json`, `*.arc56.json` file which can be useful to output a client relative to its source file.
@@ -35,7 +35,7 @@ If you want to ensure typed client output stability across different environment
 
 To make use of this feature, pass `-v`, `--version`, for example `algokit generate client --version 1.2.3 path/to/application.json`.
 
-Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `poetry` or `npm` respectively) or globally on your system (via `pipx` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
+Alternatively, you can achieve output stability by installing the underlying [Python](https://github.com/algorandfoundation/algokit-client-generator-py) or [TypeScript](https://github.com/algorandfoundation/algokit-client-generator-ts) client generator package either locally in your project (via `uv` or `npm` respectively) or globally on your system (via `uv tool` or `npm` respectively). AlgoKit will search for a matching installed version before dynamically resolving.
 
 ### Usage
 
@@ -78,7 +78,7 @@ const appClient = new HelloWorldAppClient(
     sender: deployer,
     creatorAddress: deployer.addr,
   },
-  algod
+  algod,
 );
 const app = await appClient.deploy({
   allowDelete: isLocal,
@@ -98,7 +98,7 @@ To process multiple application.json in a directory structure and output to a ty
 `algokit generate client smart_contracts/artifacts --output {contract_name}.ts`
 
 To process multiple application.json in a directory structure and output to a python client alongside each application.json:
-`algokit generate client smart_contracts/artifacts --output {app_spec_path}/client.py`
+`algokit generate client smart_contracts/artifacts --output {app_spec_dir}/client.py`
 
 ## 2. Using Custom Generate Commands
 
@@ -162,7 +162,7 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  client          Create a typed ApplicationClient from an ARC-32 application.json
+  client          Create a typed ApplicationClient from an ARC-32/56 application.json
   smart-contract  Adds a new smart contract to the existing project
 ```
 

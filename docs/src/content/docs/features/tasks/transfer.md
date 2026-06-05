@@ -15,10 +15,10 @@ Usage: algokit task transfer [OPTIONS]
 Transfer algos or assets from one account to another.
 
 Options:
-  -s, --sender TEXT               Address or alias of the sender account  [required]
-  -r, --receiver TEXT             Address or alias to an account that will receive the asset(s)  [required]
-  --asset, --id INTEGER           ASA asset id to transfer
-  -a, --amount INTEGER            Amount to transfer  [required]
+  -s, --sender TEXT               Address or alias of the sender account.  [required]
+  -r, --receiver TEXT             Address or alias to an account that will receive the asset(s).  [required]
+  --asset, --id INTEGER           Asset ID to transfer. Defaults to 0 (Algo).
+  -a, --amount INTEGER            Amount to transfer.  [required]
   --whole-units                   Use whole units (Algos | ASAs) instead of smallest divisible units (for example,
                                   microAlgos). Disabled by default.
   -n, --network [localnet|testnet|mainnet]

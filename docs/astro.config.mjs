@@ -1,7 +1,9 @@
 // @ts-check
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import mermaid from "astro-mermaid";
 import remarkGithubAlerts from "remark-github-alerts";
+import sidebar from "./sidebar.config.json";
 
 export default defineConfig({
   site: "https://algorandfoundation.github.io",
@@ -11,6 +13,7 @@ export default defineConfig({
     remarkPlugins: [remarkGithubAlerts],
   },
   integrations: [
+    mermaid({ theme: "default", autoTheme: true }),
     starlight({
       title: "AlgoKit CLI",
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 4 },
@@ -32,76 +35,7 @@ export default defineConfig({
           href: "https://discord.gg/algorand",
         },
       ],
-      sidebar: [
-        { label: "Home", link: "/" },
-        {
-          label: "Getting Started",
-          items: [
-            { slug: "tutorials/intro" },
-            { slug: "tutorials/smart-contracts" },
-            { slug: "tutorials/algokit-template" },
-          ],
-        },
-        {
-          label: "Features",
-          items: [
-            { slug: "features/overview" },
-            { slug: "features/init" },
-            { slug: "features/localnet" },
-            { slug: "features/compile" },
-            { slug: "features/generate" },
-            { slug: "features/config" },
-            { slug: "features/doctor" },
-            { slug: "features/explore" },
-            { slug: "features/dispenser" },
-            { slug: "features/goal" },
-            { slug: "features/completions" },
-            {
-              label: "AlgoKit Project",
-              collapsed: true,
-              items: [
-                { slug: "features/project" },
-                { slug: "features/project/bootstrap" },
-                { slug: "features/project/deploy" },
-                { slug: "features/project/link" },
-                { slug: "features/project/list" },
-                { slug: "features/project/run" },
-              ],
-            },
-            {
-              label: "AlgoKit Task",
-              collapsed: true,
-              items: [
-                { slug: "features/tasks" },
-                { slug: "features/tasks/analyze" },
-                { slug: "features/tasks/ipfs" },
-                { slug: "features/tasks/mint" },
-                { slug: "features/tasks/nfd" },
-                { slug: "features/tasks/opt" },
-                { slug: "features/tasks/send" },
-                { slug: "features/tasks/sign" },
-                { slug: "features/tasks/transfer" },
-                { slug: "features/tasks/vanity_address" },
-                { slug: "features/tasks/wallet" },
-              ],
-            },
-          ],
-        },
-        {
-          label: "Concepts",
-          items: [{ slug: "concepts/output-stability" }],
-        },
-        {
-          label: "Architecture Decisions",
-          collapsed: true,
-          autogenerate: { directory: "architecture-decisions" },
-        },
-        {
-          label: "CLI Reference",
-          collapsed: true,
-          items: [{ slug: "cli", label: "AlgoKit CLI" }],
-        },
-      ],
+      sidebar,
     }),
   ],
 });

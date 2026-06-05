@@ -10,24 +10,27 @@ Available commands and possible usage as follows:
 
 ```bash
 algokit task ipfs
-Usage: algokit task ipfs [OPTIONS]
+Usage: algokit task ipfs [OPTIONS] COMMAND [ARGS]...
 
-Upload files to IPFS using Pinata provider.
+  Upload files to IPFS using Pinata provider.
 
 Options:
-  -f, --file PATH Path to the file to upload. [required]
-  -n, --name TEXT Human readable name for this upload, for use in file listings.
-  -h, --help Show this message and exit.
+  -h, --help  Show this message and exit.
+
+Commands:
+  login   Login to Pinata ipfs provider.
+  logout  Logout of Pinata ipfs provider.
+  upload  Upload a file to Pinata ipfs provider.
 ```
 
-## Options
+## Upload options
 
 - `--file, -f PATH`: Specifies the path to the file to upload. This option is required.
 - `--name, -n TEXT`: Specifies a human readable name for this upload, for use in file listings.
 
 ## Prerequisites
 
-Before you can use this feature, you need to ensure that you have signed up for a Piñata account and have a JWT. You can sign up for a Piñata account by reading [quickstart](https://docs.pinata.cloud/docs/getting-started).
+Before you can use this feature, you need to ensure that you have signed up for a Piñata account and have a JWT. You can sign up for a Piñata account by reading [quickstart](https://docs.pinata.cloud/quickstart).
 
 ## Login
 
@@ -41,10 +44,10 @@ This will prompt you to enter your Piñata JWT. Once you are logged in, you can 
 
 ## Upload
 
-To upload a file to IPFS, you can use the `ipfs` command as follows:
+To upload a file to IPFS, use the `upload` subcommand:
 
 ```bash
-algokit task ipfs --file {PATH_TO_YOUR_FILE}
+algokit task ipfs upload --file {PATH_TO_YOUR_FILE}
 ```
 
 This will upload the file to IPFS using the Piñata provider and return the CID (Content Identifier) of the uploaded file.

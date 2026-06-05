@@ -613,7 +613,7 @@ def _maybe_migrate_poetry_project(project_dir: Path) -> None:
 
     if questionary_extensions.prompt_confirm(
         "Would you like to attempt to migrate the pyproject configuration to uv compliant format?\n"
-        "\u26a0\ufe0f  This will run a third-party tool (https://mkniewallner.github.io/migrate-to-uv/) "
+        "\u26a0\ufe0f  This will run a third-party tool (https://osprey-oss.github.io/migrate-to-uv/) "
         "that will attempt to convert your poetry project to uv. "
         "You are advised to double check the migrated file and it's recommended to run this "
         "in a version controlled repository to revert changes if needed.",

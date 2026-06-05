@@ -14,11 +14,14 @@ This command executes a custom command defined in the `.algokit.toml` file of th
 
 ### Options
 
+The `-l`, `-p`, `-t`, `-s` and `-c` flags below are only available when running from a workspace root.
+
 - `-l, --list`: List all projects associated with the workspace command. (Optional)
 - `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
 - `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
-- `-s, --sequential`: Execute workspace commands sequentially, for cases where you do not have a preference on the execution order, but want to disable concurrency. (Optional, defaults to concurrent)
-- `[ARGS]...`: Additional arguments to pass to the custom command. These will be appended to the end of the command specified in the `.algokit.toml` file.
+- `-s, --sequential`: Execute workspace commands sequentially. (Optional, defaults to concurrent)
+- `-c, --concurrent`: Execute workspace commands concurrently. (Optional, the default)
+- `[ARGS]...`: Additional arguments to pass to the custom command. These will be appended to the last command in the `.algokit.toml` entry (relevant when a command defines multiple commands).
 
 To get detailed help on the above options, execute:
 
@@ -67,7 +70,10 @@ Below is only visible and available when running from a workspace root.
 - `-l, --list`: List all projects associated with the workspace command. (Optional)
 - `-p, --project-name`: Execute the command on specified projects. Defaults to all projects in the current directory. (Optional)
 - `-t, --type`: Limit execution to specific project types if executing from workspace. (Optional)
-  To get a detailed help on the above commands execute:
+- `-s, --sequential`: Execute workspace commands sequentially. (Optional, defaults to concurrent)
+- `-c, --concurrent`: Execute workspace commands concurrently. (Optional, the default)
+
+To get a detailed help on the above commands execute:
 
 ```bash
 algokit project run {name_of_your_command} --help
@@ -108,6 +114,8 @@ name = 'project_a'
 
 [project.run]
 hello = { commands = ['echo hello'], description = 'Prints hello' }
+# Each command also accepts an optional `env_file` to load extra env vars before execution:
+# greet = { commands = ['echo "hello $USER_NAME"'], description = 'Greets', env_file = '.env.greet' }
 
 # ... other non [project.run] related metadata
 ```
@@ -135,7 +143,7 @@ Customize the execution order of commands in workspaces for precise control:
 
 1. Define order in `.algokit.toml`:
 
-   ```yaml
+   ```toml
    [project]
    type = 'workspace'
    projects_root_path = 'projects'

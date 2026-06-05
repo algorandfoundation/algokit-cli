@@ -16,11 +16,11 @@ runs:
 
     - uses: pnpm/action-setup@v4
       with:
-        version: 10
+        package_json_file: docs/package.json
 
     - name: Install docs dependencies
       shell: bash
-      run: cd docs && pnpm install --frozen-lockfile
+      run: pnpm install --frozen-lockfile --dir docs
 
     - name: Generate CLI reference
       shell: bash
@@ -28,4 +28,4 @@ runs:
 
     - name: Build Starlight site
       shell: bash
-      run: cd docs && pnpm run build
+      run: pnpm --dir docs build

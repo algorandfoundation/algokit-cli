@@ -1,0 +1,37 @@
+name: Publish DevPortal Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.x
+
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
+        with:
+          package_json_file: docs/package.json
+
+      - name: Setup Python environment
+        uses: algorandfoundation/algokit-shared-config/.github/actions/setup-algokit-python@main
+        with:
+          install-algokit: "false"
+
+      - name: Generate CLI reference
+        run: uv run poe docs-cli
+
+      - name: Publish DevPortal Docs
+        uses: algorandfoundation/devportal/.github/actions/publish-devportal-docs@release/ak-v4
+        with:
+          docs-dir: docs

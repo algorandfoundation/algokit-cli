@@ -14,7 +14,7 @@ See [Compile Python - Prerequisites](#prerequisites-1) and [Compile TypeScript -
 
 Algorand Python is a semantically and syntactically compatible, typed Python language that works with standard Python tooling and allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM).
 
-Algorand Python can be deployed to Algorand by using the PuyaPy optimising compiler, which takes Algorand Python and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/generate.md#1-typed-clients), will result in AVM bytecode execution semantics that match the given Python code.
+Algorand Python can be deployed to Algorand by using the PuyaPy optimising compiler, which takes Algorand Python and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](/algokit-cli/features/generate/#1-typed-clients), will result in AVM bytecode execution semantics that match the given Python code.
 
 If you want to learn more, check out the [PuyaPy docs](https://github.com/algorandfoundation/puya/blob/main/docs/index.md).
 
@@ -35,12 +35,12 @@ For more complex examples, see the [examples](https://github.com/algorandfoundat
 
 Algorand TypeScript is a typed TypeScript language that allows you to express smart contracts (apps) and smart signatures (logic signatures) for deployment on the Algorand Virtual Machine (AVM). Algorand TypeScript is currently in beta.
 
-Algorand TypeScript can be deployed to Algorand by using the PuyaTs optimising compiler, which takes Algorand TypeScript and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/generate.md#1-typed-clients), will result in AVM bytecode execution semantics that match the given TypeScript code.
+Algorand TypeScript can be deployed to Algorand by using the PuyaTs optimising compiler, which takes Algorand TypeScript and outputs [ARC-32](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0032.md) application spec files (among other formats) which, [when deployed](/algokit-cli/features/generate/#1-typed-clients), will result in AVM bytecode execution semantics that match the given TypeScript code.
 
 Below is an example Algorand TypeScript smart contract.
 
 ```typescript
-import { Contract } from "@algorandfoundation/puya-sdk";
+import { Contract } from "@algorandfoundation/algorand-typescript";
 
 class HelloWorldContract extends Contract {
   hello(name: string): string {
@@ -85,7 +85,7 @@ Any errors detected by PuyaPy during the compilation process will be printed to 
 
 PuyaPy requires Python 3.12+, so please ensure your Python version satisfies this requirement.
 
-This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically run using [pipx](https://pipx.pypa.io/stable/). In this case pipx is also required.
+This command will attempt to resolve a matching installed PuyaPy compiler, either globally installed in the system or locally installed in your project (via [uv](https://docs.astral.sh/uv/) or [Poetry](https://python-poetry.org/)). If no appropriate match is found, the PuyaPy compiler will be dynamically run using [uv](https://docs.astral.sh/uv/) (or [pipx](https://pipx.pypa.io/stable/) as a fallback).
 
 #### Examples
 

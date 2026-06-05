@@ -18,7 +18,7 @@ algokit task analyze INPUT_PATHS [OPTIONS]
 
 - `-r, --recursive`: Recursively search for all TEAL files within any provided directories.
 - `--force`: Force verification without the disclaimer confirmation prompt.
-- `--diff`: Exit with a non-zero code if differences are found between current and last reports.
+- `--diff`: Compare against the previously stored report (requires a prior run without `--diff` to produce a baseline). Exits with a non-zero code if the current report differs from the previous one, or if no previous report exists.
 - `-o, --output OUTPUT_PATH`: Directory path where to store the reports of the static analysis.
 - `-e, --exclude DETECTORS`: Exclude specific vulnerabilities from the analysis. Supports multiple exclusions in a single run.
 
@@ -28,8 +28,8 @@ algokit task analyze INPUT_PATHS [OPTIONS]
 algokit task analyze ./contracts -r --exclude rekey-to --exclude missing-fee-check
 ```
 
-This command will recursively analyze all TEAL files in the `contracts` directory and exclude the `missing-fee-check` vulnerability from the analysis.
+This command will recursively analyze all TEAL files in the `contracts` directory and exclude the `rekey-to` and `missing-fee-check` vulnerabilities from the analysis.
 
 ## Security considerations
 
-This task uses [`tealer`](https://github.com/crytic/tealer), a third-party tool, to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the [guidelines for smart contract development](https://dev.algorand.co/docs/concepts/smart-contracts/overview/). This should not be used as a substitute for an actual audit.
+This task uses [`tealer`](https://github.com/crytic/tealer), a third-party tool, to suggest improvements for your TEAL programs, but remember to always test your smart contracts code, follow modern software engineering practices and use the [guidelines for smart contract development](https://dev.algorand.co/concepts/smart-contracts/overview/). This should not be used as a substitute for an actual audit.

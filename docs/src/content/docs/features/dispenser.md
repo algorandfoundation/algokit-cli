@@ -38,7 +38,7 @@ Options
 
 - `--ci`: Generate an access token for CI. Issued for 30 days.
 - `--output`, -o: Output mode where you want to store the generated access token. Defaults to stdout. Only applicable when --ci flag is set.
-- `--file`, -f: Output filename where you want to store the generated access token. Defaults to `ci_token.txt`. Only applicable when --ci flag is set and --output mode is `file`.
+- `--file`, -f: Output filename where you want to store the generated access token. Defaults to `algokit_ci_token.txt`. Only applicable when --ci flag is set and --output mode is `file`.
 
 > Please note, algokit relies on [keyring](https://pypi.org/project/keyring/) for storing your API credentials. This implies that your credentials are stored in your system's keychain. By default it will prompt for entering your system password unless you have set it up to always allow access for `algokit-cli` to obtain API credentials.
 
@@ -74,7 +74,7 @@ Options
 
 - `--txID`, -t: Transaction ID of your refund operation. This option is required. The receiver address of the transaction must be the same as the dispenser wallet address that you can obtain by observing a `sender` field of [`fund`](#fund) transaction.
 
-> Please note, performing a refund operation will not immediately change your daily fund limit. Your daily fund limit is reset daily at midnigth UTC. If you have reached your daily fund limit, you will not be able to perform a refund operation until your daily fund limit is reset.
+> Please note, performing a refund operation will not immediately change your daily fund limit. Your daily fund limit is reset daily at midnight UTC. If you have reached your daily fund limit, you will not be able to perform a refund operation until your daily fund limit is reset.
 
 ## Limit
 

@@ -244,8 +244,8 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     prompt="Validate asset as NFT? Checks values of `total` and `decimals` as per ARC3 if set to True.",
     default=False,
     callback=_validate_supply_for_nft,
-    help="""Whether the asset should be validated as NFT or FT. Refers to NFT by default and validates canonical
-    definitions of pure or fractional NFTs as per ARC3 standard.""",
+    help="""Whether the asset should be validated as NFT or FT. Refers to FT by default; when `--nft` is set
+    the values of `total` and `decimals` are validated as a pure or fractional NFT per the ARC3 standard.""",
 )
 @click.option(
     "-i",
@@ -272,7 +272,7 @@ def _validate_supply_for_nft(context: click.Context, _: click.Parameter, value: 
     type=click.BOOL,
     prompt="Would you like to make the asset mutable?",
     default=False,
-    help="Whether the asset should be mutable or immutable. Refers to `ARC19` by default.",
+    help="Whether the asset should be mutable or immutable. Refers to `ARC3` (immutable) by default.",
 )
 @click.option(
     "-n",
