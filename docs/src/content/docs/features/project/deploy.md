@@ -17,7 +17,7 @@ This command deploys smart contracts from an AlgoKit compliant repository to the
 ### Options
 
 - `--command, -C TEXT`: Specifies a custom deploy command. If this option is not provided, the deploy command will be loaded from the `.algokit.toml` file.
-- `--interactive / --non-interactive, --ci`: Enables or disables the interactive prompt for mnemonics. When the CI environment variable is set, it defaults to non-interactive.
+- `--interactive / --non-interactive, --ci`: Enables or disables interactive prompts (for mnemonics and the MainNet deployment confirmation). Defaults to non-interactive when the `CI` environment variable is set.
 - `--path, -P DIRECTORY`: Specifies the project directory. If not provided, the current working directory will be used.
 - `--deployer`: Specifies the deployer alias. If not provided and if the deployer is specified in `.algokit.toml` file its mnemonic will be prompted.
 - `--dispenser`: Specifies the dispenser alias. If not provided and if the dispenser is specified in `.algokit.toml` file its mnemonic will be prompted.
@@ -41,19 +41,21 @@ The directory layout would look like this:
 ├── ... (your project files and directories)
 ├── .algokit.toml # Configuration file for AlgoKit
 ├── .env # (OPTIONAL) General environment variables common across all deployments
-└── .env.[{mainnet|testnet|localnet|betanet|custom}] # (OPTIONAL) Environment variables specific to deployments to a network
+└── .env.[{mainnet|testnet|localnet|custom}] # (OPTIONAL) Environment variables specific to deployments to a network
 ```
 
-> ⚠️ Please note that creating `.env` and `.env.[network_name]` files is only necessary if you're deploying to a custom network or if you want to override the default network configurations provided by AlgoKit. AlgoKit comes with predefined configurations for popular networks like `TestNet`, `MainNet`, `BetaNet`, or AlgoKit's `LocalNet`.
+> ⚠️ Please note that creating `.env` and `.env.[network_name]` files is only necessary if you're deploying to a custom network or if you want to override the default network configurations provided by AlgoKit. AlgoKit comes with predefined configurations for `TestNet`, `MainNet`, and AlgoKit's `LocalNet`. Other networks (e.g. `BetaNet`) require an explicit `.env.[network_name]` file.
 
-The logic for loading environment variables is as follows:
+Environment variables are loaded with the following precedence (lowest to highest):
 
-- If a `.env` file exists, the environment variables contained in it are loaded first.
-- If a `.env.[network_name]` file exists, the environment variables in it are loaded, overriding any previously loaded values from the `.env` file for the same variables.
+1. `.env`
+2. `.env.[network_name]`, which overrides values from `.env` for matching keys.
+3. AlgoKit built-in defaults for known networks (see below). These are applied unconditionally when deploying to `localnet`, `testnet`, or `mainnet`, and override any matching keys from the `.env` files.
+4. Process environment variables (i.e. variables set in your shell or CI environment), which override everything else.
 
 ### Default Network Configurations
 
-The `deploy` command assumes default configurations for `mainnet`, `localnet`, and `testnet` environments. If you're deploying to one of these networks and haven't provided specific environment variables, AlgoKit will use these default values:
+When deploying to `localnet`, `testnet`, or `mainnet`, AlgoKit injects the following defaults for the algod and indexer connection variables. As noted above, these are applied after the `.env` files are loaded and will override any matching keys set there. To point at a different node for these networks, set the variable in your shell or CI environment rather than in `.env.[network_name]`.
 
 - **Localnet**:
 
@@ -73,9 +75,7 @@ The `deploy` command assumes default configurations for `mainnet`, `localnet`, a
   - `ALGOD_SERVER`: "https://testnet-api.algonode.cloud"
   - `INDEXER_SERVER`: "https://testnet-idx.algonode.cloud"
 
-These default values are used when no specific `.env.[network_name]` file is present and the corresponding environment variables are not set. This feature simplifies the deployment process for these common networks, reducing the need for manual configuration in many cases.
-
-If you need to override these defaults or add additional configuration for these networks, you can still do so by creating the appropriate `.env.[network_name]` file or setting the environment variables explicitly or via generic `.env` file.
+Variables not listed above (including any custom variables your deploy script needs) follow the normal `.env` → `.env.[network_name]` → process-environment precedence, without any built-in overrides.
 
 ## AlgoKit Configuration File
 
@@ -132,7 +132,7 @@ Root `.algokit.toml`:
 ```toml
 [project]
 type = "workspace"
-projects_root_dir = 'projects'
+projects_root_path = 'projects'
 ```
 
 Contract project `.algokit.toml`:
@@ -154,29 +154,29 @@ This command deploys the smart contracts to TestNet from a sub project named 'my
 
 ## Custom Project Directory
 
-By default, the deploy command looks for the `.algokit.toml` file in the current working directory. You can specify a custom project directory using the `--project-dir` option.
+By default, the deploy command looks for the `.algokit.toml` file in the current working directory. You can specify a custom project directory using the `--path` (`-P`) option.
 
 Example:
 
 ```bash
-algokit project deploy testnet --project-dir="path/to/project"
+algokit project deploy testnet --path="path/to/project"
 ```
 
 ## Custom Deploy Command
 
-You can provide a custom deploy command using the `--custom-deploy-command` option. If this option is not provided, the deploy command will be loaded from the `.algokit.toml` file.
+You can provide a custom deploy command using the `--command` (`-C`) option. If this option is not provided, the deploy command will be loaded from the `.algokit.toml` file.
 
 Example:
 
 ```bash
-algokit project deploy testnet --custom-deploy-command="your-custom-command"
+algokit project deploy testnet --command="your-custom-command"
 ```
 
 >⚠️ Please note, chaining multiple commands with `&&` is **not** currently supported. If you need to run multiple commands, you can defer to a custom script. Refer to [run](/algokit-cli/features/project/run/#custom-command-injection) for scenarios where multiple sub-command invocations are required.
 
 ## CI Mode
 
-By using the `--ci` or `--non-interactive` flag, you can skip the interactive prompt for mnemonics.
+By using the `--ci` or `--non-interactive` flag, you can skip the interactive prompts (including the MainNet deployment confirmation and any mnemonic prompts).
 
 This is useful in CI/CD environments where user interaction is not possible. When using this flag, you need to make sure that the mnemonics are set as environment variables.
 
@@ -203,7 +203,7 @@ In this example, `my_contract_name` and `--some_contract_related_param` are extr
 ## Example of a Full Deployment
 
 ```bash
-algokit project deploy testnet --custom-deploy-command="your-custom-command"
+algokit project deploy testnet --command="your-custom-command"
 ```
 
 This example shows how to deploy smart contracts to the testnet using a custom deploy command. This also assumes that .algokit.toml file is present in the current working directory, and .env.testnet file is present in the current working directory and contains the required environment variables for deploying to TestNet environment.

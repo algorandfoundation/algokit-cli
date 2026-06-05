@@ -9,14 +9,15 @@ The Algorand AlgoKit CLI is the one-stop shop tool for developers building on th
 For details on how to use individual features see the following
 
 - [Bootstrap](/algokit-cli/features/project/bootstrap/) - Bootstrap AlgoKit project dependencies
-- [Compile](/algokit-cli/features/compile/) - Compile Algorand Python code
+- [Compile](/algokit-cli/features/compile/) - Compile Algorand smart contracts (Python and TypeScript)
 - [Completions](/algokit-cli/features/completions/) - Install shell completions for AlgoKit
+- [Config](/algokit-cli/features/config/) - Configure AlgoKit settings
 - [Deploy](/algokit-cli/features/project/deploy/) - Deploy your smart contracts effortlessly to various networks
 - [Dispenser](/algokit-cli/features/dispenser/) - Fund your TestNet account with ALGOs from the AlgoKit TestNet Dispenser
 - [Doctor](/algokit-cli/features/doctor/) - Check AlgoKit installation and dependencies
 - [Explore](/algokit-cli/features/explore/) - Explore Algorand Blockchains using lora
 - [Generate](/algokit-cli/features/generate/) - Generate code for an Algorand project
-- [Goal](/algokit-cli/features/goal/) - Run the Algorand goal CLI against the AlgoKit Sandbox
+- [Goal](/algokit-cli/features/goal/) - Run the Algorand goal CLI against the AlgoKit LocalNet
 - [Init](/algokit-cli/features/init/) - Quickly initialize new projects using official Algorand Templates or community provided templates
 - [LocalNet](/algokit-cli/features/localnet/) - Manage a locally sandboxed private Algorand network
 - [Project](/algokit-cli/features/project/) - Manage an AlgoKit project workspace on your file system

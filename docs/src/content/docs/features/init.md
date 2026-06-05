@@ -10,7 +10,7 @@ For a quick start template with all of the defaults you can run: `algokit init` 
 
 ## Prerequisites
 
-Git is a prerequisite for the init command as it is used to clone templates and initialize git repos. Please consult the [README](../../README.md#prerequisites) for installation instructions.
+Git is a prerequisite for the init command as it is used to clone templates and initialize git repos. Please consult the [README](https://github.com/algorandfoundation/algokit-cli#prerequisites) for installation instructions.
 
 ## Functionality
 
@@ -18,11 +18,11 @@ As outlined in [quick start](#quick-start), the simplest use of the command is t
 
 ```bash
 algokit init
-? Which of these options best describes the project you want to start? `Smart Contract` | `Dapp Frontend` | `Smart Contract & Dapp Frontend` | `Custom`
+? Which of these options best describes the project you want to build? `Smart Contracts 📜` | `DApp Frontend 🖥️` | `Smart Contracts & DApp Frontend 🎛️` | `Custom Template 🛠️`
 ? Name of project / directory to create the project in:  my-cool-app
 ```
 
-Once above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. By default official templates such as `python`, `typescript`, `fullstack`, `react`, `python` include a notion of a `preset`. If you want to skip all questions and let the tool preset the answers tailored for a starter project you can pick `Starter`, for a more advanced project that includes unit tests, CI automation and other advanced features, pick `Production`. Lastly, if you prefer to modify the experience and tailor the template to your needs, pick the `Custom` preset.
+Once the above 2 questions are answered, the `cli` will start instantiating the project and will start asking questions specific to the template you are instantiating. Many official templates (e.g. `python`, `typescript`, `fullstack`, `react`) expose their own template-level `preset` question via Copier; typical options include `Starter` (skip remaining questions and accept starter-tier answers), `Production` (a more advanced setup with unit tests, CI automation and other extras) or `Custom` (answer each question yourself). The exact presets and their behaviour are defined by the selected template, not by AlgoKit itself.
 
 If you want to accept the default for each option simply hit [enter] or alternatively to speed things up you can run `algokit init --defaults` and they will be auto-accepted.
 
@@ -38,11 +38,11 @@ For more details on workspaces and standalone projects, refer to the [AlgoKit Pr
 
 ## Bootstrapping
 
-You will also be prompted if you wish to run the [bootstrap](/algokit-cli/cli/#bootstrap) command, this is useful if you plan to immediately begin developing in the new project. If you passed in `--defaults` or `--bootstrap` then it will automatically run bootstrapping unless you passed in `--no-bootstrap`.
+You will also be prompted if you wish to run the [project bootstrap](/algokit-cli/cli/#bootstrap) command, this is useful if you plan to immediately begin developing in the new project. If you passed in `--defaults` or `--bootstrap` then it will automatically run bootstrapping unless you passed in `--no-bootstrap`.
 
 ```bash
 
-? Do you want to run `algokit bootstrap` to bootstrap dependencies for this new project so it can be run immediately? Yes
+? Do you want to run `algokit project bootstrap` for this new project? This will install and configure dependencies allowing it to be run immediately. Yes
 Installing Python dependencies and setting up Python virtual environment via Poetry
 poetry: Creating virtualenv my-smart-contract in /Users/algokit/algokit-init/my-smart-contract/.venv
 poetry: Updating dependencies
@@ -71,7 +71,7 @@ As a suggestion, if you wanted to open the project in VS Code you could execute:
 
 After bootstrapping you are also given the opportunity to initialize a git repo, upon successful completion of the init command the project is ready to be used. If you pass in `--git` it will automatically initialise the git repository and if you pass in `--no-git` it won't.
 
-> Please note, when using `--no-workspaces`, algokit init will assume a max lookup depth of 1 for a fresh template based project. Otherwise it will assume a max depth of 2, since default algokit workspace structure is at most 2 levels deep.
+> Please note, when using `--no-workspace`, algokit init will assume a max lookup depth of 1 for a fresh template based project. Otherwise it will assume a max depth of 2, since default algokit workspace structure is at most 2 levels deep.
 
 ## Options
 
@@ -97,7 +97,7 @@ Please inspect the template repository, and pay particular attention to the valu
 
 ```
 
-If you want to create a community template, you can use the [AlgoKit guidelines on template building](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/tutorials/algokit-template.md#creating-algokit-templates) and [Copier documentation](https://copier.readthedocs.io/en/stable/) as a starting point.
+If you want to create a community template, you can use the [AlgoKit guidelines on template building](/algokit-cli/tutorials/algokit-template/) and [Copier documentation](https://copier.readthedocs.io/en/stable/) as a starting point.
 
 ## Template Answers
 
@@ -140,7 +140,7 @@ algokit init example -l/--list
 algokit init example <example_id>
 ```
 
-When run without an example ID, the command launches an interactive selector that displays available examples with their descriptions and categories. Examples are copied to a new directory in your current location, named after the example ID.
+When run without an example ID, the command launches an interactive selector that displays available examples with their name and type. Examples are copied to a new directory in your current location, named after the example ID.
 
 ### Available Examples
 

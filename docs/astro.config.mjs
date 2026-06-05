@@ -1,6 +1,7 @@
 // @ts-check
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import mermaid from "astro-mermaid";
 import remarkGithubAlerts from "remark-github-alerts";
 import sidebar from "./sidebar.config.json";
 
@@ -12,6 +13,7 @@ export default defineConfig({
     remarkPlugins: [remarkGithubAlerts],
   },
   integrations: [
+    mermaid({ theme: "default", autoTheme: true }),
     starlight({
       title: "AlgoKit CLI",
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 4 },

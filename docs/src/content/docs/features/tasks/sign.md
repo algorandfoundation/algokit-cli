@@ -57,19 +57,19 @@ This will write the signed transaction to the specified file.
 
 ## Goal Compatibility
 
-Please note, at the moment this feature only supports [`goal clerk`](https://dev.algorand.co/algokit/algokit-cli/goal/) compatible transaction objects.
+Please note, at the moment this feature only supports [`goal clerk`](https://developer.algorand.org/docs/clis/goal/goal/) compatible transaction objects.
 
 When `--output` option is not specified, the signed transaction(s) will be output to the console in a following JSON format:
 
 ```
 [
-  {transaction_id: "TRANSACTION_ID", content: "BASE64_ENCODED_SIGNED_TRANSACTION"},
+  {"transaction_id": "TRANSACTION_ID", "content": "BASE64_ENCODED_SIGNED_TRANSACTION"}
 ]
 ```
 
 On the other hand, when `--output` option is specified, the signed transaction(s) will be stored to a file as a message pack encoded binary file.
 
-### Encoding transactins for signing
+### Encoding transactions for signing
 
 Algorand provides a set of options in [py-algorand-sdk](https://github.com/algorand/py-algorand-sdk) and [js-algorand-sdk](https://github.com/algorand/js-algorand-sdk) to encode transactions for signing.
 

@@ -24,7 +24,7 @@ You can either specify a path to an ARC-0032 JSON file, an ARC-0056 JSON file or
 The output path is interpreted as relative to the current working directory, however an absolute path may also be specified e.g.
 `algokit generate client application.json --output /absolute/path/to/client.py`
 
-There are two tokens available for use with the `-o`, `--output` [option](/algokit-cli/cli/#-o---output-output_path_pattern):
+There are two tokens available for use with the `-o`, `--output` [option](/algokit-cli/cli/#-o-output-output_path_pattern):
 
 - `{contract_name}`: This will resolve to a name based on the ARC-0032/ARC-0056 contract name, formatted appropriately for the target language.
 - `{app_spec_dir}`: This will resolve to the parent directory of the `application.json`, `*.arc32.json`, `*.arc56.json` file which can be useful to output a client relative to its source file.
@@ -78,7 +78,7 @@ const appClient = new HelloWorldAppClient(
     sender: deployer,
     creatorAddress: deployer.addr,
   },
-  algod
+  algod,
 );
 const app = await appClient.deploy({
   allowDelete: isLocal,
@@ -98,7 +98,7 @@ To process multiple application.json in a directory structure and output to a ty
 `algokit generate client smart_contracts/artifacts --output {contract_name}.ts`
 
 To process multiple application.json in a directory structure and output to a python client alongside each application.json:
-`algokit generate client smart_contracts/artifacts --output {app_spec_path}/client.py`
+`algokit generate client smart_contracts/artifacts --output {app_spec_dir}/client.py`
 
 ## 2. Using Custom Generate Commands
 
@@ -162,7 +162,7 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  client          Create a typed ApplicationClient from an ARC-32 application.json
+  client          Create a typed ApplicationClient from an ARC-32/56 application.json
   smart-contract  Adds a new smart contract to the existing project
 ```
 

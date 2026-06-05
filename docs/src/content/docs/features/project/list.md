@@ -16,18 +16,20 @@ algokit project list [OPTIONS] [WORKSPACE_PATH]
 
 ## How It Works
 
-1. **Workspace Verification**: Initially, the command checks if the specified directory (or the current directory by default) is an AlgoKit workspace. This is determined by looking for a `.algokit.toml` configuration file and verifying if the `project.type` is set to `workspace`.
+1. **Workspace Verification**: Initially, the command checks if the specified directory (or the current directory by default) is an AlgoKit workspace. This is determined by looking for a `.algokit.toml` configuration file and verifying if the `project.type` is set to `workspace`. If the starting directory is not a workspace, the command walks up to two parent directories looking for one, which is why it can be invoked anywhere within a workspace.
 
-2. **Project Enumeration**: If the directory is confirmed as a workspace, the command proceeds to enumerate all projects within the workspace. This is achieved by scanning the workspace's subdirectories for `.algokit.toml` files and extracting project names.
+2. **Project Enumeration**: If a workspace is found, the command enumerates its sub-projects by reading the `project.projects_root_path` defined in the workspace's `.algokit.toml`, then iterating over immediate subdirectories of that path which themselves contain an `.algokit.toml`. The results are sorted alphanumerically by directory name.
 
-3. **Output**: The names of all discovered projects are printed to the console. If the `-v` or `--verbose` option is used, additional details about each project are displayed.
+3. **Output**: The command first prints the workspace header with the resolved workspace path, followed by each sub-project's name and directory. A project's directory is shown as `this directory` only when it equals the current working directory; otherwise the absolute path is shown.
 
 ## Example Output
 
+Run from inside the workspace root with two sub-projects (a contract and a frontend):
+
 ```bash
-workspace: {path_to_workspace} 📁
-  - myapp ({path_to_myapp}) 📜
-  - myproject-app ({path_to_myproject_app}) 🖥️
+workspace: /path/to/workspace 📁
+  - myapp (/path/to/workspace/projects/myapp) 📜
+  - myproject-app (/path/to/workspace/projects/myproject-app) 🖥️
 ```
 
 ## Error Handling
@@ -38,7 +40,13 @@ If the command is executed in a directory that is not recognized as an AlgoKit w
 WARNING: No AlgoKit workspace found. Check [project.type] definition at .algokit.toml
 ```
 
-This message indicates that either the current directory does not contain a `.algokit.toml` file or the `project.type` within the file is not set to `workspace`.
+This message indicates that no `.algokit.toml` with `project.type = "workspace"` was found in the target directory or its parents (up to two levels up).
+
+If a workspace is found but contains no sub-projects, a different warning is emitted:
+
+```bash
+WARNING: No AlgoKit project(s) found in the workspace. Check [project.type] definition at .algokit.toml
+```
 
 ## Further Reading
 

@@ -8,21 +8,25 @@ AlgoKit supports shell completions for zsh and bash shells, e.g.
 
 ```bash
 algokit <Press Tab>
-bootstrap    completions  config       doctor       explore      goal         init         sandbox
+compile      completions  config       dispenser    doctor       explore      generate     goal         init         localnet     project      task
 ```
 
 **zsh**
 
-```bash
+```zsh
 algokit <Press Tab>
-bootstrap    -- Bootstrap AlgoKit project dependencies.
-completions  -- Install and Uninstall AlgoKit shell integration.
-config       -- Configure AlgoKit options.
-doctor       -- Run the Algorand doctor CLI.
-explore      -- Explore the specified network in the...
-goal         -- Run the Algorand goal CLI against the AlgoKit Sandbox.
-init         -- Initializes a new project.
-sandbox      -- Manage the AlgoKit sandbox.
+compile      -- Compile smart contracts and smart signatures...
+completions  -- Install and Uninstall AlgoKit shell integrations.
+config       -- Configure AlgoKit settings.
+dispenser    -- Interact with the AlgoKit TestNet Dispenser.
+doctor       -- Diagnose potential environment issues that may affect AlgoKit.
+explore      -- Explore the specified network using lora.
+generate     -- Generate code for an Algorand project.
+goal         -- Run the Algorand goal CLI against the AlgoKit LocalNet.
+init         -- Initializes a new project from a template;...
+localnet     -- Manage the AlgoKit LocalNet.
+project      -- Provides a suite of commands for managing your...
+task         -- Collection of useful tasks to help you...
 ```
 
 ## Installing
@@ -53,6 +57,6 @@ AlgoKit completions uninstalled for zsh 🎉
 
 ## Shell Option
 
-To install/uninstall the completions for a specific [shell](/algokit-cli/cli/#--shell-) the `--shell` option can be used e.g. `algokit completions install --shell bash`.
+To install/uninstall the completions for a specific [shell](/algokit-cli/cli/#shell) the `--shell` option can be used e.g. `algokit completions install --shell bash`.
 
 To learn more about the `algokit completions` command, please refer to [completions](/algokit-cli/cli/#completions) in the AlgoKit CLI reference documentation.

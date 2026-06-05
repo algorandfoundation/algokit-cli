@@ -2,7 +2,7 @@
 title: "AlgoKit Goal"
 ---
 
-AlgoKit goal command provides the user with a mechanism to run [goal cli](https://dev.algorand.co/algokit/algokit-cli/goal/) commands against the current [AlgoKit LocalNet](/algokit-cli/features/localnet/).
+AlgoKit goal command provides the user with a mechanism to run [goal cli](https://developer.algorand.org/docs/clis/goal/goal/) commands against the current [AlgoKit LocalNet](/algokit-cli/features/localnet/).
 
 You can explore all possible goal commands by running `algokit goal` e.g.:
 
@@ -66,18 +66,11 @@ algokit goal report
  Genesis hash: vEg1NCh6SSXwS6O5HAfjYCCNAs4ug328s3RYMr9syBg=
 ```
 
-If the AlgoKit Sandbox `algod` docker container is not present or not running, the command will fail with a clear error, e.g.:
+If the AlgoKit LocalNet `algod` docker container is not running, AlgoKit will automatically attempt to start it for you. If the LocalNet definition is out of date, you will see an error such as:
 
 ```bash
 algokit goal
- Error: No such container: algokit_algod
- Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
-```
-
-```bash
-algokit goal
- Error response from daemon: Container 5a73961536e2c98e371465739053d174066c40d00647c8742f2bb39eb793ed7e is not running
- Error: Error executing goal; ensure the Sandbox is started by executing `algokit sandbox status`
+ Error: LocalNet definition is out of date; please run `algokit localnet reset` first!
 ```
 
 ## Working with Files in the Container
@@ -101,10 +94,10 @@ Here, `/Path/to/inputfile/approval.teal` and `/Path/to/outputfile/approval.compi
 In case you want to manually copy files into the container, you can do so using `docker cp`:
 
 ```bash
-docker cp foo.txt algokit_algod:/root
+docker cp foo.txt algokit_sandbox_algod:/root
 ```
 
-This command copies the `foo.txt` from your local system into the root directory of the `algokit_algod` container.
+This command copies the `foo.txt` from your local system into the root directory of the `algokit_sandbox_algod` container.
 
 Note: Manual copying is optional and generally only necessary if you have specific reasons for doing so since the system will auto-mount paths specified in commands.
 

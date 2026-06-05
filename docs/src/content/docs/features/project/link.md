@@ -16,9 +16,9 @@ This command must be invoked from the root of a standalone 'frontend' typed proj
 
 ## Options
 
-- `--project-name`, `-p`: Specify one or more contract projects for the command. If not provided, the command defaults to all contract projects in the current workspace. This option can be repeated to specify multiple projects.
+- `--project-name`, `-p`: Specify one or more contract projects for the command. If neither this option nor `--all` is provided, you will be prompted to interactively select a single contract project from the workspace. This option can be repeated to specify multiple projects.
 
-- `--language`, `-l`: Set the programming language of the generated client code. The default is `typescript`, but you can specify other supported languages as well.
+- `--language`, `-l`: Set the programming language of the generated client code. The default is `typescript`. The supported values are `typescript` and `python`.
 
 - `--all`, `-a`: Link all contract projects with the frontend project. This option is mutually exclusive with `--project-name`.
 
@@ -32,13 +32,9 @@ Below is a visual representation of the `algokit project link` command in action
 
 ```mermaid
 graph LR
-    F[Frontend Project] -->|algokit generate client| C1[Contract Project 1]
-    F -->|algokit generate client| C2[Contract Project 2]
-    F -->|algokit generate client| CN[Contract Project N]
-
-    C1 -->|algokit generate client| F
-    C2 -->|algokit generate client| F
-    CN -->|algokit generate client| F
+    C1[Contract Project 1] -->|algokit generate client| F[Frontend Project]
+    C2[Contract Project 2] -->|algokit generate client| F
+    CN[Contract Project N] -->|algokit generate client| F
 
     classDef frontend fill:#f9f,stroke:#333,stroke-width:4px;
     classDef contract fill:#bbf,stroke:#333,stroke-width:2px;
@@ -50,7 +46,7 @@ graph LR
 
 2. **Contract Project Selection**: Based on the provided options, it selects the contract projects to link. This can be all contract projects within the workspace, a subset specified by name, or a single project selected interactively.
 
-3. **Client Code Generation**: For each selected contract project, it generates typed client code using the specified language. The generated code is placed in the frontend project's directory specified for contract clients.
+3. **Client Code Generation**: For each selected contract project, it generates typed client code using the specified language. The generated code is written into the directory the frontend project advertises via the `artifacts` key under `[project]` in its `.algokit.toml`.
 
 4. **Feedback**: The command provides feedback for each contract project it processes, indicating success or failure in generating the client code.
 

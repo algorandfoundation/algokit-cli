@@ -20,7 +20,7 @@ We will also refer to the official [`algokit-python-template`](https://github.co
   - [Bootstrap Option](#bootstrap-option)
   - [Predefined Copier Answers](#predefined-copier-answers)
   - [Default Behaviors](#default-behaviors)
-  - [Generators](#generators)
+  - [Generators](#working-with-generators)
 - [Recommendations](#recommendations)
 - [Conclusion](#conclusion)
 
@@ -104,13 +104,15 @@ This example shows how Jinja syntax is used within `package.json` to allow place
 
 ### Bootstrap Option
 
-When instantiating your template via AlgoKit CLI it will optionally prompt the user to automatically run [algokit bootstrap](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/bootstrap.md) after the project is initialized and can perform various setup tasks like installing dependencies or setting up databases.
+When instantiating your template via AlgoKit CLI it will optionally prompt the user to automatically run [algokit project bootstrap](/algokit-cli/features/project/bootstrap/) after the project is initialized and can perform various setup tasks like installing dependencies or setting up environment variables.
 
 - `env`: Searches for and copies an `.env*.template` file to an equivalent `.env*` file in the current working directory, prompting for any unspecified values. This feature is integral for securely managing environment variables, as it prevents sensitive data from inadvertently ending up in version control.
-  By default, Algokit will scan for network-prefixed `.env` variables (e.g., `.env.localnet`), which can be particularly useful when relying on the [Algokit deploy command](https://github.com/algorandfoundation/algokit-cli/blob/deploy-command/docs/features/deploy.md). If no such prefixed files are located, Algokit will then attempt to load default `.env` files. This functionality provides greater flexibility for different network configurations.
+  By default, Algokit will scan for network-prefixed `.env` variables (e.g., `.env.localnet`), which can be particularly useful when relying on the [Algokit deploy command](/algokit-cli/features/project/deploy/). If no such prefixed files are located, Algokit will then attempt to load default `.env` files. This functionality provides greater flexibility for different network configurations.
 
 - `poetry`: If your Python project uses Poetry for dependency management, the `poetry` command installs Poetry (if not present) and runs `poetry install` in the current working directory to install Python dependencies.
-- `npm`: If you're developing a JavaScript or TypeScript project, the `npm` command runs npm install in the current working directory to install Node.js dependencies.
+- `uv`: If your Python project uses uv for dependency management, the `uv` command installs uv (if not present) and runs `uv sync` in the current working directory to install Python dependencies.
+- `npm`: If you're developing a JavaScript or TypeScript project, the `npm` command runs `npm install` in the current working directory to install Node.js dependencies.
+- `pnpm`: Alternatively, the `pnpm` command runs `pnpm install` in the current working directory to install Node.js dependencies.
 - `all`: The `all` command runs all the aforementioned bootstrap sub-commands in the current directory and its subdirectories. This command is a comprehensive way to ensure all project dependencies and environment variables are properly set up.
 
 ### Predefined Copier Answers
@@ -133,11 +135,11 @@ This would prompt the user for the project name, and the input can then be used 
 
 When creating an AlgoKit template, there are a few default behaviors that you can expect to be provided by algokit-cli itself without introducing any extra code to your templates:
 
-- **Git**: If Git is installed on the user's system and the user's working directory is a Git repository, AlgoKit CLI will commit the newly created project as a new commit in the repository. This feature helps to maintain a clean version history for the project. If you wish to add a specific commit message for this action, you can specify a `commit_message` in the `_commit` option in your `copier.yaml` file.
+- **Git**: If Git is installed on the user's system and the user's working directory is not already a Git repository, AlgoKit CLI will initialize a new Git repository in the project directory and create an initial commit capturing the newly generated project. This feature helps to maintain a clean version history for the project.
 
-- **VSCode**: If the user has Visual Studio Code (VSCode) installed and the path to VSCode is added to their system's PATH, AlgoKit CLI will automatically open the newly created VSCode window unless user provides specific flags into the init command.
+- **VSCode**: If the user has Visual Studio Code (VSCode) installed and the path to VSCode is added to their system's PATH, AlgoKit CLI will automatically open the newly created project in VSCode unless the user passes `--no-ide` to the init command.
 
-- **Bootstrap**: AlgoKit CLI is equipped to execute a bootstrap script after a project has been initialized. This script, included in AlgoKit templates, can be automatically run to perform various setup tasks, such as installing dependencies or setting up databases. This is managed by AlgoKit CLI and not within the user-created codebase. By default, if a `bootstrap` task is defined in the `copier.yaml`, AlgoKit CLI will execute it, unless the user opts out during the prompt.
+- **Bootstrap**: After a project has been initialized, AlgoKit CLI can run `algokit project bootstrap` on the new project to perform various setup tasks, such as installing dependencies (Poetry, uv, npm, pnpm) and populating `.env` files from `.env*.template` files. This is managed by AlgoKit CLI and not within the user-created codebase. By default, AlgoKit CLI will prompt the user to run bootstrap unless `--bootstrap`/`--no-bootstrap` or `--defaults` are provided.
 
 By combining predefined Copier answers with these default behaviors, you can create a smooth, efficient, and intuitive initialization experience for the users of your template.
 
@@ -181,10 +183,10 @@ For example, the official [`algokit-python-template`](https://github.com/algoran
 Outlined below are the fundamental steps to create a generator. Although `copier` provides complete autonomy in structuring your template, you may prefer to define your generator to meet your specific needs. Nevertheless, as a starting point, we suggest:
 
 1. Generate a new directory hierarchy within your template directory under the `.algokit/generators` folder (this is merely a suggestion, you can define your custom path if necessary and point to it via the algokit.toml file).
-2. Develop a `copier.yaml` file within the generator directory and outline the generator's behavior. This file bears similarities with the root `copier.yaml` file in your template directory, but it is exclusively for the generator. The `tasks` section of the `copier.yaml` file is where you can determine the generator's behavior. Here's an example of a generator that copies the `smart-contract` directory from the template to the current working directory:
+2. Develop a `copier.yaml` file within the generator directory and outline the generator's behavior. This file bears similarities with the root `copier.yaml` file in your template directory, but it is exclusively for the generator. The `_tasks` section of the `copier.yaml` file is where you can determine the generator's behavior. Here's an example of a generator that copies the `smart-contract` directory from the template to the current working directory:
 
 ```yaml
-_task:
+_tasks:
   - "echo '==== Successfully initialized new smart contract 🚀 ===='"
 
 contract_name:
@@ -213,7 +215,7 @@ This should dynamically load and display your generator as an optional `cli` com
 - **Versioning**: Use `.algokit.toml` to specify the minimum compatible version of AlgoKit.
 - **Testing**: Include test configurations and scripts in your templates to encourage testing best practices.
 - **Linting and Formatting**: Integrate linters and code formatters in your templates to ensure code quality.
-- **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/algokit.md#guiding-principles).
+- **Algokit Principle**: for details on generic principles on designing templates refer to [algokit design principles](/algokit-cli/features/overview/#guiding-principles).
 
 ## Conclusion
 

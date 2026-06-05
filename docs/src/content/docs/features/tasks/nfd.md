@@ -40,7 +40,7 @@ This will perform a lookup and return the associated address or domain. If you w
 algokit task nfd-lookup {NFD_DOMAIN_OR_ALGORAND_ADDRESS} --output full
 ```
 
-If the lookup is successful, the result will be output to the console in a JSON format.
+If the lookup is successful, the result will be output to the console. With the default `address` output format the resolved address or domain is printed as a plain string; with the `full` or `tiny` output formats the NFD API response is printed as indented JSON.
 
 ## Further Reading
 

@@ -21,7 +21,7 @@ This guide presents installing AlgoKit using an OS agnostic procedure. For OS sp
 Before proceeding, ensure you have the following components installed:
 
 - [git](https://github.com/git-guides/install-git#install-git)
-- [Docker](https://docs.docker.com/desktop/install/mac-install/) (or [Podman](https://podman.io/getting-started/installation/), see [details](/algokit-cli/features/localnet/#podman-support))
+- [Docker](https://docs.docker.com/desktop/install/mac-install/) (or [Podman](https://podman.io/docs/installation), see [details](/algokit-cli/features/localnet/#podman-support))
 - [VSCode](https://code.visualstudio.com/download)
 
 ## Install AlgoKit
@@ -57,7 +57,7 @@ algokit --version
 Output similar to the following should be displayed:
 
 ```shell
-algokit, version 2.0.3 # or higher
+algokit, version 2.10.2 # or higher
 ```
 
 ## Start a LocalNet

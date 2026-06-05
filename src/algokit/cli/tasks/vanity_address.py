@@ -97,7 +97,7 @@ def _store_vanity_to_alias(*, alias: str, vanity_account: VanityAccount, force: 
     required=False,
     default=False,
     type=click.BOOL,
-    help="Allow overwriting an aliases without confirmation, if output option is 'alias'.",
+    help="Allow overwriting aliases without confirmation, if output option is 'alias'.",
 )
 def vanity_address(  # noqa: PLR0913
     *,

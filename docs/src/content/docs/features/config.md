@@ -17,13 +17,12 @@ Subcommands
 ### Version Prompt Configuration
 
 ```bash
-algokit config version-prompt [OPTIONS]
+algokit config version-prompt [OPTIONS] [ENABLE]
 ```
 
 This command configures the version prompt settings for AlgoKit.
 
-- `--enable`: Enable the version prompt.
-- `--disable`: Disable the version prompt.
+- `ENABLE`: Optional positional argument; one of `enable` or `disable`. If omitted, the command prints the current setting (`enable` or `disable`) instead of changing it.
 
 ### Container Engine Configuration
 
@@ -31,10 +30,10 @@ This command configures the version prompt settings for AlgoKit.
 algokit config container-engine [OPTIONS] [ENGINE]
 ```
 
-This command configures the container engine settings for AlgoKit.
+This command sets the default container engine used by AlgoKit CLI to run LocalNet images.
 
 - `--force`, `-f`: Skip confirmation prompts. Defaults to 'yes' to all prompts.
-- `ENGINE`: Optional argument to specify the container engine (docker or podman).
+- `ENGINE`: Optional argument to specify the container engine (docker or podman). If omitted, AlgoKit will prompt you to select one interactively.
 
 ### JavaScript Package Manager Configuration
 

@@ -22,8 +22,8 @@ Options:
   -o, --output [stdout|alias|file]
                                   How the output will be presented.
   -a, --alias TEXT                Alias for the address. Required if output is "alias".
-  --file-path PATH                File path where to dump the output. Required if output is "file".
-  -f, --force                     Allow overwriting an aliases without confirmation, if output option is 'alias'.
+  --file-path FILE                File path where to dump the output. Required if output is "file".
+  -f, --force                     Allow overwriting aliases without confirmation, if output option is 'alias'.
   -h, --help                      Show this message and exit.
 ```
 
@@ -38,13 +38,13 @@ algokit task vanity-address ALGO
 Generate a vanity address with the keyword "ALGO" at the start of the address with output to a file:
 
 ```bash
-algokit task vanity-address ALGO -o file -f vanity-address.txt
+algokit task vanity-address ALGO -o file --file-path vanity-address.txt
 ```
 
 Generate a vanity address with the keyword "ALGO" anywhere in the address with output to a file:
 
 ```bash
-algokit task vanity-address ALGO -m anywhere -o file -f vanity-address.txt
+algokit task vanity-address ALGO -m anywhere -o file --file-path vanity-address.txt
 ```
 
 Generate a vanity address with the keyword "ALGO" at the start of the address and store into a [wallet alias](/algokit-cli/features/tasks/wallet/):

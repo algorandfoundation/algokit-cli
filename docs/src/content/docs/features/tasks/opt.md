@@ -27,7 +27,7 @@ Options:
 ```bash
 Usage: algokit task opt-out [OPTIONS] [ASSET_IDS]...
 
-  Opt-out of an asset(s). You can only opt out of an asset with a zero balance.
+  opt-out of an asset(s). You can only opt out of an asset with a zero balance.
   Use -n to specify localnet, testnet, or mainnet. To supply multiple asset IDs, separate them with a whitespace.
 
 Options:
@@ -70,4 +70,4 @@ algokit task opt-out --account {YOUR_ACCOUNT} --all
 
 ## Further Reading
 
-For in-depth details, visit the [opt-in](/algokit-cli/cli/#opt-in) and [opt-out](../../cli/index#opt-out) sections in the AlgoKit CLI reference documentation.
+For in-depth details, visit the [opt-in](/algokit-cli/cli/#opt-in) and [opt-out](/algokit-cli/cli/#opt-out) sections in the AlgoKit CLI reference documentation.

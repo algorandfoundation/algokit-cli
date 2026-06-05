@@ -63,20 +63,20 @@ If it's the first time running it on your machine then it will download the foll
 
 - [`algorand/algod`](https://hub.docker.com/r/algorand/algod) (~500 MB)
 - [`algorand/indexer`](https://hub.docker.com/r/algorand/indexer) (~96 MB)
-- [`algorand/conduit`](https://hub.docker.com/r/algorand/conduit) (~98 MB)
-- [`postgres:13-alpine`](https://hub.docker.com/_/postgres) (~80 MB)
+- [`algorandfoundation/conduit-localnet`](https://hub.docker.com/r/algorandfoundation/conduit-localnet) (~98 MB)
+- [`postgres:16-alpine`](https://hub.docker.com/_/postgres) (~100 MB)
 
-Once they have downloaded, it won't try and re-download images unless you perform a `algokit localnet reset`.
+Once they have downloaded, AlgoKit will not re-download images unless you run `algokit localnet reset --update`.
 
 Once the LocalNet has started, the following endpoints will be available:
 
-- [algod](https://dev.algorand.co/reference/rest-apis/algod/):
+- [algod](https://dev.algorand.co/reference/rest-api/algod/):
   - address: <http://localhost:4001>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
-- [kmd](https://dev.algorand.co/reference/rest-apis/kmd/):
+- [kmd](https://dev.algorand.co/reference/rest-api/kmd/):
   - address: <http://localhost:4002>
   - token: `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
-- [indexer](https://dev.algorand.co/reference/rest-apis/indexer/):
+- [indexer](https://dev.algorand.co/reference/rest-api/indexer/):
   - address: <http://localhost:8980>
 - tealdbg port:
   - address: <http://localhost:9392>
@@ -128,7 +128,7 @@ If you change this setting for an existing LocalNet instance, AlgoKit will promp
 
 To stop the LocalNet you can execute `algokit localnet stop`. This will turn off the containers, but keep them ready to be started again in the same state by executing `algokit localnet start`.
 
-To reset the LocalNet you can execute `algokit localnet reset`, which will tear down the existing containers, refresh the container definition from the latest stored within AlgoKit and update to the latest Docker images. If you want to keep the same container spec and versions as you currently have, but quickly tear down and start a new instance then run `algokit localnet reset --no-update`.
+To reset the LocalNet you can execute `algokit localnet reset`, which will tear down the existing containers and refresh the container definition from the latest stored within AlgoKit. By default it does not pull new Docker images; pass `--update` to also pull the latest images (e.g. `algokit localnet reset --update`).
 
 ### Viewing transactions in the LocalNet
 
@@ -141,7 +141,7 @@ See the [AlgoKit Goal](/algokit-cli/features/goal/) feature. You can also execut
 Note: if you want to copy files into the container so you can access them via goal then you can use the following:
 
 ```
-docker cp foo.txt algokit_algod:/root
+docker cp foo.txt algokit_sandbox_algod:/root
 ```
 
 ### Getting access to the private key of the faucet account
@@ -163,14 +163,14 @@ Needing to do this manual step every time you spin up a new development environm
 
 AlgoKit Utils provides methods to help you do this:
 
-- TypeScript - [`ensureFunded`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#ensurefunded) and [`getDispenserAccount`](https://github.com/algorandfoundation/algokit-utils-ts/blob/main/docs/capabilities/transfer.md#dispenser)
-- Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/html/apidocs/algokit_utils/algokit_utils.html#algokit_utils.get_dispenser_account)
+- TypeScript - [`ensureFunded`](https://algorandfoundation.github.io/algokit-utils-ts/concepts/building/transfer/#ensurefunded) and [`getDispenserAccount`](https://algorandfoundation.github.io/algokit-utils-ts/concepts/building/transfer/#dispenser)
+- Python - [`ensure_funded`](https://algorandfoundation.github.io/algokit-utils-py/concepts/building/transfer/#ensure_funded) and [`get_dispenser_account`](https://algorandfoundation.github.io/algokit-utils-py/concepts/building/transfer/#dispenser)
 
 For more details about the `AlgoKit localnet` command, please refer to the [AlgoKit CLI reference documentation](/algokit-cli/cli/#localnet).
 
 ## GitHub Codespaces-based LocalNet
 
-The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by utilizing the [GitHub CLI](https://github.com/cli/gh). This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
+The AlgoKit LocalNet feature also supports running the LocalNet in a GitHub Codespace with port forwarding by utilizing the [GitHub CLI](https://github.com/cli/cli). This allows you to run the LocalNet without the need to use Docker. This is especially useful for scenarios where certain hardware or software limitations may prevent you from being able to run Docker.
 
 To run the LocalNet in a GitHub Codespace, you can use the `algokit localnet codespace` command.
 By default without `--force` flag it will prompt you to delete stale codespaces created earlier (if any). Upon termination it will also prompt to delete the codespace that was used prior to termination.
@@ -179,13 +179,13 @@ Running an interactive session ensures that you have control over the lifecycle 
 
 ### Options
 
-- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/overview/machine-types) for more details.
+- `-m`, `--machine`: Specifies the GitHub Codespace machine type to use. Defaults to `basicLinux32gb`. Available options are `basicLinux32gb`, `standardLinux32gb`, `premiumLinux`, and `largePremiumLinux`. Refer to [GitHub Codespaces documentation](https://docs.github.com/en/codespaces/customizing-your-codespace/changing-the-machine-type-for-your-codespace) for more details.
 - `-a`, `--algod-port`: Sets the port for the Algorand daemon. Defaults to `4001`.
 - `-i`, `--indexer-port`: Sets the port for the Algorand indexer. Defaults to `8980`.
 - `-k`, `--kmd-port`: Sets the port for the Algorand kmd. Defaults to `4002`.
 - `-n`, `--codespace-name`: Specifies the name of the codespace. Defaults to a random name with a timestamp.
-- `-t`, `--timeout`: Max duration for running the port forwarding process. Defaults to 1 hour. This timeout ensures the codespace **will automatically shut down** after the specified duration to prevent accidental overspending of free quota on GitHub Codespaces. [More details](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces).
-- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/template_content/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**.
+- `-t`, `--timeout`: Max duration for running the port forwarding process, in minutes. Defaults to 240 (4 hours). This timeout ensures the codespace **will automatically shut down** after the specified duration to prevent accidental overspending of free quota on GitHub Codespaces. [More details](https://docs.github.com/en/codespaces/setting-your-user-preferences/setting-your-timeout-period-for-github-codespaces).
+- `-r`, `--repo-url`: The URL of the repository to use. Defaults to the AlgoKit base template repository (`algorandfoundation/algokit-base-template`). The reason why algokit-base-template is used by default is due to [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/.devcontainer.json) which defines the scripts that take care of setting up AlgoKit CLI during container start. You can use any custom repo as a base, however it's important to ensure the reference [.devcontainer.json](https://github.com/algorandfoundation/algokit-base-template/blob/main/.devcontainer.json) file exists in your repository **otherwise there will be no ports to forward from the codespace**.
 - `--force`, `-f`: Force deletes stale codespaces and skips confirmation prompts. Defaults to explicitly prompting for confirmation.
 
 For more details about managing LocalNet in GitHub Codespaces, please refer to the [AlgoKit CLI reference documentation](/algokit-cli/cli/#codespace).

@@ -32,7 +32,7 @@ reset Remove all aliases.
 This command adds an address or account to be stored against a named alias. If the `--mnemonic` flag is used, it will prompt the user for a mnemonic phrase interactively using masked input. If the `--force` flag is used, it will allow overwriting an existing alias. Maximum number of aliases that can be stored at a time is 50.
 
 ```bash
-algokit wallet add [OPTIONS] ALIAS_NAME
+algokit task wallet add [OPTIONS] ALIAS_NAME
 ```
 
 > Please note, the command is not designed to be used in CI scope, there is no option to skip interactive masked input of the mnemonic, if you want to alias an `Account` (both private and public key) entity.
@@ -48,7 +48,7 @@ algokit wallet add [OPTIONS] ALIAS_NAME
 This command retrieves an address or account stored against a named alias.
 
 ```bash
-algokit wallet get ALIAS
+algokit task wallet get ALIAS
 ```
 
 ### List
@@ -56,7 +56,7 @@ algokit wallet get ALIAS
 This command lists all addresses and accounts stored against a named alias. If a record contains a `private_key` it will show a boolean flag indicating whether it exists, actual private key values are never exposed. As a user you can obtain the content of the stored aliases by navigating to your dedicated password manager (see [keyring details](https://pypi.org/project/keyring/)).
 
 ```bash
-algokit wallet list
+algokit task wallet list
 ```
 
 ### Remove
@@ -65,7 +65,7 @@ This command removes an address or account stored against a named alias.
 You must confirm the prompt interactively or pass `--force` | `-f` flag to ignore the prompt.
 
 ```bash
-algokit wallet remove ALIAS  [--force | -f]
+algokit task wallet remove ALIAS  [--force | -f]
 ```
 
 ### Reset
@@ -73,7 +73,7 @@ algokit wallet remove ALIAS  [--force | -f]
 This command removes all aliases. You must confirm the prompt interactively or pass `--force` | `-f` flag to ignore the prompt.
 
 ```bash
-algokit wallet reset [--force | -f]
+algokit task wallet reset [--force | -f]
 ```
 
 ## Keyring
